@@ -1,5 +1,6 @@
 # Example usage: python3 parser.py --debug --sp_description=local_data/planilhas_bsm/1_BSM_descrição.xlsx --output_folder=output/ --output_file=erros.txt
 
+# Libs
 import pandas as pd
 import os
 import re
