@@ -36,7 +36,7 @@ Instale os requerimentos
 Para executar o Adapra Parser, use o seguinte comando:
     
 ```bash
-python3 main.py --input_folder=input/
+python3 main.py --input_folder=input/espec/
 ```
 
 ### Testes

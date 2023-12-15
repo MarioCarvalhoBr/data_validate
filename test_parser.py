@@ -2,7 +2,7 @@ from myparser import verify_sp_description_parser
 from myparser import verify_structure_folder_files
 
 # Pasta raiz
-path_input = "input/"
+path_input = "input/espec/"
 # Planilhas que serão testadas: SUCESSO
 planilha_04_descricao = path_input + "4_descricao/descricao.xlsx"
 
