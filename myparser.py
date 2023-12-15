@@ -1,25 +1,54 @@
-# Example usage: python3 parser.py --sp_description=local_data/planilhas_bsm/1_BSM_descrição.xlsx
-
 # Libs
 import pandas as pd
 import os
 import re
-import argparse
-from datetime import datetime
 
-def main(args):
+import os
+
+def verify_structure_folder_files(path_folder):
+    # Estrutura esperada de pastas e arquivos
+    expected_structure = {
+        "3_cenarios_e_referencia_temporal": ["cenarios.xlsx", "referencia_temporal.xlsx"],
+        "4_descricao": ["descricao.xlsx"],
+        "5_composicao": ["composicao.xlsx"],
+        "8_valores": ["valores.xlsx"],
+        "9_proporcionalidades": ["proporcionalidades.xlsx"]
+    }
+
+    # Verifica se a pasta principal existe
+    if not os.path.exists(path_folder):
+        print(f"Pasta principal não encontrada: {path_folder}")
+        return False
+
+    # Verifica cada subpasta e seus arquivos
+    for subfolder, files in expected_structure.items():
+        subfolder_path = os.path.join(path_folder, subfolder)
+        if not os.path.exists(subfolder_path):
+            print(f"Subpasta não encontrada: {subfolder_path}")
+            return False
+
+        for file in files:
+            file_path = os.path.join(subfolder_path, file)
+            if not os.path.isfile(file_path):
+                print(f"Arquivo não encontrado: {file_path}")
+                return False
+
+    print("Estrutura de pastas e arquivos verificada com sucesso.")
+    return True
+
+def verify_sp_description_parser(path_sp_description):
     # Lista para armazenar os erros encontrados
     errors = []
     warnings = []
 
     # Teste 1: Verificar se o arquivo de entrada é .xlsx
-    if not args.sp_description.endswith('.xlsx'):
-        errors.append(f"ERRO: O arquivo {args.sp_description} de entrada não é .xlsx")
+    if not path_sp_description.endswith('.xlsx'):
+        errors.append(f"ERRO: O arquivo {path_sp_description} de entrada não é .xlsx")
 
     # Teste 2: Verificar se existe algum código HTML nas descrições simples
     try:
-        df = pd.read_excel(args.sp_description)
-        name_sp_description = os.path.basename(args.sp_description)
+        df = pd.read_excel(path_sp_description)
+        name_sp_description = os.path.basename(path_sp_description)
         # Converter o nome de todas as colunas para lowercase
         df.columns = df.columns.str.lower()
 
@@ -40,11 +69,13 @@ def main(args):
         warnings.append(f"{name_sp_description}: Coluna '{col}' será ignorada pois não está na especificação.")
 
 
-
+    is_correct = ""
     # Se a quantidade de erros é zero
     if len(errors) == 0:
+        is_correct = True
         print("SUCESSO: Nenhum erro encontrado.")
     else: 
+        is_correct = False
         # Se debug estiver ativado, printar os erros
         print("ERROS:")
         for error in errors:
@@ -63,12 +94,5 @@ def main(args):
     # Se a quantidade de avisos é zero
     if len(warnings) != 0:
         print(f"Total de {len(warnings)} avisos encontrados.")
-        
-        
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Verifica uma planilha .xlsx e reporta erros.")
-    parser.add_argument("--sp_description", type=str, required=True, help="Caminho para a planilha .xlsx.")
-    
-    args = parser.parse_args()
-    main(args)
+    return is_correct
