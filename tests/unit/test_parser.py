@@ -1,6 +1,10 @@
 from src.myparser import verify_sp_description_parser
 from src.myparser import verify_structure_folder_files
 
+# Import pytest
+import pytest
+print("pytest version:", pytest.__version__)
+
 # Pasta raiz
 path_input_data_ground_truth = "input_data/data_ground_truth"
 path_input_data_errors = "input_data/data_errors"
