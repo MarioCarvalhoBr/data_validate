@@ -1,12 +1,12 @@
-# Adapra Parser
+# Adapta Parser
 
 ## Introdução
-Bem-vindo ao repositório do Adapra Parser, uma ferramenta avançada para análise e validação de arquivos de planilhas, especialmente projetada para preparar e verificar dados antes de sua submissão à plataforma Adaptabrasil.
+Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análise e validação de arquivos de planilhas, especialmente projetada para preparar e verificar dados antes de sua submissão à plataforma Adaptabrasil.
 
 ## Características Técnicas
 
 ### Linguagem de Programação
-- **Python**: O Adapra Parser é desenvolvido em Python, aproveitando sua versatilidade e as extensas bibliotecas disponíveis para manipulação de dados.
+- **Python**: O Adapta Parser é desenvolvido em Python, aproveitando sua versatilidade e as extensas bibliotecas disponíveis para manipulação de dados.
 
 ### Dependências
 - **Pandas**: Utilizado para a leitura, manipulação e análise de dados em arquivos de planilhas.
@@ -33,7 +33,7 @@ Instale os requerimentos
 - **test_parser.py**: Script para testar o parser, garantindo a consistência e a confiabilidade dos resultados.
 
 ### Execução
-Para executar o Adapra Parser, use o seguinte comando:
+Para executar o Adapta Parser, use o seguinte comando:
     
 ```bash
 python3 main.py --input_folder=input_data/data_ground_truth/
