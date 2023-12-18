@@ -2,10 +2,33 @@
 import pandas as pd
 import os
 import re
+import openpyxl
+import language_tool_python
 
-import os
+def print_versions():
+    print("Pandas version:", pd.__version__)
+    print("Openpyxl version:", openpyxl.__version__)
+    print("LanguageTool version:", language_tool_python.__version__)
+
+def verify_ortography(path_folder):
+    '''
+    ├── 3_cenarios_e_referencia_temporal
+    │   ├── cenarios.xlsx: colunas: nome e descricao
+    │   └── referencia_temporal.xlsx: colunas:  nome e descricao
+    ├── 4_descricao
+    │   └── descricao.xlsx: colunas: nome_simples	nome_completo	desc_simples	desc_completa
+    ├── 5_composicao
+    │   └── composicao.xlsx
+    ├── 8_valores
+    │   └── valores.xlsx
+    └── 9_proporcionalidades
+        └── proporcionalidades.xlsx
+
+    '''
 
 def verify_structure_folder_files(path_folder):
+    errors = []
+    warnings = []
     # Estrutura esperada de pastas e arquivos
     expected_structure = {
         "3_cenarios_e_referencia_temporal": ["cenarios.xlsx", "referencia_temporal.xlsx"],
@@ -17,24 +40,24 @@ def verify_structure_folder_files(path_folder):
 
     # Verifica se a pasta principal existe
     if not os.path.exists(path_folder):
-        print(f"Pasta principal não encontrada: {path_folder}")
-        return False
+        errors.append(f"Pasta principal não encontrada: {path_folder}")
 
     # Verifica cada subpasta e seus arquivos
     for subfolder, files in expected_structure.items():
         subfolder_path = os.path.join(path_folder, subfolder)
         if not os.path.exists(subfolder_path):
-            print(f"Subpasta não encontrada: {subfolder_path}")
-            return False
+            errors.append(f"Subpasta não encontrada: {subfolder_path}")
 
         for file in files:
             file_path = os.path.join(subfolder_path, file)
             if not os.path.isfile(file_path):
-                print(f"Arquivo não encontrado: {file_path}")
-                return False
+                errors.append(f"Arquivo não encontrado: {file_path}")
 
-    print("Estrutura de pastas e arquivos verificada com sucesso.")
-    return True
+    is_correct = True
+    if len(errors) != 0:
+        is_correct = False
+
+    return is_correct, errors, warnings
 
 def verify_sp_description_parser(path_sp_description):
     # Lista para armazenar os erros encontrados
@@ -69,30 +92,9 @@ def verify_sp_description_parser(path_sp_description):
         warnings.append(f"{name_sp_description}: Coluna '{col}' será ignorada pois não está na especificação.")
 
 
-    is_correct = ""
+    is_correct = True
     # Se a quantidade de erros é zero
-    if len(errors) == 0:
-        is_correct = True
-        print("SUCESSO: Nenhum erro encontrado.")
-    else: 
+    if len(errors) != 0: 
         is_correct = False
-        # Se debug estiver ativado, printar os erros
-        print("ERROS:")
-        for error in errors:
-            print(error)
 
-    # Se a quantidade de avisos é zero
-    if len(warnings) != 0:
-        # Se debug estiver ativado, printar os avisos
-        print("\nAVISOS:")
-        for warning in warnings:
-            print(warning)
-    
-    if len(errors) != 0:
-        print(f"\nTotal de {len(errors)} erros encontrados.")
-
-    # Se a quantidade de avisos é zero
-    if len(warnings) != 0:
-        print(f"Total de {len(warnings)} avisos encontrados.")
-
-    return is_correct
+    return is_correct, errors, warnings

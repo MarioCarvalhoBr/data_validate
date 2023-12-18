@@ -36,13 +36,15 @@ Instale os requerimentos
 Para executar o Adapra Parser, use o seguinte comando:
     
 ```bash
-python3 main.py --input_folder=input/espec/
+python3 main.py --input_folder=input_data/data_ground_truth/
 ```
 
 ### Testes
-Execute `test_parser.py` para realizar testes automatizados, garantindo que o parser funcione conforme esperado em diferentes cenários de dados.
+Execute o código `test_parser.py` para realizar testes automatizados, garantindo que o parser funcione conforme esperado em diferentes cenários de dados.
 ```bash
-pytest test_parser.py
+pytest -v -s
+# Ou
+pytest tests/unit/test_parser.py -v
 ```
 
 ## Autores
