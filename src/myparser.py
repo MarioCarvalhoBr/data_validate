@@ -3,29 +3,84 @@ import pandas as pd
 import os
 import re
 import openpyxl
-import language_tool_python
 
+from src.util.spellchecker import verify_sintax_ortography
+    
 def print_versions():
     print("Pandas version:", pd.__version__)
     print("Openpyxl version:", openpyxl.__version__)
-    print("LanguageTool version:", language_tool_python.__version__)
 
-def verify_ortography(path_folder):
+
+def verify_spelling_text(path_folder, type_dict_spell):
+    # Lista para armazenar os erros encontrados
+    errors = []
+    warnings = []
     '''
+    Relação das colunas que devem ser aplicadas a verificação ortográfica:
     ├── 3_cenarios_e_referencia_temporal
     │   ├── cenarios.xlsx: colunas: nome e descricao
-    │   └── referencia_temporal.xlsx: colunas:  nome e descricao
+    │   └── referencia_temporal.xlsx: colunas: descricao
     ├── 4_descricao
-    │   └── descricao.xlsx: colunas: nome_simples	nome_completo	desc_simples	desc_completa
-    ├── 5_composicao
-    │   └── composicao.xlsx
-    ├── 8_valores
-    │   └── valores.xlsx
-    └── 9_proporcionalidades
-        └── proporcionalidades.xlsx
-
+    │   └── descricao.xlsx: colunas: nome_simples, nome_completo, desc_simples e desc_completa
     '''
+    path_sp_3_scenarios = os.path.join(path_folder, "3_cenarios_e_referencia_temporal", "cenarios.xlsx")
+    path_sp_3_reference = os.path.join(path_folder, "3_cenarios_e_referencia_temporal", "referencia_temporal.xlsx")
+    path_sp_4_description = os.path.join(path_folder, "4_descricao", "descricao.xlsx")
+    
+    df_scenarios = pd.read_excel(path_sp_3_scenarios)
+    df_reference = pd.read_excel(path_sp_3_reference)
+    df_description = pd.read_excel(path_sp_4_description)
+        
+    # Processar a verificação ortográfica: cenários
+    for index, row in df_scenarios.iterrows():
+        nome = row['nome']
+        descricao = row['descricao']
 
+        erros_encontrados_nome = verify_sintax_ortography(nome, type_dict_spell)
+        # Verfica se encontrou algum erro, se sim, insira na lista de erros e formate a mensagem: Palavras com possíveis erros ortográficos na planilha de cenários, linha x, coluna y
+        if len(erros_encontrados_nome) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de cenários, linha {index + 1}, coluna nome: {erros_encontrados_nome}")
+
+        erros_encontrados_descricao = verify_sintax_ortography(descricao, type_dict_spell)
+        if len(erros_encontrados_descricao) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de cenários, linha {index + 1}, coluna descricao: {erros_encontrados_descricao}")
+   
+    # Processar a verificação ortográfica: referência temporal
+    for index, row in df_reference.iterrows():
+        descricao = row['descricao']
+
+        erros_encontrados_descricao = verify_sintax_ortography(descricao, type_dict_spell)
+        if len(erros_encontrados_descricao) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de referência temporal, linha {index + 1}, coluna descricao: {erros_encontrados_descricao}")
+    # Processar a verificação ortográfica: descrição
+    for index, row in df_description.iterrows():
+        nome_simples = row['nome_simples']
+        nome_completo = row['nome_completo']
+        desc_simples = row['desc_simples']
+        desc_completa = row['desc_completa']
+
+        erros_encontrados_nome_simples = verify_sintax_ortography(nome_simples, type_dict_spell)
+        if len(erros_encontrados_nome_simples) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna nome_simples: {erros_encontrados_nome_simples}")
+        
+        erros_encontrados_nome_completo = verify_sintax_ortography(nome_completo, type_dict_spell)
+        if len(erros_encontrados_nome_completo) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna nome_completo: {erros_encontrados_nome_completo}")
+        
+        erros_encontrados_desc_simples = verify_sintax_ortography(desc_simples, type_dict_spell)
+        if len(erros_encontrados_desc_simples) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna desc_simples: {erros_encontrados_desc_simples}")
+            
+        erros_encontrados_desc_completa = verify_sintax_ortography(desc_completa, type_dict_spell)
+        if len(erros_encontrados_desc_completa) != 0:
+            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna desc_completa: {erros_encontrados_desc_completa}")
+       
+        
+    if len(errors) != 0:
+        return False, errors, warnings
+   
+    return True, errors, warnings
+    
 def verify_structure_folder_files(path_folder):
     errors = []
     warnings = []
