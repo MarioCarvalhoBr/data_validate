@@ -114,6 +114,40 @@ def verify_structure_folder_files(path_folder):
 
     return is_correct, errors, warnings
 
+def verify_sp_description_titles_uniques(path_sp_description):
+    errors = []
+    warnings = []
+
+    # Verificar se o arquivo de entrada é .xlsx
+    if not path_sp_description.endswith('.xlsx'):
+        errors.append(f"ERRO: O arquivo {path_sp_description} de entrada não é .xlsx")
+        return errors, warnings
+
+    try:
+        # Ler o arquivo .xlsx e preparar o DataFrame
+        df = pd.read_excel(path_sp_description)
+        df.columns = df.columns.str.lower()
+
+        # Limpar espaços em branco no início e no final das strings nas colunas específicas
+        for column in ['nome_simples', 'nome_completo']:
+            df[column] = df[column].str.strip()
+
+        # Verificar duplicatas em nome_simples e nome_completo
+        for column in ['nome_simples', 'nome_completo']:
+            if df[column].duplicated().any():
+                errors.append(f"{os.path.basename(path_sp_description)}: Existem {column.replace('_', ' ')} duplicados.")
+
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    is_correct = True
+    # Se a quantidade de erros é zero
+    if len(errors) != 0: 
+        is_correct = False
+
+    return is_correct, errors, warnings
+
+
 def verify_sp_description_parser(path_sp_description):
     # Lista para armazenar os erros encontrados
     errors = []

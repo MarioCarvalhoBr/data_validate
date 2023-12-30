@@ -5,10 +5,7 @@ from colorama import Fore, Back, Style
 import argparse
 import time
 
-from src.myparser import verify_sp_description_parser
-from src.myparser import verify_structure_folder_files
-from src.myparser import verify_spelling_text
-from src.myparser import print_versions
+from src.myparser import *
 from src.util.spellchecker import TypeDict
 
 if __name__ == "__main__":
@@ -61,6 +58,9 @@ if __name__ == "__main__":
         
         results_tests.append(["Issue #24: Ortografia", *(verify_spelling_text(path_input_folder, type_dict_spell))])
     
+    # verify_sp_description_titles_uniques
+    # # - Verificar nomes de colunas únicos
+    results_tests.append(["Issue #36: Títulos únicos", *(verify_sp_description_titles_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
     print(Fore.BLUE + Style.BRIGHT + "\n------ Verificação dos testes ------")
 
