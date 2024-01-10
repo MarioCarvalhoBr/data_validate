@@ -1,4 +1,4 @@
-from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques
+from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize
 from src.util.spellchecker import TypeDict
 
 # Import pytest
@@ -36,6 +36,12 @@ def test_true_verify_sp_description_titles_uniques(): # Teste true
     result_test,__,__ = verify_sp_description_titles_uniques(planilha_04_descricao)
     assert result_test is True
 
+# Arquivo issues/issues.txt
+# Testes: Issue #1: Padrão para nomes dos indicadores: verify_sp_description_text_capitalize
+def test_true_verify_sp_description_text_capitalize(): # Teste true
+    planilha_04_descricao = path_input_data_ground_truth + "/4_descricao/descricao.xlsx"
+    result_test,__,__ = verify_sp_description_text_capitalize(planilha_04_descricao)
+    assert result_test is True
 
 def test_verstion():
     print_versions()
