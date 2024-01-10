@@ -5,6 +5,7 @@ import re
 import openpyxl
 
 from src.util.spellchecker import verify_sintax_ortography
+from src.util.text_processor import capitalize_nouns_keep_articles_prepositions
     
 def print_versions():
     print("Pandas version:", pd.__version__)
@@ -39,11 +40,11 @@ def verify_spelling_text(path_folder, type_dict_spell):
         erros_encontrados_nome = verify_sintax_ortography(nome, type_dict_spell)
         # Verfica se encontrou algum erro, se sim, insira na lista de erros e formate a mensagem: Palavras com possíveis erros ortográficos na planilha de cenários, linha x, coluna y
         if len(erros_encontrados_nome) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de cenários, linha {index + 1}, coluna nome: {erros_encontrados_nome}")
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de cenários, linha {index + 1}, coluna nome: {erros_encontrados_nome}")
 
         erros_encontrados_descricao = verify_sintax_ortography(descricao, type_dict_spell)
         if len(erros_encontrados_descricao) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de cenários, linha {index + 1}, coluna descricao: {erros_encontrados_descricao}")
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de cenários, linha {index + 1}, coluna descricao: {erros_encontrados_descricao}")
    
     # Processar a verificação ortográfica: referência temporal
     for index, row in df_reference.iterrows():
@@ -51,7 +52,7 @@ def verify_spelling_text(path_folder, type_dict_spell):
 
         erros_encontrados_descricao = verify_sintax_ortography(descricao, type_dict_spell)
         if len(erros_encontrados_descricao) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de referência temporal, linha {index + 1}, coluna descricao: {erros_encontrados_descricao}")
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de referência temporal, linha {index + 1}, coluna descricao: {erros_encontrados_descricao}")
     # Processar a verificação ortográfica: descrição
     for index, row in df_description.iterrows():
         nome_simples = row['nome_simples']
@@ -61,24 +62,20 @@ def verify_spelling_text(path_folder, type_dict_spell):
 
         erros_encontrados_nome_simples = verify_sintax_ortography(nome_simples, type_dict_spell)
         if len(erros_encontrados_nome_simples) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna nome_simples: {erros_encontrados_nome_simples}")
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna nome_simples: {erros_encontrados_nome_simples}")
         
         erros_encontrados_nome_completo = verify_sintax_ortography(nome_completo, type_dict_spell)
         if len(erros_encontrados_nome_completo) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna nome_completo: {erros_encontrados_nome_completo}")
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna nome_completo: {erros_encontrados_nome_completo}")
         
         erros_encontrados_desc_simples = verify_sintax_ortography(desc_simples, type_dict_spell)
         if len(erros_encontrados_desc_simples) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna desc_simples: {erros_encontrados_desc_simples}")
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna desc_simples: {erros_encontrados_desc_simples}")
             
         erros_encontrados_desc_completa = verify_sintax_ortography(desc_completa, type_dict_spell)
         if len(erros_encontrados_desc_completa) != 0:
-            errors.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna desc_completa: {erros_encontrados_desc_completa}")
-       
-        
-    if len(errors) != 0:
-        return False, errors, warnings
-   
+            warnings.append(f"Palavras com possíveis erros ortográficos na planilha de descrição, linha {index + 1}, coluna desc_completa: {erros_encontrados_desc_completa}")
+    # Não há erros, apenas warnings
     return True, errors, warnings
     
 def verify_structure_folder_files(path_folder):
@@ -180,6 +177,46 @@ def verify_sp_description_parser(path_sp_description):
     for col in extra_columns:
         warnings.append(f"{name_sp_description}: Coluna '{col}' será ignorada pois não está na especificação.")
 
+
+    is_correct = True
+    # Se a quantidade de erros é zero
+    if len(errors) != 0: 
+        is_correct = False
+
+    return is_correct, errors, warnings
+
+def verify_sp_description_text_capitalize(path_sp_description):
+    # Lista para armazenar os erros encontrados
+    errors = []
+    warnings = []
+
+    # Teste 1: Verificar se o arquivo de entrada é .xlsx
+    if not path_sp_description.endswith('.xlsx'):
+        errors.append(f"ERRO: O arquivo {path_sp_description} de entrada não é .xlsx")
+
+    # Teste 2: Verificar se existe algum código HTML nas descrições simples
+    try:
+        df = pd.read_excel(path_sp_description)
+        name_sp_description = os.path.basename(path_sp_description)
+
+        for index, row in df.iterrows():
+            nome_simples = row['nome_simples']
+            nome_completo = row['nome_completo']
+            
+            # Verificar se o nome simples está no padrão
+            new_nome_simples = capitalize_nouns_keep_articles_prepositions(nome_simples)
+            if nome_simples != new_nome_simples:
+                # Apenas emitir um warning se o nome simples não estiver no padrão
+                warnings.append(f"{name_sp_description}: Nome simples na linha {index + 1} está fora do padrão. \nEsperado: \"{new_nome_simples}\" \nEncontrado: \"{nome_simples}\"")
+            
+            # Verificar se o nome completo está no padrão
+            new_nome_completo = capitalize_nouns_keep_articles_prepositions(nome_completo)
+            if nome_completo != new_nome_completo:
+                # Apenas emitir um warning se o nome completo não estiver no padrão
+                warnings.append(f"{name_sp_description}: Nome completo na linha {index + 1} está fora do padrão. \nEsperado: \"{new_nome_completo}\" \nEncontrado: \"{nome_completo}\"")
+                
+    except Exception as e:
+        errors.append(f"{name_sp_description}: Erro ao ler a coluna desc_simples do arquivo .xlsx: {e}")
 
     is_correct = True
     # Se a quantidade de erros é zero

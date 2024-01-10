@@ -86,6 +86,8 @@ Execute o código abaixo para realizar o lint do código.
 ```bash
 ruff myparser.py
 Ou
+ruff .
+Ou
 ruff --target-version=py310 .
 ```
 

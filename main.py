@@ -1,11 +1,11 @@
-# Example usage: python3 main.py --input_folder=input_data/data_ground_truth/
+# Example usage: python3 main.py --input_folder=input_data/data_ground_truth/ --no-spellchecker --type_dict=tiny --debug
 
 # Libs
 from colorama import Fore, Back, Style
 import argparse
 import time
 
-from src.myparser import *
+from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize
 from src.util.spellchecker import TypeDict
 
 if __name__ == "__main__":
@@ -44,7 +44,6 @@ if __name__ == "__main__":
     # 2 - Verifica se a planilha de descrição está correta
     results_tests.append(["Issue #5: Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
 
-    # verify_spelling_text
     # 3 - Verficar a ortografia
     if not args.no_spellchecker:
         # Mapear o argumento para o enum correspondente
@@ -58,10 +57,11 @@ if __name__ == "__main__":
         
         results_tests.append(["Issue #24: Ortografia", *(verify_spelling_text(path_input_folder, type_dict_spell))])
     
-    # verify_sp_description_titles_uniques
-    # # - Verificar nomes de colunas únicos
+    # 4 - Verificar nomes de colunas únicos
     results_tests.append(["Issue #36: Títulos únicos", *(verify_sp_description_titles_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
+    # 5 - Padrão para nomes dos indicadores #1
+    results_tests.append(["Issue #1: Padrão para nomes dos indicadores #1", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
     print(Fore.BLUE + Style.BRIGHT + "\n------ Verificação dos testes ------")
 
     for i, data_test in enumerate(results_tests):
@@ -74,14 +74,14 @@ if __name__ == "__main__":
             message_errors = "Erros: " + str(len(errors)) 
             # imprmir com uma cor vermelha
             print(Fore.RED + Style.BRIGHT + message_errors)
-            for error in errors:
-                print(Fore.RED + error)
+            for i_e, error in enumerate(errors):
+                print(Fore.RED + f"Erro {i_e+1}: " + error)
             
         message_warnings = "Avisos: " + str(len(warnings))
         #Imprmir de cor laranja
         print(Fore.YELLOW + Style.BRIGHT + message_warnings)
-        for warning in warnings:
-            print(Fore.YELLOW + warning)
+        for i_w, warning in enumerate(warnings):
+            print(Fore.YELLOW + f"Aviso {i_w+1}: " + warning)
     
     final_time = time.time()
     total_time = final_time - start_time
