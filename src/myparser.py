@@ -207,13 +207,13 @@ def verify_sp_description_text_capitalize(path_sp_description):
             new_nome_simples = capitalize_nouns_keep_articles_prepositions(nome_simples)
             if nome_simples != new_nome_simples:
                 # Apenas emitir um warning se o nome simples não estiver no padrão
-                warnings.append(f"{name_sp_description}: Nome simples na linha {index + 1} está fora do padrão. \nEsperado: \"{new_nome_simples}\" \nEncontrado: \"{nome_simples}\"")
+                warnings.append(f"{name_sp_description}: Nome simples na linha {index + 1} está fora do padrão. Esperado: \"{new_nome_simples}\" Encontrado: \"{nome_simples}\"")
             
             # Verificar se o nome completo está no padrão
             new_nome_completo = capitalize_nouns_keep_articles_prepositions(nome_completo)
             if nome_completo != new_nome_completo:
                 # Apenas emitir um warning se o nome completo não estiver no padrão
-                warnings.append(f"{name_sp_description}: Nome completo na linha {index + 1} está fora do padrão. \nEsperado: \"{new_nome_completo}\" \nEncontrado: \"{nome_completo}\"")
+                warnings.append(f"{name_sp_description}: Nome completo na linha {index + 1} está fora do padrão. Esperado: \"{new_nome_completo}\" Encontrado: \"{nome_completo}\"")
                 
     except Exception as e:
         errors.append(f"{name_sp_description}: Erro ao ler a coluna desc_simples do arquivo .xlsx: {e}")

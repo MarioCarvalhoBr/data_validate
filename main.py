@@ -33,16 +33,15 @@ if __name__ == "__main__":
         print("Modo debug ativado.")
         print_versions()
         print("\n")
-    
     start_time = time.time()
     print(Back.YELLOW + "Iniciando a verificação dos arquivos da pasta: " + path_input_folder)
     # Reset colorama
     print(Style.RESET_ALL)
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
-    results_tests.append(["Issue #39: Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
+    results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
     # 2 - Verifica se a planilha de descrição está correta
-    results_tests.append(["Issue #5: Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
 
     # 3 - Verficar a ortografia
     if not args.no_spellchecker:
@@ -55,37 +54,40 @@ if __name__ == "__main__":
         if args.type_dict not in ['tiny', 'full']:
             print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário tiny por padrão.")
         
-        results_tests.append(["Issue #24: Ortografia", *(verify_spelling_text(path_input_folder, type_dict_spell))])
+        results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", *(verify_spelling_text(path_input_folder, type_dict_spell))])
     
     # 4 - Verificar nomes de colunas únicos
-    results_tests.append(["Issue #36: Títulos únicos", *(verify_sp_description_titles_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(verify_sp_description_titles_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
     # 5 - Padrão para nomes dos indicadores #1
-    results_tests.append(["Issue #1: Padrão para nomes dos indicadores #1", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
     print(Fore.BLUE + Style.BRIGHT + "\n------ Verificação dos testes ------")
-
+    num_errors = 0
+    num_warnings = 0
     for i, data_test in enumerate(results_tests):
         name_test, is_correct, errors, warnings = data_test
         if is_correct:
-            print(Fore.BLUE + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Passou")
+            print(Fore.BLUE + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Passou.")
         else:
-            print(Fore.RED + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Falhou")
+            print(Fore.RED + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Falhou.")
         if not is_correct:
-            message_errors = "Erros: " + str(len(errors)) 
-            # imprmir com uma cor vermelha
-            print(Fore.RED + Style.BRIGHT + message_errors)
             for i_e, error in enumerate(errors):
-                print(Fore.RED + f"Erro {i_e+1}: " + error)
+                print(Fore.RED + error)
+                num_errors += 1
             
-        message_warnings = "Avisos: " + str(len(warnings))
-        #Imprmir de cor laranja
-        print(Fore.YELLOW + Style.BRIGHT + message_warnings)
         for i_w, warning in enumerate(warnings):
-            print(Fore.YELLOW + f"Aviso {i_w+1}: " + warning)
+            print(Fore.YELLOW + warning)
+            num_warnings += 1
+    
+    # Imprimir o número de erros e avisos
+    print(Fore.BLUE + Style.BRIGHT + "\nNúmero de erros: " + str(num_errors))
+    print(Fore.YELLOW + Style.BRIGHT + "Número de avisos: " + str(num_warnings))
     
     final_time = time.time()
     total_time = final_time - start_time
-    print(Fore.BLUE + Style.BRIGHT + "\nTempo total de execução: " + str(total_time))    
+    # Converter para 2 casas decimais
+    total_time = round(total_time, 1)
+    print(Fore.BLUE + Style.BRIGHT + "\nTempo total de execução: " + str(total_time) + " segundos")  
     # RESET COLORAMA
     print(Style.RESET_ALL)
     
