@@ -2,6 +2,7 @@
 local_data/
 test.py
 issues/
+TODO.md
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
