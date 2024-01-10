@@ -25,7 +25,7 @@ def test_true_verify_structure_folder_files(): # Teste true
     result_test,__,__ = verify_structure_folder_files(path_input_data_ground_truth)
     assert result_test is True
 def test_false_verify_structure_folder_files(): # Teste false
-    result_test,__,__ = verify_structure_folder_files(path_input_data_errors)
+    result_test,errors,warnings = verify_structure_folder_files(path_input_data_errors)
     assert result_test is False
     
 # Testes: Issue #24: Verificar ortografia
