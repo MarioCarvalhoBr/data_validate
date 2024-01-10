@@ -37,4 +37,8 @@ jobs:
       - name: Generate Coverage Report
         run: |
           coverage report -m
+      - name: Run main
+        run: |
+          python3 main.py --input_folder=input_data/data_ground_truth/ --no-spellchecker
+          python3 main.py --input_folder=input_data/data_errors/ --no-spellchecker
       

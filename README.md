@@ -18,7 +18,7 @@ Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análi
 Instale os requerimentos
 
 ```bash
-  pip install -r requeriments.txt
+  pip install -r requirements.txt
 ```
 
 ### Funcionalidades
@@ -39,12 +39,56 @@ Para executar o Adapta Parser, use o seguinte comando:
 python3 main.py --input_folder=input_data/data_ground_truth/
 ```
 
+#### Argumentos
+
+- `--input_folder` (obrigatório): Especifica o caminho para a pasta de entrada contendo os arquivos `.xlsx` a serem analisados. Este argumento é obrigatório e deve ser seguido pelo caminho da pasta.
+
+  Exemplo:
+  ```
+  --input_folder=caminho/para/pasta
+  ```
+
+- `--no-spellchecker`: Quando este argumento é usado, o script não executa a verificação ortográfica nos arquivos `.xlsx`. É útil se você deseja acelerar o processo de análise ou se a verificação ortográfica não é necessária.
+
+  Exemplo:
+  ```
+  --no-spellchecker
+  ```
+
+- `--type_dict` (padrão: `tiny`): Define qual dicionário ortográfico será utilizado durante a análise. As opções são `tiny` para um dicionário menor e mais rápido, ou `full` para um dicionário mais abrangente. Se não especificado, o padrão é `tiny`.
+Os dicionários estão localizados na pasta `dictionaries/`. Atualmente, contém apenas palavras para o idioma português na pasta `dictionaries/pt_BR/`, onde são armazenados os dicionários `tiny.txt` e `full.txt`.
+  Exemplos:
+  ```
+  --type_dict=tiny
+  --type_dict=full
+  ```
+
+- `--debug`: Executa o programa em modo de depuração. Isso pode incluir a impressão de mensagens de depuração adicionais, úteis para desenvolvimento ou diagnóstico de problemas.
+
+  Exemplo:
+  ```
+  --debug
+  ```
+
 ### Testes
 Execute o código `test_parser.py` para realizar testes automatizados, garantindo que o parser funcione conforme esperado em diferentes cenários de dados.
 ```bash
 pytest -v -s
 # Ou
 pytest tests/unit/test_parser.py -v
+# Ou
+coverage run -m pytest tests/unit/test_parser.py -v 
+coverage report -m
+```
+
+### Lint com ruff 
+Execute o código abaixo para realizar o lint do código.
+```bash
+ruff myparser.py
+Ou
+ruff .
+Ou
+ruff --target-version=py310 .
 ```
 
 ## Autores

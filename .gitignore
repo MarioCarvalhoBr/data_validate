@@ -1,7 +1,16 @@
+
+local_data/
+test.py
+issues/
+TODO.md
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
+
+# Ruff stuff
+*.ruff_cache/
 
 # C extensions
 *.so
@@ -118,6 +127,3 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
-
-
-local_data/
