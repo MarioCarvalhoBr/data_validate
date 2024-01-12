@@ -58,22 +58,35 @@ def run(path_sp_description, path_ps_composition):
     # Execução do script
     descricao = ler_planilhas(path_sp_description)
     composicao = ler_planilhas(path_ps_composition)
+    name_file_description = path_sp_description.split("/")[-1]
+    name_file_composition = path_ps_composition.split("/")[-1]
     
     codigos_faltantes = verificar_codigos(descricao, composicao)
     if codigos_faltantes:
-        errors.append("Códigos ausentes na planilha de descrição: " + str(codigos_faltantes))
+        # Remove '{}'
+        codigos_faltantes = str(codigos_faltantes)[1:-1]
+        # Remove ''
+        codigos_faltantes = codigos_faltantes.replace("'", "")
+        errors.append(f"Códigos dos indicadores do arquivo {name_file_composition} ausentes no arquivo {name_file_description}: [{str(codigos_faltantes)}]")
         is_valid = False
 
     G = montar_grafo(composicao)
     existe_ciclo, ciclo = verificar_ciclos(G)
     if existe_ciclo:
-        errors.append("Ciclo encontrado: " + str(ciclo))
+        # errors.append("Ciclo encontrado: " + str(ciclo))
+        # Imprimir o Ciclo na forma XXXX->XXXX->XXXX e YYYY->YYYY->YYYY
+        text_graph = ""
+        for origem, destino in ciclo:
+            text_graph += f"{origem} -> {destino}, "
+        # remove the last comma
+        text_graph = text_graph[:-2]
+        errors.append(f"Ciclo encontrado no arquivo {name_file_composition}: [{text_graph}]")
         is_valid = False
 
     grafos_desconectados = verificar_grafos_desconectados(G)
     if grafos_desconectados:
         is_valid = False        
         for i, sg in enumerate(grafos_desconectados, 1):
-            errors.append("Grafos desconectados encontrados: Grafo " + str(i) + ": [" + imprimir_grafo(sg) + "]")
+            errors.append("Indicadores desconectados encontrados: Indicadores " + str(i) + ": [" + imprimir_grafo(sg) + "]")
     
     return is_valid, errors, warnings
