@@ -43,7 +43,7 @@ if __name__ == "__main__":
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
     # 2 - Hierarquia como grafo conexo #2
-    results_tests.append([("Issue #2: " if is_degug else "") +"Hierarquia como grafo conexo", *(verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))])
+    results_tests.append([("Issue #2: " if is_degug else "") +"Relações entre indicadores", *(verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))])
     
     # 3 - Verifica se a planilha de descrição está correta
     results_tests.append([("Issue #5: " if is_degug else "") +"Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
