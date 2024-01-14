@@ -6,10 +6,15 @@ import openpyxl
 
 from src.util.spellchecker import verify_sintax_ortography
 from src.util.text_processor import capitalize_nouns_keep_articles_prepositions
+import src.util.graph as graph
     
 def print_versions():
+    print("\nPackages versions:")
+    print("Colorama version:", __import__('colorama').__version__)
+    print("Python version:", os.sys.version)
     print("Pandas version:", pd.__version__)
     print("Openpyxl version:", openpyxl.__version__)
+    return True
 
 
 def verify_spelling_text(path_folder, type_dict_spell):
@@ -224,3 +229,6 @@ def verify_sp_description_text_capitalize(path_sp_description):
         is_correct = False
 
     return is_correct, errors, warnings
+
+def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
+    return graph.run(path_sp_description, path_ps_composition)

@@ -5,7 +5,7 @@ from colorama import Fore, Back, Style
 import argparse
 import time
 
-from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize
+from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize, verify_graph_sp_description_composition
 from src.util.spellchecker import TypeDict
 
 if __name__ == "__main__":
@@ -35,15 +35,20 @@ if __name__ == "__main__":
         print("\n")
     start_time = time.time()
     print(Back.YELLOW + "Iniciando a verificação dos arquivos da pasta: " + path_input_folder)
+    
     # Reset colorama
     print(Style.RESET_ALL)
+    
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
-    # 2 - Verifica se a planilha de descrição está correta
+    # 2 - Hierarquia como grafo conexo #2
+    results_tests.append([("Issue #2: " if is_degug else "") +"Relações entre indicadores", *(verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))])
+    
+    # 3 - Verifica se a planilha de descrição está correta
     results_tests.append([("Issue #5: " if is_degug else "") +"Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
 
-    # 3 - Verficar a ortografia
+    # 4 - Verficar a ortografia
     if not args.no_spellchecker:
         # Mapear o argumento para o enum correspondente
         type_dict_spell = TypeDict.TINY
@@ -56,11 +61,12 @@ if __name__ == "__main__":
         
         results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", *(verify_spelling_text(path_input_folder, type_dict_spell))])
     
-    # 4 - Verificar nomes de colunas únicos
+    # 5 - Verificar nomes de colunas únicos
     results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(verify_sp_description_titles_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
-    # 5 - Padrão para nomes dos indicadores #1
+    # 6 - Padrão para nomes dos indicadores #1
     results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    
     print(Fore.BLUE + Style.BRIGHT + "\n------ Verificação dos testes ------")
     num_errors = 0
     num_warnings = 0
