@@ -39,6 +39,7 @@ if __name__ == "__main__":
     # Reset colorama
     print(Style.RESET_ALL)
     
+    # is_correct, errors, warnings = 
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
@@ -73,9 +74,9 @@ if __name__ == "__main__":
     for i, data_test in enumerate(results_tests):
         name_test, is_correct, errors, warnings = data_test
         if is_correct:
-            print(Fore.BLUE + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Passou.")
+            print(Fore.BLUE + Style.BRIGHT + "\nVerificação: " + name_test)
         else:
-            print(Fore.RED + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Falhou.")
+            print(Fore.RED + Style.BRIGHT + "\nVerificação: " + name_test)
         if not is_correct:
             for i_e, error in enumerate(errors):
                 print(Fore.RED + error)
