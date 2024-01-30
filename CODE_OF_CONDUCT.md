@@ -17,6 +17,17 @@ a:
 - conferir arquivos que serão incluídos (_staged_)
 - mensagem de _commit_.
 
+
+## Configuração inicialdo git.name e git.email
+```bash
+git config --global user.name "Seu Nome"
+git config --global user.email "seu@email.com"
+```
+Para ver as configurações
+```bash
+git config --list
+```
+
 ## Primeiro _pull_ então _commit_ depois _push_
 
 A simples execução do comando `git pull` evita _merges_ desnecessários que
