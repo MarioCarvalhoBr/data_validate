@@ -69,6 +69,8 @@ if __name__ == "__main__":
     results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
     print(Fore.WHITE + Style.BRIGHT + "\n------ Verificação dos testes ------")
+    # Reset colorama
+    print(Style.RESET_ALL)
     num_errors = 0
     num_warnings = 0
     for i, data_test in enumerate(results_tests):
@@ -86,10 +88,10 @@ if __name__ == "__main__":
             print(Fore.YELLOW + warning)
             num_warnings += 1
     
+    # Reset colorama
+    print(Style.RESET_ALL)
+
     # Imprimir o número de erros e avisos
-    '''
-    devem ser coloridas apenas quando os valores forem diferentes de zero. Quando o numero de erros for maior que zero a linha tem que ficar da mesma cor de um erro. Quando o numero de avisos for maior do que zero a linha tem que ficar da mesma cor de um aviso. Quando não tiver erro ou aviso deve ficar branco.
-    '''
     color = Fore.WHITE + Style.BRIGHT
     if num_errors > 0:
         color = Fore.RED + Style.BRIGHT
