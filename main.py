@@ -36,9 +36,6 @@ if __name__ == "__main__":
     start_time = time.time()
     print(Fore.WHITE + Style.BRIGHT +  "\nIniciando a verificação dos arquivos da pasta: " + path_input_folder)
     
-    # Reset colorama
-    print(Style.RESET_ALL)
-    
     # is_correct, errors, warnings = 
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
@@ -69,8 +66,7 @@ if __name__ == "__main__":
     results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
     print(Fore.WHITE + Style.BRIGHT + "\n------ Verificação dos testes ------")
-    # Reset colorama
-    print(Style.RESET_ALL)
+
     num_errors = 0
     num_warnings = 0
     for i, data_test in enumerate(results_tests):
@@ -87,9 +83,6 @@ if __name__ == "__main__":
         for i_w, warning in enumerate(warnings):
             print(Fore.YELLOW + warning)
             num_warnings += 1
-    
-    # Reset colorama
-    print(Style.RESET_ALL)
 
     # Imprimir o número de erros e avisos
     color = Fore.WHITE + Style.BRIGHT
