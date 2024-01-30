@@ -87,8 +87,16 @@ if __name__ == "__main__":
             num_warnings += 1
     
     # Imprimir o número de erros e avisos
-    print(Fore.YELLOW + Style.BRIGHT + "\nNúmero de erros: " + str(num_errors))
-    print(Fore.YELLOW + Style.BRIGHT + "Número de avisos: " + str(num_warnings))
+    '''
+    devem ser coloridas apenas quando os valores forem diferentes de zero. Quando o numero de erros for maior que zero a linha tem que ficar da mesma cor de um erro. Quando o numero de avisos for maior do que zero a linha tem que ficar da mesma cor de um aviso. Quando não tiver erro ou aviso deve ficar branco.
+    '''
+    color = Fore.WHITE + Style.BRIGHT
+    if num_errors > 0:
+        color = Fore.RED + Style.BRIGHT
+    print(color + "\nNúmero de erros: " + str(num_errors))
+    if num_warnings > 0:
+        color = Fore.YELLOW + Style.BRIGHT
+    print(color + "Número de avisos: " + str(num_warnings))
     
     final_time = time.time()
     total_time = final_time - start_time
