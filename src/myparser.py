@@ -34,9 +34,23 @@ def verify_spelling_text(path_folder, type_dict_spell):
     path_sp_4_description = os.path.join(path_folder, "4_descricao", "descricao.xlsx")
     
     df_scenarios = pd.read_excel(path_sp_3_scenarios)
+    # Verifica se o arquivo foi aberto com sucesso
+    if df_scenarios.empty:
+        errors.append(f"Erro ao abrir o arquivo {path_sp_3_scenarios}.")
+        return False, errors, warnings
+    
     df_reference = pd.read_excel(path_sp_3_reference)
+    # Verifica se o arquivo foi aberto com sucesso
+    if df_reference.empty:
+        errors.append(f"Erro ao abrir o arquivo {path_sp_3_reference}.")
+        return False, errors, warnings
+    
     df_description = pd.read_excel(path_sp_4_description)
-        
+    # Verifica se o arquivo foi aberto com sucesso
+    if df_description.empty:
+        errors.append(f"Erro ao abrir o arquivo {path_sp_4_description}.")
+        return False, errors, warnings
+    
     # Processar a verificação ortográfica: cenários
     for index, row in df_scenarios.iterrows():
         nome = row['nome']

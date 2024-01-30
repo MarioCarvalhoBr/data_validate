@@ -34,11 +34,12 @@ if __name__ == "__main__":
         print_versions()
         print("\n")
     start_time = time.time()
-    print(Back.YELLOW + "Iniciando a verificação dos arquivos da pasta: " + path_input_folder)
+    print(Fore.WHITE + Style.BRIGHT +  "\nIniciando a verificação dos arquivos da pasta: " + path_input_folder)
     
     # Reset colorama
     print(Style.RESET_ALL)
     
+    # is_correct, errors, warnings = 
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
@@ -46,7 +47,7 @@ if __name__ == "__main__":
     results_tests.append([("Issue #2: " if is_degug else "") +"Relações entre indicadores", *(verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))])
     
     # 3 - Verifica se a planilha de descrição está correta
-    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
 
     # 4 - Verficar a ortografia
     if not args.no_spellchecker:
@@ -67,15 +68,15 @@ if __name__ == "__main__":
     # 6 - Padrão para nomes dos indicadores #1
     results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
-    print(Fore.BLUE + Style.BRIGHT + "\n------ Verificação dos testes ------")
+    print(Fore.WHITE + Style.BRIGHT + "\n------ Verificação dos testes ------")
     num_errors = 0
     num_warnings = 0
     for i, data_test in enumerate(results_tests):
         name_test, is_correct, errors, warnings = data_test
         if is_correct:
-            print(Fore.BLUE + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Passou.")
+            print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
         else:
-            print(Fore.RED + Style.BRIGHT + "\nVerificação: " + name_test + " - " + "Falhou.")
+            print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
         if not is_correct:
             for i_e, error in enumerate(errors):
                 print(Fore.RED + error)
@@ -86,7 +87,7 @@ if __name__ == "__main__":
             num_warnings += 1
     
     # Imprimir o número de erros e avisos
-    print(Fore.BLUE + Style.BRIGHT + "\nNúmero de erros: " + str(num_errors))
+    print(Fore.YELLOW + Style.BRIGHT + "\nNúmero de erros: " + str(num_errors))
     print(Fore.YELLOW + Style.BRIGHT + "Número de avisos: " + str(num_warnings))
     
     final_time = time.time()
