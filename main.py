@@ -47,7 +47,7 @@ if __name__ == "__main__":
     results_tests.append([("Issue #2: " if is_degug else "") +"Relações entre indicadores", *(verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))])
     
     # 3 - Verifica se a planilha de descrição está correta
-    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos html nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
 
     # 4 - Verficar a ortografia
     if not args.no_spellchecker:
@@ -74,9 +74,9 @@ if __name__ == "__main__":
     for i, data_test in enumerate(results_tests):
         name_test, is_correct, errors, warnings = data_test
         if is_correct:
-            print(Fore.BLUE + Style.BRIGHT + "\nVerificação: " + name_test)
+            print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
         else:
-            print(Fore.RED + Style.BRIGHT + "\nVerificação: " + name_test)
+            print(Fore.RED + Style.BRIGHT + "Verificação: " + name_test)
         if not is_correct:
             for i_e, error in enumerate(errors):
                 print(Fore.RED + error)
