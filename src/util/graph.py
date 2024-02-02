@@ -75,7 +75,7 @@ def run(path_sp_description, path_ps_composition):
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"Códigos dos indicadores do arquivo {name_file_composition} ausentes no arquivo {name_file_description}: [{str(codigos_faltantes)}]")
+        errors.append(f"{name_file_description}: Indicadores do arquivo {name_file_composition} ausentes no arquivo {name_file_description}: [{str(codigos_faltantes)}]")
         is_valid = False
     
     codigos_faltantes = []
@@ -85,7 +85,7 @@ def run(path_sp_description, path_ps_composition):
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"Códigos dos indicadores do arquivo {name_file_description} ausentes no arquivo {name_file_composition}: [{str(codigos_faltantes)}]")
+        errors.append(f"{name_file_composition}: Indicadores do arquivo {name_file_description} ausentes no arquivo {name_file_composition}: [{str(codigos_faltantes)}]")
         is_valid = False
 
     G = montar_grafo(composicao)
@@ -98,13 +98,13 @@ def run(path_sp_description, path_ps_composition):
             text_graph += f"{origem} -> {destino}, "
         # remove the last comma
         text_graph = text_graph[:-2]
-        errors.append(f"Ciclo encontrado no arquivo {name_file_composition}: [{text_graph}]")
+        errors.append(f"{name_file_composition}: Ciclo encontrado no arquivo {name_file_composition}: [{text_graph}]")
         is_valid = False
 
     grafos_desconectados = verificar_grafos_desconectados(G)
     if grafos_desconectados:
         is_valid = False        
         for i, sg in enumerate(grafos_desconectados, 1):
-            errors.append("Indicadores desconectados encontrados: Indicadores " + str(i) + ": [" + imprimir_grafo(sg) + "]")
+            errors.append(f"{name_file_composition}: Indicadores desconectados encontrados: Indicadores " + str(i) + ": [" + imprimir_grafo(sg) + "]")
     
     return is_valid, errors, warnings
