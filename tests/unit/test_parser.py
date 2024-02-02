@@ -1,11 +1,14 @@
-from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize, verify_graph_sp_description_composition
+from src.myparser import verify_structure_folder_files
+from src.myparser import verify_sp_description_parser
+from src.myparser import verify_spelling_text
+from src.myparser import verify_sp_description_titles_uniques
+from src.myparser import verify_sp_description_text_capitalize
+from src.myparser import verify_graph_sp_description_composition
+
 from src.util.spellchecker import TypeDict
+import src.util.libraries_versions as lv
 
-# Import pytest
-import pytest
-print("pytest version:", pytest.__version__)
-
-# Pasta raiz
+# Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"
 path_input_data_errors = "input_data/data_errors"
 
@@ -59,7 +62,7 @@ def test_false_verify_sp_description_text_capitalize(): # Teste false
     __,__,warnings = verify_sp_description_text_capitalize(planilha_04_descricao)
     assert len(warnings) > 0
 
-# Testes: 6 - Hierarquia como grafo conexo #2
+# Testes: 6 - Hierarquia como grafo conexo
 def test_true_verify_graph_sp_description_composition(): # Teste true
     planilha_04_descricao = path_input_data_ground_truth + "/4_descricao/descricao.xlsx"
     planilha_05_composicao = path_input_data_ground_truth + "/5_composicao/composicao.xlsx"
@@ -72,5 +75,5 @@ def test_false_verify_graph_sp_description_composition(): # Teste false
     assert result_test is False
     
 def test_verstion():
-    ret = print_versions()
+    ret = lv.print_versions()
     assert ret is True

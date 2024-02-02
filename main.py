@@ -5,8 +5,10 @@ from colorama import Fore, Back, Style
 import argparse
 import time
 
-from src.myparser import print_versions, verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize, verify_graph_sp_description_composition
+from src.myparser import verify_structure_folder_files, verify_sp_description_parser, verify_spelling_text, verify_sp_description_titles_uniques, verify_sp_description_text_capitalize, verify_graph_sp_description_composition
 from src.util.spellchecker import TypeDict
+import src.util.libraries_versions as lv
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Analizador de arquivos .xlsx.")
@@ -30,9 +32,9 @@ if __name__ == "__main__":
     
     is_degug = args.debug
     if is_degug:
-        print("Modo debug ativado.")
-        print_versions()
-        print("\n")
+        print("\nModo debug ativado.")
+        lv.print_versions()
+
     start_time = time.time()
     print("\n")
     print(Fore.WHITE + Style.BRIGHT +  "Iniciando a verificação dos arquivos da pasta: " + path_input_folder)
