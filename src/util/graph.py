@@ -6,12 +6,20 @@ def ler_planilhas(path):
     planilha = pd.read_excel(path)
     return planilha
 
-def verificar_codigos(descricao, composicao):
+def verificar_codigos_ausentes_desc_comp(descricao, composicao):
     codigos_descricao = set(descricao['codigo'].astype(str))
     codigos_pai = set(composicao['codigo_pai'].astype(str))
     codigos_filho = set(composicao['codigo_filho'].astype(str))
 
     codigos_faltantes = (codigos_pai.union(codigos_filho) - codigos_descricao) - {'0'}
+    return codigos_faltantes
+
+def verificar_codigos_ausentes_comp_desc(composicao, descricao):
+    codigos_descricao = set(descricao['codigo'].astype(str))
+    codigos_pai = set(composicao['codigo_pai'].astype(str))
+    codigos_filho = set(composicao['codigo_filho'].astype(str))
+
+    codigos_faltantes = (codigos_descricao - codigos_pai.union(codigos_filho)) - {'0'}
     return codigos_faltantes
 
 
@@ -61,13 +69,23 @@ def run(path_sp_description, path_ps_composition):
     name_file_description = path_sp_description.split("/")[-1]
     name_file_composition = path_ps_composition.split("/")[-1]
     
-    codigos_faltantes = verificar_codigos(descricao, composicao)
+    codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
     if codigos_faltantes:
         # Remove '{}'
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
         errors.append(f"Códigos dos indicadores do arquivo {name_file_composition} ausentes no arquivo {name_file_description}: [{str(codigos_faltantes)}]")
+        is_valid = False
+    
+    codigos_faltantes = []
+    codigos_faltantes = verificar_codigos_ausentes_comp_desc(composicao, descricao)
+    if codigos_faltantes:
+        # Remove '{}'
+        codigos_faltantes = str(codigos_faltantes)[1:-1]
+        # Remove ''
+        codigos_faltantes = codigos_faltantes.replace("'", "")
+        errors.append(f"Códigos dos indicadores do arquivo {name_file_description} ausentes no arquivo {name_file_composition}: [{str(codigos_faltantes)}]")
         is_valid = False
 
     G = montar_grafo(composicao)
