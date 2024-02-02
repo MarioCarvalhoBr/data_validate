@@ -4,6 +4,7 @@ from src.myparser import verify_spelling_text
 from src.myparser import verify_sp_description_titles_uniques
 from src.myparser import verify_sp_description_text_capitalize
 from src.myparser import verify_graph_sp_description_composition
+from src.myparser import verify_ids_sp_description_values
 
 from src.util.spellchecker import TypeDict
 import src.util.libraries_versions as lv
@@ -73,7 +74,19 @@ def test_false_verify_graph_sp_description_composition(): # Teste false
     planilha_05_composicao = path_input_data_errors + "/5_composicao/composicao.xlsx"
     result_test,__,__ = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
     assert result_test is False
-    
+
+# Testes: Issue #59: Relações entre indicadores da planilha de valores
+def test_true_verify_ids_sp_description_values(): # Teste true
+    planilha_04_descricao = path_input_data_ground_truth + "/4_descricao/descricao.xlsx"
+    planilha_08_valores = path_input_data_ground_truth + "/8_valores/valores.xlsx"
+    result_test,__,__ = verify_ids_sp_description_values(planilha_04_descricao, planilha_08_valores)
+    assert result_test is True
+def test_false_verify_ids_sp_description_values(): # Teste false
+    planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
+    planilha_08_valores = path_input_data_errors + "/8_valores/valores.xlsx"
+    result_test,__,__ = verify_ids_sp_description_values(planilha_04_descricao, planilha_08_valores)
+    assert result_test is False
+
 def test_verstion():
     ret = lv.print_versions()
     assert ret is True

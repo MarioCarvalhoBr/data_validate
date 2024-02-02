@@ -71,18 +71,27 @@ Os dicionários estão localizados na pasta `dictionaries/`. Atualmente, contém
   ```
 
 ### Testes
+#### Instalando o coverage
+```bash
+pip install coverage
+```
 Execute o código `test_parser.py` para realizar testes automatizados, garantindo que o parser funcione conforme esperado em diferentes cenários de dados.
 ```bash
 pytest -v -s
 # Ou
 pytest tests/unit/test_parser.py -v
 # Ou
+coverage run -m pytest  -v -s
 coverage run -m pytest tests/unit/test_parser.py -v 
 coverage report -m
 ```
 
 ### Lint com ruff 
-Execute o código abaixo para realizar o lint do código.
+#### Instalando  o ruff
+```bash
+pip install ruff
+```
+#### Execute o código abaixo para realizar o lint do código.
 ```bash
 ruff myparser.py
 Ou

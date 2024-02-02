@@ -2,12 +2,11 @@
 import pandas as pd
 import os
 import re
-import openpyxl
 
 from src.util.spellchecker import verify_sintax_ortography
 from src.util.text_processor import capitalize_nouns_keep_articles_prepositions
 import src.util.graph as graph
-
+import src.util.sp_values as sp_values
 def verify_spelling_text(path_folder, type_dict_spell):
     # Lista para armazenar os erros encontrados
     errors = []
@@ -237,3 +236,7 @@ def verify_sp_description_text_capitalize(path_sp_description):
 
 def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
     return graph.run(path_sp_description, path_ps_composition)
+
+def verify_ids_sp_description_values(path_sp_description, path_sp_values):
+    is_correct, errors, warnings = sp_values.run(path_sp_description, path_sp_values)
+    return is_correct, errors, warnings
