@@ -8,6 +8,8 @@ O  dicionário utilizado foi baixado do site: https://www.ime.usp.br/~pf/dicios/
 Mensagem: 
 close #numero_da_issue: descrição do commit
 
-# Verificar indicadores do arquivo descricao.xlsx ausentes no arquivo composicao.xlsx 
+# Exemplo:
+Contagem de erros e warnings #46
+
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #52: Check indicators from the file descricao.xlsx missing in the file composicao.xlsx
+close #46: Count errors and warnings
