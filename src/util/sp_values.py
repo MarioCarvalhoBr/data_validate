@@ -31,7 +31,7 @@ def compare_ids(id_description, id_values, name_sp_description, name_sp_values):
     
     return errors
 
-def run(path_sp_description, path_sp_values):
+def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     errors = []
     warnings = []
 

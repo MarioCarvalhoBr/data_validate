@@ -51,10 +51,13 @@ if __name__ == "__main__":
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
     # 2 - Hierarquia como grafo conexo #2
-    results_tests.append([("Issue #2: " if is_degug else "") +"Relações entre indicadores", *(verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))])
-    
-    # 2.2 - Verificar indicadores dos arquivos descricao.xlsx ausentes em valores.xlsx, e vice-versa #59
-    results_tests.append([("Issue #59: " if is_degug else "") +"Relações entre indicadores da planilha de valores", *(verify_ids_sp_description_values(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/8_valores/valores.xlsx"))])
+    is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))
+    is_correct_val2desc, errors_val2desc, warnings_val2desc = (verify_ids_sp_description_values(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/8_valores/valores.xlsx"))
+    # 2.1 - Concatenar os resultados
+    is_correct = is_correct_comp2desc and is_correct_val2desc
+    errors = errors_comp2desc + errors_val2desc
+    warnings = warnings_comp2desc + warnings_val2desc
+    results_tests.append([("Issue #2 e 59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
     
     # 3 - Verifica se a planilha de descrição está correta
     results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
