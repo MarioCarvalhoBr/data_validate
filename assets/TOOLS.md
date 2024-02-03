@@ -9,7 +9,7 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Contagem de erros e warnings #46
+Issue: Verificação: Relações entre indicadores da planilha de valores #59
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #46: Count errors and warnings
+close #59: Check relationships between indicators in the value spreadsheet

@@ -1,8 +1,9 @@
-from src.myparser import verify_structure_folder_files
-from src.myparser import verify_sp_description_parser
-from src.myparser import verify_sp_description_titles_uniques
-from src.myparser import verify_sp_description_text_capitalize
-from src.myparser import verify_graph_sp_description_composition
+from src.orchestrator import verify_structure_folder_files
+from src.orchestrator import verify_sp_description_parser
+from src.orchestrator import verify_sp_description_titles_uniques
+from src.orchestrator import verify_sp_description_text_capitalize
+from src.orchestrator import verify_graph_sp_description_composition
+from src.orchestrator import verify_ids_sp_description_values
 
 # Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"
@@ -50,5 +51,15 @@ def test_count_errors_verify_graph_sp_description_composition(): # Teste false
     is_correct, errors, warnings = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
     # Numero de erros esperado == 4
     assert len(errors) == 4
+    # Numero de warnings esperado == 0
+    assert len(warnings) == 0
+
+# Testes: 2.2 - Verificar indicadores dos arquivos descricao.xlsx ausentes em valores.xlsx, e vice-versa
+def test_count_errors_verify_ids_sp_description_values(): # Teste false
+    planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
+    planilha_08_valores = path_input_data_errors + "/8_valores/valores.xlsx"
+    is_correct, errors, warnings = verify_ids_sp_description_values(planilha_04_descricao, planilha_08_valores)
+    # Numero de erros esperado == 2
+    assert len(errors) == 2
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
