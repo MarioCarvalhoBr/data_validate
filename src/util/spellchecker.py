@@ -13,7 +13,8 @@ def load_dictionary(path):
 
 def preprocess_text(text):
     text = re.split("Fontes:|Fonte:", text)[0]
-    text = re.sub('<.*?>|\\(.*?\\)|[^\w\s]|\d+', '', text)
+    text = re.sub(r'<.*?>|\(.*?\)|[^\w\s]|\d+', '', text)
+
     return text
 
 def find_spelling_errors(text, dictionary):
