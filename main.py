@@ -5,13 +5,13 @@ from colorama import Fore, Style
 import argparse
 import time
 
-from src.myparser import verify_structure_folder_files
-from src.myparser import verify_sp_description_parser
-from src.myparser import verify_spelling_text
-from src.myparser import verify_sp_description_titles_uniques
-from src.myparser import verify_sp_description_text_capitalize
-from src.myparser import verify_graph_sp_description_composition
-from src.myparser import verify_ids_sp_description_values
+from src.orchestrator import verify_structure_folder_files
+from src.orchestrator import verify_sp_description_parser
+from src.orchestrator import verify_spelling_text
+from src.orchestrator import verify_sp_description_titles_uniques
+from src.orchestrator import verify_sp_description_text_capitalize
+from src.orchestrator import verify_graph_sp_description_composition
+from src.orchestrator import verify_ids_sp_description_values
 from src.util.spellchecker import TypeDict
 import src.util.libraries_versions as lv
 

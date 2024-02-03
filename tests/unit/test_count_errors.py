@@ -1,9 +1,9 @@
-from src.myparser import verify_structure_folder_files
-from src.myparser import verify_sp_description_parser
-from src.myparser import verify_sp_description_titles_uniques
-from src.myparser import verify_sp_description_text_capitalize
-from src.myparser import verify_graph_sp_description_composition
-from src.myparser import verify_ids_sp_description_values
+from src.orchestrator import verify_structure_folder_files
+from src.orchestrator import verify_sp_description_parser
+from src.orchestrator import verify_sp_description_titles_uniques
+from src.orchestrator import verify_sp_description_text_capitalize
+from src.orchestrator import verify_graph_sp_description_composition
+from src.orchestrator import verify_ids_sp_description_values
 
 # Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"

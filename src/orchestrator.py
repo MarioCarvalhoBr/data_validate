@@ -1,8 +1,3 @@
-# Libs
-import pandas as pd
-import os
-import re
-
 import src.util.graph as graph
 import src.util.sp_values as sp_values
 import src.util.sp_description as sp_description
@@ -28,5 +23,4 @@ def verify_graph_sp_description_composition(path_sp_description, path_ps_composi
     return graph.run(path_sp_description, path_ps_composition)
 
 def verify_ids_sp_description_values(path_sp_description, path_sp_values):
-    is_correct, errors, warnings = sp_values.verify_ids_sp_description_values(path_sp_description, path_sp_values)
-    return is_correct, errors, warnings
+    return sp_values.verify_ids_sp_description_values(path_sp_description, path_sp_values)

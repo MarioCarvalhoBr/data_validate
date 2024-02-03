@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import re
-from src.util.sp_values import read_excel_file, extract_ids_from_description, extract_ids_from_values, compare_ids
 from src.util.text_processor import capitalize_nouns_keep_articles_prepositions
 
 def file_extension_check(path, extension='.xlsx'):
