@@ -1,10 +1,7 @@
 import networkx as nx
 import matplotlib.pyplot as plt
 import pandas as pd
-
-def ler_planilhas(path):
-    planilha = pd.read_excel(path)
-    return planilha
+from src.util.utilities import read_excel_file, file_extension_check
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
     codigos_descricao = set(descricao['codigo'].astype(str))
@@ -62,10 +59,21 @@ def run(path_sp_description, path_ps_composition):
     errors = []
     warnings = []
     is_valid = True
+
+    # Verifica se os arquivos de entrada são .xlsx
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
+    
+    is_correct, error = file_extension_check(path_ps_composition)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
     
     # Execução do script
-    descricao = ler_planilhas(path_sp_description)
-    composicao = ler_planilhas(path_ps_composition)
+    descricao = read_excel_file(path_sp_description)
+    composicao = read_excel_file(path_ps_composition)
     name_file_description = path_sp_description.split("/")[-1]
     name_file_composition = path_ps_composition.split("/")[-1]
     

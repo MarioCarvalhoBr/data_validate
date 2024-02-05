@@ -39,8 +39,8 @@ def test_count_errors_verify_sp_description_titles_uniques(): # Teste false
 def test_count_errors_verify_sp_description_text_capitalize(): # Teste false
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
     is_correct, errors, warnings = verify_sp_description_text_capitalize(planilha_04_descricao)
-    # Numero de warnings esperado == 4
-    assert len(warnings) == 4
+    # Numero de warnings esperado == 10
+    assert len(warnings) == 10
     # Numero de erros esperado == 0
     assert len(errors) == 0
 

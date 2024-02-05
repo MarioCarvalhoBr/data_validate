@@ -1,16 +1,8 @@
 import os
 
-def check_folder_exists(folder_path):
-    """Verifica se uma pasta existe."""
-    if not os.path.exists(folder_path):
-        return False, f"Pasta não encontrada: {folder_path}"
-    return True, ""
+from src.util.utilities import check_folder_exists
+from src.util.utilities import check_file_exists
 
-def check_file_exists(file_path):
-    """Verifica se um arquivo existe."""
-    if not os.path.isfile(file_path):
-        return False, f"Arquivo não encontrado: {file_path}"
-    return True, ""
 
 def verify_structure_folder_files(path_folder):
     errors = []

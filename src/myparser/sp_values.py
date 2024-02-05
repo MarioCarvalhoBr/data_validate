@@ -1,10 +1,6 @@
 import os
 import pandas as pd
-
-def read_excel_file(path):
-    if not path.endswith('.xlsx'):
-        raise ValueError(f"ERRO: O arquivo {path} de entrada não é .xlsx")
-    return pd.read_excel(path)
+from src.util.utilities import file_extension_check, read_excel_file
 
 def extract_ids_from_description(df_description):
     ids = set(df_description['codigo'].astype(str))
@@ -36,6 +32,17 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     warnings = []
 
     try:
+        is_correct, error_message = file_extension_check(path_sp_description, '.xlsx')
+        if not is_correct:
+            errors.append(error_message)
+            return False, errors, warnings
+        
+        is_correct, error_message = file_extension_check(path_sp_values, '.xlsx')
+        if not is_correct:
+            errors.append(error_message)
+            return False, errors, warnings
+        
+        
         df_description = read_excel_file(path_sp_description)
         df_values = read_excel_file(path_sp_values)
 
