@@ -39,6 +39,15 @@ def test_true_verify_spelling_text_full(): # Teste true
     assert is_correct is True
     assert len(warnings) == 0
     assert len(errors) == 0
+
+# Testes: Issue #24: Verificar ortografia
+def test_false_verify_spelling_text_full_for_errors(): # Teste true
+    type_dict_spell = TypeDict.FULL
+    is_correct,errors, warnings = verify_spelling_text(path_input_data_errors, type_dict_spell)
+    assert is_correct is False
+    assert len(warnings) == 3
+    assert len(errors) == 2
+
 def test_true_verify_spelling_text_tiny(): # Teste false
     type_dict_spell = TypeDict.TINY
     is_correct,errors, warnings = verify_spelling_text(path_input_data_ground_truth, type_dict_spell)

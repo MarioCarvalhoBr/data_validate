@@ -24,7 +24,7 @@ if __name__ == "__main__":
     parser.add_argument("--no-spellchecker", action="store_true", help="Não executa o verificador ortográfico.")
     
     # --type_dict: tiny or full
-    parser.add_argument("--type_dict", type=str, default="tiny", help="Define qual o dicinário ortográfico será utilizado: tiny ou full.")
+    parser.add_argument("--type_dict", type=str, default="full", help="Define qual o dicinário ortográfico será utilizado: tiny ou full.")
     
     # --debug 
     parser.add_argument("--debug", action="store_true", help="Executa o programa em modo debug.")
@@ -64,14 +64,15 @@ if __name__ == "__main__":
 
     # 4 - Verficar a ortografia
     if not args.no_spellchecker:
+        type_dict = type_dict.lower()
         # Mapear o argumento para o enum correspondente
-        type_dict_spell = TypeDict.TINY
+        type_dict_spell = TypeDict.FULL
         
-        if type_dict == 'full':
-            type_dict_spell = TypeDict.FULL
+        if type_dict == 'tiny':
+            type_dict_spell = TypeDict.TINY
        
         if args.type_dict not in ['tiny', 'full']:
-            print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário tiny por padrão.")
+            print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário full por padrão.")
         
         results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", *(verify_spelling_text(path_input_folder, type_dict_spell))])
     

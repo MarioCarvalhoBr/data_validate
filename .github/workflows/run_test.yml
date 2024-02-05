@@ -40,5 +40,5 @@ jobs:
       - name: Run main
         run: |
           python3 main.py --input_folder=input_data/data_ground_truth/ --type_dict=full
-          python3 main.py --input_folder=input_data/data_errors/ --type_dict=tiny
+          python3 main.py --input_folder=input_data/data_errors/ --type_dict=full
       

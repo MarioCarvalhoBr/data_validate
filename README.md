@@ -55,7 +55,7 @@ python3 main.py --input_folder=input_data/data_ground_truth/
   --no-spellchecker
   ```
 
-- `--type_dict` (padrão: `tiny`): Define qual dicionário ortográfico será utilizado durante a análise. As opções são `tiny` para um dicionário menor e mais rápido, ou `full` para um dicionário mais abrangente. Se não especificado, o padrão é `tiny`.
+- `--type_dict` (padrão: `full`): Define qual dicionário ortográfico será utilizado durante a análise. As opções são `tiny` para um dicionário menor e mais rápido, ou `full` para um dicionário mais abrangente. Se não especificado, o padrão é `full`.
 Os dicionários estão localizados na pasta `dictionaries/`. Atualmente, contém apenas palavras para o idioma português na pasta `dictionaries/pt_BR/`, onde são armazenados os dicionários `tiny.txt` e `full.txt`.
   Exemplos:
   ```
