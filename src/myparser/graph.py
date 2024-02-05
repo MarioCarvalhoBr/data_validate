@@ -1,6 +1,5 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-import pandas as pd
 from src.util.utilities import read_excel_file, file_extension_check
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):

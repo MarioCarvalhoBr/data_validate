@@ -5,9 +5,6 @@ from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
 from src.util.utilities import file_extension_check
 from src.util.utilities import read_excel_file
-from src.myparser.graph import verificar_ciclos
-from src.myparser.graph import verificar_grafos_desconectados
-from src.myparser.graph import imprimir_grafo
 
 def test_read_excel_file_with_existing_file():
     # Create a temporary excel file for testing

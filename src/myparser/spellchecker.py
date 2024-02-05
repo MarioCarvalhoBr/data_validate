@@ -1,7 +1,6 @@
 import re
 import enum
 import os
-import pandas as pd
 from src.util.utilities import check_file_exists
 from src.util.utilities import read_excel_file
 
