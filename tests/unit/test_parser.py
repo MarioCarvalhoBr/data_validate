@@ -33,14 +33,18 @@ def test_false_verify_structure_folder_files(): # Teste false
     assert result_test is False
     
 # Testes: Issue #24: Verificar ortografia
-def test_true_verify_spelling_text(): # Teste true
+def test_true_verify_spelling_text_full(): # Teste true
     type_dict_spell = TypeDict.FULL
-    result_test,__,__ = verify_spelling_text(path_input_data_ground_truth, type_dict_spell)
-    assert result_test is True
-def test_false_verify_spelling_text(): # Teste false
+    is_correct,errors, warnings = verify_spelling_text(path_input_data_ground_truth, type_dict_spell)
+    assert is_correct is True
+    assert len(warnings) == 0
+    assert len(errors) == 0
+def test_true_verify_spelling_text_tiny(): # Teste false
     type_dict_spell = TypeDict.TINY
-    __,__,warnings = verify_spelling_text(path_input_data_ground_truth, type_dict_spell)
-    assert len(warnings) > 0
+    is_correct,errors, warnings = verify_spelling_text(path_input_data_ground_truth, type_dict_spell)
+    assert is_correct is True
+    assert len(warnings) == 16
+    assert len(errors) == 0
     
 # Testes: Issue #36: Títulos únicos: verify_sp_description_titles_uniques
 def test_true_verify_sp_description_titles_uniques(): # Teste true
