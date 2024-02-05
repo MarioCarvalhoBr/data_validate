@@ -46,13 +46,13 @@ if __name__ == "__main__":
     print(Fore.WHITE + Style.BRIGHT +  "Iniciando a verificação dos arquivos da pasta: " + path_input_folder)
     print("\n")
 
-    # is_correct, errors, warnings = 
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(verify_structure_folder_files(path_input_folder))])
     
     # 2 - Hierarquia como grafo conexo #2
     is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))
     is_correct_val2desc, errors_val2desc, warnings_val2desc = (verify_ids_sp_description_values(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/8_valores/valores.xlsx"))
+    
     # 2.1 - Concatenar os resultados
     is_correct = is_correct_comp2desc and is_correct_val2desc
     errors = errors_comp2desc + errors_val2desc

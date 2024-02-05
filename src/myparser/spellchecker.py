@@ -2,6 +2,8 @@ import re
 import enum
 import os
 import pandas as pd
+from src.util.utilities import check_file_exists
+from src.util.utilities import read_excel_file
 
 class TypeDict(enum.Enum):
     TINY = 1
@@ -24,7 +26,7 @@ def find_spelling_errors(text, dictionary):
 def verify_text(column_name, text, dictionary, type_dict_spell, index, sheet_name):
     errors = verify_sintax_ortography(text, type_dict_spell, dictionary)
     if errors:
-        return f"Palavras com possíveis erros ortográficos na planilha {sheet_name}, linha {index + 1}, coluna {column_name}: {errors}"
+        return f"{sheet_name}: Palavras com possíveis erros ortográficos na planilha {sheet_name}, linha {index + 1}, coluna {column_name}: {errors}"
     return ""
 
 def verify_sintax_ortography(text, type_dict_spell, dictionary):
@@ -53,10 +55,18 @@ def run(path_folder, type_dict_spell):
 
     for sheet, columns in sheets_info.items():
         path = os.path.join(path_folder, sheet)
+        file_name = os.path.basename(path)
+
         try:
-            df = pd.read_excel(path)
+            # Check if the file exists
+            is_correct, error = check_file_exists(path)
+            if not is_correct:
+                errors.append(f"{file_name}: Planilha não encontrada no caminho {sheet}. Pulando a verificação.")
+                continue
+
+            df = read_excel_file(path)
             if df.empty:
-                errors.append(f"Erro ao abrir o arquivo {path}.")
+                errors.append(f"{file_name}: A planilha está vazia. Pulando a verificação.")
                 continue
             sheet_warnings = process_sheet(df, columns, dictionary, type_dict_spell, os.path.basename(path))
             warnings.extend(sheet_warnings)

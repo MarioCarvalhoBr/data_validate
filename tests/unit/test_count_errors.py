@@ -63,3 +63,16 @@ def test_count_errors_verify_ids_sp_description_values(): # Teste false
     assert len(errors) == 2
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
+
+# Ortografia
+from src.myparser.spellchecker import TypeDict
+from src.orchestrator import verify_spelling_text
+
+def test_count_errors_verify_spelling_text(): # Teste false
+    path_input_folder = path_input_data_errors
+    type_dict_spell = TypeDict.TINY
+    is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
+    # Numero de erros esperado == 2
+    assert len(errors) == 2
+    # Numero de warnings esperado == 14
+    assert len(warnings) == 14
