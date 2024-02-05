@@ -12,8 +12,8 @@ from src.orchestrator import verify_sp_description_titles_uniques
 from src.orchestrator import verify_sp_description_text_capitalize
 from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
-from src.util.spellchecker import TypeDict
-import src.util.libraries_versions as lv
+from src.myparser.spellchecker import TypeDict
+import src.myparser.libraries_versions as lv
 
 
 if __name__ == "__main__":

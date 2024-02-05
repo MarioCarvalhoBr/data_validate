@@ -6,8 +6,8 @@ from src.orchestrator import verify_sp_description_text_capitalize
 from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
 
-from src.util.spellchecker import TypeDict
-import src.util.libraries_versions as lv
+from src.myparser.spellchecker import TypeDict
+import src.myparser.libraries_versions as lv
 
 # Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"

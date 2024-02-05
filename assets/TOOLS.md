@@ -9,7 +9,7 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Verificação: Relações entre indicadores da planilha de valores #59
+Issue: Revisão da definição de maiúsculas e minúsculas nos títulos #55
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #59: Check relationships between indicators in the value spreadsheet
+close #55: Review the definition of uppercase and lowercase in titles

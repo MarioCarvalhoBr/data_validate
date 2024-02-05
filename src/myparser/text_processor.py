@@ -15,3 +15,7 @@ def capitalize_nouns_keep_articles_prepositions(text):
         text = text.replace(' ' + preposition.title() + ' ', ' ' + preposition + ' ')
         
     return text
+
+def capitalize_text(text):
+    new_text = text.capitalize()
+    return new_text

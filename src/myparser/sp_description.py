@@ -1,23 +1,8 @@
 import os
 import pandas as pd
 import re
-from src.util.text_processor import capitalize_nouns_keep_articles_prepositions
-
-def file_extension_check(path, extension='.xlsx'):
-    if not path.endswith(extension):
-        return False, f"ERRO: O arquivo {path} de entrada não é {extension}"
-    return True, ""
-
-def read_excel_and_lower_columns(path):
-    df = pd.read_excel(path)
-    df.columns = df.columns.str.lower()
-    return df
-
-def is_xlsx_file(path):
-    return path.endswith('.xlsx')
-
-def load_dataframe(path):
-    return pd.read_excel(path)
+from src.myparser.text_processor import capitalize_text
+from src.util.utilities import read_excel_file, file_extension_check
 
 def check_html_in_descriptions(df):
     errors = []
@@ -39,11 +24,13 @@ def format_errors_and_warnings(name, missing_columns, extra_columns):
 def verify_sp_description_parser(path_sp_description):
     errors, warnings = [], []
 
-    if not is_xlsx_file(path_sp_description):
-        return False, [f"ERRO: O arquivo {path_sp_description} de entrada não é .xlsx"], warnings
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
 
     try:
-        df = load_dataframe(path_sp_description)
+        df = read_excel_file(path_sp_description)
         df.columns = df.columns.str.lower()
 
         html_errors = check_html_in_descriptions(df)
@@ -71,7 +58,7 @@ def verify_sp_description_titles_uniques(path_sp_description):
         return is_correct, errors, warnings
 
     try:
-        df = read_excel_and_lower_columns(path_sp_description)
+        df = read_excel_file(path_sp_description, True)
         for column in ['nome_simples', 'nome_completo']:
             df[column] = df[column].str.strip()
             duplicated = df[column].duplicated().any()
@@ -91,13 +78,13 @@ def verify_sp_description_text_capitalize(path_sp_description):
         return is_correct, errors, warnings
 
     try:
-        df = read_excel_and_lower_columns(path_sp_description)
+        df = read_excel_file(path_sp_description, True)
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
                 original_text = row[column]
-                corrected_text = capitalize_nouns_keep_articles_prepositions(original_text)
-                if original_text != corrected_text:
-                    warnings.append(f"{os.path.basename(path_sp_description)}: {column.replace('_', ' ')} na linha {index + 1} está fora do padrão. Esperado: \"{corrected_text}\" Encontrado: \"{original_text}\"")
+                expected_corect_text = capitalize_text(original_text)
+                if not original_text == expected_corect_text:
+                    warnings.append(f"{os.path.basename(path_sp_description)}: {column.replace('_', ' ')} na linha {index + 1} está fora do padrão. Esperado: \"{expected_corect_text}\" Encontrado: \"{original_text}\"")
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
