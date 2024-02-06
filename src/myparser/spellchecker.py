@@ -60,12 +60,12 @@ def run(path_folder, type_dict_spell):
             # Check if the file exists
             is_correct, error = check_file_exists(path)
             if not is_correct:
-                errors.append(f"{file_name}: Planilha não encontrada no caminho '{sheet}'. Pulando a verificação.")
+                errors.append(f"{file_name}: Planilha não encontrada no caminho '{sheet}'.")
                 continue
 
             df = read_excel_file(path)
             if df.empty:
-                errors.append(f"{file_name}: A planilha está vazia. Pulando a verificação.")
+                errors.append(f"{file_name}: A planilha está vazia.")
                 continue
             sheet_warnings = process_sheet(df, columns, dictionary, type_dict_spell, os.path.basename(path))
             warnings.extend(sheet_warnings)

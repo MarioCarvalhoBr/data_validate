@@ -105,7 +105,7 @@ def verify_graph_sp_description_composition(path_sp_description, path_ps_composi
             text_graph += f"{origem} -> {destino}, "
         # remove the last comma
         text_graph = text_graph[:-2]
-        errors.append(f"{name_file_composition}: Ciclo encontrado no arquivo {name_file_composition}: [{text_graph}].")
+        errors.append(f"{name_file_composition}: Ciclo encontrado: [{text_graph}].")
         is_valid = False
 
     grafos_desconectados = verificar_grafos_desconectados(G)

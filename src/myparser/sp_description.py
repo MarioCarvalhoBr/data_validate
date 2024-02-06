@@ -33,7 +33,7 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
         df.columns = df.columns.str.lower()
 
         html_errors = check_html_in_descriptions(path_sp_description, df)
-        errors.extend(html_errors)
+        warnings.extend(html_errors)
 
         expected_columns = ["codigo", "nivel", "nome_simples", "nome_completo", "unidade", "desc_simples", "desc_completa", "cenario", "relacao", "fontes", "meta"]
         missing_columns, extra_columns = check_column_names(df, expected_columns)
@@ -76,11 +76,14 @@ def verify_sp_description_titles_uniques(path_sp_description):
 
     try:
         df = read_excel_file(path_sp_description, True)
-        for column in ['nome_simples', 'nome_completo']:
+        # Renomear para as mcolunas nome_simples e nome_completo para nomes_simples e nomes_completos
+        df.rename(columns={'nome_simples': 'nomes_simples', 'nome_completo': 'nomes_completos'}, inplace=True)
+        for column in ['nomes_simples', 'nomes_completos']:
             df[column] = df[column].str.strip()
             duplicated = df[column].duplicated().any()
             if duplicated:
-                errors.append(f"{os.path.basename(path_sp_description)}: Existem {column.replace('_', ' ')} duplicados.")
+                titles_duplicated = df[df[column].duplicated()][column].tolist()
+                warnings.append(f"{os.path.basename(path_sp_description)}: Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 

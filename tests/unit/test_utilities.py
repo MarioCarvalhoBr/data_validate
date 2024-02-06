@@ -95,7 +95,7 @@ def test_check_file_exists_with_non_existent_file():
     non_existent_file = "non_existent_file.txt"  # Non-existent file
     result, error_message = check_file_exists(non_existent_file)
     assert result is False
-    assert error_message == "non_existent_file.txt: O arquivo não foi encontrado no caminho '/non_existent_file.txt'."
+    assert error_message == "non_existent_file.txt: Arquivo não foi encontrado no diretório '/non_existent_file.txt'."
 def test_check_file_exists_with_existing_file():
     existing_file = "existing_file.txt"  # Existing file
     with open(existing_file, 'w') as f:
