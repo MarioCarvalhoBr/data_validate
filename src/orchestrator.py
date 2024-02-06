@@ -10,6 +10,9 @@ def verify_spelling_text(path_folder, type_dict_spell):
 def verify_structure_folder_files(path_folder):
     return structures_files.verify_structure_folder_files(path_folder)
 
+def verify_sp_description_titles_length(path_sp_description):
+    return sp_description.verify_sp_description_titles_length(path_sp_description)
+
 def verify_sp_description_titles_uniques(path_sp_description):
     return sp_description.verify_sp_description_titles_uniques(path_sp_description)
 

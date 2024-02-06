@@ -9,8 +9,8 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Verificar se existe erro antes de fazer a verficação ortográfica #47
+Issue: Tamanho do titulo #35 Emitir warning para todo nome e titulo que tiver mais do que 30 caracteres. Adicionar flag para desabilitar este tipo de warning
 
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #47: Verify if there is an error before doing the spell check
+close #35: Add flag to disable warning for long titles and names

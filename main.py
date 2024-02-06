@@ -12,6 +12,7 @@ from src.orchestrator import verify_sp_description_titles_uniques
 from src.orchestrator import verify_sp_description_text_capitalize
 from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
+from src.myparser.sp_description import verify_sp_description_titles_length
 from src.myparser.spellchecker import TypeDict
 import src.myparser.libraries_versions as lv
 
@@ -28,6 +29,9 @@ if __name__ == "__main__":
     
     # --debug 
     parser.add_argument("--debug", action="store_true", help="Executa o programa em modo debug.")
+
+    # --no-warning-titles-length
+    parser.add_argument("--no-warning-titles-length", action="store_true", help="Desabilita o aviso para nomes e títulos com mais de 30 caracteres.")
     
     args = parser.parse_args()
 
@@ -82,6 +86,9 @@ if __name__ == "__main__":
     # 6 - Padrão para nomes dos indicadores #1
     results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
+    # 7 - Títulos com mais de 30 caracteres
+    if not args.no_warning_titles_length:
+        results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(verify_sp_description_titles_length(path_input_folder + "/4_descricao/descricao.xlsx"))])
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
     num_errors = 0

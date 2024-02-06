@@ -48,6 +48,24 @@ def verify_sp_description_parser(path_sp_description):
     is_correct = len(errors) == 0
     return is_correct, errors, warnings
 
+def verify_sp_description_titles_length(path_sp_description):
+    errors, warnings = [], []
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
+
+    try:
+        df = read_excel_file(path_sp_description, True)
+        for column in ['nome_simples']:
+            df[column] = df[column].str.strip()
+            for index, row in df.iterrows():
+                if len(row[column]) > 30:
+                    warnings.append(f"{os.path.basename(path_sp_description)}: {column.replace('_', ' ')} na linha {index + 1} está com mais de 30 caracteres.")
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    return not errors, errors, warnings
 
 def verify_sp_description_titles_uniques(path_sp_description):
     errors, warnings = [], []
