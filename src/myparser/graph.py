@@ -54,7 +54,7 @@ def verificar_grafos_desconectados(G):
     subgrafos.sort(key=len, reverse=True)
     return subgrafos[1:] if len(subgrafos) > 1 else []
 
-def run(path_sp_description, path_ps_composition):
+def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
     errors = []
     warnings = []
     is_valid = True
@@ -82,7 +82,7 @@ def run(path_sp_description, path_ps_composition):
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"{name_file_description}: Indicadores do arquivo {name_file_composition} que não estão descritos: [{str(codigos_faltantes)}].")
+        errors.append(f"{name_file_description}: Indicadores no arquivo {name_file_composition} que não estão descritos: [{str(codigos_faltantes)}].")
         is_valid = False
     
     codigos_faltantes = []
@@ -92,7 +92,7 @@ def run(path_sp_description, path_ps_composition):
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"{name_file_composition}: Indicadores do arquivo {name_file_description} que não fazem parte da estrutura hierárquica: [{str(codigos_faltantes)}].")
+        errors.append(f"{name_file_composition}: Indicadores no arquivo {name_file_description} que não fazem parte da estrutura hierárquica: [{str(codigos_faltantes)}].")
         is_valid = False
 
     G = montar_grafo(composicao)

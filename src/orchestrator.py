@@ -16,14 +16,14 @@ def verify_sp_description_titles_length(path_sp_description):
 def verify_sp_description_titles_uniques(path_sp_description):
     return sp_description.verify_sp_description_titles_uniques(path_sp_description)
 
-def verify_sp_description_parser(path_sp_description):
-    return sp_description.verify_sp_description_parser(path_sp_description)
+def verify_sp_description_parser_html_column_names(path_sp_description):
+    return sp_description.verify_sp_description_parser_html_column_names(path_sp_description)
 
 def verify_sp_description_text_capitalize(path_sp_description):
     return sp_description.verify_sp_description_text_capitalize(path_sp_description)
 
 def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
-    return graph.run(path_sp_description, path_ps_composition)
+    return graph.verify_graph_sp_description_composition(path_sp_description, path_ps_composition)
 
 def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     return sp_values.verify_ids_sp_description_values(path_sp_description, path_sp_values)

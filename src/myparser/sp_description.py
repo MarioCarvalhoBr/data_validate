@@ -20,7 +20,7 @@ def format_errors_and_warnings(name, missing_columns, extra_columns):
     warnings = [f"{name}: Coluna '{col}' será ignorada pois não está na especificação." for col in extra_columns]
     return errors, warnings
 
-def verify_sp_description_parser(path_sp_description):
+def verify_sp_description_parser_html_column_names(path_sp_description):
     errors, warnings = [], []
 
     is_correct, error = file_extension_check(path_sp_description)

@@ -6,7 +6,7 @@ import argparse
 import time
 
 from src.orchestrator import verify_structure_folder_files
-from src.orchestrator import verify_sp_description_parser
+from src.orchestrator import verify_sp_description_parser_html_column_names
 from src.orchestrator import verify_spelling_text
 from src.orchestrator import verify_sp_description_titles_uniques
 from src.orchestrator import verify_sp_description_text_capitalize
@@ -14,7 +14,7 @@ from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
 from src.myparser.sp_description import verify_sp_description_titles_length
 from src.myparser.spellchecker import TypeDict
-import src.myparser.libraries_versions as lv
+import src.myparser.info as lv
 
 
 if __name__ == "__main__":
@@ -64,7 +64,7 @@ if __name__ == "__main__":
     results_tests.append([("Issue #2 e 59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
     
     # 3 - Verifica se a planilha de descrição está correta
-    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(verify_sp_description_parser(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(verify_sp_description_parser_html_column_names(path_input_folder + "/4_descricao/descricao.xlsx"))])
 
     # 4 - Verficar a ortografia
     if not args.no_spellchecker:
