@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 from src.util.utilities import file_extension_check, read_excel_file
 
 def extract_ids_from_description(df_description):

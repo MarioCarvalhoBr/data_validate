@@ -4,6 +4,9 @@ from src.orchestrator import verify_sp_description_titles_uniques
 from src.orchestrator import verify_sp_description_text_capitalize
 from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
+from src.myparser.spellchecker import TypeDict
+from src.orchestrator import verify_spelling_text
+
 
 # Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"
@@ -63,3 +66,22 @@ def test_count_errors_verify_ids_sp_description_values(): # Teste false
     assert len(errors) == 2
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
+
+def test_count_errors_verify_spelling_text_tiny(): # Teste false
+    path_input_folder = path_input_data_errors
+    type_dict_spell = TypeDict.TINY
+    is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
+    # Numero de erros esperado == 2
+    assert len(errors) == 2
+    # Numero de warnings esperado == 14
+    assert len(warnings) == 14
+
+def test_count_errors_verify_spelling_text_full(): # Teste false
+    path_input_folder = path_input_data_errors
+    type_dict_spell = TypeDict.FULL
+    is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
+    # Numero de erros esperado == 2
+    assert len(errors) == 2
+    # Numero de warnings esperado == 3
+    assert len(warnings) == 3
+    

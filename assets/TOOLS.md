@@ -9,7 +9,8 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Revisão da definição de maiúsculas e minúsculas nos títulos #55
+Issue: Verificar se existe erro antes de fazer a verficação ortográfica #47
+
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #55: Review the definition of uppercase and lowercase in titles
+close #47: Verify if there is an error before doing the spell check

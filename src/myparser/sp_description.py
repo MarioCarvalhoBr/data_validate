@@ -1,5 +1,4 @@
 import os
-import pandas as pd
 import re
 from src.myparser.text_processor import capitalize_text
 from src.util.utilities import read_excel_file, file_extension_check
