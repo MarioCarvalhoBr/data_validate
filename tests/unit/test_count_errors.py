@@ -4,6 +4,7 @@ from src.orchestrator import verify_sp_description_titles_uniques
 from src.orchestrator import verify_sp_description_text_capitalize
 from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
+from src.myparser.sp_description import verify_sp_description_titles_length
 from src.myparser.spellchecker import TypeDict
 from src.orchestrator import verify_spelling_text
 
@@ -11,6 +12,16 @@ from src.orchestrator import verify_spelling_text
 # Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"
 path_input_data_errors = "input_data/data_errors"
+
+def test_count_errors_verify_sp_description_titles_length(): # Teste false
+    planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
+    is_correct, errors, warnings = verify_sp_description_titles_length(planilha_04_descricao)
+    assert is_correct is True
+    # Numero de erros esperado == 0
+    assert len(errors) == 0
+    # Numero de warnings esperado == 1
+    assert len(warnings) == 1
+
 
 # Testes: Issue #5: Códigos html nas descrições simples
 def test_count_errors_verify_sp_description_parser(): # Teste false

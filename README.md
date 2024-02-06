@@ -70,6 +70,13 @@ Os dicionários estão localizados na pasta `dictionaries/`. Atualmente, contém
   --debug
   ```
 
+- `--no-warning-titles-length`: Quando este argumento é usado, o script não emite avisos sobre títulos de planilhas que excedem o limite de caracteres. Isso pode ser útil se você deseja ignorar avisos sobre títulos longos.
+
+  Exemplo:
+  ```
+  --no-warning-titles-length
+  ```
+
 ### Testes
 #### Instalando o coverage
 ```bash

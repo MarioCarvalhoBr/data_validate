@@ -25,7 +25,7 @@ def find_spelling_errors(text, dictionary):
 def verify_text(column_name, text, dictionary, type_dict_spell, index, sheet_name):
     errors = verify_sintax_ortography(text, type_dict_spell, dictionary)
     if errors:
-        return f"{sheet_name}: Palavras com possíveis erros ortográficos, linha {index + 1}, coluna {column_name}: {errors}"
+        return f"{sheet_name}, linha {index + 1}: Palavras com possíveis erros ortográficos na coluna {column_name}: {errors}."
     return ""
 
 def verify_sintax_ortography(text, type_dict_spell, dictionary):
