@@ -20,9 +20,9 @@ def compare_ids(id_description, id_values, name_sp_description, name_sp_values):
     id_values_not_in_description = id_values - id_description
 
     if id_description_not_in_values:
-        errors.append(f"{name_sp_description}: Códigos dos indicadores ausentes em {name_sp_values}: {list(id_description_not_in_values)}")
+        errors.append(f"{name_sp_description}: Códigos dos indicadores ausentes em {name_sp_values}: {list(id_description_not_in_values)}.")
     if id_values_not_in_description:
-        errors.append(f"{name_sp_values}: Códigos dos indicadores ausentes em {name_sp_description}: {list(id_values_not_in_description)}")
+        errors.append(f"{name_sp_values}: Códigos dos indicadores ausentes em {name_sp_description}: {list(id_values_not_in_description)}.")
     
     return errors
 
@@ -53,7 +53,7 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     except ValueError as e:
         errors.append(str(e))
     except Exception as e:
-        errors.append(f"Erro ao processar os arquivos: {e}")
+        errors.append(f"Erro ao processar os arquivos: {e}.")
 
     is_correct = False
     if not errors:

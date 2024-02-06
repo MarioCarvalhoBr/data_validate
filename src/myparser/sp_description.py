@@ -101,7 +101,7 @@ def verify_sp_description_text_capitalize(path_sp_description):
                 original_text = row[column]
                 expected_corect_text = capitalize_text(original_text)
                 if not original_text == expected_corect_text:
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\" Encontrado: \"{original_text}\"")
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
