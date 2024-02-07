@@ -31,6 +31,10 @@ def plot_grafo(G, is_save=False):
 def imprimir_grafo(G):
     text_graph = ""
     for origem, destino in G.edges():
+        origem = float(origem)
+        destino = float(destino)
+        origem = int(origem) if origem.is_integer() else origem
+        destino = int(destino) if destino.is_integer() else destino
         text_graph += f"{origem} -> {destino}, "
     # remove the last comma
     text_graph = text_graph[:-2]

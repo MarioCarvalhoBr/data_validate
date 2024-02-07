@@ -60,7 +60,6 @@ def run(path_folder, type_dict_spell):
             # Check if the file exists
             is_correct, error = check_file_exists(path)
             if not is_correct:
-                errors.append(f"{file_name}: Planilha não encontrada no caminho '{sheet}'.")
                 continue
 
             df = read_excel_file(path)

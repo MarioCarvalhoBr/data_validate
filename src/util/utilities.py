@@ -43,5 +43,5 @@ def check_file_exists(file_path):
     if not os.path.isfile(file_path):
         ultima_pasta = os.path.basename(os.path.dirname(file_path))
         utimo_arquivo = os.path.basename(file_path)
-        return False, f"{file_name}: Arquivo não foi encontrado no diretório '{ultima_pasta}/{utimo_arquivo}'."
+        return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/{utimo_arquivo}'."
     return True, ""

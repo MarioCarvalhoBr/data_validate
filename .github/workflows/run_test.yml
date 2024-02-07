@@ -34,15 +34,11 @@ jobs:
       - name: Test with pytest
         run: |
           coverage run -m pytest  -v -s
-          coverage json -o coverage.json
       - name: Generate Coverage Report
         run: |
           coverage report -m
-          coverage json -o coverage.json
       - name: Run main
         run: |
           python3 main.py --input_folder=input_data/data_ground_truth/
           python3 main.py --input_folder=input_data/data_errors/
           python3 main.py --input_folder=input_data/data_errors/ --no-warning-titles-length
-          python3 generate_coverage_report.py
-      
