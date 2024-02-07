@@ -114,8 +114,12 @@ def verify_graph_sp_description_composition(path_sp_description, path_ps_composi
 
     grafos_desconectados = verificar_grafos_desconectados(G)
     if grafos_desconectados:
-        is_valid = False        
-        for i, sg in enumerate(grafos_desconectados, 1):
-            errors.append(f"{name_file_composition}: Indicadores desconectados encontrados: Indicadores " + str(i) + ": [" + imprimir_grafo(sg) + "].")
+        is_valid = False
+        text_init = f"{name_file_composition}: Indicadores desconectados encontrados: "
+        lista_grafos_desconectados = []
+        for i, grafo in enumerate(grafos_desconectados):
+            text_graph = "[" + imprimir_grafo(grafo) + "]"
+            lista_grafos_desconectados.append(text_graph)    
+        errors.append(text_init + ", ".join(lista_grafos_desconectados) + ".")
     
     return is_valid, errors, warnings
