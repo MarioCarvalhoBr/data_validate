@@ -126,3 +126,24 @@ def verify_sp_description_levels(path_sp_description):
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
     return not errors, errors, warnings
+
+def verify_sp_description_punctuation(path_sp_description):
+    errors, warnings = [], []
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
+
+    try:
+        df = read_excel_file(path_sp_description, True)
+        for index, row in df.iterrows():
+            for column in ['nome_simples', 'nome_completo']:
+                if row[column][-1] in [',', '.', ';', ':', '!', '?']:
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: A coluna '{column}' não deve terminar com pontuação.")
+            for column in ['desc_simples', 'desc_completa']:
+                if row[column][-1] != '.':
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: A coluna '{column}' deve terminar com ponto.")
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    return not errors, errors, warnings
