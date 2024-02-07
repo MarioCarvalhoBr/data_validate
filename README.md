@@ -1,5 +1,7 @@
 # Adapta Parser
 
+![Coverage Status](assets/images/coverage_badge.svg)
+
 ## Introdução
 Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análise e validação de arquivos de planilhas, especialmente projetada para preparar e verificar dados antes de sua submissão à plataforma Adaptabrasil.
 

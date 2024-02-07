@@ -31,6 +31,10 @@ def plot_grafo(G, is_save=False):
 def imprimir_grafo(G):
     text_graph = ""
     for origem, destino in G.edges():
+        origem = float(origem)
+        destino = float(destino)
+        origem = int(origem) if origem.is_integer() else origem
+        destino = int(destino) if destino.is_integer() else destino
         text_graph += f"{origem} -> {destino}, "
     # remove the last comma
     text_graph = text_graph[:-2]
@@ -54,7 +58,7 @@ def verificar_grafos_desconectados(G):
     subgrafos.sort(key=len, reverse=True)
     return subgrafos[1:] if len(subgrafos) > 1 else []
 
-def run(path_sp_description, path_ps_composition):
+def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
     errors = []
     warnings = []
     is_valid = True
@@ -82,7 +86,7 @@ def run(path_sp_description, path_ps_composition):
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"{name_file_description}: Indicadores do arquivo {name_file_composition} que não estão descritos: [{str(codigos_faltantes)}].")
+        errors.append(f"{name_file_description}: Indicadores no arquivo {name_file_composition} que não estão descritos: [{str(codigos_faltantes)}].")
         is_valid = False
     
     codigos_faltantes = []
@@ -92,7 +96,7 @@ def run(path_sp_description, path_ps_composition):
         codigos_faltantes = str(codigos_faltantes)[1:-1]
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"{name_file_composition}: Indicadores do arquivo {name_file_description} que não fazem parte da estrutura hierárquica: [{str(codigos_faltantes)}].")
+        errors.append(f"{name_file_composition}: Indicadores no arquivo {name_file_description} que não fazem parte da estrutura hierárquica: [{str(codigos_faltantes)}].")
         is_valid = False
 
     G = montar_grafo(composicao)
@@ -105,13 +109,17 @@ def run(path_sp_description, path_ps_composition):
             text_graph += f"{origem} -> {destino}, "
         # remove the last comma
         text_graph = text_graph[:-2]
-        errors.append(f"{name_file_composition}: Ciclo encontrado no arquivo {name_file_composition}: [{text_graph}].")
+        errors.append(f"{name_file_composition}: Ciclo encontrado: [{text_graph}].")
         is_valid = False
 
     grafos_desconectados = verificar_grafos_desconectados(G)
     if grafos_desconectados:
-        is_valid = False        
-        for i, sg in enumerate(grafos_desconectados, 1):
-            errors.append(f"{name_file_composition}: Indicadores desconectados encontrados: Indicadores " + str(i) + ": [" + imprimir_grafo(sg) + "].")
+        is_valid = False
+        text_init = f"{name_file_composition}: Indicadores desconectados encontrados: "
+        lista_grafos_desconectados = []
+        for i, grafo in enumerate(grafos_desconectados):
+            text_graph = "[" + imprimir_grafo(grafo) + "]"
+            lista_grafos_desconectados.append(text_graph)    
+        errors.append(text_init + ", ".join(lista_grafos_desconectados) + ".")
     
     return is_valid, errors, warnings
