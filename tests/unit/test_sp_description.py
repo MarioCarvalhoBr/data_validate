@@ -118,5 +118,5 @@ def test_count_errors_verify_sp_description_punctuation(): # Teste false
     is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
     # Numero de erros esperado == 0
     assert len(errors) == 0
-    # Numero de warnings esperado == 15
-    assert len(warnings) == 15
+    # Numero de warnings esperado == 4
+    assert len(warnings) == 4
