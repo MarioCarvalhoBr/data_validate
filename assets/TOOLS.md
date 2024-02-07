@@ -9,7 +9,7 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Não pode ter indicador nível zero #37
+Issue: Adiciona a verificação da pontuação nas descrições dos indicadores #32
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #37: Check if the indicator is not level zero or negative
+close #32: Add check for punctuation in indicator descriptions

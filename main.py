@@ -14,6 +14,7 @@ from src.orchestrator import verify_graph_sp_description_composition
 from src.orchestrator import verify_ids_sp_description_values
 from src.orchestrator import verify_sp_description_titles_length
 from src.orchestrator import verify_sp_description_levels
+from src.orchestrator import verify_sp_description_punctuation
 
 from src.myparser.spellchecker import TypeDict
 import src.myparser.info as lv
@@ -95,6 +96,9 @@ if __name__ == "__main__":
     # 8 - Não pode ter indicador nível zero #37
     results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(verify_sp_description_levels(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
+    # 9 - Pontuacoes obrigatorias e proibidas #32
+    results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(verify_sp_description_punctuation(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
     num_errors = 0
@@ -137,4 +141,3 @@ if __name__ == "__main__":
     
     # RESET COLORAMA
     print(Style.RESET_ALL)
-    

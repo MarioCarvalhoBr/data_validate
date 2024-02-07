@@ -3,6 +3,7 @@ from src.myparser.sp_description import verify_sp_description_titles_uniques
 from src.myparser.sp_description import verify_sp_description_text_capitalize
 from src.myparser.sp_description import verify_sp_description_titles_length
 from src.myparser.sp_description import verify_sp_description_levels
+from src.myparser.sp_description import verify_sp_description_punctuation
 
 from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors
 
@@ -97,3 +98,25 @@ def test_count_errors_verify_sp_description_levels(): # Teste false
     assert len(errors) == 2
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
+
+# Testes: Pontuações obrigatórias e proibidas: verify_sp_description_punctuation
+def test_true_verify_sp_description_punctuation(): # Teste true
+    planilha_04_descricao = path_input_data_ground_truth + "/4_descricao/descricao.xlsx"
+    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_false_verify_sp_description_punctuation(): # Teste false
+    planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
+    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) > 0
+def test_count_errors_verify_sp_description_punctuation(): # Teste false
+    planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
+    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
+    # Numero de erros esperado == 0
+    assert len(errors) == 0
+    # Numero de warnings esperado == 4
+    assert len(warnings) == 4
