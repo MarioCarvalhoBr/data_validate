@@ -109,3 +109,20 @@ def verify_sp_description_text_capitalize(path_sp_description):
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
     return not errors, errors, warnings
+
+def verify_sp_description_levels(path_sp_description):
+    errors, warnings = [], []
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
+
+    try:
+        df = read_excel_file(path_sp_description, True)
+        for index, row in df.iterrows():
+            if row['nivel'] < 1:
+                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Nível do indicador não pode ser menor que 1.")
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    return not errors, errors, warnings

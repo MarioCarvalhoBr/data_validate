@@ -27,3 +27,6 @@ def verify_graph_sp_description_composition(path_sp_description, path_ps_composi
 
 def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     return sp_values.verify_ids_sp_description_values(path_sp_description, path_sp_values)
+
+def verify_sp_description_levels(path_sp_description):
+    return sp_description.verify_sp_description_levels(path_sp_description)
