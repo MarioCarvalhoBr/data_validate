@@ -9,8 +9,7 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Padronizar lugar da linha nas mensagens de erro e warning #49
-
+Issue: Não pode ter indicador nível zero #37
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #49: Standardize the place of the line in error and warning messages
+close #37: Check if the indicator is not level zero or negative
