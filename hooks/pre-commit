@@ -1,0 +1,15 @@
+#!/bin/sh
+
+# Caminho relativo ou absoluto para o seu script
+sh generate_badge.sh
+
+# Verificar o status de saída do script
+# Se o script sair com status diferente de zero, o commit será abortado
+if [ $? -eq 0 ]; then
+  echo "Script executado com sucesso. Adicionando image.png ao commit..."
+  # Adiciona image.png ao staging area
+  git add assets/images/coverage_badge.svg
+else
+  echo "O commit foi abortado devido a falhas nas verificações."
+  exit 1
+fi

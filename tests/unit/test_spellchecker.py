@@ -25,15 +25,15 @@ def test_count_errors_verify_spelling_text_tiny(): # Teste false
     is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
     # Numero de erros esperado == 0
     assert len(errors) == 0
-    # Numero de warnings esperado == 14
-    assert len(warnings) == 14
+    # Numero de warnings esperado == 15
+    assert len(warnings) == 15
 
 # Testes: Verificar ortografia: Full
 def test_true_verify_spelling_text_full_for_errors(): # Teste true
     type_dict_spell = TypeDict.FULL
     is_correct,errors, warnings = verify_spelling_text(path_input_data_errors, type_dict_spell)
     assert is_correct is True
-    assert len(warnings) == 3
+    assert len(warnings) == 4
     assert len(errors) == 0
 
 def test_count_errors_verify_spelling_text_full(): # Teste false
@@ -42,5 +42,5 @@ def test_count_errors_verify_spelling_text_full(): # Teste false
     is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
     # Numero de erros esperado == 0
     assert len(errors) == 0
-    # Numero de warnings esperado == 3
-    assert len(warnings) == 3
+    # Numero de warnings esperado == 4
+    assert len(warnings) == 4
