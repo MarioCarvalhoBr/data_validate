@@ -9,7 +9,8 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Adiciona a verificação da pontuação nas descrições dos indicadores #32
+Issue: Verificar unicidade dos códigos #8: Verificar se cada código de indicador é único. Caso existam códigos repetidos, informar quais estão duplicados.
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #32: Add check for punctuation in indicator descriptions
+close #8: Add check for uniqueness of indicator codes
+

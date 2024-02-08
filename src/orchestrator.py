@@ -33,3 +33,6 @@ def verify_sp_description_levels(path_sp_description):
 
 def verify_sp_description_punctuation(path_sp_description):
     return sp_description.verify_sp_description_punctuation(path_sp_description)
+
+def verify_sp_description_codes_uniques(path_sp_description):
+    return sp_description.verify_sp_description_codes_uniques(path_sp_description)

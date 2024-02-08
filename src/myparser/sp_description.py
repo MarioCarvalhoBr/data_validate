@@ -147,3 +147,21 @@ def verify_sp_description_punctuation(path_sp_description):
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
     return not errors, errors, warnings
+
+def verify_sp_description_codes_uniques(path_sp_description):
+    errors, warnings = [], []
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        errors.append(error)
+        return is_correct, errors, warnings
+
+    try:
+        df = read_excel_file(path_sp_description, True)
+        duplicated = df['codigo'].duplicated().any()
+        if duplicated:
+            codes_duplicated = df[df['codigo'].duplicated()]['codigo'].tolist()
+            errors.append(f"{os.path.basename(path_sp_description)}: Existem códigos duplicados: {codes_duplicated}.")
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    return not errors, errors, warnings

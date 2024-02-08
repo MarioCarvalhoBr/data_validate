@@ -15,6 +15,7 @@ from src.orchestrator import verify_ids_sp_description_values
 from src.orchestrator import verify_sp_description_titles_length
 from src.orchestrator import verify_sp_description_levels
 from src.orchestrator import verify_sp_description_punctuation
+from src.orchestrator import verify_sp_description_codes_uniques
 
 from src.myparser.spellchecker import TypeDict
 import src.myparser.info as lv
@@ -98,7 +99,11 @@ if __name__ == "__main__":
     
     # 9 - Pontuacoes obrigatorias e proibidas #32
     results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(verify_sp_description_punctuation(path_input_folder + "/4_descricao/descricao.xlsx"))])
+
+    # 10 - Unicidade dos códigos #8
+    results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(verify_sp_description_codes_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
     
+
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
     num_errors = 0

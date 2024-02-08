@@ -3,6 +3,9 @@ import json
 import requests
 
 def generate_coverage_report():
+    # Gera .coverage e relatório de cobertura: coverage run -m pytest  -v -s
+    subprocess.run(['coverage', 'run', '-m', 'pytest'])
+    subprocess.run(['coverage', 'report'])
     # Gera o relatório de cobertura em formato JSON
     subprocess.run(['coverage', 'json', '-o', 'coverage.json'])
 
