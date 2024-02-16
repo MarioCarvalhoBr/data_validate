@@ -9,8 +9,7 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Verificar unicidade dos códigos #8: Verificar se cada código de indicador é único. Caso existam códigos repetidos, informar quais estão duplicados.
+Issue: Hierarquia como árvore #3: Verificar se a hierarquia é uma árvore. Caso tenha algum loop, mostrar o loop para o usuário poder corrigir o problema facilmente.
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #8: Add check for uniqueness of indicator codes
-
+close #3: Verify if the hierarchy is a tree

@@ -5,6 +5,7 @@ import openpyxl
 import pandas
 import pyarrow
 import pytest
+import pipreqs
     
 def print_versions():
     print("\nPackages versions:")
@@ -15,4 +16,5 @@ def print_versions():
     print("Pandas version:", pandas.__version__)
     print("Pyarrow version:", pyarrow.__version__)
     print("Pytest version:", pytest.__version__)
+    print("Pipreqs version:", pipreqs.__version__)
     return True
