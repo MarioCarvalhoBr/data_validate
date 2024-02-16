@@ -44,3 +44,6 @@ def verify_tree_sp_composition_hierarchy(path_ps_composition):
 
 def verify_version():
     return info.print_versions()
+
+def get_spellchecker():
+    return spellchecker

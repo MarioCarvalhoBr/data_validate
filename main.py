@@ -70,10 +70,10 @@ if __name__ == "__main__":
     if not args.no_spellchecker:
         type_dict = type_dict.lower()
         # Mapear o argumento para o enum correspondente
-        type_dict_spell = orc.TypeDict.FULL
+        type_dict_spell = orc.get_spellchecker().TypeDict.FULL
         
         if type_dict == 'tiny':
-            type_dict_spell = orc.TypeDict.TINY
+            type_dict_spell = orc.get_spellchecker().TypeDict.TINY
        
         if args.type_dict not in ['tiny', 'full']:
             print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário full por padrão.")
