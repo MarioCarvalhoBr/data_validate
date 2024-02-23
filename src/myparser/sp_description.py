@@ -1,7 +1,7 @@
 import os
 import re
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import read_excel_file, file_extension_check
+from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values
 
 def check_html_in_descriptions(path_sp_description, df):
     errors = []
@@ -22,11 +22,6 @@ def format_errors_and_warnings(name, missing_columns, extra_columns):
 
 def verify_sp_description_parser_html_column_names(path_sp_description):
     errors, warnings = [], []
-
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
 
     try:
         df = read_excel_file(path_sp_description)
@@ -50,10 +45,6 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
 
 def verify_sp_description_titles_length(path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
 
     try:
         df = read_excel_file(path_sp_description, True)
@@ -69,10 +60,6 @@ def verify_sp_description_titles_length(path_sp_description):
 
 def verify_sp_description_titles_uniques(path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
 
     try:
         df = read_excel_file(path_sp_description, True)
@@ -92,10 +79,6 @@ def verify_sp_description_titles_uniques(path_sp_description):
 
 def verify_sp_description_text_capitalize(path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
 
     try:
         df = read_excel_file(path_sp_description, True)
@@ -112,13 +95,15 @@ def verify_sp_description_text_capitalize(path_sp_description):
 
 def verify_sp_description_levels(path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
+
 
     try:
+        
         df = read_excel_file(path_sp_description, True)
+        name_file_description = path_sp_description.split("/")[-1]
+        df, erros_numericos = dataframe_clean_non_numeric_values(df, name_file_description, ['codigo', 'nivel'])
+        if erros_numericos:
+            errors.extend(erros_numericos)
         for index, row in df.iterrows():
             if row['nivel'] < 1:
                 errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Nível do indicador não pode ser menor que 1.")
@@ -129,10 +114,6 @@ def verify_sp_description_levels(path_sp_description):
 
 def verify_sp_description_punctuation(path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
 
     try:
         df = read_excel_file(path_sp_description, True)
@@ -150,10 +131,6 @@ def verify_sp_description_punctuation(path_sp_description):
 
 def verify_sp_description_codes_uniques(path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
 
     try:
         df = read_excel_file(path_sp_description, True)

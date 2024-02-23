@@ -1,8 +1,10 @@
-import src.myparser.graph as graph
+import src.myparser.hierarchy.graph as graph
+import src.myparser.hierarchy.tree as tree
 import src.myparser.sp_values as sp_values
 import src.myparser.sp_description as sp_description
 import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
+import src.myparser.info as info
 
 def verify_spelling_text(path_folder, type_dict_spell):
     return spellchecker.run(path_folder, type_dict_spell)
@@ -36,3 +38,12 @@ def verify_sp_description_punctuation(path_sp_description):
 
 def verify_sp_description_codes_uniques(path_sp_description):
     return sp_description.verify_sp_description_codes_uniques(path_sp_description)
+
+def verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description):
+    return tree.verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description)
+
+def verify_version():
+    return info.print_versions()
+
+def get_spellchecker():
+    return spellchecker

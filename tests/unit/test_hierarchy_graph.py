@@ -2,10 +2,10 @@ import networkx as nx
 from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors
 
 
-from src.myparser.graph import verificar_ciclos
-from src.myparser.graph import verificar_grafos_desconectados
-from src.myparser.graph import imprimir_grafo
-from src.myparser.graph import verify_graph_sp_description_composition
+from src.myparser.hierarchy.graph import verificar_ciclos
+from src.myparser.hierarchy.graph import verificar_grafos_desconectados
+from src.myparser.hierarchy.graph import imprimir_grafo
+from src.myparser.hierarchy.graph import verify_graph_sp_description_composition
 
 # Testes: Hierarquia como grafo conexo
 def test_true_verify_graph_sp_description_composition(): # Teste true
@@ -22,8 +22,8 @@ def test_count_errors_verify_graph_sp_description_composition(): # Teste false
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
     planilha_05_composicao = path_input_data_errors + "/5_composicao/composicao.xlsx"
     is_correct, errors, warnings = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
-    # Numero de erros esperado == 4
-    assert len(errors) == 4
+    # Numero de erros esperado == 6
+    assert len(errors) == 6
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
     
