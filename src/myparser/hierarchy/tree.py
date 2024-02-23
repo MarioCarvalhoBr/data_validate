@@ -83,6 +83,8 @@ def verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_s
             if (filho is not None) and (pai is not None): 
                 linha_relacionada = df_composicao[(df_composicao['codigo_pai'] == int(pai)) & (df_composicao['codigo_filho'] == int(filho))].index.tolist()[0]
                 index_linha = linha_relacionada + 2
-                errors.append(f"{name_file_composition}, linha {index_linha}: O indicador {pai} não pode ser pai do indicador {filho}.")
-    
+                # Forma 2: composicao.xlsx, linha {}: O indicador {} (nível {}) não pode ser pai do indicador {} (nível {}).
+                nivel_pai = df_descricao[df_descricao['codigo'] == int(pai)]['nivel'].values[0]
+                nivel_filho = df_descricao[df_descricao['codigo'] == int(filho)]['nivel'].values[0]
+                errors.append(f"{name_file_composition}, linha {index_linha}: O indicador {pai} (nível {nivel_pai}) não pode ser pai do indicador {filho} (nível {nivel_filho}).")
     return not errors, errors, warnings
