@@ -1,0 +1,8 @@
+[run]
+source = src/
+
+[report]
+# Ignore files/directories
+omit =
+    *orchestrator.py*
+    */python3.5/*

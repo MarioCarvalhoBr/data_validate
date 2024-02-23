@@ -22,8 +22,8 @@ def test_count_errors_verify_graph_sp_description_composition(): # Teste false
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
     planilha_05_composicao = path_input_data_errors + "/5_composicao/composicao.xlsx"
     is_correct, errors, warnings = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
-    # Numero de erros esperado == 4
-    assert len(errors) == 4
+    # Numero de erros esperado == 6
+    assert len(errors) == 6
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
     

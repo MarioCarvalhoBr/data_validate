@@ -20,8 +20,8 @@ def test_count_errors_verify_tree_sp_composition_hierarchy(): # Teste false
     planilha_05_composicao = path_input_data_errors + "/5_composicao/composicao.xlsx"
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
     is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(planilha_05_composicao, planilha_04_descricao)
-    # Numero de erros esperado == 5
-    assert len(errors) == 5
+    # Numero de erros esperado == 7
+    assert len(errors) == 7
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
 

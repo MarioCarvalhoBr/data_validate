@@ -16,7 +16,8 @@ def dataframe_clean_non_numeric_values(df, name_file, colunas_limpar):
                 erros.append(f"{name_file}, linha {linhas_invalidas.index.tolist()[0]}: A coluna '{coluna}' deve conter apenas valores numéricos.")
             # Elimina linhas com valores não numéricos
             df = df[pd.to_numeric(df[coluna], errors='coerce').notnull()]
-    return df, erros
+    return df, erros 
+
 
 def file_extension_check(path, extension='.xlsx'):
     if not path.endswith(extension):

@@ -1,6 +1,5 @@
 import networkx as nx
-import matplotlib.pyplot as plt
-from src.util.utilities import read_excel_file, file_extension_check
+from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
     codigos_descricao = set(descricao['codigo'].astype(str))
@@ -18,7 +17,8 @@ def verificar_codigos_ausentes_comp_desc(composicao, descricao):
     codigos_faltantes = (codigos_descricao - codigos_pai.union(codigos_filho)) - {'0'}
     return codigos_faltantes
 
-
+# Function to plot: 
+'''
 def plot_grafo(G, is_save=False):
     plt.figure(figsize=(24, 16))
     pos = nx.spring_layout(G)  # Posicionamento dos nós
@@ -27,6 +27,7 @@ def plot_grafo(G, is_save=False):
     if is_save:
         plt.savefig("grafo.pdf")
     plt.show()
+'''
     
 def imprimir_grafo(G):
     text_graph = ""
@@ -58,27 +59,22 @@ def verificar_grafos_desconectados(G):
     subgrafos.sort(key=len, reverse=True)
     return subgrafos[1:] if len(subgrafos) > 1 else []
 
-def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
+def verify_graph_sp_description_composition(path_sp_description, path_sp_composition):
     errors = []
     warnings = []
     is_valid = True
-
-    # Verifica se os arquivos de entrada são .xlsx
-    is_correct, error = file_extension_check(path_sp_description)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
     
-    is_correct, error = file_extension_check(path_ps_composition)
-    if not is_correct:
-        errors.append(error)
-        return is_correct, errors, warnings
+    composicao = read_excel_file(path_sp_composition)
+    name_file_composition = path_sp_composition.split("/")[-1]
+    composicao, erros_numericos = dataframe_clean_non_numeric_values(composicao, name_file_composition, ['codigo_pai', 'codigo_filho'])
+    if erros_numericos:
+        errors.extend(erros_numericos)
     
-    # Execução do script
     descricao = read_excel_file(path_sp_description)
-    composicao = read_excel_file(path_ps_composition)
     name_file_description = path_sp_description.split("/")[-1]
-    name_file_composition = path_ps_composition.split("/")[-1]
+    descricao, erros_numericos = dataframe_clean_non_numeric_values(descricao, name_file_description, ['codigo', 'nivel'])
+    if erros_numericos:
+        errors.extend(erros_numericos)
     
     codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
     if codigos_faltantes:

@@ -16,3 +16,12 @@ def test_count_errors_verify_structure_folder_files(): # Teste false
     assert len(errors) == 2
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
+
+def test_errors_verify_structure_downr_exist_folder_files(): # Teste false
+    is_correct, errors, warnings = verify_structure_folder_files("dont_exist_path")
+    # Numero de erros esperado == 2
+    assert len(errors) == 1
+    # Numero de warnings esperado == 0
+    assert len(warnings) == 0
+    assert errors[0] == "A pasta não foi encontrada: dont_exist_path."
+

@@ -20,7 +20,7 @@ def verify_structure_folder_files(path_folder):
     exists, error = check_folder_exists(path_folder)
     if not exists:
         errors.append(error)
-        return False, errors  # Retorna imediatamente se a pasta principal não existir
+        return False, errors, warnings  # Retorna imediatamente se a pasta principal não existir
 
     # Verifica cada subpasta e seus arquivos
     for subfolder, files in expected_structure.items():
@@ -28,13 +28,11 @@ def verify_structure_folder_files(path_folder):
         exists, error = check_folder_exists(subfolder_path)
         if not exists:
             errors.append(error)
-            continue  # Continua para verificar as próximas subpastas mesmo se uma não existir
+        else:
+            for file in files:
+                file_path = os.path.join(subfolder_path, file)
+                exists, error = check_file_exists(file_path)
+                if not exists:
+                    errors.append(error)
 
-        for file in files:
-            file_path = os.path.join(subfolder_path, file)
-            exists, error = check_file_exists(file_path)
-            if not exists:
-                errors.append(error)
-
-    is_correct = len(errors) == 0
-    return is_correct, errors, warnings
+    return not errors, errors, warnings

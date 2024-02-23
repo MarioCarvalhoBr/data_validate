@@ -102,6 +102,8 @@ pytest tests/unit/test_parser.py -v
 coverage run -m pytest  -v -s
 coverage run -m pytest tests/unit/test_parser.py -v 
 coverage report -m
+# Ou
+coverage run --source=src/ -m pytest -v -s && coverage report -m
 ```
 
 ### Lint com ruff 

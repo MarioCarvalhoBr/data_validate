@@ -7,7 +7,7 @@ from src.myparser.sp_description import verify_sp_description_punctuation
 from src.myparser.sp_description import verify_sp_description_codes_uniques
 
 from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors
-
+import os
 
 # Testes: Títulos únicos: verify_sp_description_titles_uniques
 def test_true_verify_sp_description_titles_length_in_data_ground_truth(): # Teste true
@@ -95,8 +95,8 @@ def test_false_verify_sp_description_levels(): # Teste false
 def test_count_errors_verify_sp_description_levels(): # Teste false
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
     is_correct, errors, warnings = verify_sp_description_levels(planilha_04_descricao)
-    # Numero de erros esperado == 2
-    assert len(errors) == 2
+    # Numero de erros esperado == 3
+    assert len(errors) == 3
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
 
@@ -141,4 +141,33 @@ def test_count_errors_verify_sp_description_codes_uniques(): # Teste false
     # Numero de erros esperado == 1
     assert len(errors) == 1
     # Numero de warnings esperado == 0
+    assert len(warnings) == 0
+
+# Test verify_sp_description_parser_html_column_names
+def test_verify_sp_description_parser_html_column_names_with_valid_file():
+    path_sp_description = os.path.join(path_input_data_ground_truth, "4_descricao", "descricao.xlsx")
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(path_sp_description)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_verify_sp_description_parser_html_column_names_with_invalid_file():
+    path_sp_description = os.path.join(path_input_data_errors, "4_descricao", "descricao.csv")
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(path_sp_description)
+    assert is_correct is False
+    assert len(errors) > 0
+    assert len(warnings) == 0
+
+def test_verify_sp_description_parser_html_column_names_with_missing_columns():
+    path_sp_description = os.path.join(path_input_data_errors, "missing_columns.xlsx")
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(path_sp_description)
+    assert is_correct is False
+    assert len(errors) > 0
+    assert len(warnings) == 0
+
+def test_verify_sp_description_parser_html_column_names_with_extra_columns():
+    path_sp_description = os.path.join(path_input_data_errors, "extra_columns.xlsx")
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(path_sp_description)
+    assert is_correct is False
+    assert len(errors) > 0
     assert len(warnings) == 0
