@@ -15,6 +15,14 @@ Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análi
 - **OpenPyXL**: Uma biblioteca para leitura e escrita de arquivos Excel, necessária para manipular arquivos `.xlsx`.
 - **Argparse**: Facilita a criação de interfaces de linha de comando, permitindo a passagem de argumentos para o script.
 
+
+## Criando o ambiente virtual com conda
+```shell
+conda create -n adapta_data -c conda-forge python numpy pandas -y
+conda activate adapta_data
+pip install -r requirements.txt
+```
+
 ## Instalação
 
 Instale os requerimentos
@@ -86,6 +94,7 @@ pip install coverage
 ```
 Execute o código `test_parser.py` para realizar testes automatizados, garantindo que o parser funcione conforme esperado em diferentes cenários de dados.
 ```bash
+pytest --collect-only
 pytest -v -s
 # Ou
 pytest tests/unit/test_parser.py -v

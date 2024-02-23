@@ -1,89 +1,94 @@
-import re
+from src.util.utilities import read_excel_file, file_extension_check, dataframe_clean_non_numeric_values
 import pandas as pd
-from src.util.utilities import read_excel_file, file_extension_check
+def criar_arvore(composicao):
+    arvore = {}
+    for _, row in composicao.iterrows():
+        pai = str(row['codigo_pai']).replace(',', '')
+        filho = str(row['codigo_filho']).replace(',', '')
+        if pai not in arvore:
+            arvore[pai] = []
+        arvore[pai].append(filho)
+    return arvore
 
-def verificar_niveis_pai_filho(df_composicao):
-    erros_niveis = [
-        f"Erro de nível: Pai {row['codigo_pai']} (Nível {row['nivel_pai']}) e Filho {row['codigo_filho']} (Nível {row['nivel_filho']})"
-        for _, row in df_composicao.iterrows() if row['nivel_filho'] - row['nivel_pai'] != 1
-    ]
-    return erros_niveis
-
-# DFS: Depth-First Search ou Busca em Profundidade para verificar a existência de ciclos
-def dfs(hierarquia, node, visitado, caminho_atual):
+def dfs(arvore, node, visitado, caminho_atual):
     if node in visitado:
         if node in caminho_atual:
-            loop_index = caminho_atual.index(node)
-            loop = caminho_atual[loop_index:]
-            return True, f"Loop detectado: [{' -> '.join(map(str, loop))} -> {node}]"
-        return False, None
+            return True, caminho_atual[caminho_atual.index(node):] + [node]
+        return False, []
     visitado.add(node)
     caminho_atual.append(node)
-    for filho in hierarquia.get(node, []):
-        loop_found, loop_message = dfs(hierarquia, filho, visitado, caminho_atual)
-        if loop_found:
-            return True, loop_message
+    for filho in arvore.get(node, []):
+        ciclo_encontrado, ciclo = dfs(arvore, filho, visitado, caminho_atual)
+        if ciclo_encontrado:
+            return True, ciclo
     caminho_atual.pop()
-    return False, None
+    return False, []
 
-def limpar_dados_numericos(df, name_file_composition):
-    # Colunas para verificar se são numéricas
-    colunas = ['codigo_pai', 'codigo_filho', 'nivel_pai', 'nivel_filho']
+def verificar_ciclos(arvore):
+    visitado = set()
+    for node in arvore:
+        ciclo_encontrado, ciclo = dfs(arvore, node, visitado, [])
+        if ciclo_encontrado:
+            return True, ciclo
+    return False, []
+
+def verificar_erros_niveis(composicao, descricao):
     erros = []
+    niveis = {str(row['codigo']): row['nivel'] for _, row in descricao.iterrows()}
+    for _, row in composicao.iterrows():
+        pai = str(row['codigo_pai']).replace(',', '')
+        filho = str(row['codigo_filho']).replace(',', '')
+        nivel_pai = niveis.get(pai, None)
+        nivel_filho = niveis.get(filho, None)
+        # Verifica se é none
+        if nivel_pai is None:
+            erros.append((pai, None))
+        elif nivel_filho is None:
+            erros.append((None, filho))
+        elif nivel_pai >= nivel_filho:
+            erros.append((pai, filho))
+    return erros
 
-    # Verificar e eliminar linhas com valores não numéricos
-    for coluna in colunas:
-        # Verifica se a coluna contém valores não numéricos
-        if not pd.to_numeric(df[coluna], errors='coerce').notnull().all():
-            # Registra as linhas com valores não numéricos para a coluna atual
-            linhas_invalidas = df[pd.to_numeric(df[coluna], errors='coerce').isnull()]
-            if not linhas_invalidas.empty:
-                erros.append(f"{name_file_composition}, linha {linhas_invalidas.index.tolist()[0]}: A coluna '{coluna}' deve conter apenas valores numéricos.")
-            # Elimina linhas com valores não numéricos
-            df = df[pd.to_numeric(df[coluna], errors='coerce').notnull()]
-
-    if erros:
-        # Se houver erros, adiciona uma mensagem geral
-        erros.insert(0, f"{name_file_composition}: Os valores das colunas 'codigo_pai', 'codigo_filho', 'nivel_pai' e 'nivel_filho' devem ser numéricos.")
-    
-    return df, erros
-
-def verify_tree_sp_composition_hierarchy(path_ps_composition):
+def verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description):
     errors, warnings = [], []
-    is_correct, error = file_extension_check(path_ps_composition)
+    
+    is_correct, error = file_extension_check(path_sp_composition)
     if not is_correct:
         return is_correct, [error], warnings
-    
-    df_composicao = read_excel_file(path_ps_composition)
-    name_file_composition = path_ps_composition.split("/")[-1]
-
-    # Limpar dados numéricos
-    df_composicao, erros_numericos = limpar_dados_numericos(df_composicao, name_file_composition)
-
+    df_composicao = read_excel_file(path_sp_composition)
+    name_file_composition = path_sp_composition.split("/")[-1]
+    df_composicao, erros_numericos = dataframe_clean_non_numeric_values(df_composicao, name_file_composition, ['codigo_pai', 'codigo_filho'])
     if erros_numericos:
         errors.extend(erros_numericos)
     
-    if not ((df_composicao['codigo_pai'] == 0) & (df_composicao['nivel_pai'] == 0)).any():
-        # Imprimir a linha que o código_pai é 0 e o nível_pai é diferente de 0
-        numero_da_linha = df_composicao[(df_composicao['codigo_pai'] == 0) & (df_composicao['nivel_pai'] != 0)].index[0] 
-        errors.extend([f"{name_file_composition}, linha {numero_da_linha}: O valor da coluna 'nivel_pai' deve ser 0 (zero) quando o valor da coluna 'codigo_pai' for 0 (zero)."])
-
-    hierarquia = {pai: list(filhos) for pai, filhos in df_composicao.groupby('codigo_pai')['codigo_filho']}
+    is_correct, error = file_extension_check(path_sp_description)
+    if not is_correct:
+        return is_correct, [error], warnings
+    df_descricao = read_excel_file(path_sp_description)
+    name_file_description = path_sp_description.split("/")[-1]
+    df_descricao, erros_numericos = dataframe_clean_non_numeric_values(df_descricao, name_file_description, ['codigo', 'nivel'])
+    if erros_numericos:
+        errors.extend(erros_numericos)
     
-    erros_niveis = verificar_niveis_pai_filho(df_composicao)
-    if erros_niveis:
-        for erro in erros_niveis:
-            # Use RE para extrair o número da linha
-            dados = re.findall(r'\d+', erro)
-            codigo_pai = int(dados[0])
-            codigo_filho = int(dados[2])
-            nivel_pai = int(dados[1])
-            nivel_filho = int(dados[3])
-            numero_da_linha = df_composicao[(df_composicao['codigo_pai'] == codigo_pai) & (df_composicao['codigo_filho'] == codigo_filho) & (df_composicao['nivel_pai'] == nivel_pai) & (df_composicao['nivel_filho'] == nivel_filho)].index[0]
-            errors.append(f"{name_file_composition}, linha {numero_da_linha + 2}: {erro}.")
+    if not ((df_composicao['codigo_pai'] == 0)).any():
+        errors.extend([f"{name_file_composition}: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore."])
 
-    loop_found, loop_message = dfs(hierarquia, 0, set(), [])
-    if loop_found:
-        errors.extend([f"{name_file_composition}: {loop_message}."])
+    if not ((df_descricao['codigo'] == 0)).any():
+        # Adiciona a a linha com codigo=0 e nivel=0																						
+        df_descricao = pd.concat([df_descricao, pd.DataFrame([[0,0,0,0,0,0,0,0,0,0,0]], columns=['codigo', 'nivel', 'nome_simples', 'nome_completo', 'unidade', 'desc_simples','desc_completa', 'cenario', 'relacao', 'fontes', 'meta'])], ignore_index=True)
+    
+    arvore = criar_arvore(df_composicao)
+    ciclo_encontrado, ciclo = verificar_ciclos(arvore)
+    if ciclo_encontrado:
+        # print(f"Ciclo encontrado: {' -> '.join(ciclo)}")
+        errors.append(f"{name_file_composition}: Ciclo encontrado: [{' -> '.join(ciclo)}].")
+    
+    erros_niveis = verificar_erros_niveis(df_composicao, df_descricao)
+    if erros_niveis:
+        for pai, filho in erros_niveis:
+            if (filho is not None) and (pai is not None): 
+                linha_relacionada = df_composicao[(df_composicao['codigo_pai'] == int(pai)) & (df_composicao['codigo_filho'] == int(filho))].index.tolist()[0]
+                index_linha = linha_relacionada + 2
+                errors.append(f"{name_file_composition}, linha {index_linha}: O indicador {pai} não pode ser pai do indicador {filho}.")
     
     return not errors, errors, warnings

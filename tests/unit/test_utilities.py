@@ -4,6 +4,7 @@ from src.util.utilities import read_excel_file
 from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
+from src.util.utilities import dataframe_clean_non_numeric_values
 
 # Testes para read_excel_file:
 def test_read_excel_file_with_existing_file():
@@ -104,3 +105,34 @@ def test_check_file_exists_with_existing_file():
     os.remove(existing_file)  # Clean up
     assert result is True
     assert error_message == ""
+
+
+def test_dataframe_clean_non_numeric_values_with_no_errors():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+    })
+    df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    assert len(erros) == 0
+    assert len(df) == 3
+
+def test_dataframe_clean_non_numeric_values_with_non_numeric_values():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 'three'],
+        'codigo_filho': [2, 3, 4],
+    })
+    df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    assert len(erros) == 1
+    assert erros[0] == "test_file, linha 2: A coluna 'codigo_pai' deve conter apenas valores numéricos."
+    assert len(df) == 2
+
+def test_dataframe_clean_non_numeric_values_with_multiple_errors():
+    df = pd.DataFrame({
+        'codigo_pai': [2, 'three', 4],
+        'codigo_filho': [1, 2, 'three'],
+    })
+    df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    assert len(erros) == 2
+    assert erros[0] == "test_file, linha 1: A coluna 'codigo_pai' deve conter apenas valores numéricos."
+    assert erros[1] == "test_file, linha 2: A coluna 'codigo_filho' deve conter apenas valores numéricos."
+    assert len(df) == 1

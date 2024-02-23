@@ -27,7 +27,16 @@ if __name__ == "__main__":
 
     # Lista para armazenar os resultados dos testes: [nome_issue, is_correct, errors, warnings]
     results_tests = []
+
+    # Caminho para a pasta de entrada
     path_input_folder = args.input_folder
+
+    # Caminhos para as planilhas
+    path_sp_composition = path_input_folder + "/5_composicao/composicao.xlsx"
+    path_sp_description = path_input_folder + "/4_descricao/descricao.xlsx"
+    path_sp_values = path_input_folder + "/8_valores/valores.xlsx"
+    
+    # Tipo de dicionário ortográfico
     type_dict = args.type_dict
     
     is_degug = args.debug
@@ -44,9 +53,9 @@ if __name__ == "__main__":
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(orc.verify_structure_folder_files(path_input_folder))])
     
     # 2 - Hierarquia como grafo conexo
-    is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/5_composicao/composicao.xlsx"))
+    is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(path_sp_description, path_sp_composition))
     # 2.1 - Relações entre indicadores e valores
-    is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(path_input_folder + "/4_descricao/descricao.xlsx", path_input_folder + "/8_valores/valores.xlsx"))
+    is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(path_sp_description, path_sp_values))
     
     # 2.2 - Concatenar os resultados
     is_correct = is_correct_comp2desc and is_correct_val2desc
@@ -55,16 +64,16 @@ if __name__ == "__main__":
     results_tests.append([("Issue #2 e 59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
 
     # Hierarquia como árvore #3: verify_tree_sp_composition_hierarchy
-    results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_composition_hierarchy(path_input_folder + "/5_composicao/composicao.xlsx"))])
+    results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description))])
     
     # 3 - Não pode ter indicador nível zero #37
-    results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(orc.verify_sp_description_levels(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(orc.verify_sp_description_levels(path_sp_description))])
     
     # 4 - Unicidade dos códigos #8
-    results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(orc.verify_sp_description_codes_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(orc.verify_sp_description_codes_uniques(path_sp_description))])
     
     # 5 - Verifica se a planilha de descrição está correta
-    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(path_sp_description))])
 
     # 6 - Verficar a ortografia
     if not args.no_spellchecker:
@@ -81,17 +90,17 @@ if __name__ == "__main__":
         results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", *(orc.verify_spelling_text(path_input_folder, type_dict_spell))])
     
     # 7 - Verificar nomes de colunas únicos
-    results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(orc.verify_sp_description_titles_uniques(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(orc.verify_sp_description_titles_uniques(path_sp_description))])
     
     # 8 - Padrão para nomes dos indicadores #1
-    results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(orc.verify_sp_description_text_capitalize(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(orc.verify_sp_description_text_capitalize(path_sp_description))])
     
     # 9 - Títulos com mais de 30 caracteres
     if not args.no_warning_titles_length:
-        results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(path_input_folder + "/4_descricao/descricao.xlsx"))])
+        results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(path_sp_description))])
     
     # 10 - Pontuacoes obrigatorias e proibidas #32
-    results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_input_folder + "/4_descricao/descricao.xlsx"))])
+    results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description))])
 
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 

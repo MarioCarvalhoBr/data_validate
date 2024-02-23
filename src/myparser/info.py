@@ -6,7 +6,7 @@ import pandas
 import pyarrow
 import pytest
 import pipreqs
-    
+import coverage
 def print_versions():
     print("\nPackages versions:")
     print("Colorama version:", colorama.__version__)
@@ -17,4 +17,5 @@ def print_versions():
     print("Pyarrow version:", pyarrow.__version__)
     print("Pytest version:", pytest.__version__)
     print("Pipreqs version:", pipreqs.__version__)
+    print("Coverage version:", coverage.__version__)
     return True

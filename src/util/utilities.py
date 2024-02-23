@@ -1,6 +1,23 @@
 import os
 import pandas as pd
 
+def dataframe_clean_non_numeric_values(df, name_file, colunas_limpar):
+    # Colunas para verificar se são numéricas
+    colunas = colunas_limpar
+    erros = []
+
+    # Verificar e eliminar linhas com valores não numéricos
+    for coluna in colunas:
+        # Verifica se a coluna contém valores não numéricos
+        if not pd.to_numeric(df[coluna], errors='coerce').notnull().all():
+            # Registra as linhas com valores não numéricos para a coluna atual
+            linhas_invalidas = df[pd.to_numeric(df[coluna], errors='coerce').isnull()]
+            if not linhas_invalidas.empty:
+                erros.append(f"{name_file}, linha {linhas_invalidas.index.tolist()[0]}: A coluna '{coluna}' deve conter apenas valores numéricos.")
+            # Elimina linhas com valores não numéricos
+            df = df[pd.to_numeric(df[coluna], errors='coerce').notnull()]
+    return df, erros
+
 def file_extension_check(path, extension='.xlsx'):
     if not path.endswith(extension):
         return False, f"ERRO: O arquivo {path} de entrada não é {extension}"

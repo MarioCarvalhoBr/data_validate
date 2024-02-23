@@ -39,8 +39,8 @@ def verify_sp_description_punctuation(path_sp_description):
 def verify_sp_description_codes_uniques(path_sp_description):
     return sp_description.verify_sp_description_codes_uniques(path_sp_description)
 
-def verify_tree_sp_composition_hierarchy(path_ps_composition):
-    return tree.verify_tree_sp_composition_hierarchy(path_ps_composition)
+def verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description):
+    return tree.verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description)
 
 def verify_version():
     return info.print_versions()
