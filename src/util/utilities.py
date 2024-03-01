@@ -18,6 +18,15 @@ def dataframe_clean_non_numeric_values(df, name_file, colunas_limpar):
             df = df[pd.to_numeric(df[coluna], errors='coerce').notnull()]
     return df, erros 
 
+def dataframe_check_min_value(df, name_file, colunas_verificar):
+    erros = []
+    for coluna in colunas_verificar:
+        # Verifica se a col
+        if not (df[coluna] >= 0).all():
+            # Linha onde existe o valor menor que zero
+            linha_invalida = df[df[coluna] < 0].index.tolist()[0]            
+            erros.append(f"{name_file}, linha {linha_invalida}: A coluna '{coluna}' deve conter apenas valores maiores ou iguais a zero.")
+    return erros
 
 def file_extension_check(path, extension='.xlsx'):
     if not path.endswith(extension):

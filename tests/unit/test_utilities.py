@@ -5,6 +5,47 @@ from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
 from src.util.utilities import dataframe_clean_non_numeric_values
+from src.util.utilities import dataframe_check_min_value
+
+'''
+def dataframe_check_min_value(df, name_file, colunas_verificar):
+    erros = []
+    for coluna in colunas_verificar:
+        # Verifica se a col
+        if not (df[coluna] >= 0).all():
+            # Linha onde existe o valor menor que zero
+            linha_invalida = df[df[coluna] < 0].index.tolist()[0]            
+            erros.append(f"{name_file}, linha {linha_invalida}: A coluna '{coluna}' deve conter apenas valores maiores ou iguais a zero.")
+    return erros
+
+'''
+def test_dataframe_check_min_value_with_no_negative_values():
+    df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    name_file = 'test_file'
+    colunas_verificar = ['A', 'B']
+    erros = dataframe_check_min_value(df, name_file, colunas_verificar)
+    assert erros == [], "Errors should be empty"
+
+def test_dataframe_check_min_value_with_negative_values():
+    df = pd.DataFrame({'A': [-1, 2, 3], 'B': [4, -5, 6]})
+    name_file = 'test_file'
+    colunas_verificar = ['A', 'B']
+    erros = dataframe_check_min_value(df, name_file, colunas_verificar)
+    expected_errors = [
+        "test_file, linha 0: A coluna 'A' deve conter apenas valores maiores ou iguais a zero.",
+        "test_file, linha 1: A coluna 'B' deve conter apenas valores maiores ou iguais a zero."
+    ]
+    assert erros == expected_errors, "Errors do not match expected"
+
+def test_dataframe_check_min_value_with_some_columns_to_check():
+    df = pd.DataFrame({'A': [-1, 2, 3], 'B': [4, -5, 6], 'C': [7, 8, 9]})
+    name_file = 'test_file'
+    colunas_verificar = ['A', 'C']
+    erros = dataframe_check_min_value(df, name_file, colunas_verificar)
+    expected_errors = [
+        "test_file, linha 0: A coluna 'A' deve conter apenas valores maiores ou iguais a zero."
+    ]
+    assert erros == expected_errors, "Errors do not match expected"
 
 # Testes para read_excel_file:
 def test_read_excel_file_with_existing_file():

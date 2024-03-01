@@ -9,7 +9,7 @@ Mensagem:
 close #numero_da_issue: descrição do commit
 
 # Exemplo:
-Issue: Hierarquia como árvore #3: Verificar se a hierarquia é uma árvore. Caso tenha algum loop, mostrar o loop para o usuário poder corrigir o problema facilmente.
+Issue: valor minimo para o id dos indicadores #76: O id dos indicadores deve ser sempre maior ou igual a zero.
 
 Escrever o nome do commit em inglês e usar o modo imperativo.
-close #3: Verify if the hierarchy is a tree
+close #76: The id of the indicators must always be greater than or equal to zero.

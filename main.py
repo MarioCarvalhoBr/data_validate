@@ -61,7 +61,7 @@ if __name__ == "__main__":
     is_correct = is_correct_comp2desc and is_correct_val2desc
     errors = errors_comp2desc + errors_val2desc
     warnings = warnings_comp2desc + warnings_val2desc
-    results_tests.append([("Issue #2 e 59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
+    results_tests.append([("Issue #2 e #59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
 
     # Hierarquia como árvore #3: verify_tree_sp_composition_hierarchy
     results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description))])
