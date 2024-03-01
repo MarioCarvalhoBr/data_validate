@@ -39,4 +39,4 @@ def main():
 if __name__ == "__main__":
     print("Executando geração do badge.svg antes do commit...")
     main()
-    print("Geração do badge.svg concluída.")
+    print("Geração do badge.svg concluída!")

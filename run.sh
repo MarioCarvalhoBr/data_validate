@@ -9,4 +9,4 @@ coverage report -m
 coverage json -o coverage.json
 python3 generate_coverage_report.py
 
-echo "Verificações concluídas."
+echo "Verificações concluídas"
