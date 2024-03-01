@@ -37,4 +37,6 @@ def main():
     download_badge(badge_url)
 
 if __name__ == "__main__":
+    print("Executando geração do badge.svg antes do commit...")
     main()
+    print("Geração do badge.svg concluída.")
