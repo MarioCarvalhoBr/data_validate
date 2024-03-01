@@ -1,7 +1,7 @@
 import os
 import re
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values
+from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, dataframe_check_min_value
 
 def check_html_in_descriptions(path_sp_description, df):
     errors = []

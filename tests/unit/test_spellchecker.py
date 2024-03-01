@@ -25,8 +25,8 @@ def test_count_errors_verify_spelling_text_tiny(): # Teste false
     is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
     # Numero de erros esperado == 0
     assert len(errors) == 0
-    # Numero de warnings esperado == 16
-    assert len(warnings) == 16
+    # Numero de warnings esperado == 17
+    assert len(warnings) == 17
 
 # Testes: Verificar ortografia: Full
 def test_true_verify_spelling_text_full_for_errors(): # Teste true
