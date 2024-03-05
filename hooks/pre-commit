@@ -1,6 +1,9 @@
-#!/bin/sh
+#!/bin/bash
+
 
 # Caminho relativo ou absoluto para o seu script
+. ~/miniconda3/etc/profile.d/conda.sh
+conda activate adapta_data
 python3 generate_coverage_report.py
 
 # Verificar o status de saída do script
