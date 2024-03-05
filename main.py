@@ -35,6 +35,9 @@ if __name__ == "__main__":
     path_sp_composition = path_input_folder + "/5_composicao/composicao.xlsx"
     path_sp_description = path_input_folder + "/4_descricao/descricao.xlsx"
     path_sp_values = path_input_folder + "/8_valores/valores.xlsx"
+    path_scenario = path_input_folder + "/3_cenarios_e_referencia_temporal/cenarios.xlsx"
+    path_temporal_reference = path_input_folder + "/3_cenarios_e_referencia_temporal/referencia_temporal.xlsx"
+
     
     # Tipo de dicionário ortográfico
     type_dict = args.type_dict
@@ -102,6 +105,9 @@ if __name__ == "__main__":
     # 10 - Pontuacoes obrigatorias e proibidas #32
     results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description))])
 
+    # verify_combination_sp_description_values_scenario_temporal_reference
+    results_tests.append([("Issue #19: " if is_degug else "") +"Relações de combinações valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
+    
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
     num_errors = 0
