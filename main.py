@@ -55,6 +55,9 @@ if __name__ == "__main__":
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(orc.verify_structure_folder_files(path_input_folder))])
     
+    # 1.2 - Verifica se os arquivos estão limpos: verify_files_data_clean
+    results_tests.append([("Issue #79: " if is_degug else "") +"Limpeza dos arquivos", *(orc.verify_files_data_clean(path_input_folder))])
+    
     # 2 - Hierarquia como grafo conexo
     is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(path_sp_description, path_sp_composition))
     # 2.1 - Relações entre indicadores e valores
@@ -65,19 +68,19 @@ if __name__ == "__main__":
     errors = errors_comp2desc + errors_val2desc
     warnings = warnings_comp2desc + warnings_val2desc
     results_tests.append([("Issue #2 e #59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
-
+    
     # Hierarquia como árvore #3: verify_tree_sp_composition_hierarchy
     results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description))])
     
     # 3 - Não pode ter indicador nível zero #37
     results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(orc.verify_sp_description_levels(path_sp_description))])
-    
+   
     # 4 - Unicidade dos códigos #8
     results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(orc.verify_sp_description_codes_uniques(path_sp_description))])
     
     # 5 - Verifica se a planilha de descrição está correta
     results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(path_sp_description))])
-
+    
     # 6 - Verficar a ortografia
     if not args.no_spellchecker:
         type_dict = type_dict.lower()
@@ -105,8 +108,8 @@ if __name__ == "__main__":
     # 10 - Pontuacoes obrigatorias e proibidas #32
     results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description))])
 
-    # verify_combination_sp_description_values_scenario_temporal_reference
-    results_tests.append([("Issue #19: " if is_degug else "") +"Relações de combinações valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
+    # 11 - verify_combination_sp_description_values_scenario_temporal_reference
+    results_tests.append([("Issue #19: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
     
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
@@ -114,14 +117,29 @@ if __name__ == "__main__":
     num_warnings = 0
     for i, data_test in enumerate(results_tests):
         name_test, is_correct, errors, warnings = data_test
-        if is_correct:
-            print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
-        else:
-            print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
+        if errors:
+            if is_correct:
+                print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
+            else:
+                print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
+        elif not errors and not warnings:
+            if is_correct:
+                print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
+            else:
+                print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
+        
         if not is_correct:
             for i_e, error in enumerate(errors):
                 print(Fore.RED + error)
                 num_errors += 1
+
+    for i, data_test in enumerate(results_tests):
+        name_test, is_correct, _, warnings = data_test
+        if warnings:
+            if is_correct:
+                print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
+            else:
+                print(Fore.BLUE + Style.BRIGHT + "Verificação: " + name_test)
             
         for i_w, warning in enumerate(warnings):
             print(Fore.YELLOW + warning)

@@ -1,5 +1,5 @@
 import networkx as nx
-from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, dataframe_check_min_value, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
     codigos_descricao = set(descricao['codigo'].astype(str))
@@ -79,25 +79,15 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
     
     composicao = read_excel_file(path_sp_composition)
     name_file_composition = path_sp_composition.split("/")[-1]
-    composicao, erros_numericos = dataframe_clean_non_numeric_values(composicao, name_file_composition, ['codigo_pai', 'codigo_filho'])
-    if erros_numericos:
-        errors.extend(erros_numericos)
+    
+    # Limpando os dados
+    composicao, _ = dataframe_clean_values_less_than(composicao, name_file_composition, ['codigo_pai'], -1)
+    composicao, _ = dataframe_clean_values_less_than(composicao, name_file_composition, ['codigo_filho'], 1)
     
     descricao = read_excel_file(path_sp_description)
     name_file_description = path_sp_description.split("/")[-1]
-    descricao, erros_numericos = dataframe_clean_non_numeric_values(descricao, name_file_description, ['codigo', 'nivel'])
-    if erros_numericos:
-        errors.extend(erros_numericos)
-
-    # Verifica se o id dos indicadores é maior ou igual a zero
-    erros_min_value = dataframe_check_min_value(descricao, name_file_description, ['codigo'])
-    if erros_min_value:
-        errors.extend(erros_min_value)
-        
-    # Verifica se o id dos indicadores é maior ou igual a zero
-    erros_min_value = dataframe_check_min_value(composicao, name_file_composition, ['codigo_pai', 'codigo_filho'])
-    if erros_min_value:
-        errors.extend(erros_min_value)
+    # Limpando os dados
+    descricao, _ = dataframe_clean_values_less_than(descricao, name_file_description, ['codigo', 'nivel'], 1)
     
     codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
     if codigos_faltantes:

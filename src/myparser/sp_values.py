@@ -1,5 +1,5 @@
 import os
-from src.util.utilities import file_extension_check, read_excel_file, dataframe_clean_non_numeric_values, dataframe_check_min_value, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
 
 def extract_ids_from_description(df_description):
     ids = set(df_description['codigo'].astype(str))
@@ -44,28 +44,12 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
         return False, errors, []
 
     try:
-        is_correct, error_message = file_extension_check(path_sp_description, '.xlsx')
-        if not is_correct:
-            errors.append(error_message)
-            return False, errors, warnings
-        
-        is_correct, error_message = file_extension_check(path_sp_values, '.xlsx')
-        if not is_correct:
-            errors.append(error_message)
-            return False, errors, warnings
-        
-        
+
         df_description = read_excel_file(path_sp_description)
         df_values = read_excel_file(path_sp_values)
 
         # Clean non numeric values
-        df_description, erros = dataframe_clean_non_numeric_values(df_description, os.path.basename(path_sp_description), ['codigo'])
-        if erros:
-            errors += erros
-        # Check min value
-        erros = dataframe_check_min_value(df_description, os.path.basename(path_sp_description), ['codigo'])
-        if erros:
-            errors += erros
+        df_description, _ = dataframe_clean_values_less_than(df_description, os.path.basename(path_sp_description), ['codigo'])
 
         id_description = extract_ids_from_description(df_description)
         id_values = extract_ids_from_values(df_values)
@@ -77,10 +61,8 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     except Exception as e:
         errors.append(f"Erro ao processar os arquivos: {e}.")
 
-    is_correct = False
-    if not errors:
-        is_correct = True
-    return is_correct, errors, warnings
+    
+    return not errors, errors, warnings
 
 
 def verificar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values):    
@@ -122,13 +104,10 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
 
     df_scenario = read_excel_file(path_sp_scenario)
     df_description = read_excel_file(path_sp_description)
-    name_file_description = os.path.basename(path_sp_description)
     df_temporal_reference = read_excel_file(path_temporal_reference)
 
     # Clean non numeric values
-    df_description, erros = dataframe_clean_non_numeric_values(df_description, os.path.basename(path_sp_description), ['codigo'])
-    if erros:
-        errors += erros
+    df_description, _ = dataframe_clean_values_less_than(df_description, os.path.basename(path_sp_description), ['codigo'])
 
     # Verificar cada indicador em df_description
     for line, row in df_description.iterrows():
@@ -144,10 +123,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
 
         # Verifica se o código é um número maior que zero
         if not codigo.isdigit():
-            # Linha onde existe o valor não numérico
-            linha_invalida = line + 2
-            errors.append(f"{name_file_description}, linha {linha_invalida}: A coluna 'codigo' deve conter apenas valores numéricos maiores que zero.")
-            continue
+           continue
 
         cenario = row['cenario']
         lista_combinacoes = []
@@ -167,7 +143,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
         # Verificar se as combinações estão presentes em df_values
         for combinacao in lista_combinacoes:
             if combinacao not in df_values.columns:
-                errors.append(f"{name_file_values}: A combinação {combinacao} está ausente para o indicador {codigo}.")
+                errors.append(f"{name_file_values}: A coluna {combinacao} é obrigatória.")
 
         # Verifica combinações extras somente para o código X-texto
         lista_combinacoes_sp_values = [col for col in df_values.columns if col.startswith(f"{codigo}-")]
@@ -176,6 +152,6 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
         if is_error:
             for erro in erros_message:
                 # Formata erros: errors.append(f"{name_file_values}: A combinação {combinacao} existe de forma extra para o indicador {codigo}.")
-                errors.append(f"{name_file_values}: A combinação {erro} está sobrando para o indicador {codigo}.")
+                errors.append(f"{name_file_values}: A coluna {erro} é desnecessária.")
 
     return not errors, errors, []

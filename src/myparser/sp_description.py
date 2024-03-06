@@ -1,7 +1,7 @@
 import os
 import re
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
 
 def check_html_in_descriptions(path_sp_description, df):
     errors = []
@@ -141,19 +141,18 @@ def verify_sp_description_levels(path_sp_description):
     if errors:
         return False, errors, []
 
-
     try:
         
         df = read_excel_file(path_sp_description, True)
-        name_file_description = path_sp_description.split("/")[-1]
-        df, erros_numericos = dataframe_clean_non_numeric_values(df, name_file_description, ['codigo', 'nivel'])
-        if erros_numericos:
-            errors.extend(erros_numericos)
+        name_file_description = os.path.basename(path_sp_description)
+        
         for index, row in df.iterrows():
-            if row['nivel'] < 1:
-                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Nível do indicador não pode ser menor que 1.")
+            dig = str(row['nivel'])
+            # Verifica se row['nivel'] é um digito inteiro maior que zero
+            if not dig.isdigit() or int(row['nivel']) < 1:
+                errors.append(f"{name_file_description}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
     except Exception as e:
-        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+        errors.append(f"{name_file_description}: Erro ao ler o arquivo .xlsx: {e}")
 
     return not errors, errors, warnings
 
@@ -196,6 +195,11 @@ def verify_sp_description_codes_uniques(path_sp_description):
 
     try:
         df = read_excel_file(path_sp_description, True)
+        
+        # Limpar os dados
+        df, _ = dataframe_clean_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
+        
+        # Verificar se há códigos duplicados
         duplicated = df['codigo'].duplicated().any()
         if duplicated:
             codes_duplicated = df[df['codigo'].duplicated()]['codigo'].tolist()

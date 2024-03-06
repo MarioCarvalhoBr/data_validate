@@ -1,7 +1,5 @@
 import os
-
-from src.util.utilities import check_folder_exists
-from src.util.utilities import check_file_exists
+from src.util.utilities import check_file_exists, dataframe_clean_values_less_than, read_excel_file, check_folder_exists
 
 
 def verify_structure_folder_files(path_folder):
@@ -34,5 +32,38 @@ def verify_structure_folder_files(path_folder):
                 exists, error = check_file_exists(file_path)
                 if not exists:
                     errors.append(error)
+
+    return not errors, errors, warnings
+
+# Verificação de limpeza dos arquivos
+def verify_files_data_clean(path_folder):
+    errors = []
+    warnings = []
+
+    files_to_clean = [
+        ["4_descricao/descricao.xlsx", "codigo", 1],
+        ["4_descricao/descricao.xlsx", "nivel", 1],
+        ["4_descricao/descricao.xlsx", "cenario", -1],
+        ["5_composicao/composicao.xlsx", "codigo_pai", -1],
+        ["5_composicao/composicao.xlsx", "codigo_filho", 1],
+    ]
+
+    try: 
+        for data in files_to_clean:
+            file = data[0]
+            column = [data[1]]
+            value = data[2]            
+            
+            file_path = os.path.join(path_folder, file)
+            file_name = os.path.basename(file)
+                        
+            df = read_excel_file(file_path)
+            _, erros = dataframe_clean_values_less_than(df, file_name, column, value)
+            
+            if erros:
+                errors.extend(erros)
+    except Exception:
+        pass
+        # errors.append(str(e))
 
     return not errors, errors, warnings

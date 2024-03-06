@@ -4,48 +4,7 @@ from src.util.utilities import read_excel_file
 from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
-from src.util.utilities import dataframe_clean_non_numeric_values
-from src.util.utilities import dataframe_check_min_value
-
-'''
-def dataframe_check_min_value(df, name_file, colunas_verificar):
-    erros = []
-    for coluna in colunas_verificar:
-        # Verifica se a col
-        if not (df[coluna] >= 0).all():
-            # Linha onde existe o valor menor que zero
-            linha_invalida = df[df[coluna] < 0].index.tolist()[0]            
-            erros.append(f"{name_file}, linha {linha_invalida}: A coluna '{coluna}' deve conter apenas valores maiores ou iguais a zero.")
-    return erros
-
-'''
-def test_dataframe_check_min_value_with_no_negative_values():
-    df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    name_file = 'test_file'
-    colunas_verificar = ['A', 'B']
-    erros = dataframe_check_min_value(df, name_file, colunas_verificar)
-    assert erros == [], "Errors should be empty"
-
-def test_dataframe_check_min_value_with_negative_values():
-    df = pd.DataFrame({'A': [-1, 2, 3], 'B': [4, -5, 6]})
-    name_file = 'test_file'
-    colunas_verificar = ['A', 'B']
-    erros = dataframe_check_min_value(df, name_file, colunas_verificar)
-    expected_errors = [
-        "test_file, linha 0: A coluna 'A' deve conter apenas valores maiores ou iguais a zero.",
-        "test_file, linha 1: A coluna 'B' deve conter apenas valores maiores ou iguais a zero."
-    ]
-    assert erros == expected_errors, "Errors do not match expected"
-
-def test_dataframe_check_min_value_with_some_columns_to_check():
-    df = pd.DataFrame({'A': [-1, 2, 3], 'B': [4, -5, 6], 'C': [7, 8, 9]})
-    name_file = 'test_file'
-    colunas_verificar = ['A', 'C']
-    erros = dataframe_check_min_value(df, name_file, colunas_verificar)
-    expected_errors = [
-        "test_file, linha 0: A coluna 'A' deve conter apenas valores maiores ou iguais a zero."
-    ]
-    assert erros == expected_errors, "Errors do not match expected"
+from src.util.utilities import dataframe_clean_values_less_than
 
 # Testes para read_excel_file:
 def test_read_excel_file_with_existing_file():
@@ -147,33 +106,52 @@ def test_check_file_exists_with_existing_file():
     assert result is True
     assert error_message == ""
 
-
-def test_dataframe_clean_non_numeric_values_with_no_errors():
+def test_dataframe_clean_values_less_than_with_no_errors():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 3],
         'codigo_filho': [2, 3, 4],
     })
-    df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
     assert len(erros) == 0
     assert len(df) == 3
 
-def test_dataframe_clean_non_numeric_values_with_non_numeric_values():
+def test_dataframe_clean_values_less_than_with_non_numeric_values():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 'three'],
         'codigo_filho': [2, 3, 4],
     })
-    df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 1)
     assert len(erros) == 1
-    assert erros[0] == "test_file, linha 4: A coluna 'codigo_pai' deve conter apenas valores numéricos."
+    assert erros[0] == "test_file, linha 4: A coluna 'codigo_pai' contém um valor não numérico."
     assert len(df) == 2
 
-def test_dataframe_clean_non_numeric_values_with_multiple_errors():
+def test_dataframe_clean_values_less_than_with_multiple_errors():
     df = pd.DataFrame({
         'codigo_pai': [2, 'three', 4],
         'codigo_filho': [1, 2, 'three'],
     })
-    df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
     assert len(erros) == 2
-    assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' deve conter apenas valores numéricos."
-    assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' deve conter apenas valores numéricos."
+    assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor não numérico."
+    assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor não numérico."
     assert len(df) == 1
+
+def test_dataframe_clean_values_less_than_with_no_columns():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+    })
+    df, erros = dataframe_clean_values_less_than(df, 'test_file', [])
+    assert len(erros) == 0
+    assert len(df) == 3
+
+# values negativos
+def test_dataframe_clean_values_less_than_with_negative_values():
+    df = pd.DataFrame({
+        'codigo_pai': [1, -2, 3],
+        'codigo_filho': [2, 3, -4],
+    })
+    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 0)
+    assert len(erros) == 2
+    assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor menor que 0."
+    assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor menor que 0."
