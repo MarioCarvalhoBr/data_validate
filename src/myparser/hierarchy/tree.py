@@ -1,4 +1,4 @@
-from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values
+from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, check_file_exists
 import pandas as pd
 def criar_arvore(composicao):
     arvore = {}
@@ -51,6 +51,19 @@ def verificar_erros_niveis(composicao, descricao):
 
 def verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description):
     errors, warnings = [], []
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+    
+    is_correct, error_message = check_file_exists(path_sp_composition)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
     
     df_composicao = read_excel_file(path_sp_composition)
     name_file_composition = path_sp_composition.split("/")[-1]

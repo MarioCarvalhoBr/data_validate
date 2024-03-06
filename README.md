@@ -115,9 +115,9 @@ pip install ruff
 ```bash
 ruff myparser.py
 Ou
-ruff .
+ruff check . --fix
 Ou
-ruff --target-version=py310 .
+ruff check --target-version=py310 .
 ```
 
 ## Autores

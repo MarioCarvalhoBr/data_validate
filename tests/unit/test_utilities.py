@@ -164,7 +164,7 @@ def test_dataframe_clean_non_numeric_values_with_non_numeric_values():
     })
     df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
     assert len(erros) == 1
-    assert erros[0] == "test_file, linha 2: A coluna 'codigo_pai' deve conter apenas valores numéricos."
+    assert erros[0] == "test_file, linha 4: A coluna 'codigo_pai' deve conter apenas valores numéricos."
     assert len(df) == 2
 
 def test_dataframe_clean_non_numeric_values_with_multiple_errors():
@@ -174,6 +174,6 @@ def test_dataframe_clean_non_numeric_values_with_multiple_errors():
     })
     df, erros = dataframe_clean_non_numeric_values(df, 'test_file', ['codigo_pai', 'codigo_filho'])
     assert len(erros) == 2
-    assert erros[0] == "test_file, linha 1: A coluna 'codigo_pai' deve conter apenas valores numéricos."
-    assert erros[1] == "test_file, linha 2: A coluna 'codigo_filho' deve conter apenas valores numéricos."
+    assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' deve conter apenas valores numéricos."
+    assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' deve conter apenas valores numéricos."
     assert len(df) == 1

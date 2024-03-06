@@ -13,7 +13,12 @@ def dataframe_clean_non_numeric_values(df, name_file, colunas_limpar):
             # Registra as linhas com valores não numéricos para a coluna atual
             linhas_invalidas = df[pd.to_numeric(df[coluna], errors='coerce').isnull()]
             if not linhas_invalidas.empty:
-                erros.append(f"{name_file}, linha {linhas_invalidas.index.tolist()[0]}: A coluna '{coluna}' deve conter apenas valores numéricos.")
+                #linha_invalida = linhas_invalidas.index.tolist()[0] + 2
+                #erros.append(f"{name_file}, linha {linha_invalida}: A coluna '{coluna}' deve conter apenas valores numéricos.")
+                # PAra cada linha inválida na coluna, registra o erro
+                for linha_invalida in linhas_invalidas.index.tolist():
+                    erros.append(f"{name_file}, linha {linha_invalida + 2}: A coluna '{coluna}' deve conter apenas valores numéricos.")
+            
             # Elimina linhas com valores não numéricos
             df = df[pd.to_numeric(df[coluna], errors='coerce').notnull()]
     return df, erros 

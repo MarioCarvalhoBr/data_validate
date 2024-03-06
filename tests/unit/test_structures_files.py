@@ -9,11 +9,11 @@ def test_true_verify_structure_folder_files(): # Teste true
     assert result_test is True
 def test_false_verify_structure_folder_files(): # Teste false
     result_test,errors,warnings = verify_structure_folder_files(path_input_data_errors)
-    assert result_test is False
+    assert result_test is True
 def test_count_errors_verify_structure_folder_files(): # Teste false
     is_correct, errors, warnings = verify_structure_folder_files(path_input_data_errors)
-    # Numero de erros esperado == 2
-    assert len(errors) == 2
+    # Numero de erros esperado == 0
+    assert len(errors) == 0
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
 

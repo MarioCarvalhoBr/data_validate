@@ -1,7 +1,7 @@
 import os
 import re
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values
+from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, check_file_exists
 
 def check_html_in_descriptions(path_sp_description, df):
     errors = []
@@ -22,6 +22,15 @@ def format_errors_and_warnings(name, missing_columns, extra_columns):
 
 def verify_sp_description_parser_html_column_names(path_sp_description):
     errors, warnings = [], []
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
 
     try:
         df = read_excel_file(path_sp_description)
@@ -46,6 +55,15 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
 def verify_sp_description_titles_length(path_sp_description):
     errors, warnings = [], []
 
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
+
     try:
         df = read_excel_file(path_sp_description, True)
         for column in ['nome_simples']:
@@ -60,6 +78,15 @@ def verify_sp_description_titles_length(path_sp_description):
 
 def verify_sp_description_titles_uniques(path_sp_description):
     errors, warnings = [], []
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
 
     try:
         df = read_excel_file(path_sp_description, True)
@@ -80,6 +107,15 @@ def verify_sp_description_titles_uniques(path_sp_description):
 def verify_sp_description_text_capitalize(path_sp_description):
     errors, warnings = [], []
 
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
+
     try:
         df = read_excel_file(path_sp_description, True)
         for index, row in df.iterrows():
@@ -95,6 +131,15 @@ def verify_sp_description_text_capitalize(path_sp_description):
 
 def verify_sp_description_levels(path_sp_description):
     errors, warnings = [], []
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
 
 
     try:
@@ -115,6 +160,15 @@ def verify_sp_description_levels(path_sp_description):
 def verify_sp_description_punctuation(path_sp_description):
     errors, warnings = [], []
 
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
+
     try:
         df = read_excel_file(path_sp_description, True)
         for index, row in df.iterrows():
@@ -131,6 +185,14 @@ def verify_sp_description_punctuation(path_sp_description):
 
 def verify_sp_description_codes_uniques(path_sp_description):
     errors, warnings = [], []
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
 
     try:
         df = read_excel_file(path_sp_description, True)

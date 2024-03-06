@@ -1,5 +1,5 @@
 import networkx as nx
-from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, dataframe_check_min_value
+from src.util.utilities import read_excel_file, dataframe_clean_non_numeric_values, dataframe_check_min_value, check_file_exists
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
     codigos_descricao = set(descricao['codigo'].astype(str))
@@ -63,6 +63,19 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
     errors = []
     warnings = []
     is_valid = True
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+    
+    is_correct, error_message = check_file_exists(path_sp_composition)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
     
     composicao = read_excel_file(path_sp_composition)
     name_file_composition = path_sp_composition.split("/")[-1]
