@@ -6,6 +6,9 @@ import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
 import src.myparser.info as info
 
+def verify_files_data_clean(path_folder):
+    return structures_files.verify_files_data_clean(path_folder)
+
 def verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference):
     return sp_values.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference)
 
