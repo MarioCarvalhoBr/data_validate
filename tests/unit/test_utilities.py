@@ -5,6 +5,54 @@ from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
 from src.util.utilities import dataframe_clean_values_less_than
+from src.util.utilities import check_punctuation
+
+import pandas as pd
+
+# Testes para check_punctuation:
+def test_check_punctuation_with_no_errors():
+    df = pd.DataFrame({
+        'nome_simples': ['John', 'Jane', 'Doe'],
+        'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+        'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+        'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+    })
+    result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+    assert result is True
+    assert len(warnings) == 0
+
+def test_check_punctuation_with_errors_in_dont_punctuation_columns():
+    df = pd.DataFrame({
+        'nome_simples': ['John.', 'Jane?', 'Doe!'],
+        'nome_completo': ['John Doe.', 'Jane Doe?', 'John Doe!'],
+        'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+        'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+    })
+    result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+    assert result is False
+    assert len(warnings) == 6
+
+def test_check_punctuation_with_errors_in_must_end_with_dot_columns():
+    df = pd.DataFrame({
+        'nome_simples': ['John', 'Jane', 'Doe'],
+        'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+        'desc_simples': ['This is a test', 'This is another test', 'Yet another test'],
+        'desc_completa': ['This is a complete test', 'This is another complete test', 'Yet another complete test']
+    })
+    result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+    assert result is False
+    assert len(warnings) == 6
+
+def test_check_punctuation_with_no_columns():
+    df = pd.DataFrame({
+        'nome_simples': ['John', 'Jane', 'Doe'],
+        'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+        'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+        'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+    })
+    result, warnings = check_punctuation(df, 'test_file')
+    assert result is True
+    assert len(warnings) == 0
 
 # Testes para read_excel_file:
 def test_read_excel_file_with_existing_file():

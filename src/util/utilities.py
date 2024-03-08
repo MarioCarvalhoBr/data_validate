@@ -1,6 +1,25 @@
 import os
 import pandas as pd
 
+def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must_end_with_dot=None):
+    warnings = []
+    # columns_dont_punctuation = ['nome_simples', 'nome_completo']
+    # columns_must_end_with_dot = ['desc_simples', 'desc_completa']
+
+    for index, row in df.iterrows():
+        if not columns_dont_punctuation is None:
+            for column in columns_dont_punctuation:
+                if row[column][-1] in [',', '.', ';', ':', '!', '?']:
+                    warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não deve terminar com pontuação.")
+        
+        if not columns_must_end_with_dot is None:
+            for column in columns_must_end_with_dot:
+                if row[column][-1] != '.':
+                    warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' deve terminar com ponto.")
+
+    return not warnings, warnings
+
+
 '''
 def dataframe_check_min_value(df, name_file, colunas_verificar):
     erros = []

@@ -2,6 +2,7 @@ import src.myparser.hierarchy.graph as graph
 import src.myparser.hierarchy.tree as tree
 import src.myparser.sp_values as sp_values
 import src.myparser.sp_description as sp_description
+import src.myparser.sp_scenario as sp_scenario
 import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
 import src.myparser.info as info
@@ -39,8 +40,11 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
 def verify_sp_description_levels(path_sp_description):
     return sp_description.verify_sp_description_levels(path_sp_description)
 
-def verify_sp_description_punctuation(path_sp_description):
-    return sp_description.verify_sp_description_punctuation(path_sp_description)
+def verify_sp_scenario_punctuation(path_sp_scenario, columns_dont_punctuation, columns_must_end_with_dot):
+    return sp_scenario.verify_sp_scenario_punctuation(path_sp_scenario, columns_dont_punctuation, columns_must_end_with_dot)
+
+def verify_sp_description_punctuation(path_sp_description, columns_dont_punctuation, columns_must_end_with_dot):
+    return sp_description.verify_sp_description_punctuation(path_sp_description, columns_dont_punctuation, columns_must_end_with_dot)
 
 def verify_sp_description_codes_uniques(path_sp_description):
     return sp_description.verify_sp_description_codes_uniques(path_sp_description)

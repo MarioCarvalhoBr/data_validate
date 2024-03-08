@@ -106,8 +106,11 @@ if __name__ == "__main__":
         results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(path_sp_description))])
     
     # 10 - Pontuacoes obrigatorias e proibidas #32
-    results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description))])
+    results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description,  ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa']))])
 
+    # 10.1 - Pontuacoes obrigatorias e proibidas #81 em cenários
+    results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(path_scenario, columns_dont_punctuation=['nome'], columns_must_end_with_dot=['descricao']))])
+    
     # 11 - verify_combination_sp_description_values_scenario_temporal_reference
     results_tests.append([("Issue #19: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
     

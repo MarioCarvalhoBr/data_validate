@@ -103,20 +103,20 @@ def test_count_errors_verify_sp_description_levels(): # Teste false
 # Testes: Pontuações obrigatórias e proibidas: verify_sp_description_punctuation
 def test_true_verify_sp_description_punctuation(): # Teste true
     planilha_04_descricao = path_input_data_ground_truth + "/4_descricao/descricao.xlsx"
-    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
+    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao, ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_false_verify_sp_description_punctuation(): # Teste false
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
-    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
+    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao,  ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) > 0
 def test_count_errors_verify_sp_description_punctuation(): # Teste false
     planilha_04_descricao = path_input_data_errors + "/4_descricao/descricao.xlsx"
-    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao)
+    is_correct, errors, warnings = verify_sp_description_punctuation(planilha_04_descricao,  ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
     # Numero de erros esperado == 0
     assert len(errors) == 0
     # Numero de warnings esperado == 4
