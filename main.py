@@ -111,6 +111,9 @@ if __name__ == "__main__":
     # 10.1 - Pontuacoes obrigatorias e proibidas #81 em cenários
     results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(path_scenario, columns_dont_punctuation=['nome'], columns_must_end_with_dot=['descricao']))])
     
+    # 10.2 verify_sp_temporal_reference_punctuation
+    results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em referência temporal", *(orc.verify_sp_temporal_reference_punctuation(path_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=['descricao']))])
+
     # 11 - verify_combination_sp_description_values_scenario_temporal_reference
     results_tests.append([("Issue #19: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
     

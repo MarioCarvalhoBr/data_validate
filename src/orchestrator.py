@@ -3,9 +3,13 @@ import src.myparser.hierarchy.tree as tree
 import src.myparser.sp_values as sp_values
 import src.myparser.sp_description as sp_description
 import src.myparser.sp_scenario as sp_scenario
+import src.myparser.sp_temporal_reference as sp_temporal_reference
 import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
 import src.myparser.info as info
+
+def verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot):
+    return sp_temporal_reference.verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot)
 
 def verify_files_data_clean(path_folder):
     return structures_files.verify_files_data_clean(path_folder)
