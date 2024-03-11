@@ -7,63 +7,82 @@ import src.myparser.sp_temporal_reference as sp_temporal_reference
 import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
 import src.myparser.info as info
+import src.util.utilities as util
 
+import time
+
+# Decorador para medir o tempo de execução de uma função
+def timeit(method):
+    
+    def timed(*args, **kw):
+        start_time = time.time()
+        result = method(*args, **kw)
+        end_time = time.time()
+        print(f"{method.__name__} levou {end_time - start_time:.8f} segundos para executar.")
+        return result
+    return timed
+
+@timeit
+def check_file_exists(file_path):
+    return util.check_file_exists(file_path)
+
+@timeit
 def verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, columns_uniques):
     return sp_temporal_reference.verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, columns_uniques)
-
+@timeit
 def verify_sp_scenario_unique_values(path_sp_scenario, columns_uniques):
     return sp_scenario.verify_sp_scenario_unique_values(path_sp_scenario, columns_uniques)
-
+@timeit
 def verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot):
     return sp_temporal_reference.verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot)
-
+@timeit
 def verify_files_data_clean(path_folder):
     return structures_files.verify_files_data_clean(path_folder)
-
+@timeit
 def verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference):
     return sp_values.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference)
-
+@timeit
 def verify_spelling_text(path_folder, type_dict_spell):
     return spellchecker.run(path_folder, type_dict_spell)
-    
+@timeit 
 def verify_structure_folder_files(path_folder):
     return structures_files.verify_structure_folder_files(path_folder)
-
+@timeit
 def verify_sp_description_titles_length(path_sp_description):
     return sp_description.verify_sp_description_titles_length(path_sp_description)
-
+@timeit
 def verify_sp_description_titles_uniques(path_sp_description):
     return sp_description.verify_sp_description_titles_uniques(path_sp_description)
-
+@timeit
 def verify_sp_description_parser_html_column_names(path_sp_description):
     return sp_description.verify_sp_description_parser_html_column_names(path_sp_description)
-
+@timeit
 def verify_sp_description_text_capitalize(path_sp_description):
     return sp_description.verify_sp_description_text_capitalize(path_sp_description)
-
+@timeit
 def verify_graph_sp_description_composition(path_sp_description, path_ps_composition):
     return graph.verify_graph_sp_description_composition(path_sp_description, path_ps_composition)
-
+@timeit
 def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     return sp_values.verify_ids_sp_description_values(path_sp_description, path_sp_values)
-
+@timeit
 def verify_sp_description_levels(path_sp_description):
     return sp_description.verify_sp_description_levels(path_sp_description)
-
+@timeit
 def verify_sp_scenario_punctuation(path_sp_scenario, columns_dont_punctuation, columns_must_end_with_dot):
     return sp_scenario.verify_sp_scenario_punctuation(path_sp_scenario, columns_dont_punctuation, columns_must_end_with_dot)
-
+@timeit
 def verify_sp_description_punctuation(path_sp_description, columns_dont_punctuation, columns_must_end_with_dot):
     return sp_description.verify_sp_description_punctuation(path_sp_description, columns_dont_punctuation, columns_must_end_with_dot)
-
+@timeit
 def verify_sp_description_codes_uniques(path_sp_description):
     return sp_description.verify_sp_description_codes_uniques(path_sp_description)
-
+@timeit
 def verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description):
     return tree.verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description)
-
+@timeit
 def verify_version():
     return info.print_versions()
-
+@timeit
 def get_spellchecker():
     return spellchecker

@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 from src.util.utilities import check_file_exists, dataframe_clean_numeric_values_less_than, read_excel_file, check_folder_exists
 
 
@@ -33,8 +34,37 @@ def verify_structure_folder_files(path_folder):
                 if not exists:
                     errors.append(error)
 
-    return not errors, errors, warnings
+    expected_structure_columns = {
+        "3_cenarios_e_referencia_temporal/cenarios.xlsx": ["nome", "descricao", "simbolo"],
+        "3_cenarios_e_referencia_temporal/referencia_temporal.xlsx": ["nome", "descricao", "simbolo"],
+        "4_descricao/descricao.xlsx": ["codigo", "nivel", "nome_simples", "nome_completo", "unidade", "desc_simples", "desc_completa", "cenario", "relacao", "fontes", "meta"],
+        "5_composicao/composicao.xlsx": ["codigo_pai", "codigo_filho"],
+        "8_valores/valores.xlsx": ["id"],
+        "9_proporcionalidades/proporcionalidades.xlsx": ["id"]
+    }
+    for subfolder, columns in expected_structure_columns.items():
+        try: 
+            file_path = os.path.join(path_folder, subfolder)
+            file_name = os.path.basename(file_path)
 
+            df = read_excel_file(file_path)
+
+            if df is not None:
+                if file_name == "proporcionalidades.xlsx":
+                        lista_colunas = df.iloc[0].tolist()
+                        for column in columns:
+                            if column not in lista_colunas:
+                                errors.append(f"{file_name}: Coluna '{column}' não foi encontrada.")
+                else:
+                    for column in columns:
+                        if column not in df.columns:
+                            errors.append(f"{file_name}: Coluna '{column}' não foi encontrada.")
+        except Exception as e:
+            pass
+            # errors.append(str(e))
+        
+    return not errors, errors, warnings
+        
 # Verificação de limpeza dos arquivos
 def verify_files_data_clean(path_folder):
     errors = []
@@ -62,8 +92,8 @@ def verify_files_data_clean(path_folder):
             
             if erros:
                 errors.extend(erros)
-    except Exception:
+    except Exception as e:
         pass
-        # errors.append(str(e))
+        errors.append(str(e))
 
     return not errors, errors, warnings

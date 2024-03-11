@@ -38,7 +38,12 @@ if __name__ == "__main__":
     path_scenario = path_input_folder + "/3_cenarios_e_referencia_temporal/cenarios.xlsx"
     path_temporal_reference = path_input_folder + "/3_cenarios_e_referencia_temporal/referencia_temporal.xlsx"
 
-    
+    exists_sp_composition = orc.check_file_exists(path_sp_composition)[0]
+    exists_sp_description = orc.check_file_exists(path_sp_description)[0]
+    exists_sp_values = orc.check_file_exists(path_sp_values)[0]
+    exists_scenario = orc.check_file_exists(path_scenario)[0]
+    exists_temporal_reference = orc.check_file_exists(path_temporal_reference)[0]
+
     # Tipo de dicionário ortográfico
     type_dict = args.type_dict
     
@@ -55,72 +60,87 @@ if __name__ == "__main__":
     # 1 - Verifica se a estrutura de pastas e arquivos está correta
     results_tests.append([("Issue #39: " if is_degug else "") +"Estrutura da pasta de arquivos", *(orc.verify_structure_folder_files(path_input_folder))])
     
-    # 1.2 - Verifica se os arquivos estão limpos: verify_files_data_clean
-    results_tests.append([("Issue #79: " if is_degug else "") +"Limpeza dos arquivos", *(orc.verify_files_data_clean(path_input_folder))])
+    if exists_sp_composition and exists_sp_description and exists_temporal_reference:
+        # 1.2 - Verifica se os arquivos estão limpos: verify_files_data_clean
+        results_tests.append([("Issue #79: " if is_degug else "") +"Limpeza dos arquivos", *(orc.verify_files_data_clean(path_input_folder))])
     
     # 2 - Hierarquia como grafo conexo
-    is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(path_sp_description, path_sp_composition))
-    # 2.1 - Relações entre indicadores e valores
-    is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(path_sp_description, path_sp_values))
-    
-    # 2.2 - Concatenar os resultados
-    is_correct = is_correct_comp2desc and is_correct_val2desc
-    errors = errors_comp2desc + errors_val2desc
-    warnings = warnings_comp2desc + warnings_val2desc
-    results_tests.append([("Issue #2 e #59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
+    if exists_sp_composition and exists_sp_description and exists_sp_values:
+        is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(path_sp_description, path_sp_composition))
+        # 2.1 - Relações entre indicadores e valores
+        is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(path_sp_description, path_sp_values))
+        
+        # 2.2 - Concatenar os resultados
+        is_correct = is_correct_comp2desc and is_correct_val2desc
+        errors = errors_comp2desc + errors_val2desc
+        warnings = warnings_comp2desc + warnings_val2desc
+        results_tests.append([("Issue #2 e #59: " if is_degug else "") +"Relações entre indicadores", is_correct, errors, warnings])
     
     # Hierarquia como árvore #3: verify_tree_sp_composition_hierarchy
-    results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description))])
+    if exists_sp_composition and exists_sp_description:
+        results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_sp_description))])
     
     # 3 - Não pode ter indicador nível zero #37
-    results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(orc.verify_sp_description_levels(path_sp_description))])
+    if exists_sp_description:
+        results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(orc.verify_sp_description_levels(path_sp_description))])
    
     # 4 - Unicidade dos códigos #8
-    results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(orc.verify_sp_description_codes_uniques(path_sp_description))])
+    if exists_sp_description:
+        results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(orc.verify_sp_description_codes_uniques(path_sp_description))])
     
     # 5 - Verifica se a planilha de descrição está correta
-    results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(path_sp_description))])
+    if exists_sp_description:
+        results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(path_sp_description))])
     
     # 6 - Verficar a ortografia
-    if not args.no_spellchecker:
-        type_dict = type_dict.lower()
-        # Mapear o argumento para o enum correspondente
-        type_dict_spell = orc.get_spellchecker().TypeDict.FULL
+    if exists_sp_description:
+        if not args.no_spellchecker:
+            type_dict = type_dict.lower()
+            # Mapear o argumento para o enum correspondente
+            type_dict_spell = orc.get_spellchecker().TypeDict.FULL
+            
+            if type_dict == 'tiny':
+                type_dict_spell = orc.get_spellchecker().TypeDict.TINY
         
-        if type_dict == 'tiny':
-            type_dict_spell = orc.get_spellchecker().TypeDict.TINY
-       
-        if args.type_dict not in ['tiny', 'full']:
-            print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário full por padrão.")
-        
-        results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", *(orc.verify_spelling_text(path_input_folder, type_dict_spell))])
+            if args.type_dict not in ['tiny', 'full']:
+                print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário full por padrão.")
+            
+            results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", *(orc.verify_spelling_text(path_input_folder, type_dict_spell))])
     
     # 7 - Verificar nomes de colunas únicos
-    results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(orc.verify_sp_description_titles_uniques(path_sp_description))])
+    if exists_sp_description:
+        results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(orc.verify_sp_description_titles_uniques(path_sp_description))])
     
     # 8 - Padrão para nomes dos indicadores #1
-    results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(orc.verify_sp_description_text_capitalize(path_sp_description))])
+    if exists_sp_description:
+        results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(orc.verify_sp_description_text_capitalize(path_sp_description))])
     
     # 9 - Títulos com mais de 30 caracteres
-    if not args.no_warning_titles_length:
+    if exists_sp_description and not args.no_warning_titles_length:
         results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(path_sp_description))])
     
     # 10 - Pontuacoes obrigatorias e proibidas #32
-    results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description,  ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa']))])
+    if exists_sp_description:
+        results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas", *(orc.verify_sp_description_punctuation(path_sp_description,  ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa']))])
 
     # 10.1 - Pontuacoes obrigatorias e proibidas #81 em cenários
-    results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(path_scenario, columns_dont_punctuation=['nome'], columns_must_end_with_dot=['descricao']))])
+    if exists_scenario:
+        results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(path_scenario, columns_dont_punctuation=['nome'], columns_must_end_with_dot=['descricao']))])
     
     # 10.2 verify_sp_temporal_reference_punctuation
-    results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em referência temporal", *(orc.verify_sp_temporal_reference_punctuation(path_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=['descricao']))])
+    if exists_temporal_reference:
+        results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em referência temporal", *(orc.verify_sp_temporal_reference_punctuation(path_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=['descricao']))])
 
     # 10.3: verify_sp_scenario_unique_values
-    results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em cenários", *(orc.verify_sp_scenario_unique_values(path_scenario, ['nome', 'simbolo']))])
+    if exists_scenario:
+        results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em cenários", *(orc.verify_sp_scenario_unique_values(path_scenario, ['nome', 'simbolo']))])
     # 10.4: verify_sp_temporal_reference_unique_values
-    results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em referência temporal", *(orc.verify_sp_temporal_reference_unique_values(path_temporal_reference, ['nome', 'simbolo']))])
+    if exists_temporal_reference:
+        results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em referência temporal", *(orc.verify_sp_temporal_reference_unique_values(path_temporal_reference, ['nome', 'simbolo']))])
 
     # 11 - verify_combination_sp_description_values_scenario_temporal_reference
-    results_tests.append([("Issue #81: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
+    if exists_sp_description and exists_sp_values and exists_scenario and exists_temporal_reference:
+        results_tests.append([("Issue #81: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
     
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
