@@ -19,6 +19,14 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
 
     return not warnings, warnings
 
+# check_unique_values:  Valores tem que ser unicos para as colunas especificadas
+def check_unique_values(df, name_file, columns_uniques):
+    warnings = []
+    for column in columns_uniques:
+        if not df[column].is_unique:
+            warnings.append(f"{name_file}: A coluna '{column}' deve conter valores únicos.")
+    return not warnings, warnings
+
 
 '''
 def dataframe_check_min_value(df, name_file, colunas_verificar):

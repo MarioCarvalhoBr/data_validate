@@ -8,6 +8,12 @@ import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
 import src.myparser.info as info
 
+def verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, columns_uniques):
+    return sp_temporal_reference.verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, columns_uniques)
+
+def verify_sp_scenario_unique_values(path_sp_scenario, columns_uniques):
+    return sp_scenario.verify_sp_scenario_unique_values(path_sp_scenario, columns_uniques)
+
 def verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot):
     return sp_temporal_reference.verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot)
 

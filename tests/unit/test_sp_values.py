@@ -55,6 +55,6 @@ def test_errors_verify_combination_sp_description_values_scenario_temporal_refer
     planilha_03_cenarios_e_referencia_temporal_referencia_temporal = path_input_data_errors + "/3_cenarios_e_referencia_temporal/referencia_temporal.xlsx"
     is_correct, errors, warnings = verify_combination_sp_description_values_scenario_temporal_reference(planilha_04_descricao, planilha_08_valores, planilha_03_cenarios_e_referencia_temporal, planilha_03_cenarios_e_referencia_temporal_referencia_temporal)
     # Numero de erros esperado == 3
-    assert errors == ['valores.xlsx: A coluna 2-2015 é obrigatória.', 'valores.xlsx: A coluna 5000-2030-O é obrigatória.', 'valores.xlsx: A coluna 5000-2080-M é desnecessária.']
+    assert errors == ['valores.xlsx: A coluna \'2-2015\' é obrigatória.', 'valores.xlsx: A coluna \'5000-2030-O\' é obrigatória.', 'valores.xlsx: A coluna \'5000-2080-M\' é desnecessária.']
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
