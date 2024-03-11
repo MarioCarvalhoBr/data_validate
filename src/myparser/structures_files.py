@@ -86,7 +86,6 @@ def verify_files_data_clean(path_folder):
             
             file_path = os.path.join(path_folder, file)
             file_name = os.path.basename(file)
-                        
             df = read_excel_file(file_path)
             _, erros = dataframe_clean_numeric_values_less_than(df, file_name, column, value)
             
