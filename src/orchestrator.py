@@ -9,6 +9,8 @@ import src.myparser.structures_files as structures_files
 import src.myparser.info as info
 import src.util.utilities as util
 
+def verify_structure_folder_files_by_pathfile(pathfile):
+    return structures_files.verify_structure_folder_files_by_pathfile(pathfile)
 def check_file_exists(file_path):
     return util.check_file_exists(file_path)
 

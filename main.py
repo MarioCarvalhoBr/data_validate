@@ -38,11 +38,11 @@ if __name__ == "__main__":
     path_scenario = path_input_folder + "/3_cenarios_e_referencia_temporal/cenarios.xlsx"
     path_temporal_reference = path_input_folder + "/3_cenarios_e_referencia_temporal/referencia_temporal.xlsx"
 
-    exists_sp_composition = orc.check_file_exists(path_sp_composition)[0]
-    exists_sp_description = orc.check_file_exists(path_sp_description)[0]
-    exists_sp_values = orc.check_file_exists(path_sp_values)[0]
-    exists_scenario = orc.check_file_exists(path_scenario)[0]
-    exists_temporal_reference = orc.check_file_exists(path_temporal_reference)[0]
+    exists_sp_composition = orc.verify_structure_folder_files_by_pathfile(path_sp_composition)[0]
+    exists_sp_description = orc.verify_structure_folder_files_by_pathfile(path_sp_description)[0]
+    exists_sp_values = orc.verify_structure_folder_files_by_pathfile(path_sp_values)[0]
+    exists_scenario = orc.verify_structure_folder_files_by_pathfile(path_scenario)[0]
+    exists_temporal_reference = orc.verify_structure_folder_files_by_pathfile(path_temporal_reference)[0]
 
     # Tipo de dicionário ortográfico
     type_dict = args.type_dict
