@@ -143,7 +143,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
         # Verificar se as combinações estão presentes em df_values
         for combinacao in lista_combinacoes:
             if combinacao not in df_values.columns:
-                errors.append(f"{name_file_values}: A coluna {combinacao} é obrigatória.")
+                errors.append(f"{name_file_values}: A coluna '{combinacao}' é obrigatória.")
 
         # Verifica combinações extras somente para o código X-texto
         lista_combinacoes_sp_values = [col for col in df_values.columns if col.startswith(f"{codigo}-")]
@@ -152,6 +152,6 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
         if is_error:
             for erro in erros_message:
                 # Formata erros: errors.append(f"{name_file_values}: A combinação {combinacao} existe de forma extra para o indicador {codigo}.")
-                errors.append(f"{name_file_values}: A coluna {erro} é desnecessária.")
+                errors.append(f"{name_file_values}: A coluna '{erro}' é desnecessária.")
 
     return not errors, errors, []
