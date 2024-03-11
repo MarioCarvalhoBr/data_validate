@@ -7,7 +7,6 @@ from src.util.utilities import check_file_exists
 from src.util.utilities import dataframe_clean_values_less_than
 from src.util.utilities import check_punctuation
 
-import pandas as pd
 
 # Testes para check_punctuation:
 def test_check_punctuation_with_no_errors():
