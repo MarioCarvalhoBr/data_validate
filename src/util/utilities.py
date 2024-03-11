@@ -24,7 +24,7 @@ def check_unique_values(df, name_file, columns_uniques):
     warnings = []
     for column in columns_uniques:
         if not df[column].is_unique:
-            warnings.append(f"{name_file}: A coluna '{column}' deve conter valores únicos.")
+            warnings.append(f"{name_file}: A coluna '{column}' não deve conter valores repetidos.")
     return not warnings, warnings
 
 
@@ -41,7 +41,7 @@ def dataframe_check_min_value(df, name_file, colunas_verificar):
 
 '''
 
-def dataframe_clean_values_less_than(df, name_file, colunas_limpar, value=0):
+def dataframe_clean_numeric_values_less_than(df, name_file, colunas_limpar, value=0):
     erros = []
 
     for coluna in colunas_limpar:
@@ -74,6 +74,26 @@ def dataframe_clean_values_less_than(df, name_file, colunas_limpar, value=0):
 
     return df, erros
 
+'''
+# Função que limpa um dataframe de todas as linhas que contém valores não numéricos
+def dataframe_clean_non_numeric_values(df, name_file, colunas_limpar):
+    erros = []
+    for coluna in colunas_limpar:
+        # Converte a coluna para numérico, forçando não numéricos a NaN
+        df[coluna] = pd.to_numeric(df[coluna], errors='coerce')
+
+        # Encontra linhas com valores não numéricos
+        linhas_invalidas = df[df[coluna].isnull()]
+
+        # Registra erros para valores não numéricos
+        for linha_invalida in linhas_invalidas.index:
+            erros.append(f"{name_file}, linha {linha_invalida + 2}: A coluna '{coluna}' contém um valor não numérico.")
+
+    # Elimina linhas com valores não numéricos
+    df = df.drop(linhas_invalidas.index)
+
+    return df, erros
+'''
 def file_extension_check(path, extension='.xlsx'):
     if not path.endswith(extension):
         return False, f"ERRO: O arquivo {path} de entrada não é {extension}"

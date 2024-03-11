@@ -1,7 +1,7 @@
 import os
 import re
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
 from src.util.utilities import check_punctuation
 
 def check_html_in_descriptions(path_sp_description, df):
@@ -193,7 +193,7 @@ def verify_sp_description_codes_uniques(path_sp_description):
         df = read_excel_file(path_sp_description, True)
         
         # Limpar os dados
-        df, _ = dataframe_clean_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
+        df, _ = dataframe_clean_numeric_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
         
         # Verificar se há códigos duplicados
         duplicated = df['codigo'].duplicated().any()

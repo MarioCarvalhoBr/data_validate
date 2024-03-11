@@ -1,5 +1,5 @@
 import networkx as nx
-from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
     codigos_descricao = set(descricao['codigo'].astype(str))
@@ -81,13 +81,13 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
     name_file_composition = path_sp_composition.split("/")[-1]
     
     # Limpando os dados
-    composicao, _ = dataframe_clean_values_less_than(composicao, name_file_composition, ['codigo_pai'], -1)
-    composicao, _ = dataframe_clean_values_less_than(composicao, name_file_composition, ['codigo_filho'], 1)
+    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, name_file_composition, ['codigo_pai'], -1)
+    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, name_file_composition, ['codigo_filho'], 1)
     
     descricao = read_excel_file(path_sp_description)
     name_file_description = path_sp_description.split("/")[-1]
     # Limpando os dados
-    descricao, _ = dataframe_clean_values_less_than(descricao, name_file_description, ['codigo', 'nivel'], 1)
+    descricao, _ = dataframe_clean_numeric_values_less_than(descricao, name_file_description, ['codigo', 'nivel'], 1)
     
     codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
     if codigos_faltantes:

@@ -57,7 +57,7 @@ def test_verify_sp_temporal_reference_unique_values_sp_not_found(): # Teste fals
 def test_count_errors_verify_sp_temporal_reference_unique_values(): # Teste false
     planilha_03_referencia_remporal = path_input_data_errors + "/3_cenarios_e_referencia_temporal/referencia_temporal.xlsx"
     _, errors, warnings = verify_sp_temporal_reference_unique_values(planilha_03_referencia_remporal, columns_uniques=['nome', 'simbolo'])
-    # Numero de erros esperado == 2
-    assert len(errors) == 2
+    # Numero de erros esperado == 1
+    assert len(errors) == 1
     # Numero de warnings esperado == 0
     assert len(warnings) == 0

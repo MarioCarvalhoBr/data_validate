@@ -1,4 +1,4 @@
-from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
 import pandas as pd
 def criar_arvore(composicao):
     arvore = {}
@@ -68,12 +68,12 @@ def verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_s
     
     df_composicao = read_excel_file(path_sp_composition)
     name_file_composition = path_sp_composition.split("/")[-1]
-    df_composicao, _ = dataframe_clean_values_less_than(df_composicao, name_file_composition, ['codigo_pai'], -1)
-    df_composicao, _ = dataframe_clean_values_less_than(df_composicao, name_file_composition, ['codigo_filho'], 1)
+    df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, name_file_composition, ['codigo_pai'], -1)
+    df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, name_file_composition, ['codigo_filho'], 1)
     
     df_descricao = read_excel_file(path_sp_description)
     name_file_description = path_sp_description.split("/")[-1]
-    df_descricao, _ = dataframe_clean_values_less_than(df_descricao, name_file_description, ['codigo', 'nivel'], 1)
+    df_descricao, _ = dataframe_clean_numeric_values_less_than(df_descricao, name_file_description, ['codigo', 'nivel'], 1)
     
     if not ((df_composicao['codigo_pai'] == 0)).any():
         errors.extend([f"{name_file_composition}: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore."])

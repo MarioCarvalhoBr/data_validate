@@ -1,5 +1,5 @@
 import os
-from src.util.utilities import check_file_exists, dataframe_clean_values_less_than, read_excel_file, check_folder_exists
+from src.util.utilities import check_file_exists, dataframe_clean_numeric_values_less_than, read_excel_file, check_folder_exists
 
 
 def verify_structure_folder_files(path_folder):
@@ -46,8 +46,8 @@ def verify_files_data_clean(path_folder):
         ["4_descricao/descricao.xlsx", "cenario", -1],
         ["5_composicao/composicao.xlsx", "codigo_pai", -1],
         ["5_composicao/composicao.xlsx", "codigo_filho", 1],
+        ["3_cenarios_e_referencia_temporal/referencia_temporal.xlsx", "simbolo", 0],
     ]
-
     try: 
         for data in files_to_clean:
             file = data[0]
@@ -58,7 +58,7 @@ def verify_files_data_clean(path_folder):
             file_name = os.path.basename(file)
                         
             df = read_excel_file(file_path)
-            _, erros = dataframe_clean_values_less_than(df, file_name, column, value)
+            _, erros = dataframe_clean_numeric_values_less_than(df, file_name, column, value)
             
             if erros:
                 errors.extend(erros)

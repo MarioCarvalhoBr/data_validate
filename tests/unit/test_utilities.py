@@ -4,7 +4,7 @@ from src.util.utilities import read_excel_file
 from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
-from src.util.utilities import dataframe_clean_values_less_than
+from src.util.utilities import dataframe_clean_numeric_values_less_than
 from src.util.utilities import check_punctuation
 
 
@@ -153,52 +153,52 @@ def test_check_file_exists_with_existing_file():
     assert result is True
     assert error_message == ""
 
-def test_dataframe_clean_values_less_than_with_no_errors():
+def test_dataframe_clean_numeric_values_less_than_with_no_errors():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 3],
         'codigo_filho': [2, 3, 4],
     })
-    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
     assert len(erros) == 0
     assert len(df) == 3
 
-def test_dataframe_clean_values_less_than_with_non_numeric_values():
+def test_dataframe_clean_numeric_values_less_than_with_non_numeric_values():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 'three'],
         'codigo_filho': [2, 3, 4],
     })
-    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 1)
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 1)
     assert len(erros) == 1
     assert erros[0] == "test_file, linha 4: A coluna 'codigo_pai' contém um valor não numérico."
     assert len(df) == 2
 
-def test_dataframe_clean_values_less_than_with_multiple_errors():
+def test_dataframe_clean_numeric_values_less_than_with_multiple_errors():
     df = pd.DataFrame({
         'codigo_pai': [2, 'three', 4],
         'codigo_filho': [1, 2, 'three'],
     })
-    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
     assert len(erros) == 2
     assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor não numérico."
     assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor não numérico."
     assert len(df) == 1
 
-def test_dataframe_clean_values_less_than_with_no_columns():
+def test_dataframe_clean_numeric_values_less_than_with_no_columns():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 3],
         'codigo_filho': [2, 3, 4],
     })
-    df, erros = dataframe_clean_values_less_than(df, 'test_file', [])
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', [])
     assert len(erros) == 0
     assert len(df) == 3
 
 # values negativos
-def test_dataframe_clean_values_less_than_with_negative_values():
+def test_dataframe_clean_numeric_values_less_than_with_negative_values():
     df = pd.DataFrame({
         'codigo_pai': [1, -2, 3],
         'codigo_filho': [2, 3, -4],
     })
-    df, erros = dataframe_clean_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 0)
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 0)
     assert len(erros) == 2
     assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor menor que 0."
     assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor menor que 0."
