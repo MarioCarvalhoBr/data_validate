@@ -1,0 +1,30 @@
+
+
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth/
+
+
+[37m[1m------ Verificação dos testes ------
+[34m[1mVerificação: Estrutura da pasta de arquivos
+[34m[1mVerificação: Limpeza dos arquivos
+[34m[1mVerificação: Relações entre indicadores
+[34m[1mVerificação: Hierarquia como árvore
+[34m[1mVerificação: Níveis de indicadores
+[34m[1mVerificação: Unicidade dos códigos
+[34m[1mVerificação: Códigos HTML nas descrições simples
+[34m[1mVerificação: Ortografia
+[34m[1mVerificação: Títulos únicos
+[34m[1mVerificação: Padrão para nomes dos indicadores
+[34m[1mVerificação: Títulos com mais de 30 caracteres
+[34m[1mVerificação: Pontuações obrigatórias e proibidas
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
+[34m[1mVerificação: Relações de valores únicos em cenários
+[34m[1mVerificação: Relações de valores únicos em referência temporal
+[34m[1mVerificação: Relações de combinações de valores
+
+
+[37m[1mNúmero de erros: 0
+[37m[1mNúmero de avisos: 0
+[34m[1m
+Tempo total de execução: 7.1 segundos
+[0m

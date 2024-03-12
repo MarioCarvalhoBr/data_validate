@@ -1,0 +1,91 @@
+
+
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors/
+
+
+[37m[1m------ Verificação dos testes ------
+[34m[1mVerificação: Estrutura da pasta de arquivos
+[34m[1mVerificação: Limpeza dos arquivos
+[31mdescricao.xlsx, linha 12: A coluna 'codigo' contém um valor não numérico.
+[31mdescricao.xlsx, linha 13: A coluna 'codigo' contém um valor menor que 1.
+[31mdescricao.xlsx, linha 5: A coluna 'nivel' contém um valor menor que 1.
+[31mdescricao.xlsx, linha 12: A coluna 'nivel' contém um valor não numérico.
+[31mcomposicao.xlsx, linha 14: A coluna 'codigo_pai' contém um valor menor que 0.
+[31mcomposicao.xlsx, linha 16: A coluna 'codigo_pai' contém um valor não numérico.
+[31mcomposicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor menor que 1.
+[31mcomposicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor menor que 1.
+[31mcomposicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor não numérico.
+[31mreferencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor não numérico.
+[34m[1mVerificação: Relações entre indicadores
+[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 5033, 5002, 77, 5010, 5022].
+[31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
+[31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
+[31mcomposicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
+[31mdescricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [2].
+[31mvalores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
+[34m[1mVerificação: Hierarquia como árvore
+[31mcomposicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.
+[31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].
+[31mcomposicao.xlsx, linha 8: O indicador 5001 (nível 3) não pode ser pai do indicador 5000 (nível 2).
+[34m[1mVerificação: Níveis de indicadores
+[31mdescricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
+[31mdescricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0.
+[31mdescricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0.
+[34m[1mVerificação: Unicidade dos códigos
+[31mdescricao.xlsx: Existem códigos duplicados: [5007].
+[34m[1mVerificação: Relações de valores únicos em cenários
+[31mcenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.
+[31mcenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.
+[34m[1mVerificação: Relações de valores únicos em referência temporal
+[31mreferencia_temporal.xlsx: A coluna 'nome' não deve conter valores repetidos.
+[34m[1mVerificação: Relações de combinações de valores
+[31mvalores.xlsx: A coluna '2-2015' é obrigatória.
+[31mvalores.xlsx: A coluna '5000-2030-O' é obrigatória.
+[31mvalores.xlsx: A coluna '5000-2080-M' é desnecessária.
+[34m[1mVerificação: Códigos HTML nas descrições simples
+[33mdescricao.xlsx, linha 1: Coluna desc_simples não pode conter código HTML.
+[33mdescricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
+[33mdescricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
+[34m[1mVerificação: Ortografia
+[33mcenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
+[33mcenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
+[33mcenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
+[33mcenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
+[33mreferencia_temporal.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].
+[33mdescricao.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].
+[33mdescricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].
+[33mdescricao.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].
+[33mdescricao.xlsx, linha 10: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
+[33mdescricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
+[34m[1mVerificação: Títulos únicos
+[33mdescricao.xlsx: Existem nomes simples duplicados: ['Seca', 'Sensibilidade'].
+[33mdescricao.xlsx: Existem nomes completos duplicados: ['Índice de Risco de Impacto para Seca'].
+[34m[1mVerificação: Padrão para nomes dos indicadores
+[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Segurança alimentar.". Encontrado: "Segurança Alimentar.".
+[33mdescricao.xlsx, linha 1: Nome completo fora do padrão. Esperado: "Impactos para segurança alimentar". Encontrado: "Impactos para Segurança Alimentar".
+[33mdescricao.xlsx, linha 2: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
+[33mdescricao.xlsx, linha 3: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
+[33mdescricao.xlsx, linha 4: Nome completo fora do padrão. Esperado: "Índice de exposição.". Encontrado: "Índice de Exposição.".
+[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Ameaça climática". Encontrado: "Ameaça Climática".
+[33mdescricao.xlsx, linha 5: Nome completo fora do padrão. Esperado: "Índice de ameaça climática". Encontrado: "Índice de Ameaça Climática".
+[33mdescricao.xlsx, linha 6: Nome completo fora do padrão. Esperado: "Índice de sensibilidade". Encontrado: "Índice de Sensibilidade".
+[33mdescricao.xlsx, linha 7: Nome completo fora do padrão. Esperado: "Índice de capacidade adaptativa". Encontrado: "Índice de Capacidade Adaptativa".
+[34m[1mVerificação: Títulos com mais de 30 caracteres
+[33mdescricao.xlsx, linha 9: Nome simples fora do padrão. Esperado: Até 30 caracteres. Encontrado: 43 caracteres.
+[34m[1mVerificação: Pontuações obrigatórias e proibidas
+[33mdescricao.xlsx, linha 2: A coluna 'nome_simples' não deve terminar com pontuação.
+[33mdescricao.xlsx, linha 2: A coluna 'desc_completa' deve terminar com ponto.
+[33mdescricao.xlsx, linha 3: A coluna 'desc_simples' deve terminar com ponto.
+[33mdescricao.xlsx, linha 5: A coluna 'nome_completo' não deve terminar com pontuação.
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
+[33mcenarios.xlsx, linha 3: A coluna 'nome' não deve terminar com pontuação.
+[33mcenarios.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
+[33mreferencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
+
+
+[31m[1mNúmero de erros: 29
+[33m[1mNúmero de avisos: 32
+[34m[1m
+Tempo total de execução: 7.4 segundos
+[0m

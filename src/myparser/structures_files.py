@@ -122,7 +122,7 @@ def verify_files_data_clean(path_folder):
         ["4_descricao/descricao.xlsx", "codigo", 1],
         ["4_descricao/descricao.xlsx", "nivel", 1],
         ["4_descricao/descricao.xlsx", "cenario", -1],
-        ["5_composicao/composicao.xlsx", "codigo_pai", -1],
+        ["5_composicao/composicao.xlsx", "codigo_pai", 0],
         ["5_composicao/composicao.xlsx", "codigo_filho", 1],
         ["3_cenarios_e_referencia_temporal/referencia_temporal.xlsx", "simbolo", 0],
     ]

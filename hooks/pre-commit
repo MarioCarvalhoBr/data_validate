@@ -1,17 +1,28 @@
 #!/bin/bash
 
-
 # Caminho relativo ou absoluto para o seu script
 . ~/miniconda3/etc/profile.d/conda.sh
+
+# ATIVA O AMBIENTE
 conda activate adapta_data
+
+# GERA O RELATÓRIO DE COBERTURA (badge)
 python3 generate_coverage_report.py
 
+# GERANDO OS DADOS PARA OS LOGS
+python3 main.py --input_folder=input_data/data_errors/ > log/log_errors.txt
+python3 main.py --input_folder=input_data/data_ground_truth/ > log/log_ground_truth.txt
+
+# GERA O RELATÓRIO DE COBERTURA
 # Verificar o status de saída do script
 # Se o script sair com status diferente de zero, o commit será abortado
 if [ $? -eq 0 ]; then
   echo "Script executado com sucesso. Adicionando image.png ao commit..."
   # Adiciona image.png ao staging area
   git add assets/images/coverage_badge.svg
+  # Adiciona os logs ao staging area
+  git add log/log_errors.txt
+  git add log/log_ground_truth.txt
 else
   echo "O commit foi abortado devido a falhas nas verificações."
   exit 1
