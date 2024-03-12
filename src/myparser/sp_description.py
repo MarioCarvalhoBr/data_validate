@@ -1,7 +1,8 @@
 import os
 import re
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import read_excel_file, dataframe_clean_values_less_than, check_file_exists
+from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
+from src.util.utilities import check_punctuation
 
 def check_html_in_descriptions(path_sp_description, df):
     errors = []
@@ -156,7 +157,7 @@ def verify_sp_description_levels(path_sp_description):
 
     return not errors, errors, warnings
 
-def verify_sp_description_punctuation(path_sp_description):
+def verify_sp_description_punctuation(path_sp_description, columns_dont_punctuation, columns_must_end_with_dot): 
     errors, warnings = [], []
 
     # Verificar se os arquivos existem
@@ -167,18 +168,13 @@ def verify_sp_description_punctuation(path_sp_description):
     # Verifica se há erros
     if errors:
         return False, errors, []
-
+    name_file = os.path.basename(path_sp_description)
     try:
         df = read_excel_file(path_sp_description, True)
-        for index, row in df.iterrows():
-            for column in ['nome_simples', 'nome_completo']:
-                if row[column][-1] in [',', '.', ';', ':', '!', '?']:
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: A coluna '{column}' não deve terminar com pontuação.")
-            for column in ['desc_simples', 'desc_completa']:
-                if row[column][-1] != '.':
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: A coluna '{column}' deve terminar com ponto.")
+        _, warnings = check_punctuation(df, name_file, columns_dont_punctuation, columns_must_end_with_dot)
+        
     except Exception as e:
-        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+        errors.append(f"{name_file}: Erro ao ler o arquivo .xlsx: {e}")
 
     return not errors, errors, warnings
 
@@ -197,7 +193,7 @@ def verify_sp_description_codes_uniques(path_sp_description):
         df = read_excel_file(path_sp_description, True)
         
         # Limpar os dados
-        df, _ = dataframe_clean_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
+        df, _ = dataframe_clean_numeric_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
         
         # Verificar se há códigos duplicados
         duplicated = df['codigo'].duplicated().any()
