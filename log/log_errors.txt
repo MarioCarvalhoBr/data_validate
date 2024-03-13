@@ -17,7 +17,7 @@
 [31mcomposicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor não numérico.
 [31mreferencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor não numérico.
 [34m[1mVerificação: Relações entre indicadores
-[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [5033, 5002, 5022, 5010, 77, 55].
+[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5002, 5010, 5022, 5033].
 [31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 [31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 [31mcomposicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
@@ -89,5 +89,5 @@
 [31m[1mNúmero de erros: 30
 [33m[1mNúmero de avisos: 32
 [34m[1m
-Tempo total de execução: 6.1 segundos
+Tempo total de execução: 5.8 segundos
 [0m

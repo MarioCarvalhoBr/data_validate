@@ -93,9 +93,17 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
     if codigos_faltantes:
         # Remove '{}'
         codigos_faltantes = str(codigos_faltantes)[1:-1]
+        
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"{name_file_description}: Indicadores no arquivo {name_file_composition} que não estão descritos: [{str(codigos_faltantes)}].")
+        
+        # Códigos falantes ordenados em ordem ascendente
+        codigos_faltantes = sorted(codigos_faltantes.split(", "), key=lambda x: int(x), reverse=False)
+        
+        # Remove as ''
+        codigos_faltantes = [int(codigo) for codigo in codigos_faltantes]
+
+        errors.append(f"{name_file_description}: Indicadores no arquivo {name_file_composition} que não estão descritos: {str(codigos_faltantes)}.")
         is_valid = False
     
     codigos_faltantes = []
@@ -103,9 +111,17 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
     if codigos_faltantes:
         # Remove '{}'
         codigos_faltantes = str(codigos_faltantes)[1:-1]
+        
         # Remove ''
         codigos_faltantes = codigos_faltantes.replace("'", "")
-        errors.append(f"{name_file_composition}: Indicadores no arquivo {name_file_description} que não fazem parte da estrutura hierárquica: [{str(codigos_faltantes)}].")
+        
+        # Códigos falantes ordenados em ordem ascendente
+        codigos_faltantes = sorted(codigos_faltantes.split(", "), key=lambda x: int(x), reverse=False)
+        
+        # Remove as ''
+        codigos_faltantes = [int(codigo) for codigo in codigos_faltantes]
+
+        errors.append(f"{name_file_composition}: Indicadores no arquivo {name_file_description} que não fazem parte da estrutura hierárquica: {str(codigos_faltantes)}.")
         is_valid = False
 
     G = montar_grafo(composicao)
