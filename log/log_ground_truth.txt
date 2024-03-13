@@ -13,6 +13,7 @@
 [34m[1mVerificação: Códigos HTML nas descrições simples
 [34m[1mVerificação: Ortografia
 [34m[1mVerificação: Títulos únicos
+[34m[1mVerificação: Campos vazios
 [34m[1mVerificação: Padrão para nomes dos indicadores
 [34m[1mVerificação: Títulos com mais de 30 caracteres
 [34m[1mVerificação: Pontuações obrigatórias e proibidas
@@ -26,5 +27,5 @@
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 7.1 segundos
+Tempo total de execução: 6.5 segundos
 [0m

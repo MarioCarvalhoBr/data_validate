@@ -1,5 +1,7 @@
 import os
 import re
+
+import pandas as pd
 from src.myparser.text_processor import capitalize_text
 from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
 from src.util.utilities import check_punctuation
@@ -70,7 +72,12 @@ def verify_sp_description_titles_length(path_sp_description):
         for column in ['nome_simples']:
             df[column] = df[column].str.strip()
             for index, row in df.iterrows():
-                if len(row[column]) > 30:
+                text = row[column]
+                # Verifique se o texto está vazio ou nan 
+                if pd.isna(text) or text == "":
+                    continue
+                    
+                if len(text) > 30:
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até 30 caracteres. Encontrado: {len(row[column])} caracteres.")
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
@@ -122,6 +129,9 @@ def verify_sp_description_text_capitalize(path_sp_description):
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
                 original_text = row[column]
+                # Verifique se o texto está vazio ou nan 
+                if pd.isna(original_text) or original_text == "":
+                    original_text = ""
                 expected_corect_text = capitalize_text(original_text)
                 if not original_text == expected_corect_text:
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
@@ -200,6 +210,34 @@ def verify_sp_description_codes_uniques(path_sp_description):
         if duplicated:
             codes_duplicated = df[df['codigo'].duplicated()]['codigo'].tolist()
             errors.append(f"{os.path.basename(path_sp_description)}: Existem códigos duplicados: {codes_duplicated}.")
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    return not errors, errors, warnings
+
+def  verify_sp_description_empty_strings(path_sp_description):
+    errors, warnings = [], []
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    # Verifica se há erros
+    if errors:
+        return False, errors, []
+
+    try:
+        df = read_excel_file(path_sp_description, True)
+        for index, row in df.iterrows():
+            if pd.isna(row['nome_simples']) or row['nome_simples'] == "":
+                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'nome_simples' não pode ser vazia.")
+            if pd.isna(row['nome_completo']) or row['nome_completo'] == "":
+                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'nome_completo' não pode ser vazia.")
+            if pd.isna(row['desc_simples']) or row['desc_simples'] == "":
+                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'desc_simples' não pode ser vazia.")
+            if pd.isna(row['desc_completa']) or row['desc_completa'] == "":
+                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'desc_completa' não pode ser vazia.")
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
