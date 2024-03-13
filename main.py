@@ -111,13 +111,17 @@ if __name__ == "__main__":
     if exists_sp_description:
         results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(orc.verify_sp_description_titles_uniques(path_sp_description))])
     
+    # verify_sp_description_empty_strings: titulo, descricao simples e descricao completa #75
+    if exists_sp_description:
+        results_tests.append([("Issue #75: " if is_degug else "") +"Campos vazios", *(orc.verify_sp_description_empty_strings(path_sp_description))])
+    
     # 8 - Padrão para nomes dos indicadores #1
     if exists_sp_description:
         results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(orc.verify_sp_description_text_capitalize(path_sp_description))])
     
     # 9 - Títulos com mais de 30 caracteres
     if exists_sp_description and not args.no_warning_titles_length:
-        results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(path_sp_description))])
+            results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(path_sp_description))])
     
     # 10 - Pontuacoes obrigatorias e proibidas #32
     if exists_sp_description:

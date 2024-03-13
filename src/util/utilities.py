@@ -9,11 +9,19 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
     for index, row in df.iterrows():
         if columns_dont_punctuation is not None:
             for column in columns_dont_punctuation:
+                text = row[column]
+                # Verifique se o texto está vazio ou nan 
+                if pd.isna(text) or text == "":
+                    continue
                 if row[column][-1] in [',', '.', ';', ':', '!', '?']:
                     warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não deve terminar com pontuação.")
         
         if columns_must_end_with_dot is not None:
             for column in columns_must_end_with_dot:
+                text = row[column]
+                # Verifique se o texto está vazio ou nan 
+                if pd.isna(text) or text == "":
+                    continue
                 if row[column][-1] != '.':
                     warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' deve terminar com ponto.")
 

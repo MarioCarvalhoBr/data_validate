@@ -3,6 +3,7 @@ import enum
 import os
 from src.util.utilities import check_file_exists
 from src.util.utilities import read_excel_file
+import pandas as pd
 
 class TypeDict(enum.Enum):
     TINY = 1
@@ -36,7 +37,11 @@ def process_sheet(df, columns, dictionary, type_dict_spell, sheet_name):
     warnings = []
     for index, row in df.iterrows():
         for column in columns:
-            warning = verify_text(column, row[column], dictionary, type_dict_spell, index, sheet_name)
+            text = row[column]
+            # Verifique se o texto está vazio ou nan 
+            if pd.isna(text) or text == "":
+                text = ""
+            warning = verify_text(column, text, dictionary, type_dict_spell, index, sheet_name)
             if warning:
                 warnings.append(warning)
     return warnings

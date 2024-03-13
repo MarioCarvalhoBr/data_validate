@@ -17,7 +17,7 @@
 [31mcomposicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor não numérico.
 [31mreferencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor não numérico.
 [34m[1mVerificação: Relações entre indicadores
-[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 5033, 5002, 77, 5010, 5022].
+[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5002, 5010, 5022, 5033].
 [31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 [31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 [31mcomposicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
@@ -33,6 +33,8 @@
 [31mdescricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0.
 [34m[1mVerificação: Unicidade dos códigos
 [31mdescricao.xlsx: Existem códigos duplicados: [5007].
+[34m[1mVerificação: Campos vazios
+[31mdescricao.xlsx, linha 12: Coluna 'nome_simples' não pode ser vazia.
 [34m[1mVerificação: Relações de valores únicos em cenários
 [31mcenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.
 [31mcenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.
@@ -84,8 +86,8 @@
 [33mreferencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
 
 
-[31m[1mNúmero de erros: 29
+[31m[1mNúmero de erros: 30
 [33m[1mNúmero de avisos: 32
 [34m[1m
-Tempo total de execução: 7.4 segundos
+Tempo total de execução: 5.8 segundos
 [0m
