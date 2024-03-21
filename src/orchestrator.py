@@ -9,6 +9,9 @@ import src.myparser.structures_files as structures_files
 import src.myparser.info as info
 import src.util.utilities as util
 
+def verify_sp_description_cr_lf(path_sp_description):
+    return sp_description.verify_sp_description_cr_lf(path_sp_description)
+
 def verify_sp_description_empty_strings(path_sp_description):
     return sp_description.verify_sp_description_empty_strings(path_sp_description)
 

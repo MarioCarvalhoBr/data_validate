@@ -22,10 +22,11 @@
 [34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
+[34m[1mVerificação: Quebra de linha
 
 
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 6.5 segundos
+Tempo total de execução: 6.8 segundos
 [0m

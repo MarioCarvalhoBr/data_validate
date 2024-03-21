@@ -146,6 +146,10 @@ if __name__ == "__main__":
     if exists_sp_description and exists_sp_values and exists_scenario and exists_temporal_reference:
         results_tests.append([("Issue #81: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference))])
     
+    # 12 - def verify_sp_description_cr_lf(path_sp_description):
+    if exists_sp_description:
+        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha", *(orc.verify_sp_description_cr_lf(path_sp_description))])
+
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
     num_errors = 0
