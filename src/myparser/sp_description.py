@@ -129,6 +129,8 @@ def verify_sp_description_text_capitalize(path_sp_description):
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
                 original_text = row[column]
+                # Trim nos textos
+                original_text = original_text.strip() if not pd.isna(original_text) else original_text
                 # Verifique se o texto está vazio ou nan 
                 if pd.isna(original_text) or original_text == "":
                     original_text = ""
@@ -273,10 +275,15 @@ def verify_sp_description_cr_lf(path_sp_description):
                 if pd.isna(text) or text == "":
                     continue
                 if text.endswith('\x0D'):
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui CR no final do texto.")
+                    ## MEssage erro:  "Possui um caracter inválido (CR)"
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no final do texto.")
                 if text.endswith('\x0A'):
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui LF no final do texto.")
-
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no final do texto.")
+                
+                if text.startswith('\x0D'):
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no início do texto.")
+                if text.startswith('\x0A'):
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no início do texto.")
             # Item 2: Identificar CR e LF em qualquer lugar nos campos nome e título
             for column in ['nome_simples', 'nome_completo']:
                 text = row[column]
@@ -284,53 +291,9 @@ def verify_sp_description_cr_lf(path_sp_description):
                     continue
                 for match in re.finditer(r'[\x0D\x0A]', text):
                     char_type = "CR" if match.group() == '\x0D' else "LF"
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui {char_type} na posição {match.start() + 1}.")
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido ({char_type}) na posição {match.start() + 1}.")
 
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
     return not errors, errors, warnings
-
-
-def verify_sp_description_cr_lf_old(path_sp_description):
-    errors, warnings = [], []
-
-    # Verificar se os arquivos existem
-    is_correct, error_message = check_file_exists(path_sp_description)
-    if not is_correct:
-        errors.append(error_message)
-
-    if errors:
-        return False, errors, []
-
-    try:
-        df = pd.read_csv(path_sp_description, sep=';')
-        
-        # Item 1: Identificar CR e LF no final dos campos de texto
-        for index, row in df.iterrows():
-            for column in ['Tipo', 'Texto']:
-                text = row[column]
-                if pd.isna(text) or text == "":
-                    continue
-                if text.endswith('\x0D') or text.endswith('\x0A'):
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui CR ou LF no final do texto.")
-
-            # Item 2: Identificar CR e LF em qualquer lugar nos campos nome e título
-            for column in ['Tipo', 'Texto']:
-                text = row[column]
-                if pd.isna(text) or text == "":
-                    continue
-                for match in re.finditer(r'[\x0D\x0A]', text):
-                    char_type = "CR" if match.group() == '\x0D' else "LF"
-                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui {char_type} na posição {match.start() + 1}.")
-
-    except Exception as e:
-        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
-
-    return not errors, errors, warnings
-
-'''
-Exemplo de texto com CR e LF:
-Texto 1 CR: "Texto com CR\x0D"
-Texto 2 LF: "Texto com LF\x0A"
-'''

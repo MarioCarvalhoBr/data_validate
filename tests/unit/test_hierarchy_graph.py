@@ -1,6 +1,6 @@
 import networkx as nx
 import os
-from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors
+from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01
 
 from src.myparser.hierarchy.graph import verificar_ciclos
 from src.myparser.hierarchy.graph import verificar_grafos_desconectados
@@ -14,13 +14,13 @@ def test_true_verify_graph_sp_description_composition(): # Teste true
     result_test,__,__ = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
     assert result_test is True
 def test_false_verify_graph_sp_description_composition(): # Teste false
-    planilha_04_descricao = os.path.join(path_input_data_errors, "4_descricao", "descricao.xlsx")
-    planilha_05_composicao = path_input_data_errors + "/5_composicao/composicao.xlsx"
+    planilha_04_descricao = os.path.join(path_input_data_errors_01, "4_descricao", "descricao.xlsx")
+    planilha_05_composicao = path_input_data_errors_01 + "/5_composicao/composicao.xlsx"
     result_test,__,__ = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
     assert result_test is False
 def test_count_errors_verify_graph_sp_description_composition(): # Teste false
-    planilha_04_descricao = os.path.join(path_input_data_errors, "4_descricao", "descricao.xlsx")
-    planilha_05_composicao = path_input_data_errors + "/5_composicao/composicao.xlsx"
+    planilha_04_descricao = os.path.join(path_input_data_errors_01, "4_descricao", "descricao.xlsx")
+    planilha_05_composicao = path_input_data_errors_01 + "/5_composicao/composicao.xlsx"
     is_correct, errors, warnings = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
     # Numero de erros esperado == 4
     assert len(errors) == 4
