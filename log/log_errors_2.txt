@@ -1,0 +1,52 @@
+
+
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_2/
+
+
+[37m[1m------ Verificação dos testes ------
+[34m[1mVerificação: Estrutura da pasta de arquivos
+[34m[1mVerificação: Limpeza dos arquivos
+[34m[1mVerificação: Relações entre indicadores
+[34m[1mVerificação: Hierarquia como árvore
+[34m[1mVerificação: Níveis de indicadores
+[34m[1mVerificação: Unicidade dos códigos
+[34m[1mVerificação: Códigos HTML nas descrições simples
+[34m[1mVerificação: Ortografia
+[34m[1mVerificação: Títulos únicos
+[34m[1mVerificação: Campos vazios
+[34m[1mVerificação: Títulos com mais de 30 caracteres
+[34m[1mVerificação: Pontuações obrigatórias e proibidas
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
+[34m[1mVerificação: Relações de valores únicos em cenários
+[34m[1mVerificação: Relações de valores únicos em referência temporal
+[34m[1mVerificação: Relações de combinações de valores
+[34m[1mVerificação: Padrão para nomes dos indicadores
+[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com 
+ cr meio". Encontrado: "Exemplo com 
+ CR meio".
+[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com 
+ lf meio". Encontrado: "Exemplo com 
+ LF meio".
+[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com cr início". Encontrado: "Exemplo com CR início".
+[33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com lf início". Encontrado: "Exemplo com LF início".
+[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com cr fim". Encontrado: "Exemplo com CR fim".
+[33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com lf fim". Encontrado: "Exemplo com LF fim".
+[34m[1mVerificação: Quebra de linha
+[33mdescricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 13.
+[33mdescricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 13.
+[33mdescricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
+[33mdescricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
+[33mdescricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
+[33mdescricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
+[33mdescricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
+[33mdescricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
+[33mdescricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
+[33mdescricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
+
+
+[37m[1mNúmero de erros: 0
+[33m[1mNúmero de avisos: 16
+[34m[1m
+Tempo total de execução: 3.5 segundos
+[0m
