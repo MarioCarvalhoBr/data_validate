@@ -32,7 +32,7 @@
 [33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com lf início". Encontrado: "Exemplo com LF início".
 [33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com cr fim". Encontrado: "Exemplo com CR fim".
 [33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com lf fim". Encontrado: "Exemplo com LF fim".
-[34m[1mVerificação: Quebra de linha
+[34m[1mVerificação: Quebra de linha para descrição
 [33mdescricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 13.
 [33mdescricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 13.
 [33mdescricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
@@ -43,10 +43,15 @@
 [33mdescricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
 [33mdescricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
 [33mdescricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
+[34m[1mVerificação: Quebra de linha para cenários
+[33mcenarios.xlsx, linha 1: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
+[33mcenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
+[34m[1mVerificação: Quebra de linha para referência temporal
+[33mreferencia_temporal.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 11.
 
 
 [37m[1mNúmero de erros: 0
-[33m[1mNúmero de avisos: 16
+[33m[1mNúmero de avisos: 19
 [34m[1m
-Tempo total de execução: 3.5 segundos
+Tempo total de execução: 3.7 segundos
 [0m

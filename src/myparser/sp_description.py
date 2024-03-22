@@ -255,7 +255,7 @@ FAZER:
     - Nos campos nome e título, identificar se ocorrerem em qualquer lugar do texto.
     - Gerar um warning em ambos os casos dizendo em que posição estavam os caracteres que foram identificados.
 '''
-def verify_sp_description_cr_lf(path_sp_description):
+def verify_sp_description_cr_lf(path_sp_description, columns_start_end=[], columns_anywhere=[]):
     errors, warnings = [], []
 
     # Verificar se os arquivos existem
@@ -270,8 +270,11 @@ def verify_sp_description_cr_lf(path_sp_description):
         df = read_excel_file(path_sp_description, True)
         # Item 1: Identificar CR e LF no final dos campos de texto
         for index, row in df.iterrows():
-            for column in ['nome_simples', 'nome_completo']:
+            
+            for column in columns_start_end:
                 text = row[column]
+                # To srt 
+                text = str(text)
                 if pd.isna(text) or text == "":
                     continue
                 if text.endswith('\x0D'):
@@ -284,9 +287,11 @@ def verify_sp_description_cr_lf(path_sp_description):
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no início do texto.")
                 if text.startswith('\x0A'):
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no início do texto.")
+           
             # Item 2: Identificar CR e LF em qualquer lugar nos campos nome e título
-            for column in ['nome_simples', 'nome_completo']:
+            for column in columns_anywhere:
                 text = row[column]
+                text = str(text)
                 if pd.isna(text) or text == "":
                     continue
                 for match in re.finditer(r'[\x0D\x0A]', text):

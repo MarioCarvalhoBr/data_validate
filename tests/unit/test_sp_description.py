@@ -14,25 +14,54 @@ import os
 # Testes: Caracteres CR e LF: verify_sp_description_cr_lf
 def test_true_verify_sp_description_cr_lf(): # Teste true
     planilha_04_descricao = os.path.join(path_input_data_ground_truth, "4_descricao", "descricao.xlsx")
-    is_correct, errors, warnings = verify_sp_description_cr_lf(planilha_04_descricao)
+    is_correct, errors, warnings = verify_sp_description_cr_lf(planilha_04_descricao, columns_start_end=['codigo', 'nivel', 'nome_simples', 'nome_completo', 'unidade', 'desc_simples', 'desc_completa', 'cenario', 'relacao', 'fontes', 'meta'], columns_anywhere=['nome_simples', 'nome_completo'])
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_false_verify_sp_description_cr_lf(): # Teste false
     planilha_04_descricao = os.path.join(path_input_data_errors_02, "4_descricao", "descricao.xlsx")
-    is_correct, errors, warnings = verify_sp_description_cr_lf(planilha_04_descricao)
+    is_correct, errors, warnings = verify_sp_description_cr_lf(planilha_04_descricao, columns_start_end=['codigo', 'nivel', 'nome_simples', 'nome_completo', 'unidade', 'desc_simples', 'desc_completa', 'cenario', 'relacao', 'fontes', 'meta'], columns_anywhere=['nome_simples', 'nome_completo'])
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) > 0
 
 def test_count_errors_verify_sp_description_cr_lf(): # Teste false
     planilha_04_descricao = os.path.join(path_input_data_errors_02, "4_descricao", "descricao.xlsx")
-    _, errors, warnings = verify_sp_description_cr_lf(planilha_04_descricao)
+    _, errors, warnings = verify_sp_description_cr_lf(planilha_04_descricao, columns_start_end=['codigo', 'nivel', 'nome_simples', 'nome_completo', 'unidade', 'desc_simples', 'desc_completa', 'cenario', 'relacao', 'fontes', 'meta'], columns_anywhere=['nome_simples', 'nome_completo'])
     # Numero de erros esperado == 0
     assert len(errors) == 0
     # Numero de warnings esperado == 10
     assert len(warnings) == 10
+
+def test_false_verify_sp_scenario_cr_lf(): # Teste false
+    planilha_05_cenario = os.path.join(path_input_data_errors_02, "3_cenarios_e_referencia_temporal", "cenarios.xlsx")
+    is_correct, errors, warnings = verify_sp_description_cr_lf(planilha_05_cenario,columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao'])
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) > 0
+def test_count_errors_verify_sp_scenario_cr_lf(): # Teste false
+    planilha_05_cenario = os.path.join(path_input_data_errors_02, "3_cenarios_e_referencia_temporal", "cenarios.xlsx")
+    _, errors, warnings = verify_sp_description_cr_lf(planilha_05_cenario,columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao'])
+    # Numero de erros esperado == 0
+    assert len(errors) == 0
+    # Numero de warnings esperado == 2
+    assert len(warnings) == 2
+
+def test_false_verify_sp_temporal_reference_cr_lf(): # Teste false
+    planilha_06_referencia_temporal = os.path.join(path_input_data_errors_02, "3_cenarios_e_referencia_temporal", "referencia_temporal.xlsx")
+    is_correct, errors, warnings = verify_sp_description_cr_lf(planilha_06_referencia_temporal,columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao'])
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) > 0
+def test_count_errors_verify_sp_temporal_reference_cr_lf(): # Teste false
+    planilha_06_referencia_temporal = os.path.join(path_input_data_errors_02, "3_cenarios_e_referencia_temporal", "referencia_temporal.xlsx")
+    _, errors, warnings = verify_sp_description_cr_lf(planilha_06_referencia_temporal, columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao'])
+    # Numero de erros esperado == 0
+    assert len(errors) == 0
+    # Numero de warnings esperado == 1
+    assert len(warnings) == 1
+
 
 # Testes: Títulos únicos: verify_sp_description_titles_uniques
 def test_true_verify_sp_description_titles_length_in_data_ground_truth(): # Teste true

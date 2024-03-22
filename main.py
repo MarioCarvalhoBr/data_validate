@@ -148,8 +148,14 @@ if __name__ == "__main__":
     
     # 12 - def verify_sp_description_cr_lf(path_sp_description):
     if exists_sp_description:
-        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha", *(orc.verify_sp_description_cr_lf(path_sp_description))])
-
+        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para descrição", *(orc.verify_sp_description_cr_lf(path_sp_description, columns_start_end=['codigo', 'nivel', 'nome_simples', 'nome_completo', 'unidade', 'desc_simples', 'desc_completa', 'cenario', 'relacao', 'fontes', 'meta'], columns_anywhere=['nome_simples', 'nome_completo']))])
+    
+    if exists_scenario:
+        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para cenários", *(orc.verify_sp_description_cr_lf(path_scenario, columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao']))])
+    
+    if exists_temporal_reference:
+        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para referência temporal", *(orc.verify_sp_description_cr_lf(path_temporal_reference, columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao']))])
+    
     print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
 
     num_errors = 0

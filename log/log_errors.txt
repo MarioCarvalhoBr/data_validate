@@ -44,7 +44,9 @@
 [31mvalores.xlsx: A coluna '2-2015' é obrigatória.
 [31mvalores.xlsx: A coluna '5000-2030-O' é obrigatória.
 [31mvalores.xlsx: A coluna '5000-2080-M' é desnecessária.
-[34m[1mVerificação: Quebra de linha
+[34m[1mVerificação: Quebra de linha para descrição
+[34m[1mVerificação: Quebra de linha para cenários
+[34m[1mVerificação: Quebra de linha para referência temporal
 [34m[1mVerificação: Códigos HTML nas descrições simples
 [33mdescricao.xlsx, linha 1: Coluna desc_simples não pode conter código HTML.
 [33mdescricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
@@ -90,5 +92,5 @@
 [31m[1mNúmero de erros: 30
 [33m[1mNúmero de avisos: 32
 [34m[1m
-Tempo total de execução: 3.5 segundos
+Tempo total de execução: 3.6 segundos
 [0m
