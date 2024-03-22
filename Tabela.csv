@@ -1,0 +1,11 @@
+Tipo;Texto;
+CR;"Exemplo com 
+ CR meio";
+LF;"Exemplo com  LF meio";
+CR;"
+Exemplo com CR início";LF;"
+Exemplo com LF início";
+CR;"Exemplo com CR fim
+";
+LF;"Exemplo com LF fim
+";
