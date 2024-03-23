@@ -278,7 +278,6 @@ def verify_sp_description_cr_lf(path_sp_description, columns_start_end=[], colum
                 if pd.isna(text) or text == "":
                     continue
                 if text.endswith('\x0D'):
-                    ## MEssage erro:  "Possui um caracter inválido (CR)"
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no final do texto.")
                 if text.endswith('\x0A'):
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no final do texto.")

@@ -23,6 +23,7 @@ if [ $? -eq 0 ]; then
   git add assets/images/coverage_badge.svg
   # Adiciona os logs ao staging area
   git add log/log_errors.txt
+  git add log/log_errors_2.txt
   git add log/log_ground_truth.txt
 else
   echo "O commit foi abortado devido a falhas nas verificações."
