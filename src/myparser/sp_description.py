@@ -131,6 +131,10 @@ def verify_sp_description_text_capitalize(path_sp_description):
                 original_text = row[column]
                 # Trim nos textos
                 original_text = original_text.strip() if not pd.isna(original_text) else original_text
+                
+                # Remove all \r and \n (x0D and x0A)
+                original_text = re.sub(r'[\x0D\x0A]', '', original_text)
+                
                 # Verifique se o texto está vazio ou nan 
                 if pd.isna(original_text) or original_text == "":
                     original_text = ""
