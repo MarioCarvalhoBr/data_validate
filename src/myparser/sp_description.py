@@ -97,12 +97,15 @@ def verify_sp_description_titles_uniques(path_sp_description):
         return False, errors, []
 
     try:
-        df = read_excel_file(path_sp_description, True)
+        df = read_excel_file(path_sp_description)
         # Renomear para as mcolunas nome_simples e nome_completo para nomes_simples e nomes_completos
         df.rename(columns={'nome_simples': 'nomes_simples', 'nome_completo': 'nomes_completos'}, inplace=True)
+        
         for column in ['nomes_simples', 'nomes_completos']:
-            df[column] = df[column].str.strip()
+            # Convert to string
+            df[column] = df[column].astype(str).str.strip()
             duplicated = df[column].duplicated().any()
+
             if duplicated:
                 titles_duplicated = df[df[column].duplicated()][column].tolist()
                 warnings.append(f"{os.path.basename(path_sp_description)}: Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
@@ -125,20 +128,27 @@ def verify_sp_description_text_capitalize(path_sp_description):
         return False, errors, []
 
     try:
-        df = read_excel_file(path_sp_description, True)
+        df = read_excel_file(path_sp_description)
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
+
                 original_text = row[column]
-                # Trim nos textos
+
+                # Check if the text is empty or nan
+                if pd.isna(original_text) or original_text == "":
+                    continue
+
+                # To str
+                original_text = str(original_text)
+
+                # Remove all \r and \n (x0D and x0A)
+                original_text = original_text.replace('\x0D', '').replace('\x0A', '')
+
+                # Trim the text
                 original_text = original_text.strip() if not pd.isna(original_text) else original_text
                 
-                # Remove all \r and \n (x0D and x0A)
-                original_text = re.sub(r'[\x0D\x0A]', '', original_text)
-                
-                # Verifique se o texto está vazio ou nan 
-                if pd.isna(original_text) or original_text == "":
-                    original_text = ""
                 expected_corect_text = capitalize_text(original_text)
+
                 if not original_text == expected_corect_text:
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
     except Exception as e:
