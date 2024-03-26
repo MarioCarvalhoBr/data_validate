@@ -22,12 +22,12 @@
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
 [34m[1mVerificação: Padrão para nomes dos indicadores
-[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com  cr meio". Encontrado: "Exemplo com  CR meio".
-[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com  lf meio". Encontrado: "Exemplo com  LF meio".
-[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com cr início". Encontrado: "Exemplo com CR início".
-[33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com lf início". Encontrado: "Exemplo com LF início".
-[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com cr fim". Encontrado: "Exemplo com CR fim".
-[33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com lf fim". Encontrado: "Exemplo com LF fim".
+[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com <lf> cr meio". Encontrado: "Exemplo com <LF> CR meio".
+[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com <lf> lf meio". Encontrado: "Exemplo com <LF> LF meio".
+[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "<lf>exemplo com cr início". Encontrado: "<LF>Exemplo com CR início".
+[33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "<lf>exemplo com lf início". Encontrado: "<LF>Exemplo com LF início".
+[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com cr fim<lf>". Encontrado: "Exemplo com CR fim<LF>".
+[33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com lf fim<lf>". Encontrado: "Exemplo com LF fim<LF>".
 [34m[1mVerificação: Quebra de linha para descrição
 [33mdescricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 13.
 [33mdescricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 13.
@@ -49,5 +49,5 @@
 [37m[1mNúmero de erros: 0
 [33m[1mNúmero de avisos: 19
 [34m[1m
-Tempo total de execução: 7.5 segundos
+Tempo total de execução: 8.1 segundos
 [0m

@@ -142,7 +142,7 @@ def verify_sp_description_text_capitalize(path_sp_description):
                 original_text = str(original_text)
 
                 # Remove all \r and \n (x0D and x0A)
-                original_text = original_text.replace('\x0D', '').replace('\x0A', '')
+                original_text = original_text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
 
                 # Trim the text
                 original_text = original_text.strip() if not pd.isna(original_text) else original_text
