@@ -132,22 +132,20 @@ def verify_sp_description_text_capitalize(path_sp_description):
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
 
-                original_text = row[column]
+                text = row[column]
 
                 # Check if the text is empty or nan
-                if pd.isna(original_text) or original_text == "":
+                if pd.isna(text) or text == "":
                     continue
 
                 # To str
-                original_text = str(original_text)
+                text = str(text)
 
-                # Remove all \r and \n (x0D and x0A)
-                original_text = original_text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
-
-                # Trim the text
-                original_text = original_text.strip() if not pd.isna(original_text) else original_text
+                # Remove all \r and \n (x0D and x0A) and strip the text
+                original_text = text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
                 
-                expected_corect_text = capitalize_text(original_text)
+                expected_corect_text = text.replace('\x0D', '').replace('\x0A', '').strip()
+                expected_corect_text = capitalize_text(expected_corect_text)
 
                 if not original_text == expected_corect_text:
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
