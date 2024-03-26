@@ -50,7 +50,7 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
         warnings.extend(col_warnings)
 
     except Exception as e:
-        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler a coluna desc_simples do arquivo .xlsx: {e}")
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler a colunas do arquivo .xlsx: {e}")
 
     is_correct = len(errors) == 0
     return is_correct, errors, warnings
