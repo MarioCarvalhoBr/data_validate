@@ -158,6 +158,9 @@ def check_vertical_bar(df_sp, name_file):
     try:
         # Verificar se existe barra vertical
         for column in df_sp.columns:
+            #Verifica se existe erro no nome da coluna
+            if "|" in column:
+                errors.append(f"{name_file}: O nome da coluna '{column}' não pode conter o caracter '|'.")
             for index, row in df_sp.iterrows():
                 if "|" in str(row[column]):
                     errors.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não pode conter o caracter '|'.")
