@@ -203,30 +203,7 @@ def test_dataframe_clean_numeric_values_less_than_with_negative_values():
     assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor menor que 0."
     assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor menor que 0."
 
-'''
-def check_vertical_bar(df_sp, name_file):
-erros_2
-
-def check_vertical_bar(df_sp, name_file):
-    errors = []
-    try:
-        # Verificar se existe barra vertical
-        for column in df_sp.columns:
-            #Verifica se existe erro no nome da coluna
-            if "|" in column:
-                errors.append(f"{name_file}: O nome da coluna '{column}' não pode conter o caracter '|'.")
-            for index, row in df_sp.iterrows():
-                if "|" in str(row[column]):
-                    errors.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não pode conter o caracter '|'.")
-    except Exception as e:
-        errors.append(f"Erro ao ler o arquivo {name_file}: {str(e)}")
-
-    return not errors, errors
-
-
-
-
-'''
+# Function: check_vertical_bar
 def test_check_vertical_bar_with_no_errors():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 3],
@@ -235,7 +212,6 @@ def test_check_vertical_bar_with_no_errors():
     result, erros = check_vertical_bar(df, 'test_file')
     assert result is True
     assert len(erros) == 0
-
 def test_check_vertical_bar_with_errors():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 3],
@@ -246,8 +222,6 @@ def test_check_vertical_bar_with_errors():
     assert result is False
     assert len(erros) == 1
     assert erros[0] == "test_file, linha 4: A coluna 'descricao' não pode conter o caracter '|'."
-
-# | no nome da coluna
 def test_check_vertical_bar_with_column_name_error():
     df = pd.DataFrame({
         'codigo_pai': [1, 2, 3],
@@ -258,3 +232,11 @@ def test_check_vertical_bar_with_column_name_error():
     assert result is False
     assert len(erros) == 1
     assert erros[0] == "test_file: O nome da coluna 'desc|ricao' não pode conter o caracter '|'."
+def test_check_vertical_bar_with_no_columns():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+    })
+    result, erros = check_vertical_bar(df, 'test_file')
+    assert result is True
+    assert len(erros) == 0

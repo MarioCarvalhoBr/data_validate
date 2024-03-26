@@ -29,27 +29,12 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
 
     return not warnings, warnings
 
-# check_unique_values:  Valores tem que ser unicos para as colunas especificadas
 def check_unique_values(df, name_file, columns_uniques):
     warnings = []
     for column in columns_uniques:
         if not df[column].is_unique:
             warnings.append(f"{name_file}: A coluna '{column}' não deve conter valores repetidos.")
     return not warnings, warnings
-
-
-'''
-def dataframe_check_min_value(df, name_file, colunas_verificar):
-    erros = []
-    for coluna in colunas_verificar:
-        # Verifica se a col
-        if not (df[coluna] >= 0).all():
-            # Linha onde existe o valor menor que zero
-            linha_invalida = df[df[coluna] < 0].index.tolist()[0]            
-            erros.append(f"{name_file}, linha {linha_invalida}: A coluna '{coluna}' deve conter apenas valores maiores ou iguais a zero.")
-    return erros
-
-'''
 
 def dataframe_clean_numeric_values_less_than(df, name_file, colunas_limpar, value=0):
     erros = []
@@ -84,26 +69,6 @@ def dataframe_clean_numeric_values_less_than(df, name_file, colunas_limpar, valu
 
     return df, erros
 
-'''
-# Função que limpa um dataframe de todas as linhas que contém valores não numéricos
-def dataframe_clean_non_numeric_values(df, name_file, colunas_limpar):
-    erros = []
-    for coluna in colunas_limpar:
-        # Converte a coluna para numérico, forçando não numéricos a NaN
-        df[coluna] = pd.to_numeric(df[coluna], errors='coerce')
-
-        # Encontra linhas com valores não numéricos
-        linhas_invalidas = df[df[coluna].isnull()]
-
-        # Registra erros para valores não numéricos
-        for linha_invalida in linhas_invalidas.index:
-            erros.append(f"{name_file}, linha {linha_invalida + 2}: A coluna '{coluna}' contém um valor não numérico.")
-
-    # Elimina linhas com valores não numéricos
-    df = df.drop(linhas_invalidas.index)
-
-    return df, erros
-'''
 def file_extension_check(path, extension='.xlsx'):
     if not path.endswith(extension):
         return False, f"ERRO: O arquivo {path} de entrada não é {extension}"
@@ -149,16 +114,12 @@ def check_file_exists(file_path):
         return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/{utimo_arquivo}'."
     return True, ""
 
-"""
-Barra vertical como caracter exclusivo do Adapta #87
-O usuario nao pode usar | em nenhum arquivo de dados. Este caracter esta reservado para uso interno. Deve ser gerado erro toda vez que uma barra vertical for encontrada.
-"""
 def check_vertical_bar(df_sp, name_file):
     errors = []
     try:
-        # Verificar se existe barra vertical
+        # Check if there is a vertical bar in the column name
         for column in df_sp.columns:
-            #Verifica se existe erro no nome da coluna
+            # Check if there is a vertical bar in the column name
             if "|" in column:
                 errors.append(f"{name_file}: O nome da coluna '{column}' não pode conter o caracter '|'.")
             for index, row in df_sp.iterrows():
@@ -168,4 +129,3 @@ def check_vertical_bar(df_sp, name_file):
         errors.append(f"Erro ao ler o arquivo {name_file}: {str(e)}")
 
     return not errors, errors
-
