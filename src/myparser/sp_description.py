@@ -97,12 +97,15 @@ def verify_sp_description_titles_uniques(path_sp_description):
         return False, errors, []
 
     try:
-        df = read_excel_file(path_sp_description, True)
+        df = read_excel_file(path_sp_description)
         # Renomear para as mcolunas nome_simples e nome_completo para nomes_simples e nomes_completos
         df.rename(columns={'nome_simples': 'nomes_simples', 'nome_completo': 'nomes_completos'}, inplace=True)
+        
         for column in ['nomes_simples', 'nomes_completos']:
-            df[column] = df[column].str.strip()
+            # Convert to string
+            df[column] = df[column].astype(str).str.strip()
             duplicated = df[column].duplicated().any()
+
             if duplicated:
                 titles_duplicated = df[df[column].duplicated()][column].tolist()
                 warnings.append(f"{os.path.basename(path_sp_description)}: Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
@@ -125,14 +128,25 @@ def verify_sp_description_text_capitalize(path_sp_description):
         return False, errors, []
 
     try:
-        df = read_excel_file(path_sp_description, True)
+        df = read_excel_file(path_sp_description)
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
-                original_text = row[column]
-                # Verifique se o texto está vazio ou nan 
-                if pd.isna(original_text) or original_text == "":
-                    original_text = ""
-                expected_corect_text = capitalize_text(original_text)
+
+                text = row[column]
+
+                # Check if the text is empty or nan
+                if pd.isna(text) or text == "":
+                    continue
+
+                # To str
+                text = str(text)
+
+                # Remove all \r and \n (x0D and x0A) and strip the text
+                original_text = text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
+                
+                expected_corect_text = text.replace('\x0D', '').replace('\x0A', '').strip()
+                expected_corect_text = capitalize_text(expected_corect_text)
+
                 if not original_text == expected_corect_text:
                     warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
     except Exception as e:
@@ -238,6 +252,63 @@ def  verify_sp_description_empty_strings(path_sp_description):
                 errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'desc_simples' não pode ser vazia.")
             if pd.isna(row['desc_completa']) or row['desc_completa'] == "":
                 errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'desc_completa' não pode ser vazia.")
+    except Exception as e:
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
+
+    return not errors, errors, warnings
+
+'''
+Nova função para verificar se os campos de texto possuem CR e LF: 
+TAREFA: 
+    - Remover #$0D, #$0A (CR, LF) dos campos texto #85
+
+FAZER:
+    - Na tabela de descrição dos indicadores, identificar em todos os campos texto os caracteres CR e LF que estiverem no fim do texto.
+    - Nos campos nome e título, identificar se ocorrerem em qualquer lugar do texto.
+    - Gerar um warning em ambos os casos dizendo em que posição estavam os caracteres que foram identificados.
+'''
+def verify_sp_description_cr_lf(path_sp_description, columns_start_end=[], columns_anywhere=[]):
+    errors, warnings = [], []
+
+    # Verificar se os arquivos existem
+    is_correct, error_message = check_file_exists(path_sp_description)
+    if not is_correct:
+        errors.append(error_message)
+
+    if errors:
+        return False, errors, []
+
+    try:
+        df = read_excel_file(path_sp_description, True)
+        # Item 1: Identificar CR e LF no final dos campos de texto
+        for index, row in df.iterrows():
+            
+            for column in columns_start_end:
+                text = row[column]
+                # To srt 
+                text = str(text)
+                if pd.isna(text) or text == "":
+                    continue
+                if text.endswith('\x0D'):
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no final do texto.")
+                if text.endswith('\x0A'):
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no final do texto.")
+                
+                if text.startswith('\x0D'):
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no início do texto.")
+                if text.startswith('\x0A'):
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no início do texto.")
+           
+            # Item 2: Identificar CR e LF em qualquer lugar nos campos nome e título
+            for column in columns_anywhere:
+                text = row[column]
+                text = str(text)
+                if pd.isna(text) or text == "":
+                    continue
+                for match in re.finditer(r'[\x0D\x0A]', text):
+                    char_type = "CR" if match.group() == '\x0D' else "LF"
+                    warnings.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido ({char_type}) na posição {match.start() + 1}.")
+
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 

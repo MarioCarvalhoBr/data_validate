@@ -41,4 +41,5 @@ jobs:
         run: |
           python3 main.py --input_folder=input_data/data_ground_truth/
           python3 main.py --input_folder=input_data/data_errors/
+          python3 main.py --input_folder=input_data/data_errors_2/
           python3 main.py --input_folder=input_data/data_errors/ --no-warning-titles-length

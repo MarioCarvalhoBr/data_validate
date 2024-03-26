@@ -1,7 +1,7 @@
 from src.orchestrator import verify_spelling_text
 from src.myparser.spellchecker import TypeDict
 
-from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors
+from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01
 
     
 # Testes: Verificar ortografia
@@ -20,7 +20,7 @@ def test_true_verify_spelling_text_tiny(): # Teste false
     assert len(warnings) == 16
     assert len(errors) == 0
 def test_count_errors_verify_spelling_text_tiny(): # Teste false
-    path_input_folder = path_input_data_errors
+    path_input_folder = path_input_data_errors_01
     type_dict_spell = TypeDict.TINY
     is_correct, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
     # Numero de erros esperado == 0
@@ -31,13 +31,13 @@ def test_count_errors_verify_spelling_text_tiny(): # Teste false
 # Testes: Verificar ortografia: Full
 def test_true_verify_spelling_text_full_for_errors(): # Teste true
     type_dict_spell = TypeDict.FULL
-    is_correct,errors, warnings = verify_spelling_text(path_input_data_errors, type_dict_spell)
+    is_correct,errors, warnings = verify_spelling_text(path_input_data_errors_01, type_dict_spell)
     assert is_correct is True
     assert len(warnings) == 10
     assert len(errors) == 0
 
 def test_count_errors_verify_spelling_text_full(): # Teste false
-    path_input_folder = path_input_data_errors
+    path_input_folder = path_input_data_errors_01
     type_dict_spell = TypeDict.FULL
     _, errors, warnings = verify_spelling_text(path_input_folder, type_dict_spell)
     # Numero de erros esperado == 0

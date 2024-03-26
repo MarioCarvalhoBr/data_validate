@@ -13,7 +13,8 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
                 # Verifique se o texto está vazio ou nan 
                 if pd.isna(text) or text == "":
                     continue
-                if row[column][-1] in [',', '.', ';', ':', '!', '?']:
+                text = str(text).strip()
+                if text[-1] in [',', '.', ';', ':', '!', '?']:
                     warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não deve terminar com pontuação.")
         
         if columns_must_end_with_dot is not None:
@@ -22,7 +23,8 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
                 # Verifique se o texto está vazio ou nan 
                 if pd.isna(text) or text == "":
                     continue
-                if row[column][-1] != '.':
+                text = str(text).strip()
+                if text[-1] != '.':
                     warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' deve terminar com ponto.")
 
     return not warnings, warnings
