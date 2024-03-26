@@ -148,3 +148,21 @@ def check_file_exists(file_path):
         utimo_arquivo = os.path.basename(file_path)
         return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/{utimo_arquivo}'."
     return True, ""
+
+"""
+Barra vertical como caracter exclusivo do Adapta #87
+O usuario nao pode usar | em nenhum arquivo de dados. Este caracter esta reservado para uso interno. Deve ser gerado erro toda vez que uma barra vertical for encontrada.
+"""
+def check_vertical_bar(df_sp, name_file):
+    errors = []
+    try:
+        # Verificar se existe barra vertical
+        for column in df_sp.columns:
+            for index, row in df_sp.iterrows():
+                if "|" in str(row[column]):
+                    errors.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não pode conter o caracter '|'.")
+    except Exception as e:
+        errors.append(f"Erro ao ler o arquivo {name_file}: {str(e)}")
+
+    return not errors, errors
+
