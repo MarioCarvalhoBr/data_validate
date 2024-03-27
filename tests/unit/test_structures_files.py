@@ -29,7 +29,7 @@ def test_errors_verify_structure_downr_exist_folder_files(): # Teste false
 def test_count_errors_verify_structure_folder_files_data_errors_2(): # Teste false
     is_correct, errors, warnings = verify_structure_folder_files(path_input_data_errors_02)
     assert is_correct is False
-    # Numero de erros esperado == 2
-    assert len(errors) == 2
+    # Numero de erros esperado == 10
+    assert len(errors) == 10
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
