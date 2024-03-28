@@ -1,5 +1,5 @@
 import os
-from src.util.utilities import check_file_exists, dataframe_clean_numeric_values_less_than, read_excel_file, check_folder_exists
+from src.util.utilities import check_file_exists, dataframe_clean_numeric_values_less_than, read_excel_file, check_folder_exists, check_vertical_bar
 
 def verify_structure_folder_files_by_pathfile(full_pathfile):
     is_correct = False
@@ -97,6 +97,10 @@ def verify_structure_folder_files(path_folder):
 
             df = read_excel_file(file_path)
 
+            _, erros = check_vertical_bar(df, file_name)
+            if erros:
+                errors.extend(erros)
+
             if df is not None:
                 if file_name == "proporcionalidades.xlsx":
                         lista_colunas = df.iloc[0].tolist()
@@ -136,9 +140,9 @@ def verify_files_data_clean(path_folder):
             file_name = os.path.basename(file)
             df = read_excel_file(file_path)
             _, erros = dataframe_clean_numeric_values_less_than(df, file_name, column, value)
-            
             if erros:
                 errors.extend(erros)
+            
     except Exception as e:
         pass
         errors.append(str(e))

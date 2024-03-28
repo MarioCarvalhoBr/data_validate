@@ -50,7 +50,7 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
         warnings.extend(col_warnings)
 
     except Exception as e:
-        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler a coluna desc_simples do arquivo .xlsx: {e}")
+        errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler a colunas do arquivo .xlsx: {e}")
 
     is_correct = len(errors) == 0
     return is_correct, errors, warnings
@@ -257,16 +257,7 @@ def  verify_sp_description_empty_strings(path_sp_description):
 
     return not errors, errors, warnings
 
-'''
-Nova função para verificar se os campos de texto possuem CR e LF: 
-TAREFA: 
-    - Remover #$0D, #$0A (CR, LF) dos campos texto #85
 
-FAZER:
-    - Na tabela de descrição dos indicadores, identificar em todos os campos texto os caracteres CR e LF que estiverem no fim do texto.
-    - Nos campos nome e título, identificar se ocorrerem em qualquer lugar do texto.
-    - Gerar um warning em ambos os casos dizendo em que posição estavam os caracteres que foram identificados.
-'''
 def verify_sp_description_cr_lf(path_sp_description, columns_start_end=[], columns_anywhere=[]):
     errors, warnings = [], []
 

@@ -5,7 +5,7 @@ from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
 from src.util.utilities import dataframe_clean_numeric_values_less_than
-from src.util.utilities import check_punctuation
+from src.util.utilities import check_punctuation, check_vertical_bar
 
 
 # Testes para check_punctuation:
@@ -202,3 +202,41 @@ def test_dataframe_clean_numeric_values_less_than_with_negative_values():
     assert len(erros) == 2
     assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor menor que 0."
     assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor menor que 0."
+
+# Function: check_vertical_bar
+def test_check_vertical_bar_with_no_errors():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+    })
+    result, erros = check_vertical_bar(df, 'test_file')
+    assert result is True
+    assert len(erros) == 0
+def test_check_vertical_bar_with_errors():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+        'descricao': ['This is a test.', 'This is another test.', 'Yet another test. |']
+    })
+    result, erros = check_vertical_bar(df, 'test_file')
+    assert result is False
+    assert len(erros) == 1
+    assert erros[0] == "test_file, linha 4: A coluna 'descricao' não pode conter o caracter '|'."
+def test_check_vertical_bar_with_column_name_error():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+        'desc|ricao': ['This is a test.', 'This is another test.', 'Yet another test.']
+    })
+    result, erros = check_vertical_bar(df, 'test_file')
+    assert result is False
+    assert len(erros) == 1
+    assert erros[0] == "test_file: O nome da coluna 'desc|ricao' não pode conter o caracter '|'."
+def test_check_vertical_bar_with_no_columns():
+    df = pd.DataFrame({
+        'codigo_pai': [1, 2, 3],
+        'codigo_filho': [2, 3, 4],
+    })
+    result, erros = check_vertical_bar(df, 'test_file')
+    assert result is True
+    assert len(erros) == 0
