@@ -110,8 +110,7 @@ def check_file_exists(file_path):
     """Verifica se um arquivo existe."""
     if not os.path.isfile(file_path):
         ultima_pasta = os.path.basename(os.path.dirname(file_path))
-        utimo_arquivo = os.path.basename(file_path)
-        return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/{utimo_arquivo}'."
+        return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/'."
     return True, ""
 
 def check_vertical_bar(df_sp, name_file):

@@ -6,20 +6,20 @@ from src.myparser.hierarchy.tree import verificar_ciclos, verificar_erros_niveis
 
 # Testes: Hierarquia como árvore #3
 def test_true_verify_tree_sp_composition_hierarchy(): # Teste true
-    planilha_05_composicao = path_input_data_ground_truth + "/5_composicao/composicao.xlsx"
-    planilha_04_descricao = os.path.join(path_input_data_ground_truth, "4_descricao", "descricao.xlsx")
+    planilha_05_composicao = path_input_data_ground_truth + "/composicao.xlsx"
+    planilha_04_descricao = os.path.join(path_input_data_ground_truth,  "descricao.xlsx")
     result_test,__,__ = verify_tree_sp_description_composition_hierarchy(planilha_05_composicao, planilha_04_descricao)
     assert result_test is True
     
 def test_false_verify_tree_sp_composition_hierarchy(): # Teste false
-    planilha_05_composicao = path_input_data_errors_01 + "/5_composicao/composicao.xlsx"
-    planilha_04_descricao = os.path.join(path_input_data_errors_01, "4_descricao", "descricao.xlsx")
+    planilha_05_composicao = path_input_data_errors_01 + "/composicao.xlsx"
+    planilha_04_descricao = os.path.join(path_input_data_errors_01, "descricao.xlsx")
     result_test,__,__ = verify_tree_sp_description_composition_hierarchy(planilha_05_composicao, planilha_04_descricao)
     assert result_test is False
 
 def test_count_errors_verify_tree_sp_composition_hierarchy(): # Teste false
-    planilha_05_composicao = path_input_data_errors_01 + "/5_composicao/composicao.xlsx"
-    planilha_04_descricao = os.path.join(path_input_data_errors_01, "4_descricao", "descricao.xlsx")
+    planilha_05_composicao = path_input_data_errors_01 + "/composicao.xlsx"
+    planilha_04_descricao = os.path.join(path_input_data_errors_01, "descricao.xlsx")
     is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(planilha_05_composicao, planilha_04_descricao)
     # Numero de erros esperado == 3
     assert len(errors) == 3
