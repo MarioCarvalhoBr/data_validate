@@ -7,19 +7,13 @@ import src.myparser.sp_temporal_reference as sp_temporal_reference
 import src.myparser.spellchecker as spellchecker
 import src.myparser.structures_files as structures_files
 import src.myparser.info as info
-import src.util.utilities as util
 
+# VERIFICATORS
 def verify_sp_description_cr_lf(path_sp_description,  columns_start_end= [], columns_anywhere=[]):
     return sp_description.verify_sp_description_cr_lf(path_sp_description, columns_start_end, columns_anywhere)
 
 def verify_sp_description_empty_strings(path_sp_description):
     return sp_description.verify_sp_description_empty_strings(path_sp_description)
-
-def verify_structure_folder_files_by_pathfile(pathfile):
-    return structures_files.verify_structure_folder_files_by_pathfile(pathfile)
-
-def check_file_exists(file_path):
-    return util.check_file_exists(file_path)
 
 def verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, columns_uniques):
     return sp_temporal_reference.verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, columns_uniques)
@@ -36,8 +30,8 @@ def verify_files_data_clean(path_folder):
 def verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference):
     return sp_values.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference)
 
-def verify_spelling_text(path_folder, type_dict_spell):
-    return spellchecker.run(path_folder, type_dict_spell)
+def verify_spelling_text(path_sheet, sheets_info, type_dict_spell):
+    return spellchecker.run(path_sheet, sheets_info,  type_dict_spell)
     
 def verify_structure_folder_files(path_folder):
     return structures_files.verify_structure_folder_files(path_folder)
@@ -75,8 +69,14 @@ def verify_sp_description_codes_uniques(path_sp_description):
 def verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description):
     return tree.verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description)
 
-def verify_version():
+# CHECKERS
+def check_structure_file(path_file):
+    return structures_files.check_structure_file(path_file)
+
+# UTILITIES
+def print_versions():
     return info.print_versions()
 
+# GETTERS
 def get_spellchecker():
     return spellchecker

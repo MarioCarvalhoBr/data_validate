@@ -30,6 +30,8 @@
 [34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
+[34m[1mVerificação: Estrutura da pasta de arquivos
+[33mO arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 [34m[1mVerificação: Ortografia
 [33mdescricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 [34m[1mVerificação: Padrão para nomes dos indicadores
@@ -58,7 +60,7 @@
 
 
 [31m[1mNúmero de erros: 10
-[33m[1mNúmero de avisos: 20
+[33m[1mNúmero de avisos: 21
 [34m[1m
-Tempo total de execução: 6.5 segundos
+Tempo total de execução: 8.5 segundos
 [0m
