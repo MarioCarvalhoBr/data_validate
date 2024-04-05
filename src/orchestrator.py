@@ -69,10 +69,6 @@ def verify_sp_description_codes_uniques(path_sp_description):
 def verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description):
     return tree.verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_ps_description)
 
-# CHECKERS
-def check_structure_file(path_file):
-    return structures_files.check_structure_file(path_file)
-
 # UTILITIES
 def print_versions():
     return info.print_versions()

@@ -13,16 +13,6 @@ def check_html_in_descriptions(path_sp_description, df):
             errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna desc_simples não pode conter código HTML.")
     return errors
 
-def check_column_names(df, expected_columns):
-    missing_columns = [col for col in expected_columns if col not in df.columns]
-    extra_columns = [col for col in df.columns if col not in expected_columns]
-    return missing_columns, extra_columns
-
-def format_errors_and_warnings(name, missing_columns, extra_columns):
-    errors = [f"{name}: Coluna '{col}' esperada mas não foi encontrada." for col in missing_columns]
-    warnings = [f"{name}: Coluna '{col}' será ignorada pois não está na especificação." for col in extra_columns]
-    return errors, warnings
-
 def verify_sp_description_parser_html_column_names(path_sp_description):
     errors, warnings = [], []
 
@@ -41,14 +31,6 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
 
         html_errors = check_html_in_descriptions(path_sp_description, df)
         warnings.extend(html_errors)
-
-        expected_columns = ["codigo", "nivel", "nome_simples", "nome_completo", "unidade", "desc_simples", "desc_completa", "cenario", "relacao", "fontes", "meta"]
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
-        col_errors, col_warnings = format_errors_and_warnings(os.path.basename(path_sp_description), missing_columns, extra_columns)
-        
-        errors.extend(col_errors)
-        warnings.extend(col_warnings)
-
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler a colunas do arquivo .xlsx: {e}")
 
@@ -70,6 +52,9 @@ def verify_sp_description_titles_length(path_sp_description):
     try:
         df = read_excel_file(path_sp_description, True)
         for column in ['nome_simples']:
+            # Verifica se a coluna existe
+            if column not in df.columns:
+                continue
             df[column] = df[column].str.strip()
             for index, row in df.iterrows():
                 text = row[column]
@@ -99,9 +84,16 @@ def verify_sp_description_titles_uniques(path_sp_description):
     try:
         df = read_excel_file(path_sp_description)
         # Renomear para as mcolunas nome_simples e nome_completo para nomes_simples e nomes_completos
-        df.rename(columns={'nome_simples': 'nomes_simples', 'nome_completo': 'nomes_completos'}, inplace=True)
+        # Verifica se a coluna 'nome_simples' existe
+        if 'nome_simples' in df.columns:
+            df.rename(columns={'nome_simples': 'nomes_simples'}, inplace=True)
+        if 'nome_completo' in df.columns:
+            df.rename(columns={'nome_completo': 'nomes_completos'}, inplace=True)
         
         for column in ['nomes_simples', 'nomes_completos']:
+            # Verifica se a coluna existe
+            if column not in df.columns:
+                continue
             # Convert to string
             df[column] = df[column].astype(str).str.strip()
             duplicated = df[column].duplicated().any()
@@ -131,6 +123,10 @@ def verify_sp_description_text_capitalize(path_sp_description):
         df = read_excel_file(path_sp_description)
         for index, row in df.iterrows():
             for column in ['nome_simples', 'nome_completo']:
+
+                # Verifica se a coluna existe
+                if column not in df.columns:
+                    continue
 
                 text = row[column]
 
@@ -170,12 +166,13 @@ def verify_sp_description_levels(path_sp_description):
         
         df = read_excel_file(path_sp_description, True)
         name_file_description = os.path.basename(path_sp_description)
-        
-        for index, row in df.iterrows():
-            dig = str(row['nivel'])
-            # Verifica se row['nivel'] é um digito inteiro maior que zero
-            if not dig.isdigit() or int(row['nivel']) < 1:
-                errors.append(f"{name_file_description}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
+        # Verifica se a coluna 'nivel' existe
+        if 'nivel' in df.columns:
+            for index, row in df.iterrows():
+                dig = str(row['nivel'])
+                # Verifica se row['nivel'] é um digito inteiro maior que zero
+                if not dig.isdigit() or int(row['nivel']) < 1:
+                    errors.append(f"{name_file_description}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
     except Exception as e:
         errors.append(f"{name_file_description}: Erro ao ler o arquivo .xlsx: {e}")
 
@@ -195,6 +192,10 @@ def verify_sp_description_punctuation(path_sp_description, columns_dont_punctuat
     name_file = os.path.basename(path_sp_description)
     try:
         df = read_excel_file(path_sp_description, True)
+        # Verifica se todas as colunas existem em df
+        columns_dont_punctuation = [column for column in columns_dont_punctuation if column in df.columns]
+        columns_must_end_with_dot = [column for column in columns_must_end_with_dot if column in df.columns]
+
         _, warnings = check_punctuation(df, name_file, columns_dont_punctuation, columns_must_end_with_dot)
         
     except Exception as e:
@@ -215,15 +216,16 @@ def verify_sp_description_codes_uniques(path_sp_description):
 
     try:
         df = read_excel_file(path_sp_description, True)
-        
-        # Limpar os dados
-        df, _ = dataframe_clean_numeric_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
-        
-        # Verificar se há códigos duplicados
-        duplicated = df['codigo'].duplicated().any()
-        if duplicated:
-            codes_duplicated = df[df['codigo'].duplicated()]['codigo'].tolist()
-            errors.append(f"{os.path.basename(path_sp_description)}: Existem códigos duplicados: {codes_duplicated}.")
+        # Verifica se a coluna 'codigo' existe
+        if 'codigo' in df.columns:
+            # Limpar os dados
+            df, _ = dataframe_clean_numeric_values_less_than(df, os.path.basename(path_sp_description), ['codigo'], 1)
+            
+            # Verificar se há códigos duplicados
+            duplicated = df['codigo'].duplicated().any()
+            if duplicated:
+                codes_duplicated = df[df['codigo'].duplicated()]['codigo'].tolist()
+                errors.append(f"{os.path.basename(path_sp_description)}: Existem códigos duplicados: {codes_duplicated}.")
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
@@ -243,15 +245,14 @@ def  verify_sp_description_empty_strings(path_sp_description):
 
     try:
         df = read_excel_file(path_sp_description, True)
+        list_columns = [column for column in ['nome_simples', 'nome_completo', 'desc_simples', 'desc_completa'] if column in df.columns]
+
         for index, row in df.iterrows():
-            if pd.isna(row['nome_simples']) or row['nome_simples'] == "":
-                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'nome_simples' não pode ser vazia.")
-            if pd.isna(row['nome_completo']) or row['nome_completo'] == "":
-                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'nome_completo' não pode ser vazia.")
-            if pd.isna(row['desc_simples']) or row['desc_simples'] == "":
-                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'desc_simples' não pode ser vazia.")
-            if pd.isna(row['desc_completa']) or row['desc_completa'] == "":
-                errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna 'desc_completa' não pode ser vazia.")
+
+            for column in list_columns:
+                if pd.isna(row[column]) or row[column] == "":
+                    errors.append(f"{os.path.basename(path_sp_description)}, linha {index + 1}: Coluna '{column}' não pode ser vazia.")
+
     except Exception as e:
         errors.append(f"{os.path.basename(path_sp_description)}: Erro ao ler o arquivo .xlsx: {e}")
 
@@ -275,6 +276,10 @@ def verify_sp_description_cr_lf(path_sp_description, columns_start_end=[], colum
         for index, row in df.iterrows():
             
             for column in columns_start_end:
+                # Verifica se a coluna existe
+                if column not in df.columns:
+                    continue
+
                 text = row[column]
                 # To srt 
                 text = str(text)

@@ -4,7 +4,7 @@
 
 
 [37m[1m------ Verificação dos testes ------
-[34m[1mVerificação: Estrutura da pasta de arquivos
+[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [34m[1mVerificação: Limpeza dos arquivos
 [34m[1mVerificação: Relações entre indicadores
 [34m[1mVerificação: Hierarquia como árvore
@@ -30,5 +30,5 @@
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 8.8 segundos
+Tempo total de execução: 7.9 segundos
 [0m

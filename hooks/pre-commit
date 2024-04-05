@@ -12,6 +12,7 @@ python3 generate_coverage_report.py
 # GERANDO OS DADOS PARA OS LOGS
 python3 main.py --input_folder=input_data/data_errors/ > log/log_errors.txt
 python3 main.py --input_folder=input_data/data_errors_2/ > log/log_errors_2.txt
+python3 main.py --input_folder=input_data/data_errors_3/ > log/log_errors_3.txt
 python3 main.py --input_folder=input_data/data_ground_truth/ > log/log_ground_truth.txt
 
 # GERA O RELATÓRIO DE COBERTURA
@@ -24,6 +25,7 @@ if [ $? -eq 0 ]; then
   # Adiciona os logs ao staging area
   git add log/log_errors.txt
   git add log/log_errors_2.txt
+  git add log/log_errors_3.txt
   git add log/log_ground_truth.txt
 else
   echo "O commit foi abortado devido a falhas nas verificações."

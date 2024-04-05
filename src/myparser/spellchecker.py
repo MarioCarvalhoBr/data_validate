@@ -55,6 +55,8 @@ def run(path, columns_sheets, type_dict_spell):
 
     try:
         df = read_excel_file(path)
+        # Verifica se todas as colunas existem em df
+        columns_sheets = [column for column in columns_sheets if column in df.columns]
         sheet_warnings = process_sheet(df, columns_sheets, dictionary, type_dict_spell, file_name)
         warnings.extend(sheet_warnings)
     except Exception as e:

@@ -78,6 +78,9 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
         return False, errors, []
     
     composicao = read_excel_file(path_sp_composition)
+    # Verificar se as colunas com código existem
+    if 'codigo_pai' not in composicao.columns or 'codigo_filho' not in composicao.columns:
+        return False, errors, warnings
     name_file_composition = path_sp_composition.split("/")[-1]
     
     # Limpando os dados
@@ -85,6 +88,10 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
     composicao, _ = dataframe_clean_numeric_values_less_than(composicao, name_file_composition, ['codigo_filho'], 1)
     
     descricao = read_excel_file(path_sp_description)
+    # Verifica se as colunas com código existem
+    if 'codigo' not in descricao.columns or 'nivel' not in descricao.columns:
+        return False, errors, warnings
+    
     name_file_description = path_sp_description.split("/")[-1]
     # Limpando os dados
     descricao, _ = dataframe_clean_numeric_values_less_than(descricao, name_file_description, ['codigo', 'nivel'], 1)
