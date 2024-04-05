@@ -35,15 +35,27 @@ def verify_structure_folder_files(path_folder):
 
             # Check if there is a vertical bar in the column name
             errors.extend(check_vertical_bar(df, file_name)[1])
+            
+            # Ajuste para 'proporcionalidades.xlsx'
+            if file_name == "proporcionalidades.xlsx":
+                # Tratamento especial para 'proporcionalidades.xlsx'
+                header_row = df.iloc[0]
+                df.columns = header_row
+                df = df[1:].reset_index(drop=True)
 
             # Check missing columns expected columns
-            # Se não for proporcionalidades.xlsx ou valores.xlsx
-            if file_name not in ["proporcionalidades.xlsx", "valores.xlsx"]:
-                missing_columns, extra_columns = check_column_names(df, expected_columns)
-                col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
+            missing_columns, extra_columns = check_column_names(df, expected_columns)
+            col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
+            # Verifica as colunas esperadas    
+            if file_name == "valores.xlsx":
+                errors.extend(col_errors)
+            elif file_name == "proporcionalidades.xlsx":
+                errors.extend(col_errors)
+            else:
                 errors.extend(col_errors)
                 warnings.extend(col_warnings)
+
         except Exception as e:
             errors.append(f"{file_name}: Erro ao processar o arquivo: {e}")
 
