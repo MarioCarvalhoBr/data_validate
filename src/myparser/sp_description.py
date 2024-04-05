@@ -4,7 +4,7 @@ import re
 import pandas as pd
 from src.myparser.text_processor import capitalize_text
 from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
-from src.util.utilities import check_punctuation, check_column_names, format_errors_and_warnings
+from src.util.utilities import check_punctuation
 
 def check_html_in_descriptions(path_sp_description, df):
     errors = []

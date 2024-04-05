@@ -1,4 +1,3 @@
-import pandas as pd
 from src.orchestrator import verify_structure_folder_files
 from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01, path_input_data_errors_02, path_input_data_errors_03
 
