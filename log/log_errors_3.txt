@@ -34,8 +34,11 @@
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
+[33mcenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
+[33mreferencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
 [33mdescricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação.
 [33mdescricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação.
+[33mcomposicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
 [33mO arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 [34m[1mVerificação: Ortografia
 [33mdescricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
@@ -65,7 +68,7 @@
 
 
 [31m[1mNúmero de erros: 13
-[33m[1mNúmero de avisos: 23
+[33m[1mNúmero de avisos: 26
 [34m[1m
 Tempo total de execução: 8.1 segundos
 [0m

@@ -43,8 +43,8 @@ def test_errors_verify_structure_folder_files_data_errors_3(): # Teste true
 
     # Numero de erros esperado == 13
     assert len(errors) == 13
-    # Numero de warnings esperado == 3
-    assert len(warnings) == 3
+    # Numero de warnings esperado == 6
+    assert len(warnings) == 6
 
     # Verifica se os erros são o esperado
     assert errors[0] == "cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'."
@@ -62,6 +62,10 @@ def test_errors_verify_structure_folder_files_data_errors_3(): # Teste true
     assert errors[12] == "proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada."
 
     # Verifica se os warnings são o esperado
-    assert warnings[0] == "descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação."
-    assert warnings[1] == "descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação."
-    assert warnings[2] == "O arquivo 'arquivo_aleatorio.xlsx' não é esperado."
+    assert warnings[0] == "cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação."
+    assert warnings[1] == "referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação."
+    assert warnings[2] == "descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação."
+    assert warnings[3] == "descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação."
+    assert warnings[4] == "composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação."
+    assert warnings[5] == "O arquivo 'arquivo_aleatorio.xlsx' não é esperado."
+
