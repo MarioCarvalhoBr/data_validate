@@ -15,6 +15,8 @@ def verify_sp_scenario_unique_values(path_sp_scenario, columns_uniques):
     name_file = os.path.basename(path_sp_scenario)
     try:
         df = read_excel_file(path_sp_scenario, True)
+        # Veriificar se todas as colunas existem em df
+        columns_uniques = [column for column in columns_uniques if column in df.columns]
         _, errors_checkeds = check_unique_values(df, name_file, columns_uniques)
         errors.extend(errors_checkeds)
         
@@ -37,6 +39,10 @@ def verify_sp_scenario_punctuation(path_sp_scenario, columns_dont_punctuation, c
     name_file = os.path.basename(path_sp_scenario)
     try:
         df = read_excel_file(path_sp_scenario, True)
+        # Verifica se todas as colunas existem em df
+        columns_dont_punctuation = [column for column in columns_dont_punctuation if column in df.columns]
+        columns_must_end_with_dot = [column for column in columns_must_end_with_dot if column in df.columns]
+
         _, warnings = check_punctuation(df, name_file, columns_dont_punctuation, columns_must_end_with_dot)
         
     except Exception as e:

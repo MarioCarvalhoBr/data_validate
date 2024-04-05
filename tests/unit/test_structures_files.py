@@ -1,11 +1,9 @@
 import pandas as pd
-from src.myparser.structures_files import _check_file_columns
-from src.orchestrator import verify_structure_folder_files, check_structure_file
-
-from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01, path_input_data_errors_02
+from src.orchestrator import verify_structure_folder_files
+from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01, path_input_data_errors_02, path_input_data_errors_03
 
 
-# Testes: Estrutura da pasta de arquivos
+# Testes: Estrutura dos arquivos da pasta de entrada
 def test_true_verify_structure_folder_files(): # Teste true
     result_test,__,__ = verify_structure_folder_files(path_input_data_ground_truth)
     assert result_test is True
@@ -25,6 +23,7 @@ def test_errors_verify_structure_downr_exist_folder_files(): # Teste false
     is_correct, errors, warnings = verify_structure_folder_files("dont_exist_path")
     # Numero de erros esperado == 1
     assert len(errors) == 1
+
     # Numero de warnings esperado == 0
     assert len(warnings) == 0
     assert errors[0] == "A pasta não foi encontrada: dont_exist_path."
@@ -39,50 +38,29 @@ def test_count_errors_verify_structure_folder_files_data_errors_2(): # Teste fal
     assert len(warnings) == 1
     assert warnings[0] == "O arquivo 'arquivo_aleatorio.xlsx' não é esperado."
 
-def test_check_file_columns():
-    # Test when dataframe is empty
-    df = pd.DataFrame()
-    expected_structure_columns = {"test.xlsx": ["column1", "column2"]}
-    errors = _check_file_columns("test.xlsx", df, expected_structure_columns)
-    assert len(errors) == 1
-    assert errors[0] == "test.xlsx: A planilha está vazia."
+def test_errors_verify_structure_folder_files_data_errors_3(): # Teste true
+    is_correct, errors, warnings = verify_structure_folder_files(path_input_data_errors_03)
+    assert is_correct is False
 
-    # Test when dataframe has missing columns
-    df = pd.DataFrame({"column1": [1, 2, 3]})
-    errors = _check_file_columns("test.xlsx", df, expected_structure_columns)
-    assert len(errors) == 1
-    assert errors[0] == "test.xlsx: Coluna 'column2' não foi encontrada."
+    # Numero de erros esperado == 11
+    assert len(errors) == 11
+    # Numero de warnings esperado == 3
+    assert len(warnings) == 3
 
-    # Test when dataframe has all expected columns
-    df = pd.DataFrame({"column1": [1, 2, 3], "column2": [4, 5, 6]})
-    errors = _check_file_columns("test.xlsx", df, expected_structure_columns)
-    assert len(errors) == 0
+    # Verifica se os erros são o esperado
+    assert errors[0] == "cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'."
+    assert errors[1] == "cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'."
+    assert errors[2] == "referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'."
+    assert errors[3] == "descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'."
+    assert errors[4] == "descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'."
+    assert errors[5] == "descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'."
+    assert errors[6] == "descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'."
+    assert errors[7] == "descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'."
+    assert errors[8] == "descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'."
+    assert errors[9] == "descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'."
+    assert errors[10] == "descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada."
 
-    # Test special case for 'proporcionalidades.xlsx'
-    expected_structure_columns = {"proporcionalidades.xlsx": ["id"]}
-    df = pd.DataFrame({"column1": ['id', 2, 3], "column2": [4, 5, 6]})
-    errors = _check_file_columns("proporcionalidades.xlsx", df, expected_structure_columns)
-    assert len(errors) == 0
-    
-    # Test special case for 'proporcionalidades.xlsx' with missing columns
-    df = pd.DataFrame({"column1": [1, 2, 3]})
-    errors = _check_file_columns("proporcionalidades.xlsx", df, expected_structure_columns)
-    assert len(errors) == 1
-    assert errors[0] == "proporcionalidades.xlsx: Coluna 'id' não foi encontrada."
-
-# check_structure_file
-def test_check_structure_file():
-    # Test when file does not exist
-    file_path = "dont_exist_path"
-    result = check_structure_file(file_path)
-    assert result is False
-
-    # Test when file exists and has the expected structure
-    file_path = path_input_data_ground_truth + "/proporcionalidades.xlsx"
-    result = check_structure_file(file_path)
-    assert result is True
-
-    # Test when file exists but is not expected
-    file_path = path_input_data_errors_02 + "/arquivo_aleatorio.xlsx"
-    result = check_structure_file(file_path)
-    assert result is False
+    # Verifica se os warnings são o esperado
+    assert warnings[0] == "descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação."
+    assert warnings[1] == "descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação."
+    assert warnings[2] == "O arquivo 'arquivo_aleatorio.xlsx' não é esperado."

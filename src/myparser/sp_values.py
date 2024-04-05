@@ -46,6 +46,10 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     try:
 
         df_description = read_excel_file(path_sp_description)
+        # Verifica se as colunas com código existem
+        if 'codigo' not in df_description.columns:
+            return False, errors, []
+        
         df_values = read_excel_file(path_sp_values)
 
         # Clean non numeric values
@@ -113,6 +117,17 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
     # Clean non numeric values
     df_description, _ = dataframe_clean_numeric_values_less_than(df_description, name_file_description, ['codigo'])
     df_temporal_reference, _ = dataframe_clean_numeric_values_less_than(df_temporal_reference, name_file_temporal_reference, ['simbolo'])
+
+    # Verifica se as colunas com código e cenário existem
+    if 'codigo' not in df_description.columns or 'cenario' not in df_description.columns:
+        return False, errors, []
+    
+    # VErifica se as colunas obrigatórias de df_temporal_reference e df_scenario existem
+    if 'simbolo' not in df_temporal_reference.columns:
+        return False, errors, []
+
+    if 'simbolo' not in df_scenario.columns:
+        return False, errors, []
 
     # Verificar cada indicador em df_description
     for line, row in df_description.iterrows():

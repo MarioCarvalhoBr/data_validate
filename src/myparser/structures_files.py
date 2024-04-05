@@ -1,5 +1,6 @@
 import os
 from src.util.utilities import check_file_exists, dataframe_clean_numeric_values_less_than, read_excel_file, check_vertical_bar, check_folder_exists
+from src.util.utilities import check_column_names, format_errors_and_warnings
 
 # GLOBAL VARIABLES
 # Estrutura esperada de colunas para cada arquivo
@@ -11,41 +12,6 @@ _expected_structure_columns = {
     "valores.xlsx": ["id"],
     "proporcionalidades.xlsx": ["id"]
 }
-
-def _check_file_columns(file_name, df, expected_structure_columns):
-    errors = []
-    # Check if the dataframe is empty
-    if df.empty:
-        errors.append(f"{file_name}: A planilha está vazia.")
-        return errors
-    if file_name == "proporcionalidades.xlsx":
-        # Tratamento especial para 'proporcionalidades.xlsx'
-        header_row = df.iloc[0]
-        df.columns = header_row
-        df = df[1:].reset_index(drop=True)
-
-    for column in expected_structure_columns[file_name]:
-        if column not in df.columns:
-            errors.append(f"{file_name}: Coluna '{column}' não foi encontrada.")
-    return errors
-
-def check_structure_file(file_path):
-    errors = []
-
-    file_name = os.path.basename(file_path)
-    exists, _ = check_file_exists(file_path)
-    if not exists:
-        return exists
-    
-    try:
-        df = read_excel_file(file_path)
-        
-        # Check if the columns are as expected
-        errors.extend(_check_file_columns(file_name, df, _expected_structure_columns))
-    except Exception as e:
-        errors.append(f"{file_name}: Erro ao processar o arquivo: {e}")
-        
-    return not errors
    
 def verify_structure_folder_files(path_folder):
     errors = []
@@ -57,7 +23,7 @@ def verify_structure_folder_files(path_folder):
         return not errors, errors, warnings
 
     # Verifica a existência dos arquivos esperados e suas colunas
-    for file_name, __ in _expected_structure_columns.items():
+    for file_name, expected_columns in _expected_structure_columns.items():
         file_path = os.path.join(path_folder, file_name)
         exists, error = check_file_exists(file_path)
         if not exists:
@@ -70,8 +36,14 @@ def verify_structure_folder_files(path_folder):
             # Check if there is a vertical bar in the column name
             errors.extend(check_vertical_bar(df, file_name)[1])
 
-            # Check if the columns are as expected
-            errors.extend(_check_file_columns(file_name, df, _expected_structure_columns))
+            # Check missing columns expected columns
+            # Se não for proporcionalidades.xlsx ou valores.xlsx
+            if file_name not in ["proporcionalidades.xlsx", "valores.xlsx"]:
+                missing_columns, extra_columns = check_column_names(df, expected_columns)
+                col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
+
+                errors.extend(col_errors)
+                warnings.extend(col_warnings)
         except Exception as e:
             errors.append(f"{file_name}: Erro ao processar o arquivo: {e}")
 

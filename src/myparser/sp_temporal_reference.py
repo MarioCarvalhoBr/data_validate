@@ -37,6 +37,10 @@ def verify_sp_temporal_reference_punctuation(path_sp_temporal_reference, columns
     name_file = os.path.basename(path_sp_temporal_reference)
     try:
         df = read_excel_file(path_sp_temporal_reference, True)
+        # Verifica se todas as colunas existem em df
+        columns_dont_punctuation = [column for column in columns_dont_punctuation if column in df.columns]
+        columns_must_end_with_dot = [column for column in columns_must_end_with_dot if column in df.columns]
+        
         _, warnings = check_punctuation(df, name_file, columns_dont_punctuation, columns_must_end_with_dot)
         
     except Exception as e:

@@ -1,6 +1,16 @@
 import os
 import pandas as pd
 
+def check_column_names(df, expected_columns):
+    missing_columns = [col for col in expected_columns if col not in df.columns]
+    extra_columns = [col for col in df.columns if col not in expected_columns]
+    return missing_columns, extra_columns
+
+def format_errors_and_warnings(name, missing_columns, extra_columns):
+    errors = [f"{name}: Coluna '{col}' esperada mas não foi encontrada." for col in missing_columns]
+    warnings = [f"{name}: Coluna '{col}' será ignorada pois não está na especificação." for col in extra_columns]
+    return errors, warnings
+
 def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must_end_with_dot=None):
     warnings = []
     # columns_dont_punctuation = ['nome_simples', 'nome_completo']

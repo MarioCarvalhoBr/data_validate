@@ -4,7 +4,7 @@
 
 
 [37m[1m------ Verificação dos testes ------
-[34m[1mVerificação: Estrutura da pasta de arquivos
+[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [34m[1mVerificação: Limpeza dos arquivos
 [31mdescricao.xlsx, linha 12: A coluna 'codigo' contém um valor não numérico.
 [31mdescricao.xlsx, linha 13: A coluna 'codigo' contém um valor menor que 1.
@@ -92,5 +92,5 @@
 [31m[1mNúmero de erros: 30
 [33m[1mNúmero de avisos: 32
 [34m[1m
-Tempo total de execução: 7.9 segundos
+Tempo total de execução: 7.4 segundos
 [0m
