@@ -31,6 +31,11 @@ def verify_structure_folder_files(path_folder):
             continue
 
         try:
+            if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
+                continue
+            else: 
+                # print(f'Abriu o arquivo {file_path}')
+                pass
             df = read_excel_file(file_path)
 
             # Check if there is a vertical bar in the column name
@@ -88,6 +93,11 @@ def verify_files_data_clean(path_folder):
             file_path = os.path.join(path_folder, file)
             file_name = os.path.basename(file)
             df = read_excel_file(file_path)
+            
+            # Verifica se a coluna esperada existe
+            if column[0] not in df.columns:
+                continue
+
             _, erros = dataframe_clean_numeric_values_less_than(df, file_name, column, value)
             if erros:
                 errors.extend(erros)

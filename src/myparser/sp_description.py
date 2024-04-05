@@ -297,6 +297,9 @@ def verify_sp_description_cr_lf(path_sp_description, columns_start_end=[], colum
            
             # Item 2: Identificar CR e LF em qualquer lugar nos campos nome e título
             for column in columns_anywhere:
+                # Verifica se a coluna existe
+                if column not in df.columns:
+                    continue
                 text = row[column]
                 text = str(text)
                 if pd.isna(text) or text == "":
