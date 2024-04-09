@@ -1,4 +1,4 @@
-# Example usage: python3 main.py --input_folder=input_data/data_ground_truth/ --no-spellchecker --type_dict=tiny --debug
+# Example usage: python3 main.py --input_folder=input_data/data_ground_truth/ --no-spellchecker --lang_dict=tiny --debug
 
 # Libs
 from colorama import Fore, Style
@@ -14,8 +14,8 @@ if __name__ == "__main__":
     # --no-spellchecker
     parser.add_argument("--no-spellchecker", action="store_true", help="Não executa o verificador ortográfico.")
     
-    # --type_dict: tiny or full
-    parser.add_argument("--type_dict", type=str, default="full", help="Define qual o dicinário ortográfico será utilizado: tiny ou full.")
+    # --lang_dict: pt or en
+    parser.add_argument("--lang-dict", type=str, default="pt", help="Define qual a linguagem do dicionário ortográfico: pt ou en.")
     
     # --debug 
     parser.add_argument("--debug", action="store_true", help="Executa o programa em modo debug.")
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     results_tests = []
 
     # Tipo de dicionário ortográfico
-    type_dict = args.type_dict
+    lang_dict = args.lang_dict
     
     is_degug = args.debug
     if is_degug:
@@ -61,13 +61,14 @@ if __name__ == "__main__":
     print("Iniciando a verificação: Limpeza dos arquivos")
     results_tests.append([("Issue #79: " if is_degug else "") +"Limpeza dos arquivos", *(orc.verify_files_data_clean(path_input_folder))])
     
-    # 2 - Hierarquia como grafo conexo
+    # 2.0 - Hierarquia como grafo conexo
     print("Iniciando a verificação: Hierarquia como grafo conexo")
     is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(path_sp_description, path_sp_composition))
+    
     # 2.1 - Relações entre indicadores e valores
-    print("Ignorando a verificação: Relações entre indicadores e valores")
-    # is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(path_sp_description, path_sp_values))
-    is_correct_val2desc, errors_val2desc, warnings_val2desc = (True, [], [])
+    print("Iniciando a verificação: Relações entre indicadores e valores")
+    is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(path_sp_description, path_sp_values))
+
     # 2.2 - Concatenar os resultados
     is_correct = is_correct_comp2desc and is_correct_val2desc
     errors = errors_comp2desc + errors_val2desc
@@ -93,34 +94,42 @@ if __name__ == "__main__":
     # 6 - Verficar a ortografia
     print("Iniciando a verificação: Ortografia")
     if not args.no_spellchecker:
-        type_dict = type_dict.lower()
+        lang_dict = lang_dict.lower()
         # Mapear o argumento para o enum correspondente
-        type_dict_spell = orc.get_spellchecker().TypeDict.FULL
+        lang_dict_spell = "pt_BR"
         
-        if type_dict == 'tiny':
-            type_dict_spell = orc.get_spellchecker().TypeDict.TINY
+        if lang_dict == 'pt':
+            lang_dict_spell = "pt_BR"
+
+        elif lang_dict == 'en':
+            lang_dict_spell = "en_US"
     
-        if args.type_dict not in ['tiny', 'full']:
-            print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário full por padrão.")
+        if lang_dict not in ['pt', 'en']:
+            # print(Fore.RED + Style.BRIGHT + "ALERTA: Tipo de dicionário inválido, use tiny ou full. Usando o dicionário full por padrão.")
+            print(Fore.RED + Style.BRIGHT + "ALERTA: A linguagem do dicionário é inválida, use pt ou en. Usando o dicionário pt por padrão.")
         
         is_all_correct = True
         all_errors = []
         all_warnings = []
 
-        is_correct_desc, errors_spell_desc, warnings_spell_desc = orc.verify_spelling_text(path_sp_description, ["nome_simples", "nome_completo", "desc_simples", "desc_completa"], type_dict_spell)
+        time_init_ortografia = time.time()
+
+        is_correct_desc, errors_spell_desc, warnings_spell_desc = orc.verify_spelling_text(path_sp_description, ["nome_simples", "nome_completo", "desc_simples", "desc_completa"], lang_dict_spell)
         is_all_correct = is_all_correct and is_correct_desc
         all_errors.extend(errors_spell_desc)
         all_warnings.extend(warnings_spell_desc)
         
-        is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = orc.verify_spelling_text(path_sp_scenario, ["nome", "descricao"], type_dict_spell)
+        is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = orc.verify_spelling_text(path_sp_scenario, ["nome", "descricao"], lang_dict_spell)
         is_all_correct = is_all_correct and is_correct_scenario
         all_errors.extend(errors_spell_scenario)
         all_warnings.extend(warnings_spell_scenario)
 
-        is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = orc.verify_spelling_text(path_sp_temporal_reference, ["descricao"], type_dict_spell)
+        is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = orc.verify_spelling_text(path_sp_temporal_reference, ["descricao"], lang_dict_spell)
         is_all_correct = is_all_correct and is_correct_temporal_reference
         all_errors.extend(errors_spell_temporal_reference)
         all_warnings.extend(warnings_spell_temporal_reference)
+
+        time_final_ortografia = time.time()
 
         results_tests.append([("Issue #24: " if is_degug else "") +"Ortografia", is_all_correct, all_errors, all_warnings])
     
@@ -161,8 +170,8 @@ if __name__ == "__main__":
     results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em referência temporal", *(orc.verify_sp_temporal_reference_unique_values(path_sp_temporal_reference, ['nome', 'simbolo']))])
 
     # 11 - verify_combination_sp_description_values_scenario_temporal_reference
-    print("Ignorando a verificação: Relações de combinações de valores")
-    # results_tests.append([("Issue #81: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_sp_scenario, path_sp_temporal_reference))])
+    print("Iniciando a verificação: Relações de combinações de valores")
+    results_tests.append([("Issue #81: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_sp_scenario, path_sp_temporal_reference))])
     
     # 12 - def verify_sp_description_cr_lf(path_sp_description):
     print("Iniciando a verificação: Quebra de linha para descrição e cenários")
@@ -172,7 +181,8 @@ if __name__ == "__main__":
     print("Iniciando a verificação: Quebra de linha para referência temporal")
     results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para referência temporal", *(orc.verify_sp_description_cr_lf(path_sp_temporal_reference, columns_start_end=['nome', 'descricao'], columns_anywhere=['nome', 'descricao']))])
     
-    print(Fore.WHITE + Style.BRIGHT + "------ Verificação dos testes ------")
+    print("\n")
+    print(Fore.WHITE + Style.BRIGHT + "------ Resultados da verificação dos testes ------")
 
     num_errors = 0
     num_warnings = 0

@@ -1,4 +1,4 @@
-from src.orchestrator import verify_structure_folder_files
+from src.myparser.structures_files import verify_structure_folder_files
 from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01, path_input_data_errors_02, path_input_data_errors_03
 
 
@@ -41,8 +41,8 @@ def test_errors_verify_structure_folder_files_data_errors_3(): # Teste true
     is_correct, errors, warnings = verify_structure_folder_files(path_input_data_errors_03)
     assert is_correct is False
 
-    # Numero de erros esperado == 11
-    assert len(errors) == 11
+    # Numero de erros esperado == 13
+    assert len(errors) == 13
     # Numero de warnings esperado == 6
     assert len(warnings) == 6
 
@@ -58,6 +58,8 @@ def test_errors_verify_structure_folder_files_data_errors_3(): # Teste true
     assert errors[8] == "descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'."
     assert errors[9] == "descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'."
     assert errors[10] == "descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada."
+    assert errors[11] == "valores.xlsx: Coluna 'id' esperada mas não foi encontrada."
+    assert errors[12] == "proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada."
 
     # Verifica se os warnings são o esperado
     assert warnings[0] == "cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação."

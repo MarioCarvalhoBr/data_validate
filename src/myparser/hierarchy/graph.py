@@ -78,10 +78,12 @@ def verify_graph_sp_description_composition(path_sp_description, path_sp_composi
         return False, errors, []
     
     composicao = read_excel_file(path_sp_composition)
+    name_file_composition = path_sp_composition.split("/")[-1]
+
     # Verificar se as colunas com código existem
     if 'codigo_pai' not in composicao.columns or 'codigo_filho' not in composicao.columns:
+        errors.append(f"{name_file_composition}: Verificação de hierarquia de composição como grafo não realizada.")
         return False, errors, warnings
-    name_file_composition = path_sp_composition.split("/")[-1]
     
     # Limpando os dados
     composicao, _ = dataframe_clean_numeric_values_less_than(composicao, name_file_composition, ['codigo_pai'], 0)

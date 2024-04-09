@@ -1,8 +1,8 @@
 #### Recursos utilizados
 
 ##### Links úteis
-O  dicionário utilizado foi baixado do site: https://www.ime.usp.br/~pf/dicios/ e foi utilizado o arquivo: br-utf8.txt
-
+O  dicionário utilizado foi baixado do site: https://github.com/titoBouzout/Dictionaries/blob/master/Portuguese%20(Brazilian).txt
+https://github.com/pyhunspell/pyhunspell/tree/master
 #
 ##### Padrão de commits
 Mensagem: 

@@ -107,6 +107,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
     name_file_values = os.path.basename(path_sp_values)
 
     df_scenario = read_excel_file(path_sp_scenario)
+    name_file_scenario = os.path.basename(path_sp_scenario)
     
     df_description = read_excel_file(path_sp_description)
     name_file_description = os.path.basename(path_sp_description)
@@ -114,20 +115,28 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
     df_temporal_reference = read_excel_file(path_temporal_reference)
     name_file_temporal_reference = os.path.basename(path_temporal_reference)
 
-    # Clean non numeric values
-    df_description, _ = dataframe_clean_numeric_values_less_than(df_description, name_file_description, ['codigo'])
-    df_temporal_reference, _ = dataframe_clean_numeric_values_less_than(df_temporal_reference, name_file_temporal_reference, ['simbolo'])
-
     # Verifica se as colunas com código e cenário existem
     if 'codigo' not in df_description.columns or 'cenario' not in df_description.columns:
+        errors.append(f"{name_file_description}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
     
-    # VErifica se as colunas obrigatórias de df_temporal_reference e df_scenario existem
+    # Verifica se as colunas obrigatórias de df_temporal_reference e df_scenario existem
     if 'simbolo' not in df_temporal_reference.columns:
+        errors.append(f"{name_file_temporal_reference}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
 
     if 'simbolo' not in df_scenario.columns:
+        errors.append(f"{name_file_scenario}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
+    
+    if 'id' not in df_values.columns:
+        errors.append(f"{name_file_values}: Verificação de combinação de cenários e referência temporal não realizada.")
+        return False, errors, []
+
+
+    # Clean non numeric values
+    df_description, _ = dataframe_clean_numeric_values_less_than(df_description, name_file_description, ['codigo'])
+    df_temporal_reference, _ = dataframe_clean_numeric_values_less_than(df_temporal_reference, name_file_temporal_reference, ['simbolo'])
 
     # Verificar cada indicador em df_description
     for line, row in df_description.iterrows():

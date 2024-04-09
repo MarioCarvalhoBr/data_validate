@@ -1,5 +1,6 @@
 colorama==0.4.6
 coverage==7.4.2
+hunspell==0.5.5
 matplotlib==3.8.3
 networkx==3.2.1
 openpyxl==3.1.2
@@ -8,3 +9,4 @@ pipreqs==0.5.0
 pyarrow==15.0.0
 pytest==7.4.0
 Requests==2.31.0
+

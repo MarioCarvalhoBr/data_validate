@@ -28,6 +28,11 @@ jobs:
           pip install ruff
           ruff --target-version=py310 .
         continue-on-error: true
+      - name: Install Hunspell
+        run: |
+          sudo apt install libhunspell-dev
+          sudo apt-get install -y hunspell-en-us
+          sudo apt-get install -y hunspell-pt-br
       - name: Install Coverage
         run: |
           pip install coverage

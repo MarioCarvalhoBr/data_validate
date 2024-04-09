@@ -31,11 +31,6 @@ def verify_structure_folder_files(path_folder):
             continue
 
         try:
-            if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
-                continue
-            else: 
-                # print(f'Abriu o arquivo {file_path}')
-                pass
             df = read_excel_file(file_path)
 
             # Check if there is a vertical bar in the column name
@@ -50,8 +45,8 @@ def verify_structure_folder_files(path_folder):
 
             # Check missing columns expected columns
             missing_columns, extra_columns = check_column_names(df, expected_columns)
+            # Formata os erros e warnings
             col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
-
             # Verifica as colunas esperadas    
             if file_name == "valores.xlsx":
                 errors.extend(col_errors)
@@ -93,7 +88,7 @@ def verify_files_data_clean(path_folder):
             file_path = os.path.join(path_folder, file)
             file_name = os.path.basename(file)
             df = read_excel_file(file_path)
-            
+
             # Verifica se a coluna esperada existe
             if column[0] not in df.columns:
                 continue

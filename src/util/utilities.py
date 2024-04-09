@@ -85,9 +85,18 @@ def file_extension_check(path, extension='.xlsx'):
     return True, ""
 
 def read_excel_file(path, lower_columns=False):
-    df = pd.read_excel(path)
+    file_name = os.path.basename(path)
+
+    if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
+        # df = pd.read_csv(path, low_memory=False)
+        df = pd.read_excel(path)
+        # print(df)
+    else:
+        df = pd.read_excel(path)
+
     if lower_columns:
         df.columns = df.columns.str.lower()
+        
     return df
 
 def check_folder_exists(folder_path):
