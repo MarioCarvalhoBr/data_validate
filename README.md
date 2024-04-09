@@ -25,9 +25,9 @@ Certifique-se de que `python-dev` e `libhunspell-dev` estejam instalados.
     sudo apt-get install python3-dev libhunspell-dev
 ```
 ##### Windows
-"""```shell
+```shell
     pip install pyhunspell
-```"""
+```
 
 ## Criando o ambiente virtual com conda
 ```shell
