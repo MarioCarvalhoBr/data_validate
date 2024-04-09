@@ -30,8 +30,8 @@ def verify_files_data_clean(path_folder):
 def verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference):
     return sp_values.verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_scenario, path_temporal_reference)
 
-def verify_spelling_text(path_sheet, sheets_info, type_dict_spell):
-    return spellchecker.run(path_sheet, sheets_info,  type_dict_spell)
+def verify_spelling_text(path_sheet, sheets_info, lang_dict_spell):
+    return spellchecker.run(path_sheet, sheets_info, lang_dict_spell)
     
 def verify_structure_folder_files(path_folder):
     return structures_files.verify_structure_folder_files(path_folder)
@@ -72,7 +72,3 @@ def verify_tree_sp_description_composition_hierarchy(path_ps_composition, path_p
 # UTILITIES
 def print_versions():
     return info.print_versions()
-
-# GETTERS
-def get_spellchecker():
-    return spellchecker

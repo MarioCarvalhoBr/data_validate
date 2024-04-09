@@ -3,7 +3,30 @@
 [37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_3/
 
 
-[37m[1m------ Verificação dos testes ------
+Iniciando a verificação: Estrutura dos arquivos da pasta de entrada
+Iniciando a verificação: Limpeza dos arquivos
+Iniciando a verificação: Hierarquia como grafo conexo
+Iniciando a verificação: Relações entre indicadores e valores
+Iniciando a verificação: Hierarquia como árvore
+Iniciando a verificação: Níveis de indicadores
+Iniciando a verificação: Unicidade dos códigos
+Iniciando a verificação: Planilha de descrição códigos HTML
+Iniciando a verificação: Ortografia
+Iniciando a verificação: Nomes de colunas únicos
+Iniciando a verificação: Campos vazios
+Iniciando a verificação: Padrão para nomes dos indicadores
+Iniciando a verificação: Títulos com mais de 30 caracteres
+Iniciando a verificação: Pontuações obrigatórias e proibidas
+Iniciando a verificação: Pontuações obrigatórias e proibidas em cenários
+Iniciando a verificação: Pontuações obrigatórias e proibidas em referência temporal
+Iniciando a verificação: Relações de valores únicos em cenários
+Iniciando a verificação: Relações de valores únicos em referência temporal
+Iniciando a verificação: Relações de combinações de valores
+Iniciando a verificação: Quebra de linha para descrição e cenários
+Iniciando a verificação: Quebra de linha para referência temporal
+
+
+[37m[1m------ Resultados da verificação dos testes ------
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [31mcenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.
 [31mcenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
@@ -33,6 +56,7 @@
 [34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
+[31mvalores.xlsx: Verificação de combinação de cenários e referência temporal não realizada.
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [33mcenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
 [33mreferencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
@@ -41,6 +65,10 @@
 [33mcomposicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
 [33mO arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 [34m[1mVerificação: Ortografia
+[33mdescricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome_simples: ['LF'].
+[33mdescricao.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome_simples: ['LF'].
+[33mdescricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['MCTI', 'SPEI'].
+[33mdescricao.xlsx, linha 6: Palavras com possíveis erros ortográficos na coluna nome_simples: ['LF'].
 [33mdescricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 [34m[1mVerificação: Padrão para nomes dos indicadores
 [33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com cr meio". Encontrado: "Exemplo com<LF> CR meio".
@@ -67,8 +95,8 @@
 [33mreferencia_temporal.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 12.
 
 
-[31m[1mNúmero de erros: 13
-[33m[1mNúmero de avisos: 26
+[31m[1mNúmero de erros: 14
+[33m[1mNúmero de avisos: 30
 [34m[1m
-Tempo total de execução: 8.1 segundos
+Tempo total de execução: 8.7 segundos
 [0m

@@ -45,8 +45,8 @@ def verify_structure_folder_files(path_folder):
 
             # Check missing columns expected columns
             missing_columns, extra_columns = check_column_names(df, expected_columns)
+            # Formata os erros e warnings
             col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
-
             # Verifica as colunas esperadas    
             if file_name == "valores.xlsx":
                 errors.extend(col_errors)
@@ -88,6 +88,11 @@ def verify_files_data_clean(path_folder):
             file_path = os.path.join(path_folder, file)
             file_name = os.path.basename(file)
             df = read_excel_file(file_path)
+
+            # Verifica se a coluna esperada existe
+            if column[0] not in df.columns:
+                continue
+
             _, erros = dataframe_clean_numeric_values_less_than(df, file_name, column, value)
             if erros:
                 errors.extend(erros)

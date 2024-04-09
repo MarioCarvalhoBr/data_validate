@@ -14,7 +14,20 @@ Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análi
 - **Pandas**: Utilizado para a leitura, manipulação e análise de dados em arquivos de planilhas.
 - **OpenPyXL**: Uma biblioteca para leitura e escrita de arquivos Excel, necessária para manipular arquivos `.xlsx`.
 - **Argparse**: Facilita a criação de interfaces de linha de comando, permitindo a passagem de argumentos para o script.
+- **PyHunspell**: Uma interface Python para o verificador ortográfico Hunspell.
 
+#### Dependências de produção
+- **Python 3.6+**: A versão mínima do Python necessária para executar o Adapta Parser.
+##### GNU/LINUX
+Certifique-se de que `python-dev` e `libhunspell-dev` estejam instalados.
+
+```shell
+    sudo apt-get install python3-dev libhunspell-dev
+```
+##### Windows
+```shell
+    pip install pyhunspell
+```
 
 ## Criando o ambiente virtual com conda
 ```shell
@@ -59,18 +72,17 @@ python3 main.py --input_folder=input_data/data_ground_truth/
   ```
 
 - `--no-spellchecker`: Quando este argumento é usado, o script não executa a verificação ortográfica nos arquivos `.xlsx`. É útil se você deseja acelerar o processo de análise ou se a verificação ortográfica não é necessária.
-
   Exemplo:
   ```
   --no-spellchecker
   ```
 
-- `--type_dict` (padrão: `full`): Define qual dicionário ortográfico será utilizado durante a análise. As opções são `tiny` para um dicionário menor e mais rápido, ou `full` para um dicionário mais abrangente. Se não especificado, o padrão é `full`.
-Os dicionários estão localizados na pasta `dictionaries/`. Atualmente, contém apenas palavras para o idioma português na pasta `dictionaries/pt_BR/`, onde são armazenados os dicionários `tiny.txt` e `full.txt`.
+- `--lang-dict` (padrão: `pt`): Define qual a linguagem do dicionário ortográfico a ser usado. O valor padrão é `pt` (português). Você pode alterar para `en` (inglês) ou qualquer outro idioma suportado. Para adicionar novas palavras ao dicionário extra do verificador ortográfico, adicione-as ao arquivo `dictionaries/extra-words.dic`, onde a primeira linha deve ser o número de palavras adicionadas e as linhas seguintes devem conter as palavras adicionadas.
+
   Exemplos:
   ```
-  --type_dict=tiny
-  --type_dict=full
+  --lang-dict=pt
+  --lang-dict=en
   ```
 
 - `--debug`: Executa o programa em modo de depuração. Isso pode incluir a impressão de mensagens de depuração adicionais, úteis para desenvolvimento ou diagnóstico de problemas.

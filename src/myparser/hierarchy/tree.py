@@ -67,20 +67,24 @@ def verify_tree_sp_description_composition_hierarchy(path_sp_composition, path_s
         return False, errors, []
     
     df_composicao = read_excel_file(path_sp_composition)
+    name_file_composition = path_sp_composition.split("/")[-1]
+
     # Verifica se as colunas codigo_pai e codigo_filho existem
     if 'codigo_pai' not in df_composicao.columns or 'codigo_filho' not in df_composicao.columns:
+        errors.append(f"{name_file_composition}: Verificação de hierarquia de composição não realizada.")
         return False, errors, warnings
     
-    name_file_composition = path_sp_composition.split("/")[-1]
     df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, name_file_composition, ['codigo_pai'], 0)
     df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, name_file_composition, ['codigo_filho'], 1)
     
     df_descricao = read_excel_file(path_sp_description)
+    name_file_description = path_sp_description.split("/")[-1]
+
     # Verifica se a coluna codigo e nivel existem
     if 'codigo' not in df_descricao.columns or 'nivel' not in df_descricao.columns:
+        errors.append(f"{name_file_description}: Verificação de hierarquia de composição não realizada.")
         return False, errors, warnings
     
-    name_file_description = path_sp_description.split("/")[-1]
     df_descricao, _ = dataframe_clean_numeric_values_less_than(df_descricao, name_file_description, ['codigo', 'nivel'], 1)
     
     if not ((df_composicao['codigo_pai'] == 0)).any():
