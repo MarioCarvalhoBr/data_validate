@@ -44,8 +44,8 @@ Iniciando a verificação: Quebra de linha para referência temporal
 [31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 [31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 [31mcomposicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
-[31mdescricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [2].
-[31mvalores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
+[31mvalores.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [2].
+[31mvalores.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
 [34m[1mVerificação: Hierarquia como árvore
 [31mcomposicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.
 [31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].

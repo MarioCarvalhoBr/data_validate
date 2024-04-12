@@ -34,10 +34,12 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
     is_correct, error_message = check_file_exists(path_sp_description)
     if not is_correct:
         errors.append(error_message)
+    name_file_description = os.path.basename(path_sp_description)
     
     is_correct, error_message = check_file_exists(path_sp_values)
     if not is_correct:
         errors.append(error_message)
+    name_file_values = os.path.basename(path_sp_values)
 
     # Verifica se há erros
     if errors:
@@ -48,22 +50,23 @@ def verify_ids_sp_description_values(path_sp_description, path_sp_values):
         df_description = read_excel_file(path_sp_description)
         # Verifica se as colunas com código existem
         if 'codigo' not in df_description.columns:
+            errors.append(f"{name_file_description}: Verificação de códigos de indicadores não realizada.")
             return False, errors, []
         
         df_values = read_excel_file(path_sp_values)
 
         # Clean non numeric values
-        df_description, _ = dataframe_clean_numeric_values_less_than(df_description, os.path.basename(path_sp_description), ['codigo'])
+        df_description, _ = dataframe_clean_numeric_values_less_than(df_description, name_file_values, ['codigo'])
 
         id_description = extract_ids_from_description(df_description)
         id_values = extract_ids_from_values(df_values)
 
-        errors += compare_ids(id_description, id_values, os.path.basename(path_sp_description), os.path.basename(path_sp_values))
+        errors += compare_ids(id_description, id_values, name_file_values, os.path.basename(path_sp_values))
 
     except ValueError as e:
         errors.append(str(e))
     except Exception as e:
-        errors.append(f"Erro ao processar os arquivos: {e}.")
+        errors.append(f"Erro ao processar os arquivos {name_file_values} e {name_file_description}: {e}.")
 
     
     return not errors, errors, warnings

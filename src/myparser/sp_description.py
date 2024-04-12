@@ -20,13 +20,15 @@ def verify_sp_description_parser_html_column_names(path_sp_description):
     is_correct, error_message = check_file_exists(path_sp_description)
     if not is_correct:
         errors.append(error_message)
-
-    # Verifica se há erros
-    if errors:
         return False, errors, []
 
     try:
         df = read_excel_file(path_sp_description)
+
+        if 'desc_simples' not in df.columns:
+            errors.append(f"{os.path.basename(path_sp_description)}: Vericação de colunas HTML não realizada.")
+            return False, errors, []
+
         df.columns = df.columns.str.lower()
 
         html_errors = check_html_in_descriptions(path_sp_description, df)
