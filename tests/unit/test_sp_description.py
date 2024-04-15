@@ -10,6 +10,28 @@ from src.myparser.sp_description import verify_sp_description_cr_lf
 
 from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01, path_input_data_errors_02
 import os
+import pandas as pd
+
+def test_verify_sp_description_parser_html_column_names_missing_column():
+    # Create a temporary excel file
+    df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
+    df.to_excel('temp_xyz_889977.xlsx', index=False)
+
+    # Test the function with the temporary file
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names('temp_xyz_889977.xlsx')
+
+    # Check if the function returned False
+    assert is_correct is False
+
+    # Check if the function returned the correct error message
+    assert len(errors) == 1
+    assert errors[0] == f"{os.path.basename('temp_xyz_889977.xlsx')}: Vericação de colunas HTML não realizada."
+
+    # Check if the function returned no warnings
+    assert len(warnings) == 0
+
+    # Remove the temporary file
+    os.remove('temp_xyz_889977.xlsx')
 
 # Testes: Caracteres CR e LF: verify_sp_description_cr_lf
 def test_true_verify_sp_description_cr_lf(): # Teste true
