@@ -1,14 +1,14 @@
+
+# Imports libs
+import os
+from src.util.utilities import read_excel_file
+from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
+
 # Diretórios de entrada para os testes
 path_input_data_ground_truth = "input_data/data_ground_truth"
 path_input_data_errors_01 = "input_data/data_errors_01"
 path_input_data_errors_02 = "input_data/data_errors_02"
 path_input_data_errors_03 = "input_data/data_errors_03"
-
-# Imports libs
-import os
-from src.util.utilities import read_excel_file
-
-from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
 
 # 1. DATA FRAMES - GROUND TRUTH: path_input_data_ground_truth
 df_sp_scenario_gt = read_excel_file(os.path.join(path_input_data_ground_truth, SP_SCENARIO_COLUMNS.NAME_SP))

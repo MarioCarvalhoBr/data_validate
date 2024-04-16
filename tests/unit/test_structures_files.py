@@ -1,7 +1,6 @@
 from src.myparser.structures_files import verify_structure_files_dataframe, verify_structure_exepected_files_main_path
 
 from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT
-from src.myparser.structures_files import STRUCTURE_FILES_TO_CLEAN_LIST
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
 
 # DATA FRAMES - GROUND TRUTH
@@ -11,13 +10,12 @@ from tests.unit.test_constants import df_sp_scenario_gt, df_sp_temporal_referenc
 from tests.unit.test_constants import df_sp_scenario_errors_01, df_sp_temporal_reference_errors_01, df_sp_description_errors_01, df_sp_composition_errors_01, df_sp_values_errors_01, df_sp_proportionalities_errors_01
 
 # DATA FRAMES - ERROS 02
-from tests.unit.test_constants import df_sp_scenario_errors_02, df_sp_temporal_reference_errors_02, df_sp_description_errors_02, df_sp_composition_errors_02, df_sp_values_errors_02, df_sp_proportionalities_errors_02
 
 # DATA FRAMES - ERROS 03
 from tests.unit.test_constants import df_sp_scenario_errors_03, df_sp_temporal_reference_errors_03, df_sp_description_errors_03, df_sp_composition_errors_03, df_sp_values_errors_03, df_sp_proportionalities_errors_03
 
 # PATHS MAIN
-from tests.unit.test_constants import path_input_data_errors_01, path_input_data_errors_02, path_input_data_errors_03
+from tests.unit.test_constants import path_input_data_errors_02, path_input_data_errors_03
 
 def test_count_errors_verify_structure_files_dataframe_gt(): # Teste true
         # Dicionário com os dataframes
