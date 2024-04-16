@@ -136,3 +136,11 @@ ruff check --target-version=py310 .
 - [@assismauro](https://www.github.com/assismauro)
 - [@MarioCarvalhoBr](https://www.github.com/MarioCarvalhoBr)
 - [@pedro-andrade-inpe](https://www.github.com/pedro-andrade-inpe)
+
+
+### Erros comuns
+
+#### Enum34
+```shell
+pip install enum34
+```

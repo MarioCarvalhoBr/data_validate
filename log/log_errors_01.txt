@@ -117,5 +117,5 @@ Iniciando a verificação: Quebra de linha para referência temporal
 [31m[1mNúmero de erros: 30
 [33m[1mNúmero de avisos: 34
 [34m[1m
-Tempo total de execução: 4.5 segundos
+Tempo total de execução: 3.2 segundos
 [0m
