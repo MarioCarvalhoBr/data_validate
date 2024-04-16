@@ -1,8 +1,8 @@
-import os
-from src.util.utilities import read_excel_file, dataframe_clean_numeric_values_less_than, check_file_exists
+from src.util.utilities import dataframe_clean_numeric_values_less_than
+from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
 
 def extract_ids_from_description(df_description):
-    ids = set(df_description['codigo'].astype(str))
+    ids = set(df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
     # Converte em inteiros
     ids = set(int(id) for id in ids if id.isdigit())
     return ids
@@ -26,47 +26,31 @@ def compare_ids(id_description, id_values, name_sp_description, name_sp_values):
     
     return errors
 
-def verify_ids_sp_description_values(path_sp_description, path_sp_values):
+def verify_ids_sp_description_values(df_description, df_values):
+    df_description = df_description.copy()
+    df_values = df_values.copy()
     errors = []
     warnings = []
 
-    # Verificar se os arquivos existem
-    is_correct, error_message = check_file_exists(path_sp_description)
-    if not is_correct:
-        errors.append(error_message)
-    name_file_description = os.path.basename(path_sp_description)
-    
-    is_correct, error_message = check_file_exists(path_sp_values)
-    if not is_correct:
-        errors.append(error_message)
-    name_file_values = os.path.basename(path_sp_values)
-
-    # Verifica se há erros
-    if errors:
-        return False, errors, []
-
     try:
 
-        df_description = read_excel_file(path_sp_description)
         # Verifica se as colunas com código existem
         if 'codigo' not in df_description.columns:
-            errors.append(f"{name_file_description}: Verificação de códigos de indicadores não realizada.")
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores não realizada.")
             return False, errors, []
         
-        df_values = read_excel_file(path_sp_values)
-
         # Clean non numeric values
-        df_description, _ = dataframe_clean_numeric_values_less_than(df_description, name_file_values, ['codigo'])
+        df_description, _ = dataframe_clean_numeric_values_less_than(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
 
         id_description = extract_ids_from_description(df_description)
         id_values = extract_ids_from_values(df_values)
 
-        errors += compare_ids(id_description, id_values, name_file_values, os.path.basename(path_sp_values))
+        errors += compare_ids(id_description, id_values, SP_DESCRIPTION_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
 
     except ValueError as e:
         errors.append(str(e))
     except Exception as e:
-        errors.append(f"Erro ao processar os arquivos {name_file_values} e {name_file_description}: {e}.")
+        errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP} e {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
 
     
     return not errors, errors, warnings
@@ -82,76 +66,49 @@ def verificar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values)
     if lista_combinacoes_sp_values:
         return True, lista_combinacoes_sp_values
     return False, []
-def verify_combination_sp_description_values_scenario_temporal_reference(path_sp_description, path_sp_values, path_sp_scenario, path_temporal_reference):
+def verify_combination_sp_description_values_scenario_temporal_reference(df_description, df_values, df_scenario, df_temporal_reference):
     errors = []
-
-    # Verificar se os arquivos existem
-    is_correct, error_message = check_file_exists(path_sp_description)
-    if not is_correct:
-        errors.append(error_message)
-    
-    is_correct, error_message = check_file_exists(path_sp_values)
-    if not is_correct:
-        errors.append(error_message)
-
-    is_correct, error_message = check_file_exists(path_sp_scenario)
-    if not is_correct:
-        errors.append(error_message)
-    
-    is_correct, error_message = check_file_exists(path_temporal_reference)
-    if not is_correct:
-        errors.append(error_message)
-
-    # Verifica se há erros
-    if errors:
-        return False, errors, []
-
-    df_values = read_excel_file(path_sp_values)
-    name_file_values = os.path.basename(path_sp_values)
-
-    df_scenario = read_excel_file(path_sp_scenario)
-    name_file_scenario = os.path.basename(path_sp_scenario)
-    
-    df_description = read_excel_file(path_sp_description)
-    name_file_description = os.path.basename(path_sp_description)
-
-    df_temporal_reference = read_excel_file(path_temporal_reference)
-    name_file_temporal_reference = os.path.basename(path_temporal_reference)
+    df_description = df_description.copy()
+    df_values = df_values.copy()
+    df_scenario = df_scenario.copy()
+    df_temporal_reference = df_temporal_reference.copy()
 
     # Verifica se as colunas com código e cenário existem
-    if 'codigo' not in df_description.columns or 'cenario' not in df_description.columns:
-        errors.append(f"{name_file_description}: Verificação de combinação de cenários e referência temporal não realizada.")
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns or SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
     
     # Verifica se as colunas obrigatórias de df_temporal_reference e df_scenario existem
-    if 'simbolo' not in df_temporal_reference.columns:
-        errors.append(f"{name_file_temporal_reference}: Verificação de combinação de cenários e referência temporal não realizada.")
+    if SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
+        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
 
-    if 'simbolo' not in df_scenario.columns:
-        errors.append(f"{name_file_scenario}: Verificação de combinação de cenários e referência temporal não realizada.")
+    if SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
+        errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
     
-    if 'id' not in df_values.columns:
-        errors.append(f"{name_file_values}: Verificação de combinação de cenários e referência temporal não realizada.")
+    if SP_VALUES_COLUMNS.ID not in df_values.columns:
+        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
         return False, errors, []
 
 
     # Clean non numeric values
-    df_description, _ = dataframe_clean_numeric_values_less_than(df_description, name_file_description, ['codigo'])
-    df_temporal_reference, _ = dataframe_clean_numeric_values_less_than(df_temporal_reference, name_file_temporal_reference, ['simbolo'])
+    df_description, _ = dataframe_clean_numeric_values_less_than(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+    df_temporal_reference, _ = dataframe_clean_numeric_values_less_than(df_temporal_reference, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO])
 
     # Verificar cada indicador em df_description
     for line, row in df_description.iterrows():
 
         # Criar lista de símbolos de cenários
-        lista_simbolos_cenarios = df_scenario['simbolo'].unique().tolist()
+        lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
         # Criar lista de símbolos temporais
-        lista_simbolos_temporais = sorted(df_temporal_reference['simbolo'].unique().tolist())
+        lista_simbolos_temporais = sorted(df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique().tolist())
         primeiro_ano = lista_simbolos_temporais[0]
 
-        codigo = str(row['codigo']).replace(',', '')
+        codigo = str(row[SP_DESCRIPTION_COLUMNS.CODIGO]).replace(',', '')
+        # Replace .0
+        codigo = codigo.replace('.0', '')
 
         # Verifica se o código é um número maior que zero
         if not codigo.isdigit():
@@ -175,7 +132,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
         # Verificar se as combinações estão presentes em df_values
         for combinacao in lista_combinacoes:
             if combinacao not in df_values.columns:
-                errors.append(f"{name_file_values}: A coluna '{combinacao}' é obrigatória.")
+                errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{combinacao}' é obrigatória.")
 
         # Verifica combinações extras somente para o código X-texto
         lista_combinacoes_sp_values = [col for col in df_values.columns if col.startswith(f"{codigo}-")]
@@ -183,7 +140,6 @@ def verify_combination_sp_description_values_scenario_temporal_reference(path_sp
         is_error, erros_message = verificar_combinacoes_extras(lista_combinacoes_copia, lista_combinacoes_sp_values)
         if is_error:
             for erro in erros_message:
-                # Formata erros: errors.append(f"{name_file_values}: A combinação {combinacao} existe de forma extra para o indicador {codigo}.")
-                errors.append(f"{name_file_values}: A coluna '{erro}' é desnecessária.")
+                errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{erro}' é desnecessária.")
 
     return not errors, errors, []

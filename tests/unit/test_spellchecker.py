@@ -1,7 +1,19 @@
 from src.myparser.spellchecker import run as verify_spelling_text
 
-from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01, path_input_data_errors_02, path_input_data_errors_03
 
+from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
+
+# DATA FRAMES - GROUND TRUTH
+from tests.unit.test_constants import df_sp_scenario_gt, df_sp_temporal_reference_gt, df_sp_description_gt
+
+# DATA FRAMES - ERROS 01
+from tests.unit.test_constants import df_sp_scenario_errors_01, df_sp_temporal_reference_errors_01, df_sp_description_errors_01
+
+# DATA FRAMES - ERROS 02
+from tests.unit.test_constants import df_sp_scenario_errors_02, df_sp_temporal_reference_errors_02, df_sp_description_errors_02
+
+# DATA FRAMES - ERROS 03
+from tests.unit.test_constants import df_sp_scenario_errors_03, df_sp_temporal_reference_errors_03, df_sp_description_errors_03
     
 def test_true_verify_spelling_text_pt_BR_gt(): # Teste true
     lang_dict_spell = "pt_BR"
@@ -10,23 +22,19 @@ def test_true_verify_spelling_text_pt_BR_gt(): # Teste true
     all_errors = []
     all_warnings = []
     
-    path_sp_description = path_input_data_ground_truth + "/descricao.xlsx"
-    path_sp_scenario = path_input_data_ground_truth + "/cenarios.xlsx"
-    path_sp_temporal_reference = path_input_data_ground_truth + "/referencia_temporal.xlsx"
-
-    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(path_sp_description, ["nome_simples", "nome_completo", "desc_simples", "desc_completa"], lang_dict_spell)
+    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(df_sp_description_gt, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_desc
     all_errors.extend(errors_spell_desc)
     all_warnings.extend(warnings_spell_desc)
     
-    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(path_sp_scenario, ["nome", "descricao"], lang_dict_spell)
+    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(df_sp_scenario_gt, SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_scenario
     all_errors.extend(errors_spell_scenario)
     all_warnings.extend(warnings_spell_scenario)
 
-    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(path_sp_temporal_reference, ["descricao"], lang_dict_spell)
+    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(df_sp_temporal_reference_gt, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_temporal_reference
     all_errors.extend(errors_spell_temporal_reference)
@@ -44,23 +52,19 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_1(): # Teste count error
     all_errors = []
     all_warnings = []
     
-    path_sp_description = path_input_data_errors_01 + "/descricao.xlsx"
-    path_sp_scenario = path_input_data_errors_01 + "/cenarios.xlsx"
-    path_sp_temporal_reference = path_input_data_errors_01 + "/referencia_temporal.xlsx"
-
-    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(path_sp_description, ["nome_simples", "nome_completo", "desc_simples", "desc_completa"], lang_dict_spell)
+    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(df_sp_description_errors_01, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_desc
     all_errors.extend(errors_spell_desc)
     all_warnings.extend(warnings_spell_desc)
     
-    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(path_sp_scenario, ["nome", "descricao"], lang_dict_spell)
+    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(df_sp_scenario_errors_01, SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_scenario
     all_errors.extend(errors_spell_scenario)
     all_warnings.extend(warnings_spell_scenario)
 
-    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(path_sp_temporal_reference, ["descricao"], lang_dict_spell)
+    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(df_sp_temporal_reference_errors_01, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_temporal_reference
     all_errors.extend(errors_spell_temporal_reference)
@@ -84,8 +88,6 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_1(): # Teste count error
     assert all_warnings[10] == "cenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta']."
     assert all_warnings[11] == "referencia_temporal.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda']."
 
-
-
 def test_count_errors_verify_spelling_text_pt_BR_errors_2(): # Teste count errors
     lang_dict_spell = "pt_BR"
     
@@ -93,28 +95,23 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_2(): # Teste count error
     all_errors = []
     all_warnings = []
     
-    path_sp_description = path_input_data_errors_02 + "/descricao.xlsx"
-    path_sp_scenario = path_input_data_errors_02 + "/cenarios.xlsx"
-    path_sp_temporal_reference = path_input_data_errors_02 + "/referencia_temporal.xlsx"
-
-    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(path_sp_description, ["nome_simples", "nome_completo", "desc_simples", "desc_completa"], lang_dict_spell)
+    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(df_sp_description_errors_02, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_desc
     all_errors.extend(errors_spell_desc)
     all_warnings.extend(warnings_spell_desc)
     
-    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(path_sp_scenario, ["nome", "descricao"], lang_dict_spell)
+    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(df_sp_scenario_errors_02, SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_scenario
     all_errors.extend(errors_spell_scenario)
     all_warnings.extend(warnings_spell_scenario)
 
-    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(path_sp_temporal_reference, ["descricao"], lang_dict_spell)
+    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(df_sp_temporal_reference_errors_02, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_temporal_reference
     all_errors.extend(errors_spell_temporal_reference)
     all_warnings.extend(warnings_spell_temporal_reference)
-    
     
     assert is_all_correct is True
     assert len(all_warnings) == 5
@@ -126,7 +123,6 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_2(): # Teste count error
     assert all_warnings[3] == "descricao.xlsx, linha 6: Palavras com possíveis erros ortográficos na coluna nome_simples: ['LF']."
     assert all_warnings[4] == "descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."
 
-
 def test_count_errors_verify_spelling_text_pt_BR_errors_3(): # Teste count errors
     lang_dict_spell = "pt_BR"
     
@@ -134,28 +130,23 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_3(): # Teste count error
     all_errors = []
     all_warnings = []
     
-    path_sp_description = path_input_data_errors_03 + "/descricao.xlsx"
-    path_sp_scenario = path_input_data_errors_03 + "/cenarios.xlsx"
-    path_sp_temporal_reference = path_input_data_errors_03 + "/referencia_temporal.xlsx"
-
-    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(path_sp_description, ["nome_simples", "nome_completo", "desc_simples", "desc_completa"], lang_dict_spell)
+    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(df_sp_description_errors_03, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_desc
     all_errors.extend(errors_spell_desc)
     all_warnings.extend(warnings_spell_desc)
     
-    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(path_sp_scenario, ["nome", "descricao"], lang_dict_spell)
+    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(df_sp_scenario_errors_03, SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_scenario
     all_errors.extend(errors_spell_scenario)
     all_warnings.extend(warnings_spell_scenario)
 
-    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(path_sp_temporal_reference, ["descricao"], lang_dict_spell)
+    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(df_sp_temporal_reference_errors_03, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], lang_dict_spell)
 
     is_all_correct = is_all_correct and is_correct_temporal_reference
     all_errors.extend(errors_spell_temporal_reference)
     all_warnings.extend(warnings_spell_temporal_reference)
-    
     
     assert is_all_correct is True
     assert len(all_warnings) == 5

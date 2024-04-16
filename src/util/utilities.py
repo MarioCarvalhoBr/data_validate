@@ -84,7 +84,12 @@ def file_extension_check(path, extension='.xlsx'):
         return False, f"ERRO: O arquivo {path} de entrada não é {extension}"
     return True, ""
 
-def read_excel_file(path, lower_columns=False):
+def read_excel_file(path):
+    # Se o arquivo não existe retorna None
+    exists, _ = check_file_exists(path)
+    if not exists:
+        return None
+    
     file_name = os.path.basename(path)
 
     if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
@@ -94,9 +99,6 @@ def read_excel_file(path, lower_columns=False):
     else:
         df = pd.read_excel(path)
 
-    if lower_columns:
-        df.columns = df.columns.str.lower()
-        
     return df
 
 def check_folder_exists(folder_path):

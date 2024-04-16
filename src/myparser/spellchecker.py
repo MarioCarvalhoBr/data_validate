@@ -1,6 +1,4 @@
 import re
-import os
-from src.util.utilities import read_excel_file
 import pandas as pd
 import hunspell
 
@@ -41,7 +39,8 @@ def process_sheet(df, columns, meu_analizador, sheet_name):
                 warnings.append(warning)
     return warnings
 
-def run(path, columns_sheets, lang_dict_spell):
+def run(df, file_name, columns_sheets, lang_dict_spell):
+    df = df.copy()
     errors, warnings = [], []
     
     try:
@@ -54,9 +53,6 @@ def run(path, columns_sheets, lang_dict_spell):
         extra_dic = 'dictionaries/extra-words.dic'
         meu_analizador.add_dic(extra_dic)
 
-        file_name = os.path.basename(path)
-
-        df = read_excel_file(path)
         
         # Verifica se todas as colunas existem em df
         columns_sheets = [column for column in columns_sheets if column in df.columns]

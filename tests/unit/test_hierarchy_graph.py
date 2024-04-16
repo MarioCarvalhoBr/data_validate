@@ -1,27 +1,31 @@
 import networkx as nx
-import os
-from tests.unit.test_constants import path_input_data_ground_truth, path_input_data_errors_01
 
 from src.myparser.hierarchy.graph import verificar_ciclos
 from src.myparser.hierarchy.graph import verificar_grafos_desconectados
 from src.myparser.hierarchy.graph import imprimir_grafo
 from src.myparser.hierarchy.graph import verify_graph_sp_description_composition
 
-# Testes: Hierarquia como grafo conexo
-def test_true_verify_graph_sp_description_composition(): # Teste true
-    planilha_04_descricao = os.path.join(path_input_data_ground_truth,  "descricao.xlsx")
-    planilha_05_composicao = path_input_data_ground_truth + "/composicao.xlsx"
-    result_test,__,__ = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
+
+# DATA FRAMES - GROUND TRUTH
+from tests.unit.test_constants import df_sp_description_gt, df_sp_composition_gt
+
+# DATA FRAMES - ERROS 01
+from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
+
+# DATA FRAMES - ERROS 02
+
+# DATA FRAMES - ERROS 03
+
+def test_true_verify_graph_sp_description_composition_gt():
+    result_test,__,__ = verify_graph_sp_description_composition(df_sp_description_gt, df_sp_composition_gt)
     assert result_test is True
-def test_false_verify_graph_sp_description_composition(): # Teste false
-    planilha_04_descricao = os.path.join(path_input_data_errors_01, "descricao.xlsx")
-    planilha_05_composicao = path_input_data_errors_01 + "/composicao.xlsx"
-    result_test,__,__ = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
+
+def test_false_verify_graph_sp_description_composition_errors_01(): # Teste False
+    result_test,__,__ = verify_graph_sp_description_composition(df_sp_description_errors_01, df_sp_composition_errors_01)
     assert result_test is False
-def test_count_errors_verify_graph_sp_description_composition(): # Teste false
-    planilha_04_descricao = os.path.join(path_input_data_errors_01, "descricao.xlsx")
-    planilha_05_composicao = path_input_data_errors_01 + "/composicao.xlsx"
-    is_correct, errors, warnings = verify_graph_sp_description_composition(planilha_04_descricao, planilha_05_composicao)
+
+def test_count_errors_verify_graph_sp_description_composition_errors_01(): # Teste False
+    __, errors, warnings = verify_graph_sp_description_composition(df_sp_description_errors_01, df_sp_composition_errors_01)
     # Numero de erros esperado == 4
     assert len(errors) == 4
     # Numero de warnings esperado == 0
