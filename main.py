@@ -94,7 +94,7 @@ if __name__ == "__main__":
         }
      
         # ------------------------------------------------------------------------------------------------------------------------------------
-        print("Iniciando a verificação: Estrutura dos arquivos da pasta de entrada")
+        # print("Iniciando a verificação: Estrutura dos arquivos da pasta de entrada")
         # 1.1 - Estrutura dos arquivos da pasta de entrada
         all_correct_structure_files = True
         all_errors_structure_files = []
@@ -117,7 +117,7 @@ if __name__ == "__main__":
 
 
         # ------------------------------------------------------------------------------------------------------------------------------------
-        print("Iniciando a verificação: Limpeza dos arquivos")
+        # print("Iniciando a verificação: Limpeza dos arquivos")
         # 2 - Verifica se os arquivos estão limpos: verify_files_data_clean
         all_correct_clean_files = True
         all_errors_clean_files = []
@@ -139,10 +139,10 @@ if __name__ == "__main__":
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 2.0 - Hierarquia como grafo conexo
-        print("Iniciando a verificação: Hierarquia como grafo conexo")
+        # print("Iniciando a verificação: Hierarquia como grafo conexo")
         is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (orc.verify_graph_sp_description_composition(df_sp_description, df_sp_composition))
         # 2.1 - Relações entre indicadores e valores
-        print("Iniciando a verificação: Relações entre indicadores e valores")
+        # print("Iniciando a verificação: Relações entre indicadores e valores")
         is_correct_val2desc, errors_val2desc, warnings_val2desc = (orc.verify_ids_sp_description_values(df_sp_description, df_sp_values))
         # 2.2 - Concatenar os resultados
         results_tests.append([("Issue #2 e #59: " if is_degug else "") +"Relações entre indicadores", is_correct_comp2desc and is_correct_val2desc, errors_comp2desc + errors_val2desc, warnings_comp2desc + warnings_val2desc])
@@ -150,31 +150,31 @@ if __name__ == "__main__":
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # Hierarquia como árvore #3: verify_tree_sp_composition_hierarchy
-        print("Iniciando a verificação: Hierarquia como árvore")
+        # print("Iniciando a verificação: Hierarquia como árvore")
         results_tests.append([("Issue #3: " if is_degug else "") +"Hierarquia como árvore", *(orc.verify_tree_sp_description_composition_hierarchy(df_sp_composition, df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 3 - Não pode ter indicador nível zero #37
-        print("Iniciando a verificação: Níveis de indicadores")
+        # print("Iniciando a verificação: Níveis de indicadores")
         results_tests.append([("Issue #37: " if is_degug else "") +"Níveis de indicadores", *(orc.verify_sp_description_levels(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 4 - Unicidade dos códigos #8
-        print("Iniciando a verificação: Unicidade dos códigos")
+        # print("Iniciando a verificação: Unicidade dos códigos")
         results_tests.append([("Issue #8: " if is_degug else "") +"Unicidade dos códigos", *(orc.verify_sp_description_codes_uniques(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 5 - Verifica se a planilha de descrição está correta
-        print("Iniciando a verificação: Planilha de descrição códigos HTML")
+        # print("Iniciando a verificação: Planilha de descrição códigos HTML")
         results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 6 - Verficar a ortografia
-        print("Iniciando a verificação: Ortografia")
+        # print("Iniciando a verificação: Ortografia")
         if not args.no_spellchecker:
             lang_dict = lang_dict.lower()
             # Mapear o argumento para o enum correspondente
@@ -217,64 +217,64 @@ if __name__ == "__main__":
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 7 - Verificar nomes de colunas únicos
-        print("Iniciando a verificação: Nomes de colunas únicos")
+        # print("Iniciando a verificação: Nomes de colunas únicos")
         results_tests.append([("Issue #36: " if is_degug else "") +"Títulos únicos", *(orc.verify_sp_description_titles_uniques(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 8 - Verificar campos vazios
-        print("Iniciando a verificação: Campos vazios")
+        # print("Iniciando a verificação: Campos vazios")
         results_tests.append([("Issue #75: " if is_degug else "") +"Campos vazios", *(orc.verify_sp_description_empty_strings(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 9 - Padrão para nomes dos indicadores #1
-        print("Iniciando a verificação: Padrão para nomes dos indicadores")
+        # print("Iniciando a verificação: Padrão para nomes dos indicadores")
         results_tests.append([("Issue #1: " if is_degug else "") +"Padrão para nomes dos indicadores", *(orc.verify_sp_description_text_capitalize(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 9 - Títulos com mais de 30 caracteres
-        print("Iniciando a verificação: Títulos com mais de 30 caracteres")
+        # print("Iniciando a verificação: Títulos com mais de 30 caracteres")
         results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 10.0 - Pontuações obrigatórias e proibidas
-        print("Iniciando a verificação: Pontuações obrigatórias e proibidas em descrições")
+        # print("Iniciando a verificação: Pontuações obrigatórias e proibidas em descrições")
         results_tests.append([("Issue #32: " if is_degug else "") +"Pontuações obrigatórias e proibidas em descrições", *(orc.verify_sp_description_punctuation(df_sp_description,  [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO], [SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA]))])
         
         # 10.1 - Pontuações obrigatórias e proibidas em cenários
-        print("Iniciando a verificação: Pontuações obrigatórias e proibidas em cenários")
+        # print("Iniciando a verificação: Pontuações obrigatórias e proibidas em cenários")
         results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(df_sp_scenario, columns_dont_punctuation=[SP_SCENARIO_COLUMNS.NOME], columns_must_end_with_dot=[SP_SCENARIO_COLUMNS.DESCRICAO]))])
         
         # 10.2 Pontuações obrigatórias e proibidas em referência temporal
-        print("Iniciando a verificação: Pontuações obrigatórias e proibidas em referência temporal")
+        # print("Iniciando a verificação: Pontuações obrigatórias e proibidas em referência temporal")
         results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em referência temporal", *(orc.verify_sp_temporal_reference_punctuation(df_sp_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=[SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
          # 11.0: Relações de valores únicos em cenários
-        print("Iniciando a verificação: Relações de valores únicos em cenários")
+        # print("Iniciando a verificação: Relações de valores únicos em cenários")
         results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em cenários", *(orc.verify_sp_scenario_unique_values(df_sp_scenario, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.SIMBOLO]))])
         
         # 10.1': Relações de valores únicos em referência temporal
-        print("Iniciando a verificação: Relações de valores únicos em referência temporal")
+        # print("Iniciando a verificação: Relações de valores únicos em referência temporal")
         results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em referência temporal", *(orc.verify_sp_temporal_reference_unique_values(df_sp_temporal_reference, [SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 11 - Relações de combinações de valores #81
-        print("Iniciando a verificação: Relações de combinações de valores")
+        # print("Iniciando a verificação: Relações de combinações de valores")
         results_tests.append([("Issue #81: " if is_degug else "") +"Relações de combinações de valores", *(orc.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference))])
         
          # 12.0 - Quebra de linha para descrição e cenários
-        print("Iniciando a verificação: Quebra de linha para descrição e cenários")
+        # print("Iniciando a verificação: Quebra de linha para descrição e cenários")
         results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para descrição", *(orc.verify_sp_description_cr_lf(df_sp_description,SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]))])
         results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para cenários", *(orc.verify_sp_description_cr_lf(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, columns_start_end=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], columns_anywhere=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO]))])
 
         # 12.1 - Quebra de linha para referência temporal
-        print("Iniciando a verificação: Quebra de linha para referência temporal")
+        # print("Iniciando a verificação: Quebra de linha para referência temporal")
         results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para referência temporal", *(orc.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         
     print("\n")

@@ -3,27 +3,6 @@
 [37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth/
 
 
-Iniciando a verificação: Estrutura dos arquivos da pasta de entrada
-Iniciando a verificação: Limpeza dos arquivos
-Iniciando a verificação: Hierarquia como grafo conexo
-Iniciando a verificação: Relações entre indicadores e valores
-Iniciando a verificação: Hierarquia como árvore
-Iniciando a verificação: Níveis de indicadores
-Iniciando a verificação: Unicidade dos códigos
-Iniciando a verificação: Planilha de descrição códigos HTML
-Iniciando a verificação: Ortografia
-Iniciando a verificação: Nomes de colunas únicos
-Iniciando a verificação: Campos vazios
-Iniciando a verificação: Padrão para nomes dos indicadores
-Iniciando a verificação: Títulos com mais de 30 caracteres
-Iniciando a verificação: Pontuações obrigatórias e proibidas em descrições
-Iniciando a verificação: Pontuações obrigatórias e proibidas em cenários
-Iniciando a verificação: Pontuações obrigatórias e proibidas em referência temporal
-Iniciando a verificação: Relações de valores únicos em cenários
-Iniciando a verificação: Relações de valores únicos em referência temporal
-Iniciando a verificação: Relações de combinações de valores
-Iniciando a verificação: Quebra de linha para descrição e cenários
-Iniciando a verificação: Quebra de linha para referência temporal
 
 
 [37m[1m------ Resultados da verificação dos testes ------
@@ -53,5 +32,5 @@ Iniciando a verificação: Quebra de linha para referência temporal
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 3.1 segundos
+Tempo total de execução: 1.5 segundos
 [0m
