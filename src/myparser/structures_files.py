@@ -1,104 +1,140 @@
 import os
-from src.util.utilities import check_file_exists, dataframe_clean_numeric_values_less_than, read_excel_file, check_vertical_bar, check_folder_exists
+from enum import StrEnum
+
+from src.util.utilities import dataframe_clean_numeric_values_less_than, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
+
+class SP_DESCRIPTION_COLUMNS (StrEnum):
+    NAME_SP = "descricao.xlsx"
+    CODIGO = "codigo"
+    NIVEL = "nivel"
+    NOME_SIMPLES = "nome_simples"
+    NOME_COMPLETO = "nome_completo"
+    UNIDADE = "unidade"
+    DESC_SIMPLES = "desc_simples"
+    DESC_COMPLETA = "desc_completa"
+    CENARIO = "cenario"
+    RELACAO = "relacao"
+    FONTES = "fontes"
+    META = "meta"
+    PLURAL_NOMES_SIMPLES = "nomes_simples"
+    PLURAL_NOMES_COMPLETOS = "nomes_completos"
+
+class SP_COMPOSITION_COLUMNS (StrEnum):
+    NAME_SP = "composicao.xlsx"
+    CODIGO_PAI = "codigo_pai"
+    CODIGO_FILHO = "codigo_filho"
+
+class SP_VALUES_COLUMNS (StrEnum):
+    NAME_SP = "valores.xlsx"
+    ID = "id"
+    NOME = "nome"
+
+class SP_PROPORTIONALITIES_COLUMNS (StrEnum):
+    NAME_SP = "proporcionalidades.xlsx"
+    ID = "id"
+    NOME = "nome"
+
+class SP_SCENARIO_COLUMNS (StrEnum):
+    NAME_SP = "cenarios.xlsx"
+    NOME = "nome"
+    DESCRICAO = "descricao"
+    SIMBOLO = "simbolo"
+
+class SP_TEMPORAL_REFERENCE_COLUMNS (StrEnum):
+    NAME_SP = "referencia_temporal.xlsx"
+    NOME = "nome"
+    DESCRICAO = "descricao"
+    SIMBOLO = "simbolo"
 
 # GLOBAL VARIABLES
 # Estrutura esperada de colunas para cada arquivo
-_expected_structure_columns = {
-    "cenarios.xlsx": ["nome", "descricao", "simbolo"],
-    "referencia_temporal.xlsx": ["nome", "descricao", "simbolo"],
-    "descricao.xlsx": ["codigo", "nivel", "nome_simples", "nome_completo", "unidade", "desc_simples", "desc_completa", "cenario", "relacao", "fontes", "meta"],
-    "composicao.xlsx": ["codigo_pai", "codigo_filho"],
-    "valores.xlsx": ["id"],
-    "proporcionalidades.xlsx": ["id"]
+STRUCTURE_FILES_COLUMNS_DICT = {
+    SP_SCENARIO_COLUMNS.NAME_SP: [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO, SP_SCENARIO_COLUMNS.SIMBOLO],
+    SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: [SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO, SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO],
+    
+    SP_DESCRIPTION_COLUMNS.NAME_SP: [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META],
+    
+    SP_COMPOSITION_COLUMNS.NAME_SP: [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO],
+    SP_VALUES_COLUMNS.NAME_SP: [SP_VALUES_COLUMNS.ID, SP_VALUES_COLUMNS.NOME],
+    SP_PROPORTIONALITIES_COLUMNS.NAME_SP: [SP_PROPORTIONALITIES_COLUMNS.ID, SP_PROPORTIONALITIES_COLUMNS.NOME]
 }
-   
-def verify_structure_folder_files(path_folder):
+
+STRUCTURE_FILES_TO_CLEAN_LIST = [
+    [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1],
+    [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NIVEL], 1],
+    [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CENARIO], -1],
+    [SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0],
+    [SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1],
+    [SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO], 0]
+
+]
+
+def verify_structure_exepected_files_main_path(path_folder):
     errors = []
     warnings = []
+    try:
+        # Verifica se há arquivos não esperados na pasta
+        for file_name_i in os.listdir(path_folder):
+            if file_name_i not in STRUCTURE_FILES_COLUMNS_DICT and os.path.isfile(os.path.join(path_folder, file_name_i)):
+                warnings.append(f"O arquivo '{file_name_i}' não é esperado.")
 
-    exists, error = check_folder_exists(path_folder)
-    if not exists:
-        errors.append(error)
-        return not errors, errors, warnings
-
-    # Verifica a existência dos arquivos esperados e suas colunas
-    for file_name, expected_columns in _expected_structure_columns.items():
-        file_path = os.path.join(path_folder, file_name)
-        exists, error = check_file_exists(file_path)
-        if not exists:
-            errors.append(error)
-            continue
-
-        try:
-            df = read_excel_file(file_path)
-
-            # Check if there is a vertical bar in the column name
-            errors.extend(check_vertical_bar(df, file_name)[1])
-            
-            # Ajuste para 'proporcionalidades.xlsx'
-            if file_name == "proporcionalidades.xlsx":
-                # Tratamento especial para 'proporcionalidades.xlsx'
-                header_row = df.iloc[0]
-                df.columns = header_row
-                df = df[1:].reset_index(drop=True)
-
-            # Check missing columns expected columns
-            missing_columns, extra_columns = check_column_names(df, expected_columns)
-            # Formata os erros e warnings
-            col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
-            # Verifica as colunas esperadas    
-            if file_name == "valores.xlsx":
-                errors.extend(col_errors)
-            elif file_name == "proporcionalidades.xlsx":
-                errors.extend(col_errors)
-            else:
-                errors.extend(col_errors)
-                warnings.extend(col_warnings)
-
-        except Exception as e:
-            errors.append(f"{file_name}: Erro ao processar o arquivo: {e}")
-
-    # Verifica se há arquivos não esperados na pasta
-    for file_name in os.listdir(path_folder):
-        if file_name not in _expected_structure_columns and os.path.isfile(os.path.join(path_folder, file_name)):
-            warnings.append(f"O arquivo '{file_name}' não é esperado.")
+    except Exception as e:
+        errors.append(f"{path_folder}: Erro ao processar verificação dos arquivos da pasta principal: {e}.")
 
     return not errors, errors, warnings
       
-# Verificação de limpeza dos arquivos
-def verify_files_data_clean(path_folder):
+def verify_structure_files_dataframe(df, file_name, expected_columns):
+    df = df.copy()
     errors = []
     warnings = []
 
-    files_to_clean = [
-        ["descricao.xlsx", "codigo", 1],
-        ["descricao.xlsx", "nivel", 1],
-        ["descricao.xlsx", "cenario", -1],
-        ["composicao.xlsx", "codigo_pai", 0],
-        ["composicao.xlsx", "codigo_filho", 1],
-        ["referencia_temporal.xlsx", "simbolo", 0],
-    ]
-    try: 
-        for data in files_to_clean:
-            file = data[0]
-            column = [data[1]]
-            value = data[2]            
-            
-            file_path = os.path.join(path_folder, file)
-            file_name = os.path.basename(file)
-            df = read_excel_file(file_path)
+    # Se o df for none ou vazio retorna erro
+    if df is None:
+        errors.append(f"{file_name}: O arquivo esperado não foi encontrado.")
+        return not errors, errors, warnings
+    if df.empty:
+        errors.append(f"{file_name}: O arquivo esperado está vazio.")
+        return not errors, errors, warnings
+    
+    try:
+        # Check if there is a vertical bar in the column name
+        errors.extend(check_vertical_bar(df, file_name)[1])
+        
+        # Fixing the header row of SP_PROPORTIONALITIES_COLUMNS.NAME_SP
+        if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
+            header_row = df.iloc[0]
+            df.columns = header_row
+            df = df[1:].reset_index(drop=True)
+    
+        # Check missing columns expected columns and extra columns
+        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
-            # Verifica se a coluna esperada existe
-            if column[0] not in df.columns:
-                continue
-
-            _, erros = dataframe_clean_numeric_values_less_than(df, file_name, column, value)
-            if erros:
-                errors.extend(erros)
-            
+        if file_name == SP_VALUES_COLUMNS.NAME_SP:
+            errors.extend(col_errors)
+        elif file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
+            errors.extend(col_errors)
+        else:
+            errors.extend(col_errors)
+            warnings.extend(col_warnings)
     except Exception as e:
-        pass
-        errors.append(str(e))
+        errors.append(f"{file_name}: Erro ao processar a verificação de estrutura do arquivo: {e}.")
 
     return not errors, errors, warnings
+      
+def verify_files_data_clean(df, file_name, columns_to_clean, value):
+    df = df.copy()
+    errors = []
+
+    try:        
+        # Verifica se a coluna esperada existe
+        if (all(elem in df.columns for elem in columns_to_clean)):
+            _, errors_data = dataframe_clean_numeric_values_less_than(df, file_name, columns_to_clean, value)
+            if errors_data:
+                errors.extend(errors_data)
+                
+    except Exception as e:
+        errors.append(f'{file_name}: Erro ao processar a verificação de limpeza do arquivo: {e}.')
+
+    return not errors, errors, []

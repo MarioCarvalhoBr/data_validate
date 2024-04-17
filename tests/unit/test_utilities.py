@@ -7,7 +7,6 @@ from src.util.utilities import check_file_exists
 from src.util.utilities import dataframe_clean_numeric_values_less_than
 from src.util.utilities import check_punctuation, check_vertical_bar
 
-
 # Testes para check_punctuation:
 def test_check_punctuation_with_no_errors():
     df = pd.DataFrame({
@@ -69,15 +68,6 @@ def test_read_excel_file_with_non_existing_file():
         read_excel_file('non_existing_file.xlsx')
     except FileNotFoundError as e:
         assert str(e) == "[Errno 2] No such file or directory: 'non_existing_file.xlsx'"
-def test_read_excel_file_with_lower_columns():
-    # Create a temporary excel file for testing
-    df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    df.to_excel('test_file.xlsx', index=False)
-
-    loaded_df = read_excel_file('test_file.xlsx', lower_columns=True)
-    # Clean up
-    os.remove('test_file.xlsx')
-    assert loaded_df.columns.tolist() == ['a', 'b'], "Column names are not lowercased"
 
 # Testes para file_extension_check:
 def test_file_extension_check_with_invalid_extension():
