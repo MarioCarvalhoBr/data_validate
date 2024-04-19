@@ -4,12 +4,12 @@ from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLU
 def extract_ids_from_description(df_description):
     ids = set(df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
     # Converte em inteiros
-    ids = set(int(id) for id in ids if id.isdigit())
+    ids = set(int(id) for id in ids if str(str(id).replace('.0', '')).isdigit())
     return ids
 
 def extract_ids_from_values(df_values):
     ids = set(df_values.columns.str.split('-').str[0])
-    ids = set(id for id in ids if id.isdigit())
+    ids = set(id for id in ids if str(str(id).replace('.0', '')).isdigit())
     # Converte em inteiros
     ids = set(int(id) for id in ids)
     return ids
