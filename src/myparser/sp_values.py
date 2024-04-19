@@ -26,19 +26,28 @@ def compare_ids(id_description, id_values, name_sp_description, name_sp_values):
     
     return errors
 
+def processar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values):    
+    for i in lista_combinacoes:
+        # Se existe em lista_combinacoes_sp_values então pop
+        if i in lista_combinacoes_sp_values:
+            lista_combinacoes_sp_values.pop(lista_combinacoes_sp_values.index(i))
+
+    # Criando mensagens de erro se houver elementos extras
+    if lista_combinacoes_sp_values:
+        return True, lista_combinacoes_sp_values
+    return False, []
+
 def verify_ids_sp_description_values(df_description, df_values):
     df_description = df_description.copy()
     df_values = df_values.copy()
     errors = []
     warnings = []
 
-    try:
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada para a coluna: {SP_DESCRIPTION_COLUMNS.CODIGO}.")
+        return not errors, errors, warnings
 
-        # Verifica se as colunas com código existem
-        if 'codigo' not in df_description.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores não realizada.")
-            return False, errors, []
-        
+    try:
         # Clean non numeric values
         df_description, _ = dataframe_clean_numeric_values_less_than(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
 
@@ -55,17 +64,6 @@ def verify_ids_sp_description_values(df_description, df_values):
     
     return not errors, errors, warnings
 
-
-def verificar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values):    
-    for i in lista_combinacoes:
-        # Se existe em lista_combinacoes_sp_values então pop
-        if i in lista_combinacoes_sp_values:
-            lista_combinacoes_sp_values.pop(lista_combinacoes_sp_values.index(i))
-
-    # Criando mensagens de erro se houver elementos extras
-    if lista_combinacoes_sp_values:
-        return True, lista_combinacoes_sp_values
-    return False, []
 def verify_combination_sp_description_values_scenario_temporal_reference(df_description, df_values, df_scenario, df_temporal_reference):
     errors = []
     df_description = df_description.copy()
@@ -73,24 +71,22 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
     df_scenario = df_scenario.copy()
     df_temporal_reference = df_temporal_reference.copy()
 
-    # Verifica se as colunas com código e cenário existem
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns or SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
-        return False, errors, []
+    # Check if columns exists
+    text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada para a coluna"
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CODIGO}'.")
+    elif SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}'.")
+    elif SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
+        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {text_error_column} '{SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO}'.")
+    elif SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
+        errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}'.")
+    elif SP_VALUES_COLUMNS.ID not in df_values.columns:
+        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {text_error_column} '{SP_VALUES_COLUMNS.ID}'.")
     
-    # Verifica se as colunas obrigatórias de df_temporal_reference e df_scenario existem
-    if SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
-        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
-        return False, errors, []
-
-    if SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
-        errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
-        return False, errors, []
-    
-    if SP_VALUES_COLUMNS.ID not in df_values.columns:
-        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal não realizada.")
-        return False, errors, []
-
+    # Return if errors
+    if errors:
+        return not errors, errors, []
 
     # Clean non numeric values
     df_description, _ = dataframe_clean_numeric_values_less_than(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
@@ -137,7 +133,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
         # Verifica combinações extras somente para o código X-texto
         lista_combinacoes_sp_values = [col for col in df_values.columns if col.startswith(f"{codigo}-")]
         # Verificar se há combinações extras
-        is_error, erros_message = verificar_combinacoes_extras(lista_combinacoes_copia, lista_combinacoes_sp_values)
+        is_error, erros_message = processar_combinacoes_extras(lista_combinacoes_copia, lista_combinacoes_sp_values)
         if is_error:
             for erro in erros_message:
                 errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{erro}' é desnecessária.")

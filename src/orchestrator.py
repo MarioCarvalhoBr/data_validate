@@ -12,8 +12,8 @@ import src.myparser.info as info
 def verify_sp_description_cr_lf(df_sp, file_name,  columns_start_end=[], columns_anywhere=[]):
     return sp_description.verify_sp_description_cr_lf(df_sp, file_name, columns_start_end, columns_anywhere)
 
-def verify_sp_description_empty_strings(df_sp_description):
-    return sp_description.verify_sp_description_empty_strings(df_sp_description)
+def verify_sp_description_empty_strings(df_sp_description, list_columns=[]):
+    return sp_description.verify_sp_description_empty_strings(df_sp_description, list_columns)
 
 def verify_sp_temporal_reference_unique_values(df_sp_scenario, columns_uniques):
     return sp_temporal_reference.verify_sp_temporal_reference_unique_values(df_sp_scenario, columns_uniques)
@@ -45,8 +45,8 @@ def verify_sp_description_titles_length(df_sp_description):
 def verify_sp_description_titles_uniques(df_sp_description):
     return sp_description.verify_sp_description_titles_uniques(df_sp_description)
 
-def verify_sp_description_parser_html_column_names(df_sp_description):
-    return sp_description.verify_sp_description_parser_html_column_names(df_sp_description)
+def verify_sp_description_parser_html_column_names(df_sp_description, cloumn):
+    return sp_description.verify_sp_description_parser_html_column_names(df_sp_description, cloumn)
 
 def verify_sp_description_text_capitalize(df_sp_description):
     return sp_description.verify_sp_description_text_capitalize(df_sp_description)

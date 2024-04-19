@@ -96,10 +96,32 @@ def verify_structure_files_dataframe(df, file_name, expected_columns):
     if df.empty:
         errors.append(f"{file_name}: O arquivo esperado está vazio.")
         return not errors, errors, warnings
+        
+    # Check if there is a vertical bar in the column name
+    __, errors_vertical_bar = check_vertical_bar(df, file_name)
+    errors.extend(errors_vertical_bar)
     
-    try:
+    # Fixing the header row of SP_PROPORTIONALITIES_COLUMNS.NAME_SP
+    if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
+        header_row = df.iloc[0]
+        df.columns = header_row
+        df = df[1:].reset_index(drop=True)
+
+    # Check missing columns expected columns and extra columns
+    missing_columns, extra_columns = check_column_names(df, expected_columns)
+    col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
+
+    if file_name == SP_VALUES_COLUMNS.NAME_SP:
+        errors.extend(col_errors)
+    elif file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
+        errors.extend(col_errors)
+    else:
+        errors.extend(col_errors)
+        warnings.extend(col_warnings)   
+    '''try:
         # Check if there is a vertical bar in the column name
-        errors.extend(check_vertical_bar(df, file_name)[1])
+        is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)
+        errors.extend(errors_vertical_bar)
         
         # Fixing the header row of SP_PROPORTIONALITIES_COLUMNS.NAME_SP
         if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
@@ -119,7 +141,7 @@ def verify_structure_files_dataframe(df, file_name, expected_columns):
             errors.extend(col_errors)
             warnings.extend(col_warnings)
     except Exception as e:
-        errors.append(f"{file_name}: Erro ao processar a verificação de estrutura do arquivo: {e}.")
+        errors.append(f"{file_name}: Erro ao processar a verificação de estrutura do arquivo: {e}.")'''
 
     return not errors, errors, warnings
       
@@ -127,12 +149,17 @@ def verify_files_data_clean(df, file_name, columns_to_clean, value):
     df = df.copy()
     errors = []
 
+    missing_columns = set(columns_to_clean) - set(df.columns)
+    missing_columns = [str(column) for column in missing_columns]
+    if missing_columns:
+        errors.append(f"{file_name}: A verificação de limpeza foi abortada para as colunas: {missing_columns}.")
+
+    columns_to_clean = [column for column in columns_to_clean if column in df.columns]
+
     try:        
-        # Verifica se a coluna esperada existe
-        if (all(elem in df.columns for elem in columns_to_clean)):
-            _, errors_data = dataframe_clean_numeric_values_less_than(df, file_name, columns_to_clean, value)
-            if errors_data:
-                errors.extend(errors_data)
+        _, errors_data = dataframe_clean_numeric_values_less_than(df, file_name, columns_to_clean, value)
+        if errors_data:
+            errors.extend(errors_data)
                 
     except Exception as e:
         errors.append(f'{file_name}: Erro ao processar a verificação de limpeza do arquivo: {e}.')

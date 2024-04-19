@@ -88,17 +88,16 @@ def read_excel_file(path):
     # Se o arquivo não existe retorna None
     exists, _ = check_file_exists(path)
     if not exists:
-        return None
+        # Retorna um dataframe vazio
+        return pd.DataFrame()
     
     file_name = os.path.basename(path)
 
     if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
         # df = pd.read_csv(path, low_memory=False)
         df = pd.read_excel(path)
-        # print(df)
     else:
         df = pd.read_excel(path)
-
     return df
 
 def check_folder_exists(folder_path):
@@ -134,18 +133,28 @@ def check_file_exists(file_path):
         return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/'."
     return True, ""
 
+
 def check_vertical_bar(df_sp, name_file):
     errors = []
+
     try:
-        # Check if there is a vertical bar in the column name
+        # Verifica se há barra vertical nos nomes das colunas
         for column in df_sp.columns:
-            # Check if there is a vertical bar in the column name
-            if "|" in column:
+            column = str(column)
+            if '|' in column:
                 errors.append(f"{name_file}: O nome da coluna '{column}' não pode conter o caracter '|'.")
-            for index, row in df_sp.iterrows():
-                if "|" in str(row[column]):
-                    errors.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não pode conter o caracter '|'.")
+
+        # Verifica se há barra vertical nos dados das colunas
+        mask = df_sp.map(lambda x: '|' in str(x) if pd.notna(x) else False)
+        if mask.any().any():
+            for column in df_sp.columns:
+                if mask[column].any():
+                    # Encontra linhas específicas com o problema
+                    rows_with_error = mask.index[mask[column]].tolist()
+                    for row in rows_with_error:
+                        errors.append(f"{name_file}, linha {row + 2}: A coluna '{column}' não pode conter o caracter '|'.")
+    
     except Exception as e:
-        errors.append(f"Erro ao ler o arquivo {name_file}: {str(e)}")
+        errors.append(f"{name_file}: Erro ao processar a checagem de barra vertical: {str(e)}")
 
     return not errors, errors

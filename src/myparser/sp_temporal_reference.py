@@ -5,6 +5,13 @@ def verify_sp_temporal_reference_unique_values(df, columns_uniques):
     df = df.copy()
     errors, warnings = [], []
 
+    missing_columns = set(columns_uniques) - set(df.columns)
+    missing_columns = [str(column) for column in missing_columns]
+    if missing_columns:
+        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: A verificação de relações de valores únicos foi abortada para as colunas: {missing_columns}.")
+
+    columns_uniques = [column for column in columns_uniques if column in df.columns]
+
     try:
         _, errors_checkeds = check_unique_values(df, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_uniques)
         errors.extend(errors_checkeds)
@@ -18,11 +25,15 @@ def verify_sp_temporal_reference_punctuation(df, columns_dont_punctuation, colum
     df = df.copy()
     errors, warnings = [], []
 
+    missing_columns = set(columns_dont_punctuation + columns_must_end_with_dot) - set(df.columns)
+    missing_columns = [str(column) for column in missing_columns]
+    if missing_columns:
+        warnings.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: A verificação de pontuação foi abortada para as colunas: {missing_columns}.")
+
+    columns_dont_punctuation = [column for column in columns_dont_punctuation if column in df.columns]
+    columns_must_end_with_dot = [column for column in columns_must_end_with_dot if column in df.columns]
+    
     try:
-        # Verifica se todas as colunas existem em df
-        columns_dont_punctuation = [column for column in columns_dont_punctuation if column in df.columns]
-        columns_must_end_with_dot = [column for column in columns_must_end_with_dot if column in df.columns]
-        
         _, warnings = check_punctuation(df, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_dont_punctuation, columns_must_end_with_dot)
         
     except Exception as e:

@@ -7,6 +7,8 @@ from src.util.utilities import check_file_exists
 from src.util.utilities import dataframe_clean_numeric_values_less_than
 from src.util.utilities import check_punctuation, check_vertical_bar
 
+from src.myparser.structures_files import SP_COMPOSITION_COLUMNS
+
 # Testes para check_punctuation:
 def test_check_punctuation_with_no_errors():
     df = pd.DataFrame({
@@ -145,38 +147,38 @@ def test_check_file_exists_with_existing_file():
 
 def test_dataframe_clean_numeric_values_less_than_with_no_errors():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
     })
-    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
     assert len(erros) == 0
     assert len(df) == 3
 
 def test_dataframe_clean_numeric_values_less_than_with_non_numeric_values():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 'three'],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 'three'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
     })
-    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 1)
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
     assert len(erros) == 1
-    assert erros[0] == "test_file, linha 4: A coluna 'codigo_pai' contém um valor não numérico."
+    assert erros[0] == f"test_file, linha 4: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' contém um valor não numérico."
     assert len(df) == 2
 
 def test_dataframe_clean_numeric_values_less_than_with_multiple_errors():
     df = pd.DataFrame({
-        'codigo_pai': [2, 'three', 4],
-        'codigo_filho': [1, 2, 'three'],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [2, 'three', 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [1, 2, 'three'],
     })
-    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'])
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
     assert len(erros) == 2
-    assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor não numérico."
-    assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor não numérico."
+    assert erros[0] == f"test_file, linha 3: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' contém um valor não numérico."
+    assert erros[1] == f"test_file, linha 4: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_FILHO}' contém um valor não numérico."
     assert len(df) == 1
 
 def test_dataframe_clean_numeric_values_less_than_with_no_columns():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
     })
     df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', [])
     assert len(erros) == 0
@@ -185,27 +187,27 @@ def test_dataframe_clean_numeric_values_less_than_with_no_columns():
 # values negativos
 def test_dataframe_clean_numeric_values_less_than_with_negative_values():
     df = pd.DataFrame({
-        'codigo_pai': [1, -2, 3],
-        'codigo_filho': [2, 3, -4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, -2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, -4],
     })
-    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', ['codigo_pai', 'codigo_filho'], 0)
+    df, erros = dataframe_clean_numeric_values_less_than(df, 'test_file', [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 0)
     assert len(erros) == 2
-    assert erros[0] == "test_file, linha 3: A coluna 'codigo_pai' contém um valor menor que 0."
-    assert erros[1] == "test_file, linha 4: A coluna 'codigo_filho' contém um valor menor que 0."
+    assert erros[0] == f"test_file, linha 3: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' contém um valor menor que 0."
+    assert erros[1] == f"test_file, linha 4: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_FILHO}' contém um valor menor que 0."
 
 # Function: check_vertical_bar
 def test_check_vertical_bar_with_no_errors():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
     })
     result, erros = check_vertical_bar(df, 'test_file')
     assert result is True
     assert len(erros) == 0
 def test_check_vertical_bar_with_errors():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
         'descricao': ['This is a test.', 'This is another test.', 'Yet another test. |']
     })
     result, erros = check_vertical_bar(df, 'test_file')
@@ -214,8 +216,8 @@ def test_check_vertical_bar_with_errors():
     assert erros[0] == "test_file, linha 4: A coluna 'descricao' não pode conter o caracter '|'."
 def test_check_vertical_bar_with_column_name_error():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
         'desc|ricao': ['This is a test.', 'This is another test.', 'Yet another test.']
     })
     result, erros = check_vertical_bar(df, 'test_file')
@@ -224,8 +226,8 @@ def test_check_vertical_bar_with_column_name_error():
     assert erros[0] == "test_file: O nome da coluna 'desc|ricao' não pode conter o caracter '|'."
 def test_check_vertical_bar_with_no_columns():
     df = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4],
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4],
     })
     result, erros = check_vertical_bar(df, 'test_file')
     assert result is True

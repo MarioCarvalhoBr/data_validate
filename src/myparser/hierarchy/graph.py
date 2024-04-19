@@ -3,17 +3,17 @@ from src.util.utilities import dataframe_clean_numeric_values_less_than
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
-    codigos_descricao = set(descricao['codigo'].astype(str))
-    codigos_pai = set(composicao['codigo_pai'].astype(str))
-    codigos_filho = set(composicao['codigo_filho'].astype(str))
+    codigos_descricao = set(descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
+    codigos_pai = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI].astype(str))
+    codigos_filho = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO].astype(str))
 
     codigos_faltantes = (codigos_pai.union(codigos_filho) - codigos_descricao) - {'0'}
     return codigos_faltantes
 
 def verificar_codigos_ausentes_comp_desc(composicao, descricao):
-    codigos_descricao = set(descricao['codigo'].astype(str))
-    codigos_pai = set(composicao['codigo_pai'].astype(str))
-    codigos_filho = set(composicao['codigo_filho'].astype(str))
+    codigos_descricao = set(descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
+    codigos_pai = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI].astype(str))
+    codigos_filho = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO].astype(str))
 
     codigos_faltantes = (codigos_descricao - codigos_pai.union(codigos_filho)) - {'0'}
     return codigos_faltantes
@@ -45,7 +45,7 @@ def imprimir_grafo(G):
 def montar_grafo(composicao):
     G = nx.DiGraph()
     for _, row in composicao.iterrows():
-        G.add_edge(str(row['codigo_pai']), str(row['codigo_filho']))
+        G.add_edge(str(row[SP_COMPOSITION_COLUMNS.CODIGO_PAI]), str(row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO]))
     return G
 
 def verificar_ciclos(G):
@@ -69,21 +69,21 @@ def verify_graph_sp_description_composition(descricao, composicao):
 
     
     # Verificar se as colunas com código existem
-    if 'codigo_pai' not in composicao.columns or 'codigo_filho' not in composicao.columns:
+    if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in composicao.columns:
         errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada.")
-        return False, errors, warnings
+        return not errors, errors, warnings
     
     # Limpando os dados
-    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, ['codigo_pai'], 0)
-    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, ['codigo_filho'], 1)
+    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
+    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
     
     # Verifica se as colunas com código existem
-    if 'codigo' not in descricao.columns or 'nivel' not in descricao.columns:
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada.")
-        return False, errors, warnings
+        return not errors, errors, warnings
     
     # Limpando os dados
-    descricao, _ = dataframe_clean_numeric_values_less_than(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, ['codigo', 'nivel'], 1)
+    descricao, _ = dataframe_clean_numeric_values_less_than(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
     
     codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
     if codigos_faltantes:

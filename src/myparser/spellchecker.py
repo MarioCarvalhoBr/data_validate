@@ -16,13 +16,13 @@ def find_spelling_errors(text, meu_analizador):
     words = text.split()
     return [word for word in words if not meu_analizador.spell(word.strip())]
 
-def verify_text(column_name, text, meu_analizador, index, sheet_name):
-    errors = verify_sintax_ortography(text, meu_analizador)
+def check_text(column_name, text, meu_analizador, index, sheet_name):
+    errors = check_sintax_ortography(text, meu_analizador)
     if errors:
         return f"{sheet_name}, linha {index + 1}: Palavras com possíveis erros ortográficos na coluna {column_name}: {errors}."
     return ""
 
-def verify_sintax_ortography(text, meu_analizador):
+def check_sintax_ortography(text, meu_analizador):
     preprocessed_text = preprocess_text(text)
     return find_spelling_errors(preprocessed_text, meu_analizador)
 
@@ -34,7 +34,7 @@ def process_sheet(df, columns, meu_analizador, sheet_name):
             # Verifique se o texto está vazio ou nan 
             if pd.isna(text) or text == "":
                 text = ""
-            warning = verify_text(column, text, meu_analizador, index, sheet_name)
+            warning = check_text(column, text, meu_analizador, index, sheet_name)
             if warning:
                 warnings.append(warning)
     return warnings
@@ -52,9 +52,13 @@ def run(df, file_name, columns_sheets, lang_dict_spell):
         # Add extra dic to the main dictionary
         extra_dic = 'dictionaries/extra-words.dic'
         meu_analizador.add_dic(extra_dic)
-
         
-        # Verifica se todas as colunas existem em df
+        missing_columns = set(columns_sheets) - set(df.columns)
+        missing_columns = [str(column) for column in missing_columns]
+        if missing_columns:
+            warnings.append(f"{file_name}: A verificação de ortografia foi abortada para as colunas: {missing_columns}.")
+
+        # Clean columns_sheets that are not in df
         columns_sheets = [column for column in columns_sheets if column in df.columns]
         
         sheet_warnings = process_sheet(df, columns_sheets, meu_analizador, file_name)
