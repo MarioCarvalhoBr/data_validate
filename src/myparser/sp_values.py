@@ -44,7 +44,7 @@ def verify_ids_sp_description_values(df_description, df_values):
     warnings = []
 
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada para a coluna: {SP_DESCRIPTION_COLUMNS.CODIGO}.")
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
         return not errors, errors, warnings
 
     try:
@@ -72,17 +72,17 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
     df_temporal_reference = df_temporal_reference.copy()
 
     # Check if columns exists
-    text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada para a coluna"
+    text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada porque a coluna"
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CODIGO}'.")
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
     elif SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}'.")
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}' está ausente.")
     elif SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
-        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {text_error_column} '{SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO}'.")
+        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {text_error_column} '{SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO}' está ausente.")
     elif SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
-        errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}'.")
+        errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
     elif SP_VALUES_COLUMNS.ID not in df_values.columns:
-        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {text_error_column} '{SP_VALUES_COLUMNS.ID}'.")
+        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {text_error_column} '{SP_VALUES_COLUMNS.ID}' está ausente.")
     
     # Return if errors
     if errors:

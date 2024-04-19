@@ -35,7 +35,7 @@
 [34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
-[31mvalores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada para a coluna 'id'.
+[31mvalores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [33mcenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
 [33mreferencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
@@ -78,5 +78,5 @@
 [31m[1mNúmero de erros: 14
 [33m[1mNúmero de avisos: 31
 [34m[1m
-Tempo total de execução: 3.9 segundos
+Tempo total de execução: 2.2 segundos
 [0m
