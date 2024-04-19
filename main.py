@@ -169,7 +169,7 @@ if __name__ == "__main__":
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 5 - Verifica se a planilha de descrição está correta
         # print("Iniciando a verificação: Planilha de descrição códigos HTML")
-        results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(df_sp_description))])
+        results_tests.append([("Issue #5: " if is_degug else "") +"Códigos HTML nas descrições simples", *(orc.verify_sp_description_parser_html_column_names(df_sp_description, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -224,7 +224,7 @@ if __name__ == "__main__":
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 8 - Verificar campos vazios
         # print("Iniciando a verificação: Campos vazios")
-        results_tests.append([("Issue #75: " if is_degug else "") +"Campos vazios", *(orc.verify_sp_description_empty_strings(df_sp_description))])
+        results_tests.append([("Issue #75: " if is_degug else "") +"Campos vazios", *(orc.verify_sp_description_empty_strings(df_sp_description, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------

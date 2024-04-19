@@ -26,12 +26,12 @@ import pandas as pd
 def test_verify_sp_description_parser_html_column_names_missing_column_default():
     df = pd.DataFrame({'col1': [1, 2], 'col2': [3, 4]})
 
-    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(df)
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(df, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES)
 
-    assert is_correct is False
-    assert len(errors) == 1
-    assert errors[0] == f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Vericação de colunas HTML não realizada."
-    assert len(warnings) == 0
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 1
+    assert warnings[0] == f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada para a coluna '{SP_DESCRIPTION_COLUMNS.DESC_SIMPLES}'."
 
 def test_true_errors_verify_sp_description_cr_lf_gt(): # Teste true
     is_correct, errors, warnings = verify_sp_description_cr_lf(df_sp_description_gt, SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO])
@@ -100,11 +100,11 @@ def test_count_errors_verify_sp_description_titles_length():
     assert len(warnings) == 1
 
 def test_true_verify_sp_description_parser_html_column_names():
-    result_test, __, __ = verify_sp_description_parser_html_column_names(df_sp_description_gt)
+    result_test, __, __ = verify_sp_description_parser_html_column_names(df_sp_description_gt, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES)
     assert result_test is True
 
 def test_count_errors_verify_sp_description_parser_html_column_names():
-    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(df_sp_description_errors_01)
+    is_correct, errors, warnings = verify_sp_description_parser_html_column_names(df_sp_description_errors_01, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 3

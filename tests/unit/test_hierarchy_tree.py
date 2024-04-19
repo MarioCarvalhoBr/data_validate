@@ -2,7 +2,7 @@ import pandas as pd
 
 from src.myparser.hierarchy.tree import verify_tree_sp_description_composition_hierarchy, dfs, criar_arvore
 from src.myparser.hierarchy.tree import verificar_ciclos, verificar_erros_niveis
-
+from src.myparser.structures_files import SP_COMPOSITION_COLUMNS, SP_DESCRIPTION_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_gt, df_sp_composition_gt
@@ -32,24 +32,24 @@ def test_count_errors_verify_tree_sp_composition_hierarchy_errors_01(): # Teste 
 
 def test_criar_arvore_with_no_duplicates():
     composicao = pd.DataFrame({
-        'codigo_pai': [1, 2, 3],
-        'codigo_filho': [2, 3, 4]
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, 4]
     })
     arvore = criar_arvore(composicao)
     assert arvore == {'1': ['2'], '2': ['3'], '3': ['4']}
 
 def test_criar_arvore_with_duplicates():
     composicao = pd.DataFrame({
-        'codigo_pai': [1, 1, 2, 2, 3, 3],
-        'codigo_filho': [2, 2, 3, 3, 4, 4]
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 1, 2, 2, 3, 3],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 2, 3, 3, 4, 4]
     })
     arvore = criar_arvore(composicao)
     assert arvore == {'1': ['2', '2'], '2': ['3', '3'], '3': ['4', '4']}
 
 def test_criar_arvore_with_string_values():
     composicao = pd.DataFrame({
-        'codigo_pai': ['1,000', '2,000', '3,000'],
-        'codigo_filho': ['2,000', '3,000', '4,000']
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1,000', '2,000', '3,000'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2,000', '3,000', '4,000']
     })
     arvore = criar_arvore(composicao)
     assert arvore == {'1000': ['2000'], '2000': ['3000'], '3000': ['4000']}
@@ -112,48 +112,48 @@ def test_verificar_ciclos_with_multiple_branches_and_cycle():
 
 def test_verificar_erros_niveis_with_no_errors():
     composicao = pd.DataFrame({
-        'codigo_pai': ['1000', '2000', '3000'],
-        'codigo_filho': ['2000', '3000', '4000']
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1000', '2000', '3000'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2000', '3000', '4000']
     })
     descricao = pd.DataFrame({
-        'codigo': ['1000', '2000', '3000', '4000'],
-        'nivel': [1, 2, 3, 4]
+        SP_DESCRIPTION_COLUMNS.CODIGO: ['1000', '2000', '3000', '4000'],
+        SP_DESCRIPTION_COLUMNS.NIVEL: [1, 2, 3, 4]
     })
     erros = verificar_erros_niveis(composicao, descricao)
     assert erros == []
 
 def test_verificar_erros_niveis_with_errors():
     composicao = pd.DataFrame({
-        'codigo_pai': ['1000', '2000', '3000'],
-        'codigo_filho': ['2000', '3000', '4000']
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1000', '2000', '3000'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2000', '3000', '4000']
     })
     descricao = pd.DataFrame({
-        'codigo': ['1000', '2000', '3000', '4000'],
-        'nivel': [1, 2, 2, 4]
+        SP_DESCRIPTION_COLUMNS.CODIGO: ['1000', '2000', '3000', '4000'],
+        SP_DESCRIPTION_COLUMNS.NIVEL: [1, 2, 2, 4]
     })
     erros = verificar_erros_niveis(composicao, descricao)
     assert erros == [('2000', '3000')]
 
 def test_verificar_erros_niveis_with_missing_levels():
     composicao = pd.DataFrame({
-        'codigo_pai': ['1000', '2000', '3000'],
-        'codigo_filho': ['2000', '3000', '4000']
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1000', '2000', '3000'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2000', '3000', '4000']
     })
     descricao = pd.DataFrame({
-        'codigo': ['1000', '2000', '4000'],
-        'nivel': [1, 2, 4]
+        SP_DESCRIPTION_COLUMNS.CODIGO: ['1000', '2000', '4000'],
+        SP_DESCRIPTION_COLUMNS.NIVEL: [1, 2, 4]
     })
     erros = verificar_erros_niveis(composicao, descricao)
     assert erros == [(None, '3000'), ('3000', None)]
 
 def test_verificar_erros_niveis_with_major_levels():
     composicao = pd.DataFrame({
-        'codigo_pai': ['1000', '2000', '3000'],
-        'codigo_filho': ['2000', '3000', '4000']
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1000', '2000', '3000'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2000', '3000', '4000']
     })
     descricao = pd.DataFrame({
-        'codigo': ['1000', '2000', '3000', '4000'],
-        'nivel': [1, 2, 77, 88]
+        SP_DESCRIPTION_COLUMNS.CODIGO: ['1000', '2000', '3000', '4000'],
+        SP_DESCRIPTION_COLUMNS.NIVEL: [1, 2, 77, 88]
     })
     erros = verificar_erros_niveis(composicao, descricao)
     assert len(erros) == 0

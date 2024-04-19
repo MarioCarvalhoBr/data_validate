@@ -35,7 +35,7 @@
 [34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
-[31mvalores.xlsx: Verificação de combinação de cenários e referência temporal não realizada.
+[31mvalores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada para a coluna 'id'.
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [33mcenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
 [33mreferencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
@@ -57,6 +57,7 @@
 [33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com cr fim". Encontrado: "Exemplo com CR fim<LF>".
 [33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com lf fim". Encontrado: "Exemplo com LF fim<LF>".
 [34m[1mVerificação: Quebra de linha para descrição
+[33mdescricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
 [33mdescricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
 [33mdescricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
 [33mdescricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
@@ -75,7 +76,7 @@
 
 
 [31m[1mNúmero de erros: 14
-[33m[1mNúmero de avisos: 30
+[33m[1mNúmero de avisos: 31
 [34m[1m
-Tempo total de execução: 1.5 segundos
+Tempo total de execução: 3.9 segundos
 [0m

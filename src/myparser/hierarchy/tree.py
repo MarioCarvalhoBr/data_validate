@@ -36,7 +36,7 @@ def verificar_ciclos(arvore):
 
 def verificar_erros_niveis(composicao, descricao):
     erros = []
-    niveis = {(row['codigo']): row['nivel'] for _, row in descricao.iterrows()}
+    niveis = {(row[SP_DESCRIPTION_COLUMNS.CODIGO]): row[SP_DESCRIPTION_COLUMNS.NIVEL] for _, row in descricao.iterrows()}
     for _, row in composicao.iterrows():
         pai = (row[SP_COMPOSITION_COLUMNS.CODIGO_PAI])
         filho = (row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
@@ -61,7 +61,7 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
     # Verifica se as colunas codigo_pai e codigo_filho existem
     if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in df_composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in df_composicao.columns:
         errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
-        return False, errors, warnings
+        return not errors, errors, warnings
     
     df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
     df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
@@ -69,13 +69,14 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
     # Verifica se a coluna codigo e nivel existem
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df_descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in df_descricao.columns:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
-        return False, errors, warnings
+        return not errors, errors, warnings
     
     df_descricao, _ = dataframe_clean_numeric_values_less_than(df_descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
     
     if not ((df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI] == 0)).any():
         errors.extend([f"{SP_COMPOSITION_COLUMNS.NAME_SP}: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore."])
 
+    # Fix para adicionar a raiz da árvore
     if not ((df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == 0)).any():
         # Adiciona a a linha com codigo=0 e nivel=0																						
         df_descricao = pd.concat([df_descricao, pd.DataFrame([[0,0,0,0,0,0,0,0,0,0,0]], columns=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META])], ignore_index=True)
