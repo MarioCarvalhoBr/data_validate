@@ -19,7 +19,7 @@ def verify_sp_description_parser_html_column_names(df, column):
     errors, warnings = [], []
 
     if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada para a coluna '{column}'.")
+        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada porque a coluna '{column}' está ausente.")
         return not errors, errors, warnings
 
     try:
@@ -38,7 +38,7 @@ def verify_sp_description_titles_length(df):
     
     column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
     if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de 30 caracteres foi abortada para a coluna '{column}'.")
+        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de 30 caracteres foi abortada porque a coluna '{column}' está ausente.")
         return not errors, errors, warnings
 
     try:
@@ -66,7 +66,7 @@ def verify_sp_description_titles_uniques(df):
             
             # Verifica se a coluna existe
             if column not in df.columns:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos foi abortada para a coluna '{column}'.")
+                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos foi abortada porque a coluna '{column}' está ausente.")
                 continue
             
             # Convert to string
@@ -96,7 +96,7 @@ def verify_sp_description_text_capitalize(df):
             for column in [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]:
 
                 if column not in df.columns:
-                    warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de padrões para nomes dos indicadores foi abortada para a coluna '{column}'.")
+                    warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de padrões para nomes dos indicadores foi abortada porque a coluna '{column}' está ausente.")
                     continue
 
                 text = row[column]
@@ -127,7 +127,7 @@ def verify_sp_description_levels(df):
 
     # Verifica se a coluna existe
     if SP_DESCRIPTION_COLUMNS.NIVEL not in df.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de níveis de indicadores foi abortada para a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}'.")
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de níveis de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
         return not errors, errors, warnings
 
     try:
@@ -171,7 +171,7 @@ def verify_sp_description_codes_uniques(df):
     errors, warnings = [], []
 
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos únicos foi abortada para a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}'.")
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos únicos foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
         return not errors, errors, warnings
 
     try:
@@ -193,7 +193,7 @@ def verify_sp_description_empty_strings(df, list_columns=[]):
         for column in list_columns:
             # Verifica se a coluna existe
             if column not in df.columns:
-                errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de campos vazios foi abortada para a coluna '{column}'.")
+                errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de campos vazios foi abortada porque a coluna '{column}' está ausente.")
                 continue
             # Localiza linhas onde a coluna é NaN ou vazia (string vazia)
             empty_mask = df[column].isna() | (df[column] == "")

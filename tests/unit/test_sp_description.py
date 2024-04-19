@@ -31,7 +31,7 @@ def test_verify_sp_description_parser_html_column_names_missing_column_default()
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 1
-    assert warnings[0] == f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada para a coluna '{SP_DESCRIPTION_COLUMNS.DESC_SIMPLES}'."
+    assert warnings[0] == f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.DESC_SIMPLES}' está ausente."
 
 def test_true_errors_verify_sp_description_cr_lf_gt(): # Teste true
     is_correct, errors, warnings = verify_sp_description_cr_lf(df_sp_description_gt, SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO])
