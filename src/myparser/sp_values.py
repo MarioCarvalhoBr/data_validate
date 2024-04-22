@@ -1,18 +1,45 @@
-from src.util.utilities import dataframe_clean_numeric_values_less_than
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
 
-def extract_ids_from_description(df_description):
-    ids = set(df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
-    # Converte em inteiros
-    ids = set(int(id) for id in ids if id.isdigit())
-    return ids
-
 def extract_ids_from_values(df_values):
-    ids = set(df_values.columns.str.split('-').str[0])
-    ids = set(id for id in ids if id.isdigit())
+    valores_ids = df_values.columns.str.split('-').str[0]
+
+    ids_valids = set()
+    ids_invalids = set()
+
+    for valor in valores_ids:
+        is_correct, __ = check_values_integers(valor, 1)
+        if not is_correct:
+            ids_invalids.add(valor)
+        if is_correct:
+            ids_valids.add(valor)
+
+    ids_invalids.discard(SP_VALUES_COLUMNS.ID)
+    ids_invalids.discard(SP_VALUES_COLUMNS.NOME)
+    
     # Converte em inteiros
-    ids = set(int(id) for id in ids)
-    return ids
+    ids_valids = set(int(id) for id in ids_valids)
+
+    return ids_valids, ids_invalids
+
+def extract_ids_from_description(df_description):
+    valores_ids = set(df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
+
+    ids_valids = set()
+    ids_invalids = set()
+
+    for valor in valores_ids:
+        is_correct, __ = check_values_integers(valor, 1)
+        if not is_correct:
+            ids_invalids.add(valor)
+        if is_correct:
+            ids_valids.add(valor)
+    
+    # Converte em inteiros
+    ids_valids = set(int(id) for id in ids_valids)
+
+    
+    return ids_valids, ids_invalids
 
 def compare_ids(id_description, id_values, name_sp_description, name_sp_values):
     errors = []
@@ -49,12 +76,19 @@ def verify_ids_sp_description_values(df_description, df_values):
 
     try:
         # Clean non numeric values
-        df_description, _ = dataframe_clean_numeric_values_less_than(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+        df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
 
-        id_description = extract_ids_from_description(df_description)
-        id_values = extract_ids_from_values(df_values)
+        id_description_valids, __  = extract_ids_from_description(df_description)
+        id_values_valids, id_values_invalids = extract_ids_from_values(df_values)
 
-        errors += compare_ids(id_description, id_values, SP_DESCRIPTION_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
+        # Verifica se há códigos inválidos
+        final_list_invalid_codes = list(id_values_invalids)
+        # Order list
+        final_list_invalid_codes.sort()
+        if id_values_invalids:
+            errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Códigos inválidos: {final_list_invalid_codes}.")
+
+        errors += compare_ids(id_description_valids, id_values_valids, SP_DESCRIPTION_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
 
     except ValueError as e:
         errors.append(str(e))
@@ -89,53 +123,49 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
         return not errors, errors, []
 
     # Clean non numeric values
-    df_description, _ = dataframe_clean_numeric_values_less_than(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
-    df_temporal_reference, _ = dataframe_clean_numeric_values_less_than(df_temporal_reference, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO])
+    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+    df_temporal_reference, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_temporal_reference, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO])
 
-    # Verificar cada indicador em df_description
-    for line, row in df_description.iterrows():
+    try: 
+        # Verificar cada indicador em df_description
+        for line, row in df_description.iterrows():
 
-        # Criar lista de símbolos de cenários
-        lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+            # Criar lista de símbolos de cenários
+            lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
-        # Criar lista de símbolos temporais
-        lista_simbolos_temporais = sorted(df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique().tolist())
-        primeiro_ano = lista_simbolos_temporais[0]
+            # Criar lista de símbolos temporais
+            lista_simbolos_temporais = sorted(df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique().tolist())
+            primeiro_ano = lista_simbolos_temporais[0]
 
-        codigo = str(row[SP_DESCRIPTION_COLUMNS.CODIGO]).replace(',', '')
-        # Replace .0
-        codigo = codigo.replace('.0', '')
+            codigo = str(row[SP_DESCRIPTION_COLUMNS.CODIGO])
+            cenario = row[SP_DESCRIPTION_COLUMNS.CENARIO]
 
-        # Verifica se o código é um número maior que zero
-        if not codigo.isdigit():
-           continue
+            lista_combinacoes = []
+            lista_combinacoes.clear()
+            if cenario == 0:
+                lista_combinacoes.append(f"{codigo}-{primeiro_ano}")
+            elif cenario == 1:
+                lista_combinacoes.append(f"{codigo}-{primeiro_ano}")
+                # Remove first element
+                lista_simbolos_temporais.pop(0)
+                for ano in lista_simbolos_temporais:
+                    for simbolo in lista_simbolos_cenarios:
+                        lista_combinacoes.append(f"{codigo}-{ano}-{simbolo}")
+            
+            # Copia de combinações
+            lista_combinacoes_copia = lista_combinacoes.copy()
+            # Verificar se as combinações estão presentes em df_values
+            for combinacao in lista_combinacoes:
+                if combinacao not in df_values.columns:
+                    errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{combinacao}' é obrigatória.")
 
-        cenario = row['cenario']
-        lista_combinacoes = []
-        lista_combinacoes.clear()
-        if cenario == 0:
-            lista_combinacoes.append(f"{codigo}-{primeiro_ano}")
-        elif cenario == 1:
-            lista_combinacoes.append(f"{codigo}-{primeiro_ano}")
-            # Remove first element
-            lista_simbolos_temporais.pop(0)
-            for ano in lista_simbolos_temporais:
-                for simbolo in lista_simbolos_cenarios:
-                    lista_combinacoes.append(f"{codigo}-{ano}-{simbolo}")
-        
-        # Copia de combinações
-        lista_combinacoes_copia = lista_combinacoes.copy()
-        # Verificar se as combinações estão presentes em df_values
-        for combinacao in lista_combinacoes:
-            if combinacao not in df_values.columns:
-                errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{combinacao}' é obrigatória.")
-
-        # Verifica combinações extras somente para o código X-texto
-        lista_combinacoes_sp_values = [col for col in df_values.columns if col.startswith(f"{codigo}-")]
-        # Verificar se há combinações extras
-        is_error, erros_message = processar_combinacoes_extras(lista_combinacoes_copia, lista_combinacoes_sp_values)
-        if is_error:
-            for erro in erros_message:
-                errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{erro}' é desnecessária.")
-
+            # Verifica combinações extras somente para o código X-texto
+            lista_combinacoes_sp_values = [col for col in df_values.columns if col.startswith(f"{codigo}-")]
+            # Verificar se há combinações extras
+            is_error, erros_message = processar_combinacoes_extras(lista_combinacoes_copia, lista_combinacoes_sp_values)
+            if is_error:
+                for erro in erros_message:
+                    errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: A coluna '{erro}' é desnecessária.")
+    except Exception as e:
+        errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP}, {SP_VALUES_COLUMNS.NAME_SP}, {SP_SCENARIO_COLUMNS.NAME_SP} e {SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {e}.")
     return not errors, errors, []

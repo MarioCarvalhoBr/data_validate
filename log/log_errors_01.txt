@@ -8,18 +8,19 @@
 [37m[1m------ Resultados da verificação dos testes ------
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [34m[1mVerificação: Limpeza dos arquivos
-[31mdescricao.xlsx, linha 12: A coluna 'codigo' contém um valor não numérico.
-[31mdescricao.xlsx, linha 13: A coluna 'codigo' contém um valor menor que 1.
-[31mdescricao.xlsx, linha 5: A coluna 'nivel' contém um valor menor que 1.
-[31mdescricao.xlsx, linha 12: A coluna 'nivel' contém um valor não numérico.
-[31mcomposicao.xlsx, linha 14: A coluna 'codigo_pai' contém um valor menor que 0.
-[31mcomposicao.xlsx, linha 16: A coluna 'codigo_pai' contém um valor não numérico.
-[31mcomposicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor menor que 1.
-[31mcomposicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor menor que 1.
-[31mcomposicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor não numérico.
-[31mreferencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor não numérico.
+[31mdescricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.
+[31mdescricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.
+[31mdescricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor '3.1' não é um número inteiro.
+[31mdescricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.
+[31mdescricao.xlsx, linha 12: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.
+[31mcomposicao.xlsx, linha 14: A coluna 'codigo_pai' contém um valor inválido: O valor '-88' é menor que 0.
+[31mcomposicao.xlsx, linha 16: A coluna 'codigo_pai' contém um valor inválido: O valor 'MSDOS' não é um número.
+[31mcomposicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor inválido: O valor '0' é menor que 1.
+[31mcomposicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor inválido: O valor '-89' é menor que 1.
+[31mcomposicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor inválido: O valor 'GNU' não é um número.
+[31mreferencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor inválido: O valor '2050B' não é um número.
 [34m[1mVerificação: Relações entre indicadores
-[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5002, 5010, 5022, 5033].
+[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5001, 5002, 5010, 5022, 5033].
 [31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 [31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 [31mcomposicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
@@ -28,7 +29,6 @@
 [34m[1mVerificação: Hierarquia como árvore
 [31mcomposicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.
 [31mcomposicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].
-[31mcomposicao.xlsx, linha 8: O indicador 5001 (nível 3) não pode ser pai do indicador 5000 (nível 2).
 [34m[1mVerificação: Níveis de indicadores
 [31mdescricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
 [31mdescricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0.
@@ -96,5 +96,5 @@
 [31m[1mNúmero de erros: 30
 [33m[1mNúmero de avisos: 34
 [34m[1m
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 2.6 segundos
 [0m

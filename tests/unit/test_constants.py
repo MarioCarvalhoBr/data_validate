@@ -9,6 +9,7 @@ path_input_data_ground_truth = "input_data/data_ground_truth"
 path_input_data_errors_01 = "input_data/data_errors_01"
 path_input_data_errors_02 = "input_data/data_errors_02"
 path_input_data_errors_03 = "input_data/data_errors_03"
+path_input_data_errors_04 = "input_data/data_errors_04"
 
 # 1. DATA FRAMES - GROUND TRUTH: path_input_data_ground_truth
 df_sp_scenario_gt = read_excel_file(os.path.join(path_input_data_ground_truth, SP_SCENARIO_COLUMNS.NAME_SP))
@@ -41,3 +42,11 @@ df_sp_description_errors_03 = read_excel_file(os.path.join(path_input_data_error
 df_sp_composition_errors_03 = read_excel_file(os.path.join(path_input_data_errors_03, SP_COMPOSITION_COLUMNS.NAME_SP))
 df_sp_values_errors_03 = read_excel_file(os.path.join(path_input_data_errors_03, SP_VALUES_COLUMNS.NAME_SP))
 df_sp_proportionalities_errors_03 = read_excel_file(os.path.join(path_input_data_errors_03, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+
+# 5. DATA FRAMES - ERROS 04: path_input_data_errors_04
+df_sp_scenario_errors_04 = read_excel_file(os.path.join(path_input_data_errors_04, SP_SCENARIO_COLUMNS.NAME_SP))
+df_sp_temporal_reference_errors_04 = read_excel_file(os.path.join(path_input_data_errors_04, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+df_sp_description_errors_04 = read_excel_file(os.path.join(path_input_data_errors_04, SP_DESCRIPTION_COLUMNS.NAME_SP))
+df_sp_composition_errors_04 = read_excel_file(os.path.join(path_input_data_errors_04, SP_COMPOSITION_COLUMNS.NAME_SP))
+df_sp_values_errors_04 = read_excel_file(os.path.join(path_input_data_errors_04, SP_VALUES_COLUMNS.NAME_SP))
+df_sp_proportionalities_errors_04 = read_excel_file(os.path.join(path_input_data_errors_04, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))

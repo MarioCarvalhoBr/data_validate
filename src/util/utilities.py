@@ -1,5 +1,6 @@
 import os
 import pandas as pd
+import math
 
 def check_column_names(df, expected_columns):
     missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -46,37 +47,44 @@ def check_unique_values(df, name_file, columns_uniques):
             warnings.append(f"{name_file}: A coluna '{column}' não deve conter valores repetidos.")
     return not warnings, warnings
 
-def dataframe_clean_numeric_values_less_than(df, name_file, colunas_limpar, value=0):
+def check_values_integers(number, min_value=0):
+    try:
+        if math.isnan(float(number)):
+            return False, f"O valor '{number}' não é um número."
+        else:
+            if float(number) != int(float(number)):
+                return False, f"O valor '{number}' não é um número inteiro."
+            
+            # Verifica se o número é menor que value
+            if int(number) < min_value:
+                return False, f"O valor '{number}' é menor que {min_value}."
+                        
+            return True, ""
+
+    except Exception:
+        return False, f"O valor '{number}' não é um número."
+
+def clean_non_numeric_and_less_than_value_integers_dataframe(df, name_file, colunas_limpar, min_value=0):
+    df = df.copy()
     erros = []
 
     for coluna in colunas_limpar:
-        # Converte a coluna para numérico, forçando não numéricos a NaN
-        df[coluna] = pd.to_numeric(df[coluna], errors='coerce')
+        for cell in df[coluna].copy():
+            # Replace , to .
+            if isinstance(cell, str):
+                cell = cell.replace(',', '.')
+            is_correct, msg = check_values_integers(cell, min_value)
+            if not is_correct:
+                # Linha
+                linha = df[df[coluna] == cell].index[0]
+                erros.append(f"{name_file}, linha {linha + 2}: A coluna '{coluna}' contém um valor inválido: {msg}")
+                # Elimina a linha do dataframe
+                df = df[df[coluna] != cell]
 
-        # Encontra linhas com valores não numéricos ou menores que value (zero)
-        linhas_invalidas = df[(df[coluna].isnull()) | (df[coluna] < value)]
-
-        # Registra erros para valores não numéricos ou menores que zero
-        for linha_invalida in linhas_invalidas.index:
-            valor = df.at[linha_invalida, coluna]
-            if pd.isnull(valor):
-                erros.append(f"{name_file}, linha {linha_invalida + 2}: A coluna '{coluna}' contém um valor não numérico.")
-            elif valor < value:
-                erros.append(f"{name_file}, linha {linha_invalida + 2}: A coluna '{coluna}' contém um valor menor que {value}.")
-
-    for coluna in colunas_limpar:
-        # Converte a coluna para numérico, forçando não numéricos a NaN
-        df[coluna] = pd.to_numeric(df[coluna], errors='coerce')
-
-        # Encontra linhas com valores não numéricos ou menores que zero
-        linhas_invalidas = df[(df[coluna].isnull()) | (df[coluna] < value)]
-
-        # Elimina linhas com valores não numéricos ou menores que zero
-        df = df.drop(linhas_invalidas.index)
-
-        # Muda as colunas para inteiros
-        df[coluna] = df[coluna].astype(int)
-
+        # Converte a coluna para inteiro
+        if not df[coluna].empty:
+            df[coluna] = df[coluna].astype(int)
+    
     return df, erros
 
 def file_extension_check(path, extension='.xlsx'):

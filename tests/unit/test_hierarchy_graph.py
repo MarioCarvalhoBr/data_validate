@@ -5,31 +5,41 @@ from src.myparser.hierarchy.graph import verificar_grafos_desconectados
 from src.myparser.hierarchy.graph import imprimir_grafo
 from src.myparser.hierarchy.graph import verify_graph_sp_description_composition
 
-
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_gt, df_sp_composition_gt
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
 
-# DATA FRAMES - ERROS 02
-
-# DATA FRAMES - ERROS 03
+# DATA FRAMES - ERROS 04
+from tests.unit.test_constants import df_sp_description_errors_04, df_sp_composition_errors_04
 
 def test_true_verify_graph_sp_description_composition_gt():
-    result_test,__,__ = verify_graph_sp_description_composition(df_sp_description_gt, df_sp_composition_gt)
-    assert result_test is True
-
-def test_false_verify_graph_sp_description_composition_errors_01(): # Teste False
-    result_test,__,__ = verify_graph_sp_description_composition(df_sp_description_errors_01, df_sp_composition_errors_01)
-    assert result_test is False
-
-def test_count_errors_verify_graph_sp_description_composition_errors_01(): # Teste False
-    __, errors, warnings = verify_graph_sp_description_composition(df_sp_description_errors_01, df_sp_composition_errors_01)
-    # Numero de erros esperado == 4
-    assert len(errors) == 4
-    # Numero de warnings esperado == 0
+    is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_gt, df_sp_composition_gt)
+    assert is_correct is True
+    assert len(errors) == 0
     assert len(warnings) == 0
+
+def test_count_errors_verify_graph_sp_description_composition_errors_01():
+    is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_errors_01, df_sp_composition_errors_01)
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert errors[0] == "descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5001, 5002, 5010, 5022, 5033]."
+    assert errors[1] == "composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005]."
+    assert errors[2] == "composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000]."
+    assert errors[3] == "composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010]."
+
+def test_count_errors_verify_graph_sp_description_composition_errors_04():
+    is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_errors_04, df_sp_composition_errors_04)
+    assert is_correct is False
+    assert len(errors) == 3
+    assert len(warnings) == 0
+
+    assert errors[0] == "descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001]."
+    assert errors[1] == "composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002]."
+    assert errors[2] == "composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007]."
     
 def test_imprimir_grafo_with_no_edges():
     G = nx.DiGraph()

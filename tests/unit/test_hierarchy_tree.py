@@ -10,25 +10,18 @@ from tests.unit.test_constants import df_sp_description_gt, df_sp_composition_gt
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
 
-# DATA FRAMES - ERROS 02
-
-# DATA FRAMES - ERROS 03
-    
-
-def test_true_verify_tree_sp_composition_hierarchy_gt(): # Teste True
-    result_test,__,__ = verify_tree_sp_description_composition_hierarchy(df_sp_composition_gt, df_sp_description_gt)
-    assert result_test is True
-    
-def test_false_verify_tree_sp_composition_hierarchy_errors_01(): # Teste False
-    result_test,__,__ = verify_tree_sp_description_composition_hierarchy(df_sp_composition_errors_01, df_sp_description_errors_01)
-    assert result_test is False
-
-def test_count_errors_verify_tree_sp_composition_hierarchy_errors_01(): # Teste False
-    __, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_errors_01, df_sp_description_errors_01)
-    # Numero de erros esperado == 3
-    assert len(errors) == 3
-    # Numero de warnings esperado == 0
+def test_true_verify_tree_sp_composition_hierarchy_gt():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_gt, df_sp_description_gt)
+    assert is_correct is True
+    assert len(errors) == 0
     assert len(warnings) == 0
+
+def test_count_errors_verify_tree_sp_composition_hierarchy_errors_01():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_errors_01, df_sp_description_errors_01)
+    assert is_correct is False
+    assert len(errors) == 2
+    assert len(warnings) == 0
+    assert errors == ["composicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.", 'composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].']
 
 def test_criar_arvore_with_no_duplicates():
     composicao = pd.DataFrame({
@@ -48,8 +41,8 @@ def test_criar_arvore_with_duplicates():
 
 def test_criar_arvore_with_string_values():
     composicao = pd.DataFrame({
-        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1,000', '2,000', '3,000'],
-        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2,000', '3,000', '4,000']
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: ['1000', '2000', '3000'],
+        SP_COMPOSITION_COLUMNS.CODIGO_FILHO: ['2000', '3000', '4000']
     })
     arvore = criar_arvore(composicao)
     assert arvore == {'1000': ['2000'], '2000': ['3000'], '3000': ['4000']}

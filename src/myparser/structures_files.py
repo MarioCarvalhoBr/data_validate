@@ -1,7 +1,7 @@
 import os
 from enum import StrEnum
 
-from src.util.utilities import dataframe_clean_numeric_values_less_than, check_vertical_bar
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
 
 class SP_DESCRIPTION_COLUMNS (StrEnum):
@@ -61,13 +61,14 @@ STRUCTURE_FILES_COLUMNS_DICT = {
 }
 
 STRUCTURE_FILES_TO_CLEAN_LIST = [
-    [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1],
+    [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1], # CORRIGIR para 0.x
     [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NIVEL], 1],
     [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CENARIO], -1],
+    
     [SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0],
     [SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1],
+    
     [SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO], 0]
-
 ]
 
 def verify_structure_exepected_files_main_path(path_folder):
@@ -96,29 +97,7 @@ def verify_structure_files_dataframe(df, file_name, expected_columns):
     if df.empty:
         errors.append(f"{file_name}: O arquivo esperado está vazio.")
         return not errors, errors, warnings
-        
-    # Check if there is a vertical bar in the column name
-    __, errors_vertical_bar = check_vertical_bar(df, file_name)
-    errors.extend(errors_vertical_bar)
-    
-    # Fixing the header row of SP_PROPORTIONALITIES_COLUMNS.NAME_SP
-    if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
-        header_row = df.iloc[0]
-        df.columns = header_row
-        df = df[1:].reset_index(drop=True)
-
-    # Check missing columns expected columns and extra columns
-    missing_columns, extra_columns = check_column_names(df, expected_columns)
-    col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
-
-    if file_name == SP_VALUES_COLUMNS.NAME_SP:
-        errors.extend(col_errors)
-    elif file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
-        errors.extend(col_errors)
-    else:
-        errors.extend(col_errors)
-        warnings.extend(col_warnings)   
-    '''try:
+    try:
         # Check if there is a vertical bar in the column name
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)
         errors.extend(errors_vertical_bar)
@@ -141,7 +120,7 @@ def verify_structure_files_dataframe(df, file_name, expected_columns):
             errors.extend(col_errors)
             warnings.extend(col_warnings)
     except Exception as e:
-        errors.append(f"{file_name}: Erro ao processar a verificação de estrutura do arquivo: {e}.")'''
+        errors.append(f"{file_name}: Erro ao processar a verificação de estrutura do arquivo: {e}.")
 
     return not errors, errors, warnings
       
@@ -157,7 +136,7 @@ def verify_files_data_clean(df, file_name, columns_to_clean, value):
     columns_to_clean = [column for column in columns_to_clean if column in df.columns]
 
     try:        
-        _, errors_data = dataframe_clean_numeric_values_less_than(df, file_name, columns_to_clean, value)
+        _, errors_data = clean_non_numeric_and_less_than_value_integers_dataframe(df, file_name, columns_to_clean, value)
         if errors_data:
             errors.extend(errors_data)
                 
