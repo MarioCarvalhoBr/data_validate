@@ -1,0 +1,51 @@
+
+
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_04/
+
+
+
+
+[37m[1m------ Resultados da verificação dos testes ------
+[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
+[34m[1mVerificação: Limpeza dos arquivos
+[31mdescricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
+[31mdescricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
+[31mdescricao.xlsx, linha 2: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.
+[31mdescricao.xlsx, linha 3: A coluna 'nivel' contém um valor inválido: O valor '2.77' não é um número inteiro.
+[31mdescricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'XX3' não é um número.
+[31mcomposicao.xlsx, linha 5: A coluna 'codigo_pai' contém um valor inválido: O valor '5000.7875' não é um número inteiro.
+[31mcomposicao.xlsx, linha 7: A coluna 'codigo_pai' contém um valor inválido: O valor '5001.88' não é um número inteiro.
+[34m[1mVerificação: Relações entre indicadores
+[31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].
+[31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].
+[31mcomposicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].
+[31mvalores.xlsx: Códigos inválidos: ['5000.954', '5001,9483'].
+[31mvalores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].
+[34m[1mVerificação: Hierarquia como árvore
+[34m[1mVerificação: Níveis de indicadores
+[31mdescricao.xlsx, linha 2: Nível do indicador não é um número inteiro maior que 0.
+[31mdescricao.xlsx, linha 3: Nível do indicador não é um número inteiro maior que 0.
+[31mdescricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
+[34m[1mVerificação: Unicidade dos códigos
+[34m[1mVerificação: Códigos HTML nas descrições simples
+[34m[1mVerificação: Ortografia
+[34m[1mVerificação: Títulos únicos
+[34m[1mVerificação: Campos vazios
+[34m[1mVerificação: Padrão para nomes dos indicadores
+[34m[1mVerificação: Títulos com mais de 30 caracteres
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
+[34m[1mVerificação: Relações de valores únicos em cenários
+[34m[1mVerificação: Relações de valores únicos em referência temporal
+[34m[1mVerificação: Relações de combinações de valores
+[34m[1mVerificação: Quebra de linha para descrição
+[34m[1mVerificação: Quebra de linha para cenários
+[34m[1mVerificação: Quebra de linha para referência temporal
+
+
+[31m[1mNúmero de erros: 15
+[37m[1mNúmero de avisos: 0
+[34m[1m
+Tempo total de execução: 2.4 segundos
+[0m

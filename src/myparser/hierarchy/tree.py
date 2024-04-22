@@ -1,12 +1,12 @@
-from src.util.utilities import dataframe_clean_numeric_values_less_than
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS 
 
 import pandas as pd
 def criar_arvore(composicao):
     arvore = {}
     for _, row in composicao.iterrows():
-        pai = str(row[SP_COMPOSITION_COLUMNS.CODIGO_PAI]).replace(',', '')
-        filho = str(row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO]).replace(',', '')
+        pai = str(row[SP_COMPOSITION_COLUMNS.CODIGO_PAI])
+        filho = str(row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
         if pai not in arvore:
             arvore[pai] = []
         arvore[pai].append(filho)
@@ -63,15 +63,15 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
         errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
         return not errors, errors, warnings
     
-    df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
-    df_composicao, _ = dataframe_clean_numeric_values_less_than(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
+    df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
+    df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
     
     # Verifica se a coluna codigo e nivel existem
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df_descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in df_descricao.columns:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
         return not errors, errors, warnings
     
-    df_descricao, _ = dataframe_clean_numeric_values_less_than(df_descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
+    df_descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
     
     if not ((df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI] == 0)).any():
         errors.extend([f"{SP_COMPOSITION_COLUMNS.NAME_SP}: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore."])
@@ -84,7 +84,6 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
     arvore = criar_arvore(df_composicao)
     ciclo_encontrado, ciclo = verificar_ciclos(arvore)
     if ciclo_encontrado:
-        # print(f"Ciclo encontrado: {' -> '.join(ciclo)}")
         errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Ciclo encontrado: [{' -> '.join(ciclo)}].")
     
     erros_niveis = verificar_erros_niveis(df_composicao, df_descricao)

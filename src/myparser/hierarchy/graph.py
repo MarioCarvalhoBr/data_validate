@@ -1,5 +1,5 @@
 import networkx as nx
-from src.util.utilities import dataframe_clean_numeric_values_less_than
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS
 
 def verificar_codigos_ausentes_desc_comp(descricao, composicao):
@@ -74,8 +74,8 @@ def verify_graph_sp_description_composition(descricao, composicao):
         return not errors, errors, warnings
     
     # Limpando os dados
-    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
-    composicao, _ = dataframe_clean_numeric_values_less_than(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
+    composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
+    composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
     
     # Verifica se as colunas com código existem
     if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
@@ -83,7 +83,7 @@ def verify_graph_sp_description_composition(descricao, composicao):
         return not errors, errors, warnings
     
     # Limpando os dados
-    descricao, _ = dataframe_clean_numeric_values_less_than(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
+    descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
     
     codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
     if codigos_faltantes:

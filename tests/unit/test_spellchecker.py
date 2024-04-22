@@ -15,7 +15,7 @@ from tests.unit.test_constants import df_sp_scenario_errors_02, df_sp_temporal_r
 # DATA FRAMES - ERROS 03
 from tests.unit.test_constants import df_sp_scenario_errors_03, df_sp_temporal_reference_errors_03, df_sp_description_errors_03
     
-def test_true_verify_spelling_text_pt_BR_gt(): # Teste true
+def test_true_verify_spelling_text_pt_BR_gt():
     lang_dict_spell = "pt_BR"
     
     is_all_correct = True
@@ -45,7 +45,7 @@ def test_true_verify_spelling_text_pt_BR_gt(): # Teste true
     assert len(all_warnings) == 0
     assert len(all_errors) == 0
 
-def test_count_errors_verify_spelling_text_pt_BR_errors_1(): # Teste count errors
+def test_count_errors_verify_spelling_text_pt_BR_data_errors_01():
     lang_dict_spell = "pt_BR"
     
     is_all_correct = True
@@ -88,7 +88,7 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_1(): # Teste count error
     assert all_warnings[10] == "cenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta']."
     assert all_warnings[11] == "referencia_temporal.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda']."
 
-def test_count_errors_verify_spelling_text_pt_BR_errors_2(): # Teste count errors
+def test_count_errors_verify_spelling_text_pt_BR_data_errors_02():
     lang_dict_spell = "pt_BR"
     
     is_all_correct = True
@@ -123,7 +123,7 @@ def test_count_errors_verify_spelling_text_pt_BR_errors_2(): # Teste count error
     assert all_warnings[3] == "descricao.xlsx, linha 6: Palavras com possíveis erros ortográficos na coluna nome_simples: ['LF']."
     assert all_warnings[4] == "descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."
 
-def test_count_errors_verify_spelling_text_pt_BR_errors_3(): # Teste count errors
+def test_count_errors_verify_spelling_text_pt_BR_data_errors_03():
     lang_dict_spell = "pt_BR"
     
     is_all_correct = True

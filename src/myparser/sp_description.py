@@ -2,8 +2,8 @@ import re
 
 import pandas as pd
 from src.myparser.text_processor import capitalize_text
-from src.util.utilities import dataframe_clean_numeric_values_less_than
-from src.util.utilities import check_punctuation
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
+from src.util.utilities import check_punctuation, check_values_integers
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS 
 
 def check_html_in_descriptions(df, column):
@@ -129,12 +129,15 @@ def verify_sp_description_levels(df):
     if SP_DESCRIPTION_COLUMNS.NIVEL not in df.columns:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de níveis de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
         return not errors, errors, warnings
-
+    
     try:
         for index, row in df.iterrows():
-            dig = str(row[SP_DESCRIPTION_COLUMNS.NIVEL])
-            dig = dig.replace('.0', '')
-            if not dig.isdigit() or int(row[SP_DESCRIPTION_COLUMNS.NIVEL]) < 1:
+            dig = row[SP_DESCRIPTION_COLUMNS.NIVEL]
+            is_correct, msg = check_values_integers(dig, 1)
+            if not is_correct:
+                errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
+                continue
+            if dig < 1:
                 errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
@@ -175,7 +178,7 @@ def verify_sp_description_codes_uniques(df):
         return not errors, errors, warnings
 
     try:
-        df, _ = dataframe_clean_numeric_values_less_than(df, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1)
+        df, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1)
         
         duplicated = df[SP_DESCRIPTION_COLUMNS.CODIGO].duplicated().any()
         if duplicated:
