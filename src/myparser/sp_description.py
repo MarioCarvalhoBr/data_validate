@@ -1,7 +1,7 @@
 import re
 
 import pandas as pd
-from src.myparser.text_processor import capitalize_text
+from src.myparser.text_processor import capitalize_text_keep_acronyms
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation, check_values_integers
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
@@ -112,7 +112,7 @@ def verify_sp_description_text_capitalize(df):
                 original_text = text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
                 
                 expected_corect_text = text.replace('\x0D', '').replace('\x0A', '').strip()
-                expected_corect_text = capitalize_text(expected_corect_text)
+                expected_corect_text = capitalize_text_keep_acronyms(expected_corect_text)
 
                 if not original_text == expected_corect_text:
                     warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")

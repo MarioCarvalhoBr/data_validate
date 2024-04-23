@@ -113,6 +113,15 @@ def test_count_errors_verify_sp_description_text_capitalize_data_errors_01():
     assert len(warnings) == 9
     assert len(errors) == 0
 
+def test_count_errors_verify_sp_description_text_capitalize_data_errors_04():
+    is_correct, errors, warnings = verify_sp_description_text_capitalize(df_sp_description_errors_04)
+    assert is_correct is True
+    assert len(warnings) == 2
+    assert len(errors) == 0
+
+    assert warnings[0] == 'descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".'
+    assert warnings[1] == 'descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".'
+
 # Testes: verify_sp_description_levels
 def test_true_verify_sp_description_levels_data_errors_01():
     is_correct, errors, warnings = verify_sp_description_levels(df_sp_description_gt)

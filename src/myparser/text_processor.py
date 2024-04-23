@@ -16,11 +16,26 @@ def capitalize_nouns_keep_articles_prepositions(text):
         
     return text
 
-# Capitalize the first letter of the text
-def capitalize_text(text):
-    new_text = text.capitalize()
-    return new_text
-
 # Check if the text is an acronym
 def is_acronym(text):
     return text.isupper() and len(text) > 1
+
+# Capitalize the first letter of the text
+def capitalize_text(text):
+    return text.capitalize().strip()
+
+def capitalize_text_keep_acronyms(text):
+    words = text.split()  # Divide o texto em palavras
+    capitalized_words = []
+
+    for i, word in enumerate(words):
+        # Verifica se a palavra é um acrônimo
+        if is_acronym(word):
+            capitalized_words.append(word)  # Mantém o acrônimo como está
+        elif i == 0:
+            capitalized_words.append(word.capitalize())  # Capitaliza a primeira palavra da frase
+        else:
+            capitalized_words.append(word.lower())  # As demais palavras são mantidas em minúsculas
+
+    # Junta as palavras capitalizadas de volta em uma string
+    return ' '.join(capitalized_words)
