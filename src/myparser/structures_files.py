@@ -113,6 +113,14 @@ def verify_structure_files_dataframe(df, file_name, expected_columns):
             header_row = df.iloc[0]
             df.columns = header_row
             df = df[1:].reset_index(drop=True)
+
+        # Verifica se há colunas sem nome
+        for i, col in enumerate(df.columns):
+            col = str(col).strip().lower()
+            if col.startswith("unnamed") or col.startswith("Unnamed"):
+                # Formatar mensagem de erro
+                errors.append(f"{file_name}: Coluna número {i+1} não possui nome mas possui valores.")
+                
     
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(df, expected_columns)

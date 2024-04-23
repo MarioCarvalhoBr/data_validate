@@ -131,6 +131,46 @@ def test_errors_verify_structure_files_dataframe_errors_03():
     assert all_warnings_structure_files[3] == "descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação."
     assert all_warnings_structure_files[4] == "composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação."
 
+def test_errors_verify_structure_files_dataframe_errors_04():
+    
+    # Dicionário com os dataframes
+    data_df = {
+        SP_SCENARIO_COLUMNS.NAME_SP: df_sp_scenario_errors_04,
+        SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: df_sp_temporal_reference_errors_04,
+
+        SP_DESCRIPTION_COLUMNS.NAME_SP: df_sp_description_errors_04,
+        
+        SP_COMPOSITION_COLUMNS.NAME_SP: df_sp_composition_errors_04,
+        SP_VALUES_COLUMNS.NAME_SP: df_sp_values_errors_04,
+        SP_PROPORTIONALITIES_COLUMNS.NAME_SP: df_sp_proportionalities_errors_04,
+    }
+
+    all_correct_structure_files = True
+    all_errors_structure_files = []
+    all_warnings_structure_files = []
+
+    # Verifica a estrutura de cada arquivo
+    for file_name, df in data_df.items():
+        is_correct, errors, warnings = verify_structure_files_dataframe(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name])
+        all_correct_structure_files = all_correct_structure_files and is_correct
+        all_errors_structure_files.extend(errors)
+        all_warnings_structure_files.extend(warnings)
+
+    assert all_correct_structure_files is False
+
+    # Numero de erros esperado == 2
+    assert len(all_errors_structure_files) == 2
+    # Numero de warnings esperado == 1
+    assert len(all_warnings_structure_files) == 1
+
+    # Verifica se os erros são o esperado
+    assert all_errors_structure_files[0] == "composicao.xlsx: Coluna número 3 não possui nome mas possui valores."
+    assert all_errors_structure_files[1] == "valores.xlsx: Coluna número 20 não possui nome mas possui valores."
+
+    # Verifica se os warnings são o esperado
+    print(all_warnings_structure_files)
+    assert all_warnings_structure_files[0] == "composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação."
+
 # Testes: verify_structure_exepected_files_main_path
 def test_count_errors_verify_structure_exepected_files_main_path_data_errors_02():
     is_correct, errors, warnings = verify_structure_exepected_files_main_path(path_input_data_errors_02)

@@ -28,7 +28,7 @@ def test_count_errors_verify_ids_sp_description_values_data_errors_04():
     assert len(errors) == 2
     assert len(warnings) == 0
 
-    assert errors[0] == "valores.xlsx: Códigos inválidos: ['5000.954', '5001,9483']."
+    assert errors[0] == "valores.xlsx: Códigos inválidos: ['5000.954', '5001,9483', 'Unnamed: 19']."
     assert errors[1] == "valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000]."
 
 # Testes: verify_combination_sp_description_values_scenario_temporal_reference
