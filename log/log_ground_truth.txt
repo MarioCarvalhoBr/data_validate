@@ -17,7 +17,7 @@
 [34m[1mVerificação: Títulos únicos
 [34m[1mVerificação: Campos vazios
 [34m[1mVerificação: Padrão para nomes dos indicadores
-[34m[1mVerificação: Títulos com mais de 30 caracteres
+[34m[1mVerificação: Títulos com mais de 40 caracteres
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
@@ -32,5 +32,5 @@
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 2.5 segundos
 [0m

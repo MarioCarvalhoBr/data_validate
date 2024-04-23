@@ -8,8 +8,7 @@ import os
 
 import src.orchestrator as orc
 from src.util.utilities import check_file_exists, check_folder_exists, read_excel_file
-from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT
-from src.myparser.structures_files import STRUCTURE_FILES_TO_CLEAN_LIST
+from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FILES_TO_CLEAN_LIST, SP_DESCRIPTION_MAX_TITLE_LENGTH
 from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
 
 
@@ -27,7 +26,7 @@ if __name__ == "__main__":
     parser.add_argument("--debug", action="store_true", help="Executa o programa em modo debug.")
 
     # --no-warning-titles-length
-    parser.add_argument("--no-warning-titles-length", action="store_true", help="Desabilita o aviso para nomes e títulos com mais de 30 caracteres.")
+    parser.add_argument("--no-warning-titles-length", action="store_true", help=f"Desabilita o aviso para nomes e títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres.")
     
     args = parser.parse_args()
 
@@ -234,9 +233,9 @@ if __name__ == "__main__":
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
-        # 9 - Títulos com mais de 30 caracteres
-        # print("Iniciando a verificação: Títulos com mais de 30 caracteres")
-        results_tests.append([("Issue #39: " if is_degug else "") +"Títulos com mais de 30 caracteres", *(orc.verify_sp_description_titles_length(df_sp_description))])
+        # 9 - Títulos com mais de SP_DESCRIPTION_MAX_TITLE_LENGTH caracteres
+        # print("Iniciando a verificação: Títulos com mais de SP_DESCRIPTION_MAX_TITLE_LENGTH caracteres")
+        results_tests.append([("Issue #39: " if is_degug else "") +f"Títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres", *(orc.verify_sp_description_titles_length(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------

@@ -4,7 +4,7 @@ import pandas as pd
 from src.myparser.text_processor import capitalize_text
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation, check_values_integers
-from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS 
+from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
 
 def check_html_in_descriptions(df, column):
     df = df.copy()
@@ -38,7 +38,7 @@ def verify_sp_description_titles_length(df):
     
     column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
     if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de 30 caracteres foi abortada porque a coluna '{column}' está ausente.")
+        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
         return not errors, errors, warnings
 
     try:
@@ -50,8 +50,8 @@ def verify_sp_description_titles_length(df):
             if pd.isna(text) or text == "":
                 continue
                 
-            if len(text) > 30:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até 30 caracteres. Encontrado: {len(row[column])} caracteres.")
+            if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH:
+                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
