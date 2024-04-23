@@ -57,10 +57,8 @@
 [33mdescricao.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].
 [33mdescricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].
 [33mdescricao.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].
-[33mdescricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['MCTI', 'SPEI'].
 [33mdescricao.xlsx, linha 10: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
 [33mdescricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
-[33mdescricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna desc_completa: ['MCTI', 'SPEI'].
 [33mcenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
 [33mcenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
 [33mcenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
@@ -94,7 +92,7 @@
 
 
 [31m[1mNúmero de erros: 30
-[33m[1mNúmero de avisos: 34
+[33m[1mNúmero de avisos: 32
 [34m[1m
-Tempo total de execução: 2.6 segundos
+Tempo total de execução: 3.0 segundos
 [0m
