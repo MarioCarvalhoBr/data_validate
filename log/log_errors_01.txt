@@ -79,8 +79,8 @@
 [33mdescricao.xlsx, linha 5: Nome completo fora do padrão. Esperado: "Índice de ameaça climática". Encontrado: "Índice de Ameaça Climática".
 [33mdescricao.xlsx, linha 6: Nome completo fora do padrão. Esperado: "Índice de sensibilidade". Encontrado: "Índice de Sensibilidade".
 [33mdescricao.xlsx, linha 7: Nome completo fora do padrão. Esperado: "Índice de capacidade adaptativa". Encontrado: "Índice de Capacidade Adaptativa".
-[34m[1mVerificação: Títulos com mais de 30 caracteres
-[33mdescricao.xlsx, linha 9: Nome simples fora do padrão. Esperado: Até 30 caracteres. Encontrado: 43 caracteres.
+[34m[1mVerificação: Títulos com mais de 40 caracteres
+[33mdescricao.xlsx, linha 9: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres.
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
 [33mdescricao.xlsx, linha 2: A coluna 'nome_simples' não deve terminar com pontuação.
 [33mdescricao.xlsx, linha 2: A coluna 'desc_completa' deve terminar com ponto.

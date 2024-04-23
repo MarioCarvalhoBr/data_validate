@@ -62,6 +62,8 @@ def test_count_verify_sp_description_titles_length_in_data_errors_01():
     assert len(errors) == 0
     assert len(warnings) == 1
 
+    assert warnings[0] == "descricao.xlsx, linha 9: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres."
+
 # Testes: verify_sp_description_parser_html_column_names
 def test_true_verify_sp_description_parser_html_column_names_gt():
     is_correct, errors, warnings = verify_sp_description_parser_html_column_names(df_sp_description_gt, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES)

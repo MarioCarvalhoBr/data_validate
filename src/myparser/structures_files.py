@@ -4,7 +4,11 @@ from enum import StrEnum
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
 
+# CONSTANTS
+SP_DESCRIPTION_MAX_TITLE_LENGTH = 40
+
 class SP_DESCRIPTION_COLUMNS (StrEnum):
+    # Columns names
     NAME_SP = "descricao.xlsx"
     CODIGO = "codigo"
     NIVEL = "nivel"
@@ -17,6 +21,8 @@ class SP_DESCRIPTION_COLUMNS (StrEnum):
     RELACAO = "relacao"
     FONTES = "fontes"
     META = "meta"
+
+    # Others constants
     PLURAL_NOMES_SIMPLES = "nomes_simples"
     PLURAL_NOMES_COMPLETOS = "nomes_completos"
 
