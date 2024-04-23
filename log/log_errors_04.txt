@@ -7,6 +7,8 @@
 
 [37m[1m------ Resultados da verificação dos testes ------
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
+[31mcomposicao.xlsx: Coluna número 3 não possui nome mas possui valores.
+[31mvalores.xlsx: Coluna número 20 não possui nome mas possui valores.
 [34m[1mVerificação: Limpeza dos arquivos
 [31mdescricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
 [31mdescricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
@@ -19,7 +21,7 @@
 [31mdescricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].
 [31mcomposicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].
 [31mcomposicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].
-[31mvalores.xlsx: Códigos inválidos: ['5000.954', '5001,9483'].
+[31mvalores.xlsx: Códigos inválidos: ['5000.954', '5001,9483', 'Unnamed: 19'].
 [31mvalores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].
 [34m[1mVerificação: Hierarquia como árvore
 [34m[1mVerificação: Níveis de indicadores
@@ -42,10 +44,12 @@
 [34m[1mVerificação: Quebra de linha para descrição
 [34m[1mVerificação: Quebra de linha para cenários
 [34m[1mVerificação: Quebra de linha para referência temporal
+[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
+[33mcomposicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
 
 
-[31m[1mNúmero de erros: 15
-[37m[1mNúmero de avisos: 0
+[31m[1mNúmero de erros: 17
+[33m[1mNúmero de avisos: 1
 [34m[1m
-Tempo total de execução: 3.1 segundos
+Tempo total de execução: 2.9 segundos
 [0m
