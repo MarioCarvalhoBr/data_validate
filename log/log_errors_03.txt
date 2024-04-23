@@ -47,12 +47,12 @@
 [34m[1mVerificação: Ortografia
 [33mdescricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 [34m[1mVerificação: Padrão para nomes dos indicadores
-[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com cr meio". Encontrado: "Exemplo com<LF> CR meio".
-[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com lf meio". Encontrado: "Exemplo com<LF> LF meio".
-[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com cr início". Encontrado: "<LF>Exemplo com CR início".
-[33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com lf início". Encontrado: "<LF>Exemplo com LF início".
-[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com cr fim". Encontrado: "Exemplo com CR fim<LF>".
-[33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com lf fim". Encontrado: "Exemplo com LF fim<LF>".
+[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
+[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
+[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
+[33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
+[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
+[33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
 [34m[1mVerificação: Quebra de linha para descrição
 [33mdescricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
 [33mdescricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
@@ -75,5 +75,5 @@
 [31m[1mNúmero de erros: 15
 [33m[1mNúmero de avisos: 27
 [34m[1m
-Tempo total de execução: 2.7 segundos
+Tempo total de execução: 3.2 segundos
 [0m

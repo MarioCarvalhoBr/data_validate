@@ -30,10 +30,8 @@
 [31mdescricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
 [34m[1mVerificação: Unicidade dos códigos
 [34m[1mVerificação: Códigos HTML nas descrições simples
-[34m[1mVerificação: Ortografia
 [34m[1mVerificação: Títulos únicos
 [34m[1mVerificação: Campos vazios
-[34m[1mVerificação: Padrão para nomes dos indicadores
 [34m[1mVerificação: Títulos com mais de 40 caracteres
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
@@ -46,10 +44,15 @@
 [34m[1mVerificação: Quebra de linha para referência temporal
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [33mcomposicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
+[34m[1mVerificação: Ortografia
+[33mdescricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].
+[34m[1mVerificação: Padrão para nomes dos indicadores
+[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".
+[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
 
 
 [31m[1mNúmero de erros: 17
-[33m[1mNúmero de avisos: 1
+[33m[1mNúmero de avisos: 4
 [34m[1m
-Tempo total de execução: 2.9 segundos
+Tempo total de execução: 3.2 segundos
 [0m
