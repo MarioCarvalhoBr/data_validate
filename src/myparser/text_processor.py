@@ -16,6 +16,11 @@ def capitalize_nouns_keep_articles_prepositions(text):
         
     return text
 
+# Capitalize the first letter of the text
 def capitalize_text(text):
     new_text = text.capitalize()
     return new_text
+
+# Check if the text is an acronym
+def is_acronym(text):
+    return text.isupper() and len(text) > 1

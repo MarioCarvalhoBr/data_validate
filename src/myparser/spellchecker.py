@@ -1,30 +1,11 @@
 import re
 import pandas as pd
 import hunspell
+from src.myparser.text_processor import is_acronym
 
 def load_dictionary(path):
     with open(path, 'r', encoding='utf-8') as file:
         return {word.strip().lower() for word in file}
-
-def preprocess_text(text):
-    text = re.split("Fontes:|Fonte:", text)[0]
-    text = re.sub(r'<.*?>|\(.*?\)|[^\w\s]|\d+', ' ', text)
-
-    return text
-
-def find_spelling_errors(text, meu_analizador):
-    words = text.split()
-    return [word for word in words if not meu_analizador.spell(word.strip())]
-
-def check_text(column_name, text, meu_analizador, index, sheet_name):
-    errors = check_sintax_ortography(text, meu_analizador)
-    if errors:
-        return f"{sheet_name}, linha {index + 1}: Palavras com possíveis erros ortográficos na coluna {column_name}: {errors}."
-    return ""
-
-def check_sintax_ortography(text, meu_analizador):
-    preprocessed_text = preprocess_text(text)
-    return find_spelling_errors(preprocessed_text, meu_analizador)
 
 def process_sheet(df, columns, meu_analizador, sheet_name):
     warnings = []
@@ -38,6 +19,35 @@ def process_sheet(df, columns, meu_analizador, sheet_name):
             if warning:
                 warnings.append(warning)
     return warnings
+
+def check_text(column_name, text, meu_analizador, index, sheet_name):
+    
+    errors = check_sintax_ortography(text, meu_analizador)
+    if errors:
+        return f"{sheet_name}, linha {index + 1}: Palavras com possíveis erros ortográficos na coluna {column_name}: {errors}."
+    return ""
+
+def check_sintax_ortography(text, meu_analizador):
+    preprocessed_text = preprocess_text(text)
+    return find_spelling_errors(preprocessed_text, meu_analizador)
+
+def preprocess_text(text):
+    text = re.split("Fontes:|Fonte:", text)[0]
+    text = re.sub(r'<.*?>|\(.*?\)|[^\w\s]|\d+', ' ', text)
+
+    return text
+
+def find_spelling_errors(text, meu_analizador):
+    words = text.split()
+    errors = []
+    for word in words:
+        word = str(word).strip()
+        # Verifica se a palavra é um acrônimo
+        if is_acronym(word):
+            continue
+        if not meu_analizador.spell(word):
+            errors.append(word)
+    return errors
 
 def run(df, file_name, columns_sheets, lang_dict_spell):
     df = df.copy()
