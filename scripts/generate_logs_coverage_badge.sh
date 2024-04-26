@@ -10,7 +10,7 @@ coverage json -o coverage.json
 if [ $? -eq 0 ]; then
     echo "Resultado. Testes passaram com sucesso."
     echo "3. Gerando o badge de cobertura..."
-    python3 scripts/generate_coverage_report.py
+    python3 scripts/generate_badge.py
     echo "4. Gerando os logs..."
     python3 main.py --input_folder=input_data/data_errors_01/ > log/log_errors_01.txt
     python3 main.py --input_folder=input_data/data_errors_02/ > log/log_errors_02.txt

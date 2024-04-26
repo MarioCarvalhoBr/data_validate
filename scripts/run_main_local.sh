@@ -16,7 +16,7 @@ coverage report -m
 coverage json -o coverage.json
 
 echo "Gerando badge de cobertura..."
-python3 scripts/generate_coverage_report.py
+python3 scripts/generate_badge.py
 
 # EXECUTANDO AS VERIFICAÇÕES
 echo "Executando verificações..."
