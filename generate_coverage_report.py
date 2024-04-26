@@ -21,6 +21,7 @@ def extract_coverage_percentage():
 def generate_badge(coverage_percentage):
     # Gera a URL do badge usando Shields.io
     badge_url = f"https://img.shields.io/badge/coverage-{coverage_percentage}%25-brightgreen"
+    print(f'Baixando badge de cobertura da URL: {badge_url}')
     return badge_url
 
 def download_badge(badge_url, output_file='assets/images/coverage_badge.svg'):
@@ -31,12 +32,10 @@ def download_badge(badge_url, output_file='assets/images/coverage_badge.svg'):
     print(f"Badge de cobertura salvo como {output_file}")
 
 def main():
-    generate_coverage_report()
+    # generate_coverage_report()
     coverage_percentage = extract_coverage_percentage()
     badge_url = generate_badge(coverage_percentage)
     download_badge(badge_url)
 
 if __name__ == "__main__":
-    print("Executando geração do badge.svg antes do commit...")
     main()
-    print("Geração do badge.svg concluída!")

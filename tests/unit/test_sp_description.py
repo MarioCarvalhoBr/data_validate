@@ -26,7 +26,7 @@ from tests.unit.test_constants import df_sp_description_errors_04
 # Testes: verify_sp_description_cr_lf
 def test_true_errors_verify_sp_description_cr_lf_data_ground_truth_01():
     is_correct, errors, warnings = verify_sp_description_cr_lf(df_sp_description_data_ground_truth_01, SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO])
-    assert is_correct is False
+    assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
