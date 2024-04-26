@@ -21,7 +21,7 @@ if [ $? -eq 0 ]; then
   coverage json -o coverage.json
 
   echo "Gerando o badge de cobertura..."
-  python3 generate_coverage_report.py
+  python3 scripts/generate_coverage_report.py
 
   # GERANDO OS DADOS PARA OS LOGS
   echo ""
