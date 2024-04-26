@@ -373,5 +373,5 @@ def test_count_errors_verify_files_data_clean_data_errors_05():
     assert len(all_errors_clean_files) == 1
     assert len(all_warnings_clean_files) == 0
 
-    assert all_errors_clean_files[0] == "referencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo {SP_SCENARIO_COLUMNS.NAME_SP} não existe."
+    assert all_errors_clean_files[0] == f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: A tabela deve ter apenas um valor porque o arquivo {SP_SCENARIO_COLUMNS.NAME_SP} não existe."
 
