@@ -1,6 +1,6 @@
 
 
-[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth_01/
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth_02/
 
 
 
@@ -19,18 +19,15 @@
 [34m[1mVerificação: Padrão para nomes dos indicadores
 [34m[1mVerificação: Títulos com mais de 40 caracteres
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
-[34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
 [34m[1mVerificação: Quebra de linha para descrição
-[34m[1mVerificação: Quebra de linha para cenários
 [34m[1mVerificação: Quebra de linha para referência temporal
 
 
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 1.7 segundos
 [0m

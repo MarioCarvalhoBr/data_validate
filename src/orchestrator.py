@@ -24,8 +24,8 @@ def verify_sp_scenario_unique_values(df_sp_scenario, columns_uniques):
 def verify_sp_temporal_reference_punctuation(df_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot):
     return sp_temporal_reference.verify_sp_temporal_reference_punctuation(df_sp_temporal_reference, columns_dont_punctuation, columns_must_end_with_dot)
 
-def verify_files_data_clean(df, file_name, columns_to_clean, value):
-    return structures_files.verify_files_data_clean(df, file_name, columns_to_clean, value)
+def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_exists):
+    return structures_files.verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_exists)
 
 def verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference):
     return sp_values.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference)
@@ -33,11 +33,11 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_sp_d
 def verify_spelling_text(df, file_name, sheets_info, lang_dict_spell):
     return spellchecker.run(df, file_name, sheets_info, lang_dict_spell)
     
-def verify_structure_files_dataframe(df, file_name, expected_columns):
-    return structures_files.verify_structure_files_dataframe(df, file_name, expected_columns)
+def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists, sp_proportionalities_exists):
+    return structures_files.verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists, sp_proportionalities_exists)
 
-def verify_structure_exepected_files_main_path(path_folder):
-    return structures_files.verify_structure_exepected_files_main_path(path_folder)
+def verify_not_exepected_files_in_folder_root(path_folder):
+    return structures_files.verify_not_exepected_files_in_folder_root(path_folder)
 
 def verify_sp_description_titles_length(df_sp_description):
     return sp_description.verify_sp_description_titles_length(df_sp_description)

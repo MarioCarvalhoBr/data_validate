@@ -59,7 +59,7 @@ Instale os requerimentos
 Para executar o Adapta Parser, use o seguinte comando:
     
 ```bash
-python3 main.py --input_folder=input_data/data_ground_truth/
+python3 main.py --input_folder=input_data/data_ground_truth_01/
 ```
 
 #### Argumentos

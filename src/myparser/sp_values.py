@@ -109,14 +109,20 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
     text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada porque a coluna"
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
-    elif SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}' está ausente.")
     elif SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
         errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {text_error_column} '{SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO}' está ausente.")
-    elif SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
-        errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
     elif SP_VALUES_COLUMNS.ID not in df_values.columns:
         errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {text_error_column} '{SP_VALUES_COLUMNS.ID}' está ausente.")
+
+    sp_scenario_exists = True
+    if df_scenario is None or df_scenario.empty:
+        sp_scenario_exists = False
+
+    if sp_scenario_exists:
+        if SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}' está ausente.")
+        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
+            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
     
     # Return if errors
     if errors:
@@ -131,14 +137,18 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
         for line, row in df_description.iterrows():
 
             # Criar lista de símbolos de cenários
-            lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+            lista_simbolos_cenarios = []
+            if sp_scenario_exists:
+                lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
-            # Criar lista de símbolos temporais
+            # Criar lista de símbolos temporais:
             lista_simbolos_temporais = sorted(df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique().tolist())
             primeiro_ano = lista_simbolos_temporais[0]
 
             codigo = str(row[SP_DESCRIPTION_COLUMNS.CODIGO])
-            cenario = row[SP_DESCRIPTION_COLUMNS.CENARIO]
+            cenario = 0
+            if sp_scenario_exists:
+                cenario = row[SP_DESCRIPTION_COLUMNS.CENARIO]
 
             lista_combinacoes = []
             lista_combinacoes.clear()

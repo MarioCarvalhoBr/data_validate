@@ -5,13 +5,13 @@ from src.myparser.hierarchy.tree import verificar_ciclos, verificar_erros_niveis
 from src.myparser.structures_files import SP_COMPOSITION_COLUMNS, SP_DESCRIPTION_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
-from tests.unit.test_constants import df_sp_description_gt, df_sp_composition_gt
+from tests.unit.test_constants import df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
 
-def test_true_verify_tree_sp_composition_hierarchy_gt():
-    is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_gt, df_sp_description_gt)
+def test_true_verify_tree_sp_composition_hierarchy_data_ground_truth_01():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_data_ground_truth_01, df_sp_description_data_ground_truth_01)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0

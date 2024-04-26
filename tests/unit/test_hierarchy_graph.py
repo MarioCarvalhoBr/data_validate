@@ -6,7 +6,7 @@ from src.myparser.hierarchy.graph import imprimir_grafo
 from src.myparser.hierarchy.graph import verify_graph_sp_description_composition
 
 # DATA FRAMES - GROUND TRUTH
-from tests.unit.test_constants import df_sp_description_gt, df_sp_composition_gt
+from tests.unit.test_constants import df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
@@ -14,8 +14,8 @@ from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composi
 # DATA FRAMES - ERROS 04
 from tests.unit.test_constants import df_sp_description_errors_04, df_sp_composition_errors_04
 
-def test_true_verify_graph_sp_description_composition_gt():
-    is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_gt, df_sp_composition_gt)
+def test_true_verify_graph_sp_description_composition_data_ground_truth_01():
+    is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
