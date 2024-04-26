@@ -2,7 +2,7 @@ import pandas as pd
 
 from src.myparser.hierarchy.tree import verify_tree_sp_description_composition_hierarchy, dfs, criar_arvore
 from src.myparser.hierarchy.tree import verificar_ciclos, verificar_erros_niveis
-from src.myparser.structures_files import SP_COMPOSITION_COLUMNS, SP_DESCRIPTION_COLUMNS
+from src.myparser.spreadsheets import SP_COMPOSITION_COLUMNS, SP_DESCRIPTION_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01

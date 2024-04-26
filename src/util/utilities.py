@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 import math
+# Spreadsheets classes and constants
+from src.myparser.spreadsheets import SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS
+
 
 def check_column_names(df, expected_columns):
     missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -101,9 +104,10 @@ def read_excel_file(path):
     
     file_name = os.path.basename(path)
 
-    if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
+    if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP or file_name == SP_VALUES_COLUMNS.NAME_SP:
         # df = pd.read_csv(path, low_memory=False)
         df = pd.read_excel(path)
+
     else:
         df = pd.read_excel(path)
     return df

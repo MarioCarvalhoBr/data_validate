@@ -7,7 +7,8 @@ from src.util.utilities import check_file_exists
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation, check_vertical_bar
 
-from src.myparser.structures_files import SP_COMPOSITION_COLUMNS
+# Spreadsheets classes and constants
+from src.myparser.spreadsheets import SP_COMPOSITION_COLUMNS
 
 # Testes para check_punctuation:
 def test_check_punctuation_with_no_errors():

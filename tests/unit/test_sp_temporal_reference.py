@@ -1,6 +1,7 @@
 from src.myparser.sp_temporal_reference import verify_sp_temporal_reference_punctuation, verify_sp_temporal_reference_unique_values
 
-from src.myparser.structures_files import SP_TEMPORAL_REFERENCE_COLUMNS 
+# Spreadsheets classes and constants
+from src.myparser.spreadsheets import SP_TEMPORAL_REFERENCE_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_temporal_reference_data_ground_truth_01

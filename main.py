@@ -1,4 +1,4 @@
-# Example usage: python3 main.py --input_folder=input_data/data_ground_truth_01/ --no-spellchecker --lang_dict=tiny --debug
+# Example usage: python3 main.py --input_folder=input_data/data_ground_truth_01/ --no-spellchecker --lang-dict=pt --debug
 
 # Libs
 from colorama import Fore, Style
@@ -8,9 +8,10 @@ import os
 
 import src.orchestrator as orc
 from src.util.utilities import check_file_exists, check_folder_exists, read_excel_file
-from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FILES_TO_CLEAN_LIST, SP_DESCRIPTION_MAX_TITLE_LENGTH
-from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
+from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FILES_TO_CLEAN_LIST
 
+# Spreadsheets classes and constants
+from src.myparser.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Analizador de arquivos .xlsx.")
