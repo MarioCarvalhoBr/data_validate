@@ -14,7 +14,9 @@ python3 main.py --input_folder=input_data/data_errors_01/ > log/log_errors_01.tx
 python3 main.py --input_folder=input_data/data_errors_02/ > log/log_errors_02.txt
 python3 main.py --input_folder=input_data/data_errors_03/ > log/log_errors_03.txt
 python3 main.py --input_folder=input_data/data_errors_04/ > log/log_errors_04.txt
-python3 main.py --input_folder=input_data/data_ground_truth/ > log/log_ground_truth.txt
+python3 main.py --input_folder=input_data/data_errors_05/ > log/log_errors_05.txt
+python3 main.py --input_folder=input_data/data_ground_truth_01/ > log/log_data_ground_truth_01.txt
+python3 main.py --input_folder=input_data/data_ground_truth_02/ > log/log_data_ground_truth_02.txt
 
 # GERA O RELATÓRIO DE COBERTURA
 # Verificar o status de saída do script
@@ -28,7 +30,9 @@ if [ $? -eq 0 ]; then
   git add log/log_errors_02.txt
   git add log/log_errors_03.txt
   git add log/log_errors_04.txt
-  git add log/log_ground_truth.txt
+  git add log/log_errors_05.txt
+  git add log/log_data_ground_truth_01.txt
+  git add log/log_data_ground_truth_02.txt
 else
   echo "O commit foi abortado devido a falhas nas verificações."
   exit 1

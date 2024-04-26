@@ -1,13 +1,15 @@
 
 
-[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth_01/
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_05/
 
 
 
 
 [37m[1m------ Resultados da verificação dos testes ------
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
+[31mdescricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
 [34m[1mVerificação: Limpeza dos arquivos
+[31mreferencia_temporal.xlsx: A tabela deve ter apenas um valor.
 [34m[1mVerificação: Relações entre indicadores
 [34m[1mVerificação: Hierarquia como árvore
 [34m[1mVerificação: Níveis de indicadores
@@ -19,18 +21,23 @@
 [34m[1mVerificação: Padrão para nomes dos indicadores
 [34m[1mVerificação: Títulos com mais de 40 caracteres
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
-[34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
+[31mvalores.xlsx: A coluna '5000-2030-O' é desnecessária.
+[31mvalores.xlsx: A coluna '5000-2050-O' é desnecessária.
+[31mvalores.xlsx: A coluna '5000-2030-P' é desnecessária.
+[31mvalores.xlsx: A coluna '5000-2050-P' é desnecessária.
+[31mvalores.xlsx: A coluna '5003-2030-O' é desnecessária.
+[31mvalores.xlsx: A coluna '5003-2050-O' é desnecessária.
+[31mvalores.xlsx: A coluna '5003-2030-P' é desnecessária.
+[31mvalores.xlsx: A coluna '5003-2050-P' é desnecessária.
 [34m[1mVerificação: Quebra de linha para descrição
-[34m[1mVerificação: Quebra de linha para cenários
 [34m[1mVerificação: Quebra de linha para referência temporal
 
 
-[37m[1mNúmero de erros: 0
+[31m[1mNúmero de erros: 10
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 1.6 segundos
 [0m

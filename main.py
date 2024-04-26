@@ -1,4 +1,4 @@
-# Example usage: python3 main.py --input_folder=input_data/data_ground_truth/ --no-spellchecker --lang_dict=tiny --debug
+# Example usage: python3 main.py --input_folder=input_data/data_ground_truth_01/ --no-spellchecker --lang_dict=tiny --debug
 
 # Libs
 from colorama import Fore, Style
@@ -70,15 +70,26 @@ if __name__ == "__main__":
         exists_path_sp_values, error = check_file_exists(os.path.join(path_input_folder, SP_VALUES_COLUMNS.NAME_SP))
         exists_path_sp_proportionalities, error = check_file_exists(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
 
-        # Abrir os arquivos que existem 
+        # ------------------------------------------------------------------------------------------------------------------------------------
+        # LEITURA DOS ARQUIVOS E CRIAÇÃO DOS DATAFRAMES: Se não existir, o dataframe será criado vazio
+        # Arquivos opcionais: cenários e referência temporal
         df_sp_scenario = read_excel_file(os.path.join(path_input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
-        df_sp_temporal_reference = read_excel_file(os.path.join(path_input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
-
-        df_sp_description = read_excel_file(os.path.join(path_input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
+        df_sp_proportionalities = read_excel_file(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
         
+        sp_scenario_exists = True
+        sp_proportionalities_exists = True
+        if df_sp_scenario is None or df_sp_scenario.empty:
+            sp_scenario_exists = False
+        if df_sp_proportionalities is None or df_sp_proportionalities.empty:
+            sp_proportionalities_exists = False
+
+        # Arquivo obrigatório: descrição, composição, valores e proporcionalidades
+        df_sp_temporal_reference = read_excel_file(os.path.join(path_input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+        df_sp_description = read_excel_file(os.path.join(path_input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
         df_sp_composition = read_excel_file(os.path.join(path_input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
         df_sp_values = read_excel_file(os.path.join(path_input_folder, SP_VALUES_COLUMNS.NAME_SP))
-        df_sp_proportionalities = read_excel_file(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        # ------------------------------------------------------------------------------------------------------------------------------------
+
 
         # Dicionário com os dataframes
         data_df = {
@@ -100,13 +111,13 @@ if __name__ == "__main__":
         all_warnings_structure_files = []
 
         for file_name, df in data_df.items():
-            is_correct, errors, warnings = orc.verify_structure_files_dataframe(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name])
+            is_correct, errors, warnings = orc.verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], sp_scenario_exists, sp_proportionalities_exists)
             all_correct_structure_files = all_correct_structure_files and is_correct
             all_errors_structure_files.extend(errors)
             all_warnings_structure_files.extend(warnings)
         
         # 1.2 - Arquivos da pasta de entrada
-        is_correct_main_path, errors_main_path, warnings_main_path = orc.verify_structure_exepected_files_main_path(path_input_folder)
+        is_correct_main_path, errors_main_path, warnings_main_path = orc.verify_not_exepected_files_in_folder_root(path_input_folder)
         all_correct_structure_files = all_correct_structure_files and is_correct_main_path
         all_errors_structure_files.extend(errors_main_path)
         all_warnings_structure_files.extend(warnings_main_path)
@@ -127,7 +138,7 @@ if __name__ == "__main__":
             # Se for None ou empty Ignora a verificação
             if df is None or df.empty:
                 continue
-            is_correct_clean_files, errors_clean_files, warnings_clean_files = orc.verify_files_data_clean(df, file_name, columns_to_clean, value)
+            is_correct_clean_files, errors_clean_files, warnings_clean_files = orc.verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_exists)
             all_correct_clean_files = all_correct_clean_files and is_correct_clean_files
             all_errors_clean_files.extend(errors_clean_files)
             all_warnings_clean_files.extend(warnings_clean_files)
@@ -198,11 +209,11 @@ if __name__ == "__main__":
             is_all_correct = is_all_correct and is_correct_desc
             all_errors.extend(errors_spell_desc)
             all_warnings.extend(warnings_spell_desc)
-            
-            is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = orc.verify_spelling_text(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
-            is_all_correct = is_all_correct and is_correct_scenario
-            all_errors.extend(errors_spell_scenario)
-            all_warnings.extend(warnings_spell_scenario)
+            if sp_scenario_exists:
+                is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = orc.verify_spelling_text(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
+                is_all_correct = is_all_correct and is_correct_scenario
+                all_errors.extend(errors_spell_scenario)
+                all_warnings.extend(warnings_spell_scenario)
 
             is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = orc.verify_spelling_text(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], lang_dict_spell)
             is_all_correct = is_all_correct and is_correct_temporal_reference
@@ -245,7 +256,8 @@ if __name__ == "__main__":
         
         # 10.1 - Pontuações obrigatórias e proibidas em cenários
         # print("Iniciando a verificação: Pontuações obrigatórias e proibidas em cenários")
-        results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(df_sp_scenario, columns_dont_punctuation=[SP_SCENARIO_COLUMNS.NOME], columns_must_end_with_dot=[SP_SCENARIO_COLUMNS.DESCRICAO]))])
+        if sp_scenario_exists:
+            results_tests.append([("Issue #81: " if is_degug else "") +"Pontuações obrigatórias e proibidas em cenários", *(orc.verify_sp_scenario_punctuation(df_sp_scenario, columns_dont_punctuation=[SP_SCENARIO_COLUMNS.NOME], columns_must_end_with_dot=[SP_SCENARIO_COLUMNS.DESCRICAO]))])
         
         # 10.2 Pontuações obrigatórias e proibidas em referência temporal
         # print("Iniciando a verificação: Pontuações obrigatórias e proibidas em referência temporal")
@@ -255,7 +267,8 @@ if __name__ == "__main__":
         # ------------------------------------------------------------------------------------------------------------------------------------
          # 11.0: Relações de valores únicos em cenários
         # print("Iniciando a verificação: Relações de valores únicos em cenários")
-        results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em cenários", *(orc.verify_sp_scenario_unique_values(df_sp_scenario, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.SIMBOLO]))])
+        if sp_scenario_exists:
+            results_tests.append([("Issue #81: " if is_degug else "") +"Relações de valores únicos em cenários", *(orc.verify_sp_scenario_unique_values(df_sp_scenario, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.SIMBOLO]))])
         
         # 10.1': Relações de valores únicos em referência temporal
         # print("Iniciando a verificação: Relações de valores únicos em referência temporal")
@@ -269,8 +282,13 @@ if __name__ == "__main__":
         
          # 12.0 - Quebra de linha para descrição e cenários
         # print("Iniciando a verificação: Quebra de linha para descrição e cenários")
-        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para descrição", *(orc.verify_sp_description_cr_lf(df_sp_description,SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]))])
-        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para cenários", *(orc.verify_sp_description_cr_lf(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, columns_start_end=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], columns_anywhere=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO]))])
+        columns_start_end = [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META]
+        if sp_scenario_exists:
+            columns_start_end.append(SP_DESCRIPTION_COLUMNS.CENARIO)
+            
+        results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para descrição", *(orc.verify_sp_description_cr_lf(df_sp_description,SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=columns_start_end, columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]))])
+        if sp_scenario_exists:
+            results_tests.append([("Issue #85: " if is_degug else "") +"Quebra de linha para cenários", *(orc.verify_sp_description_cr_lf(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, columns_start_end=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], columns_anywhere=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO]))])
 
         # 12.1 - Quebra de linha para referência temporal
         # print("Iniciando a verificação: Quebra de linha para referência temporal")

@@ -77,7 +77,7 @@ STRUCTURE_FILES_TO_CLEAN_LIST = [
     [SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO], 0]
 ]
 
-def verify_structure_exepected_files_main_path(path_folder):
+def verify_not_exepected_files_in_folder_root(path_folder):
     errors = []
     warnings = []
     try:
@@ -91,18 +91,27 @@ def verify_structure_exepected_files_main_path(path_folder):
 
     return not errors, errors, warnings
       
-def verify_structure_files_dataframe(df, file_name, expected_columns):
+def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists=True, sp_proportionalities_exists=True):
     df = df.copy()
     errors = []
     warnings = []
 
     # Se o df for none ou vazio retorna erro
-    if df is None:
-        errors.append(f"{file_name}: O arquivo esperado não foi encontrado.")
+    if df is None or df.empty:
+        if not (file_name == SP_SCENARIO_COLUMNS.NAME_SP or file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP):
+            errors.append(f"{file_name}: O arquivo esperado não foi encontrado ou está vazio.")
         return not errors, errors, warnings
-    if df.empty:
-        errors.append(f"{file_name}: O arquivo esperado está vazio.")
-        return not errors, errors, warnings
+    
+    # Quando não existir o arquivo de SP_SCENARIO_COLUMNS.NAME_SP, a coluna 'SP_DESCRIPTION_COLUMNS.CENARIO' não pode existir no arquivo de descrição
+    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and not sp_scenario_exists:
+            # Remove a coluna 'SP_DESCRIPTION_COLUMNS.CENARIO' da lista de colunas esperadas
+            expected_columns = [column for column in expected_columns if column != SP_DESCRIPTION_COLUMNS.CENARIO]
+            # Verifica se a coluna 'SP_DESCRIPTION_COLUMNS.CENARIO' existe no arquivo
+            if SP_DESCRIPTION_COLUMNS.CENARIO in df.columns:
+                errors.append(f"{file_name}: A coluna '{SP_DESCRIPTION_COLUMNS.CENARIO}' não pode existir se o arquivo '{SP_SCENARIO_COLUMNS.NAME_SP}' não existir.")
+                # Remove a coluna 'SP_DESCRIPTION_COLUMNS.CENARIO' do dataframe
+                df = df.drop(columns=[SP_DESCRIPTION_COLUMNS.CENARIO])
+            
     try:
         # Check if there is a vertical bar in the column name
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)
@@ -138,9 +147,20 @@ def verify_structure_files_dataframe(df, file_name, expected_columns):
 
     return not errors, errors, warnings
       
-def verify_files_data_clean(df, file_name, columns_to_clean, value):
+def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_exists=True):
     df = df.copy()
     errors = []
+
+    # Verifica se a tabela SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP tem apenas um valor
+    if file_name == SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP:
+        if (not sp_scenario_exists) and (len(df) != 1):
+                errors.append(f"{file_name}: A tabela deve ter apenas um valor.")
+                return not errors, errors, []
+
+    # Verifica se a tabela SP_SCENARIO_COLUMNS.NAME_SP tem apenas um valor
+    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP:
+        if not sp_scenario_exists:
+            columns_to_clean = [column for column in columns_to_clean if column != SP_DESCRIPTION_COLUMNS.CENARIO]
 
     missing_columns = set(columns_to_clean) - set(df.columns)
     missing_columns = [str(column) for column in missing_columns]
