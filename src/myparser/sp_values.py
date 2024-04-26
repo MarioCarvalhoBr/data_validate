@@ -141,7 +141,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
             if sp_scenario_exists:
                 lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
-            # Criar lista de símbolos temporais: TODO APENAS O PRIMEIRO ANO
+            # Criar lista de símbolos temporais:
             lista_simbolos_temporais = sorted(df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique().tolist())
             primeiro_ano = lista_simbolos_temporais[0]
 
