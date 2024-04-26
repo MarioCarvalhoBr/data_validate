@@ -9,7 +9,7 @@
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
 [31mdescricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
 [34m[1mVerificação: Limpeza dos arquivos
-[31mreferencia_temporal.xlsx: A tabela deve ter apenas um valor.
+[31mreferencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
 [34m[1mVerificação: Relações entre indicadores
 [34m[1mVerificação: Hierarquia como árvore
 [34m[1mVerificação: Níveis de indicadores

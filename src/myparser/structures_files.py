@@ -154,7 +154,7 @@ def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_
     # Verifica se a tabela SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP tem apenas um valor
     if file_name == SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP:
         if (not sp_scenario_exists) and (len(df) != 1):
-                errors.append(f"{file_name}: A tabela deve ter apenas um valor.")
+                errors.append(f"{file_name}: A tabela deve ter apenas um valor porque o arquivo {SP_SCENARIO_COLUMNS.NAME_SP} não existe.")
                 return not errors, errors, []
 
     # Verifica se a tabela SP_SCENARIO_COLUMNS.NAME_SP tem apenas um valor
