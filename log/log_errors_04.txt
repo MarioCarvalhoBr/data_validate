@@ -54,5 +54,5 @@
 [31m[1mNúmero de erros: 17
 [33m[1mNúmero de avisos: 4
 [34m[1m
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 2.2 segundos
 [0m
