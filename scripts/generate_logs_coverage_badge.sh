@@ -35,8 +35,5 @@ if [ $? -eq 0 ]; then
   git add log/log_data_ground_truth_02.txt
 else
   echo "O commit foi abortado devido a falhas nas verificações."
-  notify-send -u critical \
-    "Run tests failed!" \
-    "There were <b>errors</b>. Run <b>pytest</b> to more information."
   exit 1
 fi
