@@ -36,8 +36,8 @@ def verify_spelling_text(df, file_name, sheets_info, lang_dict_spell):
 def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists, sp_proportionalities_exists):
     return structures_files.verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists, sp_proportionalities_exists)
 
-def verify_not_exepected_files_in_folder_root(path_folder):
-    return structures_files.verify_not_exepected_files_in_folder_root(path_folder)
+def verify_not_exepected_files_in_folder_root(path_folder, structure_files_columns_dict):
+    return structures_files.verify_not_exepected_files_in_folder_root(path_folder, structure_files_columns_dict)
 
 def verify_sp_description_titles_length(df_sp_description):
     return sp_description.verify_sp_description_titles_length(df_sp_description)

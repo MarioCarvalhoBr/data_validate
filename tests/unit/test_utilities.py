@@ -7,7 +7,8 @@ from src.util.utilities import check_file_exists
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation, check_vertical_bar
 
-from src.myparser.structures_files import SP_COMPOSITION_COLUMNS
+# Spreadsheets classes and constants
+from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS
 
 # Testes para check_punctuation:
 def test_check_punctuation_with_no_errors():
@@ -55,21 +56,49 @@ def test_check_punctuation_with_no_columns():
     assert len(warnings) == 0
 
 # Testes para read_excel_file:
+def test_read_excel_file_with_non_existing_file():
+    df, errors = read_excel_file('non_existing_file.xlsx')
+    assert df.empty
+    assert len(errors) == 1
+    assert errors[0] == "O arquivo non_existing_file.xlsx não foi encontrado."
+
+def test_read_excel_file_with_unsupported_extension():
+    with open('test_file.txt', 'w') as f:
+        f.write('test')
+    df, errors = read_excel_file('test_file.txt')
+    os.remove('test_file.txt')
+    assert df.empty
+    assert len(errors) == 1
+    assert errors[0] == "Tipo de arquivo não suportado: .txt"
+
+def test_read_excel_file_with_csv_file():
+    df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    # Convert to string to avoid float precision issues
+    df_test.to_csv('test_file.csv', sep='|', index=False)
+    df, errors = read_excel_file('test_file.csv')
+    os.remove('test_file.csv')
+    assert df.equals(df_test)
+    assert len(errors) == 0
+
+def test_read_excel_file_with_excel_file():
+    df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    # Convert to string to avoid float precision issues
+    df_test.to_excel('test_file.xlsx', index=False)
+    df, errors = read_excel_file('test_file.xlsx')
+    os.remove('test_file.xlsx')
+    assert df.equals(df_test)
+    assert len(errors) == 0
+
 def test_read_excel_file_with_existing_file():
-    # Create a temporary excel file for testing
     df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     df.to_excel('test_file.xlsx', index=False)
 
-    loaded_df = read_excel_file('test_file.xlsx')
+    loaded_df, errors_read_file = read_excel_file('test_file.xlsx')
+    
     # Clean up
     os.remove('test_file.xlsx')
 
-    assert loaded_df.equals(df), "DataFrames are not equal"
-def test_read_excel_file_with_non_existing_file():
-    try:
-        read_excel_file('non_existing_file.xlsx')
-    except FileNotFoundError as e:
-        assert str(e) == "[Errno 2] No such file or directory: 'non_existing_file.xlsx'"
+    assert loaded_df.equals(df), "DataFrames are equal"
 
 # Testes para file_extension_check:
 def test_file_extension_check_with_invalid_extension():
@@ -126,24 +155,49 @@ def test_check_folder_exists_with_existing_folder():
     assert error_message == ""
 
 # Testes para check_file_exists:
-def test_check_file_exists_with_invalid_path():
-    file_path = None  # Invalid path
-    result, error_message = check_file_exists(file_path)
-    assert result is False
-    assert error_message == "None: O caminho do arquivo não foi especificado."
-def test_check_file_exists_with_non_existent_file():
-    non_existent_file = "non_existent_file.txt"  # Non-existent file
-    result, error_message = check_file_exists(non_existent_file)
-    assert result is False
-    assert error_message == "non_existent_file.txt: Arquivo não foi encontrado em '/'."
-def test_check_file_exists_with_existing_file():
-    existing_file = "existing_file.txt"  # Existing file
-    with open(existing_file, 'w') as f:
-        f.write("Test file")
-    result, error_message = check_file_exists(existing_file)
-    os.remove(existing_file)  # Clean up
-    assert result is True
-    assert error_message == ""
+# FILEPATH: /home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/tests/unit/test_utilities.py
+
+def test_check_file_exists_with_csv_file():
+    with open('test_file.csv', 'w') as f:
+        f.write('test')
+    exists, is_csv, is_xlsx, warnings = check_file_exists('test_file.csv')
+    os.remove('test_file.csv')
+    assert exists is True
+    assert is_csv is True
+    assert is_xlsx is False
+    assert len(warnings) == 0
+
+def test_check_file_exists_with_xlsx_file():
+    df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    df_test.to_excel('test_file.xlsx', index=False)
+    exists, is_csv, is_xlsx, warnings = check_file_exists('test_file.xlsx')
+    os.remove('test_file.xlsx')
+    assert exists is True
+    assert is_csv is False
+    assert is_xlsx is True
+    assert len(warnings) == 0
+
+def test_check_file_exists_with_both_files():
+    with open('test_file.csv', 'w') as f:
+        f.write('test')
+    df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    df_test.to_excel('test_file.xlsx', index=False)
+    exists, is_csv, is_xlsx, warnings = check_file_exists('test_file')
+    os.remove('test_file.csv')
+    os.remove('test_file.xlsx')
+    assert exists is True
+    assert is_csv is True
+    assert is_xlsx is True
+    assert len(warnings) == 1
+    assert warnings[0] == "test_file.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."
+
+def test_check_file_exists_with_no_file():
+    exists, is_csv, is_xlsx, warnings = check_file_exists('non_existing_file')
+    assert exists is False
+    assert is_csv is False
+    assert is_xlsx is False
+    assert len(warnings) == 1
+    assert warnings[0] == "non_existing_file.csv: O arquivo esperado não foi encontrado em '/'."
 
 def test_clean_non_numeric_and_less_than_value_integers_dataframe_with_no_errors():
     df = pd.DataFrame({

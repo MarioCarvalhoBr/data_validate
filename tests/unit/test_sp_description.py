@@ -9,7 +9,8 @@ from src.myparser.sp_description import verify_sp_description_punctuation
 from src.myparser.sp_description import verify_sp_description_codes_uniques
 from src.myparser.sp_description import verify_sp_description_cr_lf
 
-from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
+# Spreadsheets classes and constants
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_data_ground_truth_01

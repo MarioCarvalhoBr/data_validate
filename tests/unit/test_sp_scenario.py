@@ -1,6 +1,7 @@
 from src.myparser.sp_scenario import verify_sp_scenario_punctuation, verify_sp_scenario_unique_values
 
-from src.myparser.structures_files import SP_SCENARIO_COLUMNS 
+# Spreadsheets classes and constants
+from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_scenario_data_ground_truth_01

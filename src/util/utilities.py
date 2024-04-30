@@ -1,6 +1,9 @@
 import os
 import pandas as pd
 import math
+# Spreadsheets classes and constants
+from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
+
 
 def check_column_names(df, expected_columns):
     missing_columns = [col for col in expected_columns if col not in df.columns]
@@ -93,20 +96,34 @@ def file_extension_check(path, extension='.xlsx'):
     return True, ""
 
 def read_excel_file(path):
-    # Se o arquivo não existe retorna None
-    exists, _ = check_file_exists(path)
-    if not exists:
-        # Retorna um dataframe vazio
-        return pd.DataFrame()
-    
-    file_name = os.path.basename(path)
+    DEFAULT_SEPARATOR = '|'
+    errors = []
 
-    if file_name == "proporcionalidades.xlsx" or file_name == "valores.xlsx":
-        # df = pd.read_csv(path, low_memory=False)
-        df = pd.read_excel(path)
+    # Checa se o arquivo existe
+    if not os.path.exists(path):
+        errors.append(f"O arquivo {path} não foi encontrado.")
+        return pd.DataFrame(), errors
+    
+
+    file_extension = os.path.splitext(path)[1].lower()
+
+    if file_extension == ".csv":
+        try:
+            df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding='utf-8', low_memory=False)
+        except Exception as e:
+            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            return pd.DataFrame(), errors
+    elif file_extension == ".xlsx":
+        try:
+            df = pd.read_excel(path)
+        except Exception as e:
+            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            return pd.DataFrame(), errors
     else:
-        df = pd.read_excel(path)
-    return df
+        errors.append(f"Tipo de arquivo não suportado: {file_extension}")
+        return pd.DataFrame(), errors
+    
+    return df, errors
 
 def check_folder_exists(folder_path):
     # Invalid path
@@ -127,19 +144,36 @@ def check_folder_exists(folder_path):
     return True, ""
 
 def check_file_exists(file_path):
-    # Invalid path
-    if file_path is None:
-        return False, f"{file_path}: O caminho do arquivo não foi especificado."
-    
-    # Pegar o arquivo que está sendo verificado
+    is_csv = False
+    is_xlsx = False
     file_name = os.path.basename(file_path)
+    file_name = file_name.replace(".xlsx", "").replace(".csv", "") + ".csv"
 
+    file_path_non_extension = os.path.splitext(file_path)[0]
 
-    """Verifica se um arquivo existe."""
-    if not os.path.isfile(file_path):
-        ultima_pasta = os.path.basename(os.path.dirname(file_path))
-        return False, f"{file_name}: Arquivo não foi encontrado em '{ultima_pasta}/'."
-    return True, ""
+    path_file_csv = file_path_non_extension + ".csv"
+    path_file_xlsx = file_path_non_extension + ".xlsx"
+
+    if os.path.exists(path_file_csv):
+        is_csv = True
+    if os.path.exists(path_file_xlsx):
+        is_xlsx = True
+
+    ultima_pasta = os.path.basename(os.path.dirname(file_path))
+
+    # Se não encontrou nenhum dos dois
+    if not is_csv and not is_xlsx:
+        name_scnario = SP_SCENARIO_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
+        name_proportionality = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
+        file_name_non_extension = file_name.replace(".csv","").replace(".xlsx","")
+
+        if file_name_non_extension == name_scnario or file_name_non_extension == name_proportionality:
+            return False, is_csv, is_xlsx, []
+        return False, is_csv, is_xlsx, [f"{file_name}: O arquivo esperado não foi encontrado em '{ultima_pasta}/'."]
+    if is_csv and is_xlsx:
+        return True, is_csv, is_xlsx, [f"{file_name}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."]
+    
+    return True, is_csv, is_xlsx, []
 
 
 def check_vertical_bar(df_sp, name_file):

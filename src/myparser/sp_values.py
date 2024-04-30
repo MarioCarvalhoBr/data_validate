@@ -1,5 +1,6 @@
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers
-from src.myparser.structures_files import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS 
+# Spreadsheets classes and constants
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 def extract_ids_from_values(df_values):
     valores_ids = df_values.columns.str.split('-').str[0]
@@ -148,7 +149,7 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
             codigo = str(row[SP_DESCRIPTION_COLUMNS.CODIGO])
             cenario = 0
             if sp_scenario_exists:
-                cenario = row[SP_DESCRIPTION_COLUMNS.CENARIO]
+                cenario = int(row[SP_DESCRIPTION_COLUMNS.CENARIO])
 
             lista_combinacoes = []
             lista_combinacoes.clear()

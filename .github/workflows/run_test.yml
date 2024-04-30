@@ -19,39 +19,40 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          
       - name: Install Enum34
         run: |
           pip install enum34
+
       - name: Install Hunspell
         run: |
           sudo apt install libhunspell-dev
           sudo apt-get install -y hunspell-en-us
           sudo apt-get install -y hunspell-pt-br
+
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
       - name: Lint with Ruff
         run: |
           pip install ruff
           ruff --target-version=py310 .
         continue-on-error: true
+
       - name: Install Coverage
         run: |
           pip install coverage
+
       - name: Test with pytest
         run: |
           coverage run -m pytest  -v -s
+
       - name: Generate Coverage Report
         run: |
           coverage report -m
+
       - name: Run main
         run: |
-          python3 main.py --input_folder=input_data/data_ground_truth_01/
-          python3 main.py --input_folder=input_data/data_ground_truth_02/
-          python3 main.py --input_folder=input_data/data_errors_01/
-          python3 main.py --input_folder=input_data/data_errors_02/
-          python3 main.py --input_folder=input_data/data_errors_03/
-          python3 main.py --input_folder=input_data/data_errors_04/
-          python3 main.py --input_folder=input_data/data_errors_05/
-          python3 main.py --input_folder=input_data/data_errors_01/ --no-warning-titles-length
+          bash scripts/run_main.sh
