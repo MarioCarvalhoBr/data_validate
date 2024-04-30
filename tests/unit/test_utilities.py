@@ -74,7 +74,6 @@ def test_read_excel_file_with_unsupported_extension():
 def test_read_excel_file_with_csv_file():
     df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     # Convert to string to avoid float precision issues
-    df_test = df_test.astype(str)
     df_test.to_csv('test_file.csv', sep='|', index=False)
     df, errors = read_excel_file('test_file.csv')
     os.remove('test_file.csv')
@@ -84,7 +83,6 @@ def test_read_excel_file_with_csv_file():
 def test_read_excel_file_with_excel_file():
     df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     # Convert to string to avoid float precision issues
-    df_test = df_test.astype(str)
     df_test.to_excel('test_file.xlsx', index=False)
     df, errors = read_excel_file('test_file.xlsx')
     os.remove('test_file.xlsx')
@@ -93,7 +91,6 @@ def test_read_excel_file_with_excel_file():
 
 def test_read_excel_file_with_existing_file():
     df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-    df = df.astype(str)
     df.to_excel('test_file.xlsx', index=False)
 
     loaded_df, errors_read_file = read_excel_file('test_file.xlsx')

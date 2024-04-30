@@ -109,13 +109,13 @@ def read_excel_file(path):
 
     if file_extension == ".csv":
         try:
-            df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding='utf-8', dtype=str, low_memory=False)
+            df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding='utf-8', low_memory=False)
         except Exception as e:
             errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
             return pd.DataFrame(), errors
     elif file_extension == ".xlsx":
         try:
-            df = pd.read_excel(path, dtype=str)
+            df = pd.read_excel(path)
         except Exception as e:
             errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
             return pd.DataFrame(), errors
