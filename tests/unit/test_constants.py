@@ -94,11 +94,3 @@ df_sp_description_errors_05, errors_read_file = read_excel_file(os.path.join(pat
 df_sp_composition_errors_05, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_05, SP_COMPOSITION_COLUMNS.NAME_SP))
 df_sp_values_errors_05, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_05, SP_VALUES_COLUMNS.NAME_SP))
 df_sp_proportionalities_errors_05, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_05, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
-
-# 7. DATA FRAMES - ERROS 06: path_input_data_errors_06
-SP_SCENARIO_COLUMNS.NAME_SP = SP_SCENARIO_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
-SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP = SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
-SP_DESCRIPTION_COLUMNS.NAME_SP = SP_DESCRIPTION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
-SP_COMPOSITION_COLUMNS.NAME_SP = SP_COMPOSITION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
-SP_VALUES_COLUMNS.NAME_SP = SP_VALUES_COLUMNS.NAME_SP.replace(".xlsx", "csv")
-SP_PROPORTIONALITIES_COLUMNS.NAME_SP = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
