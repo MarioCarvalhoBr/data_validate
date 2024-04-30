@@ -1,15 +1,15 @@
 
 
-[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_05/
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_06/
 
 
 
 
 [37m[1m------ Resultados da verificação dos testes ------
 [34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
-[31mdescricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
+[31mreferencia_temporal.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
+[31mdescricao.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
 [34m[1mVerificação: Limpeza dos arquivos
-[31mreferencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
 [34m[1mVerificação: Relações entre indicadores
 [34m[1mVerificação: Hierarquia como árvore
 [34m[1mVerificação: Níveis de indicadores
@@ -21,23 +21,21 @@
 [34m[1mVerificação: Padrão para nomes dos indicadores
 [34m[1mVerificação: Títulos com mais de 40 caracteres
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
+[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
 [34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
+[34m[1mVerificação: Relações de valores únicos em cenários
 [34m[1mVerificação: Relações de valores únicos em referência temporal
 [34m[1mVerificação: Relações de combinações de valores
-[31mvalores.xlsx: A coluna '5000-2030-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5000-2050-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5000-2030-P' é desnecessária.
-[31mvalores.xlsx: A coluna '5000-2050-P' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2030-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2050-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2030-P' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2050-P' é desnecessária.
 [34m[1mVerificação: Quebra de linha para descrição
+[34m[1mVerificação: Quebra de linha para cenários
 [34m[1mVerificação: Quebra de linha para referência temporal
+[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
+[33mO arquivo 'outro_arquivo.csv' não é esperado.
+[33mO arquivo 'outro_arquivo.xlsx' não é esperado.
 
 
-[31m[1mNúmero de erros: 10
-[37m[1mNúmero de avisos: 0
+[31m[1mNúmero de erros: 2
+[33m[1mNúmero de avisos: 2
 [34m[1m
-Tempo total de execução: 1.9 segundos
+Tempo total de execução: 1.8 segundos
 [0m

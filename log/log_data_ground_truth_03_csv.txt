@@ -1,6 +1,6 @@
 
 
-[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth_01/
+[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_ground_truth_03_csv/
 
 
 
@@ -32,5 +32,5 @@
 [37m[1mNúmero de erros: 0
 [37m[1mNúmero de avisos: 0
 [34m[1m
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 1.7 segundos
 [0m

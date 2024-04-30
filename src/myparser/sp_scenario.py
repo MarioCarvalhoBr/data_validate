@@ -1,6 +1,6 @@
 from src.util.utilities import check_punctuation, check_unique_values
 # Spreadsheets classes and constants
-from src.myparser.spreadsheets import SP_SCENARIO_COLUMNS
+from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS
 
 def verify_sp_scenario_unique_values(df, columns_uniques):
     df = df.copy()

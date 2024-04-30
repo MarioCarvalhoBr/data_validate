@@ -1,6 +1,6 @@
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 # Spreadsheets classes and constants
-from src.myparser.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS
 
 import pandas as pd
 def criar_arvore(composicao):

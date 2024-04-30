@@ -8,10 +8,9 @@ import os
 
 import src.orchestrator as orc
 from src.util.utilities import check_file_exists, check_folder_exists, read_excel_file
-from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FILES_TO_CLEAN_LIST
 
 # Spreadsheets classes and constants
-from src.myparser.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Analizador de arquivos .xlsx.")
@@ -61,21 +60,74 @@ if __name__ == "__main__":
     
     if exists_path_input_folder:
 
+        # 1.1 - Estrutura dos arquivos da pasta de entrada
+        all_correct_structure_files = True
+        all_errors_structure_files = []
+        all_warnings_structure_files = []
+
         # Checar se os arquivos existem
-        exists_path_sp_scenario, error = check_file_exists(os.path.join(path_input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
-        exists_path_sp_temporal_reference, error = check_file_exists(os.path.join(path_input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+        exists_path_sp_scenario, is_csv, is_xlsx, error = check_file_exists(os.path.join(path_input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
+        if is_csv:
+            SP_SCENARIO_COLUMNS.NAME_SP = SP_SCENARIO_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
+        all_errors_structure_files.extend(error)
 
-        exists_path_sp_description, error = check_file_exists(os.path.join(path_input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
+        exists_path_sp_temporal_reference, is_csv, is_xlsx, error = check_file_exists(os.path.join(path_input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+        if is_csv:
+            SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP = SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         
-        exists_path_sp_composition, error = check_file_exists(os.path.join(path_input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
-        exists_path_sp_values, error = check_file_exists(os.path.join(path_input_folder, SP_VALUES_COLUMNS.NAME_SP))
-        exists_path_sp_proportionalities, error = check_file_exists(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        all_errors_structure_files.extend(error)
 
+        exists_path_sp_description, is_csv, is_xlsx, error = check_file_exists(os.path.join(path_input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
+        if is_csv:
+            SP_DESCRIPTION_COLUMNS.NAME_SP = SP_DESCRIPTION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
+        all_errors_structure_files.extend(error)
+        
+        exists_path_sp_composition, is_csv, is_xlsx, error = check_file_exists(os.path.join(path_input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
+        if is_csv:
+            SP_COMPOSITION_COLUMNS.NAME_SP = SP_COMPOSITION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
+        all_errors_structure_files.extend(error)
+        
+        exists_path_sp_values, is_csv, is_xlsx, error = check_file_exists(os.path.join(path_input_folder, SP_VALUES_COLUMNS.NAME_SP))
+        if is_csv:
+            SP_VALUES_COLUMNS.NAME_SP = SP_VALUES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
+        all_errors_structure_files.extend(error)
+        
+        exists_path_sp_proportionalities, is_csv, is_xlsx, error = check_file_exists(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        if is_csv:
+            SP_PROPORTIONALITIES_COLUMNS.NAME_SP = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
+        all_errors_structure_files.extend(error)
+
+        all_correct_structure_files = not all_errors_structure_files
+        
+        # Update STRUCTURE_FILES_TO_CLEAN_LIST
+        STRUCTURE_FILES_COLUMNS_DICT = {
+            SP_SCENARIO_COLUMNS.NAME_SP: [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO, SP_SCENARIO_COLUMNS.SIMBOLO],
+            SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: [SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO, SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO],
+            
+            SP_DESCRIPTION_COLUMNS.NAME_SP: [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META],
+            
+            SP_COMPOSITION_COLUMNS.NAME_SP: [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO],
+            SP_VALUES_COLUMNS.NAME_SP: [SP_VALUES_COLUMNS.ID, SP_VALUES_COLUMNS.NOME],
+            SP_PROPORTIONALITIES_COLUMNS.NAME_SP: [SP_PROPORTIONALITIES_COLUMNS.ID, SP_PROPORTIONALITIES_COLUMNS.NOME]
+        }
+        
+        STRUCTURE_FILES_TO_CLEAN_LIST = [
+            [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1], # CORRIGIR para 0.x
+            [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NIVEL], 1],
+            [SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CENARIO], -1],
+            
+            [SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0],
+            [SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1],
+            
+            [SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO], 0]
+        ]
+        
         # ------------------------------------------------------------------------------------------------------------------------------------
+        
         # LEITURA DOS ARQUIVOS E CRIAÇÃO DOS DATAFRAMES: Se não existir, o dataframe será criado vazio
         # Arquivos opcionais: cenários e referência temporal
-        df_sp_scenario = read_excel_file(os.path.join(path_input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
-        df_sp_proportionalities = read_excel_file(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        df_sp_scenario, errors_read_file = read_excel_file(os.path.join(path_input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
+        df_sp_proportionalities, errors_read_file = read_excel_file(os.path.join(path_input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
         
         sp_scenario_exists = True
         sp_proportionalities_exists = True
@@ -85,10 +137,10 @@ if __name__ == "__main__":
             sp_proportionalities_exists = False
 
         # Arquivo obrigatório: descrição, composição, valores e proporcionalidades
-        df_sp_temporal_reference = read_excel_file(os.path.join(path_input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
-        df_sp_description = read_excel_file(os.path.join(path_input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
-        df_sp_composition = read_excel_file(os.path.join(path_input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
-        df_sp_values = read_excel_file(os.path.join(path_input_folder, SP_VALUES_COLUMNS.NAME_SP))
+        df_sp_temporal_reference, errors_read_file = read_excel_file(os.path.join(path_input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+        df_sp_description, errors_read_file = read_excel_file(os.path.join(path_input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
+        df_sp_composition, errors_read_file = read_excel_file(os.path.join(path_input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
+        df_sp_values, errors_read_file = read_excel_file(os.path.join(path_input_folder, SP_VALUES_COLUMNS.NAME_SP))
         # ------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -107,9 +159,6 @@ if __name__ == "__main__":
         # ------------------------------------------------------------------------------------------------------------------------------------
         # print("Iniciando a verificação: Estrutura dos arquivos da pasta de entrada")
         # 1.1 - Estrutura dos arquivos da pasta de entrada
-        all_correct_structure_files = True
-        all_errors_structure_files = []
-        all_warnings_structure_files = []
 
         for file_name, df in data_df.items():
             is_correct, errors, warnings = orc.verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], sp_scenario_exists, sp_proportionalities_exists)
@@ -118,7 +167,7 @@ if __name__ == "__main__":
             all_warnings_structure_files.extend(warnings)
         
         # 1.2 - Arquivos da pasta de entrada
-        is_correct_main_path, errors_main_path, warnings_main_path = orc.verify_not_exepected_files_in_folder_root(path_input_folder)
+        is_correct_main_path, errors_main_path, warnings_main_path = orc.verify_not_exepected_files_in_folder_root(path_input_folder, STRUCTURE_FILES_COLUMNS_DICT)
         all_correct_structure_files = all_correct_structure_files and is_correct_main_path
         all_errors_structure_files.extend(errors_main_path)
         all_warnings_structure_files.extend(warnings_main_path)

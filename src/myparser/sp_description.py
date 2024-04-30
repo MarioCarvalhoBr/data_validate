@@ -5,7 +5,7 @@ from src.myparser.text_processor import capitalize_text_keep_acronyms
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation, check_values_integers
 # Spreadsheets classes and constants
-from src.myparser.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
 
 def check_html_in_descriptions(df, column):
     df = df.copy()
@@ -138,6 +138,7 @@ def verify_sp_description_levels(df):
             if not is_correct:
                 errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
                 continue
+            dig = int(dig)
             if dig < 1:
                 errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Nível do indicador não é um número inteiro maior que 0.")
     except Exception as e:

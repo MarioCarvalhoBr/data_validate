@@ -17,8 +17,12 @@ if [ $? -eq 0 ]; then
     python3 main.py --input_folder=input_data/data_errors_03/ > log/log_errors_03.txt
     python3 main.py --input_folder=input_data/data_errors_04/ > log/log_errors_04.txt
     python3 main.py --input_folder=input_data/data_errors_05/ > log/log_errors_05.txt
+    python3 main.py --input_folder=input_data/data_errors_06/ > log/log_errors_06.txt
     python3 main.py --input_folder=input_data/data_ground_truth_01/ > log/log_data_ground_truth_01.txt
     python3 main.py --input_folder=input_data/data_ground_truth_02/ > log/log_data_ground_truth_02.txt
+    python3 main.py --input_folder=input_data/data_ground_truth_03_csv/ > log/log_data_ground_truth_03_csv.txt
+    python3 main.py --input_folder=input_data/data_ground_truth_04_csv_xlsx/ > log/log_data_ground_truth_04_csv_xlsx.txt
+
 
     # STAGE DOS ARQUIVOS GERADOS
     echo ""
@@ -37,8 +41,11 @@ if [ $? -eq 0 ]; then
     git add log/log_errors_03.txt
     git add log/log_errors_04.txt
     git add log/log_errors_05.txt
+    git add log/log_errors_06.txt
     git add log/log_data_ground_truth_01.txt
     git add log/log_data_ground_truth_02.txt
+    git add log/log_data_ground_truth_03_csv.txt
+    git add log/log_data_ground_truth_04_csv_xlsx.txt
 
     echo "5. Pipeline finalizado com sucesso."
 else

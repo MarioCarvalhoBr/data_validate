@@ -1,10 +1,10 @@
 from src.myparser.structures_files import verify_expected_structure_files, verify_not_exepected_files_in_folder_root, verify_files_data_clean
 
 # Spreadsheets classes and constants
-from src.myparser.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 # Structures files
-from src.myparser.structures_files import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FILES_TO_CLEAN_LIST
+from tests.unit.test_constants import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FILES_TO_CLEAN_LIST
 
 # DATA FRAMES - GROUND TRUTH 01
 from tests.unit.test_constants import df_sp_scenario_data_ground_truth_01, df_sp_temporal_reference_data_ground_truth_01, df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01, df_sp_values_data_ground_truth_01, df_sp_proportionalities_data_ground_truth_01
@@ -23,6 +23,8 @@ from tests.unit.test_constants import df_sp_scenario_errors_04, df_sp_temporal_r
 
 # DATA FRAMES - ERROS 05
 from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_reference_errors_05, df_sp_description_errors_05, df_sp_composition_errors_05, df_sp_values_errors_05, df_sp_proportionalities_errors_05
+
+# DATA FRAMES - ERROS 06
 
 # PATHS MAIN
 from tests.unit.test_constants import path_input_data_errors_02, path_input_data_errors_03, path_input_data_errors_05
@@ -58,7 +60,7 @@ def test_count_errors_verify_expected_structure_files_data_ground_truth_01():
     assert len(all_warnings_structure_files) == 0
 
 def test_count_errors_verify_expected_structure_files_data_ground_truth_02():
-        # Dicionário com os dataframes
+    # Dicionário com os dataframes
     data_df = {
         SP_SCENARIO_COLUMNS.NAME_SP: df_sp_scenario_data_ground_truth_02,
         SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: df_sp_temporal_reference_data_ground_truth_02,
@@ -231,9 +233,9 @@ def test_errors_verify_expected_structure_files_errors_05():
     }
     sp_scenario_exists = True
     sp_proportionalities_exists = True
-    if df_sp_scenario_data_ground_truth_02 is None or df_sp_scenario_data_ground_truth_02.empty:
+    if df_sp_scenario_errors_05 is None or df_sp_scenario_errors_05.empty:
         sp_scenario_exists = False
-    if df_sp_temporal_reference_data_ground_truth_02 is None or df_sp_temporal_reference_data_ground_truth_02.empty:
+    if df_sp_temporal_reference_errors_05 is None or df_sp_temporal_reference_errors_05.empty:
         sp_proportionalities_exists = False
 
     all_correct_structure_files = True
@@ -259,20 +261,21 @@ def test_errors_verify_expected_structure_files_errors_05():
 
 # Testes: verify_not_exepected_files_in_folder_root
 def test_count_errors_verify_not_exepected_files_in_folder_root_data_errors_02():
-    is_correct, errors, warnings = verify_not_exepected_files_in_folder_root(path_input_data_errors_02)
+    is_correct, errors, warnings = verify_not_exepected_files_in_folder_root(path_input_data_errors_02, STRUCTURE_FILES_COLUMNS_DICT)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 1
+    # warnings.append(f"O arquivo '{file_basename}' não é esperado.")
     assert warnings[0] == "O arquivo 'arquivo_aleatorio.xlsx' não é esperado."
 
 def test_count_errors_verify_not_exepected_files_in_folder_root_data_errors_05():
-    is_correct, errors, warnings = verify_not_exepected_files_in_folder_root(path_input_data_errors_05)
+    is_correct, errors, warnings = verify_not_exepected_files_in_folder_root(path_input_data_errors_05, STRUCTURE_FILES_COLUMNS_DICT)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_errors_verify_not_exepected_files_in_folder_root_downt_exist_folder_files():
-    is_correct, errors, warnings = verify_not_exepected_files_in_folder_root("dont_exist_path")
+    is_correct, errors, warnings = verify_not_exepected_files_in_folder_root("dont_exist_path", STRUCTURE_FILES_COLUMNS_DICT)
     assert len(errors) == 1
     assert len(warnings) == 0
 
@@ -284,7 +287,7 @@ def test_errors_verify_not_exepected_files_in_folder_root_data_errors_03():
     all_warnings_structure_files = []
 
     # Verifica a estrutura dos arquivos principais
-    is_correct_main_path, errors_main_path, warnings_main_path = verify_not_exepected_files_in_folder_root(path_input_data_errors_03)
+    is_correct_main_path, errors_main_path, warnings_main_path = verify_not_exepected_files_in_folder_root(path_input_data_errors_03, STRUCTURE_FILES_COLUMNS_DICT)
     all_correct_structure_files = all_correct_structure_files and is_correct_main_path
     all_errors_structure_files.extend(errors_main_path)
     all_warnings_structure_files.extend(warnings_main_path)

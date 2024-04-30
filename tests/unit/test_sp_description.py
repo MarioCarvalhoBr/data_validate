@@ -10,7 +10,7 @@ from src.myparser.sp_description import verify_sp_description_codes_uniques
 from src.myparser.sp_description import verify_sp_description_cr_lf
 
 # Spreadsheets classes and constants
-from src.myparser.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_data_ground_truth_01
