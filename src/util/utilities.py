@@ -5,6 +5,10 @@ import math
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
 
 
+def create_directory(dirName):
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+        
 def check_column_names(df, expected_columns):
     missing_columns = [col for col in expected_columns if col not in df.columns]
     extra_columns = [col for col in df.columns if col not in expected_columns]

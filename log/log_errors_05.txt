@@ -41,3 +41,5 @@
 [34m[1m
 Tempo total de execução: 2.1 segundos
 [0m
+
+Criado um arquivo de relatório em HTML: output_data/input_data/data_errors_05/report.html

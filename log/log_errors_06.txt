@@ -37,5 +37,7 @@
 [31m[1mNúmero de erros: 2
 [33m[1mNúmero de avisos: 2
 [34m[1m
-Tempo total de execução: 1.8 segundos
+Tempo total de execução: 2.1 segundos
 [0m
+
+Criado um arquivo de relatório em HTML: output_data/input_data/data_errors_06/report.html
