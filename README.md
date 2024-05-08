@@ -144,3 +144,7 @@ ruff check --target-version=py310 .
 ```shell
 pip install enum34
 ```
+#### Pre-commit install 
+```shell
+pre-commit install
+```

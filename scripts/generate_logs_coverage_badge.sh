@@ -61,6 +61,17 @@ if [ $? -eq 0 ]; then
     git add output_data/input_data/data_ground_truth_03_csv/report.html
     git add output_data/input_data/data_ground_truth_04_csv_xlsx/report.html
 
+    git add output_data/input_data/data_errors_01/report.pdf
+    git add output_data/input_data/data_errors_02/report.pdf
+    git add output_data/input_data/data_errors_03/report.pdf
+    git add output_data/input_data/data_errors_04/report.pdf
+    git add output_data/input_data/data_errors_05/report.pdf
+    git add output_data/input_data/data_errors_06/report.pdf
+    git add output_data/input_data/data_ground_truth_01/report.pdf
+    git add output_data/input_data/data_ground_truth_02/report.pdf
+    git add output_data/input_data/data_ground_truth_03_csv/report.pdf
+    git add output_data/input_data/data_ground_truth_04_csv_xlsx/report.pdf
+
     echo "5. Pipeline finalizado com sucesso."
 else
     echo "Resultado: Falha ao gerar o relatório de cobertura."
