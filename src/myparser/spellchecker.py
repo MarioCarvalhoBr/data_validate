@@ -49,7 +49,7 @@ def find_spelling_errors(text, meu_analizador):
             errors.append(word)
     return errors
 
-def run(df, file_name, columns_sheets, lang_dict_spell):
+def verify_spelling_text(df, file_name, columns_sheets, lang_dict_spell):
     df = df.copy()
     errors, warnings = [], []
     

@@ -1,0 +1,68 @@
+import os
+from jinja2 import Environment, FileSystemLoader
+
+class HTMLReportGenerator:
+    def __init__(self, folder, template_name="template_report.html"):
+        self.folder = folder
+        self.template_name = template_name
+        self.env = Environment(loader=FileSystemLoader(folder))
+        self.create_html_template()
+
+    def create_html_template(self):
+        """ Cria ou verifica a existência de um template HTML para os relatórios. """
+        file_path = os.path.join(self.folder, self.template_name)
+        if not os.path.exists(file_path):
+            text_html = """
+            <!DOCTYPE html>
+            <html>
+            <head lang="en">
+                <meta charset="UTF-8">
+                <title>Data Validate</title>
+            </head>
+            <body>
+                <h2>Report Errors</h2>
+                <p>{{ errors }}</p>
+                <h2>Report Warnings</h2>
+                <p>{{ warnings }}</p>
+                <h2>Report Info</h2>
+                <p>Number of errors: {{ num_errors }}</p>
+                <p>Number of warnings: {{ num_warnings }}</p>
+            </body>
+            </html>
+            """
+            with open(file_path, 'w') as f:
+                f.write(text_html)
+            # print('\nCreated a file report in HTML template: ', file_path)
+
+    def save_html_report(self, file_output_html, results_tests):
+        """ Preenche o template HTML com dados e salva o resultado. """
+        template = self.env.get_template(self.template_name)
+        
+        num_errors = sum(len(data_test[2]) for data_test in results_tests if not data_test[1])
+        num_warnings = sum(len(data_test[3]) for data_test in results_tests)
+        
+        errors = "\n<br>".join(
+            f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
+            "\n<br>".join(f"<span style='color: red;'>{error}</span>" for error in errors)
+            for name, _, errors, _ in results_tests if errors
+        )
+
+        warnings = "\n<br>".join(
+            f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
+            "\n<br>".join(f"<span style='color: orange;'>{warning}</span>" for warning in warnings)
+            for name, _, _, warnings in results_tests if warnings
+        )
+
+        template_vars = {
+            "errors": errors,
+            "warnings": warnings,
+            "num_errors": num_errors,
+            "num_warnings": num_warnings
+        }
+
+        html_out = template.render(template_vars)
+        output_path = os.path.join(self.folder, file_output_html)
+        with open(output_path, 'w') as f:
+            f.write(html_out)
+        print(f'\nCriado um arquivo de relatório em HTML: {output_path}')
+

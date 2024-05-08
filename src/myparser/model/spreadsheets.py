@@ -1,5 +1,8 @@
 # CONSTANTS
 SP_DESCRIPTION_MAX_TITLE_LENGTH = 40
+OUTPUT_FOLDER = "output_data/"
+OUTPUT_DEFAULT_HTML = "default.html"
+OUTPUT_REPORT_HTML = "report.html"
 
 class SP_DESCRIPTION_COLUMNS ():
     # Columns names

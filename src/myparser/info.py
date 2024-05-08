@@ -19,5 +19,5 @@ def print_versions():
     print("Pytest version:", pytest.__version__)
     print("Pipreqs version:", pipreqs.__version__)
     print("Coverage version:", coverage.__version__)
-    print("Pre-commit version:", pre_commit)
+    print("Pre-commit install path:", pre_commit)
     return True

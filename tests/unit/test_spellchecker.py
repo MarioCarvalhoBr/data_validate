@@ -1,4 +1,4 @@
-from src.myparser.spellchecker import run as verify_spelling_text
+from src.myparser.spellchecker import verify_spelling_text
 
 
 # Spreadsheets classes and constants
