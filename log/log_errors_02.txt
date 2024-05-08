@@ -64,7 +64,10 @@
 [31m[1mNúmero de erros: 10
 [33m[1mNúmero de avisos: 21
 [34m[1m
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 1.3 segundos
 [0m
 
 Criado um arquivo de relatório em HTML: output_data/input_data/data_errors_02/report.html
+
+Criado um arquivo de relatório em PDF: /home/aroeira/Desktop/CARVALHO/inpe/data_validate/output_data/input_data/data_errors_02/report.pdf
+
