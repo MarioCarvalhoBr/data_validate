@@ -10,7 +10,7 @@ if __name__ == "__main__":
     parser.add_argument("--input_folder", type=str, required=True, help="Caminnho para a pasta de entrada.")
     parser.add_argument("--no-spellchecker", action="store_true", help="Não executa o verificador ortográfico.")
     parser.add_argument("--lang-dict", type=str, default="pt", help="Define qual a linguagem do dicionário ortográfico: pt ou en.")
-    parser.add_argument("--no-warning-titles-length", action="store_true", help=f"Desabilita o aviso para nomes e títulos com uma quantidade de caracteres definidas.")
+    parser.add_argument("--no-warning-titles-length", action="store_true", help="Desabilita o aviso para nomes e títulos com uma quantidade de caracteres definidas.")
     parser.add_argument("--debug", action="store_true", help="Executa o programa em modo debug.")
 
     # Parser args

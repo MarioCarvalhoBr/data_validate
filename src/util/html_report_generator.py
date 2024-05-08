@@ -34,7 +34,7 @@ class HTMLReportGenerator:
                 f.write(text_html)
             # print('\nCreated a file report in HTML template: ', file_path)
 
-    def save_html_report(self, file_output_html, results_tests):
+    def save_html_report(self, output_folder, file_output_html, results_tests):
         """ Preenche o template HTML com dados e salva o resultado. """
         template = self.env.get_template(self.template_name)
         
@@ -61,7 +61,7 @@ class HTMLReportGenerator:
         }
 
         html_out = template.render(template_vars)
-        output_path = os.path.join(self.folder, file_output_html)
+        output_path = os.path.join(output_folder, file_output_html)
         with open(output_path, 'w') as f:
             f.write(html_out)
         print(f'\nCriado um arquivo de relatório em HTML: {output_path}')

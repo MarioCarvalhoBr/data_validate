@@ -1,0 +1,51 @@
+
+            <!DOCTYPE html>
+            <html>
+            <head lang="en">
+                <meta charset="UTF-8">
+                <title>Data Validate</title>
+            </head>
+            <body>
+                <h2>Report Errors</h2>
+                <p>
+<br><span style='color: blue;'>Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: red;'>composicao.xlsx: Coluna número 3 não possui nome mas possui valores.</span>
+<br><span style='color: red;'>valores.xlsx: Coluna número 20 não possui nome mas possui valores.</span>
+<br>
+<br><span style='color: blue;'>Limpeza dos arquivos</span>:
+<br><span style='color: red;'>descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 2: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 3: A coluna 'nivel' contém um valor inválido: O valor '2.77' não é um número inteiro.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'XX3' não é um número.</span>
+<br><span style='color: red;'>composicao.xlsx, linha 5: A coluna 'codigo_pai' contém um valor inválido: O valor '5000.7875' não é um número inteiro.</span>
+<br><span style='color: red;'>composicao.xlsx, linha 7: A coluna 'codigo_pai' contém um valor inválido: O valor '5001.88' não é um número inteiro.</span>
+<br>
+<br><span style='color: blue;'>Relações entre indicadores</span>:
+<br><span style='color: red;'>descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].</span>
+<br><span style='color: red;'>composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].</span>
+<br><span style='color: red;'>composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].</span>
+<br><span style='color: red;'>valores.xlsx: Códigos inválidos: ['5000.954', '5001,9483', 'Unnamed: 19'].</span>
+<br><span style='color: red;'>valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].</span>
+<br>
+<br><span style='color: blue;'>Níveis de indicadores</span>:
+<br><span style='color: red;'>descricao.xlsx, linha 2: Nível do indicador não é um número inteiro maior que 0.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 3: Nível do indicador não é um número inteiro maior que 0.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.</span></p>
+                <h2>Report Warnings</h2>
+                <p>
+<br><span style='color: blue;'>Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: orange;'>composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.</span>
+<br>
+<br><span style='color: blue;'>Ortografia</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].</span>
+<br>
+<br><span style='color: blue;'>Padrão para nomes dos indicadores</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".</span></p>
+                <h2>Report Info</h2>
+                <p>Number of errors: 17</p>
+                <p>Number of warnings: 4</p>
+            </body>
+            </html>
+            

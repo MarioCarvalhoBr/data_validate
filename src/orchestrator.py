@@ -243,8 +243,6 @@ def run(input_folder, no_spellchecker, lang_dict, no_warning_titles_length, debu
             all_errors = []
             all_warnings = []
 
-            time_init_ortografia = time.time()
-
             is_correct_desc, errors_spell_desc, warnings_spell_desc = spellchecker.verify_spelling_text(df_sp_description,SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA], lang_dict_spell)
             is_all_correct = is_all_correct and is_correct_desc
             all_errors.extend(errors_spell_desc)
@@ -259,8 +257,6 @@ def run(input_folder, no_spellchecker, lang_dict, no_warning_titles_length, debu
             is_all_correct = is_all_correct and is_correct_temporal_reference
             all_errors.extend(errors_spell_temporal_reference)
             all_warnings.extend(warnings_spell_temporal_reference)
-
-            time_final_ortografia = time.time()
 
             results_tests.append([("Issue #24: " if debug else "") +"Ortografia", is_all_correct, all_errors, all_warnings])
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -398,6 +394,7 @@ def run(input_folder, no_spellchecker, lang_dict, no_warning_titles_length, debu
     # Creating output folder
     folder_output = os.path.join(OUTPUT_FOLDER, input_folder)
     util.create_directory(folder_output)
-    report_generator = HTMLReportGenerator(folder_output, OUTPUT_DEFAULT_HTML)
-    report_generator.save_html_report(OUTPUT_REPORT_HTML, results_tests)
+
+    report_generator = HTMLReportGenerator(OUTPUT_FOLDER, OUTPUT_DEFAULT_HTML)
+    report_generator.save_html_report(folder_output, OUTPUT_REPORT_HTML, results_tests)
 
