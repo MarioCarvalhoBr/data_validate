@@ -37,5 +37,5 @@ Tempo total de execução: 1.0 segundos
 
 Criado um arquivo de relatório em HTML: output_data/input_data/data_ground_truth_04_csv_xlsx/report.html
 
-Criado um arquivo de relatório em PDF: /home/aroeira/Desktop/CARVALHO/inpe/data_validate/output_data/input_data/data_ground_truth_04_csv_xlsx/report.pdf
+Criado um arquivo de relatório em PDF: output_data/input_data/data_ground_truth_04_csv_xlsx/report.pdf
 

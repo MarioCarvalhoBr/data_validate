@@ -5,6 +5,7 @@ from pyhtml2pdf import converter
 class ReportGenerator:
     def __init__(self, folder, template_name="default.html"):
         self.folder = folder
+        self.output_folder = None
         self.template_name = template_name
         self.env = Environment(loader=FileSystemLoader(folder))
         self.create_html_template()
@@ -37,6 +38,7 @@ class ReportGenerator:
 
     def save_html_pdf_report(self, output_folder, file_output_html, results_tests):
         try: 
+            self.output_folder = output_folder
             """ Preenche o template HTML com dados e salva o resultado. """
             template = self.env.get_template(self.template_name)
             
@@ -63,8 +65,8 @@ class ReportGenerator:
             }
 
             html_out = template.render(template_vars)
-            output_path = os.path.join(output_folder, file_output_html)
-            with open(output_path, 'w') as f:
+            output_path = os.path.join(self.output_folder, file_output_html)
+            with open(output_path, 'w', encoding="utf-8") as f:
                 f.write(html_out)
             print(f'\nCriado um arquivo de relatório em HTML: {output_path}')
             self.save_pdf_report(output_path)
@@ -74,9 +76,15 @@ class ReportGenerator:
     
     def save_pdf_report(self, output_path):
         try: 
-            path = os.path.abspath(output_path)
-            converter.convert(f'file:///{path}', f'{path.replace(".html", ".pdf")}')
-            print(f'\nCriado um arquivo de relatório em PDF: {path.replace(".html", ".pdf")}\n')
+            ABSOLUTE_PATH_FILE = os.path.abspath(output_path)
+            
+            FULL_FILE_PATH_HTML = f'file:///{ABSOLUTE_PATH_FILE}'
+            ABS_PATH_PDF = ABSOLUTE_PATH_FILE.replace(".html", ".pdf")
+
+            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF)
+            
+            print(f'\nCriado um arquivo de relatório em PDF: {os.path.join(self.output_folder, os.path.basename(ABS_PATH_PDF))}\n')
+
         except Exception as e:
             print(f'\nErro ao criar o arquivo de relatório em PDF: {e}')
             pass
