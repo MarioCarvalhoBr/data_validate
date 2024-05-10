@@ -1,7 +1,10 @@
 # Importações padrões do Python
-from colorama import Fore, Style
 import time
 import os
+
+# Importações de outros módulos e pacotes
+from colorama import Fore, Style
+from colorama import just_fix_windows_console
 
 # Importações de módulos de verificações
 import src.myparser.hierarchy.graph as graph
@@ -20,6 +23,9 @@ from src.util.report_generator import ReportGenerator
 # Modelos de dados
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_MAX_TITLE_LENGTH, OUTPUT_DEFAULT_HTML, OUTPUT_REPORT_HTML
+
+# CORREÇÃO DAS CORES em terminais Windows
+just_fix_windows_console()
 
 # Função principal para executar o programa
 def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, debug):
