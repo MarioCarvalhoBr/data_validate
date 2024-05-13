@@ -12,16 +12,16 @@ if [ $? -eq 0 ]; then
     echo "3. Gerando o badge de cobertura..."
     python3 scripts/generate_badge.py
     echo "4. Gerando os logs..."
-    python3 main.py --input_folder=input_data/data_errors_01/ > log/log_errors_01.txt
-    python3 main.py --input_folder=input_data/data_errors_02/ > log/log_errors_02.txt
-    python3 main.py --input_folder=input_data/data_errors_03/ > log/log_errors_03.txt
-    python3 main.py --input_folder=input_data/data_errors_04/ > log/log_errors_04.txt
-    python3 main.py --input_folder=input_data/data_errors_05/ > log/log_errors_05.txt
-    python3 main.py --input_folder=input_data/data_errors_06/ > log/log_errors_06.txt
-    python3 main.py --input_folder=input_data/data_ground_truth_01/ > log/log_data_ground_truth_01.txt
-    python3 main.py --input_folder=input_data/data_ground_truth_02/ > log/log_data_ground_truth_02.txt
-    python3 main.py --input_folder=input_data/data_ground_truth_03_csv/ > log/log_data_ground_truth_03_csv.txt
-    python3 main.py --input_folder=input_data/data_ground_truth_04_csv_xlsx/ > log/log_data_ground_truth_04_csv_xlsx.txt
+    python3 main.py --input_folder=input_data/data_errors_01/ --debug > log/log_errors_01.txt
+    python3 main.py --input_folder=input_data/data_errors_02/ --debug> log/log_errors_02.txt
+    python3 main.py --input_folder=input_data/data_errors_03/ --debug> log/log_errors_03.txt
+    python3 main.py --input_folder=input_data/data_errors_04/ --debug> log/log_errors_04.txt
+    python3 main.py --input_folder=input_data/data_errors_05/ --debug> log/log_errors_05.txt
+    python3 main.py --input_folder=input_data/data_errors_06/ --debug> log/log_errors_06.txt
+    python3 main.py --input_folder=input_data/data_ground_truth_01/ --debug> log/log_data_ground_truth_01.txt
+    python3 main.py --input_folder=input_data/data_ground_truth_02/ --debug> log/log_data_ground_truth_02.txt
+    python3 main.py --input_folder=input_data/data_ground_truth_03_csv/ --debug> log/log_data_ground_truth_03_csv.txt
+    python3 main.py --input_folder=input_data/data_ground_truth_04_csv_xlsx/ --debug> log/log_data_ground_truth_04_csv_xlsx.txt
 
 
     # STAGE DOS ARQUIVOS GERADOS
@@ -50,27 +50,27 @@ if [ $? -eq 0 ]; then
     # Adiciona os arquivos html a ao staging area
     echo "4. Adicionando os arquivos html ao staging area..."
     git add output_data/default.html
-    git add output_data/input_data/data_errors_01/report.html
-    git add output_data/input_data/data_errors_02/report.html
-    git add output_data/input_data/data_errors_03/report.html
-    git add output_data/input_data/data_errors_04/report.html
-    git add output_data/input_data/data_errors_05/report.html
-    git add output_data/input_data/data_errors_06/report.html
-    git add output_data/input_data/data_ground_truth_01/report.html
-    git add output_data/input_data/data_ground_truth_02/report.html
-    git add output_data/input_data/data_ground_truth_03_csv/report.html
-    git add output_data/input_data/data_ground_truth_04_csv_xlsx/report.html
+    git add output_data/input_data/data_errors_01/data_errors_01_report.html
+    git add output_data/input_data/data_errors_02/data_errors_02_report.html
+    git add output_data/input_data/data_errors_03/data_errors_03_report.html
+    git add output_data/input_data/data_errors_04/data_errors_04_report.html
+    git add output_data/input_data/data_errors_05/data_errors_05_report.html
+    git add output_data/input_data/data_errors_06/data_errors_06_report.html
+    git add output_data/input_data/data_ground_truth_01/data_ground_truth_01_report.html
+    git add output_data/input_data/data_ground_truth_02/data_ground_truth_02_report.html
+    git add output_data/input_data/data_ground_truth_03_csv/data_ground_truth_03_csv_report.html
+    git add output_data/input_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
 
-    git add output_data/input_data/data_errors_01/report.pdf
-    git add output_data/input_data/data_errors_02/report.pdf
-    git add output_data/input_data/data_errors_03/report.pdf
-    git add output_data/input_data/data_errors_04/report.pdf
-    git add output_data/input_data/data_errors_05/report.pdf
-    git add output_data/input_data/data_errors_06/report.pdf
-    git add output_data/input_data/data_ground_truth_01/report.pdf
-    git add output_data/input_data/data_ground_truth_02/report.pdf
-    git add output_data/input_data/data_ground_truth_03_csv/report.pdf
-    git add output_data/input_data/data_ground_truth_04_csv_xlsx/report.pdf
+    git add output_data/input_data/data_errors_01/data_errors_01_report.pdf
+    git add output_data/input_data/data_errors_02/data_errors_02_report.pdf
+    git add output_data/input_data/data_errors_03/data_errors_03_report.pdf
+    git add output_data/input_data/data_errors_04/data_errors_04_report.pdf
+    git add output_data/input_data/data_errors_05/data_errors_05_report.pdf
+    git add output_data/input_data/data_errors_06/data_errors_06_report.pdf
+    git add output_data/input_data/data_ground_truth_01/data_ground_truth_01_report.pdf
+    git add output_data/input_data/data_ground_truth_02/data_ground_truth_02_report.pdf
+    git add output_data/input_data/data_ground_truth_03_csv/data_ground_truth_03_csv_report.pdf
+    git add output_data/input_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.pdf
 
     echo "5. Pipeline finalizado com sucesso."
 else

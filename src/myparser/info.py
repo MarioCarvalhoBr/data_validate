@@ -8,8 +8,9 @@ import pytest
 import pipreqs
 import coverage
 import pre_commit
+import datetime
 def print_versions():
-    print("\nPackages versions:")
+    print("\nPACKAGES VERSIONS: ")
     print("Colorama version:", colorama.__version__)
     print("Matplotlib version:", matplotlib.__version__)
     print("Networkx version:", networkx.__version__)
@@ -21,3 +22,24 @@ def print_versions():
     print("Coverage version:", coverage.__version__)
     print("Pre-commit install path:", pre_commit)
     return True
+
+
+# Informações da ferramenta
+
+__name__ = "Canoa"
+__version__ = "0.1.0"
+
+__author__ = "Mário de Araújo Carvalho"
+__email__ = "mariodearaujocarvalho@gmail.com"
+
+__description__ = "A simple parser for Canoa project"
+__url__ = "https://github.com/AdaptaBrasil/data_validate"
+__license__ = "MIT"
+
+__status__ = "Development"
+
+__python_version__ = "3.12"
+__packages__ = ["colorama", "matplotlib", "networkx", "openpyxl", "pandas", "pyarrow", "pytest", "pipreqs", "coverage", "pre_commit"]
+
+# UTILS
+__date_now__ = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')

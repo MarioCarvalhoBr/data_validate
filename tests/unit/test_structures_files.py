@@ -171,7 +171,6 @@ def test_errors_verify_expected_structure_files_errors_03():
     assert all_errors_structure_files[12] == "proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada."
 
     # Verifica se os warnings são o esperado
-    print(all_warnings_structure_files)
     assert all_warnings_structure_files[0] == "cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação."
     assert all_warnings_structure_files[1] == "referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação."
     assert all_warnings_structure_files[2] == "descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação."
@@ -215,7 +214,6 @@ def test_errors_verify_expected_structure_files_errors_04():
     assert all_errors_structure_files[1] == "valores.xlsx: Coluna número 20 não possui nome mas possui valores."
 
     # Verifica se os warnings são o esperado
-    print(all_warnings_structure_files)
     assert all_warnings_structure_files[0] == "composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação."
 
 def test_errors_verify_expected_structure_files_errors_05():

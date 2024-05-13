@@ -1,84 +1,95 @@
 
+Modo DEBUG ativado.
 
-[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_03/
+PACKAGES VERSIONS: 
+Colorama version: 0.4.6
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.4.2
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 
-
-
-
-[37m[1m------ Resultados da verificação dos testes ------
-[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
-[31mcenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.
-[31mcenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
-[31mreferencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
-[31mdescricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'.
-[31mdescricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
-[31mvalores.xlsx: Coluna 'id' esperada mas não foi encontrada.
-[31mproporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
-[34m[1mVerificação: Limpeza dos arquivos
-[34m[1mVerificação: Relações entre indicadores
-[31mvalores.xlsx: Códigos inválidos: ['codigo'].
-[34m[1mVerificação: Hierarquia como árvore
-[34m[1mVerificação: Níveis de indicadores
-[34m[1mVerificação: Unicidade dos códigos
-[34m[1mVerificação: Códigos HTML nas descrições simples
-[34m[1mVerificação: Títulos únicos
-[34m[1mVerificação: Campos vazios
-[34m[1mVerificação: Títulos com mais de 40 caracteres
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em cenários
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
-[34m[1mVerificação: Relações de valores únicos em cenários
-[34m[1mVerificação: Relações de valores únicos em referência temporal
-[34m[1mVerificação: Relações de combinações de valores
-[31mvalores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
-[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
-[33mcenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
-[33mreferencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
-[33mdescricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação.
-[33mdescricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação.
-[33mcomposicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
-[33mO arquivo 'arquivo_aleatorio.xlsx' não é esperado.
-[34m[1mVerificação: Ortografia
-[33mdescricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
-[34m[1mVerificação: Padrão para nomes dos indicadores
-[33mdescricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
-[33mdescricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
-[33mdescricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
-[33mdescricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
-[33mdescricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
-[33mdescricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
-[34m[1mVerificação: Quebra de linha para descrição
-[33mdescricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
-[33mdescricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
-[33mdescricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
-[33mdescricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
-[33mdescricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
-[33mdescricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
-[33mdescricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
-[33mdescricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
-[33mdescricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
-[33mdescricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
-[33mdescricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
-[34m[1mVerificação: Quebra de linha para cenários
-[33mcenarios.xlsx, linha 1: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
-[33mcenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
-[34m[1mVerificação: Quebra de linha para referência temporal
-[33mreferencia_temporal.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 12.
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
 
 
-[31m[1mNúmero de erros: 15
-[33m[1mNúmero de avisos: 27
-[34m[1m
-Tempo total de execução: 1.3 segundos
-[0m
+------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.
+cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
+referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'.
+descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
+valores.xlsx: Coluna 'id' esperada mas não foi encontrada.
+proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
+Verificação: Issue #79: Limpeza dos arquivos
+Verificação: Issue #2 e #59: Relações entre indicadores
+valores.xlsx: Códigos inválidos: ['codigo'].
+Verificação: Issue #3: Hierarquia como árvore
+Verificação: Issue #37: Níveis de indicadores
+Verificação: Issue #8: Unicidade dos códigos
+Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Issue #36: Títulos únicos
+Verificação: Issue #75: Campos vazios
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Issue #81: Relações de valores únicos em cenários
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
+referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
+descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação.
+descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação.
+composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
+O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
+Verificação: Issue #24: Ortografia
+descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
+Verificação: Issue #1: Padrão para nomes dos indicadores
+descricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
+descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
+descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
+descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
+descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
+descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
+Verificação: Issue #85: Quebra de linha para descrição
+descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
+descricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
+descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
+descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
+descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
+Verificação: Issue #85: Quebra de linha para cenários
+cenarios.xlsx, linha 1: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
+cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
+Verificação: Issue #85: Quebra de linha para referência temporal
+referencia_temporal.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 12.
 
-Criado um arquivo de relatório em HTML: output_data/input_data/data_errors_03/report.html
 
-Criado um arquivo de relatório em PDF: output_data/input_data/data_errors_03/report.pdf
+Número de erros: 15
+Número de avisos: 27
+
+Tempo total de execução: 2.4 segundos
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_03/data_errors_03_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/input_data/data_errors_03/data_errors_03_report.pdf
 

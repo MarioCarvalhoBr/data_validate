@@ -1,0 +1,179 @@
+
+                        <!DOCTYPE html>
+                        <html lang="pt-br">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                            <title>Canoa Report</title>
+                            <style>
+                                .container {
+                                    max-width: 98%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container my-5">
+
+                                <div class="text-center mb-4">
+                                    <h1><strong>Canoa</strong></h1>
+                                    <h2>Relatório de Validação de Dados</h2>
+                                </div>
+
+                                <div class="card mb-4">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Informações</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>Data e hora do processo: </strong>2024-05-13 16:30:28<br>
+                                        <strong>Versão do validador:</strong>  0.1.0
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Resumo da validação</strong>
+                                    </div>
+                                    <div class="card-body">
+                                       <p class="card-text"><strong class="text-danger">Número de Erros: 15</strong></p>
+                                        <p class="card-text"><strong class="text-warning">Número de Avisos: 27</strong></p>
+                                    </div>
+                                </div>
+                                <br>
+
+                                <div class="card mb-4">
+                                    <div class="card-header bg-danger text-white">
+                                        <strong>Erros</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+<br><span style='color: blue;'>Issue #39: Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: red;'>cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'.</span>
+<br><span style='color: red;'>descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.</span>
+<br><span style='color: red;'>valores.xlsx: Coluna 'id' esperada mas não foi encontrada.</span>
+<br><span style='color: red;'>proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.</span>
+<br>
+<br><span style='color: blue;'>Issue #79: Limpeza dos arquivos</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #2 e #59: Relações entre indicadores</span>:
+<br><span style='color: red;'>valores.xlsx: Códigos inválidos: ['codigo'].</span>
+<br>
+<br><span style='color: blue;'>Issue #3: Hierarquia como árvore</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #37: Níveis de indicadores</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #8: Unicidade dos códigos</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #5: Códigos HTML nas descrições simples</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #24: Ortografia</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #36: Títulos únicos</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #75: Campos vazios</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #1: Padrão para nomes dos indicadores</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #39: Títulos com mais de 40 caracteres</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #32: Pontuações obrigatórias e proibidas em descrições</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em cenários</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em referência temporal</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #81: Relações de valores únicos em cenários</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #81: Relações de valores únicos em referência temporal</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #81: Relações de combinações de valores</span>:
+<br><span style='color: red;'>valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.</span>
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para descrição</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para cenários</span>:
+<br>
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para referência temporal</span>:
+<br></p>
+                                    </div>
+                                </div>
+                                <div class="card mb-4">
+                                    <div class="card-header text-dark bg-warning">
+                                        <strong>Avisos</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="card-text">
+<br><span style='color: blue;'>Issue #39: Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: orange;'>cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.</span>
+<br><span style='color: orange;'>referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.</span>
+<br><span style='color: orange;'>descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação.</span>
+<br><span style='color: orange;'>descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação.</span>
+<br><span style='color: orange;'>composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.</span>
+<br><span style='color: orange;'>O arquivo 'arquivo_aleatorio.xlsx' não é esperado.</span>
+<br>
+<br><span style='color: blue;'>Issue #24: Ortografia</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].</span>
+<br>
+<br><span style='color: blue;'>Issue #1: Padrão para nomes dos indicadores</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".</span>
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para descrição</span>:
+<br><span style='color: orange;'>descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.</span>
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para cenários</span>:
+<br><span style='color: orange;'>cenarios.xlsx, linha 1: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.</span>
+<br><span style='color: orange;'>cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.</span>
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para referência temporal</span>:
+<br><span style='color: orange;'>referencia_temporal.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 12.</span></p>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
+                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></>
+                        </body>
+                        </html>
+
+            

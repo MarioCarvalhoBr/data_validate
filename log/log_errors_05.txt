@@ -1,48 +1,59 @@
 
+Modo DEBUG ativado.
 
-[37m[1mIniciando a verificação dos arquivos da pasta: input_data/data_errors_05/
+PACKAGES VERSIONS: 
+Colorama version: 0.4.6
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.4.2
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 
-
-
-
-[37m[1m------ Resultados da verificação dos testes ------
-[34m[1mVerificação: Estrutura dos arquivos da pasta de entrada
-[31mdescricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
-[34m[1mVerificação: Limpeza dos arquivos
-[31mreferencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
-[34m[1mVerificação: Relações entre indicadores
-[34m[1mVerificação: Hierarquia como árvore
-[34m[1mVerificação: Níveis de indicadores
-[34m[1mVerificação: Unicidade dos códigos
-[34m[1mVerificação: Códigos HTML nas descrições simples
-[34m[1mVerificação: Ortografia
-[34m[1mVerificação: Títulos únicos
-[34m[1mVerificação: Campos vazios
-[34m[1mVerificação: Padrão para nomes dos indicadores
-[34m[1mVerificação: Títulos com mais de 40 caracteres
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em descrições
-[34m[1mVerificação: Pontuações obrigatórias e proibidas em referência temporal
-[34m[1mVerificação: Relações de valores únicos em referência temporal
-[34m[1mVerificação: Relações de combinações de valores
-[31mvalores.xlsx: A coluna '5000-2030-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5000-2050-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5000-2030-P' é desnecessária.
-[31mvalores.xlsx: A coluna '5000-2050-P' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2030-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2050-O' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2030-P' é desnecessária.
-[31mvalores.xlsx: A coluna '5003-2050-P' é desnecessária.
-[34m[1mVerificação: Quebra de linha para descrição
-[34m[1mVerificação: Quebra de linha para referência temporal
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_05/
 
 
-[31m[1mNúmero de erros: 10
-[37m[1mNúmero de avisos: 0
-[34m[1m
-Tempo total de execução: 1.0 segundos
-[0m
+------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+descricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
+Verificação: Issue #79: Limpeza dos arquivos
+referencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
+Verificação: Issue #2 e #59: Relações entre indicadores
+Verificação: Issue #3: Hierarquia como árvore
+Verificação: Issue #37: Níveis de indicadores
+Verificação: Issue #8: Unicidade dos códigos
+Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Issue #24: Ortografia
+Verificação: Issue #36: Títulos únicos
+Verificação: Issue #75: Campos vazios
+Verificação: Issue #1: Padrão para nomes dos indicadores
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: A coluna '5000-2030-O' é desnecessária.
+valores.xlsx: A coluna '5000-2050-O' é desnecessária.
+valores.xlsx: A coluna '5000-2030-P' é desnecessária.
+valores.xlsx: A coluna '5000-2050-P' é desnecessária.
+valores.xlsx: A coluna '5003-2030-O' é desnecessária.
+valores.xlsx: A coluna '5003-2050-O' é desnecessária.
+valores.xlsx: A coluna '5003-2030-P' é desnecessária.
+valores.xlsx: A coluna '5003-2050-P' é desnecessária.
+Verificação: Issue #85: Quebra de linha para descrição
+Verificação: Issue #85: Quebra de linha para referência temporal
 
-Criado um arquivo de relatório em HTML: output_data/input_data/data_errors_05/report.html
 
-Criado um arquivo de relatório em PDF: output_data/input_data/data_errors_05/report.pdf
+Número de erros: 10
+Número de avisos: 0
+
+Tempo total de execução: 1.7 segundos
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_05/data_errors_05_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/input_data/data_errors_05/data_errors_05_report.pdf
 
