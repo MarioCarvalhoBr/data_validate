@@ -14,6 +14,10 @@ Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
+-------Exemplo com CR fim
+-------
+-------Exemplo com LF fim
+-------
 
 
 ------ Resultados da verificação dos testes ------
@@ -56,37 +60,37 @@ descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especifi
 composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
 O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Issue #24: Ortografia
-descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
+descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 Verificação: Issue #1: Padrão para nomes dos indicadores
-descricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
-descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
-descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
-descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
-descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
-descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
+descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
+descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
+descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
+descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
+descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
+descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
 Verificação: Issue #85: Quebra de linha para descrição
 descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
-descricao.xlsx, linha 1: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
-descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12.
-descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
-descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
-descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto.
-descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1.
-descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
-descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
-descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto.
-descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19.
+descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.
+descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.
+descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.
 Verificação: Issue #85: Quebra de linha para cenários
-cenarios.xlsx, linha 1: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
-cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40.
+cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.
+cenarios.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.
 Verificação: Issue #85: Quebra de linha para referência temporal
-referencia_temporal.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 12.
+referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
 Número de erros: 15
 Número de avisos: 27
 
-Tempo total de execução: 2.4 segundos
+Tempo total de execução: 2.7 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_03/data_errors_03_report.html

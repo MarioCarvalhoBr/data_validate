@@ -56,16 +56,16 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
 Verificação: Issue #24: Ortografia
-descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].
+descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].
 Verificação: Issue #1: Padrão para nomes dos indicadores
-descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".
-descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
+descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".
+descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
 
 
 Número de erros: 17
 Número de avisos: 4
 
-Tempo total de execução: 2.4 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_04/data_errors_04_report.html

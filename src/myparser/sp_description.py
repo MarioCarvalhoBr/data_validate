@@ -12,7 +12,7 @@ def check_html_in_descriptions(df, column):
     errors = []
     for index, row in df.iterrows():
         if re.search('<.*?>', str(row[column])):
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 1}: Coluna desc_simples não pode conter código HTML.")
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Coluna desc_simples não pode conter código HTML.")
     return errors
 
 def verify_sp_description_parser_html_column_names(df, column):
@@ -52,7 +52,7 @@ def verify_sp_description_titles_length(df):
                 continue
                 
             if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
+                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
@@ -116,7 +116,7 @@ def verify_sp_description_text_capitalize(df):
                 expected_corect_text = capitalize_text_keep_acronyms(expected_corect_text)
 
                 if not original_text == expected_corect_text:
-                    warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 1}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
+                    warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: \"{expected_corect_text}\". Encontrado: \"{original_text}\".")
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
@@ -204,7 +204,7 @@ def verify_sp_description_empty_strings(df, list_columns=[]):
             empty_mask = df[column].isna() | (df[column] == "")
             if empty_mask.any():
                 # Usa o numpy para obter os índices diretamente, que é mais rápido que iterrows
-                empty_indices = empty_mask[empty_mask].index + 1  # +1 para ajustar o índice para ser baseado em 1
+                empty_indices = empty_mask[empty_mask].index + 2  # +1 para ajustar o índice para ser baseado em 1
                 errors.extend([f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {idx}: Nenhum item da coluna '{column}' pode ser vazio." for idx in empty_indices])
 
     except Exception as e:
@@ -238,14 +238,15 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
                     continue
 
                 if text.endswith('\x0D'):
-                    warnings.append(f"{file_name}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no final do texto.")
+                    warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido (CR) no final do texto. Remova o último caractere do texto.")
                 if text.endswith('\x0A'):
-                    warnings.append(f"{file_name}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no final do texto.")
+                    print(f'-------{text}-------')
+                    warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.")
                 
                 if text.startswith('\x0D'):
-                    warnings.append(f"{file_name}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (CR) no início do texto.")
+                    warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido (CR) no início do texto. Remova o primeiro caractere do texto.")
                 if text.startswith('\x0A'):
-                    warnings.append(f"{file_name}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido (LF) no início do texto.")
+                    warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.")
            
             # Item 2: Identificar CR e LF em qualquer lugar nos campos nome e título
             for column in columns_anywhere_fixed:
@@ -257,7 +258,7 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
 
                 for match in re.finditer(r'[\x0D\x0A]', text):
                     char_type = "CR" if match.group() == '\x0D' else "LF"
-                    warnings.append(f"{file_name}, linha {index + 1}: O texto da coluna {column} possui um caracter inválido ({char_type}) na posição {match.start() + 1}.")
+                    warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido ({char_type}) na posição {match.start() + 1}. Remova o caractere do texto.")
 
     except Exception as e:
         errors.append(f"{file_name}: Erro ao processar a verificação: {e}.")

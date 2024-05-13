@@ -24,7 +24,7 @@ def check_text(column_name, text, meu_analizador, index, sheet_name):
     
     errors = check_sintax_ortography(text, meu_analizador)
     if errors:
-        return f"{sheet_name}, linha {index + 1}: Palavras com possíveis erros ortográficos na coluna {column_name}: {errors}."
+        return f"{sheet_name}, linha {index + 2}: Palavras com possíveis erros ortográficos na coluna {column_name}: {errors}."
     return ""
 
 def check_sintax_ortography(text, meu_analizador):

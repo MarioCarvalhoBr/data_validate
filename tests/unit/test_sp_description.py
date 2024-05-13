@@ -63,7 +63,7 @@ def test_count_verify_sp_description_titles_length_in_data_errors_01():
     assert len(errors) == 0
     assert len(warnings) == 1
 
-    assert warnings[0] == "descricao.xlsx, linha 9: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres."
+    assert warnings[0] == "descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres."
 
 # Testes: verify_sp_description_parser_html_column_names
 def test_true_verify_sp_description_parser_html_column_names_data_ground_truth_01():
@@ -120,8 +120,8 @@ def test_count_errors_verify_sp_description_text_capitalize_data_errors_04():
     assert len(warnings) == 2
     assert len(errors) == 0
 
-    assert warnings[0] == 'descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".'
-    assert warnings[1] == 'descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".'
+    assert warnings[0] == 'descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".'
+    assert warnings[1] == 'descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".'
 
 # Testes: verify_sp_description_levels
 def test_true_verify_sp_description_levels_data_errors_01():
