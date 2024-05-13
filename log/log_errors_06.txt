@@ -52,7 +52,7 @@ O arquivo 'outro_arquivo.xlsx' não é esperado.
 Número de erros: 2
 Número de avisos: 2
 
-Tempo total de execução: 1.8 segundos
+Tempo total de execução: 3.0 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_06/data_errors_06_report.html
