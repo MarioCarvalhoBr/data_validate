@@ -1,9 +1,15 @@
 import os
-import pandas as pd
 import math
+from pathlib import Path
+
+import pandas as pd
+
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
 
+
+def get_last_directory_name(path):
+    return Path(path).name
 
 def create_directory(dirName):
     if not os.path.exists(dirName):

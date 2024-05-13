@@ -5,10 +5,38 @@ from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
-from src.util.utilities import check_punctuation, check_vertical_bar
+from src.util.utilities import check_punctuation, check_vertical_bar, get_last_directory_name
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS
+
+
+# Testes para get_last_directory_name:
+def test_get_last_directory_name():
+    # Test with a normal path
+    path = "/home/user/Documents/test_folder"
+    result = get_last_directory_name(path)
+    assert result == "test_folder"
+
+    # Test with a path ending with a slash
+    path = "/home/user/Documents/test_folder/"
+    result = get_last_directory_name(path)
+    assert result == "test_folder"
+
+    # Test with a file path
+    path = "/home/user/Documents/test_folder/test_file.txt"
+    result = get_last_directory_name(path)
+    assert result == "test_file.txt"
+
+    # Test with an empty path
+    path = ""
+    result = get_last_directory_name(path)
+    assert result == ""
+
+    # Test with a path with only slashes
+    path = "/////"
+    result = get_last_directory_name(path)
+    assert result == ""
 
 # Testes para check_punctuation:
 def test_check_punctuation_with_no_errors():
