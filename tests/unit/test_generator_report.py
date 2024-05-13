@@ -3,7 +3,10 @@ from src.util.report_generator import ReportGenerator
 
 class TestReportGenerator:
     def setup_method(self):
-        self.folder = "/tmp"
+        self.folder = "tmp_test/"
+        # Create if dont exists the folder
+        if not os.path.exists(self.folder):
+            os.makedirs(self.folder)
         self.template_name = "test_template.html"
         self.report_generator = ReportGenerator(self.folder, self.template_name)
 
@@ -25,6 +28,9 @@ class TestReportGenerator:
         assert os.path.exists(os.path.join(self.folder, "test_report.pdf"))
 
     def teardown_method(self):
-        os.remove(os.path.join(self.folder, self.template_name))
-        os.remove(os.path.join(self.folder, "test_report.html"))
-        os.remove(os.path.join(self.folder, "test_report.pdf"))
+        # Remova todos os arquivos do diretório
+        for file in os.listdir(self.folder):
+            os.remove(os.path.join(self.folder, file))
+        
+        # Remova o diretório
+        os.rmdir(self.folder)
