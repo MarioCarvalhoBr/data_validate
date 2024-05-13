@@ -1,4 +1,8 @@
 
+
+
+
+
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
@@ -65,7 +69,7 @@ descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidad
 Número de erros: 17
 Número de avisos: 4
 
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_04/data_errors_04_report.html

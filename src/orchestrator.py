@@ -29,7 +29,7 @@ init_fix_colorama_windows_console()
 
 # Função principal para executar o programa
 def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, debug):
-
+    print("\n\n\n")
     if debug:
         print("\nModo DEBUG ativado.")
         info.print_versions()

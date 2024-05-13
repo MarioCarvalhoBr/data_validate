@@ -1,5 +1,4 @@
 import os
-import pytest
 from src.util.report_generator import ReportGenerator
 
 class TestReportGenerator:
