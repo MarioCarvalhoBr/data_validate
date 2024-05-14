@@ -17,11 +17,13 @@ Pipreqs version: 0.4.13
 Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 
-INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_04_csv_xlsx/
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_06/
 
 
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+referencia_temporal.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
+descricao.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
 Verificação: Issue #79: Limpeza dos arquivos
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
@@ -42,15 +44,18 @@ Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+O arquivo 'outro_arquivo.csv' não é esperado.
+O arquivo 'outro_arquivo.xlsx' não é esperado.
 
 
-Número de erros: 0
-Número de avisos: 0
+Número de erros: 2
+Número de avisos: 2
 
-Tempo total de execução: 1.8 segundos
+Tempo total de execução: 1.7 segundos
 
 
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_06/data_errors_06_report.html
 
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.pdf
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_06/data_errors_06_report.pdf
 

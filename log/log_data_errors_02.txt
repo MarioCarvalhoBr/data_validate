@@ -1,0 +1,92 @@
+
+
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.6
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.4.2
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_02/
+-------Exemplo com CR fim
+-------
+-------Exemplo com LF fim
+-------
+
+
+------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.
+cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
+referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'meta' não pode conter o caracter '|'.
+Verificação: Issue #79: Limpeza dos arquivos
+Verificação: Issue #2 e #59: Relações entre indicadores
+Verificação: Issue #3: Hierarquia como árvore
+Verificação: Issue #37: Níveis de indicadores
+Verificação: Issue #8: Unicidade dos códigos
+Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Issue #36: Títulos únicos
+Verificação: Issue #75: Campos vazios
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Issue #81: Relações de valores únicos em cenários
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Issue #81: Relações de combinações de valores
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
+Verificação: Issue #24: Ortografia
+descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
+Verificação: Issue #1: Padrão para nomes dos indicadores
+descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
+descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
+descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
+descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
+descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
+descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
+Verificação: Issue #85: Quebra de linha para descrição
+descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.
+descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.
+descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.
+Verificação: Issue #85: Quebra de linha para cenários
+cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.
+cenarios.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.
+Verificação: Issue #85: Quebra de linha para referência temporal
+referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+
+
+Número de erros: 10
+Número de avisos: 21
+
+Tempo total de execução: 3.2 segundos
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_02/data_errors_02_report.pdf
+

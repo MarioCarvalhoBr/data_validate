@@ -17,12 +17,14 @@ Pipreqs version: 0.4.13
 Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 
-INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_04_csv_xlsx/
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_05/
 
 
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+descricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
 Verificação: Issue #79: Limpeza dos arquivos
+referencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
 Verificação: Issue #37: Níveis de indicadores
@@ -34,23 +36,28 @@ Verificação: Issue #75: Campos vazios
 Verificação: Issue #1: Padrão para nomes dos indicadores
 Verificação: Issue #39: Títulos com mais de 40 caracteres
 Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
-Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
 Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
-Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: A coluna '5000-2030-O' é desnecessária.
+valores.xlsx: A coluna '5000-2050-O' é desnecessária.
+valores.xlsx: A coluna '5000-2030-P' é desnecessária.
+valores.xlsx: A coluna '5000-2050-P' é desnecessária.
+valores.xlsx: A coluna '5003-2030-O' é desnecessária.
+valores.xlsx: A coluna '5003-2050-O' é desnecessária.
+valores.xlsx: A coluna '5003-2030-P' é desnecessária.
+valores.xlsx: A coluna '5003-2050-P' é desnecessária.
 Verificação: Issue #85: Quebra de linha para descrição
-Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 
 
-Número de erros: 0
+Número de erros: 10
 Número de avisos: 0
 
-Tempo total de execução: 1.8 segundos
+Tempo total de execução: 1.7 segundos
 
 
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_05/data_errors_05_report.html
 
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.pdf
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_05/data_errors_05_report.pdf
 
