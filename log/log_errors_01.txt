@@ -1,4 +1,8 @@
 
+
+
+
+
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
@@ -17,7 +21,6 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_01/
 
 
 ------ Resultados da verificação dos testes ------
-Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 Verificação: Issue #79: Limpeza dos arquivos
 descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.
 descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.
@@ -47,7 +50,7 @@ descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior q
 Verificação: Issue #8: Unicidade dos códigos
 descricao.xlsx: Existem códigos duplicados: [5007].
 Verificação: Issue #75: Campos vazios
-descricao.xlsx, linha 12: Nenhum item da coluna 'nome_simples' pode ser vazio.
+descricao.xlsx, linha 13: Nenhum item da coluna 'nome_simples' pode ser vazio.
 Verificação: Issue #81: Relações de valores únicos em cenários
 cenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.
 cenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.
@@ -60,36 +63,38 @@ valores.xlsx: A coluna '5000-2080-M' é desnecessária.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+O arquivo '.~lock.descricao.xlsx#' não é esperado.
 Verificação: Issue #5: Códigos HTML nas descrições simples
-descricao.xlsx, linha 1: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
+descricao.xlsx, linha 4: Coluna desc_simples não pode conter código HTML.
 Verificação: Issue #24: Ortografia
-descricao.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].
-descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].
-descricao.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].
-descricao.xlsx, linha 10: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
+descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].
+descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].
+descricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].
 descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
-cenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
-cenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
-cenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
-cenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
-referencia_temporal.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].
+descricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
+cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
+cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
+cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
+cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
+referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].
 Verificação: Issue #36: Títulos únicos
 descricao.xlsx: Existem nomes simples duplicados: ['Seca', 'Sensibilidade'].
 descricao.xlsx: Existem nomes completos duplicados: ['Índice de Risco de Impacto para Seca'].
 Verificação: Issue #1: Padrão para nomes dos indicadores
-descricao.xlsx, linha 1: Nome simples fora do padrão. Esperado: "Segurança alimentar.". Encontrado: "Segurança Alimentar.".
-descricao.xlsx, linha 1: Nome completo fora do padrão. Esperado: "Impactos para segurança alimentar". Encontrado: "Impactos para Segurança Alimentar".
-descricao.xlsx, linha 2: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
+descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Segurança alimentar.". Encontrado: "Segurança Alimentar.".
+descricao.xlsx, linha 2: Nome completo fora do padrão. Esperado: "Impactos para segurança alimentar". Encontrado: "Impactos para Segurança Alimentar".
 descricao.xlsx, linha 3: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
-descricao.xlsx, linha 4: Nome completo fora do padrão. Esperado: "Índice de exposição.". Encontrado: "Índice de Exposição.".
-descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Ameaça climática". Encontrado: "Ameaça Climática".
-descricao.xlsx, linha 5: Nome completo fora do padrão. Esperado: "Índice de ameaça climática". Encontrado: "Índice de Ameaça Climática".
-descricao.xlsx, linha 6: Nome completo fora do padrão. Esperado: "Índice de sensibilidade". Encontrado: "Índice de Sensibilidade".
-descricao.xlsx, linha 7: Nome completo fora do padrão. Esperado: "Índice de capacidade adaptativa". Encontrado: "Índice de Capacidade Adaptativa".
+descricao.xlsx, linha 4: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
+descricao.xlsx, linha 5: Nome completo fora do padrão. Esperado: "Índice de exposição.". Encontrado: "Índice de Exposição.".
+descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Ameaça climática". Encontrado: "Ameaça Climática".
+descricao.xlsx, linha 6: Nome completo fora do padrão. Esperado: "Índice de ameaça climática". Encontrado: "Índice de Ameaça Climática".
+descricao.xlsx, linha 7: Nome completo fora do padrão. Esperado: "Índice de sensibilidade". Encontrado: "Índice de Sensibilidade".
+descricao.xlsx, linha 8: Nome completo fora do padrão. Esperado: "Índice de capacidade adaptativa". Encontrado: "Índice de Capacidade Adaptativa".
 Verificação: Issue #39: Títulos com mais de 40 caracteres
-descricao.xlsx, linha 9: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres.
+descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres.
 Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
 descricao.xlsx, linha 2: A coluna 'nome_simples' não deve terminar com pontuação.
 descricao.xlsx, linha 2: A coluna 'desc_completa' deve terminar com ponto.
@@ -103,9 +108,9 @@ referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
 
 
 Número de erros: 30
-Número de avisos: 32
+Número de avisos: 33
 
-Tempo total de execução: 2.4 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_01/data_errors_01_report.html

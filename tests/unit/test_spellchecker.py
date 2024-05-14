@@ -76,16 +76,16 @@ def test_count_errors_verify_spelling_text_pt_BR_data_errors_01():
     assert len(all_warnings) == 10
     assert len(all_errors) == 0
 
-    assert all_warnings[0] == "descricao.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades']."
-    assert all_warnings[1] == "descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas']."
-    assert all_warnings[2] == "descricao.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema']."
-    assert all_warnings[3] == "descricao.xlsx, linha 10: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais']."
-    assert all_warnings[4] == "descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais']."
-    assert all_warnings[5] == "cenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta']."
-    assert all_warnings[6] == "cenarios.xlsx, linha 1: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta']."
-    assert all_warnings[7] == "cenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta']."
-    assert all_warnings[8] == "cenarios.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta']."
-    assert all_warnings[9] == "referencia_temporal.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda']."
+    assert all_warnings[0] == "descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades']."
+    assert all_warnings[1] == "descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas']."
+    assert all_warnings[2] == "descricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema']."
+    assert all_warnings[3] == "descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais']."
+    assert all_warnings[4] == "descricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais']."
+    assert all_warnings[5] == "cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta']."
+    assert all_warnings[6] == "cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta']."
+    assert all_warnings[7] == "cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta']."
+    assert all_warnings[8] == "cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta']."
+    assert all_warnings[9] == "referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda']."
 
 def test_count_errors_verify_spelling_text_pt_BR_data_errors_02():
     lang_dict_spell = "pt_BR"
@@ -116,7 +116,7 @@ def test_count_errors_verify_spelling_text_pt_BR_data_errors_02():
     assert len(all_warnings) == 1
     assert len(all_errors) == 0
 
-    assert all_warnings[0] == "descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."
+    assert all_warnings[0] == "descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."
 
 def test_count_errors_verify_spelling_text_pt_BR_data_errors_03():
     lang_dict_spell = "pt_BR"
@@ -147,4 +147,4 @@ def test_count_errors_verify_spelling_text_pt_BR_data_errors_03():
     assert len(all_warnings) == 1
     assert len(all_errors) == 0
 
-    assert all_warnings[0] == "descricao.xlsx, linha 8: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."
+    assert all_warnings[0] == "descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# EXECUTANDO AS VERIFICAÇÕES
+# EXECUTANDO AS VERIFICAÇÕES - NEW
 
 echo "Executando verificações..."
 python3 main.py --input_folder=input_data/data_ground_truth_01/ --debug

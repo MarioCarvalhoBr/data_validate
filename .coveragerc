@@ -6,4 +6,4 @@ source = src/
 omit =
     *orchestrator.py*
     */python3.5/*
-    *info.py*
+    */python3.12/*

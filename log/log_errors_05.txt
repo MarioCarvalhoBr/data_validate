@@ -1,4 +1,8 @@
 
+
+
+
+
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
@@ -50,7 +54,7 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Número de erros: 10
 Número de avisos: 0
 
-Tempo total de execução: 1.7 segundos
+Tempo total de execução: 1.8 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/input_data/data_errors_05/data_errors_05_report.html

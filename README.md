@@ -71,6 +71,13 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/
   --input_folder=caminho/para/pasta
   ```
 
+- `--output_folder` (padrão: `output_data/`): Especifica o caminho para a pasta de saída onde os resultados da análise serão salvos. Se não for fornecido, os resultados serão salvos na pasta `output_data/`.
+  
+  Exemplo:
+  ```
+  --output_folder=caminho/para/pasta
+  ```
+
 - `--no-spellchecker`: Quando este argumento é usado, o script não executa a verificação ortográfica nos arquivos `.xlsx`. É útil se você deseja acelerar o processo de análise ou se a verificação ortográfica não é necessária.
   Exemplo:
   ```
