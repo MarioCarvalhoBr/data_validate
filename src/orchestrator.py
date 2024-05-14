@@ -373,14 +373,10 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         print(Style.RESET_ALL)
 
     
-    # Criar a pasta de saída principal
+    # Criar a pasta de saída para salvar os relatórios
     util.create_directory(output_folder)
-
-    # Criar a pasta de saída para os arquivos de entrada
-    new_output_folder = os.path.join(output_folder, input_folder)
-    util.create_directory(new_output_folder)
 
     report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML)
     # Pegar somente o base name do input_folder
     name_file = util.get_last_directory_name(input_folder)
-    report_generator.save_html_pdf_report(name_file=name_file, output_folder=new_output_folder, file_output_html=OUTPUT_REPORT_HTML, results_tests=results_tests)
+    report_generator.save_html_pdf_report(name_file=name_file, output_folder=output_folder, file_output_html=OUTPUT_REPORT_HTML, results_tests=results_tests)

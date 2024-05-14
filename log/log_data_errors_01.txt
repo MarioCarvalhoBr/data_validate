@@ -1,0 +1,119 @@
+
+
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.6
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.4.2
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_01/
+
+
+------ Resultados da verificação dos testes ------
+Verificação: Issue #79: Limpeza dos arquivos
+descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.
+descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.
+descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor '3.1' não é um número inteiro.
+descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.
+descricao.xlsx, linha 12: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.
+composicao.xlsx, linha 14: A coluna 'codigo_pai' contém um valor inválido: O valor '-88' é menor que 0.
+composicao.xlsx, linha 16: A coluna 'codigo_pai' contém um valor inválido: O valor 'MSDOS' não é um número.
+composicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor inválido: O valor '0' é menor que 1.
+composicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor inválido: O valor '-89' é menor que 1.
+composicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor inválido: O valor 'GNU' não é um número.
+referencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor inválido: O valor '2050B' não é um número.
+Verificação: Issue #2 e #59: Relações entre indicadores
+descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5001, 5002, 5010, 5022, 5033].
+composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
+composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
+composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
+descricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [2].
+valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
+Verificação: Issue #3: Hierarquia como árvore
+composicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.
+composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].
+Verificação: Issue #37: Níveis de indicadores
+descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
+descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0.
+descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0.
+Verificação: Issue #8: Unicidade dos códigos
+descricao.xlsx: Existem códigos duplicados: [5007].
+Verificação: Issue #75: Campos vazios
+descricao.xlsx, linha 13: Nenhum item da coluna 'nome_simples' pode ser vazio.
+Verificação: Issue #81: Relações de valores únicos em cenários
+cenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.
+cenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+referencia_temporal.xlsx: A coluna 'nome' não deve conter valores repetidos.
+Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: A coluna '2-2015' é obrigatória.
+valores.xlsx: A coluna '5000-2030-O' é obrigatória.
+valores.xlsx: A coluna '5000-2080-M' é desnecessária.
+Verificação: Issue #85: Quebra de linha para descrição
+Verificação: Issue #85: Quebra de linha para cenários
+Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+O arquivo '.~lock.descricao.xlsx#' não é esperado.
+Verificação: Issue #5: Códigos HTML nas descrições simples
+descricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
+descricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
+descricao.xlsx, linha 4: Coluna desc_simples não pode conter código HTML.
+Verificação: Issue #24: Ortografia
+descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].
+descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].
+descricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].
+descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
+descricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].
+cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
+cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
+cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
+cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
+referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].
+Verificação: Issue #36: Títulos únicos
+descricao.xlsx: Existem nomes simples duplicados: ['Seca', 'Sensibilidade'].
+descricao.xlsx: Existem nomes completos duplicados: ['Índice de Risco de Impacto para Seca'].
+Verificação: Issue #1: Padrão para nomes dos indicadores
+descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Segurança alimentar.". Encontrado: "Segurança Alimentar.".
+descricao.xlsx, linha 2: Nome completo fora do padrão. Esperado: "Impactos para segurança alimentar". Encontrado: "Impactos para Segurança Alimentar".
+descricao.xlsx, linha 3: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
+descricao.xlsx, linha 4: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
+descricao.xlsx, linha 5: Nome completo fora do padrão. Esperado: "Índice de exposição.". Encontrado: "Índice de Exposição.".
+descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Ameaça climática". Encontrado: "Ameaça Climática".
+descricao.xlsx, linha 6: Nome completo fora do padrão. Esperado: "Índice de ameaça climática". Encontrado: "Índice de Ameaça Climática".
+descricao.xlsx, linha 7: Nome completo fora do padrão. Esperado: "Índice de sensibilidade". Encontrado: "Índice de Sensibilidade".
+descricao.xlsx, linha 8: Nome completo fora do padrão. Esperado: "Índice de capacidade adaptativa". Encontrado: "Índice de Capacidade Adaptativa".
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres.
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+descricao.xlsx, linha 2: A coluna 'nome_simples' não deve terminar com pontuação.
+descricao.xlsx, linha 2: A coluna 'desc_completa' deve terminar com ponto.
+descricao.xlsx, linha 3: A coluna 'desc_simples' deve terminar com ponto.
+descricao.xlsx, linha 5: A coluna 'nome_completo' não deve terminar com pontuação.
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+cenarios.xlsx, linha 3: A coluna 'nome' não deve terminar com pontuação.
+cenarios.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
+
+
+Número de erros: 30
+Número de avisos: 33
+
+Tempo total de execução: 2.4 segundos
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_01/data_errors_01_report.pdf
+

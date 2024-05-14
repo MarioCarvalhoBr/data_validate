@@ -1,0 +1,78 @@
+
+
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.6
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.4.2
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_04/
+
+
+------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+composicao.xlsx: Coluna número 3 não possui nome mas possui valores.
+valores.xlsx: Coluna número 20 não possui nome mas possui valores.
+Verificação: Issue #79: Limpeza dos arquivos
+descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
+descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
+descricao.xlsx, linha 2: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.
+descricao.xlsx, linha 3: A coluna 'nivel' contém um valor inválido: O valor '2.77' não é um número inteiro.
+descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'XX3' não é um número.
+composicao.xlsx, linha 5: A coluna 'codigo_pai' contém um valor inválido: O valor '5000.7875' não é um número inteiro.
+composicao.xlsx, linha 7: A coluna 'codigo_pai' contém um valor inválido: O valor '5001.88' não é um número inteiro.
+Verificação: Issue #2 e #59: Relações entre indicadores
+descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].
+composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].
+composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].
+valores.xlsx: Códigos inválidos: ['5000.954', '5001,9483', 'Unnamed: 19'].
+valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].
+Verificação: Issue #3: Hierarquia como árvore
+Verificação: Issue #37: Níveis de indicadores
+descricao.xlsx, linha 2: Nível do indicador não é um número inteiro maior que 0.
+descricao.xlsx, linha 3: Nível do indicador não é um número inteiro maior que 0.
+descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
+Verificação: Issue #8: Unicidade dos códigos
+Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Issue #36: Títulos únicos
+Verificação: Issue #75: Campos vazios
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Issue #81: Relações de valores únicos em cenários
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Issue #81: Relações de combinações de valores
+Verificação: Issue #85: Quebra de linha para descrição
+Verificação: Issue #85: Quebra de linha para cenários
+Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
+Verificação: Issue #24: Ortografia
+descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].
+Verificação: Issue #1: Padrão para nomes dos indicadores
+descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".
+descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
+
+
+Número de erros: 17
+Número de avisos: 4
+
+Tempo total de execução: 2.4 segundos
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_04/data_errors_04_report.pdf
+
