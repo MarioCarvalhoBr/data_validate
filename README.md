@@ -157,3 +157,9 @@ pip install enum34
 ```shell
 pre-commit install
 ```
+#### Install genbadge
+
+```shell
+pip install genbadge[all]
+          
+```

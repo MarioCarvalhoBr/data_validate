@@ -18,10 +18,9 @@ if [ $? -eq 0 ]; then
     echo "3. Gerando o badge de cobertura e adicionando arquivos ao staging area..."
     genbadge coverage -o - > reports/coverage/coverage_badge.svg
     genbadge tests -o reports/coverage/tests_badge.svg
-    git add reports/coverage/tests_badge.svg
-    git add reports/coverage/coverage_badge.svg
-    git add reports/coverage/coverage.xml
     
+    # Adicionando arquivos ao staging area
+    git add .
 
     echo "4. Gerando os logs (.txt, html, pdf) e adicionando arquivos ao staging area..."
     for name in "${folder_input_names[@]}"; do
@@ -31,10 +30,6 @@ if [ $? -eq 0 ]; then
             python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug> log/log_$name.txt
             
             # Adicionando arquivos ao staging area
-            #git add log/log_$name.txt
-            #git add $OUTPUT_DATA/$name/default.html
-            #git add $OUTPUT_DATA/$name/${name}_report.html
-            #git add $OUTPUT_DATA/$name/${name}_report.pdf
             git add .
         else
             echo "Erro: A pasta '$INPUT_DATA/$name' não existe."

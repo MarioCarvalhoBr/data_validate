@@ -16,7 +16,6 @@ Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_04_csv_xlsx/
 
@@ -48,7 +47,7 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 1.8 segundos
+Tempo total de execução: 1.9 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
