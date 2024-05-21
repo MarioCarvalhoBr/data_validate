@@ -48,7 +48,7 @@ O arquivo '.~lock.descricao.xlsx#' não é esperado.
 Número de erros: 0
 Número de avisos: 1
 
-Tempo total de execução: 2.8 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html
