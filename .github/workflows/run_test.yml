@@ -55,4 +55,4 @@ jobs:
 
       - name: Run main
         run: |
-          bash scripts/run_main.sh
+          bash scripts/run_main_pipeline.sh

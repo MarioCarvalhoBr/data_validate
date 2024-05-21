@@ -9,6 +9,8 @@ import pipreqs
 import coverage
 import pre_commit
 import datetime
+import genbadge
+
 def print_versions():
     print("\nPACKAGES VERSIONS: ")
     print("Colorama version:", colorama.__version__)
@@ -21,6 +23,7 @@ def print_versions():
     print("Pipreqs version:", pipreqs.__version__)
     print("Coverage version:", coverage.__version__)
     print("Pre-commit install path:", pre_commit)
+    print("Genbadge version:", genbadge.__version__)
     return True
 
 

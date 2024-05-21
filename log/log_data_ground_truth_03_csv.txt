@@ -16,6 +16,7 @@ Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_03_csv/
 

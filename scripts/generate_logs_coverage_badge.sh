@@ -1,43 +1,47 @@
 #!/bin/bash
-# Caminho relativo ou absoluto para o seu script
-. ~/miniconda3/etc/profile.d/conda.sh
 
 echo "1. Ativando o ambiente..."
+. ~/miniconda3/etc/profile.d/conda.sh
 conda activate adapta_data
 
+# Importa o arquivo de constantes usando o caminho do diretório do script
+SCRIPT_DIR=$(dirname "$0")
+source "$SCRIPT_DIR/constants.sh"
 
 echo "2. Gerando o relatório de cobertura..."
-coverage run -m pytest
+coverage run -m pytest --junitxml=reports/junit/junit.xml
 coverage report
-coverage json -o coverage.json
-
-# Array com os nomes comuns das pastas e arquivos
-data_names=("data_errors_01" "data_errors_02" "data_errors_03" "data_errors_04" "data_errors_05" "data_errors_06" "data_ground_truth_01" "data_ground_truth_02" "data_ground_truth_03_csv" "data_ground_truth_04_csv_xlsx")
+coverage xml -o reports/coverage/coverage.xml
 
 if [ $? -eq 0 ]; then
-    echo "Resultado. Testes passaram com sucesso."
-    
+
     echo "3. Gerando o badge de cobertura e adicionando arquivos ao staging area..."
-    python3 scripts/generate_badge.py
-    git add assets/images/coverage_badge.svg
-    git add coverage.json
+    genbadge coverage -o - > reports/coverage/coverage_badge.svg
+    genbadge tests -o reports/coverage/tests_badge.svg
+    git add reports/coverage/tests_badge.svg
+    git add reports/coverage/coverage_badge.svg
+    git add reports/coverage/coverage.xml
+    
 
     echo "4. Gerando os logs (.txt, html, pdf) e adicionando arquivos ao staging area..."
-    # Gerando logs e adicionando arquivos ao staging area
-    for name in "${data_names[@]}"; do
-        python3 main.py --input_folder=input_data/$name/ --output_folder=output_data/$name/ --debug> log/log_$name.txt
-        
-        # Adicionando os logs ao staging area
-        git add log/log_$name.txt
+    for name in "${folder_input_names[@]}"; do
+        if [ -d "$INPUT_DATA/$name" ]; then
+            echo ""
+            echo "Processando a pasta '$INPUT_DATA/$name'..."
+            python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug> log/log_$name.txt
+            
+            # Adicionando arquivos ao staging area
+            #git add log/log_$name.txt
+            #git add $OUTPUT_DATA/$name/default.html
+            #git add $OUTPUT_DATA/$name/${name}_report.html
+            #git add $OUTPUT_DATA/$name/${name}_report.pdf
+            git add .
+        else
+            echo "Erro: A pasta '$INPUT_DATA/$name' não existe."
+            exit 1
+        fi
 
-        # Adicionando arquivos html ao staging area
-        git add output_data/$name/default.html
-        git add output_data/$name/${name}_report.html
-        
-        # Adicionando relatórios pdf ao staging area
-        git add output_data/$name/${name}_report.pdf
     done
-
     echo "5. Pipeline finalizado com sucesso."
 else
     echo "Resultado: Falha ao gerar o relatório de cobertura."

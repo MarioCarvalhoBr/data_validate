@@ -16,12 +16,12 @@ Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01/
 
 
 ------ Resultados da verificação dos testes ------
-Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 Verificação: Issue #79: Limpeza dos arquivos
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
@@ -42,12 +42,14 @@ Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+O arquivo '.~lock.descricao.xlsx#' não é esperado.
 
 
 Número de erros: 0
-Número de avisos: 0
+Número de avisos: 1
 
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 2.2 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html
