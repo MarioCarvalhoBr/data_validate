@@ -88,6 +88,36 @@ def verify_sp_description_titles_uniques(df):
 
     return not errors, errors, warnings
 
+def verify_sp_description_codes_sequential(df):
+    df = df.copy()
+    errors, warnings = [], []
+    # 0. Check if the column exists
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos sequenciais foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+        return not errors, errors, warnings
+
+    try:
+        df, erros = clean_non_numeric_and_less_than_value_integers_dataframe(df, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1)
+        
+        # 1. Check if the column has only integers
+        if erros:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos sequenciais foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' contém valores inválidos.")
+            return not errors, errors, warnings
+        
+        # 2. Check if the first code is 1
+        if df[SP_DESCRIPTION_COLUMNS.CODIGO].iloc[0] != 1:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Os códigos devem começar em 1.")
+
+        # 3. Check if the codes are sequential
+        codes = df[SP_DESCRIPTION_COLUMNS.CODIGO].tolist()
+        if codes != list(range(codes[0], codes[-1] + 1)):
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Os códigos não são sequenciais.")
+
+    except Exception as e:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+
+    return not errors, errors, warnings
+
 def verify_sp_description_text_capitalize(df):
     df = df.copy()
     errors, warnings = [], []
