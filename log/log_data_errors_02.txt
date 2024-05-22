@@ -61,7 +61,7 @@ Verificação: Issue #5: Códigos HTML nas descrições simples
 Verificação: Issue #36: Títulos únicos
 Verificação: Issue #124: Códigos sequenciais
 descricao.xlsx: A coluna 'codigo' deve começar em 1.
-descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais(1, 2, 3, ...).
+descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).
 Verificação: Issue #75: Campos vazios
 Verificação: Issue #39: Títulos com mais de 40 caracteres
 Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições

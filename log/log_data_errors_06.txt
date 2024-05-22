@@ -50,7 +50,7 @@ Verificação: Issue #24: Ortografia
 Verificação: Issue #36: Títulos únicos
 Verificação: Issue #124: Códigos sequenciais
 descricao.csv: A coluna 'codigo' deve começar em 1.
-descricao.csv: A coluna 'codigo' deve conter valores sequenciais(1, 2, 3, ...).
+descricao.csv: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).
 Verificação: Issue #75: Campos vazios
 Verificação: Issue #1: Padrão para nomes dos indicadores
 Verificação: Issue #39: Títulos com mais de 40 caracteres

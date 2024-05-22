@@ -64,7 +64,7 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 1.0 segundos
+Tempo total de execução: 1.1 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
