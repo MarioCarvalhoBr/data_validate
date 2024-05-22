@@ -49,6 +49,8 @@ descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior qu
 descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0.
 Verificação: Issue #8: Unicidade dos códigos
 descricao.xlsx: Existem códigos duplicados: [5007].
+Verificação: Issue #124: Códigos sequenciais
+descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos.
 Verificação: Issue #75: Campos vazios
 descricao.xlsx, linha 13: Nenhum item da coluna 'nome_simples' pode ser vazio.
 Verificação: Issue #81: Relações de valores únicos em cenários
@@ -107,10 +109,10 @@ Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência 
 referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
 
 
-Número de erros: 30
+Número de erros: 31
 Número de avisos: 33
 
-Tempo total de execução: 2.4 segundos
+Tempo total de execução: 3.0 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html

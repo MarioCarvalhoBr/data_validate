@@ -32,6 +32,9 @@ Verificação: Issue #8: Unicidade dos códigos
 Verificação: Issue #5: Códigos HTML nas descrições simples
 Verificação: Issue #24: Ortografia
 Verificação: Issue #36: Títulos únicos
+Verificação: Issue #124: Códigos sequenciais
+descricao.xlsx: Os códigos devem começar em 1.
+descricao.xlsx: Os códigos não são sequenciais.
 Verificação: Issue #75: Campos vazios
 Verificação: Issue #1: Padrão para nomes dos indicadores
 Verificação: Issue #39: Títulos com mais de 40 caracteres
@@ -51,10 +54,10 @@ Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
 
 
-Número de erros: 10
+Número de erros: 12
 Número de avisos: 0
 
-Tempo total de execução: 1.7 segundos
+Tempo total de execução: 2.8 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_05/data_errors_05_report.html

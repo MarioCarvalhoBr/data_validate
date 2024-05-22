@@ -46,6 +46,8 @@ descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior qu
 Verificação: Issue #8: Unicidade dos códigos
 Verificação: Issue #5: Códigos HTML nas descrições simples
 Verificação: Issue #36: Títulos únicos
+Verificação: Issue #124: Códigos sequenciais
+descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos.
 Verificação: Issue #75: Campos vazios
 Verificação: Issue #39: Títulos com mais de 40 caracteres
 Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
@@ -66,7 +68,7 @@ descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries 
 descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
 
 
-Número de erros: 17
+Número de erros: 18
 Número de avisos: 4
 
 Tempo total de execução: 2.4 segundos

@@ -254,8 +254,11 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
-        # 7 - Verificar nomes de colunas únicos
+        # 7.1 - Verificar nomes de colunas únicos
         results_tests.append([("Issue #36: " if debug else "") +"Títulos únicos", *(sp_description.verify_sp_description_titles_uniques(df_sp_description))])
+        
+        # 7.2: Verificar se os códigos são sequenciais
+        results_tests.append([("Issue #124: " if debug else "") +"Códigos sequenciais", *(sp_description.verify_sp_description_codes_sequential(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------

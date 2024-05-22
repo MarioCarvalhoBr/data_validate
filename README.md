@@ -2,7 +2,6 @@
 
 ![Coverage Status](reports/coverage/coverage_badge.svg)
 ![Tests Status](reports/coverage/tests_badge.svg)
-[![Build Status](https://travis-ci.com/MarioCarvalhoBr/data_validate.svg?branch=main)](https://travis-ci.com/MarioCarvalhoBr/data_validate)
 
 ## Introdução
 Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análise e validação de arquivos de planilhas, especialmente projetada para preparar e verificar dados antes de sua submissão à plataforma Adaptabrasil.
