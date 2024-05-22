@@ -8,8 +8,9 @@ conda activate adapta_data
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/constants.sh"
 
-# Removendo todos os arquivos e subpastas do diretório de OUTPUT_DATA
+# Removendo todos os arquivos e subpastas do diretório de OUTPUT_DATA e LOG_FOLDER
 rm -rf $OUTPUT_DATA/*
+rm -rf $LOG_FOLDER/*
 
 echo "2. Gerando o relatório de cobertura..."
 coverage run -m pytest --junitxml=reports/junit/junit.xml
