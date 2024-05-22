@@ -1,12 +1,15 @@
 #!/bin/bash
 
 echo "1. Ativando o ambiente..."
-. ~/miniconda3/etc/profile.d/conda.sh
+. ~/anaconda3/etc/profile.d/conda.sh
 conda activate adapta_data
 
 # Importa o arquivo de constantes usando o caminho do diretório do script
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/constants.sh"
+
+# Removendo todos os arquivos e subpastas do diretório de OUTPUT_DATA
+rm -rf $OUTPUT_DATA/*
 
 echo "2. Gerando o relatório de cobertura..."
 coverage run -m pytest --junitxml=reports/junit/junit.xml

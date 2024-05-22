@@ -8,6 +8,7 @@ from src.myparser.sp_description import verify_sp_description_levels
 from src.myparser.sp_description import verify_sp_description_punctuation
 from src.myparser.sp_description import verify_sp_description_codes_uniques
 from src.myparser.sp_description import verify_sp_description_cr_lf
+from src.myparser.sp_description import verify_sp_description_codes_sequential
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
@@ -23,6 +24,30 @@ from tests.unit.test_constants import df_sp_scenario_errors_02, df_sp_temporal_r
 
 # DATA FRAMES - ERROS 04
 from tests.unit.test_constants import df_sp_description_errors_04
+
+# Testes: verify_sp_description_codes_sequential
+def test_true_verify_sp_description_codes_sequential_data_ground_truth_01():
+    is_correct, errors, warnings = verify_sp_description_codes_sequential(df_sp_description_data_ground_truth_01)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+    
+def test_count_errors_verify_sp_description_codes_sequential_data_errors_01():
+    is_correct, errors, warnings = verify_sp_description_codes_sequential(df_sp_description_errors_01)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+
+    assert errors[0] == f"descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos."
+
+def test_count_errors_verify_sp_description_codes_sequential_data_errors_02():
+    is_correct, errors, warnings = verify_sp_description_codes_sequential(df_sp_description_errors_02)
+    assert is_correct is False
+    assert len(errors) == 2
+    assert len(warnings) == 0
+
+    assert errors[0] == f"descricao.xlsx: A coluna 'codigo' deve começar em 1."
+    assert errors[1] == f"descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais(1, 2, 3, ...)."
 
 # Testes: verify_sp_description_cr_lf
 def test_true_errors_verify_sp_description_cr_lf_data_ground_truth_01():
@@ -63,7 +88,7 @@ def test_count_verify_sp_description_titles_length_in_data_errors_01():
     assert len(errors) == 0
     assert len(warnings) == 1
 
-    assert warnings[0] == "descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres."
+    assert warnings[0] == f"descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres."
 
 # Testes: verify_sp_description_parser_html_column_names
 def test_true_verify_sp_description_parser_html_column_names_data_ground_truth_01():
@@ -136,9 +161,9 @@ def test_count_errors_verify_sp_description_levels_data_errors_01():
     assert len(errors) == 3
     assert len(warnings) == 0
 
-    assert errors[0] == "descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0."
-    assert errors[1] == "descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0."
-    assert errors[2] == "descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0."
+    assert errors[0] == f"descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0."
+    assert errors[1] == f"descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0."
+    assert errors[2] == f"descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0."
 
 def test_count_errors_verify_sp_description_levels_data_errors_04():
     is_correct, errors, warnings = verify_sp_description_levels(df_sp_description_errors_04)
@@ -146,9 +171,9 @@ def test_count_errors_verify_sp_description_levels_data_errors_04():
     assert len(errors) == 3
     assert len(warnings) == 0
 
-    assert errors[0] == "descricao.xlsx, linha 2: Nível do indicador não é um número inteiro maior que 0."
-    assert errors[1] == "descricao.xlsx, linha 3: Nível do indicador não é um número inteiro maior que 0."
-    assert errors[2] == "descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0."
+    assert errors[0] == f"descricao.xlsx, linha 2: Nível do indicador não é um número inteiro maior que 0."
+    assert errors[1] == f"descricao.xlsx, linha 3: Nível do indicador não é um número inteiro maior que 0."
+    assert errors[2] == f"descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0."
 
 # Testes: verify_sp_description_punctuation
 def test_true_verify_sp_description_punctuation_data_ground_truth_01():

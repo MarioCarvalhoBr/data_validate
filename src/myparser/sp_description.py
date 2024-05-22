@@ -106,12 +106,12 @@ def verify_sp_description_codes_sequential(df):
         
         # 2. Check if the first code is 1
         if df[SP_DESCRIPTION_COLUMNS.CODIGO].iloc[0] != 1:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Os códigos devem começar em 1.")
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: A coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' deve começar em 1.")
 
         # 3. Check if the codes are sequential
         codes = df[SP_DESCRIPTION_COLUMNS.CODIGO].tolist()
         if codes != list(range(codes[0], codes[-1] + 1)):
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Os códigos não são sequenciais.")
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: A coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' deve conter valores sequenciais(1, 2, 3, ...).")
 
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")

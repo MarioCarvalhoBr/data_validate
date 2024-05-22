@@ -15,7 +15,7 @@ Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
-Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_05/
 
@@ -33,8 +33,8 @@ Verificação: Issue #5: Códigos HTML nas descrições simples
 Verificação: Issue #24: Ortografia
 Verificação: Issue #36: Títulos únicos
 Verificação: Issue #124: Códigos sequenciais
-descricao.xlsx: Os códigos devem começar em 1.
-descricao.xlsx: Os códigos não são sequenciais.
+descricao.xlsx: A coluna 'codigo' deve começar em 1.
+descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais(1, 2, 3, ...).
 Verificação: Issue #75: Campos vazios
 Verificação: Issue #1: Padrão para nomes dos indicadores
 Verificação: Issue #39: Títulos com mais de 40 caracteres
@@ -57,7 +57,7 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Número de erros: 12
 Número de avisos: 0
 
-Tempo total de execução: 2.8 segundos
+Tempo total de execução: 0.9 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_05/data_errors_05_report.html

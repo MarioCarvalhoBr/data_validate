@@ -10,7 +10,7 @@ from tests.unit.test_constants import STRUCTURE_FILES_COLUMNS_DICT, STRUCTURE_FI
 from tests.unit.test_constants import df_sp_scenario_data_ground_truth_01, df_sp_temporal_reference_data_ground_truth_01, df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01, df_sp_values_data_ground_truth_01, df_sp_proportionalities_data_ground_truth_01
 
 # DATA FRAMES - GROUND TRUTH 02
-from tests.unit.test_constants import df_sp_scenario_data_ground_truth_02, df_sp_temporal_reference_data_ground_truth_02, df_sp_description_data_ground_truth_02, df_sp_composition_data_ground_truth_02, df_sp_values_data_ground_truth_02, df_sp_proportionalities_data_ground_truth_02
+from tests.unit.test_constants import df_sp_scenario_data_ground_truth_02_no_scenario, df_sp_temporal_reference_data_ground_truth_02_no_scenario, df_sp_description_data_ground_truth_02_no_scenario, df_sp_composition_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario, df_sp_proportionalities_data_ground_truth_02_no_scenario
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_scenario_errors_01, df_sp_temporal_reference_errors_01, df_sp_description_errors_01, df_sp_composition_errors_01, df_sp_values_errors_01, df_sp_proportionalities_errors_01
@@ -59,24 +59,24 @@ def test_count_errors_verify_expected_structure_files_data_ground_truth_01():
     assert len(all_errors_structure_files) == 0
     assert len(all_warnings_structure_files) == 0
 
-def test_count_errors_verify_expected_structure_files_data_ground_truth_02():
+def test_count_errors_verify_expected_structure_files_data_ground_truth_02_no_scenario():
     # Dicionário com os dataframes
     data_df = {
-        SP_SCENARIO_COLUMNS.NAME_SP: df_sp_scenario_data_ground_truth_02,
-        SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: df_sp_temporal_reference_data_ground_truth_02,
+        SP_SCENARIO_COLUMNS.NAME_SP: df_sp_scenario_data_ground_truth_02_no_scenario,
+        SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: df_sp_temporal_reference_data_ground_truth_02_no_scenario,
 
-        SP_DESCRIPTION_COLUMNS.NAME_SP: df_sp_description_data_ground_truth_02,
+        SP_DESCRIPTION_COLUMNS.NAME_SP: df_sp_description_data_ground_truth_02_no_scenario,
         
-        SP_COMPOSITION_COLUMNS.NAME_SP: df_sp_composition_data_ground_truth_02,
-        SP_VALUES_COLUMNS.NAME_SP: df_sp_values_data_ground_truth_02,
-        SP_PROPORTIONALITIES_COLUMNS.NAME_SP: df_sp_proportionalities_data_ground_truth_02,
+        SP_COMPOSITION_COLUMNS.NAME_SP: df_sp_composition_data_ground_truth_02_no_scenario,
+        SP_VALUES_COLUMNS.NAME_SP: df_sp_values_data_ground_truth_02_no_scenario,
+        SP_PROPORTIONALITIES_COLUMNS.NAME_SP: df_sp_proportionalities_data_ground_truth_02_no_scenario,
     }
 
     sp_scenario_exists = True
     sp_proportionalities_exists = True
-    if df_sp_scenario_data_ground_truth_02 is None or df_sp_scenario_data_ground_truth_02.empty:
+    if df_sp_scenario_data_ground_truth_02_no_scenario is None or df_sp_scenario_data_ground_truth_02_no_scenario.empty:
         sp_scenario_exists = False
-    if df_sp_temporal_reference_data_ground_truth_02 is None or df_sp_temporal_reference_data_ground_truth_02.empty:
+    if df_sp_temporal_reference_data_ground_truth_02_no_scenario is None or df_sp_temporal_reference_data_ground_truth_02_no_scenario.empty:
         sp_proportionalities_exists = False
 
     all_correct_structure_files = True
