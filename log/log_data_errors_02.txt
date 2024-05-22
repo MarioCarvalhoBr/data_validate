@@ -1,12 +1,6 @@
 
-
-
-
-
-Modo DEBUG ativado.
-
 PACKAGES VERSIONS: 
-Colorama version: 0.4.6
+Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
@@ -16,6 +10,28 @@ Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
 Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Setuptools version: 70.0.0
+Genbadge version: 1.1.1
+
+
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.4
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.4.2
+Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Setuptools version: 70.0.0
+Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_02/
 -------Exemplo com CR fim

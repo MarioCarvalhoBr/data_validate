@@ -9,6 +9,8 @@ import pipreqs
 import coverage
 import pre_commit
 import datetime
+import setuptools
+import genbadge
 
 def print_versions():
     print("\nPACKAGES VERSIONS: ")
@@ -22,8 +24,12 @@ def print_versions():
     print("Pipreqs version:", pipreqs.__version__)
     print("Coverage version:", coverage.__version__)
     print("Pre-commit install path:", pre_commit)
+    print("Setuptools version:", setuptools.__version__)
+    print("Genbadge version:", genbadge.__version__)
+    
     return True
 
+print_versions()
 
 # Informações da ferramenta
 

@@ -4,6 +4,7 @@
 # PASTAS DE ENTRADA E SAÍDA
 INPUT_DATA="input_data"
 OUTPUT_DATA="output_data"
+LOG_FOLDER="log"
 
 # Pastas com os dados de entrada
 folder_input_names=($(find "$INPUT_DATA" -maxdepth 1 -mindepth 1 -type d -exec basename {} \;))
