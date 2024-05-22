@@ -8,6 +8,7 @@ from src.myparser.sp_description import verify_sp_description_levels
 from src.myparser.sp_description import verify_sp_description_punctuation
 from src.myparser.sp_description import verify_sp_description_codes_uniques
 from src.myparser.sp_description import verify_sp_description_cr_lf
+from src.myparser.sp_description import verify_sp_description_codes_sequential
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
@@ -23,6 +24,30 @@ from tests.unit.test_constants import df_sp_scenario_errors_02, df_sp_temporal_r
 
 # DATA FRAMES - ERROS 04
 from tests.unit.test_constants import df_sp_description_errors_04
+
+# Testes: verify_sp_description_codes_sequential
+def test_true_verify_sp_description_codes_sequential_data_ground_truth_01():
+    is_correct, errors, warnings = verify_sp_description_codes_sequential(df_sp_description_data_ground_truth_01)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+    
+def test_count_errors_verify_sp_description_codes_sequential_data_errors_01():
+    is_correct, errors, warnings = verify_sp_description_codes_sequential(df_sp_description_errors_01)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+
+    assert errors[0] == "descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos."
+
+def test_count_errors_verify_sp_description_codes_sequential_data_errors_02():
+    is_correct, errors, warnings = verify_sp_description_codes_sequential(df_sp_description_errors_02)
+    assert is_correct is False
+    assert len(errors) == 2
+    assert len(warnings) == 0
+
+    assert errors[0] == "descricao.xlsx: A coluna 'codigo' deve começar em 1."
+    assert errors[1] == "descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...)."
 
 # Testes: verify_sp_description_cr_lf
 def test_true_errors_verify_sp_description_cr_lf_data_ground_truth_01():

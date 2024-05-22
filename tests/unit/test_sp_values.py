@@ -4,7 +4,7 @@ from src.myparser.sp_values import verify_ids_sp_description_values, verify_comb
 from tests.unit.test_constants import df_sp_scenario_data_ground_truth_01, df_sp_temporal_reference_data_ground_truth_01, df_sp_description_data_ground_truth_01, df_sp_values_data_ground_truth_01
 
 # DATA FRAMES - GROUND TRUTH 02
-from tests.unit.test_constants import df_sp_scenario_data_ground_truth_02, df_sp_temporal_reference_data_ground_truth_02, df_sp_description_data_ground_truth_02, df_sp_values_data_ground_truth_02
+from tests.unit.test_constants import df_sp_scenario_data_ground_truth_02_no_scenario, df_sp_temporal_reference_data_ground_truth_02_no_scenario, df_sp_description_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_scenario_errors_01, df_sp_temporal_reference_errors_01, df_sp_description_errors_01, df_sp_values_errors_01
@@ -22,8 +22,8 @@ def test_true_verify_ids_sp_description_values_data_ground_truth_01():
     assert len(errors) == 0
     assert len(warnings) == 0
 
-def test_true_verify_ids_sp_description_values_data_ground_truth_02():
-    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_02, df_sp_values_data_ground_truth_02)
+def test_true_verify_ids_sp_description_values_data_ground_truth_02_no_scenario():
+    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
@@ -50,8 +50,8 @@ def test_true_verify_combination_sp_description_values_scenario_temporal_referen
     assert len(errors) == 0
     assert len(warnings) == 0
 
-def test_true_verify_combination_sp_description_values_scenario_temporal_reference_data_ground_truth_02():
-    is_correct, errors, warnings = verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description_data_ground_truth_02, df_sp_values_data_ground_truth_02, df_sp_scenario_data_ground_truth_02, df_sp_temporal_reference_data_ground_truth_02)
+def test_true_verify_combination_sp_description_values_scenario_temporal_reference_data_ground_truth_02_no_scenario():
+    is_correct, errors, warnings = verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario, df_sp_scenario_data_ground_truth_02_no_scenario, df_sp_temporal_reference_data_ground_truth_02_no_scenario)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0

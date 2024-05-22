@@ -1,6 +1,7 @@
 # Adapta Parser
 
-![Coverage Status](assets/images/coverage_badge.svg)
+![Coverage Status](reports/coverage/coverage_badge.svg)
+![Tests Status](reports/coverage/tests_badge.svg)
 
 ## Introdução
 Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análise e validação de arquivos de planilhas, especialmente projetada para preparar e verificar dados antes de sua submissão à plataforma Adaptabrasil.
@@ -154,4 +155,10 @@ pip install enum34
 #### Pre-commit install 
 ```shell
 pre-commit install
+```
+#### Install genbadge
+
+```shell
+pip install genbadge[all]
+          
 ```
