@@ -47,7 +47,7 @@ def test_count_errors_verify_sp_description_codes_sequential_data_errors_02():
     assert len(warnings) == 0
 
     assert errors[0] == f"descricao.xlsx: A coluna 'codigo' deve começar em 1."
-    assert errors[1] == f"descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais(1, 2, 3, ...)."
+    assert errors[1] == f"descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...)."
 
 # Testes: verify_sp_description_cr_lf
 def test_true_errors_verify_sp_description_cr_lf_data_ground_truth_01():
