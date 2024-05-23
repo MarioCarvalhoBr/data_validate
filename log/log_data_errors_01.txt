@@ -1,26 +1,10 @@
 
-PACKAGES VERSIONS: 
-Colorama version: 0.4.4
-Matplotlib version: 3.8.3
-Networkx version: 3.2.1
-Openpyxl version: 3.1.2
-Pandas version: 2.2.2
-Pyarrow version: 15.0.0
-Pytest version: 7.4.0
-Pipreqs version: 0.4.13
-Coverage version: 7.4.2
-Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 70.0.0
-Genbadge version: 1.1.1
-
-
-
 
 
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
-Colorama version: 0.4.4
+Colorama version: 0.4.6
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
@@ -29,14 +13,15 @@ Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
-Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 70.0.0
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Setuptools version: 68.2.2
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_01/
 
 
 ------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 Verificação: Issue #79: Limpeza dos arquivos
 descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.
 descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.
@@ -54,7 +39,6 @@ descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos
 composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
-descricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [2].
 valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
 Verificação: Issue #3: Hierarquia como árvore
 composicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.
@@ -75,14 +59,11 @@ cenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 referencia_temporal.xlsx: A coluna 'nome' não deve conter valores repetidos.
 Verificação: Issue #81: Relações de combinações de valores
-valores.xlsx: A coluna '2-2015' é obrigatória.
 valores.xlsx: A coluna '5000-2030-O' é obrigatória.
 valores.xlsx: A coluna '5000-2080-M' é desnecessária.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
-Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
-O arquivo '.~lock.descricao.xlsx#' não é esperado.
 Verificação: Issue #5: Códigos HTML nas descrições simples
 descricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
@@ -125,10 +106,10 @@ Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência 
 referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
 
 
-Número de erros: 31
-Número de avisos: 33
+Número de erros: 29
+Número de avisos: 32
 
-Tempo total de execução: 1.3 segundos
+Tempo total de execução: 3.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html

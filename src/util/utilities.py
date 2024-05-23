@@ -8,6 +8,18 @@ import pandas as pd
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
 
 
+def generate_list_combinations(codigo, primeiro_ano, lista_simbolos_temporais, lista_simbolos_cenarios):
+    # Create list of combinations
+    lista_combinacoes = []
+    lista_combinacoes.append(f"{codigo}-{primeiro_ano}")
+    
+    # Remove first element
+    lista_simbolos_temporais.pop(0)
+    for ano in lista_simbolos_temporais:
+        for simbolo in lista_simbolos_cenarios:
+            lista_combinacoes.append(f"{codigo}-{ano}-{simbolo}")
+    return lista_combinacoes
+
 def get_last_directory_name(path):
     return Path(path).name
 
@@ -62,17 +74,16 @@ def check_unique_values(df, name_file, columns_uniques):
 
 def check_values_integers(number, min_value=0):
     try:
-        if math.isnan(float(number)):
-            return False, f"O valor '{number}' não é um número."
-        else:
-            if float(number) != int(float(number)):
+        # Verifica se e um NaN do pandas 
+        if pd.isna(number) or math.isnan(float(number)) or float(number) != int(float(number)):
+            if not float(number).is_integer():
                 return False, f"O valor '{number}' não é um número inteiro."
-            
-            # Verifica se o número é menor que value
-            if int(number) < min_value:
-                return False, f"O valor '{number}' é menor que {min_value}."
-                        
-            return True, ""
+            return False, f"O valor '{number}' não é um número."
+        
+        if int(number) < min_value:
+            return False, f"O valor '{number}' é menor que {min_value}."
+
+        return True, "O valor é um número inteiro."
 
     except Exception:
         return False, f"O valor '{number}' não é um número."
@@ -82,24 +93,33 @@ def clean_non_numeric_and_less_than_value_integers_dataframe(df, name_file, colu
     erros = []
 
     for coluna in colunas_limpar:
-        for cell in df[coluna].copy():
+
+        # Lista de índices para remover
+        indices_para_remover = []
+       
+        for index, row in df.iterrows():
+            cell = row[coluna]
             # Replace , to .
             if isinstance(cell, str):
                 cell = cell.replace(',', '.')
             is_correct, msg = check_values_integers(cell, min_value)
             if not is_correct:
                 # Linha
-                linha = df[df[coluna] == cell].index[0]
-                erros.append(f"{name_file}, linha {linha + 2}: A coluna '{coluna}' contém um valor inválido: {msg}")
-                # Elimina a linha do dataframe
-                df = df[df[coluna] != cell]
+                erros.append(f"{name_file}, linha {index + 2}: A coluna '{coluna}' contém um valor inválido: {msg}")
+                indices_para_remover.append(index)
+
+        # Remover linhas inválidas
+        df.drop(indices_para_remover, inplace=True)
+        # Ajusta o índice
+        # df.reset_index(drop=True, inplace=True)
 
         # Converte a coluna para inteiro
         if not df[coluna].empty:
+            
             df[coluna] = df[coluna].astype(int)
     
     return df, erros
-
+    
 def file_extension_check(path, extension='.xlsx'):
     if not path.endswith(extension):
         return False, f"ERRO: O arquivo {path} de entrada não é {extension}"

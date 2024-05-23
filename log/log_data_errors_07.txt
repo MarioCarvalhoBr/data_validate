@@ -17,15 +17,21 @@ Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/en
 Setuptools version: 68.2.2
 Genbadge version: 1.1.1
 
-INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01/
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_07/
 
 
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 Verificação: Issue #79: Limpeza dos arquivos
+descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'nan' não é um número inteiro.
+descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.
+descricao.xlsx, linha 4: A coluna 'cenario' contém um valor inválido: O valor 'PHP' não é um número.
 Verificação: Issue #2 e #59: Relações entre indicadores
+descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [3, 4].
 Verificação: Issue #3: Hierarquia como árvore
 Verificação: Issue #37: Níveis de indicadores
+descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
+descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0.
 Verificação: Issue #8: Unicidade dos códigos
 Verificação: Issue #5: Códigos HTML nas descrições simples
 Verificação: Issue #24: Ortografia
@@ -40,18 +46,25 @@ Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência 
 Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: A coluna '1-2015' é desnecessária para o indicador de nível 1.
+valores.xlsx: A coluna '2-2015' é obrigatória.
+valores.xlsx: A coluna '2-2030-O' é obrigatória.
+valores.xlsx: A coluna '2-2030-P' é obrigatória.
+valores.xlsx: A coluna '2-2050-O' é obrigatória.
+valores.xlsx: A coluna '2-DESNECESSARIA-O' é desnecessária.
+valores.xlsx: A coluna '5-2030-O' é obrigatória.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 
 
-Número de erros: 0
+Número de erros: 13
 Número de avisos: 0
 
-Tempo total de execução: 2.4 segundos
+Tempo total de execução: 2.3 segundos
 
 
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html
 
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.pdf
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_07/data_errors_07_report.pdf
 
