@@ -5,10 +5,23 @@ from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
 from src.util.utilities import check_file_exists
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
-from src.util.utilities import check_punctuation, check_vertical_bar, get_last_directory_name
+from src.util.utilities import check_punctuation 
+from src.util.utilities import check_vertical_bar
+from src.util.utilities import get_last_directory_name
+from src.util.utilities import generate_list_combinations
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS
+
+# Testes para generate_list_combinations:
+def test_generate_list_combinations():
+    codigo = 1
+    primeiro_ano = 2020
+    lista_simbolos_temporais = [2020, 2021, 2022]
+    lista_simbolos_cenarios = ['A', 'B', 'C']
+    result = generate_list_combinations(codigo, primeiro_ano, lista_simbolos_temporais, lista_simbolos_cenarios)
+    expected_result = ['1-2020', '1-2021-A', '1-2021-B', '1-2021-C', '1-2022-A', '1-2022-B', '1-2022-C']
+    assert result == expected_result
 
 
 # Testes para get_last_directory_name:
@@ -182,9 +195,6 @@ def test_check_folder_exists_with_existing_folder():
     assert result is True
     assert error_message == ""
 
-# Testes para check_file_exists:
-# FILEPATH: /home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/tests/unit/test_utilities.py
-
 def test_check_file_exists_with_csv_file():
     with open('test_file.csv', 'w') as f:
         f.write('test')
@@ -257,6 +267,16 @@ def test_clean_non_numeric_and_less_than_value_integers_dataframe_with_multiple_
     assert erros[1] == f"test_file, linha 4: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_FILHO}' contém um valor inválido: O valor 'two' não é um número."
     assert len(df) == 1
 
+def test_clean_non_numeric_and_less_than_value_integers_dataframe_with_multiple_errors_one_line():
+    df = pd.DataFrame({
+        SP_COMPOSITION_COLUMNS.CODIGO_PAI: [2, 'three', 4, "five", 6]
+    })
+    df, erros = clean_non_numeric_and_less_than_value_integers_dataframe(df, 'test_file', [SP_COMPOSITION_COLUMNS.CODIGO_PAI])
+    assert len(erros) ==  2
+    assert erros[0] == f"test_file, linha 3: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' contém um valor inválido: O valor 'three' não é um número."
+    assert erros[1] == f"test_file, linha 5: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' contém um valor inválido: O valor 'five' não é um número."
+    assert len(df) == 3
+
 def test_clean_non_numeric_and_less_than_value_integers_dataframe_with_no_columns():
     df = pd.DataFrame({
         SP_COMPOSITION_COLUMNS.CODIGO_PAI: [1, 2, 3],
@@ -275,8 +295,11 @@ def test_clean_non_numeric_and_less_than_value_integers_dataframe_with_negative_
         SP_COMPOSITION_COLUMNS.CODIGO_FILHO: [2, 3, VALUE_ERROR_2],
     })
     df, erros = clean_non_numeric_and_less_than_value_integers_dataframe(df, 'test_file', [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 0)
+    # Quantida de erros
     assert len(erros) == 2
+    # Mensagens de erro 1
     assert erros[0] == f"test_file, linha 3: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' contém um valor inválido: O valor '{VALUE_ERROR_1}' é menor que 0."
+    # Mensagens de erro 2
     assert erros[1] == f"test_file, linha 4: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_FILHO}' contém um valor inválido: O valor '{VALUE_ERROR_2}' é menor que 0."
 
 # Function: check_vertical_bar

@@ -25,7 +25,7 @@
                                         <strong>Informações</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Data e hora do processo: </strong>2024-05-23 14:12:45<br>
+                                        <strong>Data e hora do processo: </strong>2024-05-23 14:11:39<br>
                                         <strong>Versão do validador:</strong>  0.1.0
                                     </div>
                                 </div>
@@ -35,7 +35,7 @@
                                         <strong>Resumo da validação</strong>
                                     </div>
                                     <div class="card-body">
-                                       <p class="card-text"><strong class="text-danger">Número de Erros: 0</strong></p>
+                                       <p class="card-text"><strong class="text-danger">Número de Erros: 13</strong></p>
                                         <p class="card-text"><strong class="text-warning">Número de Avisos: 0</strong></p>
                                     </div>
                                 </div>
@@ -51,16 +51,19 @@
 <br>
 <br>
 <br><span style='color: blue;'>Issue #79: Limpeza dos arquivos</span>:
-<br>
+<br><span style='color: red;'>descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'nan' não é um número inteiro.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: A coluna 'cenario' contém um valor inválido: O valor 'PHP' não é um número.</span>
 <br>
 <br><span style='color: blue;'>Issue #2 e #59: Relações entre indicadores</span>:
-<br>
+<br><span style='color: red;'>descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [3, 4].</span>
 <br>
 <br><span style='color: blue;'>Issue #3: Hierarquia como árvore</span>:
 <br>
 <br>
 <br><span style='color: blue;'>Issue #37: Níveis de indicadores</span>:
-<br>
+<br><span style='color: red;'>descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0.</span>
 <br>
 <br><span style='color: blue;'>Issue #8: Unicidade dos códigos</span>:
 <br>
@@ -102,7 +105,13 @@
 <br>
 <br>
 <br><span style='color: blue;'>Issue #81: Relações de combinações de valores</span>:
-<br>
+<br><span style='color: red;'>valores.xlsx: A coluna '1-2015' é desnecessária para o indicador de nível 1.</span>
+<br><span style='color: red;'>valores.xlsx: A coluna '2-2015' é obrigatória.</span>
+<br><span style='color: red;'>valores.xlsx: A coluna '2-2030-O' é obrigatória.</span>
+<br><span style='color: red;'>valores.xlsx: A coluna '2-2030-P' é obrigatória.</span>
+<br><span style='color: red;'>valores.xlsx: A coluna '2-2050-O' é obrigatória.</span>
+<br><span style='color: red;'>valores.xlsx: A coluna '2-DESNECESSARIA-O' é desnecessária.</span>
+<br><span style='color: red;'>valores.xlsx: A coluna '5-2030-O' é obrigatória.</span>
 <br>
 <br><span style='color: blue;'>Issue #85: Quebra de linha para descrição</span>:
 <br>

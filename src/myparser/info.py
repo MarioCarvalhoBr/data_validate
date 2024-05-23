@@ -29,8 +29,6 @@ def print_versions():
     
     return True
 
-print_versions()
-
 # Informações da ferramenta
 
 __name__ = "Canoa"

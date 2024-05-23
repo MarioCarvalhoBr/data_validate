@@ -1,26 +1,10 @@
 
-PACKAGES VERSIONS: 
-Colorama version: 0.4.4
-Matplotlib version: 3.8.3
-Networkx version: 3.2.1
-Openpyxl version: 3.1.2
-Pandas version: 2.2.2
-Pyarrow version: 15.0.0
-Pytest version: 7.4.0
-Pipreqs version: 0.4.13
-Coverage version: 7.4.2
-Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 70.0.0
-Genbadge version: 1.1.1
-
-
-
 
 
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
-Colorama version: 0.4.4
+Colorama version: 0.4.6
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
@@ -29,8 +13,8 @@ Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.4.2
-Pre-commit install path: <module 'pre_commit' from '/home/aroeira/anaconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 70.0.0
+Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Setuptools version: 68.2.2
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_02/
@@ -70,6 +54,7 @@ Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência 
 Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Issue #24: Ortografia
@@ -99,10 +84,10 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 12
+Número de erros: 13
 Número de avisos: 21
 
-Tempo total de execução: 1.3 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html
