@@ -61,7 +61,7 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Número de erros: 13
 Número de avisos: 0
 
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 2.4 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html

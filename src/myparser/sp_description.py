@@ -270,7 +270,6 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
                 if text.endswith('\x0D'):
                     warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido (CR) no final do texto. Remova o último caractere do texto.")
                 if text.endswith('\x0A'):
-                    print(f'-------{text}-------')
                     warnings.append(f"{file_name}, linha {index + 2}: O texto da coluna {column} possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.")
                 
                 if text.startswith('\x0D'):
