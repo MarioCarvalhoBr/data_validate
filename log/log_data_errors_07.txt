@@ -26,6 +26,7 @@ Verificação: Issue #79: Limpeza dos arquivos
 descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'nan' não é um número inteiro.
 descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.
 descricao.xlsx, linha 4: A coluna 'cenario' contém um valor inválido: O valor 'PHP' não é um número.
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Issue #2 e #59: Relações entre indicadores
 descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [3, 4].
 Verificação: Issue #3: Hierarquia como árvore
@@ -58,10 +59,10 @@ Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 
 
-Número de erros: 13
+Número de erros: 14
 Número de avisos: 0
 
-Tempo total de execução: 2.7 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html

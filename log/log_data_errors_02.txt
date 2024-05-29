@@ -33,6 +33,7 @@ descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|
 descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
 descricao.xlsx, linha 8: A coluna 'meta' não pode conter o caracter '|'.
 Verificação: Issue #79: Limpeza dos arquivos
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
 Verificação: Issue #37: Níveis de indicadores
@@ -80,7 +81,7 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 13
+Número de erros: 14
 Número de avisos: 21
 
 Tempo total de execução: 2.7 segundos

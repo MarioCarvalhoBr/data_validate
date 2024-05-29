@@ -25,6 +25,7 @@ Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 referencia_temporal.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
 descricao.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
 Verificação: Issue #79: Limpeza dos arquivos
+composicao.csv, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
 Verificação: Issue #37: Níveis de indicadores
@@ -53,10 +54,10 @@ O arquivo 'outro_arquivo.csv' não é esperado.
 O arquivo 'outro_arquivo.xlsx' não é esperado.
 
 
-Número de erros: 5
+Número de erros: 6
 Número de avisos: 2
 
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 1.7 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_06/data_errors_06_report.html

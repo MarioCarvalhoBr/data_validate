@@ -19,9 +19,9 @@ def test_true_verify_tree_sp_composition_hierarchy_data_ground_truth_01():
 def test_count_errors_verify_tree_sp_composition_hierarchy_errors_01():
     is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_errors_01, df_sp_description_errors_01)
     assert is_correct is False
-    assert len(errors) == 2
+    assert len(errors) == 1
     assert len(warnings) == 0
-    assert errors == ["composicao.xlsx: A coluna 'codigo_pai' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore.", 'composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].']
+    assert errors == ['composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].']
 
 def test_criar_arvore_with_no_duplicates():
     composicao = pd.DataFrame({

@@ -24,6 +24,7 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_05/
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 descricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
 Verificação: Issue #79: Limpeza dos arquivos
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 referencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
@@ -55,7 +56,7 @@ Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
 
 
-Número de erros: 13
+Número de erros: 14
 Número de avisos: 0
 
 Tempo total de execução: 1.8 segundos
