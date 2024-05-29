@@ -74,9 +74,6 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
     
     df_descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
     
-    if not ((df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI] == 0)).any():
-        errors.extend([f"{SP_COMPOSITION_COLUMNS.NAME_SP}: A coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' deve conter pelo menos um valor igual a 0 para ser a raiz da árvore."])
-
     # Fix para adicionar a raiz da árvore
     if not ((df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == 0)).any():
         # Adiciona a a linha com codigo=0 e nivel=0																						

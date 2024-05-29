@@ -30,6 +30,7 @@ descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor '
 descricao.xlsx, linha 2: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.
 descricao.xlsx, linha 3: A coluna 'nivel' contém um valor inválido: O valor '2.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'XX3' não é um número.
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0.0' é menor que 1.
 composicao.xlsx, linha 5: A coluna 'codigo_pai' contém um valor inválido: O valor '5000.7875' não é um número inteiro.
 composicao.xlsx, linha 7: A coluna 'codigo_pai' contém um valor inválido: O valor '5001.88' não é um número inteiro.
 Verificação: Issue #2 e #59: Relações entre indicadores
@@ -68,7 +69,7 @@ descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries 
 descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
 
 
-Número de erros: 18
+Número de erros: 19
 Número de avisos: 4
 
 Tempo total de execução: 2.5 segundos

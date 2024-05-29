@@ -18,10 +18,6 @@ Setuptools version: 68.2.2
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
--------Exemplo com CR fim
--------
--------Exemplo com LF fim
--------
 
 
 ------ Resultados da verificação dos testes ------
@@ -40,6 +36,7 @@ descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
 valores.xlsx: Coluna 'id' esperada mas não foi encontrada.
 proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
 Verificação: Issue #79: Limpeza dos arquivos
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0.0' é menor que 1.
 Verificação: Issue #2 e #59: Relações entre indicadores
 valores.xlsx: Códigos inválidos: ['codigo'].
 Verificação: Issue #3: Hierarquia como árvore
@@ -94,10 +91,10 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 17
+Número de erros: 18
 Número de avisos: 27
 
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 3.1 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html
