@@ -83,7 +83,7 @@ referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracte
 Número de erros: 13
 Número de avisos: 21
 
-Tempo total de execução: 2.3 segundos
+Tempo total de execução: 2.7 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html
