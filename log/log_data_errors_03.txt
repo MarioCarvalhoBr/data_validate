@@ -72,6 +72,8 @@ descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com CR
 descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
 descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
 descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 Verificação: Issue #85: Quebra de linha para descrição
 descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
 descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
@@ -92,9 +94,9 @@ referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracte
 
 
 Número de erros: 18
-Número de avisos: 27
+Número de avisos: 28
 
-Tempo total de execução: 3.1 segundos
+Tempo total de execução: 2.9 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html

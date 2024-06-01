@@ -57,12 +57,14 @@ valores.xlsx: A coluna '5-2030-O' é obrigatória.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
 Número de erros: 14
-Número de avisos: 0
+Número de avisos: 1
 
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 3.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html
