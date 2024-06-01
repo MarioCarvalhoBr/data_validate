@@ -5,7 +5,7 @@ from src.myparser.text_processor import capitalize_text_keep_acronyms
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation, check_values_integers
 # Spreadsheets classes and constants
-from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_DESCRIPTION_MAX_TITLE_LENGTH, SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH
 
 def check_html_in_descriptions(df, column):
     df = df.copy()
@@ -32,31 +32,6 @@ def verify_sp_description_parser_html_column_names(df, column):
 
     is_correct = len(errors) == 0
     return is_correct, errors, warnings
-
-def verify_sp_description_titles_length(df):
-    df = df.copy()
-    errors, warnings = [], []
-    
-    column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
-    if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
-        return not errors, errors, warnings
-
-    try:
-        df.columns = df.columns.str.lower()
-        df[column] = df[column].str.strip()
-
-        for index, row in df.iterrows():
-            text = row[column]
-            if pd.isna(text) or text == "":
-                continue
-                
-            if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
-    except Exception as e:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
-
-    return not errors, errors, warnings
 
 def verify_sp_description_titles_uniques(df):
     df = df.copy()
@@ -291,5 +266,55 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
 
     except Exception as e:
         errors.append(f"{file_name}: Erro ao processar a verificação: {e}.")
+
+    return not errors, errors, warnings
+
+def verify_sp_description_titles_length(df):
+    df = df.copy()
+    errors, warnings = [], []
+    
+    column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
+    if column not in df.columns:
+        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
+        return not errors, errors, warnings
+
+    try:
+        df.columns = df.columns.str.lower()
+        df[column] = df[column].str.strip()
+
+        for index, row in df.iterrows():
+            text = row[column]
+            if pd.isna(text) or text == "":
+                continue
+                
+            if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH:
+                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
+    except Exception as e:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+
+    return not errors, errors, warnings
+
+def verify_sp_simple_description_max_length(df):
+    df = df.copy()
+    errors, warnings = [], []
+
+    column = SP_DESCRIPTION_COLUMNS.DESC_SIMPLES
+    if column not in df.columns:
+        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de descrições simples com mais de {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
+        return not errors, errors, warnings
+
+    try:
+        df.columns = df.columns.str.lower()
+        df[column] = df[column].str.strip()
+
+        for index, row in df.iterrows():
+            text = row[column]
+            if pd.isna(text) or text == "":
+                continue
+                
+            if len(text) > SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH:
+                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Descrição simples fora do padrão. Esperado: Até {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
+    except Exception as e:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
     return not errors, errors, warnings

@@ -54,10 +54,12 @@ valores.xlsx: A coluna '5003-2030-P' é desnecessária.
 valores.xlsx: A coluna '5003-2050-P' é desnecessária.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
 Número de erros: 14
-Número de avisos: 0
+Número de avisos: 1
 
 Tempo total de execução: 1.8 segundos
 

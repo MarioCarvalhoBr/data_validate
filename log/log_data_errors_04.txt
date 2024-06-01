@@ -67,10 +67,12 @@ descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna n
 Verificação: Issue #1: Padrão para nomes dos indicadores
 descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".
 descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
 Número de erros: 19
-Número de avisos: 4
+Número de avisos: 5
 
 Tempo total de execução: 2.5 segundos
 

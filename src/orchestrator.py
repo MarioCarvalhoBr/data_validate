@@ -21,8 +21,11 @@ import src.util.utilities as util
 from src.util.report_generator import ReportGenerator
 
 # Modelos de dados
+ # Colunas dos arquivos
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
-from src.myparser.model.spreadsheets import SP_DESCRIPTION_MAX_TITLE_LENGTH, OUTPUT_DEFAULT_HTML, OUTPUT_REPORT_HTML
+
+# Constantes
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_MAX_TITLE_LENGTH, SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH, OUTPUT_DEFAULT_HTML, OUTPUT_REPORT_HTML
 
 # CORREÇÃO DAS CORES em terminais Windows
 init_fix_colorama_windows_console()
@@ -210,7 +213,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 5 - Verifica se a planilha de descrição está correta
         results_tests.append([("Issue #5: " if debug else "") +"Códigos HTML nas descrições simples", *(sp_description.verify_sp_description_parser_html_column_names(df_sp_description, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES))])
         # ------------------------------------------------------------------------------------------------------------------------------------
-        
+                
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 6 - Verficar a ortografia
         if not no_spellchecker:
@@ -272,9 +275,11 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
-        # 9 - Títulos com mais de SP_DESCRIPTION_MAX_TITLE_LENGTH caracteres
+        # 9.1 - Títulos com mais de SP_DESCRIPTION_MAX_TITLE_LENGTH caracteres
         if not no_warning_titles_length:
             results_tests.append([("Issue #39: " if debug else "") +f"Títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres", *(sp_description.verify_sp_description_titles_length(df_sp_description))])
+        # 9.2 - Descrições simples com mais de SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH caracteres: verify_sp_simple_description_max_length
+        results_tests.append([("Issue #119: " if debug else "") +f"Descrições simples com mais de {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres", *(sp_description.verify_sp_simple_description_max_length(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
