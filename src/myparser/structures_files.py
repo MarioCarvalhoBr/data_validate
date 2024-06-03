@@ -1,4 +1,5 @@
 import os
+import pandas as pd
 
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
@@ -66,14 +67,26 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
             df.columns = header_row
             df = df[1:].reset_index(drop=True)
 
+        unnamed_columns_indices = []
+
         # Verifica se há colunas sem nome
         for i, col in enumerate(df.columns):
-            col = str(col).strip().lower()
-            if col.startswith("unnamed") or col.startswith("Unnamed"):
-                # Formatar mensagem de erro
-                errors.append(f"{file_name}: Coluna número {i+1} não possui nome mas possui valores.")
-                
-    
+            col_str = str(col).strip().lower()
+            if col_str.startswith("unnamed"):
+                unnamed_columns_indices.append(i)
+                # Formatar mensagem de erro genérica
+                # errors.append(f"{file_name}: Coluna número {i+1} não possui nome mas possui valores.")
+        
+        # Verificar as linhas que têm valores nessas colunas sem nome
+        quantity_valid_columns = len(df.columns) - len(unnamed_columns_indices)
+        for index, row in df.iterrows():
+            for col_index in unnamed_columns_indices:
+                if not pd.isna(row.iloc[col_index]) and str(row.iloc[col_index]).strip() != "":                    
+                    # Verify plural = "coluna" or "colunas"
+                    text_collumn = "coluna nomeada" if quantity_valid_columns == 1 else "colunas nomeadas"
+                        
+                    errors.append(f"{file_name}, linha {index+2}: A linha possui um valor na coluna {col_index+1}, que não possui nome. A tabela possui {quantity_valid_columns} {text_collumn}.")
+
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(df, expected_columns)
         col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)

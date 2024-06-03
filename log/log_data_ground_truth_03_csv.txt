@@ -50,7 +50,7 @@ descricao.csv, linha 9: Descrição simples fora do padrão. Esperado: Até 150 
 Número de erros: 0
 Número de avisos: 1
 
-Tempo total de execução: 1.9 segundos
+Tempo total de execução: 2.0 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_03_csv/data_ground_truth_03_csv_report.html

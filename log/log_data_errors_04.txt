@@ -22,8 +22,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_04/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
-composicao.xlsx: Coluna número 3 não possui nome mas possui valores.
-valores.xlsx: Coluna número 20 não possui nome mas possui valores.
+composicao.xlsx, linha 7: A linha possui um valor na coluna 3, que não possui nome. A tabela possui 2 colunas nomeadas.
+valores.xlsx, linha 7: A linha possui um valor na coluna 20, que não possui nome. A tabela possui 19 colunas nomeadas.
 Verificação: Issue #79: Limpeza dos arquivos
 descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
@@ -74,7 +74,7 @@ descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150
 Número de erros: 19
 Número de avisos: 5
 
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html
