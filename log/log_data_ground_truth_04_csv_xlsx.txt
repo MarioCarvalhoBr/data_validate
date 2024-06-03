@@ -50,7 +50,7 @@ descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150
 Número de erros: 0
 Número de avisos: 1
 
-Tempo total de execução: 2.9 segundos
+Tempo total de execução: 2.1 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html

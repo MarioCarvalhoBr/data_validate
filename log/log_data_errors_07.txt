@@ -64,7 +64,7 @@ descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150
 Número de erros: 14
 Número de avisos: 1
 
-Tempo total de execução: 3.3 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html
