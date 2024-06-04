@@ -34,20 +34,19 @@ Verificação: Issue #124: Códigos sequenciais
 Verificação: Issue #75: Campos vazios
 Verificação: Issue #1: Padrão para nomes dos indicadores
 Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
 Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
 Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
-Verificação: Issue #119: Descrições simples com mais de 150 caracteres
-descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
 Número de erros: 0
-Número de avisos: 1
+Número de avisos: 0
 
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 2.7 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.html
