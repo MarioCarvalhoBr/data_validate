@@ -58,12 +58,18 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
     df_descricao = df_descricao.copy()
     
     errors, warnings = [], []
-    
+
     # Verifica se as colunas codigo_pai e codigo_filho existem
     if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in df_composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in df_composicao.columns:
         errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
         return not errors, errors, warnings
     
+    # Corrige a coluna relacao
+    if SP_DESCRIPTION_COLUMNS.RELACAO not in df_descricao.columns:
+        # Cria a coluna relacao e preenche com 1
+        df_descricao[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
+    
+    # Limpa os valores não numéricos e menores que 0
     df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
     df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
     

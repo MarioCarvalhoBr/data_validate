@@ -31,12 +31,14 @@ STRUCTURE_FILES_TO_CLEAN_LIST = [
 # Diretórios de entrada para os testes
 path_input_data_ground_truth_01 = "input_data/data_ground_truth_01"
 path_input_data_ground_truth_02_no_scenario = "input_data/data_ground_truth_02_no_scenario"
+path_input_data_ground_truth_05 = "input_data/data_ground_truth_05"
 path_input_data_errors_01 = "input_data/data_errors_01"
 path_input_data_errors_02 = "input_data/data_errors_02"
 path_input_data_errors_03 = "input_data/data_errors_03"
 path_input_data_errors_04 = "input_data/data_errors_04"
 path_input_data_errors_05 = "input_data/data_errors_05"
 path_input_data_errors_06 = "input_data/data_errors_06"
+
 
 # 1. DATA FRAMES - GROUND TRUTH: path_input_data_ground_truth_01
 df_sp_scenario_data_ground_truth_01, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_01, SP_SCENARIO_COLUMNS.NAME_SP))
@@ -53,6 +55,14 @@ df_sp_description_data_ground_truth_02_no_scenario, errors_read_file = read_exce
 df_sp_composition_data_ground_truth_02_no_scenario, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_02_no_scenario, SP_COMPOSITION_COLUMNS.NAME_SP))
 df_sp_values_data_ground_truth_02_no_scenario, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_02_no_scenario, SP_VALUES_COLUMNS.NAME_SP))
 df_sp_proportionalities_data_ground_truth_02_no_scenario, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_02_no_scenario, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+
+# 1.3 DATA FRAMES - GROUND TRUTH: path_input_data_ground_truth_05
+df_sp_scenario_data_ground_truth_05, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_05, SP_SCENARIO_COLUMNS.NAME_SP))
+df_sp_temporal_reference_data_ground_truth_05, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_05, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+df_sp_description_data_ground_truth_05, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_05, SP_DESCRIPTION_COLUMNS.NAME_SP))
+df_sp_composition_data_ground_truth_05, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_05, SP_COMPOSITION_COLUMNS.NAME_SP))
+df_sp_values_data_ground_truth_05, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_05, SP_VALUES_COLUMNS.NAME_SP))
+df_sp_proportionalities_data_ground_truth_05, errors_read_file = read_excel_file(os.path.join(path_input_data_ground_truth_05, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
 
 
 # 2. DATA FRAMES - ERROS 01: path_input_data_errors_01

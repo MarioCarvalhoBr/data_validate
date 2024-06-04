@@ -110,7 +110,7 @@ referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
 Número de erros: 28
 Número de avisos: 33
 
-Tempo total de execução: 2.2 segundos
+Tempo total de execução: 2.8 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html

@@ -55,7 +55,12 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
             if SP_DESCRIPTION_COLUMNS.CENARIO in df.columns:
                 errors.append(f"{file_name}: A coluna '{SP_DESCRIPTION_COLUMNS.CENARIO}' não pode existir se o arquivo '{SP_SCENARIO_COLUMNS.NAME_SP}' não existir.")
                 df = df.drop(columns=[SP_DESCRIPTION_COLUMNS.CENARIO])
-            
+    
+    # Corrige a coluna relacao
+    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns):
+        # Cria a coluna relacao e preenche com 1
+        df[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
+
     try:
         # Check if there is a vertical bar in the column name
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)

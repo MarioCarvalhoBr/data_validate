@@ -220,14 +220,20 @@ def verify_sp_description_empty_strings(df, list_columns=[]):
 
 def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_anywhere=[]):
     df = df.copy()
-    # Salva o df em um arquivo novo_df.xlsx
     errors, warnings = [], []
 
+    # Verifica se a coluna RELACAO está presente no df
+    if SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns:
+        columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.RELACAO]
+        columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.RELACAO]
+
+    # Verifica todas as colunas que estão ausentes em df.columns
     missing_columns = set(columns_start_end + columns_anywhere) - set(df.columns)
     missing_columns = [str(column) for column in missing_columns]
     if missing_columns:
         warnings.append(f"{file_name}: A verificação de CR e LF foi abortada para as colunas: {missing_columns}.")
 
+    # Filtra as colunas que estão presentes em df.columns
     columns_start_end_fixed = [column for column in columns_start_end if column in df.columns]
     columns_anywhere_fixed = [column for column in columns_anywhere if column in df.columns]
 

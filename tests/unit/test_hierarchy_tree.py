@@ -6,6 +6,7 @@ from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS, SP_DESCRIPTI
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01
+from tests.unit.test_constants import df_sp_description_data_ground_truth_05, df_sp_composition_data_ground_truth_05
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
@@ -15,6 +16,13 @@ def test_true_verify_tree_sp_composition_hierarchy_data_ground_truth_01():
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
+
+def test_true_verify_tree_sp_composition_hierarchy_data_ground_truth_05():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_data_ground_truth_05, df_sp_description_data_ground_truth_05)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
 
 def test_count_errors_verify_tree_sp_composition_hierarchy_errors_01():
     is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_errors_01, df_sp_description_errors_01)

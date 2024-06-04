@@ -93,7 +93,7 @@ def test_count_verify_sp_description_titles_length_in_data_errors_01():
 
 # Testes: verify_sp_simple_description_max_length
 def test_true_verify_sp_simple_description_max_length_in_data_ground_truth_01():
-    is_correct, errors, warnings = verify_sp_description_titles_length(df_sp_description_data_ground_truth_01)
+    is_correct, errors, warnings = verify_sp_simple_description_max_length(df_sp_description_data_ground_truth_01)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
