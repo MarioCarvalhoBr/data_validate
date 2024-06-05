@@ -226,6 +226,11 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
     if SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns:
         columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.RELACAO]
         columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.RELACAO]
+    
+    # Verifica se a coluna UNIDADE está presente no df
+    if SP_DESCRIPTION_COLUMNS.UNIDADE not in df.columns:
+        columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.UNIDADE]
+        columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.UNIDADE]
 
     # Verifica todas as colunas que estão ausentes em df.columns
     missing_columns = set(columns_start_end + columns_anywhere) - set(df.columns)

@@ -60,6 +60,11 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
     if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns):
         # Cria a coluna relacao e preenche com 1
         df[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
+    
+    # Corrige a coluna unidade
+    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.UNIDADE not in df.columns):
+        # Cria a coluna unidade e preenche com vazio
+        df[SP_DESCRIPTION_COLUMNS.UNIDADE] = ""
 
     try:
         # Check if there is a vertical bar in the column name

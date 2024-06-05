@@ -14,8 +14,11 @@ from src.myparser.sp_description import verify_sp_description_codes_sequential
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
-# DATA FRAMES - GROUND TRUTH
+# DATA FRAMES - GROUND TRUTH 01
 from tests.unit.test_constants import df_sp_description_data_ground_truth_01
+
+# DATA FRAMES - GROUND TRUTH 05
+from tests.unit.test_constants import df_sp_description_data_ground_truth_05
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01
@@ -53,6 +56,13 @@ def test_count_errors_verify_sp_description_codes_sequential_data_errors_02():
 # Testes: verify_sp_description_cr_lf
 def test_true_errors_verify_sp_description_cr_lf_data_ground_truth_01():
     is_correct, errors, warnings = verify_sp_description_cr_lf(df_sp_description_data_ground_truth_01, SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO])
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+# Testes: verify_sp_description_cr_lf
+def test_true_errors_verify_sp_description_cr_lf_data_ground_truth_05():
+    is_correct, errors, warnings = verify_sp_description_cr_lf(df_sp_description_data_ground_truth_05, SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META], columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO])
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
