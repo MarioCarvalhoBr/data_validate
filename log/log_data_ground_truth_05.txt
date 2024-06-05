@@ -21,6 +21,7 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_05
 
 
 ------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 Verificação: Issue #79: Limpeza dos arquivos
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
@@ -43,14 +44,12 @@ Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
-Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
-O arquivo '.~lock.descricao.xlsx#' não é esperado.
 
 
 Número de erros: 0
-Número de avisos: 1
+Número de avisos: 0
 
-Tempo total de execução: 3.4 segundos
+Tempo total de execução: 3.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_05/data_ground_truth_05_report.html
