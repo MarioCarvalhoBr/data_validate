@@ -1,12 +1,16 @@
 import os
 import math
 from pathlib import Path
-
 import pandas as pd
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
 
+def get_min_max_values(df, key_lower, key_upper):
+    min_value = df[key_lower].min()
+    max_value = df[key_upper].max()
+
+    return min_value, max_value
 
 def generate_list_combinations(codigo, primeiro_ano, lista_simbolos_temporais, lista_simbolos_cenarios):
     # Create list of combinations
@@ -173,7 +177,7 @@ def check_folder_exists(folder_path):
         return False, f"O caminho especificado não é uma pasta: {folder_path}."
     return True, ""
 
-def check_file_exists(file_path):
+def check_sp_file_exists(file_path):
     is_csv = False
     is_xlsx = False
     file_name = os.path.basename(file_path)
@@ -204,6 +208,17 @@ def check_file_exists(file_path):
         return True, is_csv, is_xlsx, [f"{file_name}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."]
     
     return True, is_csv, is_xlsx, []
+
+
+def check_file_exists(file_path):
+    errors = []
+    exists_file = False
+    if os.path.exists(file_path):
+        exists_file = True
+    else: 
+        errors.append(f"O arquivo {os.path.basename(file_path)} não foi encontrado.")
+    
+    return exists_file, errors
 
 
 def check_vertical_bar(df_sp, name_file):

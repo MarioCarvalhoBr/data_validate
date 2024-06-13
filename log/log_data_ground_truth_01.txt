@@ -44,12 +44,13 @@ Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #16: Intervalo dos dados da legenda
 
 
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 3.9 segundos
+Tempo total de execução: 3.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html

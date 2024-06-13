@@ -3,15 +3,32 @@ import pandas as pd
 from src.util.utilities import read_excel_file
 from src.util.utilities import file_extension_check
 from src.util.utilities import check_folder_exists
-from src.util.utilities import check_file_exists
+from src.util.utilities import check_sp_file_exists
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
 from src.util.utilities import check_punctuation 
 from src.util.utilities import check_vertical_bar
 from src.util.utilities import get_last_directory_name
 from src.util.utilities import generate_list_combinations
+from src.util.utilities import get_min_max_values
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS
+
+# Testes para get_min_max_values:
+def test_get_min_max_values():
+    # Create a DataFrame with known minimum and maximum values
+    df = pd.DataFrame({
+        'lower': [1, 2, 3, 4, 5],
+        'upper': [6, 7, 8, 9, 10]
+    })
+
+    # Call the function with the DataFrame and the column name
+    min_value, max_value = get_min_max_values(df, 'lower', 'upper')
+
+    # Assert that the returned minimum and maximum values are correct
+    assert min_value == 1
+    assert max_value == 10
+
 
 # Testes para generate_list_combinations:
 def test_generate_list_combinations():
@@ -195,32 +212,32 @@ def test_check_folder_exists_with_existing_folder():
     assert result is True
     assert error_message == ""
 
-def test_check_file_exists_with_csv_file():
+def test_check_sp_file_exists_with_csv_file():
     with open('test_file.csv', 'w') as f:
         f.write('test')
-    exists, is_csv, is_xlsx, warnings = check_file_exists('test_file.csv')
+    exists, is_csv, is_xlsx, warnings = check_sp_file_exists('test_file.csv')
     os.remove('test_file.csv')
     assert exists is True
     assert is_csv is True
     assert is_xlsx is False
     assert len(warnings) == 0
 
-def test_check_file_exists_with_xlsx_file():
+def test_check_sp_file_exists_with_xlsx_file():
     df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     df_test.to_excel('test_file.xlsx', index=False)
-    exists, is_csv, is_xlsx, warnings = check_file_exists('test_file.xlsx')
+    exists, is_csv, is_xlsx, warnings = check_sp_file_exists('test_file.xlsx')
     os.remove('test_file.xlsx')
     assert exists is True
     assert is_csv is False
     assert is_xlsx is True
     assert len(warnings) == 0
 
-def test_check_file_exists_with_both_files():
+def test_check_sp_file_exists_with_both_files():
     with open('test_file.csv', 'w') as f:
         f.write('test')
     df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
     df_test.to_excel('test_file.xlsx', index=False)
-    exists, is_csv, is_xlsx, warnings = check_file_exists('test_file')
+    exists, is_csv, is_xlsx, warnings = check_sp_file_exists('test_file')
     os.remove('test_file.csv')
     os.remove('test_file.xlsx')
     assert exists is True
@@ -229,8 +246,8 @@ def test_check_file_exists_with_both_files():
     assert len(warnings) == 1
     assert warnings[0] == "test_file.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."
 
-def test_check_file_exists_with_no_file():
-    exists, is_csv, is_xlsx, warnings = check_file_exists('non_existing_file')
+def test_check_sp_file_exists_with_no_file():
+    exists, is_csv, is_xlsx, warnings = check_sp_file_exists('non_existing_file')
     assert exists is False
     assert is_csv is False
     assert is_xlsx is False

@@ -4,7 +4,7 @@ import pandas as pd
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
 # Spreadsheets classes and constants
-from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
+from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUMNS_DICT):
     errors = []
@@ -22,6 +22,11 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
         # Verifica se há arquivos não esperados na pasta
         for file_name_i in os.listdir(path_folder):
             file_basename = os.path.basename(file_name_i)
+            
+            # Legenda QML é opcional
+            if file_basename == SP_LEGEND_COLUMNS.NAME_SP:
+                continue
+            
             file_extension = os.path.splitext(file_basename)[1] 
             file_name_non_extension = file_basename.replace(file_extension, "")
             

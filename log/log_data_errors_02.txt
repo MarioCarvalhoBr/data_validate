@@ -52,6 +52,7 @@ Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.
+Verificação: Issue #16: Intervalo dos dados da legenda
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Issue #24: Ortografia
@@ -86,7 +87,7 @@ referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracte
 Número de erros: 14
 Número de avisos: 22
 
-Tempo total de execução: 2.7 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html

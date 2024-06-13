@@ -14,6 +14,7 @@ import src.myparser.sp_description as sp_description
 import src.myparser.sp_scenario as sp_scenario
 import src.myparser.sp_temporal_reference as sp_temporal_reference
 import src.myparser.structures_files as structures_files
+import src.myparser.sp_legend as sp_legend
 import src.myparser.info as info
 
 # Utilidades
@@ -22,7 +23,7 @@ from src.util.report_generator import ReportGenerator
 
 # Modelos de dados
  # Colunas dos arquivos
-from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
+from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 # Constantes
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_MAX_TITLE_LENGTH, SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH, OUTPUT_DEFAULT_HTML, OUTPUT_REPORT_HTML
@@ -60,41 +61,42 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         all_warnings_structure_files = []
 
         # Checar se os arquivos existem
-        exists_path_sp_scenario, is_csv, is_xlsx, error = util.check_file_exists(os.path.join(input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
+        exists_path_sp_scenario, is_csv, is_xlsx, error = util.check_sp_file_exists(os.path.join(input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
         if is_csv:
             SP_SCENARIO_COLUMNS.NAME_SP = SP_SCENARIO_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         all_errors_structure_files.extend(error)
 
-        exists_path_sp_temporal_reference, is_csv, is_xlsx, error = util.check_file_exists(os.path.join(input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+        exists_path_sp_temporal_reference, is_csv, is_xlsx, error = util.check_sp_file_exists(os.path.join(input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
         if is_csv:
             SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP = SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         
         all_errors_structure_files.extend(error)
 
-        exists_path_sp_description, is_csv, is_xlsx, error = util.check_file_exists(os.path.join(input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
+        exists_path_sp_description, is_csv, is_xlsx, error = util.check_sp_file_exists(os.path.join(input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
         if is_csv:
             SP_DESCRIPTION_COLUMNS.NAME_SP = SP_DESCRIPTION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         all_errors_structure_files.extend(error)
         
-        exists_path_sp_composition, is_csv, is_xlsx, error = util.check_file_exists(os.path.join(input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
+        exists_path_sp_composition, is_csv, is_xlsx, error = util.check_sp_file_exists(os.path.join(input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
         if is_csv:
             SP_COMPOSITION_COLUMNS.NAME_SP = SP_COMPOSITION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         all_errors_structure_files.extend(error)
         
-        exists_path_sp_values, is_csv, is_xlsx, error = util.check_file_exists(os.path.join(input_folder, SP_VALUES_COLUMNS.NAME_SP))
+        exists_path_sp_values, is_csv, is_xlsx, error = util.check_sp_file_exists(os.path.join(input_folder, SP_VALUES_COLUMNS.NAME_SP))
         if is_csv:
             SP_VALUES_COLUMNS.NAME_SP = SP_VALUES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         all_errors_structure_files.extend(error)
         
-        exists_path_sp_proportionalities, is_csv, is_xlsx, error = util.check_file_exists(os.path.join(input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        exists_path_sp_proportionalities, is_csv, is_xlsx, error = util.check_sp_file_exists(os.path.join(input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
         if is_csv:
             SP_PROPORTIONALITIES_COLUMNS.NAME_SP = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")
         all_errors_structure_files.extend(error)
 
         all_correct_structure_files = not all_errors_structure_files
         
-        # Update STRUCTURE_FILES_TO_CLEAN_LIST
+        # Estrutura dos arquivos
         STRUCTURE_FILES_COLUMNS_DICT = {
+            # FILES XLSX or CSV
             SP_SCENARIO_COLUMNS.NAME_SP: [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO, SP_SCENARIO_COLUMNS.SIMBOLO],
             SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: [SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO, SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO],
             
@@ -102,7 +104,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
             
             SP_COMPOSITION_COLUMNS.NAME_SP: [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO],
             SP_VALUES_COLUMNS.NAME_SP: [SP_VALUES_COLUMNS.ID, SP_VALUES_COLUMNS.NOME],
-            SP_PROPORTIONALITIES_COLUMNS.NAME_SP: [SP_PROPORTIONALITIES_COLUMNS.ID, SP_PROPORTIONALITIES_COLUMNS.NOME]
+            SP_PROPORTIONALITIES_COLUMNS.NAME_SP: [SP_PROPORTIONALITIES_COLUMNS.ID, SP_PROPORTIONALITIES_COLUMNS.NOME],
         }
         
         STRUCTURE_FILES_TO_CLEAN_LIST = [
@@ -135,6 +137,10 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         df_sp_composition, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
         df_sp_values, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_VALUES_COLUMNS.NAME_SP))
         
+        # Legend QML é opcional
+        qml_legend_exists, __ = util.check_file_exists(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
+        df_qml_legend, __ = sp_legend.read_legend_qml_file(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
+        
         # ------------------------------------------------------------------------------------------------------------------------------------
         # Dicionário com os dataframes
         data_df = {
@@ -145,7 +151,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
             
             SP_COMPOSITION_COLUMNS.NAME_SP: df_sp_composition,
             SP_VALUES_COLUMNS.NAME_SP: df_sp_values,
-            SP_PROPORTIONALITIES_COLUMNS.NAME_SP: df_sp_proportionalities,
+            SP_PROPORTIONALITIES_COLUMNS.NAME_SP: df_sp_proportionalities
         }
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 1.1 - Estrutura dos arquivos da pasta de entrada
@@ -289,7 +295,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 10.1 - Pontuações obrigatórias e proibidas em cenários
         if sp_scenario_exists:
             results_tests.append([("Issue #81: " if debug else "") +"Pontuações obrigatórias e proibidas em cenários", *(sp_scenario.verify_sp_scenario_punctuation(df_sp_scenario, columns_dont_punctuation=[SP_SCENARIO_COLUMNS.NOME], columns_must_end_with_dot=[SP_SCENARIO_COLUMNS.DESCRICAO]))])
-        
+
         # 10.2 Pontuações obrigatórias e proibidas em referência temporal
         results_tests.append([("Issue #81: " if debug else "") +"Pontuações obrigatórias e proibidas em referência temporal", *(sp_temporal_reference.verify_sp_temporal_reference_punctuation(df_sp_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=[SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -319,6 +325,9 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 12.1 - Quebra de linha para referência temporal
         results_tests.append([("Issue #85: " if debug else "") +"Quebra de linha para referência temporal", *(sp_description.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         
+        # 13 - Verificar range dos dados #16: verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
+
+        results_tests.append([("Issue #16: " if debug else "") +"Intervalo dos dados da legenda", *(sp_legend.verify_values_range(df_sp_values, df_qml_legend, qml_legend_exists))])
     if debug:
         print("\n")
         print(Fore.WHITE + Style.BRIGHT + "------ Resultados da verificação dos testes ------")
