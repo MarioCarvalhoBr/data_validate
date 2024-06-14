@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS
-from src.util.utilities import get_min_max_values
+from src.util.utilities import get_min_max_values, clean_sp_values_columns
 
 
 def read_legend_qml_file(qml_file_path):
@@ -65,11 +65,12 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
     warnings = []
     try:
         # Remove colunas que não são códigos: id e nome
-        # Verifica se SP_VALUES_COLUMNS.ID, SP_VALUES_COLUMNS.NOME estão presentes no dataframe. Se tiver, remove
         if SP_VALUES_COLUMNS.ID in df_values.columns:
-            df_values = df_values.drop(columns=[SP_VALUES_COLUMNS.ID])
+            df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
         if SP_VALUES_COLUMNS.NOME in df_values.columns:
-            df_values = df_values.drop(columns=[SP_VALUES_COLUMNS.NOME])
+            df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
+
+        colunas_sp_valores, __ = clean_sp_values_columns(df_values.columns)
 
         if not qml_legend_exists:
             MIN_VALUE, MAX_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT, SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
@@ -85,8 +86,14 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
                 errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Verificação de valores foi abortada porque os valores do arquivo QML '{SP_LEGEND_COLUMNS.NAME_SP}' não foram encontrados.")
                 return not errors, errors, warnings
 
-        for column in df_values.columns:
+        for column in colunas_sp_valores:
                 for index, value in df_values[column].items():
+                    value = pd.to_numeric(value, errors='coerce')
+                    # Verifica se o valor é um número
+                    if not pd.isna(value) and not isinstance(value, (int, float)):
+                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor '{value}' não é um número válido para a coluna '{column}'.")
+                        continue
+                    # Verifica se o valor está no intervalo
                     if value < MIN_VALUE or value > MAX_VALUE:
                         errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor {value} está fora do intervalo de {MIN_VALUE} a {MAX_VALUE} para a coluna '{column}'.")
             

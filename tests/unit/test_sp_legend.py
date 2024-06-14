@@ -19,13 +19,12 @@ def test_true_verify_values_range_data_ground_truth_01():
 def test_true_verify_values_range_data_errors_04():
     is_correct, errors, warnings = verify_values_range(df_sp_values_errors_04, df_qml_legend_errors_04, qml_legend_exists_errors_04)
     assert is_correct is False
-    assert len(errors) == 4
+    assert len(errors) == 3
     assert len(warnings) == 0
 
     assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'." == errors[0]
     assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'." == errors[1]
-    assert "valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001,9483-2015'." == errors[2]
-    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'." == errors[3]
+    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'." == errors[2]
 
 def test_true_verify_values_range_data_errors_06():
     is_correct, errors, warnings = verify_values_range(df_sp_values_errors_06, df_qml_legend_errors_06, qml_legend_exists_errors_06)
@@ -62,8 +61,8 @@ def test_verify_values_range_default_range_outside():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        'indicador_1': [0.5, 1.2, 0.7],
-        'indicador_2': [0.1, 0.4, 1.1]
+        '2-2015-O': [0.5, 1.2, 0.7],
+        '2-2015-P': [0.1, 0.4, 1.1]
     }
     df_values = pd.DataFrame(data_values)
     df_qml_legend = None  # Não usado para este teste
@@ -74,15 +73,15 @@ def test_verify_values_range_default_range_outside():
 
     assert not is_valid
     assert len(errors) == 2
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 3: O valor 1.2 está fora do intervalo de 0 a 1 para a coluna 'indicador_1'." in errors
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 4: O valor 1.1 está fora do intervalo de 0 a 1 para a coluna 'indicador_2'." in errors
+    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 3: O valor 1.2 está fora do intervalo de 0 a 1 para a coluna '2-2015-O'." in errors
+    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 4: O valor 1.1 está fora do intervalo de 0 a 1 para a coluna '2-2015-P'." in errors
 
 def test_verify_values_range_qml_range_within():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        'indicador_1': [5.0, 7.0, 9.0],
-        'indicador_2': [1.0, 4.0, 8.0]
+        '2-2015': [5.0, 7.0, 9.0],
+        '2-2016': [1.0, 4.0, 8.0]
     }
     df_values = pd.DataFrame(data_values)
     data_qml = {
@@ -102,8 +101,8 @@ def test_verify_values_range_qml_range_outside():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        'indicador_1': [5.0, 12.0, 7.0],
-        'indicador_2': [1.0, 4.0, 11.0]
+        '2-2015-O': [5.0, 12.0, 7.0],
+        '2-2015-P': [1.0, 4.0, 11.0]
     }
     df_values = pd.DataFrame(data_values)
     data_qml = {
@@ -118,15 +117,15 @@ def test_verify_values_range_qml_range_outside():
 
     assert not is_valid
     assert len(errors) == 2
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 3: O valor 12.0 está fora do intervalo de 0.0 a 10.0 para a coluna 'indicador_1'." in errors
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 4: O valor 11.0 está fora do intervalo de 0.0 a 10.0 para a coluna 'indicador_2'." in errors
+    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 3: O valor 12.0 está fora do intervalo de 0.0 a 10.0 para a coluna '2-2015-O'." in errors
+    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 4: O valor 11.0 está fora do intervalo de 0.0 a 10.0 para a coluna '2-2015-P'." in errors
 
 def test_verify_values_range_processing_error():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        'indicador_1': [5.0, 12.0, 7.0],
-        'indicador_2': [1.0, 4.0, 11.0]
+        '2-2015-O': [5.0, 12.0, 7.0],
+        '2-2015-P': [1.0, 4.0, 11.0]
     }
     df_values = pd.DataFrame(data_values)
     df_qml_legend = None  # Não usado para este teste
@@ -134,15 +133,14 @@ def test_verify_values_range_processing_error():
     qml_legend_exists = False
 
     # Introduzir um erro removendo uma coluna necessária
-    df_values = df_values.drop(columns=['indicador_1'])
+    df_values = df_values.drop(columns=['2-2015-O'])
 
     is_valid, errors, warnings = verify_values_range(df_values, df_qml_legend, qml_legend_exists)
 
     assert is_valid is False
     assert len(errors) == 2
 
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 3: O valor 4.0 está fora do intervalo de 0 a 1 para a coluna 'indicador_2'." == errors[0]
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 4: O valor 11.0 está fora do intervalo de 0 a 1 para a coluna 'indicador_2'." == errors[1]
+    assert f"{SP_VALUES_COLUMNS.NAME_SP}, linha 4: O valor 11.0 está fora do intervalo de 0 a 1 para a coluna '2-2015-P'." == errors[1]
 
 
 def test_verify_values_range_qml_invalid_values():

@@ -50,7 +50,7 @@ Verificação: Issue #16: Intervalo dos dados da legenda
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 3.5 segundos
+Tempo total de execução: 5.0 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html

@@ -63,7 +63,6 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
 valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.
 valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
-valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001,9483-2015'.
 valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
@@ -76,10 +75,10 @@ Verificação: Issue #119: Descrições simples com mais de 150 caracteres
 descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
-Número de erros: 23
+Número de erros: 22
 Número de avisos: 5
 
-Tempo total de execução: 2.6 segundos
+Tempo total de execução: 6.0 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html

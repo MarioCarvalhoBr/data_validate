@@ -2,9 +2,21 @@ import os
 import math
 from pathlib import Path
 import pandas as pd
+import re
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
+
+
+def clean_sp_values_columns(sp_values_columns):
+    pattern_id_year = re.compile(r'^\d{1,}-\d{4}$')
+    pattern_id_year_scenario = re.compile(r'^\d{1,}-\d{4}-(O|P)$')
+
+    cleaned_columns = [column for column in sp_values_columns if pattern_id_year.match(column) or pattern_id_year_scenario.match(column)]
+    extras_columns = [column for column in sp_values_columns if column not in cleaned_columns]
+
+    return cleaned_columns, extras_columns
+
 
 def get_min_max_values(df, key_lower, key_upper):
     min_value = df[key_lower].min()
