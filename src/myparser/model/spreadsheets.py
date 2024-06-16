@@ -49,3 +49,20 @@ class SP_TEMPORAL_REFERENCE_COLUMNS ():
     NOME = "nome"
     DESCRICAO = "descricao"
     SIMBOLO = "simbolo"
+
+class SP_LEGEND_COLUMNS():
+    NAME_SP = "legenda.qml"
+    
+    UUID = "uuid"
+    LABEL = "label"
+    UPPER = "upper"
+    LOWER = "lower"
+    SYMBOL = "symbol"
+    RENDER = "render"
+
+    # Others constants
+    MIN_LOWER_LEGEND_DEFAULT = 0
+    MAX_UPPER_LEGEND_DEFAULT = 1
+    KEY_RENDERER_V2 = 'renderer-v2'
+    KEY_RANGE = 'range'
+    KEY_RANGES = 'ranges'
