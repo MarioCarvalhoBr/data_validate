@@ -18,6 +18,10 @@ Setuptools version: 68.2.2
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01/
+current_tuple: (0.0, 0.154), next_tuple: (0.154, 0.308)
+current_tuple: (0.154, 0.308), next_tuple: (0.308, 0.462)
+current_tuple: (0.308, 0.462), next_tuple: (0.462, 0.616)
+current_tuple: (0.462, 0.616), next_tuple: (0.616, 0.99)
 
 
 ------ Resultados da verificação dos testes ------
@@ -45,12 +49,13 @@ Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
+Verificação: Issue #71: Sobreposição de valores na legenda
 
 
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 5.0 segundos
+Tempo total de execução: 4.4 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html

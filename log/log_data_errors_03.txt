@@ -18,6 +18,10 @@ Setuptools version: 68.2.2
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
+current_tuple: (0.0, 0.154), next_tuple: (0.154, 0.408)
+current_tuple: (0.154, 0.408), next_tuple: (0.448, 0.462)
+current_tuple: (0.448, 0.462), next_tuple: (0.462, 0.616)
+current_tuple: (0.462, 0.616), next_tuple: (0.616, 0.77)
 
 
 ------ Resultados da verificação dos testes ------
@@ -57,6 +61,12 @@ Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
 Verificação: Issue #16: Intervalo dos dados da legenda
+valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.
+valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
+valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'.
+valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
+Verificação: Issue #71: Sobreposição de valores na legenda
+legenda.qml: Sobreposição de intervalos detectada. O último valor do intervalo 2 (0.408) não corresponde ao primeiro valor do invervalo 3 (0.448).
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
 referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
@@ -94,10 +104,10 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 18
+Número de erros: 23
 Número de avisos: 28
 
-Tempo total de execução: 3.8 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html

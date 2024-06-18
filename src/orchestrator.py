@@ -326,8 +326,10 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         results_tests.append([("Issue #85: " if debug else "") +"Quebra de linha para referência temporal", *(sp_description.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         
         # 13 - Verificar range dos dados #16: verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
-
         results_tests.append([("Issue #16: " if debug else "") +"Intervalo dos dados da legenda", *(sp_legend.verify_values_range(df_sp_values, df_qml_legend, qml_legend_exists))])
+
+        # 14 - Sobreposicao de valores na legenda #71 verify_overlapping_legend_value(df_qml_legend)
+        results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *(sp_legend.verify_overlapping_legend_value(df_qml_legend, qml_legend_exists))])
     if debug:
         print("\n")
         print(Fore.WHITE + Style.BRIGHT + "------ Resultados da verificação dos testes ------")

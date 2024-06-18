@@ -2,11 +2,153 @@ import pandas as pd
 from io import StringIO
 
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS
-from src.myparser.sp_legend import read_legend_qml_file, verify_values_range
+from src.myparser.sp_legend import read_legend_qml_file, verify_values_range, verify_overlapping_legend_value, check_tuple_sequence
 
 from tests.unit.test_constants import df_sp_values_data_ground_truth_01, df_qml_legend_data_ground_truth_01, qml_legend_exists_data_ground_truth_01
 from tests.unit.test_constants import df_sp_values_errors_04, df_qml_legend_errors_04, qml_legend_exists_errors_04
+from tests.unit.test_constants import df_qml_legend_errors_03, qml_legend_exists_errors_03
 from tests.unit.test_constants import df_sp_values_errors_06, df_qml_legend_errors_06, qml_legend_exists_errors_06
+
+
+# Testes: para check_tuple_sequence
+def test_check_tuple_sequence_no_overlap():
+    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.77)]
+    errors = check_tuple_sequence(value_list)
+    assert len(errors) == 0
+
+def test_check_tuple_sequence_single_overlap():
+    value_list = [(0.0, 0.154), (0.155, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.77)]
+    errors = check_tuple_sequence(value_list)
+    assert len(errors) == 1
+    assert errors[0] == "Sobreposição de intervalos detectada. O último valor do intervalo 1 (0.154) não corresponde ao primeiro valor do invervalo 2 (0.155)."
+
+def test_check_tuple_sequence_multiple_overlaps():
+    value_list = [(0.0, 0.154), (0.155, 0.308), (0.309, 0.462), (0.463, 0.616), (0.617, 0.77)]
+    errors = check_tuple_sequence(value_list)
+    assert len(errors) == 4
+
+def test_check_tuple_sequence_partial_overlap():
+    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.463, 0.616), (0.616, 0.77)]
+    errors = check_tuple_sequence(value_list)
+    assert len(errors) == 1
+    assert errors[0] == "Sobreposição de intervalos detectada. O último valor do intervalo 3 (0.462) não corresponde ao primeiro valor do invervalo 4 (0.463)."
+
+def test_check_tuple_sequence_start_overlap():
+    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.615, 0.77)]
+    errors = check_tuple_sequence(value_list)
+    assert len(errors) == 1
+    assert errors[0] == "Sobreposição de intervalos detectada. O último valor do intervalo 4 (0.616) não corresponde ao primeiro valor do invervalo 5 (0.615)."
+
+def test_check_tuple_sequence_end_overlap():
+    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.770)]
+    errors = check_tuple_sequence(value_list)
+    assert len(errors) == 0
+
+
+def test_verify_overlapping_legend_value_overlap_detected():
+    data = {
+        'lower': [0.0, 0.154, 0.308, 0.462, 0.616],
+        'upper': [0.154, 0.308, 0.462, 0.516, 0.77]
+    }
+    df_qml_legend = pd.DataFrame(data)
+    qml_legend_exists = True
+    
+    is_valid, errors, warnings = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert not is_valid
+    assert len(errors) == 1
+    assert "legenda.qml: Sobreposição de intervalos detectada. O último valor do intervalo 4 (0.516) não corresponde ao primeiro valor do invervalo 5 (0.616)." == errors[0]
+
+def test_verify_overlapping_legend_value_no_legend():
+    df_qml_legend = pd.DataFrame()
+    qml_legend_exists = False
+    
+    is_valid, errors, _ = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert is_valid
+    assert len(errors) == 0
+
+
+def test_verify_overlapping_legend_value_empty_df():
+    df_qml_legend = pd.DataFrame()
+    qml_legend_exists = True
+    
+    is_valid, errors, _ = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert not is_valid
+    assert len(errors) == 1
+    assert errors[0] == "legenda.qml: Não foram encontrados dados no arquivo de legenda enviado."
+
+def test_verify_overlapping_legend_value_non_numeric_values():
+    data = {
+        'lower': [0.0, 0.154, None],
+        'upper': [0.154, 0.308, 0.462]
+    }
+    df_qml_legend = pd.DataFrame(data)
+    qml_legend_exists = True
+    
+    is_valid, errors, _ = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert not is_valid
+    assert len(errors) == 1
+    assert "O atributo 'lower' contém valores não numéricos." in errors[0]
+
+def test_verify_overlapping_legend_value_lower_greater_than_upper():
+    data = {
+        'lower': [0.0, 0.154, 0.5],
+        'upper': [0.154, 0.308, 0.462]
+    }
+    df_qml_legend = pd.DataFrame(data)
+    qml_legend_exists = True
+    
+    is_valid, errors, _ = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert not is_valid
+    assert len(errors) == 2
+
+    assert "legenda.qml: O valor inferior (0.5) é maior que o valor superior (0.462)." == errors[0]
+    assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[1]
+
+def test_verify_overlapping_legend_value_not_in_order():
+    data = {
+        'lower': [0.0, 0.462, 0.154],
+        'upper': [0.154, 0.616, 0.308]
+    }
+    df_qml_legend = pd.DataFrame(data)
+    qml_legend_exists = True
+    
+    is_valid, errors, warnings = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert not is_valid
+    assert len(errors) == 1
+    assert "Os valores da legenda não estão em ordem crescente." in errors[0]
+
+def test_verify_overlapping_legend_value_overlapping():
+    data = {
+        'lower': [0.0, 0.154, 0.308],
+        'upper': [0.154, 0.462, 0.462]
+    }
+    df_qml_legend = pd.DataFrame(data)
+    qml_legend_exists = True
+    
+    is_valid, errors, warnings = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert not is_valid
+    assert len(errors) == 1
+    assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[0]
+
+def test_verify_overlapping_legend_value_success():
+    data = {
+        'lower': [0.0, 0.154, 0.308, 0.462, 0.616],
+        'upper': [0.154, 0.308, 0.462, 0.616, 0.77]
+    }
+    df_qml_legend = pd.DataFrame(data)
+    qml_legend_exists = True
+    
+    is_valid, errors, warnings = verify_overlapping_legend_value(df_qml_legend, qml_legend_exists)
+    
+    assert is_valid
+    assert len(errors) == 0
 
 # Testes: verify_values_range
 def test_true_verify_values_range_data_ground_truth_01():
@@ -38,6 +180,18 @@ def test_true_verify_values_range_data_errors_06():
     assert "valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'." == errors[2]
     assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'." == errors[3]
 
+# Testes para: verify_overlapping_legend_value
+def test_true_verify_overlapping_legend_value_data_ground_truth_01():
+    is_correct, errors, warnings = verify_overlapping_legend_value(df_qml_legend_data_ground_truth_01, qml_legend_exists_data_ground_truth_01)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+def test_false_verify_overlapping_legend_value_data_errors_03():
+    is_correct, errors, warnings = verify_overlapping_legend_value(df_qml_legend_errors_03, qml_legend_exists_errors_03)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+    assert "legenda.qml: Sobreposição de intervalos detectada. O último valor do intervalo 2 (0.408) não corresponde ao primeiro valor do invervalo 3 (0.448)." == errors[0]
 
 # Testes Unitários
 def test_verify_values_range_default_range_within():
@@ -65,7 +219,7 @@ def test_verify_values_range_default_range_outside():
         '2-2015-P': [0.1, 0.4, 1.1]
     }
     df_values = pd.DataFrame(data_values)
-    df_qml_legend = None  # Não usado para este teste
+    df_qml_legend = pd.DataFrame()  # Não usado para este teste
 
     qml_legend_exists = False
 
@@ -128,7 +282,7 @@ def test_verify_values_range_processing_error():
         '2-2015-P': [1.0, 4.0, 11.0]
     }
     df_values = pd.DataFrame(data_values)
-    df_qml_legend = None  # Não usado para este teste
+    df_qml_legend = pd.DataFrame()  # Não usado para este teste
 
     qml_legend_exists = False
 
@@ -163,7 +317,7 @@ def test_verify_values_range_qml_invalid_values():
 
     assert is_valid is False
     assert len(errors) == 1
-    assert f"{SP_VALUES_COLUMNS.NAME_SP}: Verificação de valores foi abortada porque os valores do arquivo QML '{SP_LEGEND_COLUMNS.NAME_SP}' não foram encontrados." in errors
+    assert f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo 'lower' contém valores não numéricos." == errors[0]
 
 
 

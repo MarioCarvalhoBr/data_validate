@@ -64,6 +64,7 @@ Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
+Verificação: Issue #71: Sobreposição de valores na legenda
 Verificação: Issue #5: Códigos HTML nas descrições simples
 descricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
@@ -111,7 +112,7 @@ referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
 Número de erros: 28
 Número de avisos: 33
 
-Tempo total de execução: 3.6 segundos
+Tempo total de execução: 2.3 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html
