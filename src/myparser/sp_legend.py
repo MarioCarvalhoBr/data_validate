@@ -53,13 +53,18 @@ def read_legend_qml_file(qml_file_path):
         SP_LEGEND_COLUMNS.UUID, SP_LEGEND_COLUMNS.LABEL, SP_LEGEND_COLUMNS.LOWER,
         SP_LEGEND_COLUMNS.UPPER, SP_LEGEND_COLUMNS.SYMBOL, SP_LEGEND_COLUMNS.RENDER
     ])
+    
+
     # Se não houver dados, adiciona no vetor erros que não foi encontrado dados
     if df.empty:
         errors.append(f"Erro ao processar o arquivo {qml_file_path}: Não foram encontrados dados.")
+
     return df, errors
 
 def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
     df_values = df_values.copy()
+    if qml_legend_exists:
+        df_qml_legend = df_qml_legend.copy()
 
     errors = []
     warnings = []
@@ -73,17 +78,17 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
 
         colunas_sp_valores, __ = clean_sp_values_columns(df_values.columns)
 
-       
-
         if not qml_legend_exists:
             MIN_VALUE, MAX_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT, SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
         else:
-            
-
             # Verifica se o DataFrame está vazio
             if df_qml_legend.empty:
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Não foram encontrados dados no arquivo de legenda enviado.")
+                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo não possui intervalos válidos.")
                 return not errors, errors, warnings
+            
+            # Converte as colunas UPPER e LOWER para float. Se tiver dado string, converte para NaN
+            df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.LOWER], errors='coerce')
+            df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.UPPER], errors='coerce')
             
             # Convert as colunas para float: lower e upper
             df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].astype(float)
@@ -130,10 +135,9 @@ def check_tuple_sequence(value_list):
     for i in range(len(value_list) - 1):
         current_tuple = value_list[i]
         next_tuple = value_list[i + 1]
-        print(f"current_tuple: {current_tuple}, next_tuple: {next_tuple}")
         
         if current_tuple[1] != next_tuple[0]:
-            errors.append(f"Sobreposição de intervalos detectada. O último valor do intervalo {i + 1} ({current_tuple[1]}) não corresponde ao primeiro valor do invervalo {i + 2} ({next_tuple[0]}).")
+            errors.append(f"Descontinuidade de intervalos detectada. O último valor do intervalo {i + 1} ({current_tuple[1]}) não corresponde ao primeiro valor do invervalo {i + 2} ({next_tuple[0]}).")
     
     return errors
 
@@ -144,47 +148,69 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
     if not qml_legend_exists:
         return True, errors, warnings
     
+    df_qml_legend = df_qml_legend.copy()
+    
     # Verifica se o DataFrame está vazio
     if df_qml_legend.empty:
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Não foram encontrados dados no arquivo de legenda enviado.")
+        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo não possui intervalos válidos.")
         return not errors, errors, warnings
+
+    # Verifica se os valores são números
+    for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
+        
+        for index, value in df_qml_legend[column].items():
+            if value is None or pd.isna(value):
+                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo '{column}' contém valores não numéricos.")
+                continue
+            
+            # Converte value para um numero. Se não for possivel, retorna nan
+            value = pd.to_numeric(value, errors='coerce')
+            
+            # Verifica se o valor é um número
+            if (pd.isna(value)) or (not isinstance(value, (int, float))):
+                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo '{column}' contém valores não numéricos.")
+                return not errors, errors, warnings
+
+    
+    df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.LOWER], errors='coerce')
+    df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.UPPER], errors='coerce')
     
     # Convert as colunas para float: lower e upper
     df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].astype(float)
     df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = df_qml_legend[SP_LEGEND_COLUMNS.UPPER].astype(float)
 
+    # Verifica se os valores estão em ordem crescente
+    lower_values = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].tolist()
+    upper_values = df_qml_legend[SP_LEGEND_COLUMNS.UPPER].tolist()
+
+    # Remove valores nulos nan
+    lower_values = [x for x in lower_values if pd.notna(x)]
+    upper_values = [x for x in upper_values if pd.notna(x)]
+
+    # Verifica se as listas tem tamanho diferente
+    if len(lower_values) != len(upper_values):
+        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O número de valores inferiores e superiores não é o mesmo.")
+        return not errors, errors, warnings
+    
+    
+    # Verifica se os valores são válidos
+    for _, row in df_qml_legend.iterrows():
+        if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
+            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O valor inferior ({row[SP_LEGEND_COLUMNS.LOWER]}) é maior que o valor superior ({row[SP_LEGEND_COLUMNS.UPPER]}).")
+
+    
+
+    fulll_list = []
+    for i in range(len(lower_values)):
+        fulll_list.append(lower_values[i])
+        fulll_list.append(upper_values[i])
+
+    # Verifica se os valores estão em ordem crescente
+    if fulll_list != sorted(fulll_list):
+        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Os valores da legenda não estão em ordem crescente.")
+        return not errors, errors, warnings
+
     try:
-        # Verifica se os valores são números
-        for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
-            # Verifica se  ovalor é nan 
-            if df_qml_legend[column].isnull().values.any():
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo '{column}' contém valores não numéricos.")
-                return not errors, errors, warnings
-
-        # Verifica se os valores são válidos
-        for _, row in df_qml_legend.iterrows():
-            if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O valor inferior ({row[SP_LEGEND_COLUMNS.LOWER]}) é maior que o valor superior ({row[SP_LEGEND_COLUMNS.UPPER]}).")
-
-        # Verifica se os valores estão em ordem crescente
-        lower_values = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].tolist()
-        upper_values = df_qml_legend[SP_LEGEND_COLUMNS.UPPER].tolist()
-
-        # Verifica se as listas tem tamanho diferente
-        if len(lower_values) != len(upper_values):
-            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O número de valores inferiores e superiores não é o mesmo.")
-            return not errors, errors, warnings
-
-        fulll_list = []
-        for i in range(len(lower_values)):
-            fulll_list.append(lower_values[i])
-            fulll_list.append(upper_values[i])
-
-        # Verifica se os valores estão em ordem crescente
-        if fulll_list != sorted(fulll_list):
-            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Os valores da legenda não estão em ordem crescente.")
-            return not errors, errors, warnings
-
         # Verifica se os valores estão em ordem crescente
         errors_tuple = check_tuple_sequence(list(zip(lower_values, upper_values)))
         if errors_tuple: 

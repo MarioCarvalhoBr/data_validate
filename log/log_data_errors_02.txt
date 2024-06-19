@@ -53,7 +53,9 @@ Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.
 Verificação: Issue #16: Intervalo dos dados da legenda
+legenda.qml: O atributo 'upper' contém valores não numéricos.
 Verificação: Issue #71: Sobreposição de valores na legenda
+legenda.qml: O atributo 'upper' contém valores não numéricos.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Issue #24: Ortografia
@@ -85,10 +87,10 @@ Verificação: Issue #85: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 14
+Número de erros: 16
 Número de avisos: 22
 
-Tempo total de execução: 3.5 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html
