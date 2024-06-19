@@ -196,7 +196,7 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
     # Verifica se os valores são válidos
     for _, row in df_qml_legend.iterrows():
         if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
-            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O valor inferior ({row[SP_LEGEND_COLUMNS.LOWER]}) é maior que o valor superior ({row[SP_LEGEND_COLUMNS.UPPER]}).")
+            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Sobreposição de intervalos detectada. O valor inferior ({row[SP_LEGEND_COLUMNS.LOWER]}) é maior que o valor superior ({row[SP_LEGEND_COLUMNS.UPPER]}).")
 
     
 

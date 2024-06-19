@@ -51,7 +51,7 @@ Verificação: Issue #71: Sobreposição de valores na legenda
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 2.1 segundos
+Tempo total de execução: 2.4 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html

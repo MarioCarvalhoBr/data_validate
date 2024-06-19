@@ -65,7 +65,7 @@ valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0
 valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
 valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
 Verificação: Issue #71: Sobreposição de valores na legenda
-legenda.qml: O valor inferior (0.612) é maior que o valor superior (0.466).
+legenda.qml: Sobreposição de intervalos detectada. O valor inferior (0.612) é maior que o valor superior (0.466).
 legenda.qml: Os valores da legenda não estão em ordem crescente.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.

@@ -51,7 +51,7 @@ def test_false_verify_overlapping_legend_value_data_errors_04():
     assert len(errors) == 2
     assert len(warnings) == 0
 
-    assert "legenda.qml: O valor inferior (0.612) é maior que o valor superior (0.466)." == errors[0]
+    assert "legenda.qml: Sobreposição de intervalos detectada. O valor inferior (0.612) é maior que o valor superior (0.466)." == errors[0]
     assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[1]
 
 def test_false_verify_overlapping_legend_value_data_errors_05():
@@ -162,7 +162,7 @@ def test_verify_overlapping_legend_value_lower_greater_than_upper():
     assert not is_valid
     assert len(errors) == 2
 
-    assert "legenda.qml: O valor inferior (0.5) é maior que o valor superior (0.462)." == errors[0]
+    assert "legenda.qml: Sobreposição de intervalos detectada. O valor inferior (0.5) é maior que o valor superior (0.462)." == errors[0]
     assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[1]
 
 def test_verify_overlapping_legend_value_not_in_order():
