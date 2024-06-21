@@ -83,7 +83,7 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
         else:
             # Verifica se o DataFrame está vazio
             if df_qml_legend.empty:
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo não possui intervalos válidos.")
+                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.")
                 return not errors, errors, warnings
             
             # Converte as colunas UPPER e LOWER para float. Se tiver dado string, converte para NaN
@@ -98,7 +98,7 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
             for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
                 # Verifica se  ovalor é nan 
                 if df_qml_legend[column].isnull().values.any():
-                    errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo '{column}' contém valores não numéricos.")
+                    errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
                     return not errors, errors, warnings
             
             MIN_VALUE, MAX_VALUE = get_min_max_values(df_qml_legend, SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER)
@@ -137,7 +137,7 @@ def check_tuple_sequence(value_list):
         next_tuple = value_list[i + 1]
         
         if current_tuple[1] != next_tuple[0]:
-            errors.append(f"Descontinuidade de intervalos detectada. O último valor do intervalo {i + 1} ({current_tuple[1]}) não corresponde ao primeiro valor do invervalo {i + 2} ({next_tuple[0]}).")
+            errors.append("Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.")
     
     return errors
 
@@ -152,7 +152,7 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
     
     # Verifica se o DataFrame está vazio
     if df_qml_legend.empty:
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo não possui intervalos válidos.")
+        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.")
         return not errors, errors, warnings
 
     # Verifica se os valores são números
@@ -160,7 +160,7 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
         
         for index, value in df_qml_legend[column].items():
             if value is None or pd.isna(value):
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo '{column}' contém valores não numéricos.")
+                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
                 continue
             
             # Converte value para um numero. Se não for possivel, retorna nan
@@ -168,7 +168,7 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
             
             # Verifica se o valor é um número
             if (pd.isna(value)) or (not isinstance(value, (int, float))):
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo '{column}' contém valores não numéricos.")
+                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
                 return not errors, errors, warnings
 
     
@@ -189,14 +189,14 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
 
     # Verifica se as listas tem tamanho diferente
     if len(lower_values) != len(upper_values):
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: O número de valores inferiores e superiores não é o mesmo.")
+        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.")
         return not errors, errors, warnings
     
     
     # Verifica se os valores são válidos
     for _, row in df_qml_legend.iterrows():
         if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
-            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Sobreposição de intervalos detectada. O valor inferior ({row[SP_LEGEND_COLUMNS.LOWER]}) é maior que o valor superior ({row[SP_LEGEND_COLUMNS.UPPER]}).")
+            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.")
 
     
 
@@ -207,7 +207,7 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
 
     # Verifica se os valores estão em ordem crescente
     if fulll_list != sorted(fulll_list):
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Os valores da legenda não estão em ordem crescente.")
+        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.")
         return not errors, errors, warnings
 
     try:

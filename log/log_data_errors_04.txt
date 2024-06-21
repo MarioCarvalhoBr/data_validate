@@ -65,8 +65,8 @@ valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0
 valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
 valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
 Verificação: Issue #71: Sobreposição de valores na legenda
-legenda.qml: Sobreposição de intervalos detectada. O valor inferior (0.612) é maior que o valor superior (0.466).
-legenda.qml: Os valores da legenda não estão em ordem crescente.
+legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
 Verificação: Issue #24: Ortografia
@@ -81,7 +81,7 @@ descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150
 Número de erros: 24
 Número de avisos: 5
 
-Tempo total de execução: 2.4 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html

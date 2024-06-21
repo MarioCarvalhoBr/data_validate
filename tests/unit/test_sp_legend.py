@@ -27,15 +27,15 @@ def test_false_verify_overlapping_legend_value_data_errors_01():
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
-    assert errors[0] == "legenda.qml: Arquivo não possui intervalos válidos."
+    assert errors[0] == "legenda.qml: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos."
 
-    # legenda.qml: O atributo 'upper' contém valores não numéricos.
+    # Arquivo está corrompido. Uma das fatias possui um valor não numérico.
 def test_false_verify_overlapping_legend_value_data_errors_02():
     is_correct, errors, warnings = verify_overlapping_legend_value(df_qml_legend_errors_02, qml_legend_exists_errors_02)
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
-    assert "legenda.qml: O atributo 'upper' contém valores não numéricos." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
 
 
 def test_false_verify_overlapping_legend_value_data_errors_03():
@@ -43,7 +43,7 @@ def test_false_verify_overlapping_legend_value_data_errors_03():
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
-    assert "legenda.qml: Descontinuidade de intervalos detectada. O último valor do intervalo 2 (0.408) não corresponde ao primeiro valor do invervalo 3 (0.448)." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda." == errors[0]
 
 def test_false_verify_overlapping_legend_value_data_errors_04():
     is_correct, errors, warnings = verify_overlapping_legend_value(df_qml_legend_errors_04, qml_legend_exists_errors_04)
@@ -51,16 +51,16 @@ def test_false_verify_overlapping_legend_value_data_errors_04():
     assert len(errors) == 2
     assert len(warnings) == 0
 
-    assert "legenda.qml: Sobreposição de intervalos detectada. O valor inferior (0.612) é maior que o valor superior (0.466)." == errors[0]
-    assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[1]
+    assert "legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[1]
 
 def test_false_verify_overlapping_legend_value_data_errors_05():
     is_correct, errors, warnings = verify_overlapping_legend_value(df_qml_legend_errors_05, qml_legend_exists_errors_05)
     assert is_correct is False
     assert len(errors) == 2
     assert len(warnings) == 0
-    assert "legenda.qml: O atributo 'upper' contém valores não numéricos." == errors[0]
-    assert "legenda.qml: O número de valores inferiores e superiores não é o mesmo." == errors[1]
+    assert "legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias." == errors[1]
     
 # Testes: para check_tuple_sequence
 def test_check_tuple_sequence_no_overlap():
@@ -72,7 +72,7 @@ def test_check_tuple_sequence_single_overlap():
     value_list = [(0.0, 0.154), (0.155, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
-    assert errors[0] == "Descontinuidade de intervalos detectada. O último valor do intervalo 1 (0.154) não corresponde ao primeiro valor do invervalo 2 (0.155)."
+    assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
 
 def test_check_tuple_sequence_multiple_overlaps():
     value_list = [(0.0, 0.154), (0.155, 0.308), (0.309, 0.462), (0.463, 0.616), (0.617, 0.77)]
@@ -83,13 +83,13 @@ def test_check_tuple_sequence_partial_overlap():
     value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.463, 0.616), (0.616, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
-    assert errors[0] == "Descontinuidade de intervalos detectada. O último valor do intervalo 3 (0.462) não corresponde ao primeiro valor do invervalo 4 (0.463)."
+    assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
 
 def test_check_tuple_sequence_start_overlap():
     value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.615, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
-    assert errors[0] == "Descontinuidade de intervalos detectada. O último valor do intervalo 4 (0.616) não corresponde ao primeiro valor do invervalo 5 (0.615)."
+    assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
 
 def test_check_tuple_sequence_end_overlap():
     value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.770)]
@@ -109,7 +109,7 @@ def test_verify_overlapping_legend_value_overlap_detected():
     
     assert not is_valid
     assert len(errors) == 1
-    assert "legenda.qml: Descontinuidade de intervalos detectada. O último valor do intervalo 4 (0.516) não corresponde ao primeiro valor do invervalo 5 (0.616)." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda." == errors[0]
 
 def test_verify_overlapping_legend_value_no_legend():
     df_qml_legend = pd.DataFrame()
@@ -129,7 +129,7 @@ def test_verify_overlapping_legend_value_empty_df():
     
     assert not is_valid
     assert len(errors) == 1
-    assert errors[0] == "legenda.qml: Arquivo não possui intervalos válidos."
+    assert errors[0] == "legenda.qml: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos."
 
 def test_verify_overlapping_legend_value_non_numeric_values():
     data = {
@@ -143,11 +143,9 @@ def test_verify_overlapping_legend_value_non_numeric_values():
     
     assert not is_valid
     assert len(errors) == 2
-    """
-    where 2 = len(["legenda.qml: O atributo 'lower' contém valores não numéricos.", 'legenda.qml: O número de valores inferiores e superiores não é o mesmo.'])
-    """
-    assert "legenda.qml: O atributo 'lower' contém valores não numéricos." == errors[0]
-    assert 'legenda.qml: O número de valores inferiores e superiores não é o mesmo.' == errors[1]
+
+    assert "legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
+    assert 'legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.' == errors[1]
 
 def test_verify_overlapping_legend_value_lower_greater_than_upper():
     data = {
@@ -162,8 +160,8 @@ def test_verify_overlapping_legend_value_lower_greater_than_upper():
     assert not is_valid
     assert len(errors) == 2
 
-    assert "legenda.qml: Sobreposição de intervalos detectada. O valor inferior (0.5) é maior que o valor superior (0.462)." == errors[0]
-    assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[1]
+    assert "legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[1]
 
 def test_verify_overlapping_legend_value_not_in_order():
     data = {
@@ -177,7 +175,7 @@ def test_verify_overlapping_legend_value_not_in_order():
     
     assert not is_valid
     assert len(errors) == 1
-    assert "Os valores da legenda não estão em ordem crescente." in errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." in errors[0]
 
 def test_verify_overlapping_legend_value_overlapping():
     data = {
@@ -191,7 +189,7 @@ def test_verify_overlapping_legend_value_overlapping():
     
     assert not is_valid
     assert len(errors) == 1
-    assert "legenda.qml: Os valores da legenda não estão em ordem crescente." == errors[0]
+    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[0]
 
 def test_verify_overlapping_legend_value_success():
     data = {
@@ -361,7 +359,7 @@ def test_verify_values_range_qml_invalid_values():
 
     assert is_valid is False
     assert len(errors) == 1
-    assert f"{SP_LEGEND_COLUMNS.NAME_SP}: O atributo 'lower' contém valores não numéricos." == errors[0]
+    assert f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
 
 
 

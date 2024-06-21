@@ -55,10 +55,10 @@ valores.xlsx: A coluna '5003-2050-P' é desnecessária.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
-legenda.qml: O atributo 'upper' contém valores não numéricos.
+legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico.
 Verificação: Issue #71: Sobreposição de valores na legenda
-legenda.qml: O atributo 'upper' contém valores não numéricos.
-legenda.qml: O número de valores inferiores e superiores não é o mesmo.
+legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico.
+legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.
 Verificação: Issue #119: Descrições simples com mais de 150 caracteres
 descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
@@ -66,7 +66,7 @@ descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150
 Número de erros: 17
 Número de avisos: 1
 
-Tempo total de execução: 2.0 segundos
+Tempo total de execução: 1.9 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_05/data_errors_05_report.html

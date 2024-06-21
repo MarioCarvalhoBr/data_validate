@@ -62,7 +62,7 @@ valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 
 valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'.
 valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
 Verificação: Issue #71: Sobreposição de valores na legenda
-legenda.qml: Descontinuidade de intervalos detectada. O último valor do intervalo 2 (0.408) não corresponde ao primeiro valor do invervalo 3 (0.448).
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
 referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
