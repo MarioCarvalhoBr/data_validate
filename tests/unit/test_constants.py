@@ -1,7 +1,7 @@
 
 # Imports libs
 import os
-from src.util.utilities import read_excel_file, check_file_exists, check_sp_file_exists
+from src.util.utilities import read_excel_file, check_file_exists
 from src.myparser.sp_legend import read_legend_qml_file
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
