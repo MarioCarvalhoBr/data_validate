@@ -52,6 +52,7 @@ Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.
+Verificação: Issue #149: Valores indisponíveis
 Verificação: Issue #16: Intervalo dos dados da legenda
 legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico.
 Verificação: Issue #71: Sobreposição de valores na legenda
@@ -90,7 +91,7 @@ referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracte
 Número de erros: 16
 Número de avisos: 22
 
-Tempo total de execução: 1.7 segundos
+Tempo total de execução: 1.6 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html

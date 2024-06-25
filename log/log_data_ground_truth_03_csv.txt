@@ -41,6 +41,7 @@ Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência 
 Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
+Verificação: Issue #149: Valores indisponíveis
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal

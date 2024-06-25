@@ -39,6 +39,7 @@ Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
 Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
+Verificação: Issue #149: Valores indisponíveis
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
@@ -48,7 +49,7 @@ Verificação: Issue #71: Sobreposição de valores na legenda
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 2.0 segundos
+Tempo total de execução: 1.9 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.html

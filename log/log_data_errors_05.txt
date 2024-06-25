@@ -52,6 +52,7 @@ valores.xlsx: A coluna '5003-2030-O' é desnecessária.
 valores.xlsx: A coluna '5003-2050-O' é desnecessária.
 valores.xlsx: A coluna '5003-2030-P' é desnecessária.
 valores.xlsx: A coluna '5003-2050-P' é desnecessária.
+Verificação: Issue #149: Valores indisponíveis
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
