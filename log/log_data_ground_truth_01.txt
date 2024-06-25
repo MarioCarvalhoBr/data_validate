@@ -4,7 +4,7 @@
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
-Colorama version: 0.4.6
+Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
@@ -12,9 +12,9 @@ Pandas version: 2.2.2
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
-Coverage version: 7.4.2
+Coverage version: 7.5.4
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 68.2.2
+Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01/
@@ -51,7 +51,7 @@ Verificação: Issue #71: Sobreposição de valores na legenda
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 4.5 segundos
+Tempo total de execução: 2.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html
