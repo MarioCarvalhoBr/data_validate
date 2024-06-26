@@ -31,10 +31,10 @@ def test_count_errors_verify_unavailable_values_data_errors_07():
     assert len(errors) == 4
     assert len(warnings) == 0
 
-    assert errors[0] == "valores.xlsx, linha 11: O valor 'nan' não é um valor válido para a coluna '2-2030-O'."
-    assert errors[1] == "valores.xlsx, linha 12: O valor 'nan' não é um valor válido para a coluna '2-2050-O'."
-    assert errors[2] == "valores.xlsx, linha 13: O valor 'PHP' não é um valor válido para a coluna '2-2050-O'."
-    assert errors[3] == "valores.xlsx, linha 14: O valor 'nan' não é um valor válido para a coluna '2-2050-O'."
+    assert errors[0] == "valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'."
+    assert errors[1] == "valores.xlsx, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'."
+    assert errors[2] == "valores.xlsx, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'."
+    assert errors[3] == "valores.xlsx, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'."
 
 # Testes: verify_ids_sp_description_values
 def test_true_verify_ids_sp_description_values_data_ground_truth_01():

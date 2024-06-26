@@ -42,10 +42,10 @@ Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #149: Valores indisponíveis
-valores.xlsx, linha 11: O valor 'nan' não é um valor válido para a coluna '2-2030-O'.
-valores.xlsx, linha 12: O valor 'nan' não é um valor válido para a coluna '2-2050-O'.
-valores.xlsx, linha 13: O valor 'PHP' não é um valor válido para a coluna '2-2050-O'.
-valores.xlsx, linha 14: O valor 'nan' não é um valor válido para a coluna '2-2050-O'.
+valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.xlsx, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.xlsx, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.xlsx, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal

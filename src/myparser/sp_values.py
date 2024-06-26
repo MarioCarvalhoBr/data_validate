@@ -232,7 +232,7 @@ def verify_unavailable_values(df_values):
                 value = pd.to_numeric(value, errors='coerce')
                 # Verifica se o valor é um número
                 if pd.isna(value) or not isinstance(value, (int, float)):
-                    errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor '{value_aux}' não é um valor válido para a coluna '{column}'.")
+                    errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '{column}'.")
 
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
