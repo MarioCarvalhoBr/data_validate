@@ -1,7 +1,7 @@
 # Example usage: python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=output_data/ --no-spellchecker --lang-dict=pt --debug
 
 from argparse import ArgumentParser
-
+# Import orchestrator
 import src.orchestrator as orc
 
 if __name__ == "__main__":

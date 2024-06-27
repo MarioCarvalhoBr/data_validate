@@ -4,7 +4,7 @@
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
-Colorama version: 0.4.6
+Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
@@ -12,9 +12,9 @@ Pandas version: 2.2.2
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
-Coverage version: 7.4.2
+Coverage version: 7.5.4
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 68.2.2
+Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
@@ -56,6 +56,7 @@ Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
+Verificação: Issue #149: Valores indisponíveis
 Verificação: Issue #16: Intervalo dos dados da legenda
 valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.
 valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
@@ -103,7 +104,7 @@ referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracte
 Número de erros: 23
 Número de avisos: 28
 
-Tempo total de execução: 2.5 segundos
+Tempo total de execução: 1.7 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html

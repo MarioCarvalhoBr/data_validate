@@ -114,9 +114,17 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
 
         for column in colunas_sp_valores:
                 for index, value in df_values[column].items():
+                    # Verifica se o valor é uma string DI
+                    value_aux = value
+                    if value == "DI":
+                        continue
+                    if pd.isna(value):
+                        continue
+        
                     value = pd.to_numeric(value, errors='coerce')
                     # Verifica se o valor é um número
-                    if not pd.isna(value) and not isinstance(value, (int, float)):
+                    if (not isinstance(value, (int, float))):
+                        print(value_aux)
                         errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor '{value}' não é um número válido para a coluna '{column}'.")
                         continue
                     # Verifica se o valor está no intervalo
@@ -159,6 +167,10 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
     for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
         
         for index, value in df_qml_legend[column].items():
+            # Verifica se o valor é uma string DI
+            if value == "DI":
+                continue
+
             if value is None or pd.isna(value):
                 errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
                 continue

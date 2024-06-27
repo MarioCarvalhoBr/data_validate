@@ -16,7 +16,7 @@
                             <div class="container my-5">
 
                                 <div class="text-center mb-4">
-                                    <h1><strong>Canoa</strong></h1>
+                                    <h1><strong>{{ name }}</strong></h1>
                                     <h2>Relatório de Validação de Dados</h2>
                                 </div>
 
@@ -25,8 +25,8 @@
                                         <strong>Informações</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Data e hora do processo: </strong>2024-06-26 16:49:53<br>
-                                        <strong>Versão do validador:</strong>  0.1.0
+                                        <strong>Data e hora do processo: </strong>{{ date_now }}<br>
+                                        <strong>Versão do validador:</strong>  {{ version }}
                                     </div>
                                 </div>
 
@@ -35,8 +35,8 @@
                                         <strong>Resumo da validação</strong>
                                     </div>
                                     <div class="card-body">
-                                       <p class="card-text"><strong class="text-danger">Número de Erros: 0</strong></p>
-                                        <p class="card-text"><strong class="text-warning">Número de Avisos: 0</strong></p>
+                                       <p class="card-text"><strong class="text-danger">Número de Erros: {{ num_errors }}</strong></p>
+                                        <p class="card-text"><strong class="text-warning">Número de Avisos: {{ num_warnings }}</strong></p>
                                     </div>
                                 </div>
                                 <br>
@@ -46,84 +46,7 @@
                                         <strong>Erros</strong>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text">
-<br><span style='color: blue;'>Issue #39: Estrutura dos arquivos da pasta de entrada</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #79: Limpeza dos arquivos</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #2 e #59: Relações entre indicadores</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #3: Hierarquia como árvore</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #37: Níveis de indicadores</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #8: Unicidade dos códigos</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #5: Códigos HTML nas descrições simples</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #24: Ortografia</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #36: Títulos únicos</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #124: Códigos sequenciais</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #75: Campos vazios</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #1: Padrão para nomes dos indicadores</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #39: Títulos com mais de 40 caracteres</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #119: Descrições simples com mais de 150 caracteres</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #32: Pontuações obrigatórias e proibidas em descrições</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em cenários</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em referência temporal</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #81: Relações de valores únicos em cenários</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #81: Relações de valores únicos em referência temporal</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #81: Relações de combinações de valores</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #149: Valores indisponíveis</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #85: Quebra de linha para descrição</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #85: Quebra de linha para cenários</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #85: Quebra de linha para referência temporal</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #16: Intervalo dos dados da legenda</span>:
-<br>
-<br>
-<br><span style='color: blue;'>Issue #71: Sobreposição de valores na legenda</span>:
-<br></p>
+                                        <p class="card-text">{{ errors }}</p>
                                     </div>
                                 </div>
                                 <div class="card mb-4">
@@ -131,7 +54,7 @@
                                         <strong>Avisos</strong>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text"></p>
+                                        <p class="card-text">{{ warnings }}</p>
                                     </div>
                                 </div>
                                 

@@ -1,7 +1,7 @@
-from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, generate_list_combinations
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, generate_list_combinations, clean_sp_values_columns
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
-
+import pandas as pd
 def extract_ids_from_values(codes_level_to_remove, df_values):
     valores_ids = df_values.columns.str.split('-').str[0]
 
@@ -208,3 +208,32 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
     except Exception as e:
         errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP}, {SP_VALUES_COLUMNS.NAME_SP}, {SP_SCENARIO_COLUMNS.NAME_SP} e {SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {e}.")
     return not errors, errors, []
+
+def verify_unavailable_values(df_values):
+    errors = []
+    warnings = []
+    try:
+        df_values = df_values.copy()
+
+        # Remove colunas que não são códigos: id e nome
+        if SP_VALUES_COLUMNS.ID in df_values.columns:
+            df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
+        if SP_VALUES_COLUMNS.NOME in df_values.columns:
+            df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
+
+        colunas_sp_valores, __ = clean_sp_values_columns(df_values.columns)
+        for column in colunas_sp_valores:
+            for index, value in df_values[column].items():
+                value_aux = value
+                # Verifica se o valor é uma string DI
+                if value == "DI":
+                    continue
+
+                value = pd.to_numeric(value, errors='coerce')
+                # Verifica se o valor é um número
+                if pd.isna(value) or not isinstance(value, (int, float)):
+                    errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '{column}'.")
+
+    except Exception as e:
+        errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
+    return not errors, errors, warnings

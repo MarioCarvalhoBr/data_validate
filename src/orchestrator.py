@@ -313,6 +313,11 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 11 - Relações de combinações de valores #81
         results_tests.append([("Issue #81: " if debug else "") +"Relações de combinações de valores", *(sp_values.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference))])
         
+        # 11.2  - Valores indisponiveis #149: verify_unavailable_values(df_values):
+        results_tests.append([("Issue #149: " if debug else "") +"Valores indisponíveis", *(sp_values.verify_unavailable_values(df_sp_values))])
+
+
+        # ------------------------------------------------------------------------------------------------------------------------------------
          # 12.0 - Quebra de linha para descrição e cenários
         columns_start_end = [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META]
         if sp_scenario_exists:

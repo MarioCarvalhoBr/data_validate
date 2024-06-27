@@ -1,4 +1,4 @@
-from src.myparser.sp_values import verify_ids_sp_description_values, verify_combination_sp_description_values_scenario_temporal_reference
+from src.myparser.sp_values import verify_ids_sp_description_values, verify_combination_sp_description_values_scenario_temporal_reference, verify_unavailable_values
 
 # DATA FRAMES - GROUND TRUTH 01
 from tests.unit.test_constants import df_sp_scenario_data_ground_truth_01, df_sp_temporal_reference_data_ground_truth_01, df_sp_description_data_ground_truth_01, df_sp_values_data_ground_truth_01
@@ -14,7 +14,28 @@ from tests.unit.test_constants import df_sp_description_errors_04, df_sp_values_
 
 # DATA FRAMES - ERROS 05
 from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_reference_errors_05, df_sp_description_errors_05, df_sp_values_errors_05
-    
+
+# DATA FRAMES - ERROS 07
+from tests.unit.test_constants import df_sp_values_errors_07
+
+# Testes para: verify_unavailable_values
+def test_true_verify_unavailable_values_data_ground_truth_01():
+    is_correct, errors, warnings = verify_unavailable_values(df_sp_values_data_ground_truth_01)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_count_errors_verify_unavailable_values_data_errors_07():
+    is_correct, errors, warnings = verify_unavailable_values(df_sp_values_errors_07)
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert errors[0] == "valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'."
+    assert errors[1] == "valores.xlsx, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'."
+    assert errors[2] == "valores.xlsx, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'."
+    assert errors[3] == "valores.xlsx, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'."
+
 # Testes: verify_ids_sp_description_values
 def test_true_verify_ids_sp_description_values_data_ground_truth_01():
     is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_01, df_sp_values_data_ground_truth_01)
@@ -79,5 +100,3 @@ def test_errors_verify_combination_sp_description_values_scenario_temporal_refer
     assert errors[6] == "valores.xlsx: A coluna '5003-2050-O' é desnecessária."
     assert errors[7] == "valores.xlsx: A coluna '5003-2030-P' é desnecessária."
     assert errors[8] == "valores.xlsx: A coluna '5003-2050-P' é desnecessária."
-
-

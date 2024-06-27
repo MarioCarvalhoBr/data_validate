@@ -17,7 +17,7 @@ Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/en
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 
-INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01/
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_07/
 
 
 ------ Resultados da verificação dos testes ------
@@ -42,6 +42,10 @@ Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #149: Valores indisponíveis
+valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.xlsx, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.xlsx, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.xlsx, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
@@ -49,13 +53,13 @@ Verificação: Issue #16: Intervalo dos dados da legenda
 Verificação: Issue #71: Sobreposição de valores na legenda
 
 
-Número de erros: 0
+Número de erros: 4
 Número de avisos: 0
 
 Tempo total de execução: 2.4 segundos
 
 
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html
 
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.pdf
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_07/data_errors_07_report.pdf
 

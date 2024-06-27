@@ -4,7 +4,7 @@
 Modo DEBUG ativado.
 
 PACKAGES VERSIONS: 
-Colorama version: 0.4.6
+Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
@@ -12,9 +12,9 @@ Pandas version: 2.2.2
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
-Coverage version: 7.4.2
+Coverage version: 7.5.4
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
-Setuptools version: 68.2.2
+Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_04_csv_xlsx/
@@ -41,6 +41,311 @@ Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência 
 Verificação: Issue #81: Relações de valores únicos em cenários
 Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
+Verificação: Issue #149: Valores indisponíveis
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-P'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-P'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '3-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '4-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-O'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-O'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2030-P'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '5-2050-P'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '6-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '7-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '8-2015'.
+valores.csv, linha 2: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 7: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 8: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 9: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 10: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 15: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 16: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 17: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 18: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 19: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
+valores.csv, linha 20: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '9-2015'.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
@@ -48,10 +353,10 @@ Verificação: Issue #16: Intervalo dos dados da legenda
 Verificação: Issue #71: Sobreposição de valores na legenda
 
 
-Número de erros: 0
+Número de erros: 304
 Número de avisos: 0
 
-Tempo total de execução: 2.2 segundos
+Tempo total de execução: 1.6 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
