@@ -56,6 +56,7 @@ valores.csv, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a
 valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'.
 valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
 Verificação: Issue #71: Sobreposição de valores na legenda
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 O arquivo 'outro_arquivo.csv' não é esperado.
 O arquivo 'outro_arquivo.xlsx' não é esperado.
@@ -66,7 +67,7 @@ descricao.csv, linha 9: Descrição simples fora do padrão. Esperado: Até 150 
 Número de erros: 10
 Número de avisos: 3
 
-Tempo total de execução: 1.2 segundos
+Tempo total de execução: 0.9 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_06/data_errors_06_report.html

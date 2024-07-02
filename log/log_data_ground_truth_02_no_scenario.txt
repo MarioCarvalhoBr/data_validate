@@ -44,12 +44,13 @@ Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
 Verificação: Issue #71: Sobreposição de valores na legenda
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 
 
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 2.0 segundos
+Tempo total de execução: 1.5 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.html

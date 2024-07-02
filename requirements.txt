@@ -11,5 +11,6 @@ pre_commit==3.7.0
 pyarrow==15.0.0
 pyhtml2pdf==0.0.7
 pytest==7.4.0
+Requests==2.32.3
 setuptools==70.0.0
-xhtml2pdf==0.2.15
+coverage==7.5.4
