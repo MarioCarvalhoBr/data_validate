@@ -10,6 +10,7 @@ from colorama import init as init_fix_colorama_windows_console
 import src.myparser.hierarchy.graph as graph
 import src.myparser.hierarchy.tree as tree
 import src.myparser.sp_values as sp_values
+import src.myparser.sp_proportionalities as sp_proportionalities
 import src.myparser.sp_description as sp_description
 import src.myparser.sp_scenario as sp_scenario
 import src.myparser.sp_temporal_reference as sp_temporal_reference
@@ -122,7 +123,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # LEITURA DOS ARQUIVOS E CRIAÇÃO DOS DATAFRAMES: Se não existir, o dataframe será criado vazio
         # Arquivos opcionais: cenários e referência temporal
         df_sp_scenario, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
-        df_sp_proportionalities, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        df_sp_proportionalities, errors_read_file = util.read_file_proporcionalites(os.path.join(input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
         
         sp_scenario_exists = True
         sp_proportionalities_exists = True
@@ -335,6 +336,10 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
 
         # 14 - Sobreposicao de valores na legenda #71 verify_overlapping_legend_value(df_qml_legend)
         results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *(sp_legend.verify_overlapping_legend_value(df_qml_legend, qml_legend_exists))])
+    
+        # 15 - Verificar propriedades de soma nos fatores influenciadores #69: verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities)
+        results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *(sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_DESCRIPTION_COLUMNS.NAME_SP))])
+        
     if debug:
         print("\n")
         print(Fore.WHITE + Style.BRIGHT + "------ Resultados da verificação dos testes ------")

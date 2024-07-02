@@ -76,11 +76,10 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)
         errors.extend(errors_vertical_bar)
         
-        # Fixing the header row of SP_PROPORTIONALITIES_COLUMNS.NAME_SP
         if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
-            header_row = df.iloc[0]
+            header_row = df.columns
+            header_row = [str(col[1]).strip().lower() for col in header_row]
             df.columns = header_row
-            df = df[1:].reset_index(drop=True)
 
         unnamed_columns_indices = []
 

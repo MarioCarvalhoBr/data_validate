@@ -224,7 +224,6 @@ def verify_unavailable_values(df_values):
         colunas_sp_valores, __ = clean_sp_values_columns(df_values.columns)
         for column in colunas_sp_valores:
             for index, value in df_values[column].items():
-                value_aux = value
                 # Verifica se o valor é uma string DI
                 if value == "DI":
                     continue

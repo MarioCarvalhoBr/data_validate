@@ -7,6 +7,13 @@ import re
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
 
+def truncate_number(x, precision):
+    """ Trunca o valor 'x' à precisão especificada sem arredondamento. """
+    # Se não tiver casas decimais, retorna o valor original
+    if x == int(x):
+        return x
+    factor = 10 ** precision
+    return math.trunc(x * factor) / factor
 
 def clean_sp_values_columns(sp_values_columns):
     pattern_id_year = re.compile(r'^\d{1,}-\d{4}$')
@@ -162,6 +169,37 @@ def read_excel_file(path):
     elif file_extension == ".xlsx":
         try:
             df = pd.read_excel(path)
+        except Exception as e:
+            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            return pd.DataFrame(), errors
+    else:
+        errors.append(f"Tipo de arquivo não suportado: {file_extension}")
+        return pd.DataFrame(), errors
+    
+    return df, errors
+
+def read_file_proporcionalites(path):
+    """ Lê o arquivo de entrada (CSV ou Excel) e retorna um DataFrame. """
+    DEFAULT_SEPARATOR = '|'
+    errors = []
+
+    # Checa se o arquivo existe
+    if not os.path.exists(path):
+        errors.append(f"O arquivo {path} não foi encontrado.")
+        return pd.DataFrame(), errors
+    
+
+    file_extension = os.path.splitext(path)[1].lower()
+
+    if file_extension == ".csv":
+        try:
+            df = pd.read_csv(path, delimiter=DEFAULT_SEPARATOR, encoding='utf-8', low_memory=False, dtype=str, header=[0, 1])
+        except Exception as e:
+            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            return pd.DataFrame(), errors
+    elif file_extension == ".xlsx":
+        try:
+            df = pd.read_excel(path, header=[0, 1], dtype=str)
         except Exception as e:
             errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
             return pd.DataFrame(), errors

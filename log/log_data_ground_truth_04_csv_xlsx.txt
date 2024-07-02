@@ -351,12 +351,21 @@ Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
 Verificação: Issue #71: Sobreposição de valores na legenda
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
 
 
-Número de erros: 304
+Número de erros: 312
 Número de avisos: 0
 
-Tempo total de execução: 1.6 segundos
+Tempo total de execução: 1.1 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
