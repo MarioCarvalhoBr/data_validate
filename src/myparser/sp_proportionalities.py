@@ -84,7 +84,7 @@ def check_sum_equals_one(subdatasets):
                 # Verifica se o valor tem mais de 3 casas decimais
                 if not has_more_than_3_decimal_places and a.as_tuple().exponent < -3:
                     has_more_than_3_decimal_places = True
-                    warnings.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: Existem valores com mais de 3 casas decimais na planilha, esses valores serão truncados para 3 casas decimais.")
+                    warnings.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.")
                 
                 all_cells.append(str(new_value))
                 

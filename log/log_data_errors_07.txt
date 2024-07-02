@@ -61,13 +61,13 @@ proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2
 Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.
-proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, esses valores serão truncados para 3 casas decimais.
+proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
 Número de erros: 10
 Número de avisos: 3
 
-Tempo total de execução: 1.9 segundos
+Tempo total de execução: 1.7 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_07/data_errors_07_report.html

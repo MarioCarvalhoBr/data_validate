@@ -24,7 +24,7 @@ def test_count_errors_verify_sp_scenario_punctuation_data_errors_01():
 
     assert warnings[0] == "proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1."
     assert warnings[1] == "proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1."
-    assert warnings[2] == "proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, esses valores serão truncados para 3 casas decimais."
+    assert warnings[2] == "proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais."
 
     assert errors[0] == "proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1."
     assert errors[1] == "proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1."
