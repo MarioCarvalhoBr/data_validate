@@ -37,26 +37,26 @@ class ReportGenerator:
 
                                 <div class="text-center mb-4">
                                     <h1><strong>{{ name }}</strong></h1>
-                                    <h2>Relatório de Validação de Dados</h2>
+                                    <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
                                 </div>
 
                                 <div class="card mb-4">
                                     <div class="card-header bg-primary text-white">
-                                        <strong>Informações</strong>
+                                        <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
                                     <div class="card-body">
                                         <strong>Data e hora do processo: </strong>{{ date_now }}<br>
-                                        <strong>Versão do validador:</strong>  {{ version }}
+                                        <strong>Vers&atilde;o do validador:</strong>  {{ version }}
                                     </div>
                                 </div>
 
                                 <div class="card">
                                     <div class="card-header bg-primary text-white">
-                                        <strong>Resumo da validação</strong>
+                                        <strong>Resumo da valida&ccedil;&atilde;o</strong>
                                     </div>
                                     <div class="card-body">
-                                       <p class="card-text"><strong class="text-danger">Número de Erros: {{ num_errors }}</strong></p>
-                                        <p class="card-text"><strong class="text-warning">Número de Avisos: {{ num_warnings }}</strong></p>
+                                        <p class="card-text"><strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong></p>
+                                        <p class="card-text"><strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong></p>
                                     </div>
                                 </div>
                                 <br>
@@ -77,14 +77,12 @@ class ReportGenerator:
                                         <p class="card-text">{{ warnings }}</p>
                                     </div>
                                 </div>
-                                
+
                             </div>
-                            <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.8/dist/umd/popper.min.js" integrity="sha384-I7E8VVD/ismYTF4hNIPjVp/Zjvgyol6VFvRkX/vR+Vc4jQkC+hVqc2pM8ODewa9r" crossorigin="anonymous"></script>
-                            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.min.js" integrity="sha384-0pUGZvbkm6XF6gxjEnlmuGrJXVbNuzT9qBBavbLwCsOGabYfZo0T0to5eqruptLy" crossorigin="anonymous"></script>
                         </body>
                         </html>
-
             """
+ 
         with open(file_path, 'w') as f:
             f.write(text_html)
         # print('\nCreated a file report in HTML template: ', file_path)
@@ -139,8 +137,7 @@ class ReportGenerator:
             FULL_FILE_PATH_HTML = f'file:///{ABSOLUTE_PATH_FILE}'
             ABS_PATH_PDF = ABSOLUTE_PATH_FILE.replace(".html", ".pdf")
 
-            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF)
-            
+            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF, install_driver= False)
             print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {os.path.join(self.output_folder, os.path.basename(ABS_PATH_PDF))}\n')
 
         except Exception as e:
