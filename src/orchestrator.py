@@ -121,12 +121,19 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # LEITURA DOS ARQUIVOS E CRIAÇÃO DOS DATAFRAMES: Se não existir, o dataframe será criado vazio
+        # Lista com os erros de leitura dos arquivos
+        all_errors_read_files = []
+        
         # Arquivos opcionais: cenários e referência temporal
         df_sp_scenario, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_SCENARIO_COLUMNS.NAME_SP))
+        all_errors_read_files.extend(errors_read_file)
+        
         df_sp_proportionalities, errors_read_file = util.read_file_proporcionalites(os.path.join(input_folder, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+        all_errors_read_files.extend(errors_read_file)
         
         sp_scenario_exists = True
         sp_proportionalities_exists = True
+        
         if df_sp_scenario is None or df_sp_scenario.empty:
             sp_scenario_exists = False
         if df_sp_proportionalities is None or df_sp_proportionalities.empty:
@@ -134,14 +141,20 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
 
         # Arquivo obrigatório: descrição, composição, valores e proporcionalidades
         df_sp_temporal_reference, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+        all_errors_read_files.extend(errors_read_file)
         df_sp_description, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_DESCRIPTION_COLUMNS.NAME_SP))
+        all_errors_read_files.extend(errors_read_file)
         df_sp_composition, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_COMPOSITION_COLUMNS.NAME_SP))
+        all_errors_read_files.extend(errors_read_file)
         df_sp_values, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_VALUES_COLUMNS.NAME_SP))
+        all_errors_read_files.extend(errors_read_file)
         
         # Legend QML é opcional
         qml_legend_exists, __ = util.check_file_exists(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
-        df_qml_legend, __ = sp_legend.read_legend_qml_file(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
-        
+        df_qml_legend, errors_read_file_xml = sp_legend.read_legend_qml_file(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
+        if qml_legend_exists:
+            all_errors_read_files.extend(errors_read_file_xml)
+            
         # ------------------------------------------------------------------------------------------------------------------------------------
         # Dicionário com os dataframes
         data_df = {
@@ -164,9 +177,16 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         
         # 1.2 - Arquivos da pasta de entrada
         is_correct_main_path, errors_main_path, warnings_main_path = structures_files.verify_not_exepected_files_in_folder_root(input_folder, STRUCTURE_FILES_COLUMNS_DICT)
-        all_correct_structure_files = all_correct_structure_files and is_correct_main_path
         all_errors_structure_files.extend(errors_main_path)
         all_warnings_structure_files.extend(warnings_main_path)
+
+        # 1.3 - Verificar se houve erros na leitura dos arquivos
+        is_correct_read_files, errors_read_files, warnings_read_files = structures_files.verify_errors_read_files_in_folder_root(all_errors_read_files)
+        all_errors_structure_files.extend(errors_read_files)
+        all_warnings_structure_files.extend(warnings_read_files)
+        
+        all_correct_structure_files = all_correct_structure_files and is_correct_main_path and is_correct_read_files
+
 
         results_tests.append([("Issue #39: " if debug else "") +"Estrutura dos arquivos da pasta de entrada", all_correct_structure_files, all_errors_structure_files, all_warnings_structure_files])
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -337,8 +357,9 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 14 - Sobreposicao de valores na legenda #71 verify_overlapping_legend_value(df_qml_legend)
         results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *(sp_legend.verify_overlapping_legend_value(df_qml_legend, qml_legend_exists))])
     
-        # 15 - Verificar propriedades de soma nos fatores influenciadores #69: verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities)
-        results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *(sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_DESCRIPTION_COLUMNS.NAME_SP))])
+        # 15 - Verificar propriedades de soma nos fatores influenciadores #69
+        if sp_proportionalities_exists:
+            results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *(sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_DESCRIPTION_COLUMNS.NAME_SP))])
         
     if debug:
         print("\n")

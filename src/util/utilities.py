@@ -1,8 +1,10 @@
 import os
 import math
+import re
+
 from pathlib import Path
 import pandas as pd
-import re
+import chardet
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
@@ -148,32 +150,47 @@ def file_extension_check(path, extension='.xlsx'):
         return False, f"ERRO: O arquivo {path} de entrada não é {extension}"
     return True, ""
 
+# Função para detectar a codificação de um arquivo lendo apenas a primeira linha
+def detect_encoding(file_path, num_bytes=1024):
+    with open(file_path, 'rb') as f:
+        raw_data = f.read(num_bytes)
+        result = chardet.detect(raw_data)
+        return result['encoding']
+
+
 def read_excel_file(path):
     DEFAULT_SEPARATOR = '|'
+    ENCODING = 'utf-8'
     errors = []
 
     # Checa se o arquivo existe
     if not os.path.exists(path):
-        errors.append(f"O arquivo {path} não foi encontrado.")
+        # errors.append(f"O arquivo {path} não foi encontrado.")
         return pd.DataFrame(), errors
-    
 
     file_extension = os.path.splitext(path)[1].lower()
+    filename = os.path.basename(path)
 
     if file_extension == ".csv":
         try:
-            df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding='utf-8', low_memory=False)
+            file_encoding = detect_encoding(path)
+            if not any(enc in file_encoding.lower() for enc in ['ascii', 'utf-8']):
+                errors.append(f"{filename}: O arquivo está no formato {file_encoding}, deveria ser UTF-8.")
+                return pd.DataFrame(), errors
+            
+            df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False)
+            
         except Exception as e:
-            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")
             return pd.DataFrame(), errors
     elif file_extension == ".xlsx":
         try:
             df = pd.read_excel(path)
         except Exception as e:
-            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")
             return pd.DataFrame(), errors
     else:
-        errors.append(f"Tipo de arquivo não suportado: {file_extension}")
+        errors.append(f"{filename}: Tipo de arquivo não suportado: {file_extension}")
         return pd.DataFrame(), errors
     
     return df, errors
@@ -181,30 +198,38 @@ def read_excel_file(path):
 def read_file_proporcionalites(path):
     """ Lê o arquivo de entrada (CSV ou Excel) e retorna um DataFrame. """
     DEFAULT_SEPARATOR = '|'
+    ENCODING = 'utf-8'
     errors = []
+
+    filename = os.path.basename(path)
 
     # Checa se o arquivo existe
     if not os.path.exists(path):
-        errors.append(f"O arquivo {path} não foi encontrado.")
+        # errors.append(f"O arquivo {path} não foi encontrado.")
         return pd.DataFrame(), errors
     
-
     file_extension = os.path.splitext(path)[1].lower()
 
     if file_extension == ".csv":
         try:
-            df = pd.read_csv(path, delimiter=DEFAULT_SEPARATOR, encoding='utf-8', low_memory=False, dtype=str, header=[0, 1])
+            file_encoding = detect_encoding(path)
+            if not any(enc in file_encoding.lower() for enc in ['ascii', 'utf-8']):
+                errors.append(f"{filename}: O arquivo está no formato {file_encoding}, deveria ser UTF-8.")
+                return pd.DataFrame(), errors
+            
+            df = pd.read_csv(path, delimiter=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False, dtype=str, header=[0, 1])
+
         except Exception as e:
-            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")
             return pd.DataFrame(), errors
     elif file_extension == ".xlsx":
         try:
             df = pd.read_excel(path, header=[0, 1], dtype=str)
         except Exception as e:
-            errors.append(f"Erro ao abrir o arquivo {path}: {str(e)}")
+            errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")
             return pd.DataFrame(), errors
     else:
-        errors.append(f"Tipo de arquivo não suportado: {file_extension}")
+        errors.append(f"{filename}: Tipo de arquivo não suportado: {file_extension}")
         return pd.DataFrame(), errors
     
     return df, errors

@@ -68,6 +68,9 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
 
     errors = []
     warnings = []
+
+    if df_values.empty:
+        return True, errors, warnings
     
     try:
         # Remove colunas que não são códigos: id e nome

@@ -107,8 +107,9 @@ def count_repeated_values(string_list):
     return num_repeated
 
 def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities, file_name):
-    df_proportionalities = df_proportionalities.copy()
     df = df_proportionalities.copy()
+    if df.empty:
+        return True, [], []
     
     errors = []
     warnings = []

@@ -56,6 +56,9 @@ def verificar_erros_niveis(composicao, descricao):
 def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao):
     df_composicao = df_composicao.copy()
     df_descricao = df_descricao.copy()
+
+    if df_composicao.empty or df_descricao.empty:
+        return True, [], []
     
     errors, warnings = [], []
 

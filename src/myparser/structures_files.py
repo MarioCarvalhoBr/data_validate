@@ -6,6 +6,14 @@ from src.util.utilities import check_column_names, format_errors_and_warnings
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
+
+def verify_errors_read_files_in_folder_root(read_errors):
+    warnings = []
+    errors = []
+    for error in read_errors:
+        errors.append(error)
+    return not errors, errors, warnings
+
 def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUMNS_DICT):
     errors = []
     warnings = []

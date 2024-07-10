@@ -64,6 +64,10 @@ def verificar_grafos_desconectados(G):
 def verify_graph_sp_description_composition(descricao, composicao):
     descricao = descricao.copy()
     composicao = composicao.copy()
+
+    # Se for empty, retorna True
+    if descricao.empty or composicao.empty:
+        return True, [], []
     errors = []
     warnings = []
     is_valid = True
