@@ -16,6 +16,7 @@ Coverage version: 7.5.4
 Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
+CharDet Version:  5.2.0
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
 
@@ -115,7 +116,7 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 Número de erros: 29
 Número de avisos: 31
 
-Tempo total de execução: 1.6 segundos
+Tempo total de execução: 1.2 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html

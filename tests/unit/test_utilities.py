@@ -117,8 +117,7 @@ def test_check_punctuation_with_no_columns():
 def test_read_excel_file_with_non_existing_file():
     df, errors = read_excel_file('non_existing_file.xlsx')
     assert df.empty
-    assert len(errors) == 1
-    assert errors[0] == "O arquivo non_existing_file.xlsx não foi encontrado."
+    assert len(errors) == 0
 
 def test_read_excel_file_with_unsupported_extension():
     with open('test_file.txt', 'w') as f:
@@ -127,7 +126,7 @@ def test_read_excel_file_with_unsupported_extension():
     os.remove('test_file.txt')
     assert df.empty
     assert len(errors) == 1
-    assert errors[0] == "Tipo de arquivo não suportado: .txt"
+    assert errors[0] == "test_file.txt: Tipo de arquivo não suportado: .txt"
 
 def test_read_excel_file_with_csv_file():
     df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})

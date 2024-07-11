@@ -11,6 +11,7 @@ import pre_commit
 import datetime
 import setuptools
 import genbadge
+import chardet
 
 def print_versions():
     print("\nPACKAGES VERSIONS: ")
@@ -26,6 +27,8 @@ def print_versions():
     print("Pre-commit install path:", pre_commit)
     print("Setuptools version:", setuptools.__version__)
     print("Genbadge version:", genbadge.__version__)
+    print("CharDet Version: ", chardet.__version__)
+
     
     return True
 

@@ -1,4 +1,4 @@
-from src.myparser.structures_files import verify_expected_structure_files, verify_not_exepected_files_in_folder_root, verify_files_data_clean
+from src.myparser.structures_files import verify_expected_structure_files, verify_not_exepected_files_in_folder_root, verify_files_data_clean, verify_errors_read_files_in_folder_root
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
@@ -24,10 +24,21 @@ from tests.unit.test_constants import df_sp_scenario_errors_04, df_sp_temporal_r
 # DATA FRAMES - ERROS 05
 from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_reference_errors_05, df_sp_description_errors_05, df_sp_composition_errors_05, df_sp_values_errors_05, df_sp_proportionalities_errors_05
 
-# DATA FRAMES - ERROS 06
-
+# DATA FRAMES - ERROS 08
+from tests.unit.test_constants import all_errors_read_files_data_errors_08
 # PATHS MAIN
 from tests.unit.test_constants import path_input_data_errors_02, path_input_data_errors_03, path_input_data_errors_05
+
+def test_count_errors_verify_errors_read_files_in_folder_root_data_errors_08():
+    is_correct, errors, warnings = verify_errors_read_files_in_folder_root(all_errors_read_files_data_errors_08)
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert errors[0] == "proporcionalidades.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
+    assert errors[1] == "referencia_temporal.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
+    assert errors[2] == "descricao.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
+    assert errors[3] == "valores.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
 
 # Testes: verify_expected_structure_files
 def test_count_errors_verify_expected_structure_files_data_ground_truth_01():

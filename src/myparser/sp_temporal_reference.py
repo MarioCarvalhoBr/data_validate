@@ -4,6 +4,8 @@ from src.myparser.model.spreadsheets import SP_TEMPORAL_REFERENCE_COLUMNS
 
 def verify_sp_temporal_reference_unique_values(df, columns_uniques):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     missing_columns = set(columns_uniques) - set(df.columns)
@@ -24,6 +26,8 @@ def verify_sp_temporal_reference_unique_values(df, columns_uniques):
 
 def verify_sp_temporal_reference_punctuation(df, columns_dont_punctuation, columns_must_end_with_dot): 
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     missing_columns = set(columns_dont_punctuation + columns_must_end_with_dot) - set(df.columns)

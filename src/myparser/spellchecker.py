@@ -51,6 +51,8 @@ def find_spelling_errors(text, meu_analizador):
 
 def verify_spelling_text(df, file_name, columns_sheets, lang_dict_spell):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
     
     try:

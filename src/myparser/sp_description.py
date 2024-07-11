@@ -17,6 +17,8 @@ def check_html_in_descriptions(df, column):
 
 def verify_sp_description_parser_html_column_names(df, column):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     if column not in df.columns:
@@ -35,6 +37,8 @@ def verify_sp_description_parser_html_column_names(df, column):
 
 def verify_sp_description_titles_uniques(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     try:
@@ -65,6 +69,8 @@ def verify_sp_description_titles_uniques(df):
 
 def verify_sp_description_codes_sequential(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
     # 0. Check if the column exists
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
@@ -95,6 +101,9 @@ def verify_sp_description_codes_sequential(df):
 
 def verify_sp_description_text_capitalize(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
+    
     errors, warnings = [], []
 
     try:
@@ -129,6 +138,9 @@ def verify_sp_description_text_capitalize(df):
 
 def verify_sp_description_levels(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
+    
     errors, warnings = [], []
 
     # Verifica se a coluna existe
@@ -153,6 +165,8 @@ def verify_sp_description_levels(df):
 
 def verify_sp_description_punctuation(df, columns_dont_punctuation, columns_must_end_with_dot): 
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     try:
@@ -178,6 +192,8 @@ def verify_sp_description_punctuation(df, columns_dont_punctuation, columns_must
 
 def verify_sp_description_codes_uniques(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
@@ -197,6 +213,9 @@ def verify_sp_description_codes_uniques(df):
     return not errors, errors, warnings
 
 def verify_sp_description_empty_strings(df, list_columns=[]):
+    df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     try:
@@ -220,6 +239,8 @@ def verify_sp_description_empty_strings(df, list_columns=[]):
 
 def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_anywhere=[]):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     # Verifica se a coluna RELACAO está presente no df
@@ -282,6 +303,8 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
 
 def verify_sp_description_titles_length(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
     
     column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
@@ -307,6 +330,8 @@ def verify_sp_description_titles_length(df):
 
 def verify_sp_simple_description_max_length(df):
     df = df.copy()
+    if df.empty:
+        return True, [], []
     errors, warnings = [], []
 
     column = SP_DESCRIPTION_COLUMNS.DESC_SIMPLES

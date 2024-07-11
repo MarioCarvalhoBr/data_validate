@@ -80,6 +80,10 @@ def processar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values)
 def verify_ids_sp_description_values(df_description, df_values):
     df_description = df_description.copy()
     df_values = df_values.copy()
+
+    # Se for empty, retorna True
+    if df_description.empty or df_values.empty:
+        return True, [], []
     errors = []
     warnings = []
 
@@ -119,6 +123,9 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
     df_values = df_values.copy()
     df_scenario = df_scenario.copy()
     df_temporal_reference = df_temporal_reference.copy()
+    # Se for empty, retorna True
+    if df_description.empty or df_values.empty or df_temporal_reference.empty:
+        return True, [], []
 
     # Check if columns exists
     text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada porque a coluna"
@@ -212,6 +219,8 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
 def verify_unavailable_values(df_values):
     errors = []
     warnings = []
+    if df_values.empty:
+        return True, [], []
     try:
         df_values = df_values.copy()
 
