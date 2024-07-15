@@ -57,7 +57,7 @@ Verificação: Issue #71: Sobreposição de valores na legenda
 Número de erros: 4
 Número de avisos: 0
 
-Tempo total de execução: 0.3 segundos
+Tempo total de execução: 0.4 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_08/data_errors_08_report.html

@@ -103,7 +103,7 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 Número de erros: 22
 Número de avisos: 25
 
-Tempo total de execução: 1.2 segundos
+Tempo total de execução: 3.1 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html

@@ -57,6 +57,8 @@ class ReportGenerator:
                                     <div class="card-body">
                                         <p class="card-text"><strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong></p>
                                         <p class="card-text"><strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong></p>
+                                        <p id="id_tests_not_executed" class="card-text" style="display: {{ display }}"><strong>Testes n&atilde;o executados:</strong> {{ tests_not_executed }} </p>
+                                        
                                     </div>
                                 </div>
                                 <br>
@@ -87,7 +89,7 @@ class ReportGenerator:
             f.write(text_html)
         # print('\nCreated a file report in HTML template: ', file_path)
 
-    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests):
+    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed):
         try: 
             self.output_folder = output_folder
             """ Preenche o template HTML com dados e salva o resultado. """
@@ -107,6 +109,10 @@ class ReportGenerator:
                 "\n<br>".join(f"<span style='color: orange;'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
+            display = "block" if results_tests_not_executed else "none"
+
+            results_tests_not_executed = "\n".join([f"<li>{test_name}</li>" for test_name in results_tests_not_executed])
+            results_tests_not_executed = f"<ul>{results_tests_not_executed}</ul>"
 
             template_vars = {
                 "name": info.__name__,
@@ -115,7 +121,11 @@ class ReportGenerator:
                 "errors": errors,
                 "warnings": warnings,
                 "num_errors": num_errors,
-                "num_warnings": num_warnings
+                "num_warnings": num_warnings,
+
+                "tests_not_executed": results_tests_not_executed,
+                "display": display
+
             }
 
             html_out = template.render(template_vars)
