@@ -51,7 +51,7 @@ Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 Número de erros: 0
 Número de avisos: 0
 
-Tempo total de execução: 1.4 segundos
+Tempo total de execução: 1.6 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.html

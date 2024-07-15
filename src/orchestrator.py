@@ -41,6 +41,12 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
 
     # Lista para armazenar os resultados dos testes: [nome_issue, is_correct, errors, warnings]
     results_tests = []
+    # Lista de testes não realizados por solicitação do usuário
+    results_tests_not_executed = []
+    if no_spellchecker:
+        results_tests_not_executed.append("Verificador ortográfico")
+    if no_warning_titles_length:
+        results_tests_not_executed.append(f"Títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres")
 
     print("\nINICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: " + input_folder)
 
@@ -425,8 +431,8 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
     
     # Criar a pasta de saída para salvar os relatórios
     util.create_directory(output_folder)
-
     report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML)
+
     # Pegar somente o base name do input_folder
     name_file = util.get_last_directory_name(input_folder)
-    report_generator.save_html_pdf_report(name_file=name_file, output_folder=output_folder, file_output_html=OUTPUT_REPORT_HTML, results_tests=results_tests)
+    report_generator.save_html_pdf_report(name_file=name_file, output_folder=output_folder, file_output_html=OUTPUT_REPORT_HTML, results_tests=results_tests, results_tests_not_executed=results_tests_not_executed)
