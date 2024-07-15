@@ -68,7 +68,7 @@ descricao.csv, linha 9: Descrição simples fora do padrão. Esperado: Até 150 
 Número de erros: 10
 Número de avisos: 3
 
-Tempo total de execução: 0.9 segundos
+Tempo total de execução: 1.0 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_06/data_errors_06_report.html

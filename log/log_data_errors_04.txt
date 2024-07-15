@@ -78,7 +78,6 @@ proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (D
 proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
-O arquivo '.~lock.valores.xlsx#' não é esperado.
 Verificação: Issue #24: Ortografia
 descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].
 Verificação: Issue #1: Padrão para nomes dos indicadores
@@ -93,9 +92,9 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 
 
 Número de erros: 30
-Número de avisos: 9
+Número de avisos: 8
 
-Tempo total de execução: 1.4 segundos
+Tempo total de execução: 1.2 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html
