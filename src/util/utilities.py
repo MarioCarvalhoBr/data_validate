@@ -17,12 +17,15 @@ def truncate_number(x, precision):
     factor = 10 ** precision
     return math.trunc(x * factor) / factor
 
-def clean_sp_values_columns(sp_values_columns):
+def extract_ids_from_list(list_values):
     pattern_id_year = re.compile(r'^\d{1,}-\d{4}$')
     pattern_id_year_scenario = re.compile(r'^\d{1,}-\d{4}-(O|P)$')
+    # Convert to string 
+    list_values = [str(value) for value in list_values]
 
-    cleaned_columns = [column for column in sp_values_columns if pattern_id_year.match(column) or pattern_id_year_scenario.match(column)]
-    extras_columns = [column for column in sp_values_columns if column not in cleaned_columns]
+    # Extract IDs from list
+    cleaned_columns = [column for column in list_values if pattern_id_year.match(column) or pattern_id_year_scenario.match(column)]
+    extras_columns = [column for column in list_values if column not in cleaned_columns]
 
     return cleaned_columns, extras_columns
 

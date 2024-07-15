@@ -10,9 +10,44 @@ from src.util.utilities import check_vertical_bar
 from src.util.utilities import get_last_directory_name
 from src.util.utilities import generate_list_combinations
 from src.util.utilities import get_min_max_values
+from src.util.utilities import extract_ids_from_list
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS
+
+# Tests for extract_ids_from_list:
+
+def test_extract_ids_from_list_with_valid_ids():
+    list_values = ['123-2020', '456-2021-O', '789-2022', 'invalid', '12345']
+    expected_cleaned_columns = ['123-2020', '456-2021-O', '789-2022']
+    expected_extras_columns = ['invalid', '12345']
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    assert cleaned_columns == expected_cleaned_columns
+    assert extras_columns == expected_extras_columns
+
+def test_extract_ids_from_list_with_no_valid_ids():
+    list_values = ['invalid', '12345', 'test']
+    expected_cleaned_columns = []
+    expected_extras_columns = ['invalid', '12345', 'test']
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    assert cleaned_columns == expected_cleaned_columns
+    assert extras_columns == expected_extras_columns
+
+def test_extract_ids_from_list_empty_list():
+    list_values = []
+    expected_cleaned_columns = []
+    expected_extras_columns = []
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    assert cleaned_columns == expected_cleaned_columns
+    assert extras_columns == expected_extras_columns
+
+def test_extract_ids_from_list_all_valid_ids():
+    list_values = ['1-2020', '2-2021-O', '3-2022-P']
+    expected_cleaned_columns = ['1-2020', '2-2021-O', '3-2022-P']
+    expected_extras_columns = []
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    assert cleaned_columns == expected_cleaned_columns
+    assert extras_columns == expected_extras_columns
 
 # Testes para get_min_max_values:
 def test_get_min_max_values():

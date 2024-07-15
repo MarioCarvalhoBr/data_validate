@@ -1,33 +1,9 @@
-from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, generate_list_combinations, clean_sp_values_columns
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, generate_list_combinations, extract_ids_from_list
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 import pandas as pd
-def extract_ids_from_values(codes_level_to_remove, df_values):
-    valores_ids = df_values.columns.str.split('-').str[0]
 
-    # Remove os códigos que não são nivel 1
-    valores_ids = set(valores_ids) - set(codes_level_to_remove)
-
-    ids_valids = set()
-    ids_invalids = set()
-
-    for valor in valores_ids:
-        is_correct, __ = check_values_integers(valor, 1)
-        if not is_correct:
-            ids_invalids.add(valor)
-        if is_correct:
-            ids_valids.add(valor)
-
-    # Remover colunas que não são códigos: id e nome
-    ids_invalids.discard(SP_VALUES_COLUMNS.ID)
-    ids_invalids.discard(SP_VALUES_COLUMNS.NOME)
-    
-    # Converte em inteiros
-    ids_valids = set(int(id) for id in ids_valids)
-
-    return ids_valids, ids_invalids
-
-def extract_ids_from_description(df_description):
+def extract_ids_from_list_from_description(df_description):
     # Remove a linha que o nivel == 1
     df_description = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] != 1]
     
@@ -77,6 +53,26 @@ def processar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values)
         return True, lista_combinacoes_sp_values
     return False, []
 
+def extract_ids_from_list_from_values(codes_level_to_remove, list_values):    
+    
+    # Extract ids from columns
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    # Converter ambas as listas em strings
+    cleaned_columns = [str(id) for id in cleaned_columns]
+    extras_columns = [str(id) for id in extras_columns]
+    
+    # Remove os valores ID e NOME das colunas extras
+    extras_columns = [column for column in extras_columns if column != SP_VALUES_COLUMNS.ID and column != SP_VALUES_COLUMNS.NOME]
+    # Remove os códigos que não são nivel 1
+    extracted_ids = set([id.split('-')[0] for id in cleaned_columns]) - set(codes_level_to_remove)
+
+    # Remove os códigos repetidos e converte em inteiros
+    ids_valids = set(int(id) for id in set(extracted_ids))
+
+
+    return ids_valids, extras_columns
+
+
 def verify_ids_sp_description_values(df_description, df_values):
     df_description = df_description.copy()
     df_values = df_values.copy()
@@ -97,8 +93,8 @@ def verify_ids_sp_description_values(df_description, df_values):
         
         # codes_level = Lista com todos os códigos que são nivel 1
         codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == 1][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
-        id_description_valids, __  = extract_ids_from_description(df_description)
-        id_values_valids, id_values_invalids = extract_ids_from_values(codes_level_to_remove, df_values)
+        id_description_valids, __  = extract_ids_from_list_from_description(df_description)
+        id_values_valids, id_values_invalids = extract_ids_from_list_from_values(codes_level_to_remove, df_values.columns)
 
         # Verifica se há códigos inválidos
         final_list_invalid_codes = list(id_values_invalids)
@@ -109,8 +105,6 @@ def verify_ids_sp_description_values(df_description, df_values):
 
         errors += compare_ids(id_description_valids, id_values_valids, SP_DESCRIPTION_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
 
-    except ValueError as e:
-        errors.append(str(e))
     except Exception as e:
         errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP} e {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
 
@@ -230,7 +224,7 @@ def verify_unavailable_values(df_values):
         if SP_VALUES_COLUMNS.NOME in df_values.columns:
             df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
 
-        colunas_sp_valores, __ = clean_sp_values_columns(df_values.columns)
+        colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
         for column in colunas_sp_valores:
             for index, value in df_values[column].items():
                 # Verifica se o valor é uma string DI
