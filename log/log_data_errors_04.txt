@@ -38,7 +38,7 @@ Verificação: Issue #2 e #59: Relações entre indicadores
 descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].
 composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].
 composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].
-valores.xlsx: Códigos inválidos: ['5000.954', '5001,9483', 'Unnamed: 19'].
+valores.xlsx: Códigos inválidos: ['5000.954-2015', '5001,9483-2015', 'Unnamed: 19'].
 valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].
 Verificação: Issue #3: Hierarquia como árvore
 Verificação: Issue #37: Níveis de indicadores
@@ -94,7 +94,7 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 Número de erros: 30
 Número de avisos: 8
 
-Tempo total de execução: 4.2 segundos
+Tempo total de execução: 1.2 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html

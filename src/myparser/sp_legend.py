@@ -1,7 +1,7 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS
-from src.util.utilities import get_min_max_values, clean_sp_values_columns
+from src.util.utilities import get_min_max_values, extract_ids_from_list
 
 
 def read_legend_qml_file(qml_file_path):
@@ -79,7 +79,7 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
         if SP_VALUES_COLUMNS.NOME in df_values.columns:
             df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
 
-        colunas_sp_valores, __ = clean_sp_values_columns(df_values.columns)
+        colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
 
         if not qml_legend_exists:
             MIN_VALUE, MAX_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT, SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT

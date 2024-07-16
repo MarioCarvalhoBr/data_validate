@@ -41,6 +41,7 @@ descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos
 composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
+valores.xlsx: Códigos inválidos: ['5000-2080-M'].
 valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
 Verificação: Issue #3: Hierarquia como árvore
 composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].
@@ -125,10 +126,10 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 37
+Número de erros: 38
 Número de avisos: 36
 
-Tempo total de execução: 1.7 segundos
+Tempo total de execução: 1.4 segundos
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html
