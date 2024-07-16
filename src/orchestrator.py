@@ -33,7 +33,7 @@ from src.myparser.model.spreadsheets import SP_DESCRIPTION_MAX_TITLE_LENGTH, SP_
 init_fix_colorama_windows_console()
 
 # Função principal para executar o programa
-def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, debug):
+def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, no_time, debug):
     print("\n")
     if debug:
         print("\nModo DEBUG ativado.")
@@ -423,7 +423,8 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # Converter para 2 casas decimais
         total_time = round(total_time, 1)
         
-        print(Fore.BLUE + Style.BRIGHT + "\nTempo total de execução: " + str(total_time) + " segundos")  
+        if not no_time:
+            print(Fore.BLUE + Style.BRIGHT + "Tempo total de execução: " + str(total_time) + " segundos")
         
         # RESET COLORAMA
         print(Style.RESET_ALL)
@@ -431,7 +432,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
     
     # Criar a pasta de saída para salvar os relatórios
     util.create_directory(output_folder)
-    report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML)
+    report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML, no_time=no_time)
 
     # Pegar somente o base name do input_folder
     name_file = util.get_last_directory_name(input_folder)

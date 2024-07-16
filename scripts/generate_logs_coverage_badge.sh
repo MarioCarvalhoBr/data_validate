@@ -31,7 +31,7 @@ if [ $? -eq 0 ]; then
         if [ -d "$INPUT_DATA/$name" ]; then
             echo ""
             echo "Processando a pasta '$INPUT_DATA/$name'..."
-            python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug> log/log_$name.txt
+            python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug --no-time> log/log_$name.txt
             
             # Adicionando arquivos ao staging area
             git add .

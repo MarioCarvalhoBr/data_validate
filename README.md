@@ -60,22 +60,10 @@ Instale os requerimentos
 Para executar o Adapta Parser, use o seguinte comando:
     
 ```bash
-python3 main.py --input_folder=input_data/data_ground_truth_01/
+python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=output_data/
 ```
 
 #### Argumentos
-
-"""
-Descrição dos seguintes argumentos: 
-    # Args
-    parser.add_argument("--input_folder", type=str, required=True, help="Caminnho para a pasta de entrada.")
-    parser.add_argument("--output_folder", default="output_data/", type=str, required=False, help="Caminnho para a pasta de saída.")
-    parser.add_argument("--no-spellchecker", action="store_true", help="Não executa o verificador ortográfico.")
-    parser.add_argument("--lang-dict", type=str, default="pt", help="Define qual a linguagem do dicionário ortográfico: pt ou en.")
-    parser.add_argument("--no-warning-titles-length", action="store_true", help="Desabilita o aviso para nomes e títulos com uma quantidade de caracteres definidas.")
-    parser.add_argument("--debug", action="store_true", help="Executa o programa em modo debug.")
-
-"""
 
 - `--input_folder` (obrigatório): Especifica o caminho para a pasta de entrada contendo os arquivos `.xlsx` a serem analisados. Este argumento é obrigatório e deve ser seguido pelo caminho da pasta.
 
@@ -114,6 +102,12 @@ Descrição dos seguintes argumentos:
   Exemplo:
   ```
   --debug
+  ```
+
+- `--no-time`: Quando este argumento é usado, o script não exibe informações de tempo de execução, além de omitir a data e hora da execução nos relatórios. Isso pode ser útil se você deseja reduzir a quantidade de saída gerada.
+  Exemplo:
+  ```
+  --no-time
   ```
 
 ### Testes
