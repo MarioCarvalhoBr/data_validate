@@ -4,7 +4,8 @@ from pyhtml2pdf import converter
 import src.myparser.info as info
 
 class ReportGenerator:
-    def __init__(self, folder, template_name="default.html"):
+    def __init__(self, folder, template_name="default.html", no_time=False):
+        self.no_time = no_time
         self.folder = folder
         self.output_folder = None
         self.template_name = template_name
@@ -45,8 +46,8 @@ class ReportGenerator:
                                         <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Data e hora do processo: </strong>{{ date_now }}<br>
-                                        <strong>Vers&atilde;o do validador:</strong>  {{ version }}
+                                        <strong>Vers&atilde;o do validador:</strong>  {{ version }}<br>
+                                        <strong style="display: {{ display_date }}">Data e hora do processo: </strong>{{ date_now }}
                                     </div>
                                 </div>
 
@@ -57,7 +58,7 @@ class ReportGenerator:
                                     <div class="card-body">
                                         <p class="card-text"><strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong></p>
                                         <p class="card-text"><strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong></p>
-                                        <p id="id_tests_not_executed" class="card-text" style="display: {{ display }}"><strong>Testes n&atilde;o executados:</strong> {{ tests_not_executed }} </p>
+                                        <p id="tests_not_executed" class="card-text" style="display: {{ display_tests_not_executed }}"><strong>Testes n&atilde;o executados:</strong> {{ tests_not_executed }} </p>
                                         
                                     </div>
                                 </div>
@@ -109,22 +110,30 @@ class ReportGenerator:
                 "\n<br>".join(f"<span style='color: orange;'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
-            display = "block" if results_tests_not_executed else "none"
+            display_tests_not_executed = "block" if results_tests_not_executed else "none"
+            display_date = "block" if not self.no_time else "none"
 
             results_tests_not_executed = "\n".join([f"<li>{test_name}</li>" for test_name in results_tests_not_executed])
             results_tests_not_executed = f"<ul>{results_tests_not_executed}</ul>"
 
+            date_now = info.__date_now__
+            if self.no_time:
+                date_now = ""
+
             template_vars = {
                 "name": info.__name__,
-                "date_now": info.__date_now__,
+
                 "version": info.__version__,
                 "errors": errors,
                 "warnings": warnings,
                 "num_errors": num_errors,
                 "num_warnings": num_warnings,
 
+                "date_now": date_now,
+                "display_date": display_date,
+
                 "tests_not_executed": results_tests_not_executed,
-                "display": display
+                "display_tests_not_executed": display_tests_not_executed
 
             }
 
