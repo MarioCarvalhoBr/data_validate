@@ -109,6 +109,7 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   ```
   --no-time
   ```
+  
 
 ### Testes
 #### Instalando o coverage
