@@ -281,7 +281,7 @@ def check_sp_file_exists(file_path):
 
         if file_name_non_extension == name_scnario or file_name_non_extension == name_proportionality:
             return False, is_csv, is_xlsx, []
-        return False, is_csv, is_xlsx, [f"{file_name}: O arquivo esperado não foi encontrado em '{ultima_pasta}/'."]
+        return False, is_csv, is_xlsx, [f"{file_name}: O arquivo esperado não foi encontrado."]
     if is_csv and is_xlsx:
         return True, is_csv, is_xlsx, [f"{file_name}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."]
     

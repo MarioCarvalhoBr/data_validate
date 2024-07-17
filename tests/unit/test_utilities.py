@@ -286,7 +286,7 @@ def test_check_sp_file_exists_with_no_file():
     assert is_csv is False
     assert is_xlsx is False
     assert len(warnings) == 1
-    assert warnings[0] == "non_existing_file.csv: O arquivo esperado não foi encontrado em '/'."
+    assert warnings[0] == "non_existing_file.csv: O arquivo esperado não foi encontrado."
 
 def test_clean_non_numeric_and_less_than_value_integers_dataframe_with_no_errors():
     df = pd.DataFrame({
