@@ -271,8 +271,6 @@ def check_sp_file_exists(file_path):
     if os.path.exists(path_file_xlsx):
         is_xlsx = True
 
-    ultima_pasta = os.path.basename(os.path.dirname(file_path))
-
     # Se não encontrou nenhum dos dois
     if not is_csv and not is_xlsx:
         name_scnario = SP_SCENARIO_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
