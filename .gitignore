@@ -1,5 +1,6 @@
 
 local_data/
+output_data/*/*.pdf
 test.py
 issues/
 TODO.md
