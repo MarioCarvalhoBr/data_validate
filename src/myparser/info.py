@@ -7,7 +7,7 @@ import pyarrow
 import pytest
 import pipreqs
 import coverage
-import pre_commit
+from pre_commit import constants as pre_commit
 import datetime
 import setuptools
 import genbadge
@@ -24,7 +24,7 @@ def print_versions():
     print("Pytest version:", pytest.__version__)
     print("Pipreqs version:", pipreqs.__version__)
     print("Coverage version:", coverage.__version__)
-    print("Pre-commit install path:", pre_commit)
+    print("Pre-commit version:", pre_commit.VERSION)
     print("Setuptools version:", setuptools.__version__)
     print("Genbadge version:", genbadge.__version__)
     print("CharDet Version: ", chardet.__version__)

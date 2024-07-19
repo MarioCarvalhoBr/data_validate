@@ -225,17 +225,32 @@ def verify_unavailable_values(df_values):
             df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
 
         colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
+
+        
+        
         for column in colunas_sp_valores:
+            line_init = None
+            line_end = None
+            count_errors = 0
+            errors_column = []
             for index, value in df_values[column].items():
                 # Verifica se o valor é uma string DI
                 if value == "DI":
                     continue
-
+                
                 value = pd.to_numeric(value, errors='coerce')
-                # Verifica se o valor é um número
                 if pd.isna(value) or not isinstance(value, (int, float)):
-                    errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '{column}'.")
-
+                    if line_init is None:
+                        line_init = index + 2
+                        errors_column.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '{column}'.")
+                    count_errors += 1
+                    
+                    line_end = index + 2
+            if count_errors > 1:
+                errors_column.clear()
+                errors_column.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {count_errors} valores que não são número válido nem DI (Dado Indisponível) para a coluna '{column}', entre as linhas {line_init} e {line_end}.")
+            
+            errors.extend(errors_column)
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
     return not errors, errors, warnings

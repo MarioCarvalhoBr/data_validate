@@ -13,7 +13,7 @@ Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
 Coverage version: 7.5.4
-Pre-commit install path: <module 'pre_commit' from '/home/carvalho/miniconda3/envs/adapta_data/lib/python3.12/site-packages/pre_commit/__init__.py'>
+Pre-commit version: 3.7.0
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
@@ -23,8 +23,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_04/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
-composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas.
-valores.xlsx, linha 7: A linha possui um valor na coluna 20, mas a tabela possui apenas 19 colunas.
+composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas válidas.
+valores.xlsx, linha 7: A linha possui um valor na coluna 20, mas a tabela possui apenas 19 colunas válidas.
 Verificação: Issue #79: Limpeza dos arquivos
 descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.

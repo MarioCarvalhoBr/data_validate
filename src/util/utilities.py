@@ -179,9 +179,10 @@ def read_excel_file(path):
             file_encoding = detect_encoding(path)
             if not any(enc in file_encoding.lower() for enc in ['ascii', 'utf-8']):
                 errors.append(f"{filename}: O arquivo está no formato {file_encoding}, deveria ser UTF-8.")
+            try: 
+                df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False)
+            except Exception:
                 return pd.DataFrame(), errors
-            
-            df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False)
             
         except Exception as e:
             errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")
@@ -218,9 +219,10 @@ def read_file_proporcionalites(path):
             file_encoding = detect_encoding(path)
             if not any(enc in file_encoding.lower() for enc in ['ascii', 'utf-8']):
                 errors.append(f"{filename}: O arquivo está no formato {file_encoding}, deveria ser UTF-8.")
+            try:            
+                df = pd.read_csv(path, delimiter=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False, dtype=str, header=[0, 1])
+            except Exception:
                 return pd.DataFrame(), errors
-            
-            df = pd.read_csv(path, delimiter=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False, dtype=str, header=[0, 1])
 
         except Exception as e:
             errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")

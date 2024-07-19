@@ -90,14 +90,11 @@ class ReportGenerator:
             f.write(text_html)
         # print('\nCreated a file report in HTML template: ', file_path)
 
-    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed):
+    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings):
         try: 
             self.output_folder = output_folder
             """ Preenche o template HTML com dados e salva o resultado. """
             template = self.env.get_template(self.template_name)
-            
-            num_errors = sum(len(data_test[2]) for data_test in results_tests if not data_test[1])
-            num_warnings = sum(len(data_test[3]) for data_test in results_tests)
             
             errors = "\n<br>".join(
                 f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
