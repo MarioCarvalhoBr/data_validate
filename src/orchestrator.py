@@ -365,7 +365,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
     
         # 15 - Verificar propriedades de soma nos fatores influenciadores #69
         if sp_proportionalities_exists:
-            results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *(sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_DESCRIPTION_COLUMNS.NAME_SP))])
+            results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *(sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))])
         
     if debug:
         print("\n")

@@ -44,9 +44,7 @@ Verificação: Issue #81: Relações de valores únicos em referência temporal
 Verificação: Issue #81: Relações de combinações de valores
 Verificação: Issue #149: Valores indisponíveis
 valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
-valores.xlsx, linha 12: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
-valores.xlsx, linha 13: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
-valores.xlsx, linha 14: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2050-O'.
+valores.xlsx: 3 valores que não são número válido nem DI (Dado Indisponível) para a coluna '2-2050-O', entre as linhas 12 e 14.
 Verificação: Issue #85: Quebra de linha para descrição
 Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
@@ -65,7 +63,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 10
+Número de erros: 8
 Número de avisos: 3
 
 
