@@ -20,7 +20,7 @@ class TestReportGenerator:
 
     def test_save_html_pdf_report(self):
         results_tests = [("Test", True, [], [])]
-        self.report_generator.save_html_pdf_report("test_report", self.folder, ".html", results_tests, [])
+        self.report_generator.save_html_pdf_report("test_report", self.folder, ".html", results_tests, [], 0, 0)
         assert os.path.exists(os.path.join(self.folder, "test_report.html"))
 
     def test_save_pdf_report(self):
