@@ -36,12 +36,12 @@ class ReportGenerator:
                         <body>
                             <div class="container my-5">
 
-                                <div class="text-center mb-4">
+                                <div class="text-center mb-12">
                                     <h1><strong>{{ name }}</strong></h1>
                                     <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
                                 </div>
 
-                                <div class="card mb-4">
+                                <div class="card mb-12">
                                     <div class="card-header bg-primary text-white">
                                         <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
@@ -58,13 +58,16 @@ class ReportGenerator:
                                     <div class="card-body">
                                         <p class="card-text"><strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong></p>
                                         <p class="card-text"><strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong></p>
+                                        <p class="card-text" style="color: green;"><strong>N&uacute;mero de testes executados: {{ number_tests }}</strong></p>
+
                                         <p id="tests_not_executed" class="card-text" style="display: {{ display_tests_not_executed }}"><strong>Testes n&atilde;o executados:</strong> {{ tests_not_executed }} </p>
+                                        
                                         
                                     </div>
                                 </div>
                                 <br>
 
-                                <div class="card mb-4">
+                                <div class="card mb-12">
                                     <div class="card-header bg-danger text-white">
                                         <strong>Erros</strong>
                                     </div>
@@ -90,7 +93,7 @@ class ReportGenerator:
             f.write(text_html)
         # print('\nCreated a file report in HTML template: ', file_path)
 
-    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings):
+    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings, number_tests):
         try: 
             self.output_folder = output_folder
             """ Preenche o template HTML com dados e salva o resultado. """
@@ -125,6 +128,7 @@ class ReportGenerator:
                 "warnings": warnings,
                 "num_errors": num_errors,
                 "num_warnings": num_warnings,
+                "number_tests": number_tests,
 
                 "date_now": date_now,
                 "display_date": display_date,
