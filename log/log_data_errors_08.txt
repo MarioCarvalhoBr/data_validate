@@ -23,10 +23,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_08/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
-proporcionalidades.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8.
 referencia_temporal.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8.
 descricao.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8.
-valores.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8.
 Verificação: Issue #79: Limpeza dos arquivos
 Verificação: Issue #2 e #59: Relações entre indicadores
 Verificação: Issue #3: Hierarquia como árvore
@@ -52,9 +50,10 @@ Verificação: Issue #85: Quebra de linha para cenários
 Verificação: Issue #85: Quebra de linha para referência temporal
 Verificação: Issue #16: Intervalo dos dados da legenda
 Verificação: Issue #71: Sobreposição de valores na legenda
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 
 
-Número de erros: 4
+Número de erros: 2
 Número de avisos: 0
 
 

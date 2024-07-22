@@ -37,7 +37,7 @@ descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
 valores.xlsx: Coluna 'id' esperada mas não foi encontrada.
 proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
 Verificação: Issue #79: Limpeza dos arquivos
-composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0.0' é menor que 1.
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Issue #2 e #59: Relações entre indicadores
 valores.xlsx: Códigos inválidos: ['codigo'].
 Verificação: Issue #3: Hierarquia como árvore

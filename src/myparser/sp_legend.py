@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
+import numpy as np
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS
 from src.util.utilities import get_min_max_values, extract_ids_from_list
 
@@ -76,8 +77,6 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
         # Remove colunas que não são códigos: id e nome
         if SP_VALUES_COLUMNS.ID in df_values.columns:
             df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
-        if SP_VALUES_COLUMNS.NOME in df_values.columns:
-            df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
 
         colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
 
@@ -121,18 +120,23 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
                     value_aux = value
                     if value == "DI":
                         continue
+                    
                     if pd.isna(value):
                         continue
+                    
+                    # CORREÇÃO DOS VALORES FLUTUANTES
+                    value = value.replace(',', '.')
         
                     value = pd.to_numeric(value, errors='coerce')
+                    
                     # Verifica se o valor é um número
-                    if (not isinstance(value, (int, float))):
-                        print(value_aux)
-                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor '{value}' não é um número válido para a coluna '{column}'.")
+                    if pd.isna(value):
+                        print(f'Valor: {value_aux} - {type(value)}')
+                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor '{value_aux}' não é um número válido para a coluna '{column}'.")
                         continue
                     # Verifica se o valor está no intervalo
                     if value < MIN_VALUE or value > MAX_VALUE:
-                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor {value} está fora do intervalo de {MIN_VALUE} a {MAX_VALUE} para a coluna '{column}'.")
+                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor {value_aux} está fora do intervalo de {MIN_VALUE} a {MAX_VALUE} para a coluna '{column}'.")
             
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
@@ -174,15 +178,18 @@ def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
             if value == "DI":
                 continue
 
-            if value is None or pd.isna(value):
+            if value is None or pd.isna(value.replace(',', '.')):
                 errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
                 continue
+
+            # CORREÇÃO DOS VALORES FLUTUANTES
+            value = value.replace(',', '.')
             
             # Converte value para um numero. Se não for possivel, retorna nan
             value = pd.to_numeric(value, errors='coerce')
             
             # Verifica se o valor é um número
-            if (pd.isna(value)) or (not isinstance(value, (int, float))):
+            if pd.isna(value):
                 errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
                 return not errors, errors, warnings
 

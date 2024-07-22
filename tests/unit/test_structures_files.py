@@ -32,13 +32,11 @@ from tests.unit.test_constants import path_input_data_errors_02, path_input_data
 def test_count_errors_verify_errors_read_files_in_folder_root_data_errors_08():
     is_correct, errors, warnings = verify_errors_read_files_in_folder_root(all_errors_read_files_data_errors_08)
     assert is_correct is False
-    assert len(errors) == 4
+    assert len(errors) == 2
     assert len(warnings) == 0
 
-    assert errors[0] == "proporcionalidades.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
-    assert errors[1] == "referencia_temporal.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
-    assert errors[2] == "descricao.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
-    assert errors[3] == "valores.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
+    assert errors[0] == "referencia_temporal.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
+    assert errors[1] == "descricao.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8."
 
 # Testes: verify_expected_structure_files
 def test_count_errors_verify_expected_structure_files_data_ground_truth_01():
@@ -222,7 +220,7 @@ def test_errors_verify_expected_structure_files_errors_04():
 
     # Verifica se os erros são o esperado
     assert all_errors_structure_files[0] == "composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas válidas."
-    assert all_errors_structure_files[1] == "valores.xlsx, linha 7: A linha possui um valor na coluna 20, mas a tabela possui apenas 19 colunas válidas."
+    assert all_errors_structure_files[1] == "valores.xlsx, linha 7: A linha possui um valor na coluna 19, mas a tabela possui apenas 18 colunas válidas."
     
     # Verifica se os warnings são o esperado
     assert all_warnings_structure_files[0] == "composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação."

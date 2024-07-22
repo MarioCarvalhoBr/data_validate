@@ -17,15 +17,15 @@ def build_subdatasets(df, file_path):
 
 def create_subdatasets_xlsx(df, parent_columns):
     """ Cria subdatasets a partir de um arquivo Excel. """
-    unique_parents = [col for col in parent_columns[2:] if 'Unnamed' not in col]
-    subdatasets = {'main': df.iloc[:, :2]}
+    unique_parents = [col for col in parent_columns[1:] if 'Unnamed' not in col]
+    subdatasets = {'main': df.iloc[:, :1]}
     
     for parent_id in unique_parents:
         start_col = (parent_columns == parent_id).argmax()
         end_col = (parent_columns[start_col + 1:] != parent_id).argmax() + start_col + 1
         if end_col == start_col + 1:
             end_col = len(parent_columns)
-        columns_to_include = df.columns[:2].tolist() + df.columns[start_col:end_col].tolist()
+        columns_to_include = df.columns[:1].tolist() + df.columns[start_col:end_col].tolist()
         subdatasets[parent_id] = df.loc[:, columns_to_include]
     
     return subdatasets
@@ -33,18 +33,19 @@ def create_subdatasets_xlsx(df, parent_columns):
 def create_subdatasets_csv(df, parent_columns):
     """ Cria subdatasets a partir de um arquivo CSV. """
     unique_parents = []
-    for col in parent_columns[2:]:
+    for col in parent_columns[1:]:
         if not col.startswith('Unnamed'):
             unique_parents.append(col)
     
-    subdatasets = {'main': df.iloc[:, :2]}
-    
+    subdatasets = {'main': df.iloc[:, :1]}
+
     for parent_id in unique_parents:
         start_col = parent_columns.get_loc(parent_id)
         end_col = start_col + 1
         while end_col < len(parent_columns) and parent_columns[end_col].startswith('Unnamed'):
             end_col += 1
-        columns_to_include = df.columns[:2].tolist() + df.columns[start_col:end_col].tolist()
+        
+        columns_to_include = df.columns[:1].tolist() + df.columns[start_col:end_col].tolist()
         subdatasets[parent_id] = df.loc[:, columns_to_include]
     
     return subdatasets
@@ -63,8 +64,8 @@ def check_sum_equals_one(subdatasets):
         for index, row in subdataset.iterrows():
             all_cells = []
 
-            index_aux = 2
-            for cell in row[2:]:
+            index_aux = 1
+            for cell in row[1:]:
                 sub_col = row.index[index_aux][1]
                 index_aux += 1
 
@@ -72,10 +73,12 @@ def check_sum_equals_one(subdatasets):
                 if cell == 'DI':
                     continue
 
-                cell_aux = pd.to_numeric(cell, errors='coerce')
-                if pd.isna(cell_aux):
+                
+                if pd.isna(cell) or pd.isna(pd.to_numeric(cell, errors='coerce')): 
                     errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '{parent_id}' e indicador filho '{sub_col}'.")
                     continue
+                cell_aux = cell.replace(',', '.')
+                cell_aux = pd.to_numeric(cell_aux, errors='coerce')
                 
                 # Trunca o valor para 3 casas decimais
                 new_value = truncate_number(cell_aux, 3)

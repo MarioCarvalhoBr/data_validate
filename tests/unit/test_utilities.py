@@ -164,16 +164,19 @@ def test_read_excel_file_with_unsupported_extension():
     assert errors[0] == "test_file.txt: Tipo de arquivo não suportado: .txt"
 
 def test_read_excel_file_with_csv_file():
-    df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    df_test = pd.DataFrame({'A': ['1', '2', '3'], 'B': ['4', '5', '6']})
+    
     # Convert to string to avoid float precision issues
     df_test.to_csv('test_file.csv', sep='|', index=False)
     df, errors = read_excel_file('test_file.csv')
+    
     os.remove('test_file.csv')
+    
     assert df.equals(df_test)
     assert len(errors) == 0
 
 def test_read_excel_file_with_excel_file():
-    df_test = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    df_test = pd.DataFrame({'A': ['1', '2', '3'], 'B': ['4', '5', '6']})
     # Convert to string to avoid float precision issues
     df_test.to_excel('test_file.xlsx', index=False)
     df, errors = read_excel_file('test_file.xlsx')
@@ -182,7 +185,7 @@ def test_read_excel_file_with_excel_file():
     assert len(errors) == 0
 
 def test_read_excel_file_with_existing_file():
-    df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
+    df = pd.DataFrame({'A': ['1', '2', '3'], 'B': ['4', '5', '6']})
     df.to_excel('test_file.xlsx', index=False)
 
     loaded_df, errors_read_file = read_excel_file('test_file.xlsx')

@@ -5,12 +5,12 @@ import pandas as pd
 
 def extract_ids_from_list_from_description(df_description):
     # Remove a linha que o nivel == 1
-    df_description = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] != 1]
+    df_description = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] != '1']
     
     # Remove a linha que o nivel == 2 e cenario == 0
     # Verifica se a coluna cenario existe em df_description
     if SP_DESCRIPTION_COLUMNS.CENARIO in df_description.columns:
-        df_description = df_description[~((df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == 2) & (df_description[SP_DESCRIPTION_COLUMNS.CENARIO] == 0))]
+        df_description = df_description[~((df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '2') & (df_description[SP_DESCRIPTION_COLUMNS.CENARIO] == '0'))]
     
     valores_ids = set(df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
 
@@ -62,7 +62,7 @@ def extract_ids_from_list_from_values(codes_level_to_remove, list_values):
     extras_columns = [str(id) for id in extras_columns]
     
     # Remove os valores ID e NOME das colunas extras
-    extras_columns = [column for column in extras_columns if column != SP_VALUES_COLUMNS.ID and column != SP_VALUES_COLUMNS.NOME]
+    extras_columns = [column for column in extras_columns if column != SP_VALUES_COLUMNS.ID]
     # Remove os códigos que não são nivel 1
     extracted_ids = set([id.split('-')[0] for id in cleaned_columns]) - set(codes_level_to_remove)
 
@@ -92,7 +92,7 @@ def verify_ids_sp_description_values(df_description, df_values):
         df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
         
         # codes_level = Lista com todos os códigos que são nivel 1
-        codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == 1][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+        codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
         id_description_valids, __  = extract_ids_from_list_from_description(df_description)
         id_values_valids, id_values_invalids = extract_ids_from_list_from_values(codes_level_to_remove, df_values.columns)
 
@@ -153,16 +153,16 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
     df_temporal_reference, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_temporal_reference, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO])
 
     try: 
+        # Criar lista de símbolos de cenários
+        lista_simbolos_cenarios = []
+        if sp_scenario_exists:
+            lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+
         # Verificar cada indicador em df_description
         for line, row in df_description.iterrows():
             # Leitura de valores
             codigo = str(row[SP_DESCRIPTION_COLUMNS.CODIGO])
             nivel = int(row[SP_DESCRIPTION_COLUMNS.NIVEL])
-
-            # Criar lista de símbolos de cenários
-            lista_simbolos_cenarios = []
-            if sp_scenario_exists:
-                lista_simbolos_cenarios = df_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
             # Criar lista de símbolos temporais:
             lista_simbolos_temporais = sorted(df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique().tolist())
@@ -221,12 +221,8 @@ def verify_unavailable_values(df_values):
         # Remove colunas que não são códigos: id e nome
         if SP_VALUES_COLUMNS.ID in df_values.columns:
             df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
-        if SP_VALUES_COLUMNS.NOME in df_values.columns:
-            df_values.drop(columns=[SP_VALUES_COLUMNS.NOME], inplace=True)
 
         colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
-
-        
         
         for column in colunas_sp_valores:
             line_init = None
@@ -237,9 +233,9 @@ def verify_unavailable_values(df_values):
                 # Verifica se o valor é uma string DI
                 if value == "DI":
                     continue
-                
-                value = pd.to_numeric(value, errors='coerce')
-                if pd.isna(value) or not isinstance(value, (int, float)):
+
+                # CORREÇÃO DOS VALORES FLUTUANTES
+                if pd.isna(value) or pd.isna(pd.to_numeric(value.replace(',', '.'), errors='coerce')):
                     if line_init is None:
                         line_init = index + 2
                         errors_column.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '{column}'.")
