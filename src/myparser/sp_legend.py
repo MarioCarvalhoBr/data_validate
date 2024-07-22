@@ -1,6 +1,5 @@
 import xml.etree.ElementTree as ET
 import pandas as pd
-import numpy as np
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS
 from src.util.utilities import get_min_max_values, extract_ids_from_list
 
