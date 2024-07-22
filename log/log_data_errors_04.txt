@@ -24,21 +24,21 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_04/
 ------ Resultados da verificação dos testes ------
 Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas válidas.
-valores.xlsx, linha 7: A linha possui um valor na coluna 20, mas a tabela possui apenas 19 colunas válidas.
+valores.xlsx, linha 7: A linha possui um valor na coluna 19, mas a tabela possui apenas 18 colunas válidas.
 Verificação: Issue #79: Limpeza dos arquivos
 descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
 descricao.xlsx, linha 2: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.
 descricao.xlsx, linha 3: A coluna 'nivel' contém um valor inválido: O valor '2.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'XX3' não é um número.
-composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0.0' é menor que 1.
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 composicao.xlsx, linha 5: A coluna 'codigo_pai' contém um valor inválido: O valor '5000.7875' não é um número inteiro.
 composicao.xlsx, linha 7: A coluna 'codigo_pai' contém um valor inválido: O valor '5001.88' não é um número inteiro.
 Verificação: Issue #2 e #59: Relações entre indicadores
 descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].
 composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].
 composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].
-valores.xlsx: Códigos inválidos: ['5000.954-2015', '5001,9483-2015', 'Unnamed: 19'].
+valores.xlsx: Códigos inválidos: ['5000.954-2015', '5001,9483-2015', 'Unnamed: 18'].
 valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].
 Verificação: Issue #3: Hierarquia como árvore
 Verificação: Issue #37: Níveis de indicadores

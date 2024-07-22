@@ -180,7 +180,7 @@ def read_excel_file(path):
             if not any(enc in file_encoding.lower() for enc in ['ascii', 'utf-8']):
                 errors.append(f"{filename}: O arquivo está no formato {file_encoding}, deveria ser UTF-8.")
             try: 
-                df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False)
+                df = pd.read_csv(path, sep=DEFAULT_SEPARATOR, encoding=ENCODING, low_memory=False, dtype=str)
             except Exception:
                 return pd.DataFrame(), errors
             
@@ -189,7 +189,7 @@ def read_excel_file(path):
             return pd.DataFrame(), errors
     elif file_extension == ".xlsx":
         try:
-            df = pd.read_excel(path)
+            df = pd.read_excel(path, dtype=str)
         except Exception as e:
             errors.append(f"{filename}: Erro ao abrir o arquivo: {str(e)}")
             return pd.DataFrame(), errors

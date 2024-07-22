@@ -31,13 +31,9 @@ class SP_COMPOSITION_COLUMNS ():
 class SP_VALUES_COLUMNS ():
     NAME_SP = "valores.xlsx"
     ID = "id"
-    NOME = "nome"
-
 class SP_PROPORTIONALITIES_COLUMNS ():
     NAME_SP = "proporcionalidades.xlsx"
     ID = "id"
-    NOME = "nome"
-
 class SP_SCENARIO_COLUMNS ():
     NAME_SP = "cenarios.xlsx"
     NOME = "nome"

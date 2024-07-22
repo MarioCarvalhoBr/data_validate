@@ -99,8 +99,8 @@ def test_check_tuple_sequence_end_overlap():
 
 def test_verify_overlapping_legend_value_overlap_detected():
     data = {
-        'lower': [0.0, 0.154, 0.308, 0.462, 0.616],
-        'upper': [0.154, 0.308, 0.462, 0.516, 0.77]
+        'lower': ["0.0"," 0.154", "0.308", "0.462", "0.616"],
+        'upper': ["0.154", "0.308", "0.462","0.516", "0.77"]
     }
     df_qml_legend = pd.DataFrame(data)
     qml_legend_exists = True
@@ -133,8 +133,8 @@ def test_verify_overlapping_legend_value_empty_df():
 
 def test_verify_overlapping_legend_value_non_numeric_values():
     data = {
-        'lower': [0.0, 0.154, None],
-        'upper': [0.154, 0.308, 0.462]
+        'lower': ["0.0"," 0.154", None],
+        'upper': ["0.154", "0.308", "0.462"]
     }
     df_qml_legend = pd.DataFrame(data)
     qml_legend_exists = True
@@ -149,8 +149,8 @@ def test_verify_overlapping_legend_value_non_numeric_values():
 
 def test_verify_overlapping_legend_value_lower_greater_than_upper():
     data = {
-        'lower': [0.0, 0.154, 0.5],
-        'upper': [0.154, 0.308, 0.462]
+        'lower': ["0.0"," 0.154", "0.5"],
+        'upper': ["0.154", "0.308", "0.462"]
     }
     df_qml_legend = pd.DataFrame(data)
     qml_legend_exists = True
@@ -165,8 +165,8 @@ def test_verify_overlapping_legend_value_lower_greater_than_upper():
 
 def test_verify_overlapping_legend_value_not_in_order():
     data = {
-        'lower': [0.0, 0.462, 0.154],
-        'upper': [0.154, 0.616, 0.308]
+        'lower': ["0.0"," 0.462", "0.154"],
+        'upper': ["0.154", "0.616", "0.308"]
     }
     df_qml_legend = pd.DataFrame(data)
     qml_legend_exists = True
@@ -179,8 +179,8 @@ def test_verify_overlapping_legend_value_not_in_order():
 
 def test_verify_overlapping_legend_value_overlapping():
     data = {
-        'lower': [0.0, 0.154, 0.308],
-        'upper': [0.154, 0.462, 0.462]
+        'lower': ["0.0", "0.154", "0.308"],
+        'upper': ["0.154", "0.462", "0.462"]
     }
     df_qml_legend = pd.DataFrame(data)
     qml_legend_exists = True
@@ -193,8 +193,8 @@ def test_verify_overlapping_legend_value_overlapping():
 
 def test_verify_overlapping_legend_value_success():
     data = {
-        'lower': [0.0, 0.154, 0.308, 0.462, 0.616],
-        'upper': [0.154, 0.308, 0.462, 0.616, 0.77]
+        'lower': ["0.0", "0.154", "0.308", "0.462", "0.616"],
+        'upper': ["0.154", "0.308", "0.462", "0.616", "0.77"]
     }
     df_qml_legend = pd.DataFrame(data)
     qml_legend_exists = True
@@ -257,8 +257,8 @@ def test_verify_values_range_default_range_outside():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        '2-2015-O': [0.5, 1.2, 0.7],
-        '2-2015-P': [0.1, 0.4, 1.1]
+        '2-2015-O': ["0.5", "1.2", "0.7"],
+        '2-2015-P': ["0.1","0.4", "1.1"]
     }
     df_values = pd.DataFrame(data_values)
     df_qml_legend = pd.DataFrame()  # Não usado para este teste
@@ -276,8 +276,8 @@ def test_verify_values_range_qml_range_within():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        '2-2015': [5.0, 7.0, 9.0],
-        '2-2016': [1.0, 4.0, 8.0]
+        '2-2015': ["5.0", "7.0", "9.0"],
+        '2-2016': ["1.0", "4.0", "8.0"]
     }
     df_values = pd.DataFrame(data_values)
     data_qml = {
@@ -297,8 +297,8 @@ def test_verify_values_range_qml_range_outside():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        '2-2015-O': [5.0, 12.0, 7.0],
-        '2-2015-P': [1.0, 4.0, 11.0]
+        '2-2015-O': ["5.0", "12.0", "7.0"],
+        '2-2015-P': ["1.0", "4.0", "11.0"]
     }
     df_values = pd.DataFrame(data_values)
     data_qml = {
@@ -320,8 +320,8 @@ def test_verify_values_range_processing_error():
     data_values = {
         'id': [1, 2, 3],
         'nome': ['Cidade A', 'Cidade B', 'Cidade C'],
-        '2-2015-O': [5.0, 12.0, 7.0],
-        '2-2015-P': [1.0, 4.0, 11.0]
+        '2-2015-O': ['5.0', '12.0', '7.0'],
+        '2-2015-P': ['1.0', '4.0', '11.0']
     }
     df_values = pd.DataFrame(data_values)
     df_qml_legend = pd.DataFrame()  # Não usado para este teste
