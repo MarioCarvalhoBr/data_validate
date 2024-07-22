@@ -1,0 +1,155 @@
+
+                        <!DOCTYPE html>
+                        <html lang="pt-br">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                            <title>Canoa Report</title>
+                            <style>
+                                .container {
+                                    max-width: 98%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container my-5">
+
+                                <div class="text-center mb-12">
+                                    <h1><strong>Canoa</strong></h1>
+                                    <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
+                                </div>
+
+                                <div class="card mb-12">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Informa&ccedil;&otilde;es</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong>Vers&atilde;o do validador: 0.3.0</strong><br>
+                                        <strong style="display: none">Data e hora do processo:  </strong>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Resumo da valida&ccedil;&atilde;o</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong class="text-danger">N&uacute;mero de Erros: 30</strong><br>
+                                        <strong class="text-warning">N&uacute;mero de Avisos: 8</strong><br>
+                                        <strong style="color: green;">N&uacute;mero de testes executados: 27</strong><br>
+                                        <strong id="tests_not_executed" style="display: none">Testes n&atilde;o executados: <ul></ul></strong> 
+
+                                    </div>
+                                </div>
+
+                                <div class="card mb-12">
+                                    <div class="card-header bg-danger text-white">
+                                        <strong>Erros</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong class="card-text">
+<br><span style='color: blue;'>Issue #39: Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: red;'>composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas válidas.</span>
+<br><span style='color: red;'>valores.xlsx, linha 7: A linha possui um valor na coluna 19, mas a tabela possui apenas 18 colunas válidas.</span>
+<br><span style='color: blue;'>Issue #79: Limpeza dos arquivos</span>:
+<br><span style='color: red;'>descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 2: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 3: A coluna 'nivel' contém um valor inválido: O valor '2.77' não é um número inteiro.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor 'XX3' não é um número.</span>
+<br><span style='color: red;'>composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.</span>
+<br><span style='color: red;'>composicao.xlsx, linha 5: A coluna 'codigo_pai' contém um valor inválido: O valor '5000.7875' não é um número inteiro.</span>
+<br><span style='color: red;'>composicao.xlsx, linha 7: A coluna 'codigo_pai' contém um valor inválido: O valor '5001.88' não é um número inteiro.</span>
+<br><span style='color: blue;'>Issue #2 e #59: Relações entre indicadores</span>:
+<br><span style='color: red;'>descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].</span>
+<br><span style='color: red;'>composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].</span>
+<br><span style='color: red;'>composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].</span>
+<br><span style='color: red;'>valores.xlsx: Códigos inválidos: ['5000.954-2015', '5001,9483-2015', 'Unnamed: 18'].</span>
+<br><span style='color: red;'>valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].</span>
+<br><span style='color: blue;'>Issue #3: Hierarquia como árvore</span>:
+<br>
+<br><span style='color: blue;'>Issue #37: Níveis de indicadores</span>:
+<br><span style='color: red;'>descricao.xlsx, linha 2: Nível do indicador não é um número inteiro maior que 0.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 3: Nível do indicador não é um número inteiro maior que 0.</span>
+<br><span style='color: red;'>descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.</span>
+<br><span style='color: blue;'>Issue #8: Unicidade dos códigos</span>:
+<br>
+<br><span style='color: blue;'>Issue #5: Códigos HTML nas descrições simples</span>:
+<br>
+<br><span style='color: blue;'>Issue #24: Ortografia</span>:
+<br>
+<br><span style='color: blue;'>Issue #36: Títulos únicos</span>:
+<br>
+<br><span style='color: blue;'>Issue #124: Códigos sequenciais</span>:
+<br><span style='color: red;'>descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos.</span>
+<br><span style='color: blue;'>Issue #75: Campos vazios</span>:
+<br>
+<br><span style='color: blue;'>Issue #1: Padrão para nomes dos indicadores</span>:
+<br>
+<br><span style='color: blue;'>Issue #39: Títulos com mais de 40 caracteres</span>:
+<br>
+<br><span style='color: blue;'>Issue #119: Descrições simples com mais de 150 caracteres</span>:
+<br>
+<br><span style='color: blue;'>Issue #32: Pontuações obrigatórias e proibidas em descrições</span>:
+<br>
+<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em cenários</span>:
+<br>
+<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em referência temporal</span>:
+<br>
+<br><span style='color: blue;'>Issue #81: Relações de valores únicos em cenários</span>:
+<br>
+<br><span style='color: blue;'>Issue #81: Relações de valores únicos em referência temporal</span>:
+<br>
+<br><span style='color: blue;'>Issue #81: Relações de combinações de valores</span>:
+<br>
+<br><span style='color: blue;'>Issue #149: Valores indisponíveis</span>:
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para descrição</span>:
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para cenários</span>:
+<br>
+<br><span style='color: blue;'>Issue #85: Quebra de linha para referência temporal</span>:
+<br>
+<br><span style='color: blue;'>Issue #16: Intervalo dos dados da legenda</span>:
+<br><span style='color: red;'>valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.</span>
+<br><span style='color: red;'>valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.</span>
+<br><span style='color: red;'>valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.</span>
+<br><span style='color: blue;'>Issue #71: Sobreposição de valores na legenda</span>:
+<br><span style='color: red;'>legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.</span>
+<br><span style='color: red;'>legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.</span>
+<br><span style='color: blue;'>Issue #69: Propriedades de soma nos fatores influenciadores</span>:
+<br><span style='color: red;'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.</span>
+<br><span style='color: red;'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.</span>
+<br><span style='color: red;'>proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.</span>
+<br><span style='color: red;'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span>
+<br><span style='color: red;'>proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.</span>
+<br><span style='color: red;'>proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span></strong>
+                                    </div>
+                                </div>
+                                <div class="card mb-4">
+                                    <div class="card-header text-dark bg-warning">
+                                        <strong>Avisos</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong class="card-text">
+<br><span style='color: blue;'>Issue #39: Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: orange;'>composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.</span>
+<br><span style='color: blue;'>Issue #24: Ortografia</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna nome_simples: ['ries'].</span>
+<br><span style='color: blue;'>Issue #1: Padrão para nomes dos indicadores</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".</span>
+<br><span style='color: orange;'>descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".</span>
+<br><span style='color: blue;'>Issue #119: Descrições simples com mais de 150 caracteres</span>:
+<br><span style='color: orange;'>descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.</span>
+<br><span style='color: blue;'>Issue #69: Propriedades de soma nos fatores influenciadores</span>:
+<br><span style='color: orange;'>proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.</span>
+<br><span style='color: orange;'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.</span>
+<br><span style='color: orange;'>proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.</span></strong>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </body>
+                        </html>
+            
