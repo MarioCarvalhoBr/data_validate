@@ -78,6 +78,7 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 
 Número de erros: 23
 Número de avisos: 4
+Número de verificações realizadas: 24
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_05/data_errors_05_report.html

@@ -55,6 +55,7 @@ Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 
 Número de erros: 2
 Número de avisos: 0
+Número de verificações realizadas: 27
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_08/data_errors_08_report.html

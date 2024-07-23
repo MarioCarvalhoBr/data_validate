@@ -36,18 +36,18 @@ class ReportGenerator:
                         <body>
                             <div class="container my-5">
 
-                                <div class="text-center mb-4">
+                                <div class="text-center mb-12">
                                     <h1><strong>{{ name }}</strong></h1>
                                     <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
                                 </div>
 
-                                <div class="card mb-4">
+                                <div class="card mb-12">
                                     <div class="card-header bg-primary text-white">
                                         <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Vers&atilde;o do validador:</strong>  {{ version }}<br>
-                                        <strong style="display: {{ display_date }}">Data e hora do processo: </strong>{{ date_now }}
+                                        <strong>Vers&atilde;o do validador: {{ version }}</strong><br>
+                                        <strong style="display: {{ display_date }}">Data e hora do processo: {{ date_now }} </strong>
                                     </div>
                                 </div>
 
@@ -56,20 +56,20 @@ class ReportGenerator:
                                         <strong>Resumo da valida&ccedil;&atilde;o</strong>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text"><strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong></p>
-                                        <p class="card-text"><strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong></p>
-                                        <p id="tests_not_executed" class="card-text" style="display: {{ display_tests_not_executed }}"><strong>Testes n&atilde;o executados:</strong> {{ tests_not_executed }} </p>
-                                        
+                                        <strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong><br>
+                                        <strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong><br>
+                                        <strong style="color: green;">N&uacute;mero de testes executados: {{ number_tests }}</strong><br>
+                                        <strong id="tests_not_executed" style="display: {{ display_tests_not_executed }}">Testes n&atilde;o executados: {{ tests_not_executed }}</strong> 
+
                                     </div>
                                 </div>
-                                <br>
 
-                                <div class="card mb-4">
+                                <div class="card mb-12">
                                     <div class="card-header bg-danger text-white">
                                         <strong>Erros</strong>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text">{{ errors }}</p>
+                                        <strong class="card-text">{{ errors }}</strong>
                                     </div>
                                 </div>
                                 <div class="card mb-4">
@@ -77,7 +77,7 @@ class ReportGenerator:
                                         <strong>Avisos</strong>
                                     </div>
                                     <div class="card-body">
-                                        <p class="card-text">{{ warnings }}</p>
+                                        <strong class="card-text">{{ warnings }}</strong>
                                     </div>
                                 </div>
 
@@ -90,21 +90,28 @@ class ReportGenerator:
             f.write(text_html)
         # print('\nCreated a file report in HTML template: ', file_path)
 
-    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings):
+    def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings, number_tests):
+        """
+        num_errors: int
+        num_warnings: int
+        number_tests: int
+        results_tests: list
+        results_tests_not_executed: list
+        """
         try: 
             self.output_folder = output_folder
             """ Preenche o template HTML com dados e salva o resultado. """
             template = self.env.get_template(self.template_name)
             
-            errors = "\n<br>".join(
-                f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
-                "\n<br>".join(f"<span style='color: red;'>{error}</span>" for error in errors)
+            errors = "".join(
+                f"\n<br><span style='color: blue;'>{name}</span>:\n" +
+                "\n".join(f"<br><span style='color: red;'>{error}</span>" for error in errors)
                 for name, _, errors, _ in results_tests
             )
 
-            warnings = "\n<br>".join(
-                f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
-                "\n<br>".join(f"<span style='color: orange;'>{warning}</span>" for warning in warnings)
+            warnings = "".join(
+                f"\n<br><span style='color: blue;'>{name}</span>:\n" +
+                "\n".join(f"<br><span style='color: orange;'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
             display_tests_not_executed = "block" if results_tests_not_executed else "none"
@@ -125,6 +132,7 @@ class ReportGenerator:
                 "warnings": warnings,
                 "num_errors": num_errors,
                 "num_warnings": num_warnings,
+                "number_tests": number_tests,
 
                 "date_now": date_now,
                 "display_date": display_date,

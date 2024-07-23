@@ -87,7 +87,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
     exists, error = util.check_folder_exists(input_folder)
     exists_input_folder = True
     if not exists:
-        results_tests.append(["Estrutura dos arquivos da pasta de entrada", *flatten(*False, [error], [])])
+        results_tests.append(["Estrutura dos arquivos da pasta de entrada", *flatten(False, [error], [])])
         exists_input_folder = False
     
     if exists_input_folder:
@@ -442,6 +442,9 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         else:
             print(Fore.WHITE + Style.BRIGHT + "Número de avisos: " + str(global_num_warnings))
 
+        # Número de verificações realizadas
+        number_tests = str(len(results_tests))
+        print(Fore.GREEN + Style.BRIGHT + "Número de verificações realizadas: " + number_tests)
         # Finalizar o contador de tempo ---------------------------------------------
         final_time = time.time()
         total_time = final_time - start_time
@@ -462,4 +465,4 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
 
     # Pegar somente o base name do input_folder
     name_file = util.get_last_directory_name(input_folder)
-    report_generator.save_html_pdf_report(name_file=name_file, output_folder=output_folder, file_output_html=OUTPUT_REPORT_HTML, results_tests=results_tests, results_tests_not_executed=results_tests_not_executed, num_errors=global_num_errors, num_warnings=global_num_warnings)
+    report_generator.save_html_pdf_report(name_file=name_file, output_folder=output_folder, file_output_html=OUTPUT_REPORT_HTML, results_tests=results_tests, results_tests_not_executed=results_tests_not_executed, num_errors=global_num_errors, num_warnings=global_num_warnings, number_tests=number_tests)

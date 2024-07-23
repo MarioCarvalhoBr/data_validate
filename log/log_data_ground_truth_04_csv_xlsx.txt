@@ -53,6 +53,7 @@ Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
 
 Número de erros: 0
 Número de avisos: 0
+Número de verificações realizadas: 27
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
