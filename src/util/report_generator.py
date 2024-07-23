@@ -104,14 +104,14 @@ class ReportGenerator:
             template = self.env.get_template(self.template_name)
             
             errors = "".join(
-                f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
-                "\n<br>".join(f"<span style='color: red;'>{error}</span>" for error in errors)
+                f"\n<br><span style='color: blue;'>{name}</span>:\n" +
+                "\n".join(f"<br><span style='color: red;'>{error}</span>" for error in errors)
                 for name, _, errors, _ in results_tests
             )
 
             warnings = "".join(
-                f"\n<br><span style='color: blue;'>{name}</span>:\n<br>" +
-                "\n<br>".join(f"<span style='color: orange;'>{warning}</span>" for warning in warnings)
+                f"\n<br><span style='color: blue;'>{name}</span>:\n" +
+                "\n".join(f"<br><span style='color: orange;'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
             display_tests_not_executed = "block" if results_tests_not_executed else "none"
