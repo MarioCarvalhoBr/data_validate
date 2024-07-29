@@ -104,7 +104,7 @@ def verify_values_range_multiple_legend(root_path, df_values, df_description, df
 
     if sp_scenario_exists:
         if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
-            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' não está ausente.")
     
     # Return if errors
     if errors:
