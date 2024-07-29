@@ -53,10 +53,10 @@ def processar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values)
         return True, lista_combinacoes_sp_values
     return False, []
 
-def extract_ids_from_list_from_values(codes_level_to_remove, list_values):    
+def extract_ids_from_list_from_values(codes_level_to_remove, list_values, lista_cenarios):   
     
     # Extract ids from columns
-    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values, lista_cenarios)
     # Converter ambas as listas em strings
     cleaned_columns = [str(id) for id in cleaned_columns]
     extras_columns = [str(id) for id in extras_columns]
@@ -73,7 +73,7 @@ def extract_ids_from_list_from_values(codes_level_to_remove, list_values):
     return ids_valids, extras_columns
 
 
-def verify_ids_sp_description_values(df_description, df_values):
+def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
     df_description = df_description.copy()
     df_values = df_values.copy()
 
@@ -86,6 +86,22 @@ def verify_ids_sp_description_values(df_description, df_values):
     if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
         return not errors, errors, warnings
+    
+    sp_scenario_exists = True
+    if df_sp_scenario.empty:
+        sp_scenario_exists = False
+
+    if sp_scenario_exists:
+        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+    
+    # Return if errors
+    if errors:
+        return not errors, errors, []
+    
+    lista_simbolos_cenarios = []
+    if sp_scenario_exists:
+        lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
     try:
         # Clean non numeric values
@@ -94,7 +110,7 @@ def verify_ids_sp_description_values(df_description, df_values):
         # codes_level = Lista com todos os códigos que são nivel 1
         codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
         id_description_valids, __  = extract_ids_from_list_from_description(df_description)
-        id_values_valids, id_values_invalids = extract_ids_from_list_from_values(codes_level_to_remove, df_values.columns)
+        id_values_valids, id_values_invalids = extract_ids_from_list_from_values(codes_level_to_remove, df_values.columns, lista_simbolos_cenarios)
 
         # Verifica se há códigos inválidos
         final_list_invalid_codes = list(id_values_invalids)
@@ -210,11 +226,28 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
         errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP}, {SP_VALUES_COLUMNS.NAME_SP}, {SP_SCENARIO_COLUMNS.NAME_SP} e {SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {e}.")
     return not errors, errors, []
 
-def verify_unavailable_values(df_values):
+def verify_unavailable_values(df_values, df_sp_scenario):
     errors = []
     warnings = []
     if df_values.empty:
         return True, [], []
+    
+    sp_scenario_exists = True
+    if df_sp_scenario.empty:
+        sp_scenario_exists = False
+
+    if sp_scenario_exists:
+        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+    
+    # Return if errors
+    if errors:
+        return not errors, errors, []
+    
+    lista_simbolos_cenarios = []
+    if sp_scenario_exists:
+        lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+
     try:
         df_values = df_values.copy()
 
@@ -222,7 +255,7 @@ def verify_unavailable_values(df_values):
         if SP_VALUES_COLUMNS.ID in df_values.columns:
             df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
 
-        colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
+        colunas_sp_valores, __ = extract_ids_from_list(df_values.columns, lista_simbolos_cenarios)
         
         for column in colunas_sp_valores:
             line_init = None

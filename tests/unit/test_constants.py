@@ -43,6 +43,8 @@ path_input_data_errors_05 = "input_data/data_errors_05"
 path_input_data_errors_06 = "input_data/data_errors_06"
 path_input_data_errors_07 = "input_data/data_errors_07"
 path_input_data_errors_08 = "input_data/data_errors_08"
+path_input_data_errors_09 = "input_data/data_errors_09"
+path_input_data_errors_10 = "input_data/data_errors_10"
 
 
 # 1. DATA FRAMES - GROUND TRUTH: path_input_data_ground_truth_01
@@ -156,12 +158,12 @@ qml_legend_exists_errors_05, __ = check_file_exists(os.path.join(path_input_data
 df_qml_legend_errors_05, __ = read_legend_qml_file(os.path.join(path_input_data_errors_05, SP_LEGEND_COLUMNS.NAME_SP))
 
 # 7. DATA FRAMES - ERROS 06: path_input_data_errors_06
-df_sp_scenario_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_SCENARIO_COLUMNS.NAME_SP))
-df_sp_temporal_reference_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
-df_sp_description_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_DESCRIPTION_COLUMNS.NAME_SP))
-df_sp_composition_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_COMPOSITION_COLUMNS.NAME_SP))
+df_sp_scenario_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_SCENARIO_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
+df_sp_temporal_reference_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
+df_sp_description_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_DESCRIPTION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
+df_sp_composition_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_COMPOSITION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
 df_sp_values_errors_06, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_06, SP_VALUES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
-df_sp_proportionalities_errors_06, errors_read_file = read_file_proporcionalites(os.path.join(path_input_data_errors_06, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+df_sp_proportionalities_errors_06, errors_read_file = read_file_proporcionalites(os.path.join(path_input_data_errors_06, SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
 # Legend QML é opcional
 qml_legend_exists_errors_06, __ = check_file_exists(os.path.join(path_input_data_errors_06, SP_LEGEND_COLUMNS.NAME_SP))
 df_qml_legend_errors_06, __ = read_legend_qml_file(os.path.join(path_input_data_errors_06, SP_LEGEND_COLUMNS.NAME_SP))
@@ -198,3 +200,26 @@ all_errors_read_files_data_errors_08.extend(errors_read_file_3)
 all_errors_read_files_data_errors_08.extend(errors_read_file_4)
 all_errors_read_files_data_errors_08.extend(errors_read_file_5)
 all_errors_read_files_data_errors_08.extend(errors_read_file_6)
+
+# 10. DATA FRAMES - ERROS 09: path_input_data_errors_09
+df_sp_scenario_errors_09, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_09, SP_SCENARIO_COLUMNS.NAME_SP))
+df_sp_temporal_reference_errors_09, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_09, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+df_sp_description_errors_09, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_09, SP_DESCRIPTION_COLUMNS.NAME_SP))
+df_sp_composition_errors_09, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_09, SP_COMPOSITION_COLUMNS.NAME_SP))
+df_sp_values_errors_09, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_09, SP_VALUES_COLUMNS.NAME_SP))
+df_sp_proportionalities_errors_09, errors_read_file = read_file_proporcionalites(os.path.join(path_input_data_errors_09, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+# Legend QML é opcional
+qml_legend_exists_errors_09, __ = check_file_exists(os.path.join(path_input_data_errors_09, SP_LEGEND_COLUMNS.NAME_SP))
+df_qml_legend_errors_09, __ = read_legend_qml_file(os.path.join(path_input_data_errors_09, SP_LEGEND_COLUMNS.NAME_SP))
+
+# 11. DATA FRAMES - ERROS 10: path_input_data_errors_10
+df_sp_scenario_errors_10, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_10, SP_SCENARIO_COLUMNS.NAME_SP))
+df_sp_temporal_reference_errors_10, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_10, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+df_sp_description_errors_10, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_10, SP_DESCRIPTION_COLUMNS.NAME_SP))
+df_sp_composition_errors_10, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_10, SP_COMPOSITION_COLUMNS.NAME_SP))
+df_sp_values_errors_10, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_10, SP_VALUES_COLUMNS.NAME_SP))
+df_sp_proportionalities_errors_10, errors_read_file = read_file_proporcionalites(os.path.join(path_input_data_errors_10, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
+# Legend QML é opcional
+qml_legend_exists_errors_10, __ = check_file_exists(os.path.join(path_input_data_errors_10, SP_LEGEND_COLUMNS.NAME_SP))
+df_qml_legend_errors_10, __ = read_legend_qml_file(os.path.join(path_input_data_errors_10, SP_LEGEND_COLUMNS.NAME_SP))
+

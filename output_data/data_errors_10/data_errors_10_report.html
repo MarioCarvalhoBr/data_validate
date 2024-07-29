@@ -35,9 +35,9 @@
                                         <strong>Resumo da valida&ccedil;&atilde;o</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong class="text-danger">N&uacute;mero de Erros: 23</strong><br>
-                                        <strong class="text-warning">N&uacute;mero de Avisos: 4</strong><br>
-                                        <strong style="color: green;">N&uacute;mero de testes executados: 24</strong><br>
+                                        <strong class="text-danger">N&uacute;mero de Erros: 1</strong><br>
+                                        <strong class="text-warning">N&uacute;mero de Avisos: 0</strong><br>
+                                        <strong style="color: green;">N&uacute;mero de testes executados: 27</strong><br>
                                         <strong id="tests_not_executed" style="display: none">Testes n&atilde;o executados: <ul></ul></strong> 
 
                                     </div>
@@ -50,12 +50,11 @@
                                     <div class="card-body">
                                         <strong class="card-text">
 <br><span style='color: blue;'>Issue #39: Estrutura dos arquivos da pasta de entrada</span>:
-<br><span style='color: red;'>descricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.</span>
+<br><span style='color: red;'>legenda.qml: O arquivo legenda.qml foi entregue junto com os outros 9 arquivos QML. Os outros arquivos serão ignorados.</span>
 <br><span style='color: blue;'>Issue #79: Limpeza dos arquivos</span>:
-<br><span style='color: red;'>composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.</span>
-<br><span style='color: red;'>referencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.</span>
+
 <br><span style='color: blue;'>Issue #2 e #59: Relações entre indicadores</span>:
-<br><span style='color: red;'>valores.xlsx: Códigos inválidos: ['5000-2030-O', '5000-2030-P', '5000-2050-O', '5000-2050-P', '5003-2030-O', '5003-2030-P', '5003-2050-O', '5003-2050-P'].</span>
+
 <br><span style='color: blue;'>Issue #3: Hierarquia como árvore</span>:
 
 <br><span style='color: blue;'>Issue #37: Níveis de indicadores</span>:
@@ -69,8 +68,7 @@
 <br><span style='color: blue;'>Issue #36: Títulos únicos</span>:
 
 <br><span style='color: blue;'>Issue #124: Códigos sequenciais</span>:
-<br><span style='color: red;'>descricao.xlsx: A coluna 'codigo' deve começar em 1.</span>
-<br><span style='color: red;'>descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).</span>
+
 <br><span style='color: blue;'>Issue #75: Campos vazios</span>:
 
 <br><span style='color: blue;'>Issue #1: Padrão para nomes dos indicadores</span>:
@@ -81,38 +79,30 @@
 
 <br><span style='color: blue;'>Issue #32: Pontuações obrigatórias e proibidas em descrições</span>:
 
+<br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em cenários</span>:
+
 <br><span style='color: blue;'>Issue #81: Pontuações obrigatórias e proibidas em referência temporal</span>:
+
+<br><span style='color: blue;'>Issue #81: Relações de valores únicos em cenários</span>:
 
 <br><span style='color: blue;'>Issue #81: Relações de valores únicos em referência temporal</span>:
 
 <br><span style='color: blue;'>Issue #81: Relações de combinações de valores</span>:
-<br><span style='color: red;'>valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5000-2030-O' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5000-2050-O' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5000-2030-P' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5000-2050-P' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5003-2030-O' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5003-2050-O' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5003-2030-P' é desnecessária.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '5003-2050-P' é desnecessária.</span>
+
 <br><span style='color: blue;'>Issue #149: Valores indisponíveis</span>:
 
 <br><span style='color: blue;'>Issue #85: Quebra de linha para descrição</span>:
+
+<br><span style='color: blue;'>Issue #85: Quebra de linha para cenários</span>:
 
 <br><span style='color: blue;'>Issue #85: Quebra de linha para referência temporal</span>:
 
 <br><span style='color: blue;'>Issue #16: Intervalo dos dados da legenda</span>:
 
 <br><span style='color: blue;'>Issue #71: Sobreposição de valores na legenda</span>:
-<br><span style='color: red;'>legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico.</span>
-<br><span style='color: red;'>legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.</span>
+
 <br><span style='color: blue;'>Issue #69: Propriedades de soma nos fatores influenciadores</span>:
-<br><span style='color: red;'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span></strong>
+</strong>
                                     </div>
                                 </div>
                                 <div class="card mb-4">
@@ -120,13 +110,7 @@
                                         <strong>Avisos</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong class="card-text">
-<br><span style='color: blue;'>Issue #119: Descrições simples com mais de 150 caracteres</span>:
-<br><span style='color: orange;'>descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.</span>
-<br><span style='color: blue;'>Issue #69: Propriedades de soma nos fatores influenciadores</span>:
-<br><span style='color: orange;'>proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.</span>
-<br><span style='color: orange;'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.</span>
-<br><span style='color: orange;'>proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.</span></strong>
+                                        <strong class="card-text"></strong>
                                     </div>
                                 </div>
 
