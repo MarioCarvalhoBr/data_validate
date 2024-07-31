@@ -1,0 +1,124 @@
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.4
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.5.4
+Pre-commit version: 3.7.0
+Setuptools version: 70.0.0
+Genbadge version: 1.1.1
+CharDet Version:  5.2.0
+
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
+
+
+------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.
+cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
+referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
+descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'.
+descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
+valores.xlsx: Coluna 'id' esperada mas não foi encontrada.
+proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
+Verificação: Issue #79: Limpeza dos arquivos
+composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
+Verificação: Issue #2 e #59: Relações entre indicadores
+valores.xlsx: Códigos inválidos: ['codigo'].
+Verificação: Issue #3: Hierarquia como árvore
+Verificação: Issue #37: Níveis de indicadores
+Verificação: Issue #8: Unicidade dos códigos
+Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Issue #36: Títulos únicos
+Verificação: Issue #124: Códigos sequenciais
+descricao.xlsx: A coluna 'codigo' deve começar em 1.
+descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).
+Verificação: Issue #75: Campos vazios
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Issue #81: Relações de valores únicos em cenários
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Issue #81: Relações de combinações de valores
+valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
+Verificação: Issue #149: Valores indisponíveis
+Verificação: Issue #16: Intervalo dos dados da legenda
+valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.
+valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
+valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'.
+valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
+Verificação: Issue #71: Sobreposição de valores na legenda
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
+proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.
+proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.
+proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
+proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
+proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
+proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
+referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na especificação.
+descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação.
+descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação.
+composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
+O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
+Verificação: Issue #24: Ortografia
+descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
+Verificação: Issue #1: Padrão para nomes dos indicadores
+descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".
+descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".
+descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".
+descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".
+descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
+descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
+Verificação: Issue #85: Quebra de linha para descrição
+descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
+descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.
+descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.
+descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.
+descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.
+descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.
+descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.
+Verificação: Issue #85: Quebra de linha para cenários
+cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.
+cenarios.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.
+Verificação: Issue #85: Quebra de linha para referência temporal
+referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
+proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
+proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.
+proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
+
+
+Número de erros: 29
+Número de avisos: 31
+Número de verificações realizadas: 27
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_03/data_errors_03_report.pdf
+

@@ -1,0 +1,62 @@
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.4
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.5.4
+Pre-commit version: 3.7.0
+Setuptools version: 70.0.0
+Genbadge version: 1.1.1
+CharDet Version:  5.2.0
+
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_05/
+
+
+------ Resultados da verificação dos testes ------
+Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
+Verificação: Issue #79: Limpeza dos arquivos
+Verificação: Issue #2 e #59: Relações entre indicadores
+Verificação: Issue #3: Hierarquia como árvore
+Verificação: Issue #37: Níveis de indicadores
+Verificação: Issue #8: Unicidade dos códigos
+Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Issue #24: Ortografia
+Verificação: Issue #36: Títulos únicos
+Verificação: Issue #124: Códigos sequenciais
+Verificação: Issue #75: Campos vazios
+Verificação: Issue #1: Padrão para nomes dos indicadores
+Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Issue #81: Relações de valores únicos em cenários
+Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Issue #81: Relações de combinações de valores
+Verificação: Issue #149: Valores indisponíveis
+Verificação: Issue #85: Quebra de linha para descrição
+Verificação: Issue #85: Quebra de linha para cenários
+Verificação: Issue #85: Quebra de linha para referência temporal
+Verificação: Issue #16: Intervalo dos dados da legenda
+Verificação: Issue #71: Sobreposição de valores na legenda
+Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
+
+
+Número de erros: 0
+Número de avisos: 0
+Número de verificações realizadas: 27
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_05/data_ground_truth_05_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_05/data_ground_truth_05_report.pdf
+
