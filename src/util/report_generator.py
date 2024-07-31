@@ -1,4 +1,5 @@
 import os
+import sys
 from jinja2 import Environment, FileSystemLoader
 from pyhtml2pdf import converter
 import src.myparser.info as info
@@ -88,7 +89,6 @@ class ReportGenerator:
  
         with open(file_path, 'w') as f:
             f.write(text_html)
-        # print('\nCreated a file report in HTML template: ', file_path)
 
     def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings, number_tests):
         """
@@ -151,7 +151,7 @@ class ReportGenerator:
             self.save_pdf_report(output_path)
 
         except Exception as e:
-            print(f'\nErro ao criar o arquivo de relatório em HTML: {e}')
+            print(f'\nErro ao criar o arquivo de relatório em HTML: {e}', file=sys.stderr)
             pass
     
     def save_pdf_report(self, output_path):
@@ -165,5 +165,5 @@ class ReportGenerator:
             print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {os.path.join(self.output_folder, os.path.basename(ABS_PATH_PDF))}\n')
 
         except Exception as e:
-            print(f'\nErro ao criar o arquivo de relatório em PDF: {e}')
+            print(f'\nErro ao criar o arquivo de relatório em PDF: {e}', file=sys.stderr)
             pass

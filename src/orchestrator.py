@@ -24,7 +24,7 @@ from src.util.report_generator import ReportGenerator
 
 # Modelos de dados
  # Colunas dos arquivos
-from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
 # Constantes
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_MAX_TITLE_LENGTH, SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH, OUTPUT_DEFAULT_HTML, OUTPUT_REPORT_HTML
@@ -185,12 +185,6 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         all_errors_read_files.extend(errors_read_file)
         df_sp_values, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_VALUES_COLUMNS.NAME_SP))
         all_errors_read_files.extend(errors_read_file)
-        
-        # Legend QML é opcional
-        qml_legend_exists, __ = util.check_file_exists(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
-        df_qml_legend, errors_read_file_xml = sp_legend.read_legend_qml_file(os.path.join(input_folder, SP_LEGEND_COLUMNS.NAME_SP))
-        if qml_legend_exists:
-            all_errors_read_files.extend(errors_read_file_xml)
             
         # ------------------------------------------------------------------------------------------------------------------------------------
         # Dicionário com os dataframes
@@ -395,7 +389,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 13 - Verificar range dos dados #16: 
         results_tests.append([("Issue #16: " if debug else "") +"Intervalo dos dados da legenda", *flatten(*sp_legend.verify_values_range_multiple_legend(input_folder, df_sp_values, df_sp_description, df_sp_scenario))])
 
-        # 14 - Sobreposicao de valores na legenda #71 verify_overlapping_legend_value(df_qml_legend)
+        # 14 - Sobreposicao de valores na legenda #71
         results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *flatten(*sp_legend.verify_overlapping_multiple_legend_value(input_folder, df_sp_description))])
         
         # 15 - Verificar propriedades de soma nos fatores influenciadores #69
