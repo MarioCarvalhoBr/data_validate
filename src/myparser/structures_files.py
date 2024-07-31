@@ -1,8 +1,10 @@
 import os
 import pandas as pd
-
+import copy
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
+from src.util.utilities import  check_file_exists
+
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 
@@ -27,8 +29,9 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
         NEW_STRUCTURE_FILES_COLUMNS_DICT[new_key] = STRUCTURE_FILES_COLUMNS_DICT[key]
 
     try:
+        lista_arquivos = [file_name for file_name in os.listdir(path_folder) if not file_name.endswith('.qml')]
         # Verifica se há arquivos não esperados na pasta
-        for file_name_i in os.listdir(path_folder):
+        for file_name_i in lista_arquivos:
             file_basename = os.path.basename(file_name_i)
             
             # Legenda QML é opcional
@@ -155,3 +158,61 @@ def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_
         errors.append(f'{file_name}: Erro ao processar a verificação de limpeza do arquivo: {e}.')
 
     return not errors, errors, []
+
+def verify_files_legends_qml(df_description, root_path):
+    errors = []
+    warnings = []
+
+    files_qml = [f for f in os.listdir(root_path) if f.endswith('.qml')]
+    len_files_qml = len(files_qml) - 1 
+    
+    # Caso 0: Não foi entregue nenhum arquivo QML
+    if len(files_qml) == 0:
+        return not errors, errors, warnings
+    
+    # Caso 1: Somento o arquivo de legenda SP_LEGEND_COLUMNS.NAME_SP foi entregue
+    if len(files_qml) == 1 and files_qml[0] == SP_LEGEND_COLUMNS.NAME_SP:
+        return not errors, errors, warnings
+    
+    # Caso 2: O arquivo de legenda SP_LEGEND_COLUMNS.NAME_SP fo entrege junto com outros arquivos QML
+    if SP_LEGEND_COLUMNS.NAME_SP in files_qml:
+        errors.append(f'{SP_LEGEND_COLUMNS.NAME_SP}: O arquivo {SP_LEGEND_COLUMNS.NAME_SP} foi entregue junto com os outros {len_files_qml} arquivos QML. Os outros arquivos serão ignorados.')
+        return not errors, errors, warnings
+
+    # Copiar files_qml com deepcopy, pois a lista files_qml será alterada
+    copy_files_qml = copy.deepcopy(files_qml)
+    
+    # Caso 3: Apenas arquivos QML dos indicadores foram entregues
+    df_description = df_description.copy()
+    if df_description.empty: # Não continuar a verificação se o arquivo de descrição estiver vazio
+        return not errors, errors, warnings
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns: # Não continuar a verificação se o arquivo de descrição não tiver a coluna de código
+        return not errors, errors, warnings
+    
+    # No futuro essa função será removida, pois não iremos alterar os dados do usuário
+    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+    
+    codigos_indicadores_nivel_1 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+    codigos_indicadores_nivel_2 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '2'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+    codigos_indicadores_outros = [codigo for codigo in df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist() if codigo not in codigos_indicadores_nivel_1 and codigo not in codigos_indicadores_nivel_2]
+    
+    for codigo in codigos_indicadores_outros:
+        file_name = codigo + '.qml'
+        path_legend = os.path.join(root_path, file_name)
+        exist_file, __ = check_file_exists(path_legend)
+        
+        if not exist_file:
+            errors.append(f'{file_name}: Arquivo de legenda esperado mas não encontrado.')
+        else:
+            copy_files_qml.remove(file_name)
+
+    # Remove todos os codigos_indicadores_nivel_2 do copy_files_qml
+    for codigo in codigos_indicadores_nivel_2:
+        file_name = codigo + '.qml'
+        if file_name in copy_files_qml:
+            copy_files_qml.remove(file_name)
+    # Arquivos extras
+    for file_name in copy_files_qml:
+        warnings.append(f'{file_name}: Arquivo de legenda não esperado.')
+        
+    return not errors, errors, warnings

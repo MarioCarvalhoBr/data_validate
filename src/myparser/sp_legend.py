@@ -1,119 +1,177 @@
-import xml.etree.ElementTree as ET
 import pandas as pd
-from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS
-from src.util.utilities import get_min_max_values, extract_ids_from_list
+import os
+from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_VALUES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS
+from src.util.utilities import extract_ids_from_list, clean_non_numeric_and_less_than_value_integers_dataframe, check_file_exists, read_legend_qml_file
+from src.util.utilities import check_overlapping, get_min_max_legend
 
-
-def read_legend_qml_file(qml_file_path):
-    # Parse the QML file
-
-    # Create a list to store the data
-    data_list = []
-    errors = []
-
-    try: 
-        tree = ET.parse(qml_file_path)
-        root = tree.getroot()
-
-        # For each child in the root
-        for child in root:
-            # Check if the child is the renderer-v2
-            if child.tag == SP_LEGEND_COLUMNS.KEY_RENDERER_V2:
-                
-                # Get the ranges element
-                ranges_element = child.find(SP_LEGEND_COLUMNS.KEY_RANGES)
-
-                # Check if the ranges element exists
-                if ranges_element is not None:
-
-                    # Get all range elements
-                    for range_element in ranges_element.findall(SP_LEGEND_COLUMNS.KEY_RANGE): 
-                        uuid = range_element.get(SP_LEGEND_COLUMNS.UUID)
-                        label = range_element.get(SP_LEGEND_COLUMNS.LABEL)
-                        lower = range_element.get(SP_LEGEND_COLUMNS.LOWER)
-                        upper = range_element.get(SP_LEGEND_COLUMNS.UPPER)
-                        symbol = int(range_element.get(SP_LEGEND_COLUMNS.SYMBOL))
-                        render = range_element.get(SP_LEGEND_COLUMNS.RENDER)
-                        
-                        # Append the data to the list
-                        data_list.append({
-                            SP_LEGEND_COLUMNS.UUID: uuid,
-                            SP_LEGEND_COLUMNS.LABEL: label,
-                            SP_LEGEND_COLUMNS.LOWER: lower,
-                            SP_LEGEND_COLUMNS.UPPER: upper,
-                            SP_LEGEND_COLUMNS.SYMBOL: symbol,
-                            SP_LEGEND_COLUMNS.RENDER: render
-                        })
-    except Exception as e:
-        errors.append(f"Erro ao processar o arquivo {qml_file_path}: {e}")
-        return pd.DataFrame(), errors
-
-    # Convert the list to a DataFrame
-    df = pd.DataFrame(data_list, columns=[
-        SP_LEGEND_COLUMNS.UUID, SP_LEGEND_COLUMNS.LABEL, SP_LEGEND_COLUMNS.LOWER,
-        SP_LEGEND_COLUMNS.UPPER, SP_LEGEND_COLUMNS.SYMBOL, SP_LEGEND_COLUMNS.RENDER
-    ])
+def verify_overlapping_multiple_legend_value(root_path, df_description):
     
+    errors = []
+    warnings = []
 
-    # Se não houver dados, adiciona no vetor erros que não foi encontrado dados
-    if df.empty:
-        errors.append(f"Erro ao processar o arquivo {qml_file_path}: Não foram encontrados dados.")
+    # 1 - Listar todos os arquivos qml da pasta
+    files_qml = [f for f in os.listdir(root_path) if f.endswith('.qml')]
 
-    return df, errors
+    # Caso não tenha arquivos qml, retorna sem erros pois não há o que verificar
+    if len(files_qml) == 0:
+        return not errors, errors, warnings
+    
+    # Cópia do DataFrame para não alterar o original
+    df_description = df_description.copy()
+    # Verifica se o DataFrame está vazio
+    if df_description.empty:
+        return not errors, errors, warnings
+    # Verifica se a coluna CODIGO está presente
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+        return not errors, errors, warnings
+    
+    # Clean non numeric values - No futuro essa função será removida
+    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+    
+    # Lista com todos os códigos que são nivel 1 - Não tem dado
+    codigos_indicadores_nivel_1 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+    
+    # Lista com todos os códigos que são nivel 2 - Pode ou não ter dado
+    codigos_indicadores_nivel_2 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '2'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
 
-def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
-    df_values = df_values.copy()
-    if qml_legend_exists:
-        df_qml_legend = df_qml_legend.copy()
+    # Todos os códigos que não são nivel 1 e nem nivel 2 - Todos devem ter dado
+    codigos_indicadores_outros = [codigo for codigo in df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist() if codigo not in codigos_indicadores_nivel_1 and codigo not in codigos_indicadores_nivel_2]
+    
+    
+    # CASO 1: Caso veio o legenda.qml, verifica apenas ele.
+    if (SP_LEGEND_COLUMNS.NAME_SP in files_qml):
+        path_legend = os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP)
+        df_qml_legend, __ = read_legend_qml_file(path_legend)
+        
+        __, errors_check =  check_overlapping(SP_LEGEND_COLUMNS.NAME_SP, df_qml_legend)
+        errors.extend(errors_check)
+        return not errors, errors, warnings
+
+    # Processando os indicadores de nivel 2
+    for codigo in codigos_indicadores_nivel_2:
+        file_name = codigo + '.qml'
+        path_legend = os.path.join(root_path, file_name)
+        exist_file, __ = check_file_exists(path_legend)
+        
+        if not exist_file:
+            continue
+        
+        df_qml_legend, __ = read_legend_qml_file(path_legend)
+        __, errors_i = check_overlapping(file_name, df_qml_legend)
+        
+        errors.extend(errors_i)
+
+    # Processando os outros indicadores que não são nivel 1 e nem nivel 2
+    for codigo in codigos_indicadores_outros:
+        file_name = codigo + '.qml'
+        path_legend = os.path.join(root_path, file_name)
+        exist_file, error = check_file_exists(path_legend)
+        
+        if not exist_file:
+            continue
+        
+        df_qml_legend, __ = read_legend_qml_file(path_legend)
+        __, errors_i = check_overlapping(file_name, df_qml_legend)
+        
+        errors.extend(errors_i)
+
+    return not errors, errors, warnings
+
+def verify_values_range_multiple_legend(root_path, df_values, df_description, df_sp_scenario):
 
     errors = []
     warnings = []
 
+    MIN_VALUE, MAX_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT, SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
+
+    df_qml_legend = None
+
+    # Copia os DataFrames para não alterar os originais
+    df_values = df_values.copy()
+    df_description = df_description.copy()
+    df_sp_scenario = df_sp_scenario.copy()
+    
+    # Verifica se o DataFrame está vazio
     if df_values.empty:
         return True, errors, warnings
+    if df_description.empty or df_sp_scenario.empty:
+        return not errors, errors, warnings
+    
+    sp_scenario_exists = True
+    if df_sp_scenario.empty:
+        sp_scenario_exists = False
+
+    if sp_scenario_exists:
+        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' não está ausente.")
+    
+    # Return if errors
+    if errors:
+        return not errors, errors, []
+    
+    lista_simbolos_cenarios = []
+    if sp_scenario_exists:
+        lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+    
+    #### Pré-processamento dos DataFrames
+    
+    # Remove a coluna ID se existir
+    if SP_VALUES_COLUMNS.ID in df_values.columns:
+        df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
+
+    # Verifica se a coluna CODIGO está presente
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+        return not errors, errors, warnings
+    
+    # Clean non numeric values - No futuro essa função será removida
+    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+    
+    # Lista com todos os códigos que são nivel 1 - Não tem dado
+    codigos_indicadores_nivel_1 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
     
     try:
-        # Remove colunas que não são códigos: id e nome
-        if SP_VALUES_COLUMNS.ID in df_values.columns:
-            df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
-
-        colunas_sp_valores, __ = extract_ids_from_list(df_values.columns)
-
-        if not qml_legend_exists:
-            MIN_VALUE, MAX_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT, SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
-        else:
-            # Verifica se o DataFrame está vazio
-            if df_qml_legend.empty:
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.")
+        colunas_sp_valores, __ = extract_ids_from_list(df_values.columns, lista_simbolos_cenarios)
+        exists_legend_default, __ = check_file_exists(os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP))
+        if exists_legend_default:
+            df_qml_legend, __ = read_legend_qml_file(os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP))
+            errors_legend_min_max, min_value, max_value = get_min_max_legend(SP_LEGEND_COLUMNS.NAME_SP, df_qml_legend)
+            errors.extend(errors_legend_min_max)
+            
+            if errors:
                 return not errors, errors, warnings
             
-            # Converte as colunas UPPER e LOWER para float. Se tiver dado string, converte para NaN
-            df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.LOWER], errors='coerce')
-            df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.UPPER], errors='coerce')
-            
-            # Convert as colunas para float: lower e upper
-            df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].astype(float)
-            df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = df_qml_legend[SP_LEGEND_COLUMNS.UPPER].astype(float)
-            
-            # Verifica se os valores são números
-            for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
-                # Verifica se  ovalor é nan 
-                if df_qml_legend[column].isnull().values.any():
-                    errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
-                    return not errors, errors, warnings
-            
-            MIN_VALUE, MAX_VALUE = get_min_max_values(df_qml_legend, SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER)
+            MIN_VALUE = min_value
+            MAX_VALUE = max_value
 
-            # Convert to float
-            MIN_VALUE = float(MIN_VALUE)
-            MAX_VALUE = float(MAX_VALUE)
-            # Verifica se os valores foram encontradoos são nan ou None
-            if (MIN_VALUE is None or MAX_VALUE is None) or (pd.isna(MIN_VALUE) or pd.isna(MAX_VALUE)):
-                
-                errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Verificação de valores foi abortada porque os valores do arquivo QML '{SP_LEGEND_COLUMNS.NAME_SP}' não foram encontrados.")
-                return not errors, errors, warnings
-
+        # Processando as colunas válidas
         for column in colunas_sp_valores:
+                code_column = column.split('-')[0]
+
+                if code_column in codigos_indicadores_nivel_1:
+                    continue
+                
+                # Os casos abaixo são para os indicadores de nivel 2 e outros já são tratados
+                if not exists_legend_default:
+                    
+                    qml_code_legend = code_column + '.qml'
+                    exists_legend_i, __ = check_file_exists(os.path.join(root_path, qml_code_legend))
+
+                    if not exists_legend_i:
+                        MIN_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT
+                        MAX_VALUE = SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
+                    
+                    else:
+                        df_qml_legend, __ = read_legend_qml_file(os.path.join(root_path, qml_code_legend))
+                        errors_legend, min_value, max_value = get_min_max_legend(qml_code_legend, df_qml_legend)
+                        
+                        if errors_legend:
+                            errors.extend(errors_legend)
+                        
+                        MIN_VALUE = min_value
+                        MAX_VALUE = max_value
+                        
                 for index, value in df_values[column].items():
                     # Verifica se o valor é uma string DI
                     value_aux = value
@@ -130,7 +188,6 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
                     
                     # Verifica se o valor é um número
                     if pd.isna(value):
-                        print(f'Valor: {value_aux} - {type(value)}')
                         errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor '{value_aux}' não é um número válido para a coluna '{column}'.")
                         continue
                     # Verifica se o valor está no intervalo
@@ -139,108 +196,6 @@ def verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
             
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
-        return not errors, errors, warnings
-
-    return not errors, errors, warnings
-
-def check_tuple_sequence(value_list):
-    errors = []
-    
-    for i in range(len(value_list) - 1):
-        current_tuple = value_list[i]
-        next_tuple = value_list[i + 1]
-        
-        if current_tuple[1] != next_tuple[0]:
-            errors.append("Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.")
-    
-    return errors
-
-    
-def verify_overlapping_legend_value(df_qml_legend, qml_legend_exists):
-    errors = []
-    warnings = []
-    if not qml_legend_exists:
-        return True, errors, warnings
-    
-    df_qml_legend = df_qml_legend.copy()
-    
-    # Verifica se o DataFrame está vazio
-    if df_qml_legend.empty:
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.")
-        return not errors, errors, warnings
-
-    # Verifica se os valores são números
-    for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
-        
-        for index, value in df_qml_legend[column].items():
-            # Verifica se o valor é uma string DI
-            if value == "DI":
-                continue
-
-            if value is None or pd.isna(value.replace(',', '.')):
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
-                continue
-
-            # CORREÇÃO DOS VALORES FLUTUANTES
-            value = value.replace(',', '.')
-            
-            # Converte value para um numero. Se não for possivel, retorna nan
-            value = pd.to_numeric(value, errors='coerce')
-            
-            # Verifica se o valor é um número
-            if pd.isna(value):
-                errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
-                return not errors, errors, warnings
-
-    
-    df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.LOWER], errors='coerce')
-    df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.UPPER], errors='coerce')
-    
-    # Convert as colunas para float: lower e upper
-    df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].astype(float)
-    df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = df_qml_legend[SP_LEGEND_COLUMNS.UPPER].astype(float)
-
-    # Verifica se os valores estão em ordem crescente
-    lower_values = df_qml_legend[SP_LEGEND_COLUMNS.LOWER].tolist()
-    upper_values = df_qml_legend[SP_LEGEND_COLUMNS.UPPER].tolist()
-
-    # Remove valores nulos nan
-    lower_values = [x for x in lower_values if pd.notna(x)]
-    upper_values = [x for x in upper_values if pd.notna(x)]
-
-    # Verifica se as listas tem tamanho diferente
-    if len(lower_values) != len(upper_values):
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.")
-        return not errors, errors, warnings
-    
-    
-    # Verifica se os valores são válidos
-    for _, row in df_qml_legend.iterrows():
-        if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
-            errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.")
-
-    
-
-    fulll_list = []
-    for i in range(len(lower_values)):
-        fulll_list.append(lower_values[i])
-        fulll_list.append(upper_values[i])
-
-    # Verifica se os valores estão em ordem crescente
-    if fulll_list != sorted(fulll_list):
-        errors.append(f"{SP_LEGEND_COLUMNS.NAME_SP}: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.")
-        return not errors, errors, warnings
-
-    try:
-        # Verifica se os valores estão em ordem crescente
-        errors_tuple = check_tuple_sequence(list(zip(lower_values, upper_values)))
-        if errors_tuple: 
-            for error in errors_tuple:
-                errors.append(f'{SP_LEGEND_COLUMNS.NAME_SP}: {error}')
-            return not errors, errors, warnings
-
-    except Exception as e:
-        errors.append(f"Erro ao processar o arquivo {SP_LEGEND_COLUMNS.NAME_SP}: {e}.")
         return not errors, errors, warnings
 
     return not errors, errors, warnings

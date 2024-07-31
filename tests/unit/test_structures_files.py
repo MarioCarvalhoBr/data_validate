@@ -1,4 +1,4 @@
-from src.myparser.structures_files import verify_expected_structure_files, verify_not_exepected_files_in_folder_root, verify_files_data_clean, verify_errors_read_files_in_folder_root
+from src.myparser.structures_files import verify_expected_structure_files, verify_not_exepected_files_in_folder_root, verify_files_data_clean, verify_errors_read_files_in_folder_root, verify_files_legends_qml
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
@@ -26,8 +26,12 @@ from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_r
 
 # DATA FRAMES - ERROS 08
 from tests.unit.test_constants import all_errors_read_files_data_errors_08
+
+# DATA FRAMES - ERROS 09 e 10 df_sp_description_errors_09
+from tests.unit.test_constants import df_sp_description_errors_09, df_sp_description_errors_10
+
 # PATHS MAIN
-from tests.unit.test_constants import path_input_data_errors_02, path_input_data_errors_03, path_input_data_errors_05
+from tests.unit.test_constants import path_input_data_errors_02, path_input_data_errors_03, path_input_data_errors_05, path_input_data_errors_09, path_input_data_errors_10, path_input_data_ground_truth_01
 
 def test_count_errors_verify_errors_read_files_in_folder_root_data_errors_08():
     is_correct, errors, warnings = verify_errors_read_files_in_folder_root(all_errors_read_files_data_errors_08)
@@ -388,3 +392,33 @@ def test_count_errors_verify_files_data_clean_data_errors_05():
 
     assert all_errors_clean_files[0] == f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: A tabela deve ter apenas um valor porque o arquivo {SP_SCENARIO_COLUMNS.NAME_SP} não existe."
 
+
+# verify_files_legends_qml para 09
+def test_count_errors_verify_files_legends_qml_errors_09():
+    is_correct, errors, warnings = verify_files_legends_qml(df_sp_description_errors_09, path_input_data_errors_09)
+    
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 2
+
+    assert errors[0] == "3.qml: Arquivo de legenda esperado mas não encontrado."
+    assert warnings[0] == "1.qml: Arquivo de legenda não esperado."
+    assert warnings[1] == "99.qml: Arquivo de legenda não esperado."
+    
+
+# verify_files_legends_qml para 10
+def test_count_errors_verify_files_legends_qml_errors_10():
+    is_correct, errors, warnings = verify_files_legends_qml(df_sp_description_errors_10, path_input_data_errors_10)
+    
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+
+    assert errors[0] == "legenda.qml: O arquivo legenda.qml foi entregue junto com os outros 9 arquivos QML. Os outros arquivos serão ignorados."
+
+def test_true_verify_files_legends_qml_data_ground_truth_01():
+    is_correct, errors, warnings = verify_files_legends_qml(df_sp_description_data_ground_truth_01, path_input_data_ground_truth_01)
+    
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0

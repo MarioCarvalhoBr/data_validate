@@ -73,6 +73,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
     results_tests = []
     # Lista de testes não realizados por solicitação do usuário
     results_tests_not_executed = []
+    number_tests = 0
     if no_spellchecker:
         results_tests_not_executed.append("Verificador ortográfico")
     if no_warning_titles_length:
@@ -220,9 +221,13 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         is_correct_read_files, errors_read_files, warnings_read_files = structures_files.verify_errors_read_files_in_folder_root(all_errors_read_files)
         all_errors_structure_files.extend(errors_read_files)
         all_warnings_structure_files.extend(warnings_read_files)
-        
-        all_correct_structure_files = all_correct_structure_files and is_correct_main_path and is_correct_read_files
 
+        # 1.4 verify_files_legends_qml(df_description, root_path):
+        is_correct_legend_qml, errors_legend_qml, warnings_legend_qml = structures_files.verify_files_legends_qml(df_sp_description, input_folder)
+        all_errors_structure_files.extend(errors_legend_qml)
+        all_warnings_structure_files.extend(warnings_legend_qml)
+        
+        all_correct_structure_files = all_correct_structure_files and is_correct_main_path and is_correct_read_files and is_correct_legend_qml
 
         results_tests.append([("Issue #39: " if debug else "") +"Estrutura dos arquivos da pasta de entrada", *flatten(all_correct_structure_files, all_errors_structure_files, all_warnings_structure_files)])
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -252,7 +257,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 2.0 - Hierarquia como grafo conexo
         is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (graph.verify_graph_sp_description_composition(df_sp_description, df_sp_composition))
         # 2.1 - Relações entre indicadores e valores
-        is_correct_val2desc, errors_val2desc, warnings_val2desc = (sp_values.verify_ids_sp_description_values(df_sp_description, df_sp_values))
+        is_correct_val2desc, errors_val2desc, warnings_val2desc = (sp_values.verify_ids_sp_description_values(df_sp_description, df_sp_values, df_sp_scenario))
         # 2.2 - Concatenar os resultados
         results_tests.append([("Issue #2 e #59: " if debug else "") +"Relações entre indicadores", *flatten(is_correct_comp2desc and is_correct_val2desc, errors_comp2desc + errors_val2desc, warnings_comp2desc + warnings_val2desc)])
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -371,7 +376,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         results_tests.append([("Issue #81: " if debug else "") +"Relações de combinações de valores", *flatten(*sp_values.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference))])
         
         # 11.2  - Valores indisponiveis #149: verify_unavailable_values(df_values):
-        results_tests.append([("Issue #149: " if debug else "") +"Valores indisponíveis", *flatten(*sp_values.verify_unavailable_values(df_sp_values))])
+        results_tests.append([("Issue #149: " if debug else "") +"Valores indisponíveis", *flatten(*sp_values.verify_unavailable_values(df_sp_values, df_sp_scenario))])
 
 
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -387,12 +392,12 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 12.1 - Quebra de linha para referência temporal
         results_tests.append([("Issue #85: " if debug else "") +"Quebra de linha para referência temporal", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         
-        # 13 - Verificar range dos dados #16: verify_values_range(df_values, df_qml_legend, qml_legend_exists=False):
-        results_tests.append([("Issue #16: " if debug else "") +"Intervalo dos dados da legenda", *flatten(*sp_legend.verify_values_range(df_sp_values, df_qml_legend, qml_legend_exists))])
+        # 13 - Verificar range dos dados #16: 
+        results_tests.append([("Issue #16: " if debug else "") +"Intervalo dos dados da legenda", *flatten(*sp_legend.verify_values_range_multiple_legend(input_folder, df_sp_values, df_sp_description, df_sp_scenario))])
 
         # 14 - Sobreposicao de valores na legenda #71 verify_overlapping_legend_value(df_qml_legend)
-        results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *flatten(*sp_legend.verify_overlapping_legend_value(df_qml_legend, qml_legend_exists))])
-    
+        results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *flatten(*sp_legend.verify_overlapping_multiple_legend_value(input_folder, df_sp_description))])
+        
         # 15 - Verificar propriedades de soma nos fatores influenciadores #69
         if sp_proportionalities_exists:
             results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))])

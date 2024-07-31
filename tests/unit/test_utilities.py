@@ -20,8 +20,9 @@ from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS
 def test_extract_ids_from_list_with_valid_ids():
     list_values = ['123-2020', '456-2021-O', '789-2022', 'invalid', '12345']
     expected_cleaned_columns = ['123-2020', '456-2021-O', '789-2022']
+    lista = ['O']
     expected_extras_columns = ['invalid', '12345']
-    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values, lista)
     assert cleaned_columns == expected_cleaned_columns
     assert extras_columns == expected_extras_columns
 
@@ -45,7 +46,7 @@ def test_extract_ids_from_list_all_valid_ids():
     list_values = ['1-2020', '2-2021-O', '3-2022-P']
     expected_cleaned_columns = ['1-2020', '2-2021-O', '3-2022-P']
     expected_extras_columns = []
-    cleaned_columns, extras_columns = extract_ids_from_list(list_values)
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values, ['O', 'P'])
     assert cleaned_columns == expected_cleaned_columns
     assert extras_columns == expected_extras_columns
 

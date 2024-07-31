@@ -10,23 +10,23 @@ from tests.unit.test_constants import df_sp_scenario_data_ground_truth_02_no_sce
 from tests.unit.test_constants import df_sp_scenario_errors_01, df_sp_temporal_reference_errors_01, df_sp_description_errors_01, df_sp_values_errors_01
 
 # DATA FRAMES - ERROS 04
-from tests.unit.test_constants import df_sp_description_errors_04, df_sp_values_errors_04
+from tests.unit.test_constants import df_sp_description_errors_04, df_sp_values_errors_04, df_sp_scenario_errors_04
 
 # DATA FRAMES - ERROS 05
 from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_reference_errors_05, df_sp_description_errors_05, df_sp_values_errors_05
 
 # DATA FRAMES - ERROS 07
-from tests.unit.test_constants import df_sp_values_errors_07
+from tests.unit.test_constants import df_sp_values_errors_07, df_sp_scenario_errors_07
 
 # Testes para: verify_unavailable_values
 def test_true_verify_unavailable_values_data_ground_truth_01():
-    is_correct, errors, warnings = verify_unavailable_values(df_sp_values_data_ground_truth_01)
+    is_correct, errors, warnings = verify_unavailable_values(df_sp_values_data_ground_truth_01, df_sp_scenario_data_ground_truth_01)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_count_errors_verify_unavailable_values_data_errors_07():
-    is_correct, errors, warnings = verify_unavailable_values(df_sp_values_errors_07)
+    is_correct, errors, warnings = verify_unavailable_values(df_sp_values_errors_07, df_sp_scenario_errors_07)
     assert is_correct is False
     assert len(errors) == 2
     assert len(warnings) == 0
@@ -36,19 +36,19 @@ def test_count_errors_verify_unavailable_values_data_errors_07():
 
 # Testes: verify_ids_sp_description_values
 def test_true_verify_ids_sp_description_values_data_ground_truth_01():
-    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_01, df_sp_values_data_ground_truth_01)
+    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_01, df_sp_values_data_ground_truth_01, df_sp_scenario_data_ground_truth_01)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_true_verify_ids_sp_description_values_data_ground_truth_02_no_scenario():
-    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario)
+    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario, df_sp_scenario_data_ground_truth_02_no_scenario)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_count_errors_verify_ids_sp_description_values_data_errors_01():
-    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_errors_01, df_sp_values_errors_01)
+    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_errors_01, df_sp_values_errors_01, df_sp_scenario_errors_01)
     assert is_correct is False
     assert len(errors) == 2
     assert len(warnings) == 0
@@ -56,7 +56,7 @@ def test_count_errors_verify_ids_sp_description_values_data_errors_01():
     assert errors[1] == "valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018]."
 
 def test_count_errors_verify_ids_sp_description_values_data_errors_04():
-    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_errors_04, df_sp_values_errors_04)
+    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_errors_04, df_sp_values_errors_04, df_sp_scenario_errors_04)
     assert is_correct is False
     assert len(errors) == 2
     assert len(warnings) == 0
@@ -106,7 +106,7 @@ def test_extract_ids_with_valid_and_invalid_ids():
     list_values = ['1-2020', '2-2020', '3-2020', 'invalid', '4-2020']
     expected_ids_valids = {2, 3, 4}
     expected_extras_columns = ['invalid']
-    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values)
+    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values, [])
     assert ids_valids == expected_ids_valids
     assert extras_columns == expected_extras_columns
 
@@ -115,7 +115,7 @@ def test_extract_ids_with_all_valid_ids():
     list_values = ['2-2020', '3-2020', '4-2020']
     expected_ids_valids = {2, 3, 4}
     expected_extras_columns = []
-    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values)
+    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values, [])
     assert ids_valids == expected_ids_valids
     assert extras_columns == expected_extras_columns
 
@@ -124,7 +124,7 @@ def test_extract_ids_with_empty_list_values():
     list_values = []
     expected_ids_valids = set()
     expected_extras_columns = []
-    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values)
+    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values, [])
     assert ids_valids == expected_ids_valids
     assert extras_columns == expected_extras_columns
 
@@ -133,6 +133,6 @@ def test_extract_ids_with_all_ids_to_remove():
     list_values = ['2-2020', '3-2020', '4-2020']
     expected_ids_valids = set()
     expected_extras_columns = []
-    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values)
+    ids_valids, extras_columns = extract_ids_from_list_from_values(codes_level_to_remove, list_values, [])
     assert ids_valids == expected_ids_valids
     assert extras_columns == expected_extras_columns
