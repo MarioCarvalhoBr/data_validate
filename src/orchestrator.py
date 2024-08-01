@@ -219,6 +219,8 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # 1.4 verify_files_legends_qml(df_description, root_path):
         is_correct_legend_qml, errors_legend_qml, warnings_legend_qml = structures_files.verify_files_legends_qml(df_sp_description, input_folder)
         all_errors_structure_files.extend(errors_legend_qml)
+        # Ordenar os valores de warnings
+        warnings_legend_qml = sorted(warnings_legend_qml)
         all_warnings_structure_files.extend(warnings_legend_qml)
         
         all_correct_structure_files = all_correct_structure_files and is_correct_main_path and is_correct_read_files and is_correct_legend_qml
