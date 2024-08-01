@@ -223,7 +223,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         
         all_correct_structure_files = all_correct_structure_files and is_correct_main_path and is_correct_read_files and is_correct_legend_qml
 
-        results_tests.append([("Issue #39: " if debug else "") +"Estrutura dos arquivos da pasta de entrada", *flatten(all_correct_structure_files, all_errors_structure_files, all_warnings_structure_files)])
+        results_tests.append(["Estrutura dos arquivos da pasta de entrada", *flatten(all_correct_structure_files, all_errors_structure_files, all_warnings_structure_files)])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -243,7 +243,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
             all_errors_clean_files.extend(errors_clean_files)
             all_warnings_clean_files.extend(warnings_clean_files)
         
-        results_tests.append([("Issue #79: " if debug else "") +"Limpeza dos arquivos", *flatten(all_correct_clean_files, all_errors_clean_files, all_warnings_clean_files)])
+        results_tests.append(["Limpeza dos arquivos", *flatten(all_correct_clean_files, all_errors_clean_files, all_warnings_clean_files)])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         
@@ -252,28 +252,33 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (graph.verify_graph_sp_description_composition(df_sp_description, df_sp_composition))
         # 2.1 - Relações entre indicadores e valores
         is_correct_val2desc, errors_val2desc, warnings_val2desc = (sp_values.verify_ids_sp_description_values(df_sp_description, df_sp_values, df_sp_scenario))
+        is_correct_prop2desc, errors_prop2desc, warnings_prop2desc = True, [], []
+        if sp_proportionalities_exists:
+            is_correct_prop2desc, errors_prop2desc, warnings_prop2desc = sp_proportionalities.verify_ids_sp_description_proportionalities(df_sp_description=df_sp_description, df_sp_proportionalities=df_sp_proportionalities, df_sp_scenario=df_sp_scenario, name_sp_description=SP_DESCRIPTION_COLUMNS.NAME_SP, name_sp_proportionalities=SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_scenario=SP_SCENARIO_COLUMNS.NAME_SP)
+    
+        
         # 2.2 - Concatenar os resultados
-        results_tests.append([("Issue #2 e #59: " if debug else "") +"Relações entre indicadores", *flatten(is_correct_comp2desc and is_correct_val2desc, errors_comp2desc + errors_val2desc, warnings_comp2desc + warnings_val2desc)])
+        results_tests.append(["Relações entre indicadores", *flatten(is_correct_comp2desc and is_correct_val2desc and is_correct_prop2desc, errors_comp2desc + errors_val2desc + errors_prop2desc, warnings_comp2desc + warnings_val2desc + warnings_prop2desc)])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # Hierarquia como árvore #3: verify_tree_sp_composition_hierarchy
-        results_tests.append([("Issue #3: " if debug else "") +"Hierarquia como árvore", *flatten(*tree.verify_tree_sp_description_composition_hierarchy(df_sp_composition, df_sp_description))])
+        results_tests.append(["Hierarquia como árvore", *flatten(*tree.verify_tree_sp_description_composition_hierarchy(df_sp_composition, df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 3 - Não pode ter indicador nível zero #37
-        results_tests.append([("Issue #37: " if debug else "") +"Níveis de indicadores", *flatten(*sp_description.verify_sp_description_levels(df_sp_description))])
+        results_tests.append(["Níveis de indicadores", *flatten(*sp_description.verify_sp_description_levels(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 4 - Unicidade dos códigos #8
-        results_tests.append([("Issue #8: " if debug else "") +"Unicidade dos códigos", *flatten(*sp_description.verify_sp_description_codes_uniques(df_sp_description))])
+        results_tests.append(["Unicidade dos códigos", *flatten(*sp_description.verify_sp_description_codes_uniques(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 5 - Verifica se a planilha de descrição está correta
-        results_tests.append([("Issue #5: " if debug else "") +"Códigos HTML nas descrições simples", *flatten(*sp_description.verify_sp_description_parser_html_column_names(df_sp_description, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES))])
+        results_tests.append(["Códigos HTML nas descrições simples", *flatten(*sp_description.verify_sp_description_parser_html_column_names(df_sp_description, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES))])
         # ------------------------------------------------------------------------------------------------------------------------------------
                 
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -315,62 +320,62 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
             all_errors.extend(errors_spell_temporal_reference)
             all_warnings.extend(warnings_spell_temporal_reference)
 
-            results_tests.append([("Issue #24: " if debug else "") +"Ortografia", *flatten(is_all_correct, all_errors, all_warnings)])
+            results_tests.append(["Ortografia", *flatten(is_all_correct, all_errors, all_warnings)])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 7.1 - Verificar nomes de colunas únicos
-        results_tests.append([("Issue #36: " if debug else "") +"Títulos únicos", *flatten(*sp_description.verify_sp_description_titles_uniques(df_sp_description))])
+        results_tests.append(["Títulos únicos", *flatten(*sp_description.verify_sp_description_titles_uniques(df_sp_description))])
         
         # 7.2: Verificar se os códigos são sequenciais
-        results_tests.append([("Issue #124: " if debug else "") +"Códigos sequenciais", *flatten(*sp_description.verify_sp_description_codes_sequential(df_sp_description))])
+        results_tests.append(["Códigos sequenciais", *flatten(*sp_description.verify_sp_description_codes_sequential(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 8 - Verificar campos vazios
-        results_tests.append([("Issue #75: " if debug else "") +"Campos vazios", *flatten(*sp_description.verify_sp_description_empty_strings(df_sp_description, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA]))])
+        results_tests.append(["Campos vazios", *flatten(*sp_description.verify_sp_description_empty_strings(df_sp_description, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 9 - Padrão para nomes dos indicadores #1
-        results_tests.append([("Issue #1: " if debug else "") +"Padrão para nomes dos indicadores", *flatten(*sp_description.verify_sp_description_text_capitalize(df_sp_description))])
+        results_tests.append(["Padrão para nomes dos indicadores", *flatten(*sp_description.verify_sp_description_text_capitalize(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 9.1 - Títulos com mais de SP_DESCRIPTION_MAX_TITLE_LENGTH caracteres
         if not no_warning_titles_length:
-            results_tests.append([("Issue #39: " if debug else "") +f"Títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres", *flatten(*sp_description.verify_sp_description_titles_length(df_sp_description))])
+            results_tests.append([f"Títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres", *flatten(*sp_description.verify_sp_description_titles_length(df_sp_description))])
         # 9.2 - Descrições simples com mais de SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH caracteres: verify_sp_simple_description_max_length
-        results_tests.append([("Issue #119: " if debug else "") +f"Descrições simples com mais de {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres", *flatten(*sp_description.verify_sp_simple_description_max_length(df_sp_description))])
+        results_tests.append([f"Descrições simples com mais de {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres", *flatten(*sp_description.verify_sp_simple_description_max_length(df_sp_description))])
         # ------------------------------------------------------------------------------------------------------------------------------------
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 10.0 - Pontuações obrigatórias e proibidas
-        results_tests.append([("Issue #32: " if debug else "") +"Pontuações obrigatórias e proibidas em descrições", *flatten(*sp_description.verify_sp_description_punctuation(df_sp_description,  [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO], [SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA]))])
+        results_tests.append(["Pontuações obrigatórias e proibidas em descrições", *flatten(*sp_description.verify_sp_description_punctuation(df_sp_description,  [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO], [SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA]))])
         
         # 10.1 - Pontuações obrigatórias e proibidas em cenários
         if sp_scenario_exists:
-            results_tests.append([("Issue #81: " if debug else "") +"Pontuações obrigatórias e proibidas em cenários", *flatten(*sp_scenario.verify_sp_scenario_punctuation(df_sp_scenario, columns_dont_punctuation=[SP_SCENARIO_COLUMNS.NOME], columns_must_end_with_dot=[SP_SCENARIO_COLUMNS.DESCRICAO]))])
+            results_tests.append(["Pontuações obrigatórias e proibidas em cenários", *flatten(*sp_scenario.verify_sp_scenario_punctuation(df_sp_scenario, columns_dont_punctuation=[SP_SCENARIO_COLUMNS.NOME], columns_must_end_with_dot=[SP_SCENARIO_COLUMNS.DESCRICAO]))])
 
         # 10.2 Pontuações obrigatórias e proibidas em referência temporal
-        results_tests.append([("Issue #81: " if debug else "") +"Pontuações obrigatórias e proibidas em referência temporal", *flatten(*sp_temporal_reference.verify_sp_temporal_reference_punctuation(df_sp_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=[SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
+        results_tests.append(["Pontuações obrigatórias e proibidas em referência temporal", *flatten(*sp_temporal_reference.verify_sp_temporal_reference_punctuation(df_sp_temporal_reference, columns_dont_punctuation=[], columns_must_end_with_dot=[SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
          # 11.0: Relações de valores únicos em cenários
         if sp_scenario_exists:
-            results_tests.append([("Issue #81: " if debug else "") +"Relações de valores únicos em cenários", *flatten(*sp_scenario.verify_sp_scenario_unique_values(df_sp_scenario, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.SIMBOLO]))])
+            results_tests.append(["Relações de valores únicos em cenários", *flatten(*sp_scenario.verify_sp_scenario_unique_values(df_sp_scenario, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.SIMBOLO]))])
         
         # 10.1: Relações de valores únicos em referência temporal
-        results_tests.append([("Issue #81: " if debug else "") +"Relações de valores únicos em referência temporal", *flatten(*sp_temporal_reference.verify_sp_temporal_reference_unique_values(df_sp_temporal_reference, [SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO]))])
+        results_tests.append(["Relações de valores únicos em referência temporal", *flatten(*sp_temporal_reference.verify_sp_temporal_reference_unique_values(df_sp_temporal_reference, [SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO]))])
         # ------------------------------------------------------------------------------------------------------------------------------------
         
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 11 - Relações de combinações de valores #81
-        results_tests.append([("Issue #81: " if debug else "") +"Relações de combinações de valores", *flatten(*sp_values.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference))])
+        results_tests.append(["Relações de combinações de valores", *flatten(*sp_values.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference))])
         
         # 11.2  - Valores indisponiveis #149: verify_unavailable_values(df_values):
-        results_tests.append([("Issue #149: " if debug else "") +"Valores indisponíveis", *flatten(*sp_values.verify_unavailable_values(df_sp_values, df_sp_scenario))])
+        results_tests.append(["Valores indisponíveis", *flatten(*sp_values.verify_unavailable_values(df_sp_values, df_sp_scenario))])
 
 
         # ------------------------------------------------------------------------------------------------------------------------------------
@@ -379,22 +384,23 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         if sp_scenario_exists:
             columns_start_end.append(SP_DESCRIPTION_COLUMNS.CENARIO)
             
-        results_tests.append([("Issue #85: " if debug else "") +"Quebra de linha para descrição", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_description,SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=columns_start_end, columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]))])
+        results_tests.append(["Quebra de linha para descrição", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_description,SP_DESCRIPTION_COLUMNS.NAME_SP, columns_start_end=columns_start_end, columns_anywhere=[SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]))])
         if sp_scenario_exists:
-            results_tests.append([("Issue #85: " if debug else "") +"Quebra de linha para cenários", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, columns_start_end=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], columns_anywhere=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO]))])
+            results_tests.append(["Quebra de linha para cenários", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_scenario,SP_SCENARIO_COLUMNS.NAME_SP, columns_start_end=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], columns_anywhere=[SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO]))])
 
         # 12.1 - Quebra de linha para referência temporal
-        results_tests.append([("Issue #85: " if debug else "") +"Quebra de linha para referência temporal", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
+        results_tests.append(["Quebra de linha para referência temporal", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         
         # 13 - Verificar range dos dados #16: 
-        results_tests.append([("Issue #16: " if debug else "") +"Intervalo dos dados da legenda", *flatten(*sp_legend.verify_values_range_multiple_legend(input_folder, df_sp_values, df_sp_description, df_sp_scenario))])
+        results_tests.append(["Intervalo dos dados da legenda", *flatten(*sp_legend.verify_values_range_multiple_legend(input_folder, df_sp_values, df_sp_description, df_sp_scenario))])
 
         # 14 - Sobreposicao de valores na legenda #71
-        results_tests.append([("Issue #71: " if debug else "") +"Sobreposição de valores na legenda", *flatten(*sp_legend.verify_overlapping_multiple_legend_value(input_folder, df_sp_description))])
+        results_tests.append(["Sobreposição de valores na legenda", *flatten(*sp_legend.verify_overlapping_multiple_legend_value(input_folder, df_sp_description))])
         
         # 15 - Verificar propriedades de soma nos fatores influenciadores #69
         if sp_proportionalities_exists:
-            results_tests.append([("Issue #69: " if debug else "") +"Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))])
+            results_tests.append(["Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))])
+        
         
     if debug:
         print("\n")
@@ -457,7 +463,6 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # RESET COLORAMA
         print(Style.RESET_ALL)
 
-    
     # Criar a pasta de saída para salvar os relatórios
     util.create_directory(output_folder)
     report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML, no_time=no_time)
