@@ -61,8 +61,8 @@ def test_true_verify_ids_sp_description_proportionalities_data_ground_truth_02_n
 def test_true_verify_ids_sp_description_proportionalities_data_ground_truth_03():
     is_correct, errors, warnings = verify_ids_sp_description_proportionalities(df_sp_description=df_sp_description_data_ground_truth_03_csv, df_sp_proportionalities=df_sp_proportionalities_data_ground_truth_03_csv, df_sp_scenario=df_sp_scenario_data_ground_truth_03_csv, name_sp_description=SP_DESCRIPTION_COLUMNS.NAME_SP, name_sp_proportionalities=SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_scenario=SP_SCENARIO_COLUMNS.NAME_SP)
     assert is_correct is True
-    assert len(errors) ==0
-    assert len(warnings) ==0
+    assert len(errors) == 0
+    assert len(warnings) == 0
 
 def test_count_errors_verify_ids_sp_description_proportionalities_data_errors_09():
     is_correct, errors, warnings =verify_ids_sp_description_proportionalities(df_sp_description=df_sp_description_errors_09, df_sp_proportionalities=df_sp_proportionalities_errors_09, df_sp_scenario=df_sp_scenario_errors_09, name_sp_description=SP_DESCRIPTION_COLUMNS.NAME_SP, name_sp_proportionalities=SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_scenario=SP_SCENARIO_COLUMNS.NAME_SP)
