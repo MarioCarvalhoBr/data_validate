@@ -345,11 +345,12 @@ def verify_sp_simple_description_max_length(df):
 
         for index, row in df.iterrows():
             text = row[column]
+            
             if pd.isna(text) or text == "":
                 continue
                 
             if len(text) > SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: Descrição simples fora do padrão. Esperado: Até {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
+                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: \"{text}\". Descrição simples fora do padrão. Esperado: Até {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 

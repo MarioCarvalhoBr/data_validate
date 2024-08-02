@@ -114,7 +114,7 @@ def test_count_verify_sp_simple_description_max_length_in_data_errors_01():
     assert len(errors) == 0
     assert len(warnings) == 1
 
-    assert warnings[0] == "descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres."
+    assert warnings[0] == "descricao.xlsx, linha 9: \"Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.\". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres."
 
 def test_verify_sp_simple_description_max_length():
     # Test with all descriptions within the maximum length
@@ -125,12 +125,12 @@ def test_verify_sp_simple_description_max_length():
     assert len(warnings) == 0
 
     # Test with one description exceeding the maximum length
-    df = pd.DataFrame({'desc_simples': ['Test description' * 100, 'Another test description', 'Yet another test description']})
+    df = pd.DataFrame({'desc_simples': ['A' * 250, 'Another test description', 'Yet another test description']})
     is_correct, errors, warnings = verify_sp_simple_description_max_length(df)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 1
-    assert warnings[0] == "descricao.xlsx, linha 2: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 1600 caracteres."
+    assert warnings[0] == f"descricao.xlsx, linha 2: \"{'A' * 250}\". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 250 caracteres."
 
 # Testes: verify_sp_description_parser_html_column_names
 def test_true_verify_sp_description_parser_html_column_names_data_ground_truth_01():

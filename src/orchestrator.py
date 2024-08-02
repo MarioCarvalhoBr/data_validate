@@ -252,8 +252,10 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 2.0 - Hierarquia como grafo conexo
         is_correct_comp2desc, errors_comp2desc, warnings_comp2desc = (graph.verify_graph_sp_description_composition(df_sp_description, df_sp_composition))
+        
         # 2.1 - Relações entre indicadores e valores
         is_correct_val2desc, errors_val2desc, warnings_val2desc = (sp_values.verify_ids_sp_description_values(df_sp_description, df_sp_values, df_sp_scenario))
+        
         is_correct_prop2desc, errors_prop2desc, warnings_prop2desc = True, [], []
         if sp_proportionalities_exists:
             is_correct_prop2desc, errors_prop2desc, warnings_prop2desc = sp_proportionalities.verify_ids_sp_description_proportionalities(df_sp_description=df_sp_description, df_sp_proportionalities=df_sp_proportionalities, df_sp_scenario=df_sp_scenario, name_sp_description=SP_DESCRIPTION_COLUMNS.NAME_SP, name_sp_proportionalities=SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_scenario=SP_SCENARIO_COLUMNS.NAME_SP)
