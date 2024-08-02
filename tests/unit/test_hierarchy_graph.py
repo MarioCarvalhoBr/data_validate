@@ -13,6 +13,8 @@ from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composi
 
 # DATA FRAMES - ERROS 04
 from tests.unit.test_constants import df_sp_description_errors_04, df_sp_composition_errors_04
+# DATA FRAMES  - ERROS 10
+from tests.unit.test_constants import df_sp_description_errors_10, df_sp_composition_errors_10
 
 def test_true_verify_graph_sp_description_composition_data_ground_truth_01():
     is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01)
@@ -40,6 +42,14 @@ def test_count_errors_verify_graph_sp_description_composition_errors_04():
     assert errors[0] == "descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001]."
     assert errors[1] == "composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002]."
     assert errors[2] == "composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007]."
+
+def test_count_errors_verify_graph_sp_description_composition_errors_10():
+    is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_errors_10, df_sp_composition_errors_10)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+    # Exibir o o sub-grafo de forma ordenada
+    assert errors[0] == "composicao.xlsx: Indicadores desconectados encontrados: [1 -> 2, 2 -> 4, 2 -> 5]."
     
 def test_imprimir_grafo_with_no_edges():
     G = nx.DiGraph()

@@ -104,12 +104,12 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
         
         # Verificar as linhas que têm valores nessas colunas sem nome
         quantity_valid_columns = len(df.columns) - len(unnamed_columns_indices)
+
         for index, row in df.iterrows():
-            for col_index in unnamed_columns_indices:
-                if not pd.isna(row.iloc[col_index]) and str(row.iloc[col_index]).strip() != "":                    
-                    # Verify plural = "coluna" or "colunas"
-                    text_collumn = "coluna" if quantity_valid_columns == 1 else "colunas"
-                    errors.append(f"{file_name}, linha {index+2}: A linha possui um valor na coluna {col_index+1}, mas a tabela possui apenas {quantity_valid_columns} {text_collumn} válidas.")
+            # Caso a linha não seja vaio e tenha mais valores do que o número de colunas
+            if pd.notnull(row).sum() > quantity_valid_columns:
+                text_column = "coluna" if quantity_valid_columns == 1 else "colunas"
+                errors.append(f"{file_name}, linha {index+2}: A linha possui {pd.notnull(row).sum()} valores, mas a tabela possui apenas {quantity_valid_columns} {text_column}.")
         
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(df, expected_columns)

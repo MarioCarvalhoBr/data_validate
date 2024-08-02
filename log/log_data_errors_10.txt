@@ -26,6 +26,7 @@ Verificação: Estrutura dos arquivos da pasta de entrada
 legenda.qml: O arquivo legenda.qml foi entregue junto com os outros 9 arquivos QML. Os outros arquivos serão ignorados.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
+composicao.xlsx: Indicadores desconectados encontrados: [1 -> 2, 2 -> 4, 2 -> 5].
 descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 3, 4, 5, 6, 7, 8, 9].
 proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
 Verificação: Hierarquia como árvore
@@ -54,7 +55,7 @@ Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
 
 
-Número de erros: 3
+Número de erros: 4
 Número de avisos: 0
 Número de verificações realizadas: 27
 

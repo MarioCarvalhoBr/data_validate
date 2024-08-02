@@ -223,8 +223,8 @@ def test_errors_verify_expected_structure_files_errors_04():
     assert len(all_warnings_structure_files) == 1
 
     # Verifica se os erros são o esperado
-    assert all_errors_structure_files[0] == "composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas válidas."
-    assert all_errors_structure_files[1] == "valores.xlsx, linha 7: A linha possui um valor na coluna 19, mas a tabela possui apenas 18 colunas válidas."
+    assert all_errors_structure_files[0] == "composicao.xlsx, linha 7: A linha possui 3 valores, mas a tabela possui apenas 2 colunas."
+    assert all_errors_structure_files[1] == "valores.xlsx, linha 7: A linha possui 19 valores, mas a tabela possui apenas 18 colunas."
     
     # Verifica se os warnings são o esperado
     assert all_warnings_structure_files[0] == "composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação."
