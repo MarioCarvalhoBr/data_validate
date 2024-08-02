@@ -396,12 +396,16 @@ def test_count_errors_verify_files_data_clean_data_errors_05():
 # verify_files_legends_qml para 09
 def test_count_errors_verify_files_legends_qml_errors_09():
     is_correct, errors, warnings = verify_files_legends_qml(df_sp_description_errors_09, path_input_data_errors_09)
+
+    # Ordenar os valores de warnings
+    warnings = sorted(warnings)
     
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 2
 
     assert errors[0] == "3.qml: Arquivo de legenda esperado mas não encontrado."
+    
     assert warnings[0] == "1.qml: Arquivo de legenda não esperado."
     assert warnings[1] == "99.qml: Arquivo de legenda não esperado."
     

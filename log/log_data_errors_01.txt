@@ -22,8 +22,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_01/
 
 
 ------ Resultados da verificação dos testes ------
-Verificação: Issue #39: Estrutura dos arquivos da pasta de entrada
-Verificação: Issue #79: Limpeza dos arquivos
+Verificação: Estrutura dos arquivos da pasta de entrada
+Verificação: Limpeza dos arquivos
 descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.
 descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.
 descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor '3.1' não é um número inteiro.
@@ -35,53 +35,55 @@ composicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor inválido: O
 composicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor inválido: O valor '-89' é menor que 1.
 composicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor inválido: O valor 'GNU' não é um número.
 referencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor inválido: O valor '2050B' não é um número.
-Verificação: Issue #2 e #59: Relações entre indicadores
+Verificação: Relações entre indicadores
 descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [55, 77, 5001, 5002, 5010, 5022, 5033].
 composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5005].
 composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].
 composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].
-valores.xlsx: Códigos inválidos: ['5000-2080-M'].
+valores.xlsx: Colunas inválidas: ['5000-2080-M'].
 valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].
-Verificação: Issue #3: Hierarquia como árvore
+descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007].
+proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
+Verificação: Hierarquia como árvore
 composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].
-Verificação: Issue #37: Níveis de indicadores
+Verificação: Níveis de indicadores
 descricao.xlsx, linha 4: Nível do indicador não é um número inteiro maior que 0.
 descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior que 0.
 descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0.
-Verificação: Issue #8: Unicidade dos códigos
+Verificação: Unicidade dos códigos
 descricao.xlsx: Existem códigos duplicados: [5007].
-Verificação: Issue #124: Códigos sequenciais
+Verificação: Códigos sequenciais
 descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos.
-Verificação: Issue #75: Campos vazios
+Verificação: Campos vazios
 descricao.xlsx, linha 13: Nenhum item da coluna 'nome_simples' pode ser vazio.
-Verificação: Issue #81: Relações de valores únicos em cenários
+Verificação: Relações de valores únicos em cenários
 cenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.
 cenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.
-Verificação: Issue #81: Relações de valores únicos em referência temporal
+Verificação: Relações de valores únicos em referência temporal
 referencia_temporal.xlsx: A coluna 'nome' não deve conter valores repetidos.
-Verificação: Issue #81: Relações de combinações de valores
+Verificação: Relações de combinações de valores
 valores.xlsx: A coluna '5000-2030-O' é obrigatória.
 valores.xlsx: A coluna '5000-2080-M' é desnecessária.
-Verificação: Issue #149: Valores indisponíveis
-Verificação: Issue #85: Quebra de linha para descrição
-Verificação: Issue #85: Quebra de linha para cenários
-Verificação: Issue #85: Quebra de linha para referência temporal
-Verificação: Issue #16: Intervalo dos dados da legenda
+Verificação: Valores indisponíveis
+Verificação: Quebra de linha para descrição
+Verificação: Quebra de linha para cenários
+Verificação: Quebra de linha para referência temporal
+Verificação: Intervalo dos dados da legenda
 legenda.qml: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.
-Verificação: Issue #71: Sobreposição de valores na legenda
+Verificação: Sobreposição de valores na legenda
 legenda.qml: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.
-Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
+Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.
 proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
 proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
 proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
-Verificação: Issue #5: Códigos HTML nas descrições simples
+Verificação: Códigos HTML nas descrições simples
 descricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 4: Coluna desc_simples não pode conter código HTML.
-Verificação: Issue #24: Ortografia
+Verificação: Ortografia
 descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].
 descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].
 descricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].
@@ -92,10 +94,10 @@ cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna de
 cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
 cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
 referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].
-Verificação: Issue #36: Títulos únicos
+Verificação: Títulos únicos
 descricao.xlsx: Existem nomes simples duplicados: ['Seca', 'Sensibilidade'].
 descricao.xlsx: Existem nomes completos duplicados: ['Índice de Risco de Impacto para Seca'].
-Verificação: Issue #1: Padrão para nomes dos indicadores
+Verificação: Padrão para nomes dos indicadores
 descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Segurança alimentar.". Encontrado: "Segurança Alimentar.".
 descricao.xlsx, linha 2: Nome completo fora do padrão. Esperado: "Impactos para segurança alimentar". Encontrado: "Impactos para Segurança Alimentar".
 descricao.xlsx, linha 3: Nome completo fora do padrão. Esperado: "Índice de risco de impacto para seca". Encontrado: "Índice de Risco de Impacto para Seca".
@@ -105,27 +107,27 @@ descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Ameaça climá
 descricao.xlsx, linha 6: Nome completo fora do padrão. Esperado: "Índice de ameaça climática". Encontrado: "Índice de Ameaça Climática".
 descricao.xlsx, linha 7: Nome completo fora do padrão. Esperado: "Índice de sensibilidade". Encontrado: "Índice de Sensibilidade".
 descricao.xlsx, linha 8: Nome completo fora do padrão. Esperado: "Índice de capacidade adaptativa". Encontrado: "Índice de Capacidade Adaptativa".
-Verificação: Issue #39: Títulos com mais de 40 caracteres
+Verificação: Títulos com mais de 40 caracteres
 descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres.
-Verificação: Issue #119: Descrições simples com mais de 150 caracteres
+Verificação: Descrições simples com mais de 150 caracteres
 descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
-Verificação: Issue #32: Pontuações obrigatórias e proibidas em descrições
+Verificação: Pontuações obrigatórias e proibidas em descrições
 descricao.xlsx, linha 2: A coluna 'nome_simples' não deve terminar com pontuação.
 descricao.xlsx, linha 2: A coluna 'desc_completa' deve terminar com ponto.
 descricao.xlsx, linha 3: A coluna 'desc_simples' deve terminar com ponto.
 descricao.xlsx, linha 5: A coluna 'nome_completo' não deve terminar com pontuação.
-Verificação: Issue #81: Pontuações obrigatórias e proibidas em cenários
+Verificação: Pontuações obrigatórias e proibidas em cenários
 cenarios.xlsx, linha 3: A coluna 'nome' não deve terminar com pontuação.
 cenarios.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
-Verificação: Issue #81: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Pontuações obrigatórias e proibidas em referência temporal
 referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
-Verificação: Issue #69: Propriedades de soma nos fatores influenciadores
+Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 37
+Número de erros: 39
 Número de avisos: 36
 Número de verificações realizadas: 27
 
