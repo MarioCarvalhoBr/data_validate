@@ -33,6 +33,7 @@ descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'
 descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.
 descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
 descricao.xlsx, linha 8: A coluna 'meta' não pode conter o caracter '|'.
+O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Limpeza dos arquivos
 composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Relações entre indicadores
@@ -67,8 +68,6 @@ proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (D
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
 proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
 proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
-Verificação: Estrutura dos arquivos da pasta de entrada
-O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Ortografia
 descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 Verificação: Padrão para nomes dos indicadores
@@ -102,8 +101,8 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 24
-Número de avisos: 25
+Número de erros: 25
+Número de avisos: 24
 Número de verificações realizadas: 27
 
 

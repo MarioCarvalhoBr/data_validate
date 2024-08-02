@@ -19,16 +19,24 @@ def verify_errors_read_files_in_folder_root(read_errors):
 def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUMNS_DICT):
     errors = []
     warnings = []
-    STRUCTURE_FILES_COLUMNS_DICT = STRUCTURE_FILES_COLUMNS_DICT.copy()
-
-    NEW_STRUCTURE_FILES_COLUMNS_DICT = {}
-
-    # Remove todas as execessões de arquivos esperados: STRUCTURE_FILES_COLUMNS_DICT
-    for key in list(STRUCTURE_FILES_COLUMNS_DICT.keys()):
-        new_key = key.replace(".csv", "").replace(".xlsx", "")
-        NEW_STRUCTURE_FILES_COLUMNS_DICT[new_key] = STRUCTURE_FILES_COLUMNS_DICT[key]
-
+    
     try:
+        STRUCTURE_FILES_COLUMNS_DICT = STRUCTURE_FILES_COLUMNS_DICT.copy()
+        
+        # Verifica se dentro da pasta path_folder existe apenas 1 unica pasta
+        lista_arquivos = [file_name for file_name in os.listdir(path_folder)]
+        if len(lista_arquivos) == 1 and os.path.isdir(os.path.join(path_folder, lista_arquivos[0])):
+            errors.append("Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.")
+            return not errors, errors, warnings
+
+        NEW_STRUCTURE_FILES_COLUMNS_DICT = {}
+
+        # Remove todas as execessões de arquivos esperados: STRUCTURE_FILES_COLUMNS_DICT
+        for key in list(STRUCTURE_FILES_COLUMNS_DICT.keys()):
+            new_key = key.replace(".csv", "").replace(".xlsx", "")
+            NEW_STRUCTURE_FILES_COLUMNS_DICT[new_key] = STRUCTURE_FILES_COLUMNS_DICT[key]
+
+    
         lista_arquivos = [file_name for file_name in os.listdir(path_folder) if not file_name.endswith('.qml')]
         # Verifica se há arquivos não esperados na pasta
         for file_name_i in lista_arquivos:
@@ -42,8 +50,11 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
             file_name_non_extension = file_basename.replace(file_extension, "")
             
             if file_name_non_extension not in NEW_STRUCTURE_FILES_COLUMNS_DICT:
-                    warnings.append(f"O arquivo '{os.path.basename(file_name_i)}' não é esperado.")
-
+                    # Verifica se é uma pasta ou um arquivo
+                    if os.path.isdir(os.path.join(path_folder, file_name_i)):
+                        errors.append(f"A pasta '{file_name_i}' não é esperada.")
+                    else:
+                        errors.append(f"O arquivo '{file_name_i}' não é esperado.")
     except Exception as e:
         errors.append(f"{path_folder}: Erro ao processar verificação dos arquivos da pasta principal: {e}.")
 

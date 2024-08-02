@@ -25,6 +25,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_06/
 Verificação: Estrutura dos arquivos da pasta de entrada
 referencia_temporal.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
 descricao.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.
+O arquivo 'outro_arquivo.csv' não é esperado.
+O arquivo 'outro_arquivo.xlsx' não é esperado.
 Verificação: Limpeza dos arquivos
 composicao.csv, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Relações entre indicadores
@@ -60,15 +62,12 @@ valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a
 valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
-Verificação: Estrutura dos arquivos da pasta de entrada
-O arquivo 'outro_arquivo.csv' não é esperado.
-O arquivo 'outro_arquivo.xlsx' não é esperado.
 Verificação: Descrições simples com mais de 150 caracteres
 descricao.csv, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
-Número de erros: 12
-Número de avisos: 3
+Número de erros: 14
+Número de avisos: 1
 Número de verificações realizadas: 27
 
 
