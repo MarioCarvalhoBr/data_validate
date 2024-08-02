@@ -404,7 +404,7 @@ def test_count_errors_verify_files_legends_qml_errors_09():
     assert len(errors) == 1
     assert len(warnings) == 2
 
-    assert errors[0] == "3.qml: Arquivo de legenda esperado mas não encontrado."
+    assert errors[0] == "7.qml: Arquivo de legenda esperado mas não encontrado."
     
     assert warnings[0] == "1.qml: Arquivo de legenda não esperado."
     assert warnings[1] == "99.qml: Arquivo de legenda não esperado."

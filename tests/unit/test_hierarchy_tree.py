@@ -11,6 +11,10 @@ from tests.unit.test_constants import df_sp_description_data_ground_truth_05, df
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composition_errors_01
 
+# DATA FRAMES - ERRORS 09
+from tests.unit.test_constants import df_sp_description_errors_09, df_sp_composition_errors_09
+
+
 def test_true_verify_tree_sp_composition_hierarchy_data_ground_truth_01():
     is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_data_ground_truth_01, df_sp_description_data_ground_truth_01)
     assert is_correct is True
@@ -29,7 +33,18 @@ def test_count_errors_verify_tree_sp_composition_hierarchy_errors_01():
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
-    assert errors == ['composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].']
+    assert errors[0] == 'composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].'
+
+def test_count_errors_verify_tree_sp_composition_hierarchy_errors_09():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_hierarchy(df_sp_composition_errors_09, df_sp_description_errors_09)
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert errors[0] == 'composicao.xlsx: Ciclo encontrado: [1 -> 2 -> 1].'
+    assert errors[1] == 'composicao.xlsx, linha 3: O indicador 2 (nível 2) não pode ser pai do indicador 3 (nível 2). Atualize os níveis no arquivo de descricao.xlsx.'
+    assert errors[2] == 'composicao.xlsx, linha 4: O indicador 2 (nível 2) não pode ser pai do indicador 1 (nível 1). Atualize os níveis no arquivo de descricao.xlsx.'
+    assert errors[3] == 'composicao.xlsx, linha 6: O indicador 3 (nível 2) não pode ser pai do indicador 6 (nível 2). Atualize os níveis no arquivo de descricao.xlsx.'
 
 def test_criar_arvore_with_no_duplicates():
     composicao = pd.DataFrame({
