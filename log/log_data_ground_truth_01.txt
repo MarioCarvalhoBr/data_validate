@@ -23,7 +23,6 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
-O arquivo '.~lock.descricao.xlsx#' não é esperado.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 Verificação: Hierarquia como árvore
@@ -52,7 +51,7 @@ Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
 
 
-Número de erros: 1
+Número de erros: 0
 Número de avisos: 0
 Número de verificações realizadas: 27
 

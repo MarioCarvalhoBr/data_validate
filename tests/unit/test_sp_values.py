@@ -1,3 +1,4 @@
+import pandas as pd
 from src.myparser.sp_values import verify_ids_sp_description_values, verify_combination_sp_description_values_scenario_temporal_reference, verify_unavailable_values, extract_ids_from_list_from_values
 
 # DATA FRAMES - GROUND TRUTH 01
@@ -17,6 +18,33 @@ from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_r
 
 # DATA FRAMES - ERROS 07
 from tests.unit.test_constants import df_sp_values_errors_07, df_sp_scenario_errors_07
+
+# Import SP_VALUES_COLUMNS
+from tests.unit.test_constants import SP_DESCRIPTION_COLUMNS
+
+def test_verify_ids_sp_description_values_column_missing():
+    df_description = pd.DataFrame({
+        'other_column': ['a', 'b', 'c']
+    })
+    df_values = pd.DataFrame({
+        '1-2020': ['1', '1', '1']
+    })
+    df_scenario = pd.DataFrame({
+        'nome': ['Otimista', 'Pessimista'],
+        'descricao': ['Este cenário representa uma visão mais otimista, sendo baseado em um menor crescimento populacional, menor desmatamento, menor consumo, etc.', 'Este cenário representa uma visão mais pessimista, sendo baseado em um maior crescimento populacional, maior desmatamento, maior consumo etc.'],
+        'simbolo': ['O', 'P']
+    })
+    
+    errors = []
+    warnings = []
+
+    result, errors, warnings = verify_ids_sp_description_values(df_description, df_values, df_scenario)
+
+    expected_error = f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna 'codigo' está ausente."
+    
+    assert result is False
+    assert errors == [expected_error]
+    assert warnings == []
 
 # Testes para: verify_unavailable_values
 def test_true_verify_unavailable_values_data_ground_truth_01():

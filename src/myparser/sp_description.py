@@ -321,8 +321,8 @@ def verify_sp_description_titles_length(df):
             if pd.isna(text) or text == "":
                 continue
                 
-            if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
+            if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH: 
+                warnings.append(f'{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: "{text}". {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.')
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
@@ -350,7 +350,7 @@ def verify_sp_simple_description_max_length(df):
                 continue
                 
             if len(text) > SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: \"{text}\". Descrição simples fora do padrão. Esperado: Até {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.")
+                warnings.append(f'{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: "{text}". Descrição simples fora do padrão. Esperado: Até {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.')
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 

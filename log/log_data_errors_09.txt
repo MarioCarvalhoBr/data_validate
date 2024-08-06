@@ -33,9 +33,9 @@ descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2
 proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
 Verificação: Hierarquia como árvore
 composicao.xlsx: Ciclo encontrado: [1 -> 2 -> 1].
-composicao.xlsx, linha 3: O indicador 2 (nível 2) não pode ser pai do indicador 3 (nível 2). Atualize os níveis no arquivo de descricao.xlsx.
-composicao.xlsx, linha 4: O indicador 2 (nível 2) não pode ser pai do indicador 1 (nível 1). Atualize os níveis no arquivo de descricao.xlsx.
-composicao.xlsx, linha 6: O indicador 3 (nível 2) não pode ser pai do indicador 6 (nível 2). Atualize os níveis no arquivo de descricao.xlsx.
+composicao.xlsx, linha 3: O indicador 2 (nível 2) não pode ser pai do indicador 3 (nível 2). Atualize os níveis no arquivo de descrição.
+composicao.xlsx, linha 4: O indicador 2 (nível 2) não pode ser pai do indicador 1 (nível 1). Atualize os níveis no arquivo de descrição.
+composicao.xlsx, linha 6: O indicador 3 (nível 2) não pode ser pai do indicador 6 (nível 2). Atualize os níveis no arquivo de descrição.
 Verificação: Níveis de indicadores
 Verificação: Unicidade dos códigos
 Verificação: Códigos HTML nas descrições simples

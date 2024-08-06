@@ -1,5 +1,5 @@
 import networkx as nx
-
+import pandas as pd
 from src.myparser.hierarchy.graph import verificar_ciclos
 from src.myparser.hierarchy.graph import verificar_grafos_desconectados
 from src.myparser.hierarchy.graph import imprimir_grafo
@@ -15,6 +15,27 @@ from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composi
 from tests.unit.test_constants import df_sp_description_errors_04, df_sp_composition_errors_04
 # DATA FRAMES  - ERROS 10
 from tests.unit.test_constants import df_sp_description_errors_10, df_sp_composition_errors_10
+from tests.unit.test_constants import SP_DESCRIPTION_COLUMNS
+
+def test_verify_ids_sp_description_values_column_missing():
+    df_description = pd.DataFrame({
+        'other_column': ['a', 'b', 'c']
+    })
+    df_composition = pd.DataFrame({
+        'codigo_pai': ['1', '1', '1'],
+        'codigo_filho': ['2', '3', '4']
+    })
+    
+    errors = []
+    warnings = []
+
+    result, errors, warnings = verify_graph_sp_description_composition(df_description, df_composition)
+
+    expected_error = f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada."
+    
+    assert result is False
+    assert errors == [expected_error]
+    assert warnings == []
 
 def test_true_verify_graph_sp_description_composition_data_ground_truth_01():
     is_correct, errors, warnings = verify_graph_sp_description_composition(df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01)

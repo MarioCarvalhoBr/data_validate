@@ -99,7 +99,7 @@ def test_count_verify_sp_description_titles_length_in_data_errors_01():
     assert len(errors) == 0
     assert len(warnings) == 1
 
-    assert warnings[0] == "descricao.xlsx, linha 10: Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres."
+    assert warnings[0] == 'descricao.xlsx, linha 10: "Produtores e estabelecimentos agropecuários". Nome simples fora do padrão. Esperado: Até 40 caracteres. Encontrado: 43 caracteres.'
 
 # Testes: verify_sp_simple_description_max_length
 def test_true_verify_sp_simple_description_max_length_in_data_ground_truth_01():
@@ -114,7 +114,7 @@ def test_count_verify_sp_simple_description_max_length_in_data_errors_01():
     assert len(errors) == 0
     assert len(warnings) == 1
 
-    assert warnings[0] == "descricao.xlsx, linha 9: \"Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.\". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres."
+    assert warnings[0] == 'descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.'
 
 def test_verify_sp_simple_description_max_length():
     # Test with all descriptions within the maximum length
