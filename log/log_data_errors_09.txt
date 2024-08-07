@@ -23,12 +23,19 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_09/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
-3.qml: Arquivo de legenda esperado mas não encontrado.
+7.qml: Arquivo de legenda esperado mas não encontrado.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
-descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 3, 4, 5, 6, 7, 8, 9].
+composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [4].
+composicao.xlsx: Ciclo encontrado: [1 -> 2, 2 -> 1].
+valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [3, 6].
+descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 4, 5, 7, 8, 9].
 proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
 Verificação: Hierarquia como árvore
+composicao.xlsx: Ciclo encontrado: [1 -> 2 -> 1].
+composicao.xlsx, linha 3: O indicador 2 (nível 2) não pode ser pai do indicador 3 (nível 2). Atualize os níveis no arquivo de descrição.
+composicao.xlsx, linha 4: O indicador 2 (nível 2) não pode ser pai do indicador 1 (nível 1). Atualize os níveis no arquivo de descrição.
+composicao.xlsx, linha 6: O indicador 3 (nível 2) não pode ser pai do indicador 6 (nível 2). Atualize os níveis no arquivo de descrição.
 Verificação: Níveis de indicadores
 Verificação: Unicidade dos códigos
 Verificação: Códigos HTML nas descrições simples
@@ -57,7 +64,7 @@ Verificação: Estrutura dos arquivos da pasta de entrada
 99.qml: Arquivo de legenda não esperado.
 
 
-Número de erros: 3
+Número de erros: 10
 Número de avisos: 2
 Número de verificações realizadas: 27
 

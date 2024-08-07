@@ -36,6 +36,7 @@ descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'
 descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
 valores.xlsx: Coluna 'id' esperada mas não foi encontrada.
 proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
+O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Limpeza dos arquivos
 composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Relações entre indicadores
@@ -80,7 +81,6 @@ referencia_temporal.xlsx: Coluna 'COLUNA_C' será ignorada pois não está na es
 descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação.
 descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação.
 composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação.
-O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Ortografia
 descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 Verificação: Padrão para nomes dos indicadores
@@ -91,7 +91,7 @@ descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF
 descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".
 descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
 Verificação: Descrições simples com mais de 150 caracteres
-descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
+descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 Verificação: Quebra de linha para descrição
 descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
 descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
@@ -115,8 +115,8 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 31
-Número de avisos: 31
+Número de erros: 32
+Número de avisos: 30
 Número de verificações realizadas: 27
 
 

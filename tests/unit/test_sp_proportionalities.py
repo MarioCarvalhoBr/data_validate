@@ -71,5 +71,5 @@ def test_count_errors_verify_ids_sp_description_proportionalities_data_errors_09
     assert len(errors) == 2
     assert len(warnings) == 0
 
-    assert errors[0] == "descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 3, 4, 5, 6, 7, 8, 9]."
+    assert errors[0] == "descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 4, 5, 7, 8, 9]."
     assert errors[1] == "proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023]."

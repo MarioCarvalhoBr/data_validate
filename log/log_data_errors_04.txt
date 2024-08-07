@@ -23,8 +23,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_04/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
-composicao.xlsx, linha 7: A linha possui um valor na coluna 3, mas a tabela possui apenas 2 colunas válidas.
-valores.xlsx, linha 7: A linha possui um valor na coluna 19, mas a tabela possui apenas 18 colunas válidas.
+composicao.xlsx, linha 7: A linha possui 3 valores, mas a tabela possui apenas 2 colunas.
+valores.xlsx, linha 7: A linha possui 19 valores, mas a tabela possui apenas 18 colunas.
 Verificação: Limpeza dos arquivos
 descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
@@ -86,7 +86,7 @@ Verificação: Padrão para nomes dos indicadores
 descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries finais". Encontrado: "IDEB séries Finais".
 descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
 Verificação: Descrições simples com mais de 150 caracteres
-descricao.xlsx, linha 9: Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
+descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.

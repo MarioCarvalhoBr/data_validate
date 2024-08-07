@@ -18,17 +18,18 @@ Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
 
-INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_10/
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_00/
 
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
-legenda.qml: O arquivo legenda.qml foi entregue junto com os outros 9 arquivos QML. Os outros arquivos serão ignorados.
+referencia_temporal.csv: O arquivo esperado não foi encontrado.
+descricao.csv: O arquivo esperado não foi encontrado.
+composicao.csv: O arquivo esperado não foi encontrado.
+valores.csv: O arquivo esperado não foi encontrado.
+Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
-composicao.xlsx: Indicadores desconectados encontrados: [1 -> 2, 2 -> 4, 2 -> 5].
-descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 3, 4, 5, 6, 7, 8, 9].
-proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
 Verificação: Hierarquia como árvore
 Verificação: Níveis de indicadores
 Verificação: Unicidade dos códigos
@@ -41,26 +42,22 @@ Verificação: Padrão para nomes dos indicadores
 Verificação: Títulos com mais de 40 caracteres
 Verificação: Descrições simples com mais de 150 caracteres
 Verificação: Pontuações obrigatórias e proibidas em descrições
-Verificação: Pontuações obrigatórias e proibidas em cenários
 Verificação: Pontuações obrigatórias e proibidas em referência temporal
-Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
 Verificação: Valores indisponíveis
 Verificação: Quebra de linha para descrição
-Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
-Verificação: Propriedades de soma nos fatores influenciadores
 
 
-Número de erros: 4
+Número de erros: 5
 Número de avisos: 0
-Número de verificações realizadas: 27
+Número de verificações realizadas: 23
 
 
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_10/data_errors_10_report.html
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_00/data_errors_00_report.html
 
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_10/data_errors_10_report.pdf
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_00/data_errors_00_report.pdf
 

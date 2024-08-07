@@ -34,6 +34,7 @@ path_input_data_ground_truth_02_no_scenario = "input_data/data_ground_truth_02_n
 path_input_data_ground_truth_03_csv = "input_data/data_ground_truth_03_csv"
 path_input_data_ground_truth_04_csv_xlsx = "input_data/data_ground_truth_04_csv_xlsx"
 path_input_data_ground_truth_05 = "input_data/data_ground_truth_05"
+path_input_data_errors_00 = "input_data/data_errors_00"
 path_input_data_errors_01 = "input_data/data_errors_01"
 path_input_data_errors_02 = "input_data/data_errors_02"
 path_input_data_errors_03 = "input_data/data_errors_03"

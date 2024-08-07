@@ -32,16 +32,18 @@ def plot_grafo(G, is_save=False):
 '''
     
 def imprimir_grafo(G):
-    text_graph = ""
+    list_text_graph = []
     for origem, destino in G.edges():
         origem = float(origem)
         destino = float(destino)
         origem = int(origem) if origem.is_integer() else origem
         destino = int(destino) if destino.is_integer() else destino
-        text_graph += f"{origem} -> {destino}, "
-    # remove the last comma
-    text_graph = text_graph[:-2]
-    return text_graph
+        list_text_graph.append(f"{origem} -> {destino}")
+    
+    # Sort text_graph
+    list_text_graph = sorted(list_text_graph, key=lambda x: x, reverse=False)
+    full_text_graph = ", ".join(list_text_graph)
+    return full_text_graph
     
 def montar_grafo(composicao):
     G = nx.DiGraph()
@@ -72,6 +74,11 @@ def verify_graph_sp_description_composition(descricao, composicao):
     warnings = []
     is_valid = True
 
+    # Verifica se as colunas com código existem
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada.")
+        return not errors, errors, warnings
+
     
     # Verificar se as colunas com código existem
     if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in composicao.columns:
@@ -81,11 +88,6 @@ def verify_graph_sp_description_composition(descricao, composicao):
     # Limpando os dados
     composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
     composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
-    
-    # Verifica se as colunas com código existem
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada.")
-        return not errors, errors, warnings
     
     # Limpando os dados
     descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
