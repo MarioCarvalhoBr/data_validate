@@ -132,15 +132,12 @@ def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_prop
     if not exists_sp_proportionalities:
         return True, errors, warnings
 
-    """try:
+    try:
         # Verifica se a soma dos valores de cada subdataset é igual a 1
         subdatasets = build_subdatasets(df, file_name)
         errors, warnings = check_sum_equals_one(subdatasets)
     except Exception as e:
-        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")"""
-    # Verifica se a soma dos valores de cada subdataset é igual a 1
-    subdatasets = build_subdatasets(df, file_name)
-    errors, warnings = check_sum_equals_one(subdatasets)
+        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
     return not errors, errors, warnings
 
