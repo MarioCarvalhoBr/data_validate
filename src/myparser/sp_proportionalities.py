@@ -22,12 +22,16 @@ def create_subdatasets_xlsx(df, parent_columns):
     
     for parent_id in unique_parents:
         start_col = (parent_columns == parent_id).argmax()
-        end_col = (parent_columns[start_col + 1:] != parent_id).argmax() + start_col + 1
-        if end_col == start_col + 1:
-            end_col = len(parent_columns)
+        if start_col + 1 == len(parent_columns):
+            end_col = start_col + 1
+        else:
+            end_col = (parent_columns[start_col + 1:] != parent_id).argmax() + start_col + 1
+            if end_col == start_col + 1:
+                end_col = len(parent_columns)
+
         columns_to_include = df.columns[:1].tolist() + df.columns[start_col:end_col].tolist()
         subdatasets[parent_id] = df.loc[:, columns_to_include]
-    
+        
     return subdatasets
 
 def create_subdatasets_csv(df, parent_columns):
@@ -42,6 +46,7 @@ def create_subdatasets_csv(df, parent_columns):
     for parent_id in unique_parents:
         start_col = parent_columns.get_loc(parent_id)
         end_col = start_col + 1
+
         while end_col < len(parent_columns) and parent_columns[end_col].startswith('Unnamed'):
             end_col += 1
         
@@ -116,17 +121,26 @@ def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_prop
     
     errors = []
     warnings = []
+
+    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+        errors.append(f"{file_name}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+        return not errors, errors
     
     # Se não existir a coluna de proporcionalidades, retorna True
     if not exists_sp_proportionalities:
         return True, errors, warnings
 
-    try:
+    """try:
         # Verifica se a soma dos valores de cada subdataset é igual a 1
         subdatasets = build_subdatasets(df, file_name)
         errors, warnings = check_sum_equals_one(subdatasets)
     except Exception as e:
-        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")"""
+    # Verifica se a soma dos valores de cada subdataset é igual a 1
+    subdatasets = build_subdatasets(df, file_name)
+    errors, warnings = check_sum_equals_one(subdatasets)
 
     return not errors, errors, warnings
 
@@ -210,6 +224,10 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
     # Lista com todos as colunas nivel 1
     level_one_columns = df_proportionalities.columns.get_level_values(0).unique().tolist()
     level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+        errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+        return not errors, errors
     
     # Verifica se id existe em level_two_columns
     if SP_PROPORTIONALITIES_COLUMNS.ID in level_two_columns:

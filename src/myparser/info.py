@@ -35,7 +35,7 @@ def print_versions():
 # Informações da ferramenta
 
 __name__ = "Canoa"
-__version__ = "0.3.01"
+__version__ = "0.3.02"
 
 __author__ = "Mário de Araújo Carvalho"
 __email__ = "mariodearaujocarvalho@gmail.com"
