@@ -32,17 +32,17 @@ def plot_grafo(G, is_save=False):
 '''
     
 def imprimir_grafo(G):
-    list_text_graph = []
+    text_graph = []
     for origem, destino in G.edges():
         origem = float(origem)
         destino = float(destino)
         origem = int(origem) if origem.is_integer() else origem
         destino = int(destino) if destino.is_integer() else destino
-        list_text_graph.append(f"{origem} -> {destino}")
+        text_graph.append(f"{origem} -> {destino}")
     
-    # Sort text_graph
-    list_text_graph = sorted(list_text_graph, key=lambda x: x, reverse=False)
-    full_text_graph = ", ".join(list_text_graph)
+    # Ordenação das sub-arvores usando o menor pai até o maior pai.
+    text_graph = sorted(text_graph, key=lambda x: x, reverse=False)
+    full_text_graph = ", ".join(text_graph)
     return full_text_graph
     
 def montar_grafo(composicao):
