@@ -11,11 +11,11 @@ for folder in "${data_names[@]}"; do
         echo ""
         echo "Processando a pasta '$INPUT_DATA/$folder'..."
         
-        python3 main.py --input_folder=$INPUT_DATA/$folder/ --output_folder=$OUTPUT_DATA/$folder/ --debug --no-time
+        python3 main.py --input_folder=$INPUT_DATA/$folder/ --output_folder=$OUTPUT_DATA/$folder/ --debug --no-time --no-version
         
         if [ "$folder" == "data_errors_01" ]; then
             echo "Processando a pasta '$folder' com a flag --no-warning-titles-length..."
-            python3 main.py --input_folder=$INPUT_DATA/$folder/ --output_folder=$OUTPUT_DATA/$folder/ --debug --no-warning-titles-length --no-time
+            python3 main.py --input_folder=$INPUT_DATA/$folder/ --output_folder=$OUTPUT_DATA/$folder/ --debug --no-warning-titles-length --no-time --no-version
         fi
 
     else

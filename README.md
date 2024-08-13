@@ -109,6 +109,12 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   ```
   --no-time
   ```
+
+  - `--no-version`: Quando este argumento é usado, o script não exibe a versão do Adapta Parser na saída. Isso pode ser útil se você deseja reduzir a quantidade de saída gerada.
+  - Exemplo:
+  ```
+  --no-version
+  ```
   
 
 ### Testes
