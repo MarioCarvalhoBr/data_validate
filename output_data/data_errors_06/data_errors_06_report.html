@@ -1,0 +1,130 @@
+
+                        <!DOCTYPE html>
+                        <html lang="pt-br">
+                        <head>
+                            <meta charset="UTF-8">
+                            <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+                            <title>Canoa Report</title>
+                            <style>
+                                .container {
+                                    max-width: 98%;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            <div class="container my-5">
+
+                                <div class="text-center mb-12">
+                                    <h1><strong>Canoa</strong></h1>
+                                    <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
+                                </div>
+
+                                <div class="card mb-12">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Informa&ccedil;&otilde;es</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong style="display: none">Vers&atilde;o do validador: </strong><br>
+                                        <strong style="display: none">Data e hora do processo:  </strong>
+                                    </div>
+                                </div>
+
+                                <div class="card">
+                                    <div class="card-header bg-primary text-white">
+                                        <strong>Resumo da valida&ccedil;&atilde;o</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong class="text-danger">N&uacute;mero de Erros: 14</strong><br>
+                                        <strong class="text-warning">N&uacute;mero de Avisos: 1</strong><br>
+                                        <strong style="color: green;">N&uacute;mero de testes executados: 27</strong><br>
+                                        <strong id="tests_not_executed" style="display: none">Testes n&atilde;o executados: <ul></ul></strong> 
+
+                                    </div>
+                                </div>
+
+                                <div class="card mb-12">
+                                    <div class="card-header bg-danger text-white">
+                                        <strong>Erros</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong class="card-text">
+<br><span style='color: blue;'>Estrutura dos arquivos da pasta de entrada</span>:
+<br><span style='color: red;'>referencia_temporal.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.</span>
+<br><span style='color: red;'>descricao.csv: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.</span>
+<br><span style='color: red;'>O arquivo 'outro_arquivo.csv' não é esperado.</span>
+<br><span style='color: red;'>O arquivo 'outro_arquivo.xlsx' não é esperado.</span>
+<br><span style='color: blue;'>Limpeza dos arquivos</span>:
+<br><span style='color: red;'>composicao.csv, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.</span>
+<br><span style='color: blue;'>Relações entre indicadores</span>:
+<br><span style='color: red;'>descricao.csv: Códigos dos indicadores ausentes em proporcionalidades.csv: [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007].</span>
+<br><span style='color: red;'>proporcionalidades.csv: Códigos dos indicadores ausentes em descricao.csv: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].</span>
+<br><span style='color: blue;'>Hierarquia como árvore</span>:
+
+<br><span style='color: blue;'>Níveis de indicadores</span>:
+
+<br><span style='color: blue;'>Unicidade dos códigos</span>:
+
+<br><span style='color: blue;'>Códigos HTML nas descrições simples</span>:
+
+<br><span style='color: blue;'>Ortografia</span>:
+
+<br><span style='color: blue;'>Títulos únicos</span>:
+
+<br><span style='color: blue;'>Códigos sequenciais</span>:
+<br><span style='color: red;'>descricao.csv: A coluna 'codigo' deve começar em 1.</span>
+<br><span style='color: red;'>descricao.csv: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).</span>
+<br><span style='color: blue;'>Campos vazios</span>:
+
+<br><span style='color: blue;'>Padrão para nomes dos indicadores</span>:
+
+<br><span style='color: blue;'>Títulos com mais de 40 caracteres</span>:
+
+<br><span style='color: blue;'>Descrições simples com mais de 150 caracteres</span>:
+
+<br><span style='color: blue;'>Pontuações obrigatórias e proibidas em descrições</span>:
+
+<br><span style='color: blue;'>Pontuações obrigatórias e proibidas em cenários</span>:
+
+<br><span style='color: blue;'>Pontuações obrigatórias e proibidas em referência temporal</span>:
+
+<br><span style='color: blue;'>Relações de valores únicos em cenários</span>:
+
+<br><span style='color: blue;'>Relações de valores únicos em referência temporal</span>:
+
+<br><span style='color: blue;'>Relações de combinações de valores</span>:
+<br><span style='color: red;'>valores.csv: A coluna '2-2015' é desnecessária para o indicador de nível 1.</span>
+<br><span style='color: blue;'>Valores indisponíveis</span>:
+
+<br><span style='color: blue;'>Quebra de linha para descrição</span>:
+
+<br><span style='color: blue;'>Quebra de linha para cenários</span>:
+
+<br><span style='color: blue;'>Quebra de linha para referência temporal</span>:
+
+<br><span style='color: blue;'>Intervalo dos dados da legenda</span>:
+<br><span style='color: red;'>valores.csv, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.</span>
+<br><span style='color: red;'>valores.csv, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.</span>
+<br><span style='color: red;'>valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'.</span>
+<br><span style='color: red;'>valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.</span>
+<br><span style='color: blue;'>Sobreposição de valores na legenda</span>:
+
+<br><span style='color: blue;'>Propriedades de soma nos fatores influenciadores</span>:
+</strong>
+                                    </div>
+                                </div>
+                                <div class="card mb-4">
+                                    <div class="card-header text-dark bg-warning">
+                                        <strong>Avisos</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <strong class="card-text">
+<br><span style='color: blue;'>Descrições simples com mais de 150 caracteres</span>:
+<br><span style='color: orange;'>descricao.csv, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.</span></strong>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </body>
+                        </html>
+            

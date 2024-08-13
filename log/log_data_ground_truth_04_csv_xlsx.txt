@@ -1,0 +1,62 @@
+
+
+
+Modo DEBUG ativado.
+
+PACKAGES VERSIONS: 
+Colorama version: 0.4.4
+Matplotlib version: 3.8.3
+Networkx version: 3.2.1
+Openpyxl version: 3.1.2
+Pandas version: 2.2.2
+Pyarrow version: 15.0.0
+Pytest version: 7.4.0
+Pipreqs version: 0.4.13
+Coverage version: 7.5.4
+Pre-commit version: 3.7.0
+Setuptools version: 70.0.0
+Genbadge version: 1.1.1
+CharDet Version:  5.2.0
+
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_04_csv_xlsx/
+
+
+------ Resultados da verificação dos testes ------
+Verificação: Estrutura dos arquivos da pasta de entrada
+Verificação: Limpeza dos arquivos
+Verificação: Relações entre indicadores
+Verificação: Hierarquia como árvore
+Verificação: Níveis de indicadores
+Verificação: Unicidade dos códigos
+Verificação: Códigos HTML nas descrições simples
+Verificação: Ortografia
+Verificação: Títulos únicos
+Verificação: Códigos sequenciais
+Verificação: Campos vazios
+Verificação: Padrão para nomes dos indicadores
+Verificação: Títulos com mais de 40 caracteres
+Verificação: Descrições simples com mais de 150 caracteres
+Verificação: Pontuações obrigatórias e proibidas em descrições
+Verificação: Pontuações obrigatórias e proibidas em cenários
+Verificação: Pontuações obrigatórias e proibidas em referência temporal
+Verificação: Relações de valores únicos em cenários
+Verificação: Relações de valores únicos em referência temporal
+Verificação: Relações de combinações de valores
+Verificação: Valores indisponíveis
+Verificação: Quebra de linha para descrição
+Verificação: Quebra de linha para cenários
+Verificação: Quebra de linha para referência temporal
+Verificação: Intervalo dos dados da legenda
+Verificação: Sobreposição de valores na legenda
+Verificação: Propriedades de soma nos fatores influenciadores
+
+
+Número de erros: 0
+Número de avisos: 0
+Número de verificações realizadas: 27
+
+
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.pdf
+
