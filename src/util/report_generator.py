@@ -5,8 +5,9 @@ from pyhtml2pdf import converter
 import src.myparser.info as info
 
 class ReportGenerator:
-    def __init__(self, folder, template_name="default.html", no_time=False):
+    def __init__(self, folder, template_name="default.html", no_time=False, no_version=False):
         self.no_time = no_time
+        self.no_version = no_version
         self.folder = folder
         self.output_folder = None
         self.template_name = template_name
@@ -47,7 +48,7 @@ class ReportGenerator:
                                         <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Vers&atilde;o do validador: {{ version }}</strong><br>
+                                        <strong style="display: {{ display_version }}">Vers&atilde;o do validador: {{ version }}</strong><br>
                                         <strong style="display: {{ display_date }}">Data e hora do processo: {{ date_now }} </strong>
                                     </div>
                                 </div>
@@ -116,6 +117,7 @@ class ReportGenerator:
             )
             display_tests_not_executed = "block" if results_tests_not_executed else "none"
             display_date = "block" if not self.no_time else "none"
+            display_version = "block" if not self.no_version else "none"
 
             results_tests_not_executed = "\n".join([f"<li>{test_name}</li>" for test_name in results_tests_not_executed])
             results_tests_not_executed = f"<ul>{results_tests_not_executed}</ul>"
@@ -124,10 +126,16 @@ class ReportGenerator:
             if self.no_time:
                 date_now = ""
 
+            app_version = info.__version__
+            if self.no_version:
+                app_version = ""
+
             template_vars = {
                 "name": info.__name__,
 
-                "version": info.__version__,
+                "version": app_version,
+                "display_version": display_version,
+
                 "errors": errors,
                 "warnings": warnings,
                 "num_errors": num_errors,
