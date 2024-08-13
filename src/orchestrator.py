@@ -60,7 +60,7 @@ def flatten(is_correct, list_errors, list_warnings):
     return is_correct, list_errors, list_warnings
 
 # Função principal para executar o programa
-def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, no_time, debug):
+def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, no_time, debug, no_version):
     global global_num_warnings
     global global_num_errors
     
@@ -469,7 +469,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
 
     # Criar a pasta de saída para salvar os relatórios
     util.create_directory(output_folder)
-    report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML, no_time=no_time)
+    report_generator = ReportGenerator(output_folder, OUTPUT_DEFAULT_HTML, no_time=no_time, no_version=no_version)
 
     # Pegar somente o base name do input_folder
     name_file = util.get_last_directory_name(input_folder)

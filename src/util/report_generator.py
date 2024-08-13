@@ -5,8 +5,9 @@ from pyhtml2pdf import converter
 import src.myparser.info as info
 
 class ReportGenerator:
-    def __init__(self, folder, template_name="default.html", no_time=False):
+    def __init__(self, folder, template_name="default.html", no_time=False, no_version=False):
         self.no_time = no_time
+        self.no_version = no_version
         self.folder = folder
         self.output_folder = None
         self.template_name = template_name
@@ -47,8 +48,8 @@ class ReportGenerator:
                                         <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Vers&atilde;o do validador: {{ version }}</strong><br>
-                                        <strong style="display: {{ display_date }}">Data e hora do processo: {{ date_now }} </strong>
+                                        {{ text_display_date }}
+                                        {{ text_display_version }}
                                     </div>
                                 </div>
 
@@ -116,26 +117,33 @@ class ReportGenerator:
             )
             display_tests_not_executed = "block" if results_tests_not_executed else "none"
             display_date = "block" if not self.no_time else "none"
+            display_version = "block" if not self.no_version else "none"
 
             results_tests_not_executed = "\n".join([f"<li>{test_name}</li>" for test_name in results_tests_not_executed])
             results_tests_not_executed = f"<ul>{results_tests_not_executed}</ul>"
 
-            date_now = info.__date_now__
-            if self.no_time:
-                date_now = ""
+            date_now = ""
+            if not self.no_version:
+                date_now = f"<strong>Vers&atilde;o do validador: { info.__version__ }</strong>"
+
+            app_version = ""
+            if not self.no_time:
+                app_version = f"<strong>Data e hora do processo: { info.__date_now__ } </strong>"
+
+            if not self.no_version and not self.no_time:
+                date_now = date_now + "<br>"
 
             template_vars = {
                 "name": info.__name__,
 
-                "version": info.__version__,
                 "errors": errors,
                 "warnings": warnings,
                 "num_errors": num_errors,
                 "num_warnings": num_warnings,
                 "number_tests": number_tests,
 
-                "date_now": date_now,
-                "display_date": display_date,
+                "text_display_version": app_version,
+                "text_display_date": date_now,
 
                 "tests_not_executed": results_tests_not_executed,
                 "display_tests_not_executed": display_tests_not_executed
