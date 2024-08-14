@@ -116,17 +116,18 @@ def count_repeated_values(string_list):
 
 def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities, file_name):
     df = df_proportionalities.copy()
-    if df.empty:
-        return True, [], []
     
     errors = []
     warnings = []
 
+    if df.empty:
+        return True, errors, warnings
+    
     level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
 
     if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
         errors.append(f"{file_name}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
-        return not errors, errors
+        return not errors, errors, warnings
     
     # Se não existir a coluna de proporcionalidades, retorna True
     if not exists_sp_proportionalities:
@@ -224,7 +225,7 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
 
     if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
         errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
-        return not errors, errors
+        return not errors, errors, warnings
     
     # Verifica se id existe em level_two_columns
     if SP_PROPORTIONALITIES_COLUMNS.ID in level_two_columns:
