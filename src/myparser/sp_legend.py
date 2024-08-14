@@ -192,7 +192,7 @@ def verify_values_range_multiple_legend(root_path, df_values, df_description, df
                         continue
                     # Verifica se o valor está no intervalo
                     if value < MIN_VALUE or value > MAX_VALUE:
-                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor {value_aux} está fora do intervalo de {MIN_VALUE} a {MAX_VALUE} para a coluna '{column}'.")
+                        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor {value_aux} está fora do intervalo da legenda ({MIN_VALUE} a {MAX_VALUE}) para a coluna '{column}'.")
             
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
