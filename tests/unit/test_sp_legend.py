@@ -12,6 +12,8 @@ from tests.unit.test_constants import path_input_data_errors_04, df_sp_descripti
 from tests.unit.test_constants import path_input_data_errors_05, df_sp_description_errors_05
 from tests.unit.test_constants import path_input_data_errors_06, df_sp_description_errors_06, df_sp_scenario_errors_06, df_sp_values_errors_06
 
+from tests.unit.test_constants import path_input_data_errors_11, df_sp_values_errors_11, df_sp_description_errors_11, df_sp_scenario_errors_11
+
 # Testes para:  verify_overlapping_multiple_legend_value(root_path, df_description)
 def test_true_verify_overlapping_multiple_legend_value_data_ground_truth_01():
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_ground_truth_01, df_sp_description_data_ground_truth_01)
@@ -199,9 +201,23 @@ def test_true_verify_values_range_multiple_legend_data_errors_04():
     assert len(errors) == 3
     assert len(warnings) == 0
 
-    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'." == errors[0]
-    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'." == errors[1]
-    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'." == errors[2]
+    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'." == errors[0]
+    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'." == errors[1]
+    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'." == errors[2]
+
+
+def test_true_verify_values_range_multiple_legend_data_errors_11():
+    is_correct, errors, warnings = verify_values_range_multiple_legend(path_input_data_errors_11, df_sp_values_errors_11, df_sp_description_errors_11, df_sp_scenario_errors_11)
+    
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert "valores.xlsx, linha 2: O valor 2 está fora do intervalo da legenda (0 a 1) para a coluna '2-2015'." == errors[0]
+    assert "valores.xlsx, linha 3: O valor 3 está fora do intervalo da legenda (0 a 1) para a coluna '2-2015'." == errors[1]
+    assert "valores.xlsx, linha 4: O valor 4 está fora do intervalo da legenda (0 a 1) para a coluna '2-2030-O'." == errors[2]
+    assert "valores.xlsx, linha 5: O valor 5 está fora do intervalo da legenda (0 a 1) para a coluna '2-2030-O'." == errors[3]
+
 
 def test_true_verify_values_range_multiple_legend_data_errors_06():
     is_correct, errors, warnings = verify_values_range_multiple_legend(path_input_data_errors_06, df_sp_values_errors_06, df_sp_description_errors_06, df_sp_scenario_errors_06)
@@ -210,10 +226,10 @@ def test_true_verify_values_range_multiple_legend_data_errors_06():
     assert len(errors) == 4
     assert len(warnings) == 0
 
-    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'." == errors[0]
-    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'." == errors[1]
-    assert "valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'." == errors[2]
-    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'." == errors[3]
+    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'." == errors[0]
+    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'." == errors[1]
+    assert "valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5001-2015'." == errors[2]
+    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'." == errors[3]
 
 # Testes Unitários
 def test_read_legend_qml_file_success():

@@ -56,10 +56,10 @@ Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
-valores.csv, linha 17: O valor 0.789912176738247 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2030-P'.
-valores.csv, linha 6: O valor 0.779055534730612 está fora do intervalo de 0.0 a 0.77 para a coluna '5000-2050-P'.
-valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo de 0.0 a 0.77 para a coluna '5001-2015'.
-valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo de 0.0 a 0.77 para a coluna '5005-2015'.
+valores.csv, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'.
+valores.csv, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'.
+valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5001-2015'.
+valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'.
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Descrições simples com mais de 150 caracteres
