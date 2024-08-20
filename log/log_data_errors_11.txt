@@ -23,7 +23,6 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_11/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
-O arquivo '.~lock.descricao.xlsx#' não é esperado.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 valores.xlsx: Colunas inválidas: ['HTML-2030-P', 'PHP'].
@@ -67,7 +66,7 @@ Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
 
 
-Número de erros: 16
+Número de erros: 15
 Número de avisos: 0
 Número de verificações realizadas: 27
 
