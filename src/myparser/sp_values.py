@@ -54,23 +54,38 @@ def processar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values)
     return False, []
 
 def extract_ids_from_list_from_values(codes_level_to_remove, list_values, lista_cenarios):   
-    
-    # Extract ids from columns
+    # Extrai ids das colunas
     cleaned_columns, extras_columns = extract_ids_from_list(list_values, lista_cenarios)
-    # Converter ambas as listas em strings
-    cleaned_columns = [str(id) for id in cleaned_columns]
-    extras_columns = [str(id) for id in extras_columns]
+
+    # Converte ambas as listas em strings
+    cleaned_columns_str = []
+    for id in cleaned_columns:
+        cleaned_columns_str.append(str(id))
     
+    extras_columns_str = []
+    for id in extras_columns:
+        extras_columns_str.append(str(id))
+
     # Remove os valores ID e NOME das colunas extras
-    extras_columns = [column for column in extras_columns if column != SP_VALUES_COLUMNS.ID]
-    # Remove os códigos que não são nivel 1
-    extracted_ids = set([id.split('-')[0] for id in cleaned_columns]) - set(codes_level_to_remove)
+    filtered_extras_columns = []
+    for column in extras_columns_str:
+        if column != SP_VALUES_COLUMNS.ID:
+            filtered_extras_columns.append(column)
+
+    # Remove os códigos que não são nível 1
+    extracted_ids = set()
+    for id in cleaned_columns_str:
+        code_level = id.split('-')[0]
+        if code_level not in codes_level_to_remove:
+            extracted_ids.add(code_level)
 
     # Remove os códigos repetidos e converte em inteiros
-    ids_valids = set(int(id) for id in set(extracted_ids))
+    ids_valids = set()
+    for id in extracted_ids:
+        ids_valids.add(int(id))
 
+    return ids_valids, filtered_extras_columns
 
-    return ids_valids, extras_columns
 
 
 def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
@@ -114,6 +129,7 @@ def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
 
         # Verifica se há colunas inválidos
         final_list_invalid_codes = list(id_values_invalids)
+        
         # Order list
         final_list_invalid_codes.sort()
         if id_values_invalids:
