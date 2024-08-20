@@ -19,6 +19,10 @@ from tests.unit.test_constants import df_sp_scenario_errors_05, df_sp_temporal_r
 # DATA FRAMES - ERROS 07
 from tests.unit.test_constants import df_sp_values_errors_07, df_sp_scenario_errors_07
 
+# DATA FRAMES - ERROS 11
+from tests.unit.test_constants import df_sp_description_errors_11, df_sp_values_errors_11, df_sp_scenario_errors_11
+
+
 # Import SP_VALUES_COLUMNS
 from tests.unit.test_constants import SP_DESCRIPTION_COLUMNS
 
@@ -91,6 +95,17 @@ def test_count_errors_verify_ids_sp_description_values_data_errors_04():
 
     assert errors[0] == "valores.xlsx: Colunas inválidas: ['5000.954-2015', '5001,9483-2015', 'Unnamed: 18']."
     assert errors[1] == "valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000]."
+
+
+def test_count_errors_verify_ids_sp_description_values_data_errors_11():
+    is_correct, errors, warnings = verify_ids_sp_description_values(df_sp_description_errors_11, df_sp_values_errors_11, df_sp_scenario_errors_11)
+    assert is_correct is False
+    assert len(errors) == 3
+    assert len(warnings) == 0
+
+    assert errors[0] == "valores.xlsx: Colunas inválidas: ['HTML-2030-P', 'PHP']."
+    assert errors[1] == "descricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [3, 4]."
+    assert errors[2] == "valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [88, 777]."
 
 # Testes: verify_combination_sp_description_values_scenario_temporal_reference
 def test_true_verify_combination_sp_description_values_scenario_temporal_reference_data_ground_truth_01():
