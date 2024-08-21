@@ -64,11 +64,13 @@ valores.xlsx, linha 4: O valor 4 está fora do intervalo da legenda (0 a 1) para
 valores.xlsx, linha 5: O valor 5 está fora do intervalo da legenda (0 a 1) para a coluna '2-2030-O'.
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
+Verificação: Indicadores pai repetidos em proporcionalidades
+proporcionalidades.xlsx: O indicador pai '2-2015' está repetido. Filhos esperados: ['5-2030-O', '5-2050-O', '5-2030-P']. Filhos encontrados: ['5-2030-O', '5-2050-O', '5-2030-P', '5-2030-O', '2-2030-O', '5-2050-O'].
 
 
-Número de erros: 15
+Número de erros: 16
 Número de avisos: 0
-Número de verificações realizadas: 27
+Número de verificações realizadas: 28
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_11/data_errors_11_report.html

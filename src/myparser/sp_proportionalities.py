@@ -3,25 +3,28 @@ from decimal import Decimal
 import pandas as pd
 
 from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS
-from src.util.utilities import truncate_number, clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, extract_ids_from_list
+from src.util.utilities import check_repetead_list, truncate_number, clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, extract_ids_from_list
 
-def build_subdatasets(df, file_path):
-    parent_columns = df.columns.get_level_values(0)
-    
-    if file_path.endswith('.xlsx'):
-        return create_subdatasets_xlsx(df, parent_columns)
-    elif file_path.endswith('.csv'):
-        return create_subdatasets_csv(df, parent_columns)
-    else:
-        return None
+def build_subdatasets(df_proportionalities, file_path):
+    df_proportionalities = df_proportionalities.copy()
+    parent_columns = df_proportionalities.columns.get_level_values(0)
+
+    return create_subdatasets_xlsx(df_proportionalities, parent_columns)
 
 def create_subdatasets_xlsx(df, parent_columns):
     """ Cria subdatasets a partir de um arquivo Excel. """
     unique_parents = [col for col in parent_columns[1:] if 'Unnamed' not in col]
     subdatasets = {'main': df.iloc[:, :1]}
-    
+
+    ids_ja_cadastrados = []
+
     for parent_id in unique_parents:
+        if parent_id in ids_ja_cadastrados:
+            continue
+        ids_ja_cadastrados.append(parent_id)
         start_col = (parent_columns == parent_id).argmax()
+
+        # Encontra os indices dos filhos
         if start_col + 1 == len(parent_columns):
             end_col = start_col + 1
         else:
@@ -29,30 +32,14 @@ def create_subdatasets_xlsx(df, parent_columns):
             if end_col == start_col + 1:
                 end_col = len(parent_columns)
 
-        columns_to_include = df.columns[:1].tolist() + df.columns[start_col:end_col].tolist()
-        subdatasets[parent_id] = df.loc[:, columns_to_include]
+        # Slice a pandas dataframe by columns
+        sub_data = df.iloc[:, start_col:end_col]
         
-    return subdatasets
-
-def create_subdatasets_csv(df, parent_columns):
-    """ Cria subdatasets a partir de um arquivo CSV. """
-    unique_parents = []
-    for col in parent_columns[1:]:
-        if not col.startswith('Unnamed'):
-            unique_parents.append(col)
-    
-    subdatasets = {'main': df.iloc[:, :1]}
-
-    for parent_id in unique_parents:
-        start_col = parent_columns.get_loc(parent_id)
-        end_col = start_col + 1
-
-        while end_col < len(parent_columns) and parent_columns[end_col].startswith('Unnamed'):
-            end_col += 1
+        # Insert the first column of the original dataframe
+        sub_data = pd.concat([df.iloc[:, :1], sub_data], axis=1)
         
-        columns_to_include = df.columns[:1].tolist() + df.columns[start_col:end_col].tolist()
-        subdatasets[parent_id] = df.loc[:, columns_to_include]
-    
+        subdatasets[parent_id] = sub_data
+
     return subdatasets
 
 def check_sum_equals_one(subdatasets):
@@ -114,34 +101,6 @@ def count_repeated_values(string_list):
     num_repeated = len(string_list) - len(unique_values)
     return num_repeated
 
-def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities, file_name):
-    df = df_proportionalities.copy()
-    
-    errors = []
-    warnings = []
-
-    if df.empty:
-        return True, errors, warnings
-    
-    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
-
-    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
-        errors.append(f"{file_name}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
-        return not errors, errors, warnings
-    
-    # Se não existir a coluna de proporcionalidades, retorna True
-    if not exists_sp_proportionalities:
-        return True, errors, warnings
-
-    try:
-        # Verifica se a soma dos valores de cada subdataset é igual a 1
-        subdatasets = build_subdatasets(df, file_name)
-        errors, warnings = check_sum_equals_one(subdatasets)
-    except Exception as e:
-        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
-
-    return not errors, errors, warnings
-
 def extract_ids_from_list_from_description(df_description):
     # Remove a linha que o nivel == 1
     df_description = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] != '1']
@@ -180,6 +139,51 @@ def compare_ids(id_description, id_proporcionalities, name_sp_description, name_
         errors.append(f"{name_sp_proportionalities}: Códigos dos indicadores ausentes em {name_sp_description}: {list(id_values_not_in_description)}.")
     
     return errors
+
+def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities, file_name):
+    df = df_proportionalities.copy()
+    
+    errors = []
+    warnings = []
+
+    if df.empty:
+        return True, errors, warnings
+    
+    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+        errors.append(f"{file_name}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+        return not errors, errors, warnings
+    
+    # Se não existir a coluna de proporcionalidades, retorna True
+    if not exists_sp_proportionalities:
+        return True, errors, warnings
+   
+    try:
+        # -------------------------------------------------------
+        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
+        parent_columns = []
+        old_columns = df_proportionalities.columns.get_level_values(0)
+        for col in old_columns:
+            if col.startswith('Unnamed'):
+                if parent_columns:
+                    ultimo = parent_columns[-1]
+                    parent_columns.append(ultimo)
+                    continue
+
+            parent_columns.append(col)
+        df_proportionalities.columns = pd.MultiIndex.from_arrays([parent_columns, df_proportionalities.columns.get_level_values(1)])
+        # -------------------------------------------------------
+
+        # Verifica se a soma dos valores de cada subdataset é igual a 1
+        subdatasets = build_subdatasets(df, file_name)
+
+        errors, warnings = check_sum_equals_one(subdatasets)
+    except Exception as e:
+        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+
+    return not errors, errors, warnings
+
 def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proportionalities, df_sp_scenario, name_sp_description, name_sp_proportionalities, name_sp_scenario):
     # Copia os dataframes para não alterar os originais
     df_description = df_sp_description.copy()
@@ -208,50 +212,159 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
     if errors:
         return not errors, errors, []
     
-    lista_simbolos_cenarios = []
-    if sp_scenario_exists:
-        lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+    try:
 
-    # Clean non numeric values
-    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, name_sp_description, [SP_DESCRIPTION_COLUMNS.CODIGO])
-        
+        # -------------------------------------------------------
+        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
+        parent_columns = []
+        old_columns = df_proportionalities.columns.get_level_values(0)
+        for col in old_columns:
+            if col.startswith('Unnamed'):
+                if parent_columns:
+                    ultimo = parent_columns[-1]
+                    parent_columns.append(ultimo)
+                    continue
 
-    codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
-    id_description_valids, __  = extract_ids_from_list_from_description(df_description)    
-
-    # Lista com todos as colunas nivel 1
-    level_one_columns = df_proportionalities.columns.get_level_values(0).unique().tolist()
-    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
-
-    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
-        errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
-        return not errors, errors, warnings
+            parent_columns.append(col)
+        df_proportionalities.columns = pd.MultiIndex.from_arrays([parent_columns, df_proportionalities.columns.get_level_values(1)])
+        # -------------------------------------------------------
     
-    # Verifica se id existe em level_two_columns
-    if SP_PROPORTIONALITIES_COLUMNS.ID in level_two_columns:
-        level_two_columns.remove(SP_PROPORTIONALITIES_COLUMNS.ID)
-    
-    # Remove todos os valores de level_one_columns que começam com 'Unnamed': if not col.startswith('Unnamed'):
-    level_one_columns = [col for col in level_one_columns if not col.startswith('Unnamed')]
-    level_two_columns = [col for col in level_two_columns if not col.startswith('Unnamed')]
+        lista_simbolos_cenarios = []
+        if sp_scenario_exists:
+            lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
 
-    cleaned_level_one_columns, extras_columns_one = extract_ids_from_list(level_one_columns, lista_simbolos_cenarios)
-    cleaned_level_one_columns = [str(id) for id in cleaned_level_one_columns]
-    extras_columns_one = [str(id) for id in extras_columns_one]
-    extracted_ids_one = set([id.split('-')[0] for id in cleaned_level_one_columns]) - set(codes_level_to_remove)
+        # Clean non numeric values
+        df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, name_sp_description, [SP_DESCRIPTION_COLUMNS.CODIGO])
+            
 
-    cleaned_level_two_columns, extras_columns_two = extract_ids_from_list(level_two_columns, lista_simbolos_cenarios)
-    cleaned_level_two_columns = [str(id) for id in cleaned_level_two_columns]
-    extras_columns_two = [str(id) for id in extras_columns_two]
-    extracted_ids_two = set([id.split('-')[0] for id in cleaned_level_two_columns]) - set(codes_level_to_remove)
-    all_codes_proportionalities = set(extracted_ids_one) | set(extracted_ids_two)
+        codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+        id_description_valids, __  = extract_ids_from_list_from_description(df_description)    
 
-    # Convert to ser para int 
-    id_description_valids = set([int(id) for id in id_description_valids])
-    all_codes_proportionalities = set([int(id) for id in all_codes_proportionalities])
+        # Lista com todos as colunas nivel 1
+        level_one_columns = df_proportionalities.columns.get_level_values(0).unique().tolist()
+        level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
 
-    # Verifica se todos os códigos que estão em df_description e não estão em df_proportionalities
-    errors += compare_ids(id_description_valids, all_codes_proportionalities, name_sp_description, name_sp_proportionalities)
+        if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+            errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+            return not errors, errors, warnings
         
+        # Verifica se id existe em level_two_columns
+        if SP_PROPORTIONALITIES_COLUMNS.ID in level_two_columns:
+            level_two_columns.remove(SP_PROPORTIONALITIES_COLUMNS.ID)
+        
+        # Remove todos os valores de level_one_columns que começam com 'Unnamed': if not col.startswith('Unnamed'):
+        level_one_columns = [col for col in level_one_columns if not col.startswith('Unnamed')]
+        level_two_columns = [col for col in level_two_columns if not col.startswith('Unnamed')]
+
+        cleaned_level_one_columns, extras_columns_one = extract_ids_from_list(level_one_columns, lista_simbolos_cenarios)
+        cleaned_level_one_columns = [str(id) for id in cleaned_level_one_columns]
+        extras_columns_one = [str(id) for id in extras_columns_one]
+        extracted_ids_one = set([id.split('-')[0] for id in cleaned_level_one_columns]) - set(codes_level_to_remove)
+
+        cleaned_level_two_columns, extras_columns_two = extract_ids_from_list(level_two_columns, lista_simbolos_cenarios)
+        cleaned_level_two_columns = [str(id) for id in cleaned_level_two_columns]
+        extras_columns_two = [str(id) for id in extras_columns_two]
+        extracted_ids_two = set([id.split('-')[0] for id in cleaned_level_two_columns]) - set(codes_level_to_remove)
+        all_codes_proportionalities = set(extracted_ids_one) | set(extracted_ids_two)
+
+        # Convert to ser para int 
+        id_description_valids = set([int(id) for id in id_description_valids])
+        all_codes_proportionalities = set([int(id) for id in all_codes_proportionalities])
+
+        # Verifica se todos os códigos que estão em df_description e não estão em df_proportionalities
+        errors += compare_ids(id_description_valids, all_codes_proportionalities, name_sp_description, name_sp_proportionalities)
+    except Exception as e:
+        errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")    
 
     return not errors, errors, warnings
+
+def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities, df_sp_scenario, name_sp_proportionalities, name_sp_scenario):
+    # Copia os dataframes para não alterar os originais
+    df_proportionalities = df_sp_proportionalities.copy()
+    df_sp_scenario = df_sp_scenario.copy()
+
+    errors = []
+    warnings = []
+
+    # Se for empty, retorna True
+    if df_proportionalities.empty:
+        return True, errors, warnings
+    
+    sp_scenario_exists = True
+    if df_sp_scenario.empty:
+        sp_scenario_exists = False
+
+    if sp_scenario_exists:
+        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+            errors.append(f"{name_sp_scenario}: Verificação abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+    
+    # Return if errors
+    if errors:
+        return not errors, errors, warnings
+    
+    try:
+        # -------------------------------------------------------
+        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
+        parent_columns = []
+        old_columns = df_proportionalities.columns.get_level_values(0)
+        for col in old_columns:
+            if col.startswith('Unnamed'):
+                if parent_columns:
+                    ultimo = parent_columns[-1]
+                    parent_columns.append(ultimo)
+                    continue
+
+            parent_columns.append(col)
+        df_proportionalities.columns = pd.MultiIndex.from_arrays([parent_columns, df_proportionalities.columns.get_level_values(1)])
+        # -------------------------------------------------------
+    
+        lista_simbolos_cenarios = []
+        if sp_scenario_exists:
+            lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()        
+
+        cleaned_level_one_columns = []
+        repeated_columns = []
+
+        # Códigos dos indicadores que estão em nível 1
+        level_one_columns = [col for col in df_proportionalities.columns.get_level_values(0).tolist() if not col.startswith('Unnamed')]
+        cleaned_level_one_columns, __ = extract_ids_from_list(level_one_columns, lista_simbolos_cenarios)
+        cleaned_level_one_columns = [str(id) for id in cleaned_level_one_columns]
+
+        # Verifica se há códigos repetidos
+        __, repeated_columns = check_repetead_list(name_sp_proportionalities, cleaned_level_one_columns)
+        
+        # Cria subdatasets usando os códigos dos indicadores
+        subdatasets = build_subdatasets(df_proportionalities, name_sp_proportionalities)
+
+        # Encontrar  o subdataset com o indicador pai 
+        for parent_id, subdataset in subdatasets.items():
+            # Se for o main continua
+            if parent_id == 'main':
+                continue
+            
+            numRepeticoes = None
+            for lista in repeated_columns:
+                indicador, numRepeticoes = lista
+                if parent_id == indicador:
+                    num_columns = subdataset.shape[1] - 1 # Subtrai 1 para desconsiderar a coluna de índices
+                    if numRepeticoes != num_columns:
+                        # Filhos esperados
+                        filhos_esperados = [filho[1] for filho in subdataset.columns[1:num_columns + 1].tolist()]
+
+                        # Filhos encontrados
+                        filhos_encontrados = [filho.split('.')[0] for filho in df_proportionalities[parent_id].columns[0:].tolist()]
+                        
+                        # Limpa os filhos encontrados para o padrão de códigos do cenário(se houver)
+                        cleaned_filhos_encontrados, __ = extract_ids_from_list(filhos_encontrados, lista_simbolos_cenarios)
+                        
+                        errors.append(f"{name_sp_proportionalities}: O indicador pai '{parent_id}' está repetido. Filhos esperados: {filhos_esperados}. Filhos encontrados: {cleaned_filhos_encontrados}.")
+                    break
+
+        
+    except Exception as e:
+        errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
+
+    return not errors, errors, warnings
+
+
+

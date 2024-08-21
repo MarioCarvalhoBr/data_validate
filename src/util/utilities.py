@@ -2,6 +2,7 @@ import os
 import math
 import re
 import xml.etree.ElementTree as ET
+from collections import Counter
 
 from pathlib import Path
 import pandas as pd
@@ -9,6 +10,24 @@ import chardet
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS, SP_LEGEND_COLUMNS
+
+def check_repetead_list(file_name, lista):
+
+    # Contar as ocorrências de cada elemento na lista
+    contagem = Counter(lista)
+
+    # Verificar se há repetições e criar a lista de erros
+    existe_repeticao = False
+    lista_erros = []
+    
+    for item, count in contagem.items():
+        if count > 1:
+            existe_repeticao = True
+            # lista_erros.append(f"{file_name}: O indicador '{item}' está repetido {count} vezes nas colunas.")
+            lista_erros.append([item,count])
+
+    return existe_repeticao, lista_erros
+
 
 def get_min_max_legend(name_file, df_qml_legend):
         errors = []

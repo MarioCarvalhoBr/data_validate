@@ -1,4 +1,4 @@
-from src.myparser.sp_proportionalities import verify_sum_prop_influence_factor_values, verify_ids_sp_description_proportionalities
+from src.myparser.sp_proportionalities import verify_sum_prop_influence_factor_values, verify_ids_sp_description_proportionalities, verify_repeated_columns_parent_sp_description_proportionalities
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS
@@ -18,6 +18,12 @@ from tests.unit.test_constants import df_sp_proportionalities_errors_09, df_sp_d
 
 # DATA FRAMES - ERROS 01
 from tests.unit.test_constants import df_sp_proportionalities_errors_01
+
+# DATA FRAMES - ERROS 11
+from tests.unit.test_constants import df_sp_proportionalities_errors_11, df_sp_scenario_errors_11
+
+# DATA FRAMES - ERROS 06
+from tests.unit.test_constants import df_sp_proportionalities_errors_06, df_sp_scenario_errors_06
 
 
 # Teste: verify_sp_scenario_punctuation
@@ -73,3 +79,28 @@ def test_count_errors_verify_ids_sp_description_proportionalities_data_errors_09
 
     assert errors[0] == "descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 4, 5, 7, 8, 9]."
     assert errors[1] == "proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023]."
+
+
+# verify_repeated_columns_parent_sp_description_proportionalities (df_sp_proportionalities, df_sp_scenario, name_sp_proportionalities, name_sp_scenario):
+def test_true_verify_repeated_columns_parent_sp_description_proportionalities_data_ground_truth_01():
+    
+    is_correct, errors, warnings = verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities_data_ground_truth_01, df_sp_scenario_data_ground_truth_01, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_SCENARIO_COLUMNS.NAME_SP)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_count_errors_verify_repeated_columns_parent_sp_description_proportionalities_data_errors_11():
+    is_correct, errors, warnings = verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities_errors_11, df_sp_scenario_errors_11, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_SCENARIO_COLUMNS.NAME_SP)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+
+    assert errors[0] == "proporcionalidades.xlsx: O indicador pai '2-2015' está repetido. Filhos esperados: ['5-2030-O', '5-2050-O', '5-2030-P']. Filhos encontrados: ['5-2030-O', '5-2050-O', '5-2030-P', '5-2030-O', '2-2030-O', '5-2050-O']."
+
+def test_count_errors_verify_repeated_columns_parent_sp_description_proportionalities_data_errors_06():
+    is_correct, errors, warnings = verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities_errors_06, df_sp_scenario_errors_06, SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".xlsx",".csv"), SP_SCENARIO_COLUMNS.NAME_SP)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+
+    assert errors[0] == "proporcionalidades.csv: O indicador pai '2-2015' está repetido. Filhos esperados: ['5-2030-O', '5-2050-O', '5-2030-P']. Filhos encontrados: ['5-2030-O', '5-2050-O', '5-2030-P', '5-2030-O', '2-2030-O', '5-2050-O']."
