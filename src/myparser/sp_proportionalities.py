@@ -357,7 +357,7 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
                         # Limpa os filhos encontrados para o padrão de códigos do cenário(se houver)
                         cleaned_filhos_encontrados, __ = extract_ids_from_list(filhos_encontrados, lista_simbolos_cenarios)
                         
-                        errors.append(f"{name_sp_proportionalities}: O indicador pai '{parent_id}' está repetido. Filhos esperados: {filhos_esperados}. Filhos encontrados: {cleaned_filhos_encontrados}.")
+                        errors.append(f"{name_sp_proportionalities}: O indicador pai '{parent_id}' deveria possuir os seguintes filhos: {filhos_esperados}. Entretanto, foram encontrados os filhos {cleaned_filhos_encontrados}.")
                     break
 
         
