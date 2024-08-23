@@ -49,11 +49,12 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
+Verificação: Indicadores pai repetidos em proporcionalidades
 
 
 Número de erros: 0
 Número de avisos: 0
-Número de verificações realizadas: 27
+Número de verificações realizadas: 28
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html

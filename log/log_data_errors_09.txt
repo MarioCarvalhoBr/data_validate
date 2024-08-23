@@ -59,6 +59,7 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
+Verificação: Indicadores pai repetidos em proporcionalidades
 Verificação: Estrutura dos arquivos da pasta de entrada
 1.qml: Arquivo de legenda não esperado.
 99.qml: Arquivo de legenda não esperado.
@@ -66,7 +67,7 @@ Verificação: Estrutura dos arquivos da pasta de entrada
 
 Número de erros: 10
 Número de avisos: 2
-Número de verificações realizadas: 27
+Número de verificações realizadas: 28
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_09/data_errors_09_report.html

@@ -68,6 +68,7 @@ proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (D
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
 proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
 proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
+Verificação: Indicadores pai repetidos em proporcionalidades
 Verificação: Ortografia
 descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 Verificação: Padrão para nomes dos indicadores
@@ -103,7 +104,7 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 
 Número de erros: 25
 Número de avisos: 24
-Número de verificações realizadas: 27
+Número de verificações realizadas: 28
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html

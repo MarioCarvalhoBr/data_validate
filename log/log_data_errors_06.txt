@@ -31,7 +31,7 @@ Verificação: Limpeza dos arquivos
 composicao.csv, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 Verificação: Relações entre indicadores
 descricao.csv: Códigos dos indicadores ausentes em proporcionalidades.csv: [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007].
-proporcionalidades.csv: Códigos dos indicadores ausentes em descricao.csv: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
+proporcionalidades.csv: Códigos dos indicadores ausentes em descricao.csv: [3, 4, 5, 6, 7, 8].
 Verificação: Hierarquia como árvore
 Verificação: Níveis de indicadores
 Verificação: Unicidade dos códigos
@@ -62,13 +62,36 @@ valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo da legen
 valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'.
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
+proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
+proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
+proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
+proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
+Existem mais 40 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores pai repetidos em proporcionalidades
+proporcionalidades.csv: O indicador pai '2-2015' está repetido na planilha.
 Verificação: Descrições simples com mais de 150 caracteres
 descricao.csv, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
-Número de erros: 14
+Número de erros: 75
 Número de avisos: 1
-Número de verificações realizadas: 27
+Número de verificações realizadas: 28
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_06/data_errors_06_report.html

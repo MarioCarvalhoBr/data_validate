@@ -46,11 +46,12 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
+Verificação: Indicadores pai repetidos em proporcionalidades
 
 
 Número de erros: 0
 Número de avisos: 0
-Número de verificações realizadas: 24
+Número de verificações realizadas: 25
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.html

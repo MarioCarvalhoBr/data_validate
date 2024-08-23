@@ -116,8 +116,6 @@ class ReportGenerator:
                 for name, _, _, warnings in results_tests if warnings
             )
             display_tests_not_executed = "block" if results_tests_not_executed else "none"
-            display_date = "block" if not self.no_time else "none"
-            display_version = "block" if not self.no_version else "none"
 
             results_tests_not_executed = "\n".join([f"<li>{test_name}</li>" for test_name in results_tests_not_executed])
             results_tests_not_executed = f"<ul>{results_tests_not_executed}</ul>"
