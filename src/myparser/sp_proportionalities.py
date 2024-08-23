@@ -290,6 +290,13 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
     if df_proportionalities.empty:
         return True, errors, warnings
     
+    
+    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+        errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+        return not errors, errors, warnings
+    
     sp_scenario_exists = True
     if df_sp_scenario.empty:
         sp_scenario_exists = False
@@ -348,19 +355,8 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
                 if parent_id == indicador:
                     num_columns = subdataset.shape[1] - 1 # Subtrai 1 para desconsiderar a coluna de índices
                     if numRepeticoes != num_columns:
-                        # Filhos esperados
-                        filhos_esperados = [filho[1] for filho in subdataset.columns[1:num_columns + 1].tolist()]
-
-                        # Filhos encontrados
-                        filhos_encontrados = [filho.split('.')[0] for filho in df_proportionalities[parent_id].columns[0:].tolist()]
-                        
-                        # Limpa os filhos encontrados para o padrão de códigos do cenário(se houver)
-                        cleaned_filhos_encontrados, __ = extract_ids_from_list(filhos_encontrados, lista_simbolos_cenarios)
-                        
-                        errors.append(f"{name_sp_proportionalities}: O indicador pai '{parent_id}' deveria possuir os seguintes filhos: {filhos_esperados}. Entretanto, foram encontrados os filhos {cleaned_filhos_encontrados}.")
+                        errors.append(f"{name_sp_proportionalities}: O indicador pai '{parent_id}' está repetido na planilha.")
                     break
-
-        
     except Exception as e:
         errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
 

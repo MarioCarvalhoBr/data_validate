@@ -95,7 +95,7 @@ def test_count_errors_verify_repeated_columns_parent_sp_description_proportional
     assert len(errors) == 1
     assert len(warnings) == 0
 
-    assert errors[0] == "proporcionalidades.xlsx: O indicador pai '2-2015' deveria possuir os seguintes filhos: ['5-2030-O', '5-2050-O', '5-2030-P']. Entretanto, foram encontrados os filhos ['5-2030-O', '5-2050-O', '5-2030-P', '5-2030-O', '2-2030-O', '5-2050-O']."
+    assert errors[0] == "proporcionalidades.xlsx: O indicador pai '2-2015' está repetido na planilha."
 
 def test_count_errors_verify_repeated_columns_parent_sp_description_proportionalities_data_errors_06():
     is_correct, errors, warnings = verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities_errors_06, df_sp_scenario_errors_06, SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".xlsx",".csv"), SP_SCENARIO_COLUMNS.NAME_SP)
@@ -103,4 +103,4 @@ def test_count_errors_verify_repeated_columns_parent_sp_description_proportional
     assert len(errors) == 1
     assert len(warnings) == 0
 
-    assert errors[0] == "proporcionalidades.csv: O indicador pai '2-2015' deveria possuir os seguintes filhos: ['5-2030-O', '5-2050-O', '5-2030-P']. Entretanto, foram encontrados os filhos ['5-2030-O', '5-2050-O', '5-2030-P', '5-2030-O', '2-2030-O', '5-2050-O']."
+    assert errors[0] == "proporcionalidades.csv: O indicador pai '2-2015' está repetido na planilha."
