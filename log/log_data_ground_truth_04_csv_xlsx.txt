@@ -49,33 +49,13 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2015 é 16.000, e não 1.
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2030-O é 15.000, e não 1.
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2050-O é 14.000, e não 1.
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2030-P é 13.000, e não 1.
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 2-2050-P é 12.000, e não 1.
-Existem mais 40 erros similares aos anteriores que foram omitidos.
-Verificação: Indicadores pai repetidos em proporcionalidades
+Verificação: Indicadores repetidos em proporcionalidades
+Verificação: Relações de indicadores em proporcionalidades
 
 
-Número de erros: 60
+Número de erros: 0
 Número de avisos: 0
-Número de verificações realizadas: 28
+Número de verificações realizadas: 29
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_04_csv_xlsx/data_ground_truth_04_csv_xlsx_report.html

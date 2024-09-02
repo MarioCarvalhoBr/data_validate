@@ -59,15 +59,19 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
-Verificação: Indicadores pai repetidos em proporcionalidades
+Verificação: Indicadores repetidos em proporcionalidades
+Verificação: Relações de indicadores em proporcionalidades
+proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
+proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
+proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
 Verificação: Estrutura dos arquivos da pasta de entrada
 1.qml: Arquivo de legenda não esperado.
 99.qml: Arquivo de legenda não esperado.
 
 
-Número de erros: 10
+Número de erros: 13
 Número de avisos: 2
-Número de verificações realizadas: 28
+Número de verificações realizadas: 29
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_09/data_errors_09_report.html

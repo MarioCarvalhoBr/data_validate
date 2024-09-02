@@ -448,7 +448,22 @@ def read_file_proporcionalites(path):
     else:
         errors.append(f"{filename}: Tipo de arquivo não suportado: {file_extension}")
         return pd.DataFrame(), errors
-    
+    # FIX COLUMN NAMES
+    if not df.empty:
+        # -------------------------------------------------------
+        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
+        parent_columns = []
+        old_columns = df.columns.get_level_values(0)
+        for col in old_columns:
+            if col.startswith('Unnamed'):
+                if parent_columns:
+                    ultimo = parent_columns[-1]
+                    parent_columns.append(ultimo)
+                    continue
+
+            parent_columns.append(col)
+        df.columns = pd.MultiIndex.from_arrays([parent_columns, df.columns.get_level_values(1)])
+        # -------------------------------------------------------
     return df, errors
 
 def check_folder_exists(folder_path):

@@ -69,7 +69,9 @@ Verificação: Sobreposição de valores na legenda
 legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx: Verificação abortada porque a coluna 'id' está ausente.
-Verificação: Indicadores pai repetidos em proporcionalidades
+Verificação: Indicadores repetidos em proporcionalidades
+proporcionalidades.xlsx: Verificação abortada porque a coluna 'id' está ausente.
+Verificação: Relações de indicadores em proporcionalidades
 proporcionalidades.xlsx: Verificação abortada porque a coluna 'id' está ausente.
 Verificação: Estrutura dos arquivos da pasta de entrada
 cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação.
@@ -107,9 +109,9 @@ Verificação: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 27
+Número de erros: 28
 Número de avisos: 27
-Número de verificações realizadas: 28
+Número de verificações realizadas: 29
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_03/data_errors_03_report.html

@@ -2,10 +2,10 @@ from decimal import Decimal
 
 import pandas as pd
 
-from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS
+from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_COMPOSITION_COLUMNS
 from src.util.utilities import check_repetead_list, truncate_number, clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, extract_ids_from_list
 
-def build_subdatasets(df_proportionalities, file_path):
+def build_subdatasets(df_proportionalities):
     df_proportionalities = df_proportionalities.copy()
     parent_columns = df_proportionalities.columns.get_level_values(0)
 
@@ -13,16 +13,17 @@ def build_subdatasets(df_proportionalities, file_path):
 
 def create_subdatasets_xlsx(df, parent_columns):
     """ Cria subdatasets a partir de um arquivo Excel. """
-    unique_parents = [col for col in parent_columns[1:] if 'Unnamed' not in col]
+    parent_ids_cleaned = [col for col in parent_columns[1:]]
     subdatasets = {'main': df.iloc[:, :1]}
 
     ids_ja_cadastrados = []
 
-    for parent_id in unique_parents:
+    for parent_id in parent_ids_cleaned:
         if parent_id in ids_ja_cadastrados:
             continue
         ids_ja_cadastrados.append(parent_id)
         start_col = (parent_columns == parent_id).argmax()
+        
 
         # Encontra os indices dos filhos
         if start_col + 1 == len(parent_columns):
@@ -31,9 +32,9 @@ def create_subdatasets_xlsx(df, parent_columns):
             end_col = (parent_columns[start_col + 1:] != parent_id).argmax() + start_col + 1
             if end_col == start_col + 1:
                 end_col = len(parent_columns)
-
         # Slice a pandas dataframe by columns
         sub_data = df.iloc[:, start_col:end_col]
+        
         
         # Insert the first column of the original dataframe
         sub_data = pd.concat([df.iloc[:, :1], sub_data], axis=1)
@@ -69,6 +70,7 @@ def check_sum_equals_one(subdatasets):
                 if pd.isna(cell) or pd.isna(pd.to_numeric(cell, errors='coerce')): 
                     errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '{parent_id}' e indicador filho '{sub_col}'.")
                     continue
+                
                 cell_aux = cell.replace(',', '.')
                 cell_aux = pd.to_numeric(cell_aux, errors='coerce')
                 
@@ -83,7 +85,6 @@ def check_sum_equals_one(subdatasets):
                 
                 all_cells.append(str(new_value))
                 
-            
             # Soma os valores válidos da linha
             row_sum = sum([Decimal(cell) for cell in all_cells])
             
@@ -141,12 +142,12 @@ def compare_ids(id_description, id_proporcionalities, name_sp_description, name_
     return errors
 
 def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities, file_name):
-    df = df_proportionalities.copy()
+    df_proportionalities = df_proportionalities.copy()
     
     errors = []
     warnings = []
 
-    if df.empty:
+    if df_proportionalities.empty:
         return True, errors, warnings
     
     level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
@@ -160,23 +161,8 @@ def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_prop
         return True, errors, warnings
    
     try:
-        # -------------------------------------------------------
-        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
-        parent_columns = []
-        old_columns = df_proportionalities.columns.get_level_values(0)
-        for col in old_columns:
-            if col.startswith('Unnamed'):
-                if parent_columns:
-                    ultimo = parent_columns[-1]
-                    parent_columns.append(ultimo)
-                    continue
-
-            parent_columns.append(col)
-        df_proportionalities.columns = pd.MultiIndex.from_arrays([parent_columns, df_proportionalities.columns.get_level_values(1)])
-        # -------------------------------------------------------
-
         # Verifica se a soma dos valores de cada subdataset é igual a 1
-        subdatasets = build_subdatasets(df, file_name)
+        subdatasets = build_subdatasets(df_proportionalities)
 
         errors, warnings = check_sum_equals_one(subdatasets)
     except Exception as e:
@@ -213,22 +199,6 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
         return not errors, errors, []
     
     try:
-
-        # -------------------------------------------------------
-        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
-        parent_columns = []
-        old_columns = df_proportionalities.columns.get_level_values(0)
-        for col in old_columns:
-            if col.startswith('Unnamed'):
-                if parent_columns:
-                    ultimo = parent_columns[-1]
-                    parent_columns.append(ultimo)
-                    continue
-
-            parent_columns.append(col)
-        df_proportionalities.columns = pd.MultiIndex.from_arrays([parent_columns, df_proportionalities.columns.get_level_values(1)])
-        # -------------------------------------------------------
-    
         lista_simbolos_cenarios = []
         if sp_scenario_exists:
             lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
@@ -310,20 +280,8 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
         return not errors, errors, warnings
     
     try:
-        # -------------------------------------------------------
-        # REFACTOR THIS IN THE FUTURE: Corrige o dataframe para padronizar os nomes das colunas. No futoro, isso será feito uma ÚNICA VEZ em uma classe que irá processar os dados.
-        parent_columns = []
-        old_columns = df_proportionalities.columns.get_level_values(0)
-        for col in old_columns:
-            if col.startswith('Unnamed'):
-                if parent_columns:
-                    ultimo = parent_columns[-1]
-                    parent_columns.append(ultimo)
-                    continue
-
-            parent_columns.append(col)
-        df_proportionalities.columns = pd.MultiIndex.from_arrays([parent_columns, df_proportionalities.columns.get_level_values(1)])
-        # -------------------------------------------------------
+        # Cria subdatasets usando os códigos dos indicadores
+        subdatasets = build_subdatasets(df_proportionalities)
     
         lista_simbolos_cenarios = []
         if sp_scenario_exists:
@@ -339,9 +297,6 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
 
         # Verifica se há códigos repetidos
         __, repeated_columns = check_repetead_list(name_sp_proportionalities, cleaned_level_one_columns)
-        
-        # Cria subdatasets usando os códigos dos indicadores
-        subdatasets = build_subdatasets(df_proportionalities, name_sp_proportionalities)
 
         # Encontrar  o subdataset com o indicador pai 
         for parent_id, subdataset in subdatasets.items():
@@ -362,5 +317,83 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
 
     return not errors, errors, warnings
 
+def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, name_sp_proportionalities, name_sp_composition):
+    # Copia os DataFrames para evitar modificar os originais
+    df_proportionalities = df_sp_proportionalities.copy()
+    df_composition = df_sp_composition.copy()
 
+    errors = []
+    warnings = []
 
+    # Se algum DataFrame estiver vazio, retorna sucesso sem erros
+    if df_proportionalities.empty or df_composition.empty:
+        return True, errors, warnings
+    
+    # Cria os subdatasets de proporcionalidades
+    subdatasets = build_subdatasets(df_proportionalities)
+
+    level_two_columns = df_proportionalities.columns.get_level_values(1).unique()
+
+    # Verifica se as colunas obrigatórias estão presentes
+    required_columns = [
+        (SP_PROPORTIONALITIES_COLUMNS.ID, level_two_columns, name_sp_proportionalities),
+        (SP_COMPOSITION_COLUMNS.CODIGO_PAI, df_composition.columns, name_sp_composition),
+        (SP_COMPOSITION_COLUMNS.CODIGO_FILHO, df_composition.columns, name_sp_composition),
+    ]
+    
+    for column, available_columns, sheet_name in required_columns:
+        if column not in available_columns:
+            errors.append(f"{sheet_name}: Verificação abortada porque a coluna '{column}' está ausente.")
+            return False, errors, warnings
+    try:
+        composition_gouped_dict = {}
+        
+        # Remove de df_composition as linhas que tem CODIGO_PAI == 1
+        df_composition = df_composition[df_composition[SP_COMPOSITION_COLUMNS.CODIGO_PAI] != '1']
+        
+        for __, row in df_composition.iterrows():
+            pai = row[SP_COMPOSITION_COLUMNS.CODIGO_PAI]
+            filho = row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO]
+            if pai not in composition_gouped_dict:
+                composition_gouped_dict[pai] = []
+            composition_gouped_dict[pai].append(filho)        
+        
+        for parent_id, subdataset in subdatasets.items():
+            if parent_id == 'main':
+                continue
+
+            cleaned_parent_id = parent_id.split('-')[0]
+
+            # VERIFICAR SE O INDICADOR PAI ESTÁ NA COMPOSIÇÃO. Verificar na key de composition_gouped_dict
+            if cleaned_parent_id not in composition_gouped_dict.keys():
+                errors.append(f"{name_sp_proportionalities}: O indicador pai '{cleaned_parent_id}' (em '{parent_id}') não está presente na coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' da planilha {name_sp_composition}.")
+                continue
+
+            # Lista de filhos do subdataset com as chaves originais
+            list_children_key_original = subdataset.columns.get_level_values(1).tolist() 
+            list_children_key_original.remove(SP_PROPORTIONALITIES_COLUMNS.ID) 
+            
+            # Lista de filhos do subdataset com as chaves limpas
+            list_childrens_key_cleaned = [filho.split('-')[0] for filho in list_children_key_original] 
+            
+            # Dicionário que armazena os filhos de cada pai
+            dict_childrens_keys_by_cleaned_parent_id = {} 
+            dict_childrens_keys_by_cleaned_parent_id.setdefault(cleaned_parent_id, []).extend(list_childrens_key_cleaned)
+
+            # Verifica se composition_gouped_dict[cleaned_parent_id] contém os mesmos filhos que dict_childrens_keys_by_cleaned_parent_id[cleaned_parent_id]
+            set_errors = set()
+            set_errors = {
+                            f"{name_sp_proportionalities}: O indicador '{filho}' (em '{filho_orig}') não é filho do indicador '{cleaned_parent_id}' (em '{parent_id}') conforme especificado em {name_sp_composition}."
+                            for filho, filho_orig in zip(list_childrens_key_cleaned, list_children_key_original)
+                            if filho not in composition_gouped_dict[cleaned_parent_id]
+                        }
+            errors.extend(set_errors)
+
+            # Verifica se dict_childrens_keys_by_cleaned_parent_id[cleaned_parent_id] contém os mesmos filhos que composition_gouped_dict[cleaned_parent_id]
+            for filho in composition_gouped_dict[cleaned_parent_id]:
+                if filho not in dict_childrens_keys_by_cleaned_parent_id[cleaned_parent_id]:
+                    errors.append(f"{name_sp_proportionalities}: Deve existir pelo menos uma relação do indicador filho '{filho}' com o indicador pai '{parent_id}' conforme especificado em {name_sp_composition}.")
+                    
+    except Exception as e:
+        errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
+    return not errors, errors, warnings
