@@ -322,7 +322,7 @@ def verify_sp_description_titles_length(df):
                 continue
                 
             if len(text) > SP_DESCRIPTION_MAX_TITLE_LENGTH: 
-                warnings.append(f'{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: "{text}". {column.replace('_', ' ').capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.')
+                warnings.append(f'{SP_DESCRIPTION_COLUMNS.NAME_SP}, linha {index + 2}: "{text}". {column.replace("_", " ").capitalize()} fora do padrão. Esperado: Até {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres. Encontrado: {len(row[column])} caracteres.')
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 

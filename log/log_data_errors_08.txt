@@ -51,20 +51,16 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 Verificação: Propriedades de soma nos fatores influenciadores
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 5008-2010 é 3.000, e não 1.
-proporcionalidades.csv, linha 3: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
-proporcionalidades.csv, linha 4: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
-proporcionalidades.csv, linha 5: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
-proporcionalidades.csv, linha 6: A soma dos valores para o indicador pai 5009-2010 é 2.000, e não 1.
-Verificação: Indicadores pai repetidos em proporcionalidades
+Verificação: Indicadores repetidos em proporcionalidades
+Verificação: Relações de indicadores em proporcionalidades
+proporcionalidades.csv: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.csv.
+proporcionalidades.csv: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.csv.
+proporcionalidades.csv: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.csv.
 
 
-Número de erros: 10
+Número de erros: 5
 Número de avisos: 0
-Número de verificações realizadas: 28
+Número de verificações realizadas: 29
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_08/data_errors_08_report.html

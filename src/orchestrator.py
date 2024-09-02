@@ -405,11 +405,15 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         if sp_proportionalities_exists:
             results_tests.append(["Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))])
 
-        # 16 - Verificar se existem indicadores pai repetidos em proporcionalidades #162
+        # 16 - Verificar se existem indicadores repetidos em proporcionalidades #162
         if sp_proportionalities_exists:
             
             is_correct, errors, warnings = sp_proportionalities.verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities, df_sp_scenario, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_SCENARIO_COLUMNS.NAME_SP)
-            results_tests.append(["Indicadores pai repetidos em proporcionalidades", *flatten(is_correct, errors, warnings)])
+            results_tests.append(["Indicadores repetidos em proporcionalidades", *flatten(is_correct, errors, warnings)])
+
+        # 17 - Verificar as relações de pai e filho no arquivo de proporcionalidade #209: verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, name_sp_proportionalities, name_sp_composition)
+        if sp_proportionalities_exists:
+            results_tests.append(["Relações de indicadores em proporcionalidades", *flatten(*sp_proportionalities.verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_COMPOSITION_COLUMNS.NAME_SP))])
 
     if debug:
         print("\n")
