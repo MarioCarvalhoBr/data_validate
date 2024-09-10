@@ -56,11 +56,33 @@ Verificação: Relações de indicadores em proporcionalidades
 proporcionalidades.csv: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.csv.
 proporcionalidades.csv: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.csv.
 proporcionalidades.csv: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.csv.
+Verificação: Indicadores em valores e proporcionalidades
+valores.csv: O indicador '2-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '2-2030-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '2-2030-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '2-2050-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '2-2050-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '3-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '4-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5-2030-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5-2030-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5-2050-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5-2050-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '6-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '7-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '8-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '9-2015' não está presente na planilha proporcionalidades.csv.
+proporcionalidades.csv: O indicador '5008-2010' não está presente na planilha valores.csv.
+proporcionalidades.csv: O indicador '5009-2010' não está presente na planilha valores.csv.
+proporcionalidades.csv: O indicador '5010-2010' não está presente na planilha valores.csv.
+proporcionalidades.csv: O indicador '5021-2010' não está presente na planilha valores.csv.
+Existem mais 10 erros similares aos anteriores que foram omitidos.
 
 
-Número de erros: 5
+Número de erros: 35
 Número de avisos: 0
-Número de verificações realizadas: 29
+Número de verificações realizadas: 30
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_08/data_errors_08_report.html

@@ -2,7 +2,7 @@ from decimal import Decimal
 
 import pandas as pd
 
-from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_COMPOSITION_COLUMNS
+from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS
 from src.util.utilities import check_repetead_list, truncate_number, clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, extract_ids_from_list
 
 def build_subdatasets(df_proportionalities):
@@ -396,4 +396,50 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
                     
     except Exception as e:
         errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
+    return not errors, errors, warnings
+
+
+def verify_ids_values_proportionalities(df_proportionalities, df_values, proportionalities_name, values_name):
+    df_proportionalities = df_proportionalities.copy()
+    df_values = df_values.copy()
+    errors = []
+    warnings = []
+
+    if df_proportionalities.empty and df_values.empty:
+        return True, errors, warnings
+    
+    proportionalities_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+    required_columns = [
+        (SP_PROPORTIONALITIES_COLUMNS.ID, proportionalities_columns, proportionalities_name),
+        (SP_VALUES_COLUMNS.ID, df_values.columns, values_name),
+    ]
+    
+    for column, available_columns, sheet_name in required_columns:
+        if column not in available_columns:
+            errors.append(f"{sheet_name}: Verificação abortada porque a coluna '{column}' está ausente.")
+            return False, errors, warnings
+
+    proportionalities_indicators_lvl1 = df_proportionalities.columns.get_level_values(0).unique().tolist()
+    proportionalities_indicators_lvl1.remove('Unnamed: 0_level_0')
+    
+    proportionalities_indicators_lvl2 = proportionalities_columns
+    proportionalities_indicators_lvl2.remove(SP_PROPORTIONALITIES_COLUMNS.ID)
+    
+    proportionalities_indicators = sorted(set(proportionalities_indicators_lvl1 + proportionalities_indicators_lvl2))
+
+    values_indicators = df_values.columns.unique().tolist()
+    values_indicators.remove(SP_VALUES_COLUMNS.ID)
+    values_indicators = sorted(set(values_indicators))
+
+    common_indicators = sorted(set(values_indicators).intersection(proportionalities_indicators))
+
+    missing_in_proportionalities = sorted(set(values_indicators) - set(common_indicators))
+    for indicator in missing_in_proportionalities:
+        errors.append(f"{values_name}: O indicador '{indicator}' não está presente na planilha {proportionalities_name}.")
+
+    missing_in_values = sorted(set(proportionalities_indicators) - set(common_indicators))
+    for indicator in missing_in_values:
+        errors.append(f"{proportionalities_name}: O indicador '{indicator}' não está presente na planilha {values_name}.")
+
     return not errors, errors, warnings

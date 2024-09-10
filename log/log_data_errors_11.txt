@@ -71,11 +71,33 @@ Verificação: Relações de indicadores em proporcionalidades
 proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '4' com o indicador pai '2-2015' conforme especificado em composicao.xlsx.
 proporcionalidades.xlsx: O indicador pai '99' (em '99-2050-P') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
 proporcionalidades.xlsx: O indicador '88' (em '88-2050-O') não é filho do indicador '3' (em '3-2015') conforme especificado em composicao.xlsx.
+Verificação: Indicadores em valores e proporcionalidades
+valores.xlsx: O indicador '2-2090-O' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '5-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '5-2030-O' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '5-2050-O' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '6-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '7-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '777-2080-P' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '88-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '9-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador 'HTML-2030-P' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador 'PHP' não está presente na planilha proporcionalidades.xlsx.
+proporcionalidades.xlsx: O indicador '2-2030-P' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '2-2050-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '3-2015' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '3-2030-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '3-2050-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '4-2030-P' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '6-2030-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '7-2030-P' não está presente na planilha valores.xlsx.
+Existem mais 6 erros similares aos anteriores que foram omitidos.
 
 
-Número de erros: 20
+Número de erros: 46
 Número de avisos: 0
-Número de verificações realizadas: 29
+Número de verificações realizadas: 30
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_11/data_errors_11_report.html

@@ -18,7 +18,7 @@ Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
 
-INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_05/
+INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_12/
 
 
 ------ Resultados da verificação dos testes ------
@@ -52,14 +52,32 @@ Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
 Verificação: Indicadores em valores e proporcionalidades
+valores.xlsx: O indicador '4-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '5-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '5-2030-O' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '5-2050-O' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '7-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.
+valores.xlsx: O indicador '9-2015' não está presente na planilha proporcionalidades.xlsx.
+proporcionalidades.xlsx: O indicador '3-2030-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '3-2050-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '4-2030-P' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '4-2050-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '6-2030-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '6-2050-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '7-2030-P' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '7-2050-P' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '8-2030-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '9-2030-O' não está presente na planilha valores.xlsx.
+proporcionalidades.xlsx: O indicador '9-2050-O' não está presente na planilha valores.xlsx.
 
 
-Número de erros: 0
+Número de erros: 18
 Número de avisos: 0
 Número de verificações realizadas: 30
 
 
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_05/data_ground_truth_05_report.html
+Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_12/data_errors_12_report.html
 
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_05/data_ground_truth_05_report.pdf
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_12/data_errors_12_report.pdf
 
