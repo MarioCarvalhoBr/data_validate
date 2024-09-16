@@ -17,7 +17,7 @@ from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_
 from tests.unit.test_constants import df_sp_proportionalities_errors_09, df_sp_description_errors_09, df_sp_scenario_errors_09
 
 # DATA FRAMES - ERROS 01
-from tests.unit.test_constants import df_sp_proportionalities_errors_01
+from tests.unit.test_constants import df_sp_proportionalities_errors_01, df_sp_values_errors_01
 
 # DATA FRAMES - ERROS 11
 from tests.unit.test_constants import df_sp_proportionalities_errors_11, df_sp_scenario_errors_11, df_sp_composition_errors_11
@@ -28,16 +28,21 @@ from tests.unit.test_constants import df_sp_proportionalities_errors_06, df_sp_s
 # DATA FRAMES - ERROS 12
 from tests.unit.test_constants import df_sp_proportionalities_errors_12, df_sp_values_errors_12
 
+# DATA FRAMES - ERROS 13
+from tests.unit.test_constants import df_sp_proportionalities_errors_13, df_sp_values_errors_13
+
 
 # Teste: verify_sp_scenario_punctuation
 def test_true_verify_sp_scenario_punctuation_data_ground_truth_01():
-    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_data_ground_truth_01, True, SP_PROPORTIONALITIES_COLUMNS.NAME_SP)
+    # def verify_sum_prop_influence_factor_values(sp_df_proportionalities, sp_df_values, name_sp_df_proporcionalities, name_sp_df_values):
+
+    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_data_ground_truth_01, df_sp_values_data_ground_truth_01, name_sp_df_proporcionalities= SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_df_values= SP_VALUES_COLUMNS.NAME_SP)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_count_errors_verify_sp_scenario_punctuation_data_errors_01():
-    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_errors_01, True, SP_PROPORTIONALITIES_COLUMNS.NAME_SP)
+    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_errors_01, df_sp_values_errors_01, name_sp_df_proporcionalities= SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_df_values= SP_VALUES_COLUMNS.NAME_SP)
     assert is_correct is False
     assert len(errors) == 6
     assert len(warnings) == 3
@@ -53,6 +58,16 @@ def test_count_errors_verify_sp_scenario_punctuation_data_errors_01():
     assert errors[4] == "proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'."
     assert errors[5] == "proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1."
 
+def test_count_errors_verify_sp_scenario_punctuation_data_errors_13():
+    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_errors_13, df_sp_values_errors_13, name_sp_df_proporcionalities= SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_df_values= SP_VALUES_COLUMNS.NAME_SP)
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert errors[0] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível)."
+    assert errors[1] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível)."
+    assert errors[2] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível)."
+    assert errors[3] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível)."
 
 # Testes: def verify_ids_sp_description_proportionalities
 def test_true_verify_ids_sp_description_proportionalities_data_ground_truth_01():

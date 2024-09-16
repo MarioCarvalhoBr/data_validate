@@ -43,7 +43,7 @@ def create_subdatasets_xlsx(df, parent_columns):
 
     return subdatasets
 
-def check_sum_equals_one(subdatasets):
+def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_proporcionalities_name):
     errors = []
     warnings = []
 
@@ -56,19 +56,23 @@ def check_sum_equals_one(subdatasets):
         
         for index, row in subdataset.iterrows():
             all_cells = []
-
             index_aux = 1
+
+            id_linha = row.iloc[0]
+            
+            lista_id_coluna_valor = []
             for cell in row[1:]:
                 sub_col = row.index[index_aux][1]
                 index_aux += 1
 
+                lista_id_coluna_valor.append([id_linha, sub_col, cell])
+
                 # Se a célula for 'DI', pula para a próxima
                 if cell == 'DI':
                     continue
-
                 
                 if pd.isna(cell) or pd.isna(pd.to_numeric(cell, errors='coerce')): 
-                    errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '{parent_id}' e indicador filho '{sub_col}'.")
+                    errors.append(f"{name_sp_proporcionalities_name}, linha {index + 3}: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '{parent_id}' e indicador filho '{sub_col}'.")
                     continue
                 
                 cell_aux = cell.replace(',', '.')
@@ -81,17 +85,32 @@ def check_sum_equals_one(subdatasets):
                 # Verifica se o valor tem mais de 3 casas decimais
                 if not has_more_than_3_decimal_places and a.as_tuple().exponent < -3:
                     has_more_than_3_decimal_places = True
-                    warnings.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.")
+                    warnings.append(f"{name_sp_proporcionalities_name}, linha {index + 3}: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.")
                 
                 all_cells.append(str(new_value))
-                
+            
             # Soma os valores válidos da linha
             row_sum = sum([Decimal(cell) for cell in all_cells])
-            
-            if row_sum < Decimal('0.99') or row_sum > Decimal('1.01'):
-                errors.append(f'{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
+
+            '''
+            Fatores influenciadores somando zero #206
+
+            Existe uma possibilidade de os fatores influenciadores terem que ser zero. Quando os valores dos respectivos indicadores forem todos zero ou DI, pois neste caso nao tem como calcular os pesos dos fatores influenciadores. Adicionar esta verificacao.
+            '''
+            if row_sum == 0:
+                for data in lista_id_coluna_valor:
+                    id_linha, id_coluna, valor = data
+                    
+                    try: 
+                        valor = sp_df_values.loc[sp_df_values[SP_VALUES_COLUMNS.ID] == id_linha][id_coluna].values[0]
+                        if valor != 'DI' and float(valor) != 0:
+                            errors.append(f"{name_sp_proporcionalities_name}: A soma de fatores influenciadores é 0 (zero). Na planilha {name_sp_df_values} o indicador '{id_coluna}' para o ID '{id_linha}' não é zero ou DI (Dado Indisponível).")
+                    except Exception as e:
+                        continue
+            elif row_sum < Decimal('0.99') or row_sum > Decimal('1.01'):
+                errors.append(f'{name_sp_proporcionalities_name}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
             elif row_sum != 1 and row_sum >= Decimal('0.99') and row_sum <= Decimal('1.01'):
-                warnings.append(f'{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
+                warnings.append(f'{name_sp_proporcionalities_name}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
             
     return errors, warnings
 
@@ -141,32 +160,29 @@ def compare_ids(id_description, id_proporcionalities, name_sp_description, name_
     
     return errors
 
-def verify_sum_prop_influence_factor_values(df_proportionalities, exists_sp_proportionalities, file_name):
-    df_proportionalities = df_proportionalities.copy()
+def verify_sum_prop_influence_factor_values(sp_df_proportionalities, sp_df_values, name_sp_df_proporcionalities, name_sp_df_values):
+    df_proportionalities = sp_df_proportionalities.copy()
+    df_values = sp_df_values.copy()
     
     errors = []
     warnings = []
 
-    if df_proportionalities.empty:
+    if df_proportionalities.empty or df_values.empty:
         return True, errors, warnings
     
     level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
 
     if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
-        errors.append(f"{file_name}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+        errors.append(f"{name_sp_df_proporcionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
         return not errors, errors, warnings
-    
-    # Se não existir a coluna de proporcionalidades, retorna True
-    if not exists_sp_proportionalities:
-        return True, errors, warnings
    
     try:
         # Verifica se a soma dos valores de cada subdataset é igual a 1
         subdatasets = build_subdatasets(df_proportionalities)
 
-        errors, warnings = check_sum_equals_one(subdatasets)
+        errors, warnings = check_sum_equals_one(subdatasets,  sp_df_values, name_sp_df_values, name_sp_df_proporcionalities)
     except Exception as e:
-        errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+        errors.append(f"{name_sp_df_proporcionalities}: Erro ao processar a verificação: {e}.")
 
     return not errors, errors, warnings
 
