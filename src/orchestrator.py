@@ -402,8 +402,8 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         results_tests.append(["Sobreposição de valores na legenda", *flatten(*sp_legend.verify_overlapping_multiple_legend_value(input_folder, df_sp_description))])
         
         # 15 - Verificar propriedades de soma nos fatores influenciadores #69
-        if sp_proportionalities_exists:
-            results_tests.append(["Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, sp_proportionalities_exists, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))])
+        if sp_proportionalities_exists: 
+            results_tests.append(["Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, df_sp_values, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP))])
 
         # 16 - Verificar se existem indicadores repetidos em proporcionalidades #162
         if sp_proportionalities_exists:
@@ -415,6 +415,9 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         if sp_proportionalities_exists:
             results_tests.append(["Relações de indicadores em proporcionalidades", *flatten(*sp_proportionalities.verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_COMPOSITION_COLUMNS.NAME_SP))])
 
+        # Verificar indicadores em valores e proporcionalidades
+        if sp_proportionalities_exists:
+            results_tests.append(["Indicadores em valores e proporcionalidades", *flatten(*sp_proportionalities.verify_ids_values_proportionalities(df_sp_proportionalities, df_sp_values, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP))])
     if debug:
         print("\n")
         print(Fore.WHITE + Style.BRIGHT + "------ Resultados da verificação dos testes ------")

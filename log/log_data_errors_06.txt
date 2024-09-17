@@ -65,34 +65,56 @@ Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 proporcionalidades.csv: O indicador pai '2-2015' está repetido na planilha.
 Verificação: Relações de indicadores em proporcionalidades
+proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2015' conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2030-O' conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2050-O' conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2030-P' conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '2' (em '2-2030-P') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '2' (em '2-2050-O') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.csv.
 Existem mais 14 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores em valores e proporcionalidades
+valores.csv: O indicador '5000-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5000-2030-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5000-2030-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5000-2050-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5000-2050-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5001-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5002-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5003-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5003-2030-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5003-2030-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5003-2050-O' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5003-2050-P' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5004-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5005-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5006-2015' não está presente na planilha proporcionalidades.csv.
+valores.csv: O indicador '5007-2015' não está presente na planilha proporcionalidades.csv.
+proporcionalidades.csv: O indicador '2-2030-O' não está presente na planilha valores.csv.
+proporcionalidades.csv: O indicador '2-2030-P' não está presente na planilha valores.csv.
+proporcionalidades.csv: O indicador '2-2050-O' não está presente na planilha valores.csv.
+proporcionalidades.csv: O indicador '2-2050-P' não está presente na planilha valores.csv.
+Existem mais 11 erros similares aos anteriores que foram omitidos.
 Verificação: Descrições simples com mais de 150 caracteres
 descricao.csv, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
-Número de erros: 49
+Número de erros: 80
 Número de avisos: 1
-Número de verificações realizadas: 29
+Número de verificações realizadas: 30
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_06/data_errors_06_report.html

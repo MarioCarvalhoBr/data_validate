@@ -1,23 +1,23 @@
-from src.myparser.sp_proportionalities import verify_sum_prop_influence_factor_values, verify_ids_sp_description_proportionalities, verify_repeated_columns_parent_sp_description_proportionalities, verify_parent_child_relationships
+from src.myparser.sp_proportionalities import verify_sum_prop_influence_factor_values, verify_ids_sp_description_proportionalities, verify_repeated_columns_parent_sp_description_proportionalities, verify_parent_child_relationships, verify_ids_values_proportionalities
 
 # Spreadsheets classes and constants
-from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_COMPOSITION_COLUMNS
+from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
-from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_01, df_sp_description_data_ground_truth_01, df_sp_scenario_data_ground_truth_01, df_sp_composition_data_ground_truth_01
+from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_01, df_sp_description_data_ground_truth_01, df_sp_scenario_data_ground_truth_01, df_sp_composition_data_ground_truth_01, df_sp_values_data_ground_truth_01
 
 # DATA FRAMES - GROUND TRUTH 02
-from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_02_no_scenario, df_sp_description_data_ground_truth_02_no_scenario, df_sp_scenario_data_ground_truth_02_no_scenario, df_sp_composition_data_ground_truth_02_no_scenario
+from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_02_no_scenario, df_sp_description_data_ground_truth_02_no_scenario, df_sp_scenario_data_ground_truth_02_no_scenario, df_sp_composition_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario
 
 # DATA FRAMES - GROUND TRUTH 03
-from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_03_csv, df_sp_description_data_ground_truth_03_csv, df_sp_scenario_data_ground_truth_03_csv, df_sp_composition_data_ground_truth_03_csv
+from tests.unit.test_constants import df_sp_proportionalities_data_ground_truth_03_csv, df_sp_description_data_ground_truth_03_csv, df_sp_scenario_data_ground_truth_03_csv, df_sp_composition_data_ground_truth_03_csv, df_sp_values_data_ground_truth_03_csv
 
 
 # DATA FRAMES - ERROS 09
 from tests.unit.test_constants import df_sp_proportionalities_errors_09, df_sp_description_errors_09, df_sp_scenario_errors_09
 
 # DATA FRAMES - ERROS 01
-from tests.unit.test_constants import df_sp_proportionalities_errors_01
+from tests.unit.test_constants import df_sp_proportionalities_errors_01, df_sp_values_errors_01
 
 # DATA FRAMES - ERROS 11
 from tests.unit.test_constants import df_sp_proportionalities_errors_11, df_sp_scenario_errors_11, df_sp_composition_errors_11
@@ -25,16 +25,24 @@ from tests.unit.test_constants import df_sp_proportionalities_errors_11, df_sp_s
 # DATA FRAMES - ERROS 06
 from tests.unit.test_constants import df_sp_proportionalities_errors_06, df_sp_scenario_errors_06
 
+# DATA FRAMES - ERROS 12
+from tests.unit.test_constants import df_sp_proportionalities_errors_12, df_sp_values_errors_12
+
+# DATA FRAMES - ERROS 13
+from tests.unit.test_constants import df_sp_proportionalities_errors_13, df_sp_values_errors_13
+
 
 # Teste: verify_sp_scenario_punctuation
 def test_true_verify_sp_scenario_punctuation_data_ground_truth_01():
-    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_data_ground_truth_01, True, SP_PROPORTIONALITIES_COLUMNS.NAME_SP)
+    # def verify_sum_prop_influence_factor_values(sp_df_proportionalities, sp_df_values, name_sp_df_proporcionalities, name_sp_df_values):
+
+    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_data_ground_truth_01, df_sp_values_data_ground_truth_01, name_sp_df_proporcionalities= SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_df_values= SP_VALUES_COLUMNS.NAME_SP)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
 
 def test_count_errors_verify_sp_scenario_punctuation_data_errors_01():
-    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_errors_01, True, SP_PROPORTIONALITIES_COLUMNS.NAME_SP)
+    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_errors_01, df_sp_values_errors_01, name_sp_df_proporcionalities= SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_df_values= SP_VALUES_COLUMNS.NAME_SP)
     assert is_correct is False
     assert len(errors) == 6
     assert len(warnings) == 3
@@ -50,6 +58,16 @@ def test_count_errors_verify_sp_scenario_punctuation_data_errors_01():
     assert errors[4] == "proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'."
     assert errors[5] == "proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1."
 
+def test_count_errors_verify_sp_scenario_punctuation_data_errors_13():
+    is_correct, errors, warnings = verify_sum_prop_influence_factor_values(df_sp_proportionalities_errors_13, df_sp_values_errors_13, name_sp_df_proporcionalities= SP_PROPORTIONALITIES_COLUMNS.NAME_SP, name_sp_df_values= SP_VALUES_COLUMNS.NAME_SP)
+    assert is_correct is False
+    assert len(errors) == 4
+    assert len(warnings) == 0
+
+    assert errors[0] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível)."
+    assert errors[1] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível)."
+    assert errors[2] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível)."
+    assert errors[3] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível)."
 
 # Testes: def verify_ids_sp_description_proportionalities
 def test_true_verify_ids_sp_description_proportionalities_data_ground_truth_01():
@@ -132,3 +150,47 @@ def test_count_errors_verify_parent_child_relationships_data_errors_11():
     assert errors[0] == "proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '4' com o indicador pai '2-2015' conforme especificado em composicao.xlsx."
     assert errors[1] == "proporcionalidades.xlsx: O indicador pai '99' (em '99-2050-P') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx."
     assert errors[2] == "proporcionalidades.xlsx: O indicador '88' (em '88-2050-O') não é filho do indicador '3' (em '3-2015') conforme especificado em composicao.xlsx."
+
+# Testes para def verify_ids_values_proportionalities(df_sp_proportionalities, df_sp_values, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP))
+def test_true_verify_ids_values_proportionalities_data_ground_truth_01(): 
+    is_correct, errors, warnings = verify_ids_values_proportionalities(df_sp_proportionalities_data_ground_truth_01, df_sp_values_data_ground_truth_01, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_true_verify_ids_values_proportionalities_data_ground_truth_02_no_scenario():
+    is_correct, errors, warnings = verify_ids_values_proportionalities(df_sp_proportionalities_data_ground_truth_02_no_scenario, df_sp_values_data_ground_truth_02_no_scenario, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_true_verify_ids_values_proportionalities_data_ground_truth_03():
+    is_correct, errors, warnings = verify_ids_values_proportionalities(df_sp_proportionalities_data_ground_truth_03_csv, df_sp_values_data_ground_truth_03_csv, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_count_errors_verify_ids_values_proportionalities_data_errors_12():
+    is_correct, errors, warnings = verify_ids_values_proportionalities(df_sp_proportionalities_errors_12, df_sp_values_errors_12, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
+    assert is_correct is False
+    assert len(errors) == 18
+    assert len(warnings) == 0
+
+    assert errors[0] == "valores.xlsx: O indicador '4-2015' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[1] == "valores.xlsx: O indicador '5-2015' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[2] == "valores.xlsx: O indicador '5-2030-O' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[3] == "valores.xlsx: O indicador '5-2050-O' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[4] == "valores.xlsx: O indicador '7-2015' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[5] == "valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[6] == "valores.xlsx: O indicador '9-2015' não está presente na planilha proporcionalidades.xlsx."
+    assert errors[7] == "proporcionalidades.xlsx: O indicador '3-2030-O' não está presente na planilha valores.xlsx."
+    assert errors[8] == "proporcionalidades.xlsx: O indicador '3-2050-O' não está presente na planilha valores.xlsx."
+    assert errors[9] == "proporcionalidades.xlsx: O indicador '4-2030-P' não está presente na planilha valores.xlsx."
+    assert errors[10] == "proporcionalidades.xlsx: O indicador '4-2050-O' não está presente na planilha valores.xlsx."
+    assert errors[11] == "proporcionalidades.xlsx: O indicador '6-2030-O' não está presente na planilha valores.xlsx."
+    assert errors[12] == "proporcionalidades.xlsx: O indicador '6-2050-O' não está presente na planilha valores.xlsx."
+    assert errors[13] == "proporcionalidades.xlsx: O indicador '7-2030-P' não está presente na planilha valores.xlsx."
+    assert errors[14] == "proporcionalidades.xlsx: O indicador '7-2050-P' não está presente na planilha valores.xlsx."
+    assert errors[15] == "proporcionalidades.xlsx: O indicador '8-2030-O' não está presente na planilha valores.xlsx."
+    assert errors[16] == "proporcionalidades.xlsx: O indicador '9-2030-O' não está presente na planilha valores.xlsx."
+    assert errors[17] == "proporcionalidades.xlsx: O indicador '9-2050-O' não está presente na planilha valores.xlsx."

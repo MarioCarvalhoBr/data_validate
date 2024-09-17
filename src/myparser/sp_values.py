@@ -27,7 +27,6 @@ def extract_ids_from_list_from_description(df_description):
     # Converte em inteiros
     ids_valids = set(int(id) for id in ids_valids)
 
-    
     return ids_valids, ids_invalids
 
 def compare_ids(id_description, id_values, name_sp_description, name_sp_values):
@@ -299,3 +298,6 @@ def verify_unavailable_values(df_values, df_sp_scenario):
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
     return not errors, errors, warnings
+
+def verify_scenario_coherence_values(df_sp_proportionalities, df_sp_composition, name_sp_proportionalities, name_sp_composition):
+    pass
