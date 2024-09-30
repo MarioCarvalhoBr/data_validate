@@ -418,6 +418,9 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # Verificar indicadores em valores e proporcionalidades
         if sp_proportionalities_exists:
             results_tests.append(["Indicadores em valores e proporcionalidades", *flatten(*sp_proportionalities.verify_ids_values_proportionalities(df_sp_proportionalities, df_sp_values, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP))])
+    
+    # Número de verificações realizadas
+    number_tests = str(len(results_tests))
     if debug:
         print("\n")
         print(Fore.WHITE + Style.BRIGHT + "------ Resultados da verificação dos testes ------")
@@ -464,7 +467,6 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
             print(Fore.WHITE + Style.BRIGHT + "Número de avisos: " + str(global_num_warnings))
 
         # Número de verificações realizadas
-        number_tests = str(len(results_tests))
         print(Fore.GREEN + Style.BRIGHT + "Número de verificações realizadas: " + number_tests)
         # Finalizar o contador de tempo ---------------------------------------------
         final_time = time.time()
