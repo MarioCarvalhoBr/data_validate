@@ -66,18 +66,21 @@ def get_min_max_legend(name_file, df_qml_legend):
         
         return errors, MIN_VALUE, MAX_VALUE
     
-    
 def check_tuple_sequence(value_list):
     errors = []
     
     for i in range(len(value_list) - 1):
         current_tuple = value_list[i]
         next_tuple = value_list[i + 1]
-        
-        if current_tuple[1] != next_tuple[0]:
+ 
+        VALOR_DIFF = round(next_tuple[0] - current_tuple[1], 2)
+
+        VALOR_DIFF = int(VALOR_DIFF*10000)        
+
+        if VALOR_DIFF != 100 or current_tuple[1] >= next_tuple[0]:
             errors.append("Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.")
-    
     return errors
+
 def check_overlapping(file_name, df_qml_legend):
     errors = []
     
@@ -213,7 +216,7 @@ def read_legend_qml_file(qml_file_path):
                         label = range_element.get(SP_LEGEND_COLUMNS.LABEL)
                         lower = range_element.get(SP_LEGEND_COLUMNS.LOWER)
                         upper = range_element.get(SP_LEGEND_COLUMNS.UPPER)
-                        symbol = int(range_element.get(SP_LEGEND_COLUMNS.SYMBOL))
+                        symbol = range_element.get(SP_LEGEND_COLUMNS.SYMBOL)
                         render = range_element.get(SP_LEGEND_COLUMNS.RENDER)
                         
                         # Append the data to the list
@@ -240,6 +243,8 @@ def read_legend_qml_file(qml_file_path):
     if df.empty:
         errors.append(f"Erro ao processar o arquivo {qml_file_path}: Não foram encontrados dados.")
 
+    # Remove a linha do dataframe cujo symbol == "Dado indisponivel"
+    df = df[df[SP_LEGEND_COLUMNS.LABEL] != "Dado indisponível"]
     return df, errors
 
 def get_min_max_values(df, key_lower, key_upper):

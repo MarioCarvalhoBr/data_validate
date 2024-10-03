@@ -58,6 +58,27 @@ Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
+2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+Existem mais 4 erros similares aos anteriores que foram omitidos.
 Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
@@ -91,7 +112,7 @@ Verificação: Estrutura dos arquivos da pasta de entrada
 99.qml: Arquivo de legenda não esperado.
 
 
-Número de erros: 43
+Número de erros: 67
 Número de avisos: 2
 Número de verificações realizadas: 30
 

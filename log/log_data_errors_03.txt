@@ -61,10 +61,6 @@ Verificação: Relações de combinações de valores
 valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
 Verificação: Valores indisponíveis
 Verificação: Intervalo dos dados da legenda
-valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'.
-valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'.
-valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5001-2015'.
-valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'.
 Verificação: Sobreposição de valores na legenda
 legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
 Verificação: Propriedades de soma nos fatores influenciadores
@@ -111,7 +107,7 @@ Verificação: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 29
+Número de erros: 25
 Número de avisos: 27
 Número de verificações realizadas: 30
 

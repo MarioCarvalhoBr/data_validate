@@ -61,30 +61,34 @@ valores.csv, linha 6: O valor 0.779055534730612 está fora do intervalo da legen
 valores.csv, linha 2: O valor 0.806633367915323 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5001-2015'.
 valores.csv, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'.
 Verificação: Sobreposição de valores na legenda
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
 Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 proporcionalidades.csv: O indicador pai '2-2015' está repetido na planilha.
 Verificação: Relações de indicadores em proporcionalidades
-proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2015' conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2030-O' conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2050-O' conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-O') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2050-P') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-O') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: O indicador '5' (em '5-2030-P') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.csv.
 proporcionalidades.csv: Deve existir pelo menos uma relação do indicador filho '5000' com o indicador pai '2-2030-P' conforme especificado em composicao.csv.
-proporcionalidades.csv: O indicador '2' (em '2-2050-O') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.csv.
+proporcionalidades.csv: O indicador '2' (em '2-2050-P') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.csv.
 Existem mais 14 erros similares aos anteriores que foram omitidos.
 Verificação: Indicadores em valores e proporcionalidades
 valores.csv: O indicador '5000-2015' não está presente na planilha proporcionalidades.csv.
@@ -112,7 +116,7 @@ Verificação: Descrições simples com mais de 150 caracteres
 descricao.csv, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 
 
-Número de erros: 80
+Número de erros: 84
 Número de avisos: 1
 Número de verificações realizadas: 30
 
