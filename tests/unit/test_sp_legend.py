@@ -64,12 +64,12 @@ def test_false_verify_overlapping_multiple_legend_value_data_errors_05():
     
 # Testes: para check_tuple_sequence
 def test_check_tuple_sequence_no_overlap():
-    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.77)]
+    value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.47, 0.61), (0.62, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 0
 
 def test_check_tuple_sequence_single_overlap():
-    value_list = [(0.0, 0.154), (0.155, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.77)]
+    value_list = [(0.0, 0.15), (0.18, 0.30), (0.31, 0.46), (0.47, 0.61), (0.62, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
     assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
@@ -80,27 +80,27 @@ def test_check_tuple_sequence_multiple_overlaps():
     assert len(errors) == 4
 
 def test_check_tuple_sequence_partial_overlap():
-    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.463, 0.616), (0.616, 0.77)]
+    value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.48, 0.61), (0.62, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
     assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
 
 def test_check_tuple_sequence_start_overlap():
-    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.615, 0.77)]
+    value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.47, 0.61), (0.68, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
     assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
 
 def test_check_tuple_sequence_end_overlap():
-    value_list = [(0.0, 0.154), (0.154, 0.308), (0.308, 0.462), (0.462, 0.616), (0.616, 0.770)]
+    value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.47, 0.61), (0.62, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 0
 
 
 def test_verify_overlapping_multiple_legend_value_overlap_detected():
     data = {
-        'lower': ["0.0"," 0.154", "0.308", "0.462", "0.616"],
-        'upper': ["0.154", "0.308", "0.462","0.516", "0.77"]
+        'lower': ["0.0"," 0.16", "0.31", "0.47", "0.61"],
+        'upper': ["0.15", "0.30", "0.46","0.51", "0.77"]
     }
     df_qml_legend = pd.DataFrame(data)
     
@@ -177,8 +177,8 @@ def test_verify_overlapping_multiple_legend_value_overlapping():
 
 def test_verify_overlapping_multiple_legend_value_success():
     data = {
-        'lower': ["0.0", "0.154", "0.308", "0.462", "0.616"],
-        'upper': ["0.154", "0.308", "0.462", "0.616", "0.77"]
+        'lower': ["0.0"," 0.16", "0.31", "0.47", "0.52"],
+        'upper': ["0.15", "0.30", "0.46","0.51", "0.77"]
     }
     df_qml_legend = pd.DataFrame(data)
     
@@ -250,7 +250,7 @@ def test_read_legend_qml_file_success():
     assert df.iloc[0]['label'] == "Test 1"
     assert df.iloc[0]['lower'] == "0.0"
     assert df.iloc[0]['upper'] == "1.0"
-    assert df.iloc[0]['symbol'] == 0
+    assert df.iloc[0]['symbol'] == "0"
     assert df.iloc[0]['render'] == "None"
 
 def test_read_legend_qml_file_no_renderer_v2():

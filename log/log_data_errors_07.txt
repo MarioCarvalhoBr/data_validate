@@ -54,6 +54,10 @@ Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 valores.xlsx, linha 13: O valor 'PHP' não é um número válido para a coluna '2-2050-O'.
 Verificação: Sobreposição de valores na legenda
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai 'Unnamed: 0_level_0' e indicador filho 'nome'.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai Unnamed: 0_level_0 é 1100015, e não 1.
@@ -103,7 +107,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 54
+Número de erros: 58
 Número de avisos: 3
 Número de verificações realizadas: 30
 

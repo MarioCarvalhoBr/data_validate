@@ -48,6 +48,10 @@ Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
 Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
@@ -72,7 +76,7 @@ proporcionalidades.xlsx: O indicador '9-2030-O' não está presente na planilha 
 proporcionalidades.xlsx: O indicador '9-2050-O' não está presente na planilha valores.xlsx.
 
 
-Número de erros: 18
+Número de erros: 22
 Número de avisos: 0
 Número de verificações realizadas: 30
 
