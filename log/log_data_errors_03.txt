@@ -47,6 +47,7 @@ Verificação: Níveis de indicadores
 Verificação: Unicidade dos códigos
 Verificação: Códigos HTML nas descrições simples
 Verificação: Títulos únicos
+composicao.xlsx: Nó raiz '1' não encontrado.
 Verificação: Códigos sequenciais
 descricao.xlsx: A coluna 'codigo' deve começar em 1.
 descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).
@@ -107,7 +108,7 @@ Verificação: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 25
+Número de erros: 26
 Número de avisos: 27
 Número de verificações realizadas: 30
 

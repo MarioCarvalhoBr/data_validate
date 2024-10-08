@@ -329,7 +329,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
 
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 7.1 - Verificar nomes de colunas únicos
-        results_tests.append(["Títulos únicos", *flatten(*sp_description.verify_sp_description_titles_uniques(df_sp_description))])
+        results_tests.append(["Títulos únicos", *flatten(*graph.verify_unique_titles_description_composition(df_sp_description, df_sp_composition))])
         
         # 7.2: Verificar se os códigos são sequenciais
         results_tests.append(["Códigos sequenciais", *flatten(*sp_description.verify_sp_description_codes_sequential(df_sp_description))])

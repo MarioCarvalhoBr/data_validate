@@ -151,3 +151,109 @@ def verify_graph_sp_description_composition(descricao, composicao):
         errors.append(text_init + ", ".join(lista_grafos_desconectados) + ".")
     
     return is_valid, errors, warnings
+
+def check_sp_description_titles_uniques(df):
+    df = df.copy()
+    errors = []
+
+    if df.empty:
+        return errors
+    for column in [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]:
+        
+        # Verifica se a coluna existe
+        if column not in df.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos foi abortada porque a coluna '{column}' está ausente.")
+            continue
+        
+        # Convert to string
+        df[column] = df[column].astype(str).str.strip()
+        duplicated = df[column].duplicated().any()
+
+        if duplicated:
+            titles_duplicated = df[df[column].duplicated()][column].tolist()
+            # Rename columns to plural
+            if column == SP_DESCRIPTION_COLUMNS.NOME_SIMPLES:
+                column = SP_DESCRIPTION_COLUMNS.PLURAL_NOMES_SIMPLES
+            elif column == SP_DESCRIPTION_COLUMNS.NOME_COMPLETO:
+                column = SP_DESCRIPTION_COLUMNS.PLURAL_NOMES_COMPLETOS
+
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
+
+    return errors
+
+def verify_unique_titles_description_composition(descricao, composicao):
+    descricao = descricao.copy()
+    composicao = composicao.copy()
+
+    # Se for empty, retorna True
+    if descricao.empty or composicao.empty:
+        return True, [], []
+    errors = []
+    warnings = []
+    is_valid = True
+
+    # Verifica se as colunas com código existem
+    if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
+        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada.")
+        return not errors, errors, warnings
+
+    
+    # Verificar se as colunas com código existem
+    if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in composicao.columns:
+        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada.")
+        return not errors, errors, warnings
+    
+    # Limpando os dados
+    composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
+    composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
+    
+    # Limpando os dados
+    descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
+    
+    codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
+    if codigos_faltantes:
+        return not errors, errors, warnings
+    
+    codigos_faltantes = verificar_codigos_ausentes_comp_desc(composicao, descricao)
+    if codigos_faltantes:
+        return not errors, errors, warnings
+
+    # Montar o grafo
+    G = montar_grafo(composicao)
+
+    existe_ciclo, __ = verificar_ciclos(G)
+    if existe_ciclo:
+        return not errors, errors, warnings
+
+    grafos_desconectados = verificar_grafos_desconectados(G)
+    if grafos_desconectados:
+        return not errors, errors, warnings
+    
+    # Verifica se existe pelo menos 1 nó pai == 1, senão, mostrar erro e solicitar correção
+    if not G.has_node('1'):
+        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Nó raiz '1' não encontrado.")
+        return not errors, errors, warnings
+    
+    # Convert the graph to a tree
+    tree = nx.bfs_tree(G, '1')
+    
+    # Todos os filhos de 1
+    filhos_1 = list(tree.neighbors('1'))
+
+    # Para cada filho de 1, pegar toda a sub-arvore abaixo
+    for filho in filhos_1:
+        
+        # Rodar um BFS a partir do filho
+        sub_arvore = nx.bfs_tree(G, filho)
+        
+        # Monta uma lista somente com os código dos nós
+        lista_nos = list(sub_arvore.nodes())
+
+        # Busca todos um sub-dataframe de descrição com os códigos (SP_DESCRIPTION_COLUMNS.CODIGO) que estão na lista_nos
+        sub_descricao = descricao[descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).isin(lista_nos)]
+        
+        # Check if the titles are unique
+        warnings_i = check_sp_description_titles_uniques(sub_descricao)
+        warnings += warnings_i
+    
+    return not errors, errors, warnings

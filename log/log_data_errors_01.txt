@@ -52,6 +52,7 @@ descricao.xlsx, linha 5: Nível do indicador não é um número inteiro maior qu
 descricao.xlsx, linha 12: Nível do indicador não é um número inteiro maior que 0.
 Verificação: Unicidade dos códigos
 descricao.xlsx: Existem códigos duplicados: [5007].
+Verificação: Títulos únicos
 Verificação: Códigos sequenciais
 descricao.xlsx: Verificação de códigos sequenciais foi abortada porque a coluna 'codigo' contém valores inválidos.
 Verificação: Campos vazios
@@ -121,9 +122,6 @@ cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna de
 cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].
 cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].
 referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].
-Verificação: Títulos únicos
-descricao.xlsx: Existem nomes simples duplicados: ['Seca', 'Sensibilidade'].
-descricao.xlsx: Existem nomes completos duplicados: ['Índice de Risco de Impacto para Seca'].
 Verificação: Padrão para nomes dos indicadores
 descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Segurança alimentar.". Encontrado: "Segurança Alimentar.".
 descricao.xlsx, linha 2: Nome completo fora do padrão. Esperado: "Impactos para segurança alimentar". Encontrado: "Impactos para Segurança Alimentar".
@@ -155,7 +153,7 @@ proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais n
 
 
 Número de erros: 83
-Número de avisos: 36
+Número de avisos: 34
 Número de verificações realizadas: 30
 
 

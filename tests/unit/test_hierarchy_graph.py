@@ -4,6 +4,7 @@ from src.myparser.hierarchy.graph import verificar_ciclos
 from src.myparser.hierarchy.graph import verificar_grafos_desconectados
 from src.myparser.hierarchy.graph import imprimir_grafo
 from src.myparser.hierarchy.graph import verify_graph_sp_description_composition
+from src.myparser.hierarchy.graph import verify_unique_titles_description_composition
 
 # DATA FRAMES - GROUND TRUTH
 from tests.unit.test_constants import df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01
@@ -16,6 +17,14 @@ from tests.unit.test_constants import df_sp_description_errors_04, df_sp_composi
 # DATA FRAMES  - ERROS 10
 from tests.unit.test_constants import df_sp_description_errors_10, df_sp_composition_errors_10
 from tests.unit.test_constants import SP_DESCRIPTION_COLUMNS
+
+
+# Testes: verify_sp_description_titles_uniques
+def test_true_verify_sp_description_titles_uniques_data_data_ground_truth_01():
+    is_correct, errors, warnings = verify_unique_titles_description_composition(df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
 
 def test_verify_ids_sp_description_values_column_missing():
     df_description = pd.DataFrame({

@@ -1,7 +1,6 @@
 import pandas as pd
 
 from src.myparser.sp_description import verify_sp_description_parser_html_column_names
-from src.myparser.sp_description import verify_sp_description_titles_uniques
 from src.myparser.sp_description import verify_sp_description_text_capitalize
 from src.myparser.sp_description import verify_sp_description_titles_length
 from src.myparser.sp_description import verify_sp_simple_description_max_length
@@ -154,19 +153,6 @@ def test_verify_sp_description_parser_html_column_names_missing_column_default()
     assert len(errors) == 0
     assert len(warnings) == 1
     assert warnings[0] == f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.DESC_SIMPLES}' está ausente."
-    
-# Testes: verify_sp_description_titles_uniques
-def test_true_verify_sp_description_titles_uniques_data_data_ground_truth_01():
-    is_correct, errors, warnings = verify_sp_description_titles_uniques(df_sp_description_data_ground_truth_01)
-    assert is_correct is True
-    assert len(errors) == 0
-    assert len(warnings) == 0
-
-def test_true_verify_sp_description_titles_uniques_data_errors_01():
-    is_correct, errors, warnings = verify_sp_description_titles_uniques(df_sp_description_errors_01)
-    assert is_correct is True
-    assert len(errors) == 0
-    assert len(warnings) == 2
 
 # Testes: verify_sp_description_text_capitalize
 def test_true_verify_sp_description_text_capitalize_data_ground_truth_01():

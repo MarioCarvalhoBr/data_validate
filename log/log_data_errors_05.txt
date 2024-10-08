@@ -37,6 +37,7 @@ Verificação: Unicidade dos códigos
 Verificação: Códigos HTML nas descrições simples
 Verificação: Ortografia
 Verificação: Títulos únicos
+composicao.xlsx: Nó raiz '1' não encontrado.
 Verificação: Códigos sequenciais
 descricao.xlsx: A coluna 'codigo' deve começar em 1.
 descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).
@@ -105,7 +106,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 59
+Número de erros: 60
 Número de avisos: 4
 Número de verificações realizadas: 27
 
