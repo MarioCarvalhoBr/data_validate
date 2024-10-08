@@ -35,38 +35,6 @@ def verify_sp_description_parser_html_column_names(df, column):
     is_correct = len(errors) == 0
     return is_correct, errors, warnings
 
-def verify_sp_description_titles_uniques(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
-    errors, warnings = [], []
-
-    try:
-        for column in [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]:
-            
-            # Verifica se a coluna existe
-            if column not in df.columns:
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos foi abortada porque a coluna '{column}' está ausente.")
-                continue
-            
-            # Convert to string
-            df[column] = df[column].astype(str).str.strip()
-            duplicated = df[column].duplicated().any()
-
-            if duplicated:
-                titles_duplicated = df[df[column].duplicated()][column].tolist()
-                # Rename columns to plural
-                if column == SP_DESCRIPTION_COLUMNS.NOME_SIMPLES:
-                    column = SP_DESCRIPTION_COLUMNS.PLURAL_NOMES_SIMPLES
-                elif column == SP_DESCRIPTION_COLUMNS.NOME_COMPLETO:
-                    column = SP_DESCRIPTION_COLUMNS.PLURAL_NOMES_COMPLETOS
-
-                warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
-    except Exception as e:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
-
-    return not errors, errors, warnings
-
 def verify_sp_description_codes_sequential(df):
     df = df.copy()
     if df.empty:
