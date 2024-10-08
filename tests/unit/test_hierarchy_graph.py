@@ -31,7 +31,7 @@ def test_count_errors_verify_sp_description_titles_uniques_data_errors_14():
     is_correct, errors, warnings = verify_unique_titles_description_composition(df_sp_description_errors_14, df_sp_composition_errors_14)
     assert is_correct is True
     assert len(errors) == 0
-    assert len(warnings) == 2
+    assert len(warnings) == 4
 
     assert warnings[0] == "descricao.xlsx: Existem nomes simples duplicados: ['Seca']."
     assert warnings[1] == "descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca']."
