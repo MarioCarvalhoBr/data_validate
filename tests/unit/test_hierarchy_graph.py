@@ -35,6 +35,9 @@ def test_count_errors_verify_sp_description_titles_uniques_data_errors_14():
 
     assert warnings[0] == "descricao.xlsx: Existem nomes simples duplicados: ['Seca']."
     assert warnings[1] == "descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca']."
+    assert warnings[2] == "descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade']."
+    assert warnings[3] == "descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade']."
+
     
 
 

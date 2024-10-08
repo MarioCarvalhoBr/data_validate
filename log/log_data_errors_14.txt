@@ -60,10 +60,12 @@ Verificação: Indicadores em valores e proporcionalidades
 Verificação: Títulos únicos
 descricao.xlsx: Existem nomes simples duplicados: ['Seca'].
 descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca'].
+descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].
+descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].
 
 
 Número de erros: 6
-Número de avisos: 2
+Número de avisos: 4
 Número de verificações realizadas: 30
 
 
