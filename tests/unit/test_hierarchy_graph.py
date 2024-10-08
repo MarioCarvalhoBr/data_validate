@@ -16,15 +16,27 @@ from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composi
 from tests.unit.test_constants import df_sp_description_errors_04, df_sp_composition_errors_04
 # DATA FRAMES  - ERROS 10
 from tests.unit.test_constants import df_sp_description_errors_10, df_sp_composition_errors_10
+from tests.unit.test_constants import df_sp_description_errors_14, df_sp_composition_errors_14
 from tests.unit.test_constants import SP_DESCRIPTION_COLUMNS
 
 
-# Testes: verify_sp_description_titles_uniques
+# Testes: verify_unique_titles_description_composition
 def test_true_verify_sp_description_titles_uniques_data_data_ground_truth_01():
     is_correct, errors, warnings = verify_unique_titles_description_composition(df_sp_description_data_ground_truth_01, df_sp_composition_data_ground_truth_01)
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
+
+def test_count_errors_verify_sp_description_titles_uniques_data_errors_14():
+    is_correct, errors, warnings = verify_unique_titles_description_composition(df_sp_description_errors_14, df_sp_composition_errors_14)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 2
+
+    assert warnings[0] == "descricao.xlsx: Existem nomes simples duplicados: ['Seca']."
+    assert warnings[1] == "descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca']."
+    
+
 
 def test_verify_ids_sp_description_values_column_missing():
     df_description = pd.DataFrame({
