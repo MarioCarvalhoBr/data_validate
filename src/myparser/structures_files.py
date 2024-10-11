@@ -170,6 +170,11 @@ def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_
 def verify_files_legends_qml(df_description, root_path):
     errors, warnings = [], []
     try:
+        # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de legenda não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
+            return not errors, errors, warnings
+        
         files_qml = [f for f in os.listdir(root_path) if f.endswith('.qml')]
         len_files_qml = len(files_qml) - 1 
         

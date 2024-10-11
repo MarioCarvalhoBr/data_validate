@@ -25,6 +25,7 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_08/
 Verificação: Estrutura dos arquivos da pasta de entrada
 referencia_temporal.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8.
 descricao.csv: O arquivo está no formato ISO-8859-1, deveria ser UTF-8.
+descricao.csv: Verificação de legenda não realizada. Coluna 'nivel' não encontrada.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 Verificação: Hierarquia como árvore
@@ -49,7 +50,9 @@ Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
+descricao.csv: Verificação foi abortada porque a coluna 'nivel' não está ausente.
 Verificação: Sobreposição de valores na legenda
+descricao.csv: Verificação foi abortada porque a coluna 'nivel' não está ausente.
 Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
@@ -80,7 +83,7 @@ proporcionalidades.csv: O indicador '5021-2010' não está presente na planilha 
 Existem mais 10 erros similares aos anteriores que foram omitidos.
 
 
-Número de erros: 35
+Número de erros: 38
 Número de avisos: 0
 Número de verificações realizadas: 30
 

@@ -194,6 +194,11 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
         # Se for empty, retorna True
         if df_description.empty or df_proportionalities.empty:
             return True, errors, warnings
+        
+        # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de legenda não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
+            return not errors, errors, warnings
 
         if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
             errors.append(f"{name_sp_description}: Verificação abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")

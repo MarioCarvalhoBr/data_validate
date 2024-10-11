@@ -62,6 +62,11 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
         if df_composicao.empty or df_descricao.empty:
             return True, errors, warnings
         
+        # Verifica se NIVEL está contido na coluna de descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_descricao.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
+            return not errors, errors, warnings
+        
         # Verifica se as colunas codigo_pai e codigo_filho existem
         if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in df_composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in df_composicao.columns:
             errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
@@ -104,6 +109,7 @@ def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao
                     nivel_filho = df_descricao[df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == int(filho)][SP_DESCRIPTION_COLUMNS.NIVEL].values[0]
                     errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}, linha {index_linha}: O indicador {pai} (nível {nivel_pai}) não pode ser pai do indicador {filho} (nível {nivel_filho}). Atualize os níveis no arquivo de descrição.")
     except Exception as e:
-        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+
+        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Erro ao processar a verificação.")
     
     return not errors, errors, warnings

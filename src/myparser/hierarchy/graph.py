@@ -101,6 +101,11 @@ def verify_graph_sp_description_composition(descricao, composicao):
         # Se for empty, retorna True
         if descricao.empty or composicao.empty:
             return True, errors, warnings
+        
+        # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
+            return not errors, errors, warnings
 
         # Verifica se as colunas com código existem
         if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
@@ -187,6 +192,11 @@ def verify_unique_titles_description_composition(descricao, composicao):
         # Se for empty, retorna True
         if descricao.empty or composicao.empty:
             return True, errors, warnings
+        
+        # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
+            return not errors, errors, warnings
 
         # Verifica se as colunas com código existem
         if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:

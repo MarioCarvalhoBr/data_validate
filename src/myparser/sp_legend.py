@@ -7,6 +7,11 @@ from src.util.utilities import check_overlapping, get_min_max_legend
 def verify_overlapping_multiple_legend_value(root_path, df_description):
     errors, warnings = [], []
     try:
+        # Verificar se a coluna NIVEL está presente em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não está ausente.")
+            return not errors, errors, warnings
+        
         # 1 - Listar todos os arquivos qml da pasta
         files_qml = [f for f in os.listdir(root_path) if f.endswith('.qml')]
 
@@ -81,6 +86,11 @@ def verify_overlapping_multiple_legend_value(root_path, df_description):
 def verify_values_range_multiple_legend(root_path, df_values, df_description, df_sp_scenario):
     errors, warnings = [], []
     try:
+        # Verificar se a coluna NIVEL está presente em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não está ausente.")
+            return not errors, errors, warnings
+        
         MIN_VALUE, MAX_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT, SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
 
         df_qml_legend = None
