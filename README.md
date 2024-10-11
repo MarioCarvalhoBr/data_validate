@@ -121,7 +121,12 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   ```
   --sector=nome_do_setor
   ```
-  
+
+  - `--protocol`: Quando este argumento é usado, o script exibe o protocolo no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
+  - Exemplo:
+  ```
+  --protocol=nome_do_protocolo
+  ```
 
 ### Testes
 #### Instalando o coverage

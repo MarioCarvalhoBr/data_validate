@@ -68,8 +68,3 @@ Número de erros: 6
 Número de avisos: 4
 Número de verificações realizadas: 30
 
-
-Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_14/data_errors_14_report.html
-
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_14/data_errors_14_report.pdf
-

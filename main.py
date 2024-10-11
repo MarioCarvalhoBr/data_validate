@@ -1,5 +1,5 @@
 # Example usage mandatory arguments only: python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=local_data/foo/ --debug
-# Example usage optionals arguments: python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=local_data/foo/ --debug --sector="Setor A"
+# Example usage optionals arguments: python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=local_data/foo/ --debug --sector="Setor A" --protocol="Protocolo B"
 
 from argparse import ArgumentParser
 # Import orchestrator
@@ -17,12 +17,13 @@ if __name__ == "__main__":
     parser.add_argument("--no-time", action="store_true", help="Não exibe informações de tempo e data de execução.")
     parser.add_argument("--no-version", action="store_true", help="Não exibe a versão do script no relatório final.")
     parser.add_argument("--sector", type=str, default=None, help="Nome do setor estratégico.")
+    parser.add_argument("--protocol", type=str, default=None, help="Nome do protocolo.")
     
     # Parser args
     args = parser.parse_args()
 
     # Run orchestrator
-    orc.run(input_folder=args.input_folder,output_folder=args.output_folder, no_spellchecker=args.no_spellchecker, lang_dict=args.lang_dict, no_warning_titles_length=args.no_warning_titles_length, no_time=args.no_time, debug=args.debug, no_version=args.no_version, sector=args.sector)
+    orc.run(input_folder=args.input_folder,output_folder=args.output_folder, no_spellchecker=args.no_spellchecker, lang_dict=args.lang_dict, no_warning_titles_length=args.no_warning_titles_length, no_time=args.no_time, debug=args.debug, no_version=args.no_version, sector=args.sector, protocol=args.protocol)
 
     
 # Criar uma classe MyArgParser
