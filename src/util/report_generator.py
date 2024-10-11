@@ -5,12 +5,13 @@ from pyhtml2pdf import converter
 import src.myparser.info as info
 
 class ReportGenerator:
-    def __init__(self, folder, template_name="default.html", no_time=False, no_version=False, sector=None, protocol=None):
+    def __init__(self, folder, template_name="default.html", no_time=False, no_version=False, sector=None, protocol=None, user=None):
         self.no_time = no_time
         self.no_version = no_version
         # Optional argument
         self.sector = sector
         self.protocol = protocol
+        self.user = user
 
         self.folder = folder
         self.output_folder = None
@@ -52,6 +53,7 @@ class ReportGenerator:
                                         <strong>Informa&ccedil;&otilde;es</strong>
                                     </div>
                                     <div class="card-body">
+                                        {{ text_display_user }}
                                         {{ text_display_sector }}
                                         {{ text_display_protocol }}
                                         {{ text_display_date }}
@@ -138,12 +140,18 @@ class ReportGenerator:
                 date_now = date_now + "<br>"
 
             # Optional arguments
+            text_display_user = ""
             text_display_sector = ""
+            text_display_protocol = ""
+            
             if self.sector is not None:
                 text_display_sector = f"<strong>Setor estrat&eacute;gico: {self.sector}</strong><br>"
             
             if self.protocol is not None:
                 text_display_protocol = f"<strong>Protocolo: {self.protocol}</strong><br>"
+
+            if self.user is not None:
+                text_display_user = f"<strong>Usu&aacute;rio: {self.user}</strong><br>"
 
             template_vars = {
                 "name": info.__name__,
@@ -158,6 +166,7 @@ class ReportGenerator:
                 "text_display_date": date_now,
                 "text_display_sector": text_display_sector,
                 "text_display_protocol": text_display_protocol,
+                "text_display_user": text_display_user,
 
                 "tests_not_executed": results_tests_not_executed,
                 "display_tests_not_executed": display_tests_not_executed

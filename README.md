@@ -128,6 +128,12 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   --protocol=nome_do_protocolo
   ```
 
+  - `--user`: Quando este argumento é usado, o script exibe o nome do usuário no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
+  - Exemplo:
+  ```
+  --user=nome_do_usuario
+  ```
+
 ### Testes
 #### Instalando o coverage
 ```bash
