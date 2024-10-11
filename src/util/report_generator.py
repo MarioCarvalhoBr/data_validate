@@ -100,13 +100,6 @@ class ReportGenerator:
             f.write(text_html)
 
     def save_html_pdf_report(self, name_file, output_folder, file_output_html, results_tests, results_tests_not_executed, num_errors, num_warnings, number_tests):
-        """
-        num_errors: int
-        num_warnings: int
-        number_tests: int
-        results_tests: list
-        results_tests_not_executed: list
-        """
         try: 
             self.output_folder = output_folder
             """ Preenche o template HTML com dados e salva o resultado. """
@@ -183,7 +176,6 @@ class ReportGenerator:
 
         except Exception as e:
             print(f'\nErro ao criar o arquivo de relatório em HTML: {e}', file=sys.stderr)
-            pass
     
     def save_pdf_report(self, output_path):
         try: 

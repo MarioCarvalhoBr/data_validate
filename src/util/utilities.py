@@ -341,6 +341,10 @@ def clean_non_numeric_and_less_than_value_integers_dataframe(df, name_file, colu
 
         # Lista de índices para remover
         indices_para_remover = []
+        # Verifica se a coluna existe no dataframe
+        if coluna not in df.columns:
+            erros.append(f"{name_file}: A coluna '{coluna}' não foi encontrada.")
+            continue
        
         for index, row in df.iterrows():
             cell = row[coluna]
@@ -472,52 +476,58 @@ def read_file_proporcionalites(path):
     return df, errors
 
 def check_folder_exists(folder_path):
-    # Invalid path
-    if folder_path is None:
-        return False, f"O caminho da pasta não foi especificado: {folder_path}."
-    
-    # Empty string
-    if folder_path == "":
-        return False, f"O caminho da pasta está vazio: {folder_path}."
-    
-    # Path to a file, not a folder
-    if not os.path.exists(folder_path):
-        return False, f"A pasta não foi encontrada: {folder_path}."
-    
-    # Path to a folder
-    if not os.path.isdir(folder_path):
-        return False, f"O caminho especificado não é uma pasta: {folder_path}."
-    return True, ""
+    try: 
+        # Invalid path
+        if folder_path is None:
+            return False, f"O caminho da pasta não foi especificado: {folder_path}."
+        
+        # Empty string
+        if folder_path == "":
+            return False, f"O caminho da pasta está vazio: {folder_path}."
+        
+        # Path to a file, not a folder
+        if not os.path.exists(folder_path):
+            return False, f"A pasta não foi encontrada: {folder_path}."
+        
+        # Path to a folder
+        if not os.path.isdir(folder_path):
+            return False, f"O caminho especificado não é uma pasta: {folder_path}."
+        return True, ""
+    except Exception as e:
+        return False, f"Erro ao verificar a pasta: {str(e)}"
 
 def check_sp_file_exists(file_path):
-    is_csv = False
-    is_xlsx = False
-    file_name = os.path.basename(file_path)
-    file_name = file_name.replace(".xlsx", "").replace(".csv", "") + ".csv"
+    try: 
+        is_csv = False
+        is_xlsx = False
+        file_name = os.path.basename(file_path)
+        file_name = file_name.replace(".xlsx", "").replace(".csv", "") + ".csv"
 
-    file_path_non_extension = os.path.splitext(file_path)[0]
+        file_path_non_extension = os.path.splitext(file_path)[0]
 
-    path_file_csv = file_path_non_extension + ".csv"
-    path_file_xlsx = file_path_non_extension + ".xlsx"
+        path_file_csv = file_path_non_extension + ".csv"
+        path_file_xlsx = file_path_non_extension + ".xlsx"
 
-    if os.path.exists(path_file_csv):
-        is_csv = True
-    if os.path.exists(path_file_xlsx):
-        is_xlsx = True
+        if os.path.exists(path_file_csv):
+            is_csv = True
+        if os.path.exists(path_file_xlsx):
+            is_xlsx = True
 
-    # Se não encontrou nenhum dos dois
-    if not is_csv and not is_xlsx:
-        name_scnario = SP_SCENARIO_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
-        name_proportionality = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
-        file_name_non_extension = file_name.replace(".csv","").replace(".xlsx","")
+        # Se não encontrou nenhum dos dois
+        if not is_csv and not is_xlsx:
+            name_scnario = SP_SCENARIO_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
+            name_proportionality = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
+            file_name_non_extension = file_name.replace(".csv","").replace(".xlsx","")
 
-        if file_name_non_extension == name_scnario or file_name_non_extension == name_proportionality:
-            return False, is_csv, is_xlsx, []
-        return False, is_csv, is_xlsx, [f"{file_name}: O arquivo esperado não foi encontrado."]
-    if is_csv and is_xlsx:
-        return True, is_csv, is_xlsx, [f"{file_name}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."]
-    
-    return True, is_csv, is_xlsx, []
+            if file_name_non_extension == name_scnario or file_name_non_extension == name_proportionality:
+                return False, is_csv, is_xlsx, []
+            return False, is_csv, is_xlsx, [f"{file_name}: O arquivo esperado não foi encontrado."]
+        if is_csv and is_xlsx:
+            return True, is_csv, is_xlsx, [f"{file_name}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."]
+        
+        return True, is_csv, is_xlsx, []
+    except Exception as e:
+        return False, f"Erro ao verificar se o arquivo existe: {str(e)}"
 
 
 def check_file_exists(file_path):

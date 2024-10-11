@@ -145,7 +145,6 @@ def extract_ids_from_list_from_description(df_description):
     # Converte em inteiros
     ids_valids = set(str(id) for id in ids_valids)
 
-    
     return ids_valids, ids_invalids
 
 def compare_ids(id_description, id_proporcionalities, name_sp_description, name_sp_proportionalities):
@@ -161,22 +160,20 @@ def compare_ids(id_description, id_proporcionalities, name_sp_description, name_
     return errors
 
 def verify_sum_prop_influence_factor_values(sp_df_proportionalities, sp_df_values, name_sp_df_proporcionalities, name_sp_df_values):
-    df_proportionalities = sp_df_proportionalities.copy()
-    df_values = sp_df_values.copy()
-    
-    errors = []
-    warnings = []
-
-    if df_proportionalities.empty or df_values.empty:
-        return True, errors, warnings
-    
-    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
-
-    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
-        errors.append(f"{name_sp_df_proporcionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
-        return not errors, errors, warnings
-   
+    errors, warnings = [], []
     try:
+        df_proportionalities = sp_df_proportionalities.copy()
+        df_values = sp_df_values.copy()
+
+        if df_proportionalities.empty or df_values.empty:
+            return True, errors, warnings
+        
+        level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+        if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+            errors.append(f"{name_sp_df_proporcionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+            return not errors, errors, warnings
+   
         # Verifica se a soma dos valores de cada subdataset é igual a 1
         subdatasets = build_subdatasets(df_proportionalities)
 
@@ -187,34 +184,33 @@ def verify_sum_prop_influence_factor_values(sp_df_proportionalities, sp_df_value
     return not errors, errors, warnings
 
 def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proportionalities, df_sp_scenario, name_sp_description, name_sp_proportionalities, name_sp_scenario):
-    # Copia os dataframes para não alterar os originais
-    df_description = df_sp_description.copy()
-    df_proportionalities = df_sp_proportionalities.copy()
-    df_sp_scenario = df_sp_scenario.copy()
-
-    # Se for empty, retorna True
-    if df_description.empty or df_proportionalities.empty:
-        return True, [], []
-    errors = []
-    warnings = []
-
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
-        errors.append(f"{name_sp_description}: Verificação abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
-        return not errors, errors, warnings
-    
-    sp_scenario_exists = True
-    if df_sp_scenario.empty:
-        sp_scenario_exists = False
-
-    if sp_scenario_exists:
-        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
-            errors.append(f"{name_sp_scenario}: Verificação abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
-    
-    # Return if errors
-    if errors:
-        return not errors, errors, []
-    
+    errors, warnings = [], []
     try:
+        # Copia os dataframes para não alterar os originais
+        df_description = df_sp_description.copy()
+        df_proportionalities = df_sp_proportionalities.copy()
+        df_sp_scenario = df_sp_scenario.copy()
+
+        # Se for empty, retorna True
+        if df_description.empty or df_proportionalities.empty:
+            return True, errors, warnings
+
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+            errors.append(f"{name_sp_description}: Verificação abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+            return not errors, errors, warnings
+        
+        sp_scenario_exists = True
+        if df_sp_scenario.empty:
+            sp_scenario_exists = False
+
+        if sp_scenario_exists:
+            if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+                errors.append(f"{name_sp_scenario}: Verificação abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+        
+        # Return if errors
+        if errors:
+            return not errors, errors, []
+    
         lista_simbolos_cenarios = []
         if sp_scenario_exists:
             lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
@@ -265,37 +261,35 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
     return not errors, errors, warnings
 
 def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities, df_sp_scenario, name_sp_proportionalities, name_sp_scenario):
-    # Copia os dataframes para não alterar os originais
-    df_proportionalities = df_sp_proportionalities.copy()
-    df_sp_scenario = df_sp_scenario.copy()
-
-    errors = []
-    warnings = []
-
-    # Se for empty, retorna True
-    if df_proportionalities.empty:
-        return True, errors, warnings
-    
-    
-    level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
-
-    if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
-        errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
-        return not errors, errors, warnings
-    
-    sp_scenario_exists = True
-    if df_sp_scenario.empty:
-        sp_scenario_exists = False
-
-    if sp_scenario_exists:
-        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
-            errors.append(f"{name_sp_scenario}: Verificação abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
-    
-    # Return if errors
-    if errors:
-        return not errors, errors, warnings
-    
+    errors, warnings = [], []
     try:
+        # Copia os dataframes para não alterar os originais
+        df_proportionalities = df_sp_proportionalities.copy()
+        df_sp_scenario = df_sp_scenario.copy()
+
+        # Se for empty, retorna True
+        if df_proportionalities.empty:
+            return True, errors, warnings
+        
+        
+        level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+        if SP_PROPORTIONALITIES_COLUMNS.ID not in level_two_columns:
+            errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
+            return not errors, errors, warnings
+        
+        sp_scenario_exists = True
+        if df_sp_scenario.empty:
+            sp_scenario_exists = False
+
+        if sp_scenario_exists:
+            if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+                errors.append(f"{name_sp_scenario}: Verificação abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+        
+        # Return if errors
+        if errors:
+            return not errors, errors, warnings
+    
         # Cria subdatasets usando os códigos dos indicadores
         subdatasets = build_subdatasets(df_proportionalities)
     
@@ -334,34 +328,33 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
     return not errors, errors, warnings
 
 def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, name_sp_proportionalities, name_sp_composition):
-    # Copia os DataFrames para evitar modificar os originais
-    df_proportionalities = df_sp_proportionalities.copy()
-    df_composition = df_sp_composition.copy()
-
-    errors = []
-    warnings = []
-
-    # Se algum DataFrame estiver vazio, retorna sucesso sem erros
-    if df_proportionalities.empty or df_composition.empty:
-        return True, errors, warnings
-    
-    # Cria os subdatasets de proporcionalidades
-    subdatasets = build_subdatasets(df_proportionalities)
-
-    level_two_columns = df_proportionalities.columns.get_level_values(1).unique()
-
-    # Verifica se as colunas obrigatórias estão presentes
-    required_columns = [
-        (SP_PROPORTIONALITIES_COLUMNS.ID, level_two_columns, name_sp_proportionalities),
-        (SP_COMPOSITION_COLUMNS.CODIGO_PAI, df_composition.columns, name_sp_composition),
-        (SP_COMPOSITION_COLUMNS.CODIGO_FILHO, df_composition.columns, name_sp_composition),
-    ]
-    
-    for column, available_columns, sheet_name in required_columns:
-        if column not in available_columns:
-            errors.append(f"{sheet_name}: Verificação abortada porque a coluna '{column}' está ausente.")
-            return False, errors, warnings
+    errors, warnings = [], []
     try:
+        # Copia os DataFrames para evitar modificar os originais
+        df_proportionalities = df_sp_proportionalities.copy()
+        df_composition = df_sp_composition.copy()
+
+        # Se algum DataFrame estiver vazio, retorna sucesso sem erros
+        if df_proportionalities.empty or df_composition.empty:
+            return True, errors, warnings
+        
+        # Cria os subdatasets de proporcionalidades
+        subdatasets = build_subdatasets(df_proportionalities)
+
+        level_two_columns = df_proportionalities.columns.get_level_values(1).unique()
+
+        # Verifica se as colunas obrigatórias estão presentes
+        required_columns = [
+            (SP_PROPORTIONALITIES_COLUMNS.ID, level_two_columns, name_sp_proportionalities),
+            (SP_COMPOSITION_COLUMNS.CODIGO_PAI, df_composition.columns, name_sp_composition),
+            (SP_COMPOSITION_COLUMNS.CODIGO_FILHO, df_composition.columns, name_sp_composition),
+        ]
+        
+        for column, available_columns, sheet_name in required_columns:
+            if column not in available_columns:
+                errors.append(f"{sheet_name}: Verificação abortada porque a coluna '{column}' está ausente.")
+                return False, errors, warnings
+
         composition_gouped_dict = {}
         
         # Remove de df_composition as linhas que tem CODIGO_PAI == 1
@@ -414,48 +407,50 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
         errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
     return not errors, errors, warnings
 
-
 def verify_ids_values_proportionalities(df_proportionalities, df_values, proportionalities_name, values_name):
-    df_proportionalities = df_proportionalities.copy()
-    df_values = df_values.copy()
-    errors = []
-    warnings = []
+    errors, warnings = [], []
+    try:
+        df_proportionalities = df_proportionalities.copy()
+        df_values = df_values.copy()
 
-    if df_proportionalities.empty and df_values.empty:
-        return True, errors, warnings
+        if df_proportionalities.empty and df_values.empty:
+            return True, errors, warnings
+        
+        proportionalities_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
+
+        required_columns = [
+            (SP_PROPORTIONALITIES_COLUMNS.ID, proportionalities_columns, proportionalities_name),
+            (SP_VALUES_COLUMNS.ID, df_values.columns, values_name),
+        ]
+        
+        for column, available_columns, sheet_name in required_columns:
+            if column not in available_columns:
+                errors.append(f"{sheet_name}: Verificação abortada porque a coluna '{column}' está ausente.")
+                return False, errors, warnings
+
+        proportionalities_indicators_lvl1 = df_proportionalities.columns.get_level_values(0).unique().tolist()
+        proportionalities_indicators_lvl1.remove('Unnamed: 0_level_0')
+        
+        proportionalities_indicators_lvl2 = proportionalities_columns
+        proportionalities_indicators_lvl2.remove(SP_PROPORTIONALITIES_COLUMNS.ID)
+        
+        proportionalities_indicators = sorted(set(proportionalities_indicators_lvl1 + proportionalities_indicators_lvl2))
+
+        values_indicators = df_values.columns.unique().tolist()
+        values_indicators.remove(SP_VALUES_COLUMNS.ID)
+        values_indicators = sorted(set(values_indicators))
+
+        common_indicators = sorted(set(values_indicators).intersection(proportionalities_indicators))
+
+        missing_in_proportionalities = sorted(set(values_indicators) - set(common_indicators))
+        for indicator in missing_in_proportionalities:
+            errors.append(f"{values_name}: O indicador '{indicator}' não está presente na planilha {proportionalities_name}.")
+
+        missing_in_values = sorted(set(proportionalities_indicators) - set(common_indicators))
+        for indicator in missing_in_values:
+            errors.append(f"{proportionalities_name}: O indicador '{indicator}' não está presente na planilha {values_name}.")
     
-    proportionalities_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
-
-    required_columns = [
-        (SP_PROPORTIONALITIES_COLUMNS.ID, proportionalities_columns, proportionalities_name),
-        (SP_VALUES_COLUMNS.ID, df_values.columns, values_name),
-    ]
+    except Exception as e:
+        errors.append(f"{proportionalities_name}: Erro ao processar a verificação: {e}.")
     
-    for column, available_columns, sheet_name in required_columns:
-        if column not in available_columns:
-            errors.append(f"{sheet_name}: Verificação abortada porque a coluna '{column}' está ausente.")
-            return False, errors, warnings
-
-    proportionalities_indicators_lvl1 = df_proportionalities.columns.get_level_values(0).unique().tolist()
-    proportionalities_indicators_lvl1.remove('Unnamed: 0_level_0')
-    
-    proportionalities_indicators_lvl2 = proportionalities_columns
-    proportionalities_indicators_lvl2.remove(SP_PROPORTIONALITIES_COLUMNS.ID)
-    
-    proportionalities_indicators = sorted(set(proportionalities_indicators_lvl1 + proportionalities_indicators_lvl2))
-
-    values_indicators = df_values.columns.unique().tolist()
-    values_indicators.remove(SP_VALUES_COLUMNS.ID)
-    values_indicators = sorted(set(values_indicators))
-
-    common_indicators = sorted(set(values_indicators).intersection(proportionalities_indicators))
-
-    missing_in_proportionalities = sorted(set(values_indicators) - set(common_indicators))
-    for indicator in missing_in_proportionalities:
-        errors.append(f"{values_name}: O indicador '{indicator}' não está presente na planilha {proportionalities_name}.")
-
-    missing_in_values = sorted(set(proportionalities_indicators) - set(common_indicators))
-    for indicator in missing_in_values:
-        errors.append(f"{proportionalities_name}: O indicador '{indicator}' não está presente na planilha {values_name}.")
-
     return not errors, errors, warnings

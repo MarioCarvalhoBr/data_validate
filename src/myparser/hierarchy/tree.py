@@ -54,53 +54,56 @@ def verificar_erros_niveis(composicao, descricao):
     return erros
 
 def verify_tree_sp_description_composition_hierarchy(df_composicao, df_descricao):
-    df_composicao = df_composicao.copy()
-    df_descricao = df_descricao.copy()
-
-    if df_composicao.empty or df_descricao.empty:
-        return True, [], []
-    
     errors, warnings = [], []
+    try:
+        df_composicao = df_composicao.copy()
+        df_descricao = df_descricao.copy()
 
-    # Verifica se as colunas codigo_pai e codigo_filho existem
-    if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in df_composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in df_composicao.columns:
-        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
-        return not errors, errors, warnings
+        if df_composicao.empty or df_descricao.empty:
+            return True, errors, warnings
+        
+        # Verifica se as colunas codigo_pai e codigo_filho existem
+        if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in df_composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in df_composicao.columns:
+            errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
+            return not errors, errors, warnings
+        
+        # Corrige a coluna relacao
+        if SP_DESCRIPTION_COLUMNS.RELACAO not in df_descricao.columns:
+            # Cria a coluna relacao e preenche com 1
+            df_descricao[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
+        
+        # Limpa os valores não numéricos e menores que 0
+        df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
+        df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
+        
+        # Verifica se a coluna codigo e nivel existem
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df_descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in df_descricao.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
+            return not errors, errors, warnings
+        
+        df_descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
+        
+        # Fix para adicionar a raiz da árvore
+        if not ((df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == 0)).any():
+            # Adiciona a a linha com codigo=0 e nivel=0																						
+            df_descricao = pd.concat([df_descricao, pd.DataFrame([[0,0,0,0,0,0,0,0,0,0,0]], columns=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META])], ignore_index=True)
+        
+        arvore = criar_arvore(df_composicao)
+        ciclo_encontrado, ciclo = verificar_ciclos(arvore)
+        if ciclo_encontrado:
+            errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Ciclo encontrado: [{' -> '.join(ciclo)}].")
+        
+        erros_niveis = verificar_erros_niveis(df_composicao, df_descricao)
+        if erros_niveis:
+            for pai, filho in erros_niveis:
+                if (filho is not None) and (pai is not None): 
+                    linha_relacionada = df_composicao[(df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI] == int(pai)) & (df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO] == int(filho))].index.tolist()[0]
+                    index_linha = linha_relacionada + 2
+                    
+                    nivel_pai = df_descricao[df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == int(pai)][SP_DESCRIPTION_COLUMNS.NIVEL].values[0]
+                    nivel_filho = df_descricao[df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == int(filho)][SP_DESCRIPTION_COLUMNS.NIVEL].values[0]
+                    errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}, linha {index_linha}: O indicador {pai} (nível {nivel_pai}) não pode ser pai do indicador {filho} (nível {nivel_filho}). Atualize os níveis no arquivo de descrição.")
+    except Exception as e:
+        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
     
-    # Corrige a coluna relacao
-    if SP_DESCRIPTION_COLUMNS.RELACAO not in df_descricao.columns:
-        # Cria a coluna relacao e preenche com 1
-        df_descricao[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
-    
-    # Limpa os valores não numéricos e menores que 0
-    df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
-    df_composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
-    
-    # Verifica se a coluna codigo e nivel existem
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in df_descricao.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição não realizada.")
-        return not errors, errors, warnings
-    
-    df_descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
-    
-    # Fix para adicionar a raiz da árvore
-    if not ((df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == 0)).any():
-        # Adiciona a a linha com codigo=0 e nivel=0																						
-        df_descricao = pd.concat([df_descricao, pd.DataFrame([[0,0,0,0,0,0,0,0,0,0,0]], columns=[SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL, SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.UNIDADE, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA, SP_DESCRIPTION_COLUMNS.CENARIO, SP_DESCRIPTION_COLUMNS.RELACAO, SP_DESCRIPTION_COLUMNS.FONTES, SP_DESCRIPTION_COLUMNS.META])], ignore_index=True)
-    
-    arvore = criar_arvore(df_composicao)
-    ciclo_encontrado, ciclo = verificar_ciclos(arvore)
-    if ciclo_encontrado:
-        errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Ciclo encontrado: [{' -> '.join(ciclo)}].")
-    
-    erros_niveis = verificar_erros_niveis(df_composicao, df_descricao)
-    if erros_niveis:
-        for pai, filho in erros_niveis:
-            if (filho is not None) and (pai is not None): 
-                linha_relacionada = df_composicao[(df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI] == int(pai)) & (df_composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO] == int(filho))].index.tolist()[0]
-                index_linha = linha_relacionada + 2
-                
-                nivel_pai = df_descricao[df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == int(pai)][SP_DESCRIPTION_COLUMNS.NIVEL].values[0]
-                nivel_filho = df_descricao[df_descricao[SP_DESCRIPTION_COLUMNS.CODIGO] == int(filho)][SP_DESCRIPTION_COLUMNS.NIVEL].values[0]
-                errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}, linha {index_linha}: O indicador {pai} (nível {nivel_pai}) não pode ser pai do indicador {filho} (nível {nivel_filho}). Atualize os níveis no arquivo de descrição.")
     return not errors, errors, warnings

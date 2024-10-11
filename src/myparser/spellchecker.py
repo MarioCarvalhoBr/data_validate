@@ -50,12 +50,12 @@ def find_spelling_errors(text, meu_analizador):
     return errors
 
 def verify_spelling_text(df, file_name, columns_sheets, lang_dict_spell):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-    
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+    
         PATH_DIC = f'dictionaries/{lang_dict_spell}/{lang_dict_spell}.dic'
         PATH_AFF = f'dictionaries/{lang_dict_spell}/{lang_dict_spell}.aff'
         
