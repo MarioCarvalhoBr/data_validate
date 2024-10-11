@@ -105,7 +105,7 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
                         valor = sp_df_values.loc[sp_df_values[SP_VALUES_COLUMNS.ID] == id_linha][id_coluna].values[0]
                         if valor != 'DI' and float(valor) != 0:
                             errors.append(f"{name_sp_proporcionalities_name}: A soma de fatores influenciadores é 0 (zero). Na planilha {name_sp_df_values} o indicador '{id_coluna}' para o ID '{id_linha}' não é zero ou DI (Dado Indisponível).")
-                    except Exception as e:
+                    except Exception:
                         continue
             elif row_sum < Decimal('0.99') or row_sum > Decimal('1.01'):
                 errors.append(f'{name_sp_proporcionalities_name}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')

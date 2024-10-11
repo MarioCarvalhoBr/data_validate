@@ -190,7 +190,6 @@ def verify_unique_titles_description_composition(descricao, composicao):
         return True, [], []
     errors = []
     warnings = []
-    is_valid = True
 
     # Verifica se as colunas com código existem
     if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
