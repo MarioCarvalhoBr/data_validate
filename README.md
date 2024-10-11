@@ -115,6 +115,12 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   ```
   --no-version
   ```
+
+  - `--sector`: Quando este argumento é usado, o script exibe o setor estratégico no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
+  - Exemplo:
+  ```
+  --sector=nome_do_setor
+  ```
   
 
 ### Testes
