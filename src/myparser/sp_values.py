@@ -94,14 +94,14 @@ def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
         # Se for empty, retorna True
         if df_description.empty or df_values.empty:
             return True, errors, warnings
-        
-        # Verifica a coluna nível em descrição
-        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
-            return not errors, errors, warnings
 
         if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
             errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+            return not errors, errors, warnings
+        
+         # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
             return not errors, errors, warnings
         
         sp_scenario_exists = True
