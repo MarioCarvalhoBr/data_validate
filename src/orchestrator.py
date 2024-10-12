@@ -61,7 +61,7 @@ def flatten(is_correct, list_errors, list_warnings):
 
 # Função principal para executar o programa
 def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titles_length, no_time, debug, no_version, sector, protocol, user):
-
+    
     global global_num_warnings
     global global_num_errors
     

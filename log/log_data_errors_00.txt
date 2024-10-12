@@ -28,6 +28,7 @@ descricao.csv: O arquivo esperado não foi encontrado.
 composicao.csv: O arquivo esperado não foi encontrado.
 valores.csv: O arquivo esperado não foi encontrado.
 Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.
+descricao.xlsx: Verificação de legenda não realizada. Coluna 'nivel' não encontrada.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 Verificação: Hierarquia como árvore
@@ -49,10 +50,12 @@ Verificação: Valores indisponíveis
 Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
+descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.
 Verificação: Sobreposição de valores na legenda
+descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.
 
 
-Número de erros: 5
+Número de erros: 8
 Número de avisos: 0
 Número de verificações realizadas: 23
 

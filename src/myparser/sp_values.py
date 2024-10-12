@@ -85,39 +85,41 @@ def extract_ids_from_list_from_values(codes_level_to_remove, list_values, lista_
 
     return ids_valids, filtered_extras_columns
 
-
-
 def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
-    df_description = df_description.copy()
-    df_values = df_values.copy()
-
-    # Se for empty, retorna True
-    if df_description.empty or df_values.empty:
-        return True, [], []
-    errors = []
-    warnings = []
-
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
-        return not errors, errors, warnings
-    
-    sp_scenario_exists = True
-    if df_sp_scenario.empty:
-        sp_scenario_exists = False
-
-    if sp_scenario_exists:
-        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
-            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
-    
-    # Return if errors
-    if errors:
-        return not errors, errors, []
-    
-    lista_simbolos_cenarios = []
-    if sp_scenario_exists:
-        lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
-
+    errors, warnings = [], []
     try:
+        df_description = df_description.copy()
+        df_values = df_values.copy()
+
+        # Se for empty, retorna True
+        if df_description.empty or df_values.empty:
+            return True, errors, warnings
+
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+            return not errors, errors, warnings
+        
+         # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
+            return not errors, errors, warnings
+        
+        sp_scenario_exists = True
+        if df_sp_scenario.empty:
+            sp_scenario_exists = False
+
+        if sp_scenario_exists:
+            if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+                errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+        
+        # Return if errors
+        if errors:
+            return not errors, errors, []
+        
+        lista_simbolos_cenarios = []
+        if sp_scenario_exists:
+            lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+
         # Clean non numeric values
         df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
         
@@ -135,55 +137,58 @@ def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
             errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Colunas inválidas: {final_list_invalid_codes}.")
 
         errors += compare_ids(id_description_valids, id_values_valids, SP_DESCRIPTION_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP)
-
     except Exception as e:
         errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP} e {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
 
-    
     return not errors, errors, warnings
 
 def verify_combination_sp_description_values_scenario_temporal_reference(df_description, df_values, df_scenario, df_temporal_reference):
-    errors = []
-    df_description = df_description.copy()
-    df_values = df_values.copy()
-    df_scenario = df_scenario.copy()
-    df_temporal_reference = df_temporal_reference.copy()
-    # Se for empty, retorna True
-    if df_description.empty or df_values.empty or df_temporal_reference.empty:
-        return True, [], []
+    errors, warnings = [], []
+    try:
+        df_description = df_description.copy()
+        df_values = df_values.copy()
+        df_scenario = df_scenario.copy()
+        df_temporal_reference = df_temporal_reference.copy()
+        # Se for empty, retorna True
+        if df_description.empty or df_values.empty or df_temporal_reference.empty:
+            return True, errors, warnings
+        
+        # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de combinação de cenários e referência temporal foi abortada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
+            return not errors, errors, warnings
 
-    # Check if columns exists
-    text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada porque a coluna"
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
-    elif SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
-        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {text_error_column} '{SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO}' está ausente.")
-    elif SP_VALUES_COLUMNS.ID not in df_values.columns:
-        errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {text_error_column} '{SP_VALUES_COLUMNS.ID}' está ausente.")
+        # Check if columns exists
+        text_error_column = "Verificação de combinação de cenários e referência temporal foi abortada porque a coluna"
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+        elif SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
+            errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {text_error_column} '{SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO}' está ausente.")
+        elif SP_VALUES_COLUMNS.ID not in df_values.columns:
+            errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {text_error_column} '{SP_VALUES_COLUMNS.ID}' está ausente.")
 
-    sp_scenario_exists = True
-    if df_scenario is None or df_scenario.empty:
-        sp_scenario_exists = False
+        sp_scenario_exists = True
+        if df_scenario is None or df_scenario.empty:
+            sp_scenario_exists = False
 
-    if sp_scenario_exists:
-        if SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}' está ausente.")
-        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
-            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
-    
-    # Return if errors
-    if errors:
-        return not errors, errors, []
+        if sp_scenario_exists:
+            if SP_DESCRIPTION_COLUMNS.CENARIO not in df_description.columns:
+                errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: {text_error_column} '{SP_DESCRIPTION_COLUMNS.CENARIO}' está ausente.")
+            if SP_SCENARIO_COLUMNS.SIMBOLO not in df_scenario.columns:
+                errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: {text_error_column} '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+        
+        # Return if errors
+        if errors:
+            return not errors, errors, []
 
-    # Clean non numeric values
-    # Verifica se a coluna cenario existe em df_description
-    collumns_to_clean_df_description = [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL]
-    if sp_scenario_exists:
-        collumns_to_clean_df_description.append(SP_DESCRIPTION_COLUMNS.CENARIO)
-    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, collumns_to_clean_df_description)
-    df_temporal_reference, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_temporal_reference, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO])
+        # Clean non numeric values
+        # Verifica se a coluna cenario existe em df_description
+        collumns_to_clean_df_description = [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL]
+        if sp_scenario_exists:
+            collumns_to_clean_df_description.append(SP_DESCRIPTION_COLUMNS.CENARIO)
+        df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, collumns_to_clean_df_description)
+        df_temporal_reference, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_temporal_reference, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO])
 
-    try: 
         # Criar lista de símbolos de cenários
         lista_simbolos_cenarios = []
         if sp_scenario_exists:
@@ -239,31 +244,31 @@ def verify_combination_sp_description_values_scenario_temporal_reference(df_desc
             lista_combinacoes_copia.clear()
     except Exception as e:
         errors.append(f"Erro ao processar os arquivos {SP_DESCRIPTION_COLUMNS.NAME_SP}, {SP_VALUES_COLUMNS.NAME_SP}, {SP_SCENARIO_COLUMNS.NAME_SP} e {SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: {e}.")
-    return not errors, errors, []
+    
+    return not errors, errors, warnings
 
 def verify_unavailable_values(df_values, df_sp_scenario):
-    errors = []
-    warnings = []
-    if df_values.empty:
-        return True, [], []
-    
-    sp_scenario_exists = True
-    if df_sp_scenario.empty:
-        sp_scenario_exists = False
-
-    if sp_scenario_exists:
-        if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
-            errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
-    
-    # Return if errors
-    if errors:
-        return not errors, errors, []
-    
-    lista_simbolos_cenarios = []
-    if sp_scenario_exists:
-        lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
-
+    errors, warnings = [], []
     try:
+        if df_values.empty:
+            return True, errors, warnings
+        
+        sp_scenario_exists = True
+        if df_sp_scenario.empty:
+            sp_scenario_exists = False
+
+        if sp_scenario_exists:
+            if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
+                errors.append(f"{SP_SCENARIO_COLUMNS.NAME_SP}: Verificação foi abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
+        
+        # Return if errors
+        if errors:
+            return not errors, errors, []
+        
+        lista_simbolos_cenarios = []
+        if sp_scenario_exists:
+            lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()
+
         df_values = df_values.copy()
 
         # Remove colunas que não são códigos: id e nome
@@ -297,7 +302,5 @@ def verify_unavailable_values(df_values, df_sp_scenario):
             errors.extend(errors_column)
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
+    
     return not errors, errors, warnings
-
-def verify_scenario_coherence_values(df_sp_proportionalities, df_sp_composition, name_sp_proportionalities, name_sp_composition):
-    pass

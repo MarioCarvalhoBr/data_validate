@@ -17,9 +17,7 @@ def verify_errors_read_files_in_folder_root(read_errors):
     return not errors, errors, warnings
 
 def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUMNS_DICT):
-    errors = []
-    warnings = []
-    
+    errors, warnings = [], []
     try:
         STRUCTURE_FILES_COLUMNS_DICT = STRUCTURE_FILES_COLUMNS_DICT.copy()
         
@@ -61,39 +59,38 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
     return not errors, errors, warnings
       
 def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists=True, sp_proportionalities_exists=True):
-    df = df.copy()
-    errors = []
-    warnings = []
-
-    # Se o df for none ou vazio retorna erro
-    if df is None or df.empty:
-        name_scnario = SP_SCENARIO_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
-        name_proportionality = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
-        file_name_non_extension = file_name.replace(".csv","").replace(".xlsx","")
-
-        if (file_name_non_extension == name_scnario and not sp_scenario_exists) or (file_name_non_extension == name_proportionality and not sp_proportionalities_exists):
-            return True, [], []
-
-        return False, [], []
-    
-    # Quando não existir o arquivo de SP_SCENARIO_COLUMNS.NAME_SP, a coluna 'SP_DESCRIPTION_COLUMNS.CENARIO' não pode existir no arquivo de descrição
-    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and not sp_scenario_exists:
-            expected_columns = [column for column in expected_columns if column != SP_DESCRIPTION_COLUMNS.CENARIO]
-            if SP_DESCRIPTION_COLUMNS.CENARIO in df.columns:
-                errors.append(f"{file_name}: A coluna '{SP_DESCRIPTION_COLUMNS.CENARIO}' não pode existir se o arquivo '{SP_SCENARIO_COLUMNS.NAME_SP}' não existir.")
-                df = df.drop(columns=[SP_DESCRIPTION_COLUMNS.CENARIO])
-    
-    # Corrige a coluna relacao
-    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns):
-        # Cria a coluna relacao e preenche com 1
-        df[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
-    
-    # Corrige a coluna unidade
-    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.UNIDADE not in df.columns):
-        # Cria a coluna unidade e preenche com vazio
-        df[SP_DESCRIPTION_COLUMNS.UNIDADE] = ""
-
+    errors, warnings = [], []
     try:
+        df = df.copy()
+        # Se o df for none ou vazio retorna erro
+        if df is None or df.empty:
+            name_scnario = SP_SCENARIO_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
+            name_proportionality = SP_PROPORTIONALITIES_COLUMNS.NAME_SP.replace(".csv","").replace(".xlsx","")
+            file_name_non_extension = file_name.replace(".csv","").replace(".xlsx","")
+
+            if (file_name_non_extension == name_scnario and not sp_scenario_exists) or (file_name_non_extension == name_proportionality and not sp_proportionalities_exists):
+                return True, errors, warnings
+
+            return False, errors, warnings
+        
+        # Quando não existir o arquivo de SP_SCENARIO_COLUMNS.NAME_SP, a coluna 'SP_DESCRIPTION_COLUMNS.CENARIO' não pode existir no arquivo de descrição
+        if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and not sp_scenario_exists:
+                expected_columns = [column for column in expected_columns if column != SP_DESCRIPTION_COLUMNS.CENARIO]
+                if SP_DESCRIPTION_COLUMNS.CENARIO in df.columns:
+                    errors.append(f"{file_name}: A coluna '{SP_DESCRIPTION_COLUMNS.CENARIO}' não pode existir se o arquivo '{SP_SCENARIO_COLUMNS.NAME_SP}' não existir.")
+                    df = df.drop(columns=[SP_DESCRIPTION_COLUMNS.CENARIO])
+        
+        # Corrige a coluna relacao
+        if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns):
+            # Cria a coluna relacao e preenche com 1
+            df[SP_DESCRIPTION_COLUMNS.RELACAO] = 1
+        
+        # Corrige a coluna unidade
+        if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP and (SP_DESCRIPTION_COLUMNS.UNIDADE not in df.columns):
+            # Cria a coluna unidade e preenche com vazio
+            df[SP_DESCRIPTION_COLUMNS.UNIDADE] = ""
+
+    
         # Check if there is a vertical bar in the column name
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)
         errors.extend(errors_vertical_bar)
@@ -139,28 +136,28 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
     return not errors, errors, warnings
       
 def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_exists=True):
-    df = df.copy()
-    errors = []
+    errors, warnings = [], []
+    try:
+        df = df.copy()
+        # Verifica se a tabela SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP tem apenas um valor
+        if file_name == SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP:
+            if (not sp_scenario_exists) and (len(df) != 1):
+                    errors.append(f"{file_name}: A tabela deve ter apenas um valor porque o arquivo {SP_SCENARIO_COLUMNS.NAME_SP} não existe.")
+                    return not errors, errors, []
 
-    # Verifica se a tabela SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP tem apenas um valor
-    if file_name == SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP:
-        if (not sp_scenario_exists) and (len(df) != 1):
-                errors.append(f"{file_name}: A tabela deve ter apenas um valor porque o arquivo {SP_SCENARIO_COLUMNS.NAME_SP} não existe.")
-                return not errors, errors, []
+        # Verifica se a tabela SP_SCENARIO_COLUMNS.NAME_SP tem apenas um valor
+        if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP:
+            if not sp_scenario_exists:
+                columns_to_clean = [column for column in columns_to_clean if column != SP_DESCRIPTION_COLUMNS.CENARIO]
 
-    # Verifica se a tabela SP_SCENARIO_COLUMNS.NAME_SP tem apenas um valor
-    if file_name == SP_DESCRIPTION_COLUMNS.NAME_SP:
-        if not sp_scenario_exists:
-            columns_to_clean = [column for column in columns_to_clean if column != SP_DESCRIPTION_COLUMNS.CENARIO]
+        missing_columns = set(columns_to_clean) - set(df.columns)
+        missing_columns = [str(column) for column in missing_columns]
+        if missing_columns:
+            errors.append(f"{file_name}: A verificação de limpeza foi abortada para as colunas: {missing_columns}.")
 
-    missing_columns = set(columns_to_clean) - set(df.columns)
-    missing_columns = [str(column) for column in missing_columns]
-    if missing_columns:
-        errors.append(f"{file_name}: A verificação de limpeza foi abortada para as colunas: {missing_columns}.")
+        columns_to_clean = [column for column in columns_to_clean if column in df.columns]
 
-    columns_to_clean = [column for column in columns_to_clean if column in df.columns]
-
-    try:        
+            
         _, errors_data = clean_non_numeric_and_less_than_value_integers_dataframe(df, file_name, columns_to_clean, value)
         if errors_data:
             errors.extend(errors_data)
@@ -168,62 +165,69 @@ def verify_files_data_clean(df, file_name, columns_to_clean, value, sp_scenario_
     except Exception as e:
         errors.append(f'{file_name}: Erro ao processar a verificação de limpeza do arquivo: {e}.')
 
-    return not errors, errors, []
+    return not errors, errors, warnings
 
 def verify_files_legends_qml(df_description, root_path):
-    errors = []
-    warnings = []
-
-    files_qml = [f for f in os.listdir(root_path) if f.endswith('.qml')]
-    len_files_qml = len(files_qml) - 1 
-    
-    # Caso 0: Não foi entregue nenhum arquivo QML
-    if len(files_qml) == 0:
-        return not errors, errors, warnings
-    
-    # Caso 1: Somento o arquivo de legenda SP_LEGEND_COLUMNS.NAME_SP foi entregue
-    if len(files_qml) == 1 and files_qml[0] == SP_LEGEND_COLUMNS.NAME_SP:
-        return not errors, errors, warnings
-    
-    # Caso 2: O arquivo de legenda SP_LEGEND_COLUMNS.NAME_SP fo entrege junto com outros arquivos QML
-    if SP_LEGEND_COLUMNS.NAME_SP in files_qml:
-        errors.append(f'{SP_LEGEND_COLUMNS.NAME_SP}: O arquivo {SP_LEGEND_COLUMNS.NAME_SP} foi entregue junto com os outros {len_files_qml} arquivos QML. Os outros arquivos serão ignorados.')
-        return not errors, errors, warnings
-
-    # Copiar files_qml com deepcopy, pois a lista files_qml será alterada
-    copy_files_qml = copy.deepcopy(files_qml)
-    
-    # Caso 3: Apenas arquivos QML dos indicadores foram entregues
-    df_description = df_description.copy()
-    if df_description.empty: # Não continuar a verificação se o arquivo de descrição estiver vazio
-        return not errors, errors, warnings
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns: # Não continuar a verificação se o arquivo de descrição não tiver a coluna de código
-        return not errors, errors, warnings
-    
-    # No futuro essa função será removida, pois não iremos alterar os dados do usuário
-    df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
-    
-    codigos_indicadores_nivel_1 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
-    codigos_indicadores_nivel_2 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '2'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
-    codigos_indicadores_outros = [codigo for codigo in df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist() if codigo not in codigos_indicadores_nivel_1 and codigo not in codigos_indicadores_nivel_2]
-    
-    for codigo in codigos_indicadores_outros:
-        file_name = codigo + '.qml'
-        path_legend = os.path.join(root_path, file_name)
-        exist_file, __ = check_file_exists(path_legend)
+    errors, warnings = [], []
+    try:
+        # Verifica a coluna nível em descrição
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df_description.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de legenda não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
+            return not errors, errors, warnings
         
-        if not exist_file:
-            errors.append(f'{file_name}: Arquivo de legenda esperado mas não encontrado.')
-        else:
-            copy_files_qml.remove(file_name)
-
-    # Remove todos os codigos_indicadores_nivel_2 do copy_files_qml
-    for codigo in codigos_indicadores_nivel_2:
-        file_name = codigo + '.qml'
-        if file_name in copy_files_qml:
-            copy_files_qml.remove(file_name)
-    # Arquivos extras
-    for file_name in copy_files_qml:
-        warnings.append(f'{file_name}: Arquivo de legenda não esperado.')
+        files_qml = [f for f in os.listdir(root_path) if f.endswith('.qml')]
+        len_files_qml = len(files_qml) - 1 
         
+        # Caso 0: Não foi entregue nenhum arquivo QML
+        if len(files_qml) == 0:
+            return not errors, errors, warnings
+        
+        # Caso 1: Somento o arquivo de legenda SP_LEGEND_COLUMNS.NAME_SP foi entregue
+        if len(files_qml) == 1 and files_qml[0] == SP_LEGEND_COLUMNS.NAME_SP:
+            return not errors, errors, warnings
+        
+        # Caso 2: O arquivo de legenda SP_LEGEND_COLUMNS.NAME_SP fo entrege junto com outros arquivos QML
+        if SP_LEGEND_COLUMNS.NAME_SP in files_qml:
+            errors.append(f'{SP_LEGEND_COLUMNS.NAME_SP}: O arquivo {SP_LEGEND_COLUMNS.NAME_SP} foi entregue junto com os outros {len_files_qml} arquivos QML. Os outros arquivos serão ignorados.')
+            return not errors, errors, warnings
+
+        # Copiar files_qml com deepcopy, pois a lista files_qml será alterada
+        copy_files_qml = copy.deepcopy(files_qml)
+        
+        # Caso 3: Apenas arquivos QML dos indicadores foram entregues
+        df_description = df_description.copy()
+        if df_description.empty: # Não continuar a verificação se o arquivo de descrição estiver vazio
+            return not errors, errors, warnings
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df_description.columns: # Não continuar a verificação se o arquivo de descrição não tiver a coluna de código
+            return not errors, errors, warnings
+        
+        # No futuro essa função será removida, pois não iremos alterar os dados do usuário
+        df_description, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df_description, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO])
+        
+        codigos_indicadores_nivel_1 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+        codigos_indicadores_nivel_2 = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '2'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
+        codigos_indicadores_outros = [codigo for codigo in df_description[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist() if codigo not in codigos_indicadores_nivel_1 and codigo not in codigos_indicadores_nivel_2]
+        
+        for codigo in codigos_indicadores_outros:
+            file_name = codigo + '.qml'
+            path_legend = os.path.join(root_path, file_name)
+            exist_file, __ = check_file_exists(path_legend)
+            
+            if not exist_file:
+                errors.append(f'{file_name}: Arquivo de legenda esperado mas não encontrado.')
+            else:
+                copy_files_qml.remove(file_name)
+
+        # Remove todos os codigos_indicadores_nivel_2 do copy_files_qml
+        for codigo in codigos_indicadores_nivel_2:
+            file_name = codigo + '.qml'
+            if file_name in copy_files_qml:
+                copy_files_qml.remove(file_name)
+        # Arquivos extras
+        for file_name in copy_files_qml:
+            warnings.append(f'{file_name}: Arquivo de legenda não esperado.')
+            
+    except Exception as e:
+        errors.append(f'{SP_LEGEND_COLUMNS.NAME_SP}: Erro ao processar a verificação dos arquivos QML: {e}.')
+    
     return not errors, errors, warnings

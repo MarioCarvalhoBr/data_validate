@@ -16,36 +16,37 @@ def check_html_in_descriptions(df, column):
     return errors
 
 def verify_sp_description_parser_html_column_names(df, column):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-
-    if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada porque a coluna '{column}' está ausente.")
-        return not errors, errors, warnings
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+        
+        if column not in df.columns:
+            warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos HTML nas descrições simples foi abortada porque a coluna '{column}' está ausente.")
+            return not errors, errors, warnings
+
+    
         df.columns = df.columns.str.lower()
         html_errors = check_html_in_descriptions(df, column)
         warnings.extend(html_errors)
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação do arquivo: {e}.")
 
-    is_correct = len(errors) == 0
-    return is_correct, errors, warnings
+    return not errors, errors, warnings
 
 def verify_sp_description_codes_sequential(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-    # 0. Check if the column exists
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos sequenciais foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
-        return not errors, errors, warnings
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+        # 0. Check if the column exists
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos sequenciais foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+            return not errors, errors, warnings
+
+    
         df, erros = clean_non_numeric_and_less_than_value_integers_dataframe(df, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1)
         
         # 1. Check if the column has only integers
@@ -68,18 +69,17 @@ def verify_sp_description_codes_sequential(df):
     return not errors, errors, warnings
 
 def verify_sp_description_text_capitalize(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
-    
     errors, warnings = [], []
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+        
         for index, row in df.iterrows():
             for column in [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO]:
 
                 if column not in df.columns:
-                    warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de padrões para nomes dos indicadores foi abortada porque a coluna '{column}' está ausente.")
+                    warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de padrões para nomes dos indicadores foi abortada porque a coluna '{column}' não está ausente.")
                     continue
 
                 text = row[column]
@@ -102,21 +102,23 @@ def verify_sp_description_text_capitalize(df):
     except Exception as e:
         errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
+    # Remove dados repetidos de warnings
+    warnings = list(dict.fromkeys(warnings))
     return not errors, errors, warnings
 
 def verify_sp_description_levels(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
-    
     errors, warnings = [], []
-
-    # Verifica se a coluna existe
-    if SP_DESCRIPTION_COLUMNS.NIVEL not in df.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de níveis de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
-        return not errors, errors, warnings
-    
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+
+        # Verifica se a coluna existe
+        if SP_DESCRIPTION_COLUMNS.NIVEL not in df.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de níveis de indicadores foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' está ausente.")
+            return not errors, errors, warnings
+    
+    
         for index, row in df.iterrows():
             dig = row[SP_DESCRIPTION_COLUMNS.NIVEL]
             is_correct, msg = check_values_integers(dig, 1)
@@ -131,13 +133,13 @@ def verify_sp_description_levels(df):
 
     return not errors, errors, warnings
 
-def verify_sp_description_punctuation(df, columns_dont_punctuation, columns_must_end_with_dot): 
-    df = df.copy()
-    if df.empty:
-        return True, [], []
+def verify_sp_description_punctuation(df, columns_dont_punctuation, columns_must_end_with_dot):
     errors, warnings = [], []
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+
         columns_dont_punctuation_fixed = [column for column in columns_dont_punctuation if column in df.columns]
         columns_must_end_with_dot_fixed = [column for column in columns_must_end_with_dot if column in df.columns]
 
@@ -159,16 +161,16 @@ def verify_sp_description_punctuation(df, columns_dont_punctuation, columns_must
     return not errors, errors, warnings
 
 def verify_sp_description_codes_uniques(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-
-    if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
-        errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos únicos foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
-        return not errors, errors, warnings
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+
+        if SP_DESCRIPTION_COLUMNS.CODIGO not in df.columns:
+            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de códigos únicos foi abortada porque a coluna '{SP_DESCRIPTION_COLUMNS.CODIGO}' está ausente.")
+            return not errors, errors, warnings
+
         df, _ = clean_non_numeric_and_less_than_value_integers_dataframe(df, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO], 1)
         
         duplicated = df[SP_DESCRIPTION_COLUMNS.CODIGO].duplicated().any()
@@ -181,12 +183,12 @@ def verify_sp_description_codes_uniques(df):
     return not errors, errors, warnings
 
 def verify_sp_description_empty_strings(df, list_columns=[]):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+
         for column in list_columns:
             # Verifica se a coluna existe
             if column not in df.columns:
@@ -206,32 +208,32 @@ def verify_sp_description_empty_strings(df, list_columns=[]):
     return not errors, errors, warnings
 
 def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_anywhere=[]):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-
-    # Verifica se a coluna RELACAO está presente no df
-    if SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns:
-        columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.RELACAO]
-        columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.RELACAO]
-    
-    # Verifica se a coluna UNIDADE está presente no df
-    if SP_DESCRIPTION_COLUMNS.UNIDADE not in df.columns:
-        columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.UNIDADE]
-        columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.UNIDADE]
-
-    # Verifica todas as colunas que estão ausentes em df.columns
-    missing_columns = set(columns_start_end + columns_anywhere) - set(df.columns)
-    missing_columns = [str(column) for column in missing_columns]
-    if missing_columns:
-        warnings.append(f"{file_name}: A verificação de CR e LF foi abortada para as colunas: {missing_columns}.")
-
-    # Filtra as colunas que estão presentes em df.columns
-    columns_start_end_fixed = [column for column in columns_start_end if column in df.columns]
-    columns_anywhere_fixed = [column for column in columns_anywhere if column in df.columns]
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+
+        # Verifica se a coluna RELACAO está presente no df
+        if SP_DESCRIPTION_COLUMNS.RELACAO not in df.columns:
+            columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.RELACAO]
+            columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.RELACAO]
+        
+        # Verifica se a coluna UNIDADE está presente no df
+        if SP_DESCRIPTION_COLUMNS.UNIDADE not in df.columns:
+            columns_start_end = [column for column in columns_start_end if column != SP_DESCRIPTION_COLUMNS.UNIDADE]
+            columns_anywhere = [column for column in columns_anywhere if column != SP_DESCRIPTION_COLUMNS.UNIDADE]
+
+        # Verifica todas as colunas que estão ausentes em df.columns
+        missing_columns = set(columns_start_end + columns_anywhere) - set(df.columns)
+        missing_columns = [str(column) for column in missing_columns]
+        if missing_columns:
+            warnings.append(f"{file_name}: A verificação de CR e LF foi abortada para as colunas: {missing_columns}.")
+
+        # Filtra as colunas que estão presentes em df.columns
+        columns_start_end_fixed = [column for column in columns_start_end if column in df.columns]
+        columns_anywhere_fixed = [column for column in columns_anywhere if column in df.columns]
+
         # Item 1: Identificar CR e LF no final dos campos de texto
         for index, row in df.iterrows():
             
@@ -270,17 +272,17 @@ def verify_sp_description_cr_lf(df, file_name,  columns_start_end=[], columns_an
     return not errors, errors, warnings
 
 def verify_sp_description_titles_length(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-    
-    column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
-    if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
-        return not errors, errors, warnings
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+        
+        column = SP_DESCRIPTION_COLUMNS.NOME_SIMPLES
+        if column not in df.columns:
+            warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos com mais de {SP_DESCRIPTION_MAX_TITLE_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
+            return not errors, errors, warnings
+
         df.columns = df.columns.str.lower()
         df[column] = df[column].str.strip()
 
@@ -297,17 +299,17 @@ def verify_sp_description_titles_length(df):
     return not errors, errors, warnings
 
 def verify_sp_simple_description_max_length(df):
-    df = df.copy()
-    if df.empty:
-        return True, [], []
     errors, warnings = [], []
-
-    column = SP_DESCRIPTION_COLUMNS.DESC_SIMPLES
-    if column not in df.columns:
-        warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de descrições simples com mais de {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
-        return not errors, errors, warnings
-
     try:
+        df = df.copy()
+        if df.empty:
+            return True, errors, warnings
+
+        column = SP_DESCRIPTION_COLUMNS.DESC_SIMPLES
+        if column not in df.columns:
+            warnings.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de descrições simples com mais de {SP_COMPOSITION_MAX_SIMPLE_DESCRIPTION_LENGTH} caracteres foi abortada porque a coluna '{column}' está ausente.")
+            return not errors, errors, warnings
+
         df.columns = df.columns.str.lower()
         df[column] = df[column].str.strip()
 
