@@ -10,6 +10,24 @@ import chardet
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS, SP_LEGEND_COLUMNS
+def agrupar_lista(lista):
+    # Inicializando variáveis
+    lista_agrupada = []
+    grupo_atual = [lista[0]]  # Começa com o primeiro elemento da lista
+    
+    # Itera a partir do segundo elemento
+    for elemento in lista[1:]:
+        if elemento == grupo_atual[0]:
+            # Se o elemento for igual ao primeiro do grupo atual, adiciona ao grupo
+            grupo_atual.append(elemento)
+        else:
+            # Se for diferente, salva o grupo atual e começa um novo grupo
+            lista_agrupada.append(grupo_atual)
+            grupo_atual = [elemento]
+    
+    # Adiciona o último grupo à lista de agrupados
+    lista_agrupada.append(grupo_atual)
+    return lista_agrupada
 
 def check_repetead_list(file_name, lista):
 
