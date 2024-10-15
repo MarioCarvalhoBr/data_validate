@@ -3,43 +3,41 @@ from decimal import Decimal
 import pandas as pd
 
 from src.myparser.model.spreadsheets import SP_PROPORTIONALITIES_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_SCENARIO_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS
-from src.util.utilities import check_repetead_list, truncate_number, clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, extract_ids_from_list
+from src.util.utilities import agrupar_lista, truncate_number, clean_non_numeric_and_less_than_value_integers_dataframe, check_values_integers, extract_ids_from_list
 
 def build_subdatasets(df_proportionalities):
     df_proportionalities = df_proportionalities.copy()
-    parent_columns = df_proportionalities.columns.get_level_values(0)
+    parent_columns = df_proportionalities.columns.get_level_values(0).unique().tolist()
 
     return create_subdatasets_xlsx(df_proportionalities, parent_columns)
 
 def create_subdatasets_xlsx(df, parent_columns):
     """ Cria subdatasets a partir de um arquivo Excel. """
-    parent_ids_cleaned = [col for col in parent_columns[1:]]
-    subdatasets = {'main': df.iloc[:, :1]}
+    # Remove a coluna que inicia com 'Unnamed'
+    parent_ids_cleaned = [col for col in parent_columns if not col.startswith('Unnamed')]
 
-    ids_ja_cadastrados = []
+    subdatasets = {}
+
+    # Pegar toda a coluna level 2 que o código é id e colcoar em um sub_dataset_id
+    level_2_columns = df.columns
+    has_found_col_id = False
+    
+    found_col_level_0 = None
+
+    for col in level_2_columns:
+        col_level_0, col_level_1 = col
+        if col_level_1 == SP_PROPORTIONALITIES_COLUMNS.ID:
+            has_found_col_id = True
+            found_col_level_0 = col_level_0
+            break
+    
+    if not has_found_col_id:
+        return subdatasets
+    
+    sub_dataset_id = df[found_col_level_0]    
 
     for parent_id in parent_ids_cleaned:
-        if parent_id in ids_ja_cadastrados:
-            continue
-        ids_ja_cadastrados.append(parent_id)
-        start_col = (parent_columns == parent_id).argmax()
-        
-
-        # Encontra os indices dos filhos
-        if start_col + 1 == len(parent_columns):
-            end_col = start_col + 1
-        else:
-            end_col = (parent_columns[start_col + 1:] != parent_id).argmax() + start_col + 1
-            if end_col == start_col + 1:
-                end_col = len(parent_columns)
-        # Slice a pandas dataframe by columns
-        sub_data = df.iloc[:, start_col:end_col]
-        
-        
-        # Insert the first column of the original dataframe
-        sub_data = pd.concat([df.iloc[:, :1], sub_data], axis=1)
-        
-        subdatasets[parent_id] = sub_data
+        subdatasets[parent_id] = pd.concat([sub_dataset_id, df[parent_id]], axis=1)
 
     return subdatasets
 
@@ -50,22 +48,23 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
     has_more_than_3_decimal_places = False
 
     for parent_id, subdataset in subdatasets.items():
-        # Se o ID pai for 'main', pula para o próximo subdataset
-        if parent_id == 'main':
-            continue
-        
         for index, row in subdataset.iterrows():
             all_cells = []
-            index_aux = 1
 
-            id_linha = row.iloc[0]
-            
+            # Iterrows retorna uma tupla nome da coluna, dados da linha
             lista_id_coluna_valor = []
-            for cell in row[1:]:
-                sub_col = row.index[index_aux][1]
-                index_aux += 1
+            id_linha = 0
+            sub_col = ""
+            for i, cell in enumerate(row):
+                # Nome da coluna
+                nome_coluna = row.index[i]
 
-                lista_id_coluna_valor.append([id_linha, sub_col, cell])
+                if i == 0:
+                    id_linha = cell
+                    continue
+
+                lista_id_coluna_valor.append([id_linha, nome_coluna, cell])
+                sub_col = nome_coluna
 
                 # Se a célula for 'DI', pula para a próxima
                 if cell == 'DI':
@@ -92,11 +91,6 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
             # Soma os valores válidos da linha
             row_sum = sum([Decimal(cell) for cell in all_cells])
 
-            '''
-            Fatores influenciadores somando zero #206
-
-            Existe uma possibilidade de os fatores influenciadores terem que ser zero. Quando os valores dos respectivos indicadores forem todos zero ou DI, pois neste caso nao tem como calcular os pesos dos fatores influenciadores. Adicionar esta verificacao.
-            '''
             if row_sum == 0:
                 for data in lista_id_coluna_valor:
                     id_linha, id_coluna, valor = data
@@ -265,17 +259,15 @@ def verify_ids_sp_description_proportionalities(df_sp_description, df_sp_proport
 
     return not errors, errors, warnings
 
-def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities, df_sp_scenario, name_sp_proportionalities, name_sp_scenario):
+def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities, name_sp_proportionalities):
     errors, warnings = [], []
     try:
         # Copia os dataframes para não alterar os originais
         df_proportionalities = df_sp_proportionalities.copy()
-        df_sp_scenario = df_sp_scenario.copy()
 
         # Se for empty, retorna True
         if df_proportionalities.empty:
             return True, errors, warnings
-        
         
         level_two_columns = df_proportionalities.columns.get_level_values(1).unique().tolist()
 
@@ -283,50 +275,23 @@ def verify_repeated_columns_parent_sp_description_proportionalities(df_sp_propor
             errors.append(f"{name_sp_proportionalities}: Verificação abortada porque a coluna '{SP_PROPORTIONALITIES_COLUMNS.ID}' está ausente.")
             return not errors, errors, warnings
         
-        sp_scenario_exists = True
-        if df_sp_scenario.empty:
-            sp_scenario_exists = False
-
-        if sp_scenario_exists:
-            if SP_SCENARIO_COLUMNS.SIMBOLO not in df_sp_scenario.columns:
-                errors.append(f"{name_sp_scenario}: Verificação abortada porque a coluna '{SP_SCENARIO_COLUMNS.SIMBOLO}' está ausente.")
-        
         # Return if errors
         if errors:
-            return not errors, errors, warnings
-    
-        # Cria subdatasets usando os códigos dos indicadores
-        subdatasets = build_subdatasets(df_proportionalities)
-    
-        lista_simbolos_cenarios = []
-        if sp_scenario_exists:
-            lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].unique().tolist()        
-
-        cleaned_level_one_columns = []
-        repeated_columns = []
-
+            return not errors, errors, warnings    
+        
         # Códigos dos indicadores que estão em nível 1
         level_one_columns = [col for col in df_proportionalities.columns.get_level_values(0).tolist() if not col.startswith('Unnamed')]
-        cleaned_level_one_columns, __ = extract_ids_from_list(level_one_columns, lista_simbolos_cenarios)
-        cleaned_level_one_columns = [str(id) for id in cleaned_level_one_columns]
+        grouped_columns = agrupar_lista(level_one_columns)
 
-        # Verifica se há códigos repetidos
-        __, repeated_columns = check_repetead_list(name_sp_proportionalities, cleaned_level_one_columns)
-
-        # Encontrar  o subdataset com o indicador pai 
-        for parent_id, subdataset in subdatasets.items():
-            # Se for o main continua
-            if parent_id == 'main':
-                continue
-            
-            numRepeticoes = None
-            for lista in repeated_columns:
-                indicador, numRepeticoes = lista
-                if parent_id == indicador:
-                    num_columns = subdataset.shape[1] - 1 # Subtrai 1 para desconsiderar a coluna de índices
-                    if numRepeticoes != num_columns:
-                        errors.append(f"{name_sp_proportionalities}: O indicador pai '{parent_id}' está repetido na planilha.")
-                    break
+        unique_list = []
+        for group in grouped_columns:
+            first_element = group[0]
+            if first_element not in unique_list:
+                unique_list.append(first_element)
+            else:
+                errors.append(f"{name_sp_proportionalities}: O indicador pai '{first_element}' está repetido na planilha.")
+        
+        errors = list(set(errors))
     except Exception as e:
         errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
 
@@ -373,8 +338,6 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
             composition_gouped_dict[pai].append(filho)        
         
         for parent_id, subdataset in subdatasets.items():
-            if parent_id == 'main':
-                continue
 
             cleaned_parent_id = parent_id.split('-')[0]
 
@@ -384,7 +347,7 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
                 continue
 
             # Lista de filhos do subdataset com as chaves originais
-            list_children_key_original = subdataset.columns.get_level_values(1).tolist() 
+            list_children_key_original = subdataset.columns.tolist()
             list_children_key_original.remove(SP_PROPORTIONALITIES_COLUMNS.ID) 
             
             # Lista de filhos do subdataset com as chaves limpas
@@ -410,6 +373,10 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
                     
     except Exception as e:
         errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")
+
+    # Ordena os erros
+    errors = sorted(set(errors))
+    
     return not errors, errors, warnings
 
 def verify_ids_values_proportionalities(df_proportionalities, df_values, proportionalities_name, values_name):
@@ -453,6 +420,8 @@ def verify_ids_values_proportionalities(df_proportionalities, df_values, proport
 
         missing_in_values = sorted(set(proportionalities_indicators) - set(common_indicators))
         for indicator in missing_in_values:
+            if indicator.endswith('.1'):
+                continue
             errors.append(f"{proportionalities_name}: O indicador '{indicator}' não está presente na planilha {values_name}.")
     
     except Exception as e:

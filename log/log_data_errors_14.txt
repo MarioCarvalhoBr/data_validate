@@ -52,8 +52,8 @@ Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
 proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx.
 proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.xlsx.
-proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.xlsx.
 proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.xlsx.
+proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.xlsx.
 proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.xlsx.
 proporcionalidades.xlsx: O indicador pai '6' (em '6-2015') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
 Verificação: Indicadores em valores e proporcionalidades
