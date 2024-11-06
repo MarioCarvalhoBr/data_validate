@@ -151,6 +151,9 @@
       <range uuid="{302d82b7-4b9d-4a9b-8831-581c06a2bf49}" label="0,31 - 0,46" upper="0.462000000000000" symbol="2" render="true" lower="0.308000000000000"/>
       <range uuid="{fb218511-4421-41e1-9009-e245cf2dc8cf}" label="0,46 - 0,62" upper="0.616000000000000" symbol="3" render="true" lower="0.462000000000000"/>
       <range uuid="{5a311725-5469-4af8-89fe-58e9e4422d94}" label="0,62 - 0,99" symbol="4" render="true" lower="0.616000000000000"/>
+      <range lower="" symbol="Dado indisponivel" label="Dado indisponível" uuid="84d49a57-e13b-49c2-9ecf-c3442db4e50d" render="true" upper=""/>
+
+    
     </ranges>
     <symbols>
       <symbol frame_rate="10" force_rhr="0" type="fill" alpha="1" name="0" is_animated="0" clip_to_extent="1">

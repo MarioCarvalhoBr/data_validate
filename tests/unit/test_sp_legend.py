@@ -20,30 +20,28 @@ def test_true_verify_overlapping_multiple_legend_value_data_ground_truth_01():
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
-
 def test_false_verify_overlapping_multiple_legend_value_data_errors_01():
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_errors_01, df_sp_description_errors_01)
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
     # PAREI AQUI
-    assert errors[0] == "legenda.qml: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos."
+    assert errors[0] == "Erro ao processar o arquivo legenda.qml: Não foi encontrado o elemento 'ranges' dentro do elemento 'renderer-v2'."
 
-    # Arquivo está corrompido. Uma das fatias possui um valor não numérico.
+    # Arquivo está corrompido
 def test_false_verify_overlapping_multiple_legend_value_data_errors_02():
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_errors_02, df_sp_description_errors_02)
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
-    assert "legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
-
+    assert "legenda.qml: Uma das fatias possui um valor não numérico: 'PHP'." == errors[0]
 
 def test_false_verify_overlapping_multiple_legend_value_data_errors_03():
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_errors_03, df_sp_description_errors_03)
     assert is_correct is False
     assert len(errors) == 1
     assert len(warnings) == 0
-    assert "legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda." == errors[0]
+    assert "legenda.qml: Existe uma descontinuidade nos valores das fatias da legenda: 0.46 e 0.49." == errors[0]
 
 def test_false_verify_overlapping_multiple_legend_value_data_errors_04():
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_errors_04, df_sp_description_errors_04)
@@ -54,13 +52,13 @@ def test_false_verify_overlapping_multiple_legend_value_data_errors_04():
     assert "legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda." == errors[0]
     assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[1]
 
-def test_false_verify_overlapping_multiple_legend_value_data_errors_05():
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_errors_05, df_sp_description_errors_05)
     assert is_correct is False
     assert len(errors) == 2
     assert len(warnings) == 0
-    assert "legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
-    assert "legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias." == errors[1]
+    assert "legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias." == errors[0]
+    assert "legenda.qml: Existem fatias cujo o atributo 'upper' não foi encontrado." == errors[1]
+
     
 # Testes: para check_tuple_sequence
 def test_check_tuple_sequence_no_overlap():
@@ -72,7 +70,7 @@ def test_check_tuple_sequence_single_overlap():
     value_list = [(0.0, 0.15), (0.18, 0.30), (0.31, 0.46), (0.47, 0.61), (0.62, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
-    assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
+    assert errors[0] == "Existe uma descontinuidade nos valores das fatias da legenda: 0.15 e 0.18."
 
 def test_check_tuple_sequence_multiple_overlaps():
     value_list = [(0.0, 0.154), (0.155, 0.308), (0.309, 0.462), (0.463, 0.616), (0.617, 0.77)]
@@ -83,13 +81,13 @@ def test_check_tuple_sequence_partial_overlap():
     value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.48, 0.61), (0.62, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
-    assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
+    assert errors[0] == "Existe uma descontinuidade nos valores das fatias da legenda: 0.46 e 0.48."
 
 def test_check_tuple_sequence_start_overlap():
     value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.47, 0.61), (0.68, 0.77)]
     errors = check_tuple_sequence(value_list)
     assert len(errors) == 1
-    assert errors[0] == "Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda."
+    assert errors[0] == "Existe uma descontinuidade nos valores das fatias da legenda: 0.61 e 0.68."
 
 def test_check_tuple_sequence_end_overlap():
     value_list = [(0.0, 0.15), (0.16, 0.30), (0.31, 0.46), (0.47, 0.61), (0.62, 0.77)]
@@ -108,7 +106,7 @@ def test_verify_overlapping_multiple_legend_value_overlap_detected():
     
     assert not is_valid
     assert len(errors) == 1
-    assert "legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda." == errors[0]
+    assert "legenda.qml: Existe uma descontinuidade nos valores das fatias da legenda: 0.51 e 0.61." == errors[0]
 
 def test_verify_overlapping_multiple_legend_value_empty_df():
     df_qml_legend = pd.DataFrame()
@@ -117,7 +115,7 @@ def test_verify_overlapping_multiple_legend_value_empty_df():
     
     assert not is_valid
     assert len(errors) == 1
-    assert errors[0] == "legenda.qml: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos."
+    assert errors[0] == "legenda.qml: Não foram encontrados dados válidos."
 
 def test_verify_overlapping_multiple_legend_value_non_numeric_values():
     data = {
@@ -131,7 +129,7 @@ def test_verify_overlapping_multiple_legend_value_non_numeric_values():
     assert not is_valid
     assert len(errors) == 2
 
-    assert "legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico." == errors[0]
+    assert "legenda.qml: Existem fatias cujo o atributo 'lower' não foi encontrado." == errors[0]
     assert 'legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.' == errors[1]
 
 def test_verify_overlapping_multiple_legend_value_lower_greater_than_upper():
@@ -201,9 +199,9 @@ def test_true_verify_values_range_multiple_legend_data_errors_04():
     assert len(errors) == 3
     assert len(warnings) == 0
 
-    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'." == errors[0]
-    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'." == errors[1]
-    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'." == errors[2]
+    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'." == errors[0]
+    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'." == errors[1]
+    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'." == errors[2]
 
 
 def test_true_verify_values_range_multiple_legend_data_errors_11():
@@ -226,10 +224,10 @@ def test_true_verify_values_range_multiple_legend_data_errors_06():
     assert len(errors) == 4
     assert len(warnings) == 0
 
-    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'." == errors[0]
-    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'." == errors[1]
+    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'." == errors[0]
+    assert "valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'." == errors[1]
     assert "valores.xlsx, linha 2: O valor 0.806633367915323 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5001-2015'." == errors[2]
-    assert "valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5005-2015'." == errors[3]
+    assert "valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'." == errors[3]
 
 # Testes Unitários
 def test_read_legend_qml_file_success():
@@ -244,14 +242,11 @@ def test_read_legend_qml_file_success():
     
     df, errors = read_legend_qml_file(qml_file_path)
     
-    assert df.shape[0] == 1
-    assert len(errors) == 0
-    assert df.iloc[0]['uuid'] == "1"
-    assert df.iloc[0]['label'] == "Test 1"
-    assert df.iloc[0]['lower'] == "0.0"
-    assert df.iloc[0]['upper'] == "1.0"
-    assert df.iloc[0]['symbol'] == "0"
-    assert df.iloc[0]['render'] == "None"
+    assert df.shape[0] == 0
+    assert len(errors) == 2
+
+    assert "Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'." in errors[0]
+    assert "Não foi encontrado o valor 'Dado indisponível' na coluna 'label'." in errors[1]
 
 def test_read_legend_qml_file_no_renderer_v2():
     qml_content = """<root></root>"""
@@ -261,7 +256,7 @@ def test_read_legend_qml_file_no_renderer_v2():
     
     assert df.empty
     assert len(errors) == 1
-    assert "Não foram encontrados dados." in errors[0]
+    assert "Erro ao processar o arquivo legenda.qml: Não foi encontrado o elemento 'renderer-v2'." in errors[0]
 
 def test_read_legend_qml_file_no_ranges():
     qml_content = """<root>
@@ -273,7 +268,7 @@ def test_read_legend_qml_file_no_ranges():
     
     assert df.empty
     assert len(errors) == 1
-    assert "Não foram encontrados dados." in errors[0]
+    assert "Erro ao processar o arquivo legenda.qml: Não foi encontrado o elemento 'ranges' dentro do elemento 'renderer-v2'." in errors[0]
 
 def test_read_legend_qml_file_malformed():
     qml_content = """<root>
@@ -289,7 +284,7 @@ def test_read_legend_qml_file_malformed():
     
     assert df.empty
     assert len(errors) == 1
-    assert "Erro ao processar o arquivo" in errors[0]
+    assert 'Erro ao processar o arquivo legenda.qml: mismatched tag: line 5, column 30' in errors[0]
 
 def test_read_legend_qml_file_non_existent():
     qml_file_path = "non_existent_file.qml"
