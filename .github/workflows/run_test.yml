@@ -44,10 +44,6 @@ jobs:
       - name: Install Coverage
         run: |
           pip install coverage
-      
-      - name: Install Chromium on Ubuntu
-        run: |
-          sudo apt-get install -y chromium-browser
 
       - name: Test with pytest
         run: |

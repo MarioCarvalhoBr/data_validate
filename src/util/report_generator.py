@@ -172,21 +172,15 @@ class ReportGenerator:
                 f.write(html_out)
             
             print(f'\nFoi criado um arquivo de relatório em HTML no caminho: {output_path}')
-            self.save_pdf_report(output_path)
 
-        except Exception as e:
-            print(f'\nErro ao criar o arquivo de relatório em HTML: {e}', file=sys.stderr)
-    
-    def save_pdf_report(self, output_path):
-        try: 
+            # CREATE PDF FILE
             ABSOLUTE_PATH_FILE = os.path.abspath(output_path)
             
             FULL_FILE_PATH_HTML = f'file:///{ABSOLUTE_PATH_FILE}'
             ABS_PATH_PDF = ABSOLUTE_PATH_FILE.replace(".html", ".pdf")
 
-            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF, install_driver=True)
+            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF, install_driver=False)
             print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {os.path.join(self.output_folder, os.path.basename(ABS_PATH_PDF))}\n')
 
         except Exception as e:
-            print(f'\nErro ao criar o arquivo de relatório em PDF: {e}', file=sys.stderr)
-            pass
+            print(f'\nErro ao criar o arquivo de relatório em HTML: {e}', file=sys.stderr)

@@ -60,3 +60,6 @@ Número de verificações realizadas: 30
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html
+
+Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.pdf
+
