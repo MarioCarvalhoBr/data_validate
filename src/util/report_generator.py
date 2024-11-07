@@ -184,7 +184,7 @@ class ReportGenerator:
             FULL_FILE_PATH_HTML = f'file:///{ABSOLUTE_PATH_FILE}'
             ABS_PATH_PDF = ABSOLUTE_PATH_FILE.replace(".html", ".pdf")
 
-            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF, install_driver= False)
+            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF, install_driver=True)
             print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {os.path.join(self.output_folder, os.path.basename(ABS_PATH_PDF))}\n')
 
         except Exception as e:

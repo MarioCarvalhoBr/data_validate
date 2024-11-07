@@ -121,6 +121,3 @@ Número de verificações realizadas: 30
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_09/data_errors_09_report.html
-
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_errors_09/data_errors_09_report.pdf
-

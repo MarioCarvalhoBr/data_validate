@@ -57,6 +57,3 @@ Número de verificações realizadas: 27
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.html
-
-Foi criado um arquivo de relatório em PDF no caminho: output_data/data_ground_truth_02_no_scenario/data_ground_truth_02_no_scenario_report.pdf
-
