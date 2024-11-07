@@ -17,6 +17,7 @@ Pre-commit version: 3.8.0
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
+PDFKit Version:  1.0.0
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_08/
 

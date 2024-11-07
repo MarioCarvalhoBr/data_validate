@@ -1,7 +1,7 @@
 import os
 import sys
 from jinja2 import Environment, FileSystemLoader
-from pyhtml2pdf import converter
+import pdfkit
 import src.myparser.info as info
 
 class ReportGenerator:
@@ -167,20 +167,23 @@ class ReportGenerator:
             }
 
             html_out = template.render(template_vars)
-            output_path = os.path.join(self.output_folder, name_file + file_output_html)
-            with open(output_path, 'w', encoding="utf-8") as f:
+            output_path_file_html = os.path.join(self.output_folder, name_file + file_output_html)
+            with open(output_path_file_html, 'w', encoding="utf-8") as f:
                 f.write(html_out)
             
-            print(f'\nFoi criado um arquivo de relatório em HTML no caminho: {output_path}')
-
-            # CREATE PDF FILE
-            ABSOLUTE_PATH_FILE = os.path.abspath(output_path)
-            
-            FULL_FILE_PATH_HTML = f'file:///{ABSOLUTE_PATH_FILE}'
-            ABS_PATH_PDF = ABSOLUTE_PATH_FILE.replace(".html", ".pdf")
-
-            converter.convert(FULL_FILE_PATH_HTML, ABS_PATH_PDF, install_driver=False)
-            print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {os.path.join(self.output_folder, os.path.basename(ABS_PATH_PDF))}\n')
+            print(f'\nFoi criado um arquivo de relatório em HTML no caminho: {output_path_file_html}')
+            self.save_pdf_report(output_path_file_html)
 
         except Exception as e:
             print(f'\nErro ao criar o arquivo de relatório em HTML: {e}', file=sys.stderr)
+    
+    def save_pdf_report(self, output_path_file_html):
+        try:             
+            output_path_file_pdf = output_path_file_html.replace(".html", ".pdf")
+
+            pdfkit.from_file(output_path_file_html, output_path_file_pdf)
+            print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {output_path_file_pdf}\n')
+
+        except Exception as e:
+            print(f'\nErro ao criar o arquivo de relatório em PDF: {e}', file=sys.stderr)
+            pass
