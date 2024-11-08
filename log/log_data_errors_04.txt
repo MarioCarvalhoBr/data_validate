@@ -70,8 +70,8 @@ valores.xlsx, linha 15: O valor 0.846897288840176 está fora do intervalo da leg
 valores.xlsx, linha 17: O valor 0.789912176738247 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2030-P'.
 valores.xlsx, linha 6: O valor 0.779055534730612 está fora do intervalo da legenda (0.0 a 0.77) para a coluna '5000-2050-P'.
 Verificação: Sobreposição de valores na legenda
-legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.
-legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.
+legenda.qml: Existe uma sobreposição nos valores das fatias da legenda. O elemento 'lower' (0.612) é maior que o elemento 'upper' (0.466).
+legenda.qml: Fatias não estão descritas na ordem crescente.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.

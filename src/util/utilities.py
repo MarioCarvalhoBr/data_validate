@@ -154,15 +154,16 @@ def check_overlapping(file_name, df_qml_legend):
     upper_values = [x for x in upper_values if pd.notna(x)]
 
     # Verifica se as listas tem tamanho diferente
-    if len(lower_values) != len(upper_values):
-        errors.append(f"{file_name}: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.")
+    if len(lower_values) != len(upper_values):    
+        errors.append(f"{file_name}: Valores insuficientes para delimitar as fatias. Existem elementos 'lower' ou 'upper' com valores inválidos ou ausentes.")
         return not errors, errors
-    
     
     # Verifica se os valores são válidos
     for _, row in df_qml_legend.iterrows():
         if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
-            errors.append(f"{file_name}: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.")
+            lower_i = row[SP_LEGEND_COLUMNS.LOWER]
+            upper_i = row[SP_LEGEND_COLUMNS.UPPER]
+            errors.append(f"{file_name}: Existe uma sobreposição nos valores das fatias da legenda. O elemento 'lower' ({lower_i}) é maior que o elemento 'upper' ({upper_i}).")
 
     full_list = []
     for i in range(len(lower_values)):
@@ -171,7 +172,7 @@ def check_overlapping(file_name, df_qml_legend):
 
     # Verifica se os valores estão em ordem crescente
     if full_list != sorted(full_list):
-        errors.append(f"{file_name}: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.")
+        errors.append(f"{file_name}: Fatias não estão descritas na ordem crescente.")
         return not errors, errors
 
     try:

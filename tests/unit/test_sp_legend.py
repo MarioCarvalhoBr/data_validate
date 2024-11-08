@@ -49,15 +49,15 @@ def test_false_verify_overlapping_multiple_legend_value_data_errors_04():
     assert len(errors) == 2
     assert len(warnings) == 0
 
-    assert "legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda." == errors[0]
-    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[1]
+    assert "legenda.qml: Existe uma sobreposição nos valores das fatias da legenda. O elemento 'lower' (0.612) é maior que o elemento 'upper' (0.466)." == errors[0]
+    assert "legenda.qml: Fatias não estão descritas na ordem crescente." == errors[1]
 
     is_correct, errors, warnings = verify_overlapping_multiple_legend_value(path_input_data_errors_05, df_sp_description_errors_05)
     assert is_correct is False
     assert len(errors) == 2
     assert len(warnings) == 0
-    assert "legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias." == errors[0]
-    assert "legenda.qml: Existem fatias cujo o atributo 'upper' não foi encontrado." == errors[1]
+    assert "legenda.qml: Existem fatias cujo o atributo 'upper' não foi encontrado." == errors[0]
+    assert "legenda.qml: Valores insuficientes para delimitar as fatias. Existem elementos 'lower' ou 'upper' com valores inválidos ou ausentes." == errors[1]
 
     
 # Testes: para check_tuple_sequence
@@ -130,7 +130,7 @@ def test_verify_overlapping_multiple_legend_value_non_numeric_values():
     assert len(errors) == 2
 
     assert "legenda.qml: Existem fatias cujo o atributo 'lower' não foi encontrado." == errors[0]
-    assert 'legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.' == errors[1]
+    assert "legenda.qml: Valores insuficientes para delimitar as fatias. Existem elementos 'lower' ou 'upper' com valores inválidos ou ausentes." == errors[1]
 
 def test_verify_overlapping_multiple_legend_value_lower_greater_than_upper():
     data = {
@@ -144,8 +144,8 @@ def test_verify_overlapping_multiple_legend_value_lower_greater_than_upper():
     assert not is_valid
     assert len(errors) == 2
 
-    assert "legenda.qml: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda." == errors[0]
-    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[1]
+    assert "legenda.qml: Existe uma sobreposição nos valores das fatias da legenda. O elemento 'lower' (0.5) é maior que o elemento 'upper' (0.462)." == errors[0]
+    assert "legenda.qml: Fatias não estão descritas na ordem crescente." == errors[1]
 
 def test_verify_overlapping_multiple_legend_value_not_in_order():
     data = {
@@ -158,7 +158,7 @@ def test_verify_overlapping_multiple_legend_value_not_in_order():
     
     assert not is_valid
     assert len(errors) == 1
-    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." in errors[0]
+    assert "legenda.qml: Fatias não estão descritas na ordem crescente." in errors[0]
 
 def test_verify_overlapping_multiple_legend_value_overlapping():
     data = {
@@ -171,7 +171,7 @@ def test_verify_overlapping_multiple_legend_value_overlapping():
     
     assert not is_valid
     assert len(errors) == 1
-    assert "legenda.qml: Arquivo está corrompido. Fatias não estão descritas na ordem crescente." == errors[0]
+    assert "legenda.qml: Fatias não estão descritas na ordem crescente." == errors[0]
 
 def test_verify_overlapping_multiple_legend_value_success():
     data = {

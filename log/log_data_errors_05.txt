@@ -63,8 +63,8 @@ Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
-legenda.qml: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.
 legenda.qml: Existem fatias cujo o atributo 'upper' não foi encontrado.
+legenda.qml: Valores insuficientes para delimitar as fatias. Existem elementos 'lower' ou 'upper' com valores inválidos ou ausentes.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.
