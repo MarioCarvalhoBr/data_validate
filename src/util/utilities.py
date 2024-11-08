@@ -8,9 +8,16 @@ from io import StringIO
 from pathlib import Path
 import pandas as pd
 import chardet
+from babel.numbers import format_decimal
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS, SP_LEGEND_COLUMNS
+
+
+def format_number_brazilian(n):
+    """Formata um número no padrão brasileiro."""
+    return format_decimal(n, locale='pt_BR')
+
 def agrupar_lista(lista):
     # Inicializando variáveis
     lista_agrupada = []

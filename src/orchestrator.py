@@ -50,12 +50,12 @@ def flatten(is_correct, list_errors, list_warnings):
     if count_errors > 20:
         list_errors = list_errors[:20]
         count_errors -= 20
-        list_errors.append(f"Existem mais {count_errors} erros similares aos anteriores que foram omitidos.")
+        list_errors.append(f"Existem mais {util.format_number_brazilian(count_errors)} erros similares aos anteriores que foram omitidos.")
     
     if count_warnings > 20:
         list_warnings = list_warnings[:20]
         count_warnings -= 20
-        list_warnings.append(f"Existem mais {count_warnings} avisos similares aos anteriores que foram omitidos.")
+        list_warnings.append(f"Existem mais {util.format_number_brazilian(count_warnings)} avisos similares aos anteriores que foram omitidos.")
     
     return is_correct, list_errors, list_warnings
 
