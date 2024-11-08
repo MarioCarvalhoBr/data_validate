@@ -19,16 +19,65 @@ Bem-vindo ao repositório do Adapta Parser, uma ferramenta avançada para análi
 
 #### Dependências de produção
 - **Python 3.6+**: A versão mínima do Python necessária para executar o Adapta Parser.
+- **LibHunspell**: Uma biblioteca de verificação ortográfica, necessária para a verificação ortográfica.
+- **Wkhtmltopdf**: Uma ferramenta de linha de comando para converter HTML em PDF, necessária para gerar relatórios em PDF.
+  
 ##### GNU/LINUX
-Certifique-se de que `python-dev` e `libhunspell-dev` estejam instalados.
+Certifique-se de que `python-dev`, `libhunspell-dev` e `wkhtmltopdf` estejam instalados,
 
 ```shell
-    sudo apt-get install python3-dev libhunspell-dev
+    # Instalando as dependências
+    sudo apt-get install python3-dev libhunspell-dev wkhtmltopdf
+
+    # Para correção de erros ortográficos
+    pip install hunspell
+
+    # Para gerar relatórios em PDF
+    pip install pdfkit
 ```
 ##### Windows
-```shell
-    pip install pyhunspell
-```
+Nos sistemas Windows, a instalação do `wkhtmltopdf` e `libhunspell` é um pouco mais complicada. Aqui estão as instruções para instalar essas dependências no Windows.
+
+###### wkhtmltopdf no Windows
+Para instalar o `wkhtmltopdf`, baixe o instalador do site oficial: https://wkhtmltopdf.org/downloads.html
+
+###### libhunspell no Windows
+- Alternativa 1: Usando o Chocolatey
+  
+  Se você tiver o Chocolatey instalado, você pode instalar o `libhunspell` usando o seguinte comando:
+
+  ```shell
+  choco install hunspell.portable
+  ```
+
+- Alternativa 2: Instalação manual
+  
+  Para instalar o `libhunspell` no Windows, você pode usar o pacote pré-compilado disponível em https://sourceforge.net/projects/ezwinports/files/hunspell-1.3.2-3-w32-bin.zip/download para download. Você pode descompactar o arquivo ZIP e copiar os arquivos da pasta `bin/` para a pasta `C:\Windows\System32`.
+
+- Alternativa 3: Compiling with Mingw64 and MSYS2
+  
+  Primeiro, clone o repositório do hunspell:
+  ```shell
+  git clone https://github.com/hunspell/hunspell.git
+  ```
+  Realize o download do Msys2, atualize tudo e instale os seguintes pacotes:
+
+  ```shell
+  # Instalando o MSYS2
+  pacman -S base-devel mingw-w64-x86_64-toolchain mingw-w64-x86_64-libtool
+
+  # Compilando o hunspell
+  autoreconf -vfi
+  ./configure
+  make
+  sudo make install
+  sudo ldconfig
+  ```
+- REFERÊNCIAS do hunspell: 
+  
+- https://github.com/hunspell/hunspell
+- https://stackoverflow.com/questions/58458901/how-do-i-install-hunspell-on-windows10
+
 
 ## Criando o ambiente virtual com conda
 ```shell

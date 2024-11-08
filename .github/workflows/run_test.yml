@@ -24,6 +24,10 @@ jobs:
         run: |
           pip install enum34
 
+      - name: Install WKHtmlToPdf on Ubuntu
+        run: |
+          sudo apt install wkhtmltopdf
+
       - name: Install Hunspell
         run: |
           sudo apt install libhunspell-dev

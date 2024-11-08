@@ -17,6 +17,7 @@ Pre-commit version: 3.8.0
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
+PDFKit Version:  1.0.0
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_03/
 
@@ -63,7 +64,7 @@ valores.xlsx: Verificação de combinação de cenários e referência temporal 
 Verificação: Valores indisponíveis
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
-legenda.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
+legenda.qml: Existe uma descontinuidade nos valores das fatias da legenda: 0.46 e 0.49.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx: Verificação abortada porque a coluna 'id' está ausente.
 Verificação: Indicadores repetidos em proporcionalidades

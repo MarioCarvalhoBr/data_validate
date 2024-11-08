@@ -45,10 +45,14 @@ def verify_overlapping_multiple_legend_value(root_path, df_description):
         # CASO 1: Caso veio o legenda.qml, verifica apenas ele.
         if (SP_LEGEND_COLUMNS.NAME_SP in files_qml):
             path_legend = os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP)
-            df_qml_legend, __ = read_legend_qml_file(path_legend)
+            df_qml_legend, errors_read_legend_case_1 = read_legend_qml_file(path_legend)
             
-            __, errors_check =  check_overlapping(SP_LEGEND_COLUMNS.NAME_SP, df_qml_legend)
-            errors.extend(errors_check)
+            if errors_read_legend_case_1:
+                errors.extend(errors_read_legend_case_1)            
+            else: 
+                __, errors_check =  check_overlapping(SP_LEGEND_COLUMNS.NAME_SP, df_qml_legend)
+                errors.extend(errors_check)
+            errors = sorted(list(set(errors)))
             return not errors, errors, warnings
 
         # Processando os indicadores de nivel 2
@@ -60,10 +64,13 @@ def verify_overlapping_multiple_legend_value(root_path, df_description):
             if not exist_file:
                 continue
             
-            df_qml_legend, __ = read_legend_qml_file(path_legend)
-            __, errors_i = check_overlapping(file_name, df_qml_legend)
+            df_qml_legend, errors_read_legend_level_2 = read_legend_qml_file(path_legend)
             
-            errors.extend(errors_i)
+            if errors_read_legend_level_2:
+                errors.extend(errors_read_legend_level_2)
+            else: 
+                __, errors_i = check_overlapping(file_name, df_qml_legend)
+                errors.extend(errors_i)
 
         # Processando os outros indicadores que não são nivel 1 e nem nivel 2
         for codigo in codigos_indicadores_outros:
@@ -74,13 +81,16 @@ def verify_overlapping_multiple_legend_value(root_path, df_description):
             if not exist_file:
                 continue
             
-            df_qml_legend, __ = read_legend_qml_file(path_legend)
-            __, errors_i = check_overlapping(file_name, df_qml_legend)
-            
-            errors.extend(errors_i)
+            df_qml_legend, errors_read_legend_not_level_1_2 = read_legend_qml_file(path_legend)
+
+            if errors_read_legend_not_level_1_2:
+                errors.extend(errors_read_legend_not_level_1_2)
+            else:
+                __, errors_i = check_overlapping(file_name, df_qml_legend)
+                errors.extend(errors_i)
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_LEGEND_COLUMNS.NAME_SP}: {e}.")
-    
+    errors = sorted(list(set(errors)))
     return not errors, errors, warnings
 
 def verify_values_range_multiple_legend(root_path, df_values, df_description, df_sp_scenario):
@@ -116,6 +126,7 @@ def verify_values_range_multiple_legend(root_path, df_values, df_description, df
         
         # Return if errors
         if errors:
+            errors = sorted(list(set(errors)))
             return not errors, errors, []
         
         lista_simbolos_cenarios = []
@@ -142,11 +153,16 @@ def verify_values_range_multiple_legend(root_path, df_values, df_description, df
         colunas_sp_valores, __ = extract_ids_from_list(df_values.columns, lista_simbolos_cenarios)
         exists_legend_default, __ = check_file_exists(os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP))
         if exists_legend_default:
-            df_qml_legend, __ = read_legend_qml_file(os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP))
-            errors_legend_min_max, min_value, max_value = get_min_max_legend(SP_LEGEND_COLUMNS.NAME_SP, df_qml_legend)
-            errors.extend(errors_legend_min_max)
+            df_qml_legend, errors_read_legend_default = read_legend_qml_file(os.path.join(root_path, SP_LEGEND_COLUMNS.NAME_SP))
+            
+            if errors_read_legend_default:
+                errors.extend(errors_read_legend_default)
+            else:            
+                errors_legend_min_max, min_value, max_value = get_min_max_legend(SP_LEGEND_COLUMNS.NAME_SP, df_qml_legend)
+                errors.extend(errors_legend_min_max)
             
             if errors:
+                errors = sorted(list(set(errors)))
                 return not errors, errors, warnings
             
             MIN_VALUE = min_value
@@ -170,14 +186,19 @@ def verify_values_range_multiple_legend(root_path, df_values, df_description, df
                         MAX_VALUE = SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
                     
                     else:
-                        df_qml_legend, __ = read_legend_qml_file(os.path.join(root_path, qml_code_legend))
-                        errors_legend, min_value, max_value = get_min_max_legend(qml_code_legend, df_qml_legend)
-                        
-                        if errors_legend:
-                            errors.extend(errors_legend)
-                        
-                        MIN_VALUE = min_value
-                        MAX_VALUE = max_value
+                        df_qml_legend, errors_read_legend_level_2 = read_legend_qml_file(os.path.join(root_path, qml_code_legend))
+                        if errors_read_legend_level_2:
+                            errors.extend(errors_read_legend_level_2)
+                            MIN_VALUE = SP_LEGEND_COLUMNS.MIN_LOWER_LEGEND_DEFAULT
+                            MAX_VALUE = SP_LEGEND_COLUMNS.MAX_UPPER_LEGEND_DEFAULT
+                        else:
+                            errors_legend, min_value, max_value = get_min_max_legend(qml_code_legend, df_qml_legend)
+                            
+                            if errors_legend:
+                                errors.extend(errors_legend)
+                            
+                            MIN_VALUE = min_value
+                            MAX_VALUE = max_value
                         
                 for index, value in df_values[column].items():
                     # Verifica se o valor é uma string DI
@@ -202,5 +223,5 @@ def verify_values_range_multiple_legend(root_path, df_values, df_description, df
                         errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {index + 2}: O valor {value_aux} está fora do intervalo da legenda ({MIN_VALUE} a {MAX_VALUE}) para a coluna '{column}'.")     
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
-    
+    errors = sorted(list(set(errors))) # MELHORAR. Se um erro já existir dentro do erros não inserir
     return not errors, errors, warnings

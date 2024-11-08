@@ -17,6 +17,7 @@ Pre-commit version: 3.8.0
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
+PDFKit Version:  1.0.0
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_09/
 
@@ -57,28 +58,31 @@ Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
 Verificação: Intervalo dos dados da legenda
+2.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+2.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+4.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+4.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+5.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+5.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+6.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+6.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+8.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+8.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+9.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+9.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
 Verificação: Sobreposição de valores na legenda
-2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-2.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-6.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-4.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-5.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-8.qml: Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.
-Existem mais 4 erros similares aos anteriores que foram omitidos.
+2.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+2.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+4.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+4.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+5.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+5.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+6.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+6.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+8.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+8.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
+9.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
+9.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
 Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades

@@ -24,6 +24,8 @@ class TestReportGenerator:
         assert os.path.exists(os.path.join(self.folder, "test_report.html"))
 
     def test_save_pdf_report(self):
+        results_tests = [("Test", True, [], [])]
+        self.report_generator.save_html_pdf_report("test_report", self.folder, ".html", results_tests, [], 0, 0, 0)
         self.report_generator.save_pdf_report(os.path.join(self.folder, "test_report.html"))
         assert os.path.exists(os.path.join(self.folder, "test_report.pdf"))
 
@@ -33,4 +35,5 @@ class TestReportGenerator:
             os.remove(os.path.join(self.folder, file))
         
         # Remova o diretório
-        os.rmdir(self.folder)
+        if os.path.exists(self.folder):
+            os.rmdir(self.folder)

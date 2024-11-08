@@ -3,6 +3,7 @@ import math
 import re
 import xml.etree.ElementTree as ET
 from collections import Counter
+from io import StringIO
 
 from pathlib import Path
 import pandas as pd
@@ -53,7 +54,6 @@ def get_min_max_legend(name_file, df_qml_legend):
 
         # Verifica se o DataFrame está vazio
         if df_qml_legend.empty:
-            errors.append(f"{name_file}: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.")
             return errors, MIN_VALUE, MAX_VALUE
         
         # Converte as colunas UPPER e LOWER para float. Se tiver dado string, converte para NaN
@@ -68,7 +68,11 @@ def get_min_max_legend(name_file, df_qml_legend):
         for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
             # Verifica se  ovalor é nan 
             if df_qml_legend[column].isnull().values.any():
-                errors.append(f"{name_file}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
+                
+                # Pegar exatamente o valor não numérico
+                valor_nao_numerico = df_qml_legend[column][df_qml_legend[column].isnull()].values[0]
+                errors.append(f"{name_file}: Uma das fatias possui um valor não numérico: '{valor_nao_numerico}'.")
+
                 return errors, MIN_VALUE, MAX_VALUE
         
         MIN_VALUE, MAX_VALUE = get_min_max_values(df_qml_legend, SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER)
@@ -96,7 +100,7 @@ def check_tuple_sequence(value_list):
         VALOR_DIFF = int(VALOR_DIFF*10000)        
 
         if VALOR_DIFF != 100 or current_tuple[1] >= next_tuple[0]:
-            errors.append("Arquivo está corrompido. Existe uma descontinuidade nos valores das fatias da legenda.")
+            errors.append(f"Existe uma descontinuidade nos valores das fatias da legenda: {current_tuple[1]} e {next_tuple[0]}.")
     return errors
 
 def check_overlapping(file_name, df_qml_legend):
@@ -106,19 +110,21 @@ def check_overlapping(file_name, df_qml_legend):
     
     # Verifica se o DataFrame está vazio
     if df_qml_legend.empty:
-        errors.append(f"{file_name}: Arquivo está corrompido. Fatias da legenda não possuem intervalos válidos.")
+        errors.append(f"{file_name}: Não foram encontrados dados válidos.")
         return not errors, errors
 
     # Verifica se os valores são números
     for column in [SP_LEGEND_COLUMNS.LOWER, SP_LEGEND_COLUMNS.UPPER]:
         
         for index, value in df_qml_legend[column].items():
+            value_aux = value
             # Verifica se o valor é uma string DI
             if value == "DI":
                 continue
 
             if value is None or pd.isna(value.replace(',', '.')):
-                errors.append(f"{file_name}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
+                text_error = f"Existem fatias cujo o atributo '{column}' não foi encontrado." if value is None else f"Uma das fatias possui um valor não numérico: '{value_aux}'."
+                errors.append(f"{file_name}: {text_error}")
                 continue
 
             # CORREÇÃO DOS VALORES FLUTUANTES
@@ -129,10 +135,9 @@ def check_overlapping(file_name, df_qml_legend):
             
             # Verifica se o valor é um número
             if pd.isna(value):
-                errors.append(f"{file_name}: Arquivo está corrompido. Uma das fatias possui um valor não numérico.")
+                errors.append(f"{file_name}: Uma das fatias possui um valor não numérico: '{value_aux}'.")
                 return not errors, errors
 
-    
     df_qml_legend[SP_LEGEND_COLUMNS.LOWER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.LOWER], errors='coerce')
     df_qml_legend[SP_LEGEND_COLUMNS.UPPER] = pd.to_numeric(df_qml_legend[SP_LEGEND_COLUMNS.UPPER], errors='coerce')
     
@@ -149,15 +154,16 @@ def check_overlapping(file_name, df_qml_legend):
     upper_values = [x for x in upper_values if pd.notna(x)]
 
     # Verifica se as listas tem tamanho diferente
-    if len(lower_values) != len(upper_values):
-        errors.append(f"{file_name}: Arquivo está corrompido. Valores insuficientes para delimitar as fatias.")
+    if len(lower_values) != len(upper_values):    
+        errors.append(f"{file_name}: Valores insuficientes para delimitar as fatias. Existem elementos 'lower' ou 'upper' com valores inválidos ou ausentes.")
         return not errors, errors
-    
     
     # Verifica se os valores são válidos
     for _, row in df_qml_legend.iterrows():
         if row[SP_LEGEND_COLUMNS.LOWER] > row[SP_LEGEND_COLUMNS.UPPER]:
-            errors.append(f"{file_name}: Arquivo está corrompido. Existe uma sobreposição nos valores das fatias da legenda.")
+            lower_i = row[SP_LEGEND_COLUMNS.LOWER]
+            upper_i = row[SP_LEGEND_COLUMNS.UPPER]
+            errors.append(f"{file_name}: Existe uma sobreposição nos valores das fatias da legenda. O elemento 'lower' ({lower_i}) é maior que o elemento 'upper' ({upper_i}).")
 
     full_list = []
     for i in range(len(lower_values)):
@@ -166,7 +172,7 @@ def check_overlapping(file_name, df_qml_legend):
 
     # Verifica se os valores estão em ordem crescente
     if full_list != sorted(full_list):
-        errors.append(f"{file_name}: Arquivo está corrompido. Fatias não estão descritas na ordem crescente.")
+        errors.append(f"{file_name}: Fatias não estão descritas na ordem crescente.")
         return not errors, errors
 
     try:
@@ -213,10 +219,28 @@ def read_legend_qml_file(qml_file_path):
     data_list = []
     errors = []
 
+    base_name = ""
+
+    # Verifica se qml_file_path é um StringIO. Se sim, apenas mudade para string data/legenda.qml
+    if isinstance(qml_file_path, StringIO):
+        base_name = os.path.basename("data/legenda.qml")
+    else: 
+        base_name = os.path.basename(qml_file_path)
     try: 
         tree = ET.parse(qml_file_path)
         root = tree.getroot()
 
+        
+
+        # Verifica se o elemento KEY_RENDERER_V2 está presente no root
+        if root.find(SP_LEGEND_COLUMNS.KEY_RENDERER_V2) is None:
+            errors.append(f"Erro ao processar o arquivo {base_name}: Não foi encontrado o elemento '{SP_LEGEND_COLUMNS.KEY_RENDERER_V2}'.")
+            return pd.DataFrame(), errors
+
+        # Verifica se o elemento KEY_RANGES está presente dentro do elemento KEY_RENDERER_V2
+        if root.find(SP_LEGEND_COLUMNS.KEY_RENDERER_V2).find(SP_LEGEND_COLUMNS.KEY_RANGES) is None:
+            errors.append(f"Erro ao processar o arquivo {base_name}: Não foi encontrado o elemento '{SP_LEGEND_COLUMNS.KEY_RANGES}' dentro do elemento '{SP_LEGEND_COLUMNS.KEY_RENDERER_V2}'.")
+            return pd.DataFrame(), errors
         # For each child in the root
         for child in root:
             # Check if the child is the renderer-v2
@@ -247,22 +271,34 @@ def read_legend_qml_file(qml_file_path):
                             SP_LEGEND_COLUMNS.RENDER: render
                         })
     except Exception as e:
-        errors.append(f"Erro ao processar o arquivo {qml_file_path}: {e}")
+        errors.append(f"Erro ao processar o arquivo {base_name}: {e}")
         return pd.DataFrame(), errors
 
+    if errors:
+        return pd.DataFrame(), errors
+    
     # Convert the list to a DataFrame
     df = pd.DataFrame(data_list, columns=[
         SP_LEGEND_COLUMNS.UUID, SP_LEGEND_COLUMNS.LABEL, SP_LEGEND_COLUMNS.LOWER,
         SP_LEGEND_COLUMNS.UPPER, SP_LEGEND_COLUMNS.SYMBOL, SP_LEGEND_COLUMNS.RENDER
     ])
-    
 
     # Se não houver dados, adiciona no vetor erros que não foi encontrado dados
     if df.empty:
-        errors.append(f"Erro ao processar o arquivo {qml_file_path}: Não foram encontrados dados.")
+        errors.append(f"{base_name}: Não foram encontrados dados.")
 
-    # Remove a linha do dataframe cujo symbol == "Dado indisponivel"
+    # Verifica se a linha symbol="Dado indisponivel" e label="Dado indisponível" estão presentes. Senão reporta um erro no vetor de erros
+    if df[(df[SP_LEGEND_COLUMNS.SYMBOL] == "Dado indisponivel")].empty:
+        errors.append(f"{base_name}: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.")
+    if df[(df[SP_LEGEND_COLUMNS.LABEL] == "Dado indisponível")].empty:
+        errors.append(f"{base_name}: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.")
+
+    # Remove a linha do dataframe cujo symbol == "Dado indisponivel". Se não encontrar, retorna um erro e o dataframe vazio
     df = df[df[SP_LEGEND_COLUMNS.LABEL] != "Dado indisponível"]
+
+    if errors:
+        df = pd.DataFrame()
+    
     return df, errors
 
 def get_min_max_values(df, key_lower, key_upper):

@@ -12,6 +12,7 @@ import datetime
 import setuptools
 import genbadge
 import chardet
+import pdfkit
 
 def print_versions():
     print("\nPACKAGES VERSIONS: ")
@@ -28,14 +29,14 @@ def print_versions():
     print("Setuptools version:", setuptools.__version__)
     print("Genbadge version:", genbadge.__version__)
     print("CharDet Version: ", chardet.__version__)
-
+    print("PDFKit Version: ", pdfkit.__version__)
     
     return True
 
 # Informações da ferramenta
 
 __name__ = "Canoa"
-__version__ = "0.4.1"
+__version__ = "0.4.4"
 
 __author__ = "Mário de Araújo Carvalho"
 __email__ = "mariodearaujocarvalho@gmail.com"

@@ -17,6 +17,7 @@ Pre-commit version: 3.8.0
 Setuptools version: 70.0.0
 Genbadge version: 1.1.1
 CharDet Version:  5.2.0
+PDFKit Version:  1.0.0
 
 INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_02/
 
@@ -59,9 +60,9 @@ Verificação: Relações de combinações de valores
 valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.
 Verificação: Valores indisponíveis
 Verificação: Intervalo dos dados da legenda
-legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico.
+legenda.qml: Uma das fatias possui um valor não numérico: 'nan'.
 Verificação: Sobreposição de valores na legenda
-legenda.qml: Arquivo está corrompido. Uma das fatias possui um valor não numérico.
+legenda.qml: Uma das fatias possui um valor não numérico: 'PHP'.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.
