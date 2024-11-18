@@ -171,12 +171,12 @@ def test_false_check_punctuation_with_columns_dont_punctuation():
     result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
     assert len(warnings) == 6
     assert result is False
-    assert warnings[0] == "test_file, linha 2: A coluna 'nome_simples' não deve terminar com pontuação."
-    assert warnings[1] == "test_file, linha 2: A coluna 'nome_completo' não deve terminar com pontuação."
-    assert warnings[2] == "test_file, linha 3: A coluna 'nome_simples' não deve terminar com pontuação."
-    assert warnings[3] == "test_file, linha 3: A coluna 'nome_completo' não deve terminar com pontuação."
-    assert warnings[4] == "test_file, linha 4: A coluna 'nome_simples' não deve terminar com pontuação."
-    assert warnings[5] == "test_file, linha 4: A coluna 'nome_completo' não deve terminar com pontuação."
+    assert warnings[0] == "test_file, linha 2: O valor da coluna 'nome_simples' não deve terminar com pontuação."
+    assert warnings[1] == "test_file, linha 2: O valor da coluna 'nome_completo' não deve terminar com pontuação."
+    assert warnings[2] == "test_file, linha 3: O valor da coluna 'nome_simples' não deve terminar com pontuação."
+    assert warnings[3] == "test_file, linha 3: O valor da coluna 'nome_completo' não deve terminar com pontuação."
+    assert warnings[4] == "test_file, linha 4: O valor da coluna 'nome_simples' não deve terminar com pontuação."
+    assert warnings[5] == "test_file, linha 4: O valor da coluna 'nome_completo' não deve terminar com pontuação."
 
 # Testes para read_excel_file:
 def test_read_excel_file_with_non_existing_file():
