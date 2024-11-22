@@ -8,7 +8,7 @@ Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
-Pandas version: 2.2.2
+Pandas version: 2.2.3
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13

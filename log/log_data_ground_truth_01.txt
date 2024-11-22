@@ -8,7 +8,7 @@ Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
-Pandas version: 2.2.2
+Pandas version: 2.2.3
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
@@ -24,7 +24,6 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_ground_truth_01
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
-O arquivo 'ababa.txt' não é esperado.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 Verificação: Hierarquia como árvore
@@ -56,7 +55,7 @@ Verificação: Relações de indicadores em proporcionalidades
 Verificação: Indicadores em valores e proporcionalidades
 
 
-Número de erros: 1
+Número de erros: 0
 Número de avisos: 0
 Número de verificações realizadas: 30
 
