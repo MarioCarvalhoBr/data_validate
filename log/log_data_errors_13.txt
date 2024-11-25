@@ -8,7 +8,7 @@ Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
-Pandas version: 2.2.2
+Pandas version: 2.2.3
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
@@ -54,10 +54,10 @@ Verificação: Sobreposição de valores na legenda
 legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
 legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
 Verificação: Propriedades de soma nos fatores influenciadores
-proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível).
-proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível).
-proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível).
-proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível).
+proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).
+proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).
+proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).
+proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
 Verificação: Indicadores em valores e proporcionalidades

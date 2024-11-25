@@ -98,7 +98,8 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
                     try: 
                         valor = sp_df_values.loc[sp_df_values[SP_VALUES_COLUMNS.ID] == id_linha][id_coluna].values[0]
                         if valor != 'DI' and float(valor) != 0:
-                            errors.append(f"{name_sp_proporcionalities_name}: A soma de fatores influenciadores é 0 (zero). Na planilha {name_sp_df_values} o indicador '{id_coluna}' para o ID '{id_linha}' não é zero ou DI (Dado Indisponível).")
+                            errors.append(f"{name_sp_proporcionalities_name}: A soma de fatores influenciadores para o ID '{id_linha}' no pai '{id_coluna}' é 0 (zero). Na planilha {name_sp_df_values}, existe(m) valor(es) para os filhos do indicador '{id_coluna}', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).")
+
                     except Exception:
                         continue
             elif row_sum < Decimal('0.99') or row_sum > Decimal('1.01'):
@@ -369,7 +370,8 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
             # Verifica se dict_childrens_keys_by_cleaned_parent_id[cleaned_parent_id] contém os mesmos filhos que composition_gouped_dict[cleaned_parent_id]
             for filho in composition_gouped_dict[cleaned_parent_id]:
                 if filho not in dict_childrens_keys_by_cleaned_parent_id[cleaned_parent_id]:
-                    errors.append(f"{name_sp_proportionalities}: Deve existir pelo menos uma relação do indicador filho '{filho}' com o indicador pai '{parent_id}' conforme especificado em {name_sp_composition}.")
+                    code_pai_local = parent_id.split('-')[0]
+                    errors.append(f"{name_sp_proportionalities}: Deve existir pelo menos uma relação do indicador filho '{filho}' com o indicador pai '{code_pai_local}' (em '{parent_id}') conforme especificado em {name_sp_composition}.")
                     
     except Exception as e:
         errors.append(f"{name_sp_proportionalities}: Erro ao processar a verificação: {e}.")

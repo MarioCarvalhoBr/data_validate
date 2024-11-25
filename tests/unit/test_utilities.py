@@ -138,7 +138,7 @@ def test_check_punctuation_with_errors_in_must_end_with_dot_columns():
     assert result is False
     assert len(warnings) == 6
 
-def test_check_punctuation_with_no_columns():
+def test_true_check_punctuation_with_no_columns():
     df = pd.DataFrame({
         'nome_simples': ['John', 'Jane', 'Doe'],
         'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
@@ -148,6 +148,35 @@ def test_check_punctuation_with_no_columns():
     result, warnings = check_punctuation(df, 'test_file')
     assert result is True
     assert len(warnings) == 0
+
+def test_false_check_punctuation_with_no_columns():
+    df = pd.DataFrame({
+        'nome_simples': ['John', 'Jane', 'Doe'],
+        'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+        'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+        'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test']
+    })
+    result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+    assert len(warnings) == 1
+    assert result is False
+    assert warnings[0] == "test_file, linha 4: O valor da coluna 'desc_completa' deve terminar com ponto."
+
+def test_false_check_punctuation_with_columns_dont_punctuation():
+    df = pd.DataFrame({
+        'nome_simples': ['John.', 'Jane?', 'Doe!'],
+        'nome_completo': ['John Doe.', 'Jane Doe?', 'John Doe!'],
+        'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+        'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+    })
+    result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+    assert len(warnings) == 6
+    assert result is False
+    assert warnings[0] == "test_file, linha 2: O valor da coluna 'nome_simples' não deve terminar com pontuação."
+    assert warnings[1] == "test_file, linha 2: O valor da coluna 'nome_completo' não deve terminar com pontuação."
+    assert warnings[2] == "test_file, linha 3: O valor da coluna 'nome_simples' não deve terminar com pontuação."
+    assert warnings[3] == "test_file, linha 3: O valor da coluna 'nome_completo' não deve terminar com pontuação."
+    assert warnings[4] == "test_file, linha 4: O valor da coluna 'nome_simples' não deve terminar com pontuação."
+    assert warnings[5] == "test_file, linha 4: O valor da coluna 'nome_completo' não deve terminar com pontuação."
 
 # Testes para read_excel_file:
 def test_read_excel_file_with_non_existing_file():
@@ -394,3 +423,48 @@ def test_check_vertical_bar_with_no_columns():
     result, erros = check_vertical_bar(df, 'test_file')
     assert result is True
     assert len(erros) == 0
+    # Tests for check_punctuation:
+
+    def test_check_punctuation_with_no_errors():
+        df = pd.DataFrame({
+            'nome_simples': ['John', 'Jane', 'Doe'],
+            'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+            'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+            'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+        })
+        result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+        assert result is True
+        assert len(warnings) == 0
+
+    def test_check_punctuation_with_errors_in_dont_punctuation_columns():
+        df = pd.DataFrame({
+            'nome_simples': ['John.', 'Jane?', 'Doe!'],
+            'nome_completo': ['John Doe.', 'Jane Doe?', 'John Doe!'],
+            'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+            'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+        })
+        result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+        assert result is False
+        assert len(warnings) == 6
+
+    def test_check_punctuation_with_errors_in_must_end_with_dot_columns():
+        df = pd.DataFrame({
+            'nome_simples': ['John', 'Jane', 'Doe'],
+            'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+            'desc_simples': ['This is a test', 'This is another test', 'Yet another test'],
+            'desc_completa': ['This is a complete test', 'This is another complete test', 'Yet another complete test']
+        })
+        result, warnings = check_punctuation(df, 'test_file', ['nome_simples', 'nome_completo'], ['desc_simples', 'desc_completa'])
+        assert result is False
+        assert len(warnings) == 6
+
+    def test_check_punctuation_with_no_columns():
+        df = pd.DataFrame({
+            'nome_simples': ['John', 'Jane', 'Doe'],
+            'nome_completo': ['John Doe', 'Jane Doe', 'John Doe'],
+            'desc_simples': ['This is a test.', 'This is another test.', 'Yet another test.'],
+            'desc_completa': ['This is a complete test.', 'This is another complete test.', 'Yet another complete test.']
+        })
+        result, warnings = check_punctuation(df, 'test_file')
+        assert result is True
+        assert len(warnings) == 0

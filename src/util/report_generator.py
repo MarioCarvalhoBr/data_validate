@@ -3,6 +3,7 @@ import sys
 from jinja2 import Environment, FileSystemLoader
 import pdfkit
 import src.myparser.info as info
+from src.util.utilities import format_number_brazilian
 
 class ReportGenerator:
     def __init__(self, folder, template_name="default.html", no_time=False, no_version=False, sector=None, protocol=None, user=None):
@@ -151,8 +152,8 @@ class ReportGenerator:
 
                 "errors": errors,
                 "warnings": warnings,
-                "num_errors": num_errors,
-                "num_warnings": num_warnings,
+                "num_errors": format_number_brazilian(num_errors),
+                "num_warnings": format_number_brazilian(num_warnings),
                 "number_tests": number_tests,
 
                 "text_display_version": app_version,

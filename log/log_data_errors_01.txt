@@ -8,7 +8,7 @@ Colorama version: 0.4.4
 Matplotlib version: 3.8.3
 Networkx version: 3.2.1
 Openpyxl version: 3.1.2
-Pandas version: 2.2.2
+Pandas version: 2.2.3
 Pyarrow version: 15.0.0
 Pytest version: 7.4.0
 Pipreqs version: 0.4.13
@@ -138,15 +138,15 @@ descricao.xlsx, linha 10: "Produtores e estabelecimentos agropecuários". Nome s
 Verificação: Descrições simples com mais de 150 caracteres
 descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
 Verificação: Pontuações obrigatórias e proibidas em descrições
-descricao.xlsx, linha 2: A coluna 'nome_simples' não deve terminar com pontuação.
-descricao.xlsx, linha 2: A coluna 'desc_completa' deve terminar com ponto.
-descricao.xlsx, linha 3: A coluna 'desc_simples' deve terminar com ponto.
-descricao.xlsx, linha 5: A coluna 'nome_completo' não deve terminar com pontuação.
+descricao.xlsx, linha 2: O valor da coluna 'nome_simples' não deve terminar com pontuação.
+descricao.xlsx, linha 2: O valor da coluna 'desc_completa' deve terminar com ponto.
+descricao.xlsx, linha 3: O valor da coluna 'desc_simples' deve terminar com ponto.
+descricao.xlsx, linha 5: O valor da coluna 'nome_completo' não deve terminar com pontuação.
 Verificação: Pontuações obrigatórias e proibidas em cenários
-cenarios.xlsx, linha 3: A coluna 'nome' não deve terminar com pontuação.
-cenarios.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
+cenarios.xlsx, linha 3: O valor da coluna 'nome' não deve terminar com pontuação.
+cenarios.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.
 Verificação: Pontuações obrigatórias e proibidas em referência temporal
-referencia_temporal.xlsx, linha 3: A coluna 'descricao' deve terminar com ponto.
+referencia_temporal.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.

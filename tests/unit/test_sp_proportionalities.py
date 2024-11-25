@@ -64,10 +64,10 @@ def test_count_errors_verify_sp_scenario_punctuation_data_errors_13():
     assert len(errors) == 4
     assert len(warnings) == 0
 
-    assert errors[0] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível)."
-    assert errors[1] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100049' não é zero ou DI (Dado Indisponível)."
-    assert errors[2] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '8-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível)."
-    assert errors[3] == "proporcionalidades.xlsx: A soma de fatores influenciadores é 0 (zero). Na planilha valores.xlsx o indicador '9-2015' para o ID '1100056' não é zero ou DI (Dado Indisponível)."
+    assert errors[0] == "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+    assert errors[1] == "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+    assert errors[2] == "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+    assert errors[3] == "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
 
 # Testes: def verify_ids_sp_description_proportionalities
 def test_true_verify_ids_sp_description_proportionalities_data_ground_truth_01():
@@ -146,7 +146,7 @@ def test_count_errors_verify_parent_child_relationships_data_errors_11():
     assert len(errors) == 6
     assert len(warnings) == 0
 
-    assert errors[0] == "proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '4' com o indicador pai '2-2015' conforme especificado em composicao.xlsx."
+    assert errors[0] == "proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '4' com o indicador pai '2' (em '2-2015') conforme especificado em composicao.xlsx."
     assert errors[1] == "proporcionalidades.xlsx: O indicador '8' (em '8-2030-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx."
     assert errors[2] == "proporcionalidades.xlsx: O indicador '88' (em '88-2050-O') não é filho do indicador '3' (em '3-2015') conforme especificado em composicao.xlsx."
     assert errors[3] == "proporcionalidades.xlsx: O indicador '9' (em '9-2030-O') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx."

@@ -8,9 +8,16 @@ from io import StringIO
 from pathlib import Path
 import pandas as pd
 import chardet
+from babel.numbers import format_decimal
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS, SP_LEGEND_COLUMNS
+
+
+def format_number_brazilian(n):
+    """Formata um número no padrão brasileiro."""
+    return format_decimal(n, locale='pt_BR')
+
 def agrupar_lista(lista):
     # Inicializando variáveis
     lista_agrupada = []
@@ -350,7 +357,7 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
                     continue
                 text = str(text).strip()
                 if text[-1] in [',', '.', ';', ':', '!', '?']:
-                    warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' não deve terminar com pontuação.")
+                    warnings.append(f"{name_file}, linha {index + 2}: O valor da coluna '{column}' não deve terminar com pontuação.")
         
         if columns_must_end_with_dot is not None:
             for column in columns_must_end_with_dot:
@@ -360,7 +367,7 @@ def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must
                     continue
                 text = str(text).strip()
                 if text[-1] != '.':
-                    warnings.append(f"{name_file}, linha {index + 2}: A coluna '{column}' deve terminar com ponto.")
+                    warnings.append(f"{name_file}, linha {index + 2}: O valor da coluna '{column}' deve terminar com ponto.")
 
     return not warnings, warnings
 

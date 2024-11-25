@@ -33,8 +33,8 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
         for key in list(STRUCTURE_FILES_COLUMNS_DICT.keys()):
             new_key = key.replace(".csv", "").replace(".xlsx", "")
             NEW_STRUCTURE_FILES_COLUMNS_DICT[new_key] = STRUCTURE_FILES_COLUMNS_DICT[key]
-
-    
+        
+        # Verifica se há arquivos não esperados na pasta
         lista_arquivos = [file_name for file_name in os.listdir(path_folder) if not file_name.endswith('.qml')]
         # Verifica se há arquivos não esperados na pasta
         for file_name_i in lista_arquivos:
@@ -52,6 +52,7 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
                     if os.path.isdir(os.path.join(path_folder, file_name_i)):
                         errors.append(f"A pasta '{file_name_i}' não é esperada.")
                     else:
+                        # Arquivos não esperados são tratados como erros
                         errors.append(f"O arquivo '{file_name_i}' não é esperado.")
     except Exception as e:
         errors.append(f"{path_folder}: Erro ao processar verificação dos arquivos da pasta principal: {e}.")
