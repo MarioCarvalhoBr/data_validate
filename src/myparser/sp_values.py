@@ -132,7 +132,7 @@ def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
         final_list_invalid_codes = list(id_values_invalids)
         
         # Order list
-        final_list_invalid_codes.sort()
+        final_list_invalid_codes = sorted(final_list_invalid_codes)
         if id_values_invalids:
             errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Colunas inválidas: {final_list_invalid_codes}.")
 
