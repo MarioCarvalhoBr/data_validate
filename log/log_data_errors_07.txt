@@ -24,6 +24,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_07/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
+valores.xlsx: A coluna 'nome' não é esperada.
+proporcionalidades.xlsx: A coluna 'nome' não é esperada.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 valores.xlsx: Colunas inválidas: ['nome'].
@@ -110,7 +112,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 60
+Número de erros: 62
 Número de avisos: 3
 Número de verificações realizadas: 30
 

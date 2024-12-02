@@ -1,9 +1,10 @@
 import os
+import re 
 import pandas as pd
 import copy
 from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_vertical_bar
 from src.util.utilities import check_column_names, format_errors_and_warnings
-from src.util.utilities import  check_file_exists
+from src.util.utilities import  check_file_exists, extract_ids_from_list
 
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_LEGEND_COLUMNS, SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_PROPORTIONALITIES_COLUMNS, SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
@@ -58,8 +59,39 @@ def verify_not_exepected_files_in_folder_root(path_folder, STRUCTURE_FILES_COLUM
         errors.append(f"{path_folder}: Erro ao processar verificação dos arquivos da pasta principal: {e}.")
 
     return not errors, errors, warnings
-      
-def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists=True, sp_proportionalities_exists=True):
+
+def extract_ids_from_list_from_values(list_values, lista_cenarios):   
+    # Extrai ids das colunas
+    cleaned_columns, extras_columns = extract_ids_from_list(list_values, lista_cenarios)
+
+    # Converte ambas as listas em strings
+    cleaned_columns_str = []
+    for id in cleaned_columns:
+        cleaned_columns_str.append(str(id))
+    
+    extras_columns_str = []
+    for id in extras_columns:
+        extras_columns_str.append(str(id))
+
+    # Remove os valores ID e NOME das colunas extras
+    filtered_extras_columns = []
+    for column in extras_columns_str:
+        if column != SP_VALUES_COLUMNS.ID:
+            filtered_extras_columns.append(column)
+
+    extracted_ids = set()
+    for id in cleaned_columns_str:
+        code_level = id.split('-')[0]
+        extracted_ids.add(code_level)
+
+    # Remove os códigos repetidos e converte em inteiros
+    ids_valids = set()
+    for id in extracted_ids:
+        ids_valids.add(int(id))
+
+    return ids_valids, filtered_extras_columns
+  
+def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario_exists=True, sp_proportionalities_exists=True, lista_simbolos_cenarios=[]):
     errors, warnings = [], []
     try:
         df = df.copy()
@@ -95,10 +127,11 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
         # Check if there is a vertical bar in the column name
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(df, file_name)
         errors.extend(errors_vertical_bar)
-        
+        level_one_columns = []
         if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
+            level_one_columns = df.columns.get_level_values(0).unique().tolist()
             header_row = df.columns
-            header_row = [str(col[1]).strip().lower() for col in header_row]
+            header_row = [str(col[1]).strip() for col in header_row]
             df.columns = header_row
 
         unnamed_columns_indices = []
@@ -120,15 +153,47 @@ def verify_expected_structure_files(df, file_name, expected_columns, sp_scenario
                 text_column = "coluna" if quantity_valid_columns == 1 else "colunas"
                 errors.append(f"{file_name}, linha {index+2}: A linha possui {pd.notnull(row).sum()} valores, mas a tabela possui apenas {quantity_valid_columns} {text_column}.")
         
-        # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
-        col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
+        
 
-        if file_name == SP_VALUES_COLUMNS.NAME_SP:
-            errors.extend(col_errors)
-        elif file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
-            errors.extend(col_errors)
+        if file_name == SP_PROPORTIONALITIES_COLUMNS.NAME_SP:
+            level_one_columns = [col for col in level_one_columns if not re.search(r'unnamed', col)]
+            level_one_columns = [col for col in level_one_columns if not re.search(r'Unnamed', col)]
+
+            # Level one columns
+            ids_valids, extras_columns = extract_ids_from_list_from_values(level_one_columns, lista_simbolos_cenarios)
+            for extra_column in extras_columns:
+                if extra_column.lower().startswith("unnamed"):
+                    continue
+                errors.append(f"{file_name}: A coluna '{extra_column}' não é esperada.")
+
+            # Level two columns
+            level_two_columns = df.columns
+            ids_valids, extras_columns = extract_ids_from_list_from_values(level_two_columns, lista_simbolos_cenarios)
+            for extra_column in extras_columns:
+                if extra_column.lower().startswith("unnamed"):
+                    continue
+                errors.append(f"{file_name}: A coluna '{extra_column}' não é esperada.")
+
+            # Verifica se as colunas expected_columns foram encontradas em level_one_columns
+            for col in expected_columns:
+                if col not in level_two_columns:
+                    errors.append(f"{file_name}: Coluna '{col}' esperada mas não foi encontrada.")
+
+
+        elif file_name == SP_VALUES_COLUMNS.NAME_SP:
+            ids_valids, extras_columns = extract_ids_from_list_from_values(df.columns, lista_simbolos_cenarios)
+            for extra_column in extras_columns:
+                if extra_column.lower().startswith("unnamed"):
+                    continue
+                errors.append(f"{file_name}: A coluna '{extra_column}' não é esperada.")
+            for col in expected_columns:
+                if col not in df.columns:
+                    errors.append(f"{file_name}: Coluna '{col}' esperada mas não foi encontrada.")
         else:
+            # Check missing columns expected columns and extra columns
+            missing_columns, extra_columns = check_column_names(df, expected_columns)
+            col_errors, col_warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
+            
             errors.extend(col_errors)
             warnings.extend(col_warnings)
     except Exception as e:

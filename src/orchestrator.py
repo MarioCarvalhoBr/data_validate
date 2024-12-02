@@ -35,6 +35,7 @@ init_fix_colorama_windows_console()
 # GLOBAL_VARS
 global_num_warnings = 0
 global_num_errors = 0
+LIMIT_MESSAGES = 20
 
 def flatten(is_correct, list_errors, list_warnings):
     count_errors = len(list_errors)
@@ -44,19 +45,20 @@ def flatten(is_correct, list_errors, list_warnings):
     global global_num_warnings
     global global_num_errors
 
+
     global_num_warnings += count_warnings
     global_num_errors += count_errors
 
-    if count_errors > 20:
-        if count_errors != 21:
-            count_errors -= 20
-            list_errors = list_errors[:20]
+    if count_errors > LIMIT_MESSAGES:
+        if count_errors != (LIMIT_MESSAGES + 1):
+            count_errors -= LIMIT_MESSAGES
+            list_errors = list_errors[:LIMIT_MESSAGES]
             list_errors.append(f"Existem mais {util.format_number_brazilian(count_errors)} erros similares aos anteriores que foram omitidos.")
     
-    if count_warnings > 20:
-        if count_warnings != 21:
-            count_warnings -= 20
-            list_warnings = list_warnings[:20]
+    if count_warnings > LIMIT_MESSAGES:
+        if count_warnings != (LIMIT_MESSAGES + 1):
+            count_warnings -= LIMIT_MESSAGES
+            list_warnings = list_warnings[:LIMIT_MESSAGES]
             list_warnings.append(f"Existem mais {util.format_number_brazilian(count_warnings)} avisos similares aos anteriores que foram omitidos.")
     
     return is_correct, list_errors, list_warnings
@@ -172,12 +174,17 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         all_errors_read_files.extend(errors_read_file)
         
         sp_scenario_exists = True
-        sp_proportionalities_exists = True
-        
         if df_sp_scenario is None or df_sp_scenario.empty:
             sp_scenario_exists = False
+        
+        lista_simbolos_cenarios = []
+        if sp_scenario_exists:
+            lista_simbolos_cenarios = df_sp_scenario[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
+
+        sp_proportionalities_exists = True
         if df_sp_proportionalities is None or df_sp_proportionalities.empty:
             sp_proportionalities_exists = False
+
 
         # Arquivo obrigatório: descrição, composição, valores e proporcionalidades
         df_sp_temporal_reference, errors_read_file = util.read_excel_file(os.path.join(input_folder, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
@@ -204,7 +211,7 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         # ------------------------------------------------------------------------------------------------------------------------------------
         # 1.1 - Estrutura dos arquivos da pasta de entrada
         for file_name, df in data_df.items():
-            is_correct, errors, warnings = structures_files.verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], sp_scenario_exists, sp_proportionalities_exists)
+            is_correct, errors, warnings = structures_files.verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], sp_scenario_exists, sp_proportionalities_exists, lista_simbolos_cenarios)
             all_correct_structure_files = all_correct_structure_files and is_correct
             all_errors_structure_files.extend(errors)
             all_warnings_structure_files.extend(warnings)
@@ -408,13 +415,13 @@ def run(input_folder, output_folder, no_spellchecker, lang_dict, no_warning_titl
         if sp_proportionalities_exists: 
             results_tests.append(["Propriedades de soma nos fatores influenciadores", *flatten(*sp_proportionalities.verify_sum_prop_influence_factor_values(df_sp_proportionalities, df_sp_values, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP))])
 
-        # 16 - Verificar se existem indicadores repetidos em proporcionalidades #162
+        # 16 - Verificar se existem indicadores repetidos em proporcionalidades
         if sp_proportionalities_exists:
             
             is_correct, errors, warnings = sp_proportionalities.verify_repeated_columns_parent_sp_description_proportionalities(df_sp_proportionalities, SP_PROPORTIONALITIES_COLUMNS.NAME_SP)
             results_tests.append(["Indicadores repetidos em proporcionalidades", *flatten(is_correct, errors, warnings)])
 
-        # 17 - Verificar as relações de pai e filho no arquivo de proporcionalidade #209: verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, name_sp_proportionalities, name_sp_composition)
+        # 17 - Verificar as relações de pai e filho no arquivo de proporcionalidade
         if sp_proportionalities_exists:
             results_tests.append(["Relações de indicadores em proporcionalidades", *flatten(*sp_proportionalities.verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_COMPOSITION_COLUMNS.NAME_SP))])
 

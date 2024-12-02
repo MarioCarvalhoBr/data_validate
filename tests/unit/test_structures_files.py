@@ -61,18 +61,22 @@ def test_count_errors_verify_expected_structure_files_data_ground_truth_01():
     all_correct_structure_files = True
     all_errors_structure_files = []
     all_warnings_structure_files = []
+    
+    lista_simbolos_cenarios = []
+    if df_sp_scenario_data_ground_truth_01 is not None or not df_sp_scenario_data_ground_truth_01.empty:
+        lista_simbolos_cenarios = df_sp_scenario_data_ground_truth_01[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
 
     # Verifica a estrutura de cada arquivo
     for file_name, df in data_df.items():
-        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name])
+        is_correct, errors, warnings = verify_expected_structure_files(df=df, file_name=file_name,expected_columns=STRUCTURE_FILES_COLUMNS_DICT[file_name],sp_scenario_exists=True, sp_proportionalities_exists=True, lista_simbolos_cenarios=lista_simbolos_cenarios)
         all_correct_structure_files = all_correct_structure_files and is_correct
         all_errors_structure_files.extend(errors)
-        all_warnings_structure_files.extend(warnings)
-
-    assert all_correct_structure_files is True
+        all_warnings_structure_files.extend(warnings)    
 
     assert len(all_errors_structure_files) == 0
     assert len(all_warnings_structure_files) == 0
+    assert all_correct_structure_files is True
+    
 
 def test_count_errors_verify_expected_structure_files_data_ground_truth_02_no_scenario():
     # Dicionário com os dataframes
@@ -127,16 +131,22 @@ def test_count_errors_verify_expected_structure_files_errors_01():
     all_errors_structure_files = []
     all_warnings_structure_files = []
 
+    lista_simbolos_cenarios = []
+    if not df_sp_scenario_errors_01.empty:
+        lista_simbolos_cenarios = df_sp_scenario_errors_01[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
+
     # Verifica a estrutura de cada arquivo
     for file_name, df in data_df.items():
-        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name])
+        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], lista_simbolos_cenarios=lista_simbolos_cenarios)
         all_correct_structure_files = all_correct_structure_files and is_correct
         all_errors_structure_files.extend(errors)
         all_warnings_structure_files.extend(warnings)
 
-    assert all_correct_structure_files is True
-    assert len(all_errors_structure_files) == 0
+    assert all_correct_structure_files is False
+    assert len(all_errors_structure_files) == 1
     assert len(all_warnings_structure_files) == 0
+
+    assert all_errors_structure_files[0] == "valores.xlsx: A coluna '5000-2080-M' não é esperada."
 
 def test_errors_verify_expected_structure_files_errors_03():
     
@@ -156,18 +166,20 @@ def test_errors_verify_expected_structure_files_errors_03():
     all_errors_structure_files = []
     all_warnings_structure_files = []
 
+    lista_simbolos_cenarios = []
+    if not df_sp_scenario_errors_03.empty:
+        lista_simbolos_cenarios = df_sp_scenario_errors_03[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
+
     # Verifica a estrutura de cada arquivo
     for file_name, df in data_df.items():
-        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name])
+        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], lista_simbolos_cenarios=lista_simbolos_cenarios)
         all_correct_structure_files = all_correct_structure_files and is_correct
         all_errors_structure_files.extend(errors)
         all_warnings_structure_files.extend(warnings)
 
     assert all_correct_structure_files is False
 
-    # Numero de erros esperado == 13
-    assert len(all_errors_structure_files) == 13
-    # Numero de warnings esperado == 5
+    assert len(all_errors_structure_files) == 15
     assert len(all_warnings_structure_files) == 5
 
     # Verifica se os erros são o esperado
@@ -182,8 +194,10 @@ def test_errors_verify_expected_structure_files_errors_03():
     assert all_errors_structure_files[8] == "descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'."
     assert all_errors_structure_files[9] == "descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'."
     assert all_errors_structure_files[10] == "descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada."
-    assert all_errors_structure_files[11] == "valores.xlsx: Coluna 'id' esperada mas não foi encontrada."
-    assert all_errors_structure_files[12] == "proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada."
+    assert all_errors_structure_files[11] == "valores.xlsx: A coluna 'codigo' não é esperada."
+    assert all_errors_structure_files[12] == "valores.xlsx: Coluna 'id' esperada mas não foi encontrada."
+    assert all_errors_structure_files[13] == "proporcionalidades.xlsx: A coluna 'codigo' não é esperada."
+    assert all_errors_structure_files[14] == "proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada."
 
     # Verifica se os warnings são o esperado
     assert all_warnings_structure_files[0] == "cenarios.xlsx: Coluna 'COLUNA _A' será ignorada pois não está na especificação."
@@ -210,23 +224,27 @@ def test_errors_verify_expected_structure_files_errors_04():
     all_errors_structure_files = []
     all_warnings_structure_files = []
 
+    lista_simbolos_cenarios = []
+    if not df_sp_scenario_errors_04.empty:
+        lista_simbolos_cenarios = df_sp_scenario_errors_04[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
+
     # Verifica a estrutura de cada arquivo
     for file_name, df in data_df.items():
-        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name])
+        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name],lista_simbolos_cenarios=lista_simbolos_cenarios)
         all_correct_structure_files = all_correct_structure_files and is_correct
         all_errors_structure_files.extend(errors)
         all_warnings_structure_files.extend(warnings)
 
     assert all_correct_structure_files is False
 
-    # Numero de erros esperado == 2
-    assert len(all_errors_structure_files) == 2
-    # Numero de warnings esperado == 1
+    assert len(all_errors_structure_files) == 4
     assert len(all_warnings_structure_files) == 1
 
     # Verifica se os erros são o esperado
     assert all_errors_structure_files[0] == "composicao.xlsx, linha 7: A linha possui 3 valores, mas a tabela possui apenas 2 colunas."
     assert all_errors_structure_files[1] == "valores.xlsx, linha 7: A linha possui 19 valores, mas a tabela possui apenas 18 colunas."
+    assert all_errors_structure_files[2] == "valores.xlsx: A coluna '5000.954-2015' não é esperada."
+    assert all_errors_structure_files[3] == "valores.xlsx: A coluna '5001,9483-2015' não é esperada."
     
     # Verifica se os warnings são o esperado
     assert all_warnings_structure_files[0] == "composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação."
@@ -255,9 +273,13 @@ def test_errors_verify_expected_structure_files_errors_05():
     all_errors_structure_files = []
     all_warnings_structure_files = []
 
+    lista_simbolos_cenarios = []
+    if not df_sp_scenario_errors_04.empty:
+        lista_simbolos_cenarios = df_sp_scenario_errors_04[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
+
     # Verifica a estrutura de cada arquivo
     for file_name, df in data_df.items():
-        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], sp_scenario_exists, sp_proportionalities_exists)
+        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name], sp_scenario_exists, sp_proportionalities_exists, lista_simbolos_cenarios=lista_simbolos_cenarios)
         all_correct_structure_files = all_correct_structure_files and is_correct
         all_errors_structure_files.extend(errors)
         all_warnings_structure_files.extend(warnings)

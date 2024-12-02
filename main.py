@@ -1,5 +1,5 @@
-# Example usage mandatory arguments only: python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=local_data/foo/ --debug
-# Example usage optionals arguments: python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=local_data/foo/ --debug --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
+# Example usage mandatory arguments only: python3 main.py --output_folder=local_data/foo/ --debug --input_folder=input_data/data_ground_truth_01/
+# Example usage optionals arguments: python3 main.py --output_folder=local_data/foo/ --debug --sector="Setor A" --protocol="Protocolo B" --user="Usuário C" --input_folder=input_data/data_ground_truth_01/
 
 from argparse import ArgumentParser
 # Import orchestrator

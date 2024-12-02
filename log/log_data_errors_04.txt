@@ -26,6 +26,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_04/
 Verificação: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx, linha 7: A linha possui 3 valores, mas a tabela possui apenas 2 colunas.
 valores.xlsx, linha 7: A linha possui 19 valores, mas a tabela possui apenas 18 colunas.
+valores.xlsx: A coluna '5000.954-2015' não é esperada.
+valores.xlsx: A coluna '5001,9483-2015' não é esperada.
 Verificação: Limpeza dos arquivos
 descricao.xlsx, linha 3: A coluna 'codigo' contém um valor inválido: O valor '5000.77' não é um número inteiro.
 descricao.xlsx, linha 4: A coluna 'codigo' contém um valor inválido: O valor 'XX5001' não é um número.
@@ -121,7 +123,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 67
+Número de erros: 69
 Número de avisos: 8
 Número de verificações realizadas: 30
 

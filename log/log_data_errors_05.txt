@@ -25,6 +25,14 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_05/
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
 descricao.xlsx: A coluna 'cenario' não pode existir se o arquivo 'cenarios.xlsx' não existir.
+valores.xlsx: A coluna '5000-2030-O' não é esperada.
+valores.xlsx: A coluna '5000-2050-O' não é esperada.
+valores.xlsx: A coluna '5000-2030-P' não é esperada.
+valores.xlsx: A coluna '5000-2050-P' não é esperada.
+valores.xlsx: A coluna '5003-2030-O' não é esperada.
+valores.xlsx: A coluna '5003-2050-O' não é esperada.
+valores.xlsx: A coluna '5003-2030-P' não é esperada.
+valores.xlsx: A coluna '5003-2050-P' não é esperada.
 Verificação: Limpeza dos arquivos
 composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.
 referencia_temporal.xlsx: A tabela deve ter apenas um valor porque o arquivo cenarios.xlsx não existe.
@@ -107,7 +115,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 60
+Número de erros: 68
 Número de avisos: 4
 Número de verificações realizadas: 27
 
