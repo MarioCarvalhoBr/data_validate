@@ -120,7 +120,7 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
                 warnings.append(f'{name_sp_proporcionalities_name}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
         if count_errors > 1:
             errors_column.clear()
-            errors_column.append(f"{name_sp_proporcionalities_name}: {count_errors} valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '{parent_id}' entre as linhas  {line_init} e {line_end}.")
+            errors_column.append(f"{name_sp_proporcionalities_name}: {count_errors} valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}.")
             
         errors.extend(errors_column)  
     return errors, warnings
