@@ -35,7 +35,9 @@ descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|
 descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.
 descricao.xlsx, linha 8: A coluna 'MINHAS METAS' não pode conter o caracter '|'.
 descricao.xlsx: Coluna 'meta' esperada mas não foi encontrada.
+valores.xlsx: A coluna 'codigo' não é esperada.
 valores.xlsx: Coluna 'id' esperada mas não foi encontrada.
+proporcionalidades.xlsx: A coluna 'codigo' não é esperada.
 proporcionalidades.xlsx: Coluna 'id' esperada mas não foi encontrada.
 O arquivo 'arquivo_aleatorio.xlsx' não é esperado.
 Verificação: Limpeza dos arquivos
@@ -109,7 +111,7 @@ Verificação: Quebra de linha para referência temporal
 referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
 
 
-Número de erros: 26
+Número de erros: 28
 Número de avisos: 27
 Número de verificações realizadas: 30
 

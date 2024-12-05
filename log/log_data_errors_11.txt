@@ -24,6 +24,8 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_11/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
+valores.xlsx: A coluna 'HTML-2030-P' não é esperada.
+valores.xlsx: A coluna 'PHP' não é esperada.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 valores.xlsx: Colunas inválidas: ['HTML-2030-P', 'PHP'].
@@ -103,7 +105,7 @@ proporcionalidades.xlsx: O indicador '7-2030-P' não está presente na planilha 
 Existem mais 6 erros similares aos anteriores que foram omitidos.
 
 
-Número de erros: 53
+Número de erros: 55
 Número de avisos: 0
 Número de verificações realizadas: 30
 
