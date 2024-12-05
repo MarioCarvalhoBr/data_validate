@@ -61,24 +61,13 @@ Verificação: Sobreposição de valores na legenda
 legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.
 legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.
 Verificação: Propriedades de soma nos fatores influenciadores
-proporcionalidades.xlsx, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5008-2010' e indicador filho 'nome'.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.
-proporcionalidades.xlsx, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5008-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5008-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5008-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5009-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5009-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5009-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5009-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 3: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho 'nome'.
+proporcionalidades.xlsx: 4 valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '5008-2010' entre as linhas  3 e 6.
+proporcionalidades.xlsx: 4 valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '5009-2010' entre as linhas  3 e 6.
 proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.
-proporcionalidades.xlsx, linha 4: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
-proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho 'nome'.
-proporcionalidades.xlsx, linha 6: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010' e indicador filho '5030-2010'.
 proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.
+proporcionalidades.xlsx: 6 valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '5010-2010' entre as linhas  3 e 6.
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
 proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
@@ -112,7 +101,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 62
+Número de erros: 51
 Número de avisos: 3
 Número de verificações realizadas: 30
 
