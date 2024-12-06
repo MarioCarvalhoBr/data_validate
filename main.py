@@ -19,12 +19,12 @@ if __name__ == "__main__":
     parser.add_argument("--sector", type=str, default=None, help="Nome do setor estratégico.")
     parser.add_argument("--protocol", type=str, default=None, help="Nome do protocolo.")
     parser.add_argument("--user", type=str, default=None, help="Nome do usuário.")
-    
+    parser.add_argument("--file", type=str, default=None, help="Nome do arquivo a ser analisado.")
     # Parser args
     args = parser.parse_args()
 
     # Run orchestrator
-    orc.run(input_folder=args.input_folder,output_folder=args.output_folder, no_spellchecker=args.no_spellchecker, lang_dict=args.lang_dict, no_warning_titles_length=args.no_warning_titles_length, no_time=args.no_time, debug=args.debug, no_version=args.no_version, sector=args.sector, protocol=args.protocol, user=args.user)
+    orc.run(args)
 
     
 # Criar uma classe MyArgParser

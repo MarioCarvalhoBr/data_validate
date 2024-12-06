@@ -6,13 +6,14 @@ import src.myparser.info as info
 from src.util.utilities import format_number_brazilian
 
 class ReportGenerator:
-    def __init__(self, folder, template_name="default.html", no_time=False, no_version=False, sector=None, protocol=None, user=None):
+    def __init__(self, folder, template_name="default.html", no_time=False, no_version=False, sector=None, protocol=None, user=None, file=None):
         self.no_time = no_time
         self.no_version = no_version
         # Optional argument
         self.sector = sector
         self.protocol = protocol
         self.user = user
+        self.file = file
 
         self.folder = folder
         self.output_folder = None
@@ -59,6 +60,7 @@ class ReportGenerator:
                                         {{ text_display_protocol }}
                                         {{ text_display_date }}
                                         {{ text_display_version }}
+                                        {{ text_display_file }}
                                     </div>
                                 </div>
 
@@ -128,7 +130,7 @@ class ReportGenerator:
 
             app_version = ""
             if not self.no_time:
-                app_version = f"<strong>Data e hora do processo: { info.__date_now__ } </strong>"
+                app_version = f"<strong>Data e hora do processo: { info.__date_now__ } </strong><br>"
 
             if not self.no_version and not self.no_time:
                 date_now = date_now + "<br>"
@@ -137,6 +139,7 @@ class ReportGenerator:
             text_display_user = ""
             text_display_sector = ""
             text_display_protocol = ""
+            text_display_file = ""
             
             if self.sector is not None:
                 text_display_sector = f"<strong>Setor estrat&eacute;gico: {self.sector}</strong><br>"
@@ -146,6 +149,9 @@ class ReportGenerator:
 
             if self.user is not None:
                 text_display_user = f"<strong>Usu&aacute;rio: {self.user}</strong><br>"
+
+            if self.file is not None:
+                text_display_file = f"<strong>Arquivo submetido: {self.file}</strong><br>"
 
             template_vars = {
                 "name": info.__name__,
@@ -161,6 +167,7 @@ class ReportGenerator:
                 "text_display_sector": text_display_sector,
                 "text_display_protocol": text_display_protocol,
                 "text_display_user": text_display_user,
+                "text_display_file": text_display_file,
 
                 "tests_not_executed": results_tests_not_executed,
                 "display_tests_not_executed": display_tests_not_executed
