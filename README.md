@@ -159,31 +159,31 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   --no-time
   ```
 
-  - `--no-version`: Quando este argumento é usado, o script não exibe a versão do Adapta Parser no relatório de saída Isso pode ser útil se você deseja reduzir a quantidade de saída gerada.
+- `--no-version`: Quando este argumento é usado, o script não exibe a versão do Adapta Parser no relatório de saída Isso pode ser útil se você deseja reduzir a quantidade de saída gerada.
   - Exemplo:
   ```
   --no-version
   ```
 
-  - `--sector`: Quando este argumento é usado, o script exibe o setor estratégico no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
+- `--sector`: Quando este argumento é usado, o script exibe o setor estratégico no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
   - Exemplo:
   ```
   --sector=nome_do_setor
   ```
 
-  - `--protocol`: Quando este argumento é usado, o script exibe o protocolo no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
+- `--protocol`: Quando este argumento é usado, o script exibe o protocolo no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
   - Exemplo:
   ```
   --protocol=nome_do_protocolo
   ```
 
-  - `--user`: Quando este argumento é usado, o script exibe o nome do usuário no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
+- `--user`: Quando este argumento é usado, o script exibe o nome do usuário no relatório de saída. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório.
   - Exemplo:
   ```
   --user=nome_do_usuario
   ```
 
-  - `--file`: Nome do arquivo submetido para análise. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório. Se não for fornecido, o nome do arquivo submetido não será exibido no relatório.
+- `--file`: Nome do arquivo submetido para análise. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório. Se não for fornecido, o nome do arquivo submetido não será exibido no relatório.
   - Exemplo:
   ```
   --file=nome_do_arquivo.zip
