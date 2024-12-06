@@ -48,13 +48,19 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
     has_more_than_3_decimal_places = False
 
     for parent_id, subdataset in subdatasets.items():
+
+        line_init = None
+        line_end = None
+        count_errors = 0
+        errors_column = []
+        
         for index, row in subdataset.iterrows():
-            all_cells = []
+            all_cells = []           
 
             # Iterrows retorna uma tupla nome da coluna, dados da linha
             lista_id_coluna_valor = []
             id_linha = 0
-            sub_col = ""
+            # sub_col = ""
             for i, cell in enumerate(row):
                 # Nome da coluna
                 nome_coluna = row.index[i]
@@ -64,14 +70,19 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
                     continue
 
                 lista_id_coluna_valor.append([id_linha, nome_coluna, cell])
-                sub_col = nome_coluna
+                # sub_col = nome_coluna
 
                 # Se a célula for 'DI', pula para a próxima
                 if cell == 'DI':
                     continue
                 
                 if pd.isna(cell) or pd.isna(pd.to_numeric(cell, errors='coerce')): 
-                    errors.append(f"{name_sp_proporcionalities_name}, linha {index + 3}: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '{parent_id}' e indicador filho '{sub_col}'.")
+                    if line_init is None:
+                        line_init = index + 3
+                        errors_column.append(f"{name_sp_proporcionalities_name}, linha {index + 3}: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '{parent_id}'.")
+                    count_errors += 1
+                    
+                    line_end = index + 3
                     continue
                 
                 cell_aux = cell.replace(',', '.')
@@ -91,6 +102,7 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
             # Soma os valores válidos da linha
             row_sum = sum([Decimal(cell) for cell in all_cells])
 
+            
             if row_sum == 0:
                 for data in lista_id_coluna_valor:
                     id_linha, id_coluna, valor = data
@@ -106,7 +118,11 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
                 errors.append(f'{name_sp_proporcionalities_name}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
             elif row_sum != 1 and row_sum >= Decimal('0.99') and row_sum <= Decimal('1.01'):
                 warnings.append(f'{name_sp_proporcionalities_name}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {row_sum}, e não 1.')
+        if count_errors > 1:
+            errors_column.clear()
+            errors_column.append(f"{name_sp_proporcionalities_name}: {count_errors} valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}.")
             
+        errors.extend(errors_column)  
     return errors, warnings
 
 def count_repeated_values(string_list):
