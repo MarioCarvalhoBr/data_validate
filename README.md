@@ -183,6 +183,12 @@ python3 main.py --input_folder=input_data/data_ground_truth_01/ --output_folder=
   --user=nome_do_usuario
   ```
 
+  - `--file`: Nome do arquivo submetido para análise. Isso pode ser útil se você deseja adicionar informações adicionais ao relatório. Se não for fornecido, o nome do arquivo submetido não será exibido no relatório.
+  - Exemplo:
+  ```
+  --file=nome_do_arquivo.zip
+  ```
+
 ### Testes
 #### Instalando o coverage
 ```bash
