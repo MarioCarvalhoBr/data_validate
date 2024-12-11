@@ -127,12 +127,14 @@ def verify_ids_sp_description_values(df_description, df_values, df_sp_scenario):
         codes_level_to_remove = df_description[df_description[SP_DESCRIPTION_COLUMNS.NIVEL] == '1'][SP_DESCRIPTION_COLUMNS.CODIGO].astype(str).tolist()
         id_description_valids, __  = extract_ids_from_list_from_description(df_description)
         id_values_valids, id_values_invalids = extract_ids_from_list_from_values(codes_level_to_remove, df_values.columns, lista_simbolos_cenarios)
-
-        # Verifica se há colunas inválidos
-        final_list_invalid_codes = list(id_values_invalids)
         
+        # Remove all items that contains ':'
+        id_values_invalids = set([x for x in id_values_invalids if ':' not in x])
+        # Convert to list
+        final_list_invalid_codes = list(id_values_invalids)
         # Order list
         final_list_invalid_codes = sorted(final_list_invalid_codes)
+        
         if id_values_invalids:
             errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Colunas inválidas: {final_list_invalid_codes}.")
 
