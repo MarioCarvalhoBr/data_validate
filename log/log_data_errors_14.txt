@@ -24,6 +24,10 @@ INICIANDO A VERIFICAÇÃO DOS ARQUIVOS DA PASTA: input_data/data_errors_14/
 
 ------ Resultados da verificação dos testes ------
 Verificação: Estrutura dos arquivos da pasta de entrada
+valores.xlsx: A coluna ':5-2050-P' não é esperada.
+proporcionalidades.xlsx: A coluna ':8-2015' não é esperada.
+proporcionalidades.xlsx: A coluna ':8-2015' não é esperada.
+proporcionalidades.xlsx: A coluna ':9-2015' não é esperada.
 Verificação: Limpeza dos arquivos
 Verificação: Relações entre indicadores
 Verificação: Hierarquia como árvore
@@ -42,6 +46,7 @@ Verificação: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
+valores.xlsx: A coluna '5-2050-P' é obrigatória.
 Verificação: Valores indisponíveis
 Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
@@ -58,6 +63,7 @@ proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicado
 proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.xlsx.
 proporcionalidades.xlsx: O indicador pai '6' (em '6-2015') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.
 Verificação: Indicadores em valores e proporcionalidades
+proporcionalidades.xlsx: O indicador '5-2050-P' não está presente na planilha valores.xlsx.
 Verificação: Títulos únicos
 descricao.xlsx: Existem nomes simples duplicados: ['Seca'].
 descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca'].
@@ -65,7 +71,7 @@ descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].
 descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].
 
 
-Número de erros: 6
+Número de erros: 12
 Número de avisos: 4
 Número de verificações realizadas: 30
 

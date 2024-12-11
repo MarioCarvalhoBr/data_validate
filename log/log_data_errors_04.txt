@@ -41,7 +41,7 @@ Verificação: Relações entre indicadores
 descricao.xlsx: Indicadores no arquivo composicao.xlsx que não estão descritos: [2, 5000, 5001].
 composicao.xlsx: Indicadores no arquivo descricao.xlsx que não fazem parte da estrutura hierárquica: [5002].
 composicao.xlsx: Indicadores desconectados encontrados: [5004 -> 5006, 5004 -> 5007].
-valores.xlsx: Colunas inválidas: ['5000.954-2015', '5001,9483-2015', 'Unnamed: 18'].
+valores.xlsx: Colunas inválidas: ['5000.954-2015', '5001,9483-2015'].
 valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5000].
 descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 5002, 5003, 5004, 5005, 5006, 5007].
 proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].
@@ -103,10 +103,10 @@ valores.xlsx: O indicador '5004-2015' não está presente na planilha proporcion
 valores.xlsx: O indicador '5005-2015' não está presente na planilha proporcionalidades.xlsx.
 valores.xlsx: O indicador '5006-2015' não está presente na planilha proporcionalidades.xlsx.
 valores.xlsx: O indicador '5007-2015' não está presente na planilha proporcionalidades.xlsx.
-valores.xlsx: O indicador 'Unnamed: 18' não está presente na planilha proporcionalidades.xlsx.
 proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.
-Existem mais 12 erros similares aos anteriores que foram omitidos.
+proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.
+Existem mais 11 erros similares aos anteriores que foram omitidos.
 Verificação: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
 Verificação: Ortografia
@@ -122,7 +122,7 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 68
+Número de erros: 67
 Número de avisos: 8
 Número de verificações realizadas: 30
 

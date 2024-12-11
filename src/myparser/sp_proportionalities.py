@@ -360,7 +360,8 @@ def verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition
 
             # VERIFICAR SE O INDICADOR PAI ESTÁ NA COMPOSIÇÃO. Verificar na key de composition_gouped_dict
             if cleaned_parent_id not in composition_gouped_dict.keys():
-                errors.append(f"{name_sp_proportionalities}: O indicador pai '{cleaned_parent_id}' (em '{parent_id}') não está presente na coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' da planilha {name_sp_composition}.")
+                if ":" not in parent_id:
+                    errors.append(f"{name_sp_proportionalities}: O indicador pai '{cleaned_parent_id}' (em '{parent_id}') não está presente na coluna '{SP_COMPOSITION_COLUMNS.CODIGO_PAI}' da planilha {name_sp_composition}.")
                 continue
 
             # Lista de filhos do subdataset com as chaves originais
@@ -434,13 +435,15 @@ def verify_ids_values_proportionalities(df_proportionalities, df_values, proport
 
         missing_in_proportionalities = sorted(set(values_indicators) - set(common_indicators))
         for indicator in missing_in_proportionalities:
-            errors.append(f"{values_name}: O indicador '{indicator}' não está presente na planilha {proportionalities_name}.")
+            if ":" not in indicator:
+                errors.append(f"{values_name}: O indicador '{indicator}' não está presente na planilha {proportionalities_name}.")
 
         missing_in_values = sorted(set(proportionalities_indicators) - set(common_indicators))
         for indicator in missing_in_values:
             if indicator.endswith('.1'):
                 continue
-            errors.append(f"{proportionalities_name}: O indicador '{indicator}' não está presente na planilha {values_name}.")
+            if ":" not in indicator:
+                errors.append(f"{proportionalities_name}: O indicador '{indicator}' não está presente na planilha {values_name}.")
     
     except Exception as e:
         errors.append(f"{proportionalities_name}: Erro ao processar a verificação: {e}.")

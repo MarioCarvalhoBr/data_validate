@@ -32,6 +32,8 @@ from tests.unit.test_constants import all_errors_read_files_data_errors_08
 # DATA FRAMES - ERROS 09 e 10 df_sp_description_errors_09
 from tests.unit.test_constants import df_sp_description_errors_09, df_sp_description_errors_10
 
+# DATA FRAMES - ERROS 14
+from tests.unit.test_constants import df_sp_scenario_errors_14, df_sp_temporal_reference_errors_14, df_sp_description_errors_14, df_sp_composition_errors_14, df_sp_values_errors_14, df_sp_proportionalities_errors_14
 # PATHS MAIN
 from tests.unit.test_constants import path_input_data_errors_02, path_input_data_errors_03, path_input_data_errors_05, path_input_data_errors_09, path_input_data_errors_10, path_input_data_ground_truth_01
 
@@ -205,6 +207,47 @@ def test_errors_verify_expected_structure_files_errors_03():
     assert all_warnings_structure_files[2] == "descricao.xlsx: Coluna 'MINHAS METAS' será ignorada pois não está na especificação."
     assert all_warnings_structure_files[3] == "descricao.xlsx: Coluna 'COLUNA_EXTRA' será ignorada pois não está na especificação."
     assert all_warnings_structure_files[4] == "composicao.xlsx: Coluna 'COLUNA_B' será ignorada pois não está na especificação."
+
+def test_errors_verify_expected_structure_files_errors_14():
+    
+    # Dicionário com os dataframes
+    data_df = {
+        SP_SCENARIO_COLUMNS.NAME_SP: df_sp_scenario_errors_14,
+        SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP: df_sp_temporal_reference_errors_14,
+
+        SP_DESCRIPTION_COLUMNS.NAME_SP: df_sp_description_errors_14,
+        
+        SP_COMPOSITION_COLUMNS.NAME_SP: df_sp_composition_errors_14,
+        SP_VALUES_COLUMNS.NAME_SP: df_sp_values_errors_14,
+        SP_PROPORTIONALITIES_COLUMNS.NAME_SP: df_sp_proportionalities_errors_14,
+    }
+
+    all_correct_structure_files = True
+    all_errors_structure_files = []
+    all_warnings_structure_files = []
+
+    lista_simbolos_cenarios = []
+    if not df_sp_scenario_errors_04.empty:
+        lista_simbolos_cenarios = df_sp_scenario_errors_04[SP_SCENARIO_COLUMNS.SIMBOLO].tolist()
+
+    # Verifica a estrutura de cada arquivo
+    for file_name, df in data_df.items():
+        is_correct, errors, warnings = verify_expected_structure_files(df, file_name, STRUCTURE_FILES_COLUMNS_DICT[file_name],lista_simbolos_cenarios=lista_simbolos_cenarios)
+        all_correct_structure_files = all_correct_structure_files and is_correct
+        all_errors_structure_files.extend(errors)
+        all_warnings_structure_files.extend(warnings)
+
+    assert all_correct_structure_files is False
+
+    assert len(all_errors_structure_files) == 4
+    assert len(all_warnings_structure_files) == 0
+
+    # Verifica se os erros são o esperado
+    assert all_errors_structure_files[0] == "valores.xlsx: A coluna ':5-2050-P' não é esperada."
+    assert all_errors_structure_files[1] == "proporcionalidades.xlsx: A coluna ':8-2015' não é esperada."
+    assert all_errors_structure_files[2] == "proporcionalidades.xlsx: A coluna ':8-2015' não é esperada."
+    assert all_errors_structure_files[3] == "proporcionalidades.xlsx: A coluna ':9-2015' não é esperada."
+    
 
 def test_errors_verify_expected_structure_files_errors_04():
     
