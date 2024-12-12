@@ -1,4 +1,4 @@
-name: Run Unit Test via Pytest
+name: Ubuntu Run Unit Test via Pytest
 
 on: 
   push:
