@@ -1,0 +1,64 @@
+name: Run Unit Test via Pytest
+
+on: 
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-lasted  # Especifica a última versão do Ubuntu como o ambiente
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Install Enum34
+        run: |
+          pip install enum34
+
+      - name: Install WKHtmlToPdf on Ubuntu
+        run: |
+          sudo apt-get update --fix-missing -y
+          sudo apt-get upgrade -y
+          sudo apt-get install -y wkhtmltopdf
+
+      - name: Install Hunspell
+        run: |
+          sudo apt-get update --fix-missing -y
+          sudo apt-get install -y libhunspell-dev
+          sudo apt-get install -y hunspell-en-us hunspell-pt-br
+      
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Lint with Ruff
+        run: |
+          pip install ruff
+          ruff check . --target-version=py310
+        continue-on-error: true
+
+      - name: Install Coverage
+        run: |
+          pip install coverage
+
+      - name: Test with pytest
+        run: |
+          coverage run -m pytest  -v -s
+
+      - name: Generate Coverage Report
+        run: |
+          coverage report -m
+
+      - name: Run main
+        run: |
+          bash scripts/run_main_pipeline.sh
