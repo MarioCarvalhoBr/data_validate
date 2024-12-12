@@ -13,6 +13,40 @@ from babel.numbers import format_decimal
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_SCENARIO_COLUMNS, SP_PROPORTIONALITIES_COLUMNS, SP_LEGEND_COLUMNS
 
+def check_validate_columns(name_sp, dataframe_columns, expected_columns):
+    """
+    Valida se as colunas esperadas estão presentes em um DataFrame.
+
+    Args:
+        name_sp (str): Nome da entidade sendo validada (para mensagens de erro).
+        dataframe_columns (list): Lista de colunas presentes no DataFrame.
+        expected_columns (list): Lista de colunas esperadas no DataFrame.
+
+    Returns:
+        tuple: (bool, list) - Status da validação (True se sucesso) e lista de erros.
+    """
+    # Identificar colunas ausentes
+    missing_columns = [col for col in expected_columns if col not in dataframe_columns]
+
+    # Formatar a lista de colunas para exibição natural
+    def format_columns(columns):
+        if len(columns) == 1:
+            return f"'{columns[0]}'"
+        return f"{', '.join(f"'{col}'" for col in columns[:-1])} e '{columns[-1]}'"
+
+    # Retornar erro se houver colunas ausentes
+    if missing_columns:
+        column_text = "coluna" if len(missing_columns) == 1 else "colunas"
+        formatted_columns = format_columns(missing_columns)
+        errors = [
+            f"{name_sp}: Verificação não realizada, pois a {column_text} {formatted_columns} não foi encontrada."
+            if len(missing_columns) == 1
+            else f"{name_sp}: Verificação não realizada, pois as {column_text} {formatted_columns} não foram encontradas."
+        ]
+        return False, errors
+
+    # Retornar sucesso
+    return True, []
 
 def format_number_brazilian(n):
     """Formata um número no padrão brasileiro."""

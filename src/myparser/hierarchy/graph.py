@@ -1,26 +1,11 @@
 import networkx as nx
-from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe
+from src.util.utilities import clean_non_numeric_and_less_than_value_integers_dataframe, check_validate_columns
 # Spreadsheets classes and constants
-from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS
+from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_COMPOSITION_COLUMNS, SP_VALUES_COLUMNS, SP_PROPORTIONALITIES_COLUMNS
 
-def verificar_codigos_ausentes_desc_comp(descricao, composicao):
-    codigos_descricao = set(descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
-    codigos_pai = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI].astype(str))
-    codigos_filho = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO].astype(str))
-
-    codigos_faltantes = (codigos_pai.union(codigos_filho) - codigos_descricao) - {'0'}
-    return codigos_faltantes
-
-def verificar_codigos_ausentes_comp_desc(composicao, descricao):
-    codigos_descricao = set(descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
-    codigos_pai = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI].astype(str))
-    codigos_filho = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO].astype(str))
-
-    codigos_faltantes = (codigos_descricao - codigos_pai.union(codigos_filho)) - {'0'}
-    return codigos_faltantes
-
-# Function to plot: 
 '''
+# Function to plot: 
+import matplotlib.pyplot as plt
 def plot_grafo(G, is_save=False):
     plt.figure(figsize=(24, 16))
     pos = nx.spring_layout(G)  # Posicionamento dos nós
@@ -30,6 +15,28 @@ def plot_grafo(G, is_save=False):
         plt.savefig("grafo.pdf")
     plt.show()
 '''
+
+def get_codigos_ausentes_desc_comp(descricao, composicao):
+    codigos_descricao = set(descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
+    codigos_pai = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI].astype(str))
+    codigos_filho = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO].astype(str))
+
+    codigos_faltantes = (codigos_pai.union(codigos_filho) - codigos_descricao) - {'0'}
+    return codigos_faltantes
+
+def get_codigos_ausentes_comp_desc(composicao, descricao):
+    codigos_descricao = set(descricao[SP_DESCRIPTION_COLUMNS.CODIGO].astype(str))
+    codigos_pai = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_PAI].astype(str))
+    codigos_filho = set(composicao[SP_COMPOSITION_COLUMNS.CODIGO_FILHO].astype(str))
+
+    codigos_faltantes = (codigos_descricao - codigos_pai.union(codigos_filho)) - {'0'}
+    return codigos_faltantes
+ 
+def montar_grafo(composicao):
+    G = nx.DiGraph()
+    for _, row in composicao.iterrows():
+        G.add_edge(str(row[SP_COMPOSITION_COLUMNS.CODIGO_PAI]), str(row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO]))
+    return G
     
 def imprimir_grafo(G):
     text_graph = []
@@ -44,21 +51,15 @@ def imprimir_grafo(G):
     text_graph = sorted(text_graph, key=lambda x: x, reverse=False)
     full_text_graph = ", ".join(text_graph)
     return full_text_graph
-    
-def montar_grafo(composicao):
-    G = nx.DiGraph()
-    for _, row in composicao.iterrows():
-        G.add_edge(str(row[SP_COMPOSITION_COLUMNS.CODIGO_PAI]), str(row[SP_COMPOSITION_COLUMNS.CODIGO_FILHO]))
-    return G
-
-def verificar_ciclos(G):
+   
+def check_ciclos(G):
     try:
         ciclo = nx.find_cycle(G)
         return True, ciclo
     except nx.NetworkXNoCycle:
         return False, None
 
-def verificar_grafos_desconectados(G):
+def check_grafos_desconectados(G):
     subgrafos = [G.subgraph(c).copy() for c in nx.weakly_connected_components(G)]
     subgrafos.sort(key=len, reverse=True)
     return subgrafos[1:] if len(subgrafos) > 1 else []
@@ -91,6 +92,13 @@ def check_sp_description_titles_uniques(df):
             errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
 
     return errors
+    
+def get_indicadores_folhas(G):
+    folhas = []
+    for node in G.nodes():
+        if G.out_degree(node) == 0:
+            folhas.append(node)
+    return folhas
 
 def verify_graph_sp_description_composition(descricao, composicao):
     errors, warnings = [], []
@@ -102,20 +110,12 @@ def verify_graph_sp_description_composition(descricao, composicao):
         if descricao.empty or composicao.empty:
             return True, errors, warnings
 
-        # Verifica se as colunas com código existem
-        if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada.")
-            return not errors, errors, warnings
-        
-        # Verifica a coluna nível em descrição
-        if SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
-            return not errors, errors, warnings
-
-        
-        # Verificar se as colunas com código existem
-        if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in composicao.columns:
-            errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de hierarquia de composição como grafo não realizada.")
+        # Validação das colunas esperadas
+        __, errors_description = check_validate_columns(SP_DESCRIPTION_COLUMNS.NAME_SP, descricao.columns.tolist(), [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL])
+        __, errors_composition = check_validate_columns(SP_COMPOSITION_COLUMNS.NAME_SP, composicao.columns.tolist(), [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
+        errors.extend(errors_description)
+        errors.extend(errors_composition)
+        if errors:
             return not errors, errors, warnings
         
         # Limpando os dados
@@ -125,7 +125,7 @@ def verify_graph_sp_description_composition(descricao, composicao):
         # Limpando os dados
         descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
         
-        codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
+        codigos_faltantes = get_codigos_ausentes_desc_comp(descricao, composicao)
         if codigos_faltantes:
             # Remove '{}'
             codigos_faltantes = str(codigos_faltantes)[1:-1]
@@ -142,7 +142,7 @@ def verify_graph_sp_description_composition(descricao, composicao):
             errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Indicadores no arquivo {SP_COMPOSITION_COLUMNS.NAME_SP} que não estão descritos: {str(codigos_faltantes)}.")
         
         codigos_faltantes = []
-        codigos_faltantes = verificar_codigos_ausentes_comp_desc(composicao, descricao)
+        codigos_faltantes = get_codigos_ausentes_comp_desc(composicao, descricao)
         if codigos_faltantes:
             # Remove '{}'
             codigos_faltantes = str(codigos_faltantes)[1:-1]
@@ -159,7 +159,7 @@ def verify_graph_sp_description_composition(descricao, composicao):
             errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Indicadores no arquivo {SP_DESCRIPTION_COLUMNS.NAME_SP} que não fazem parte da estrutura hierárquica: {str(codigos_faltantes)}.")
 
         G = montar_grafo(composicao)
-        existe_ciclo, ciclo = verificar_ciclos(G)
+        existe_ciclo, ciclo = check_ciclos(G)
         if existe_ciclo:
             # errors.append("Ciclo encontrado: " + str(ciclo))
             # Imprimir o Ciclo na forma XXXX->XXXX->XXXX e YYYY->YYYY->YYYY
@@ -170,7 +170,7 @@ def verify_graph_sp_description_composition(descricao, composicao):
             text_graph = text_graph[:-2]
             errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Ciclo encontrado: [{text_graph}].")
 
-        grafos_desconectados = verificar_grafos_desconectados(G)
+        grafos_desconectados = check_grafos_desconectados(G)
         if grafos_desconectados:
             text_init = f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Indicadores desconectados encontrados: "
             lista_grafos_desconectados = []
@@ -193,20 +193,13 @@ def verify_unique_titles_description_composition(descricao, composicao):
         if descricao.empty or composicao.empty:
             return True, errors, warnings
         
-        # Verifica a coluna nível em descrição
-        if SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada. Coluna '{SP_DESCRIPTION_COLUMNS.NIVEL}' não encontrada.")
-            return not errors, errors, warnings
-
-        # Verifica se as colunas com código existem
-        if SP_DESCRIPTION_COLUMNS.CODIGO not in descricao.columns or SP_DESCRIPTION_COLUMNS.NIVEL not in descricao.columns:
-            errors.append(f"{SP_DESCRIPTION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada.")
-            return not errors, errors, warnings
-
-        
-        # Verificar se as colunas com código existem
-        if SP_COMPOSITION_COLUMNS.CODIGO_PAI not in composicao.columns or SP_COMPOSITION_COLUMNS.CODIGO_FILHO not in composicao.columns:
-            errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Verificação de títulos únicos de composição como árvore não realizada.")
+        # Validação das colunas esperadas
+        # Validação das colunas esperadas
+        __, errors_description = check_validate_columns(SP_DESCRIPTION_COLUMNS.NAME_SP, descricao.columns.tolist(), [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL])
+        __, errors_composition = check_validate_columns(SP_COMPOSITION_COLUMNS.NAME_SP, composicao.columns.tolist(), [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
+        errors.extend(errors_description)
+        errors.extend(errors_composition)
+        if errors:
             return not errors, errors, warnings
         
         # Limpando os dados
@@ -216,22 +209,22 @@ def verify_unique_titles_description_composition(descricao, composicao):
         # Limpando os dados
         descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
         
-        codigos_faltantes = verificar_codigos_ausentes_desc_comp(descricao, composicao)
+        codigos_faltantes = get_codigos_ausentes_desc_comp(descricao, composicao)
         if codigos_faltantes:
             return not errors, errors, warnings
         
-        codigos_faltantes = verificar_codigos_ausentes_comp_desc(composicao, descricao)
+        codigos_faltantes = get_codigos_ausentes_comp_desc(composicao, descricao)
         if codigos_faltantes:
             return not errors, errors, warnings
 
         # Montar o grafo
         G = montar_grafo(composicao)
 
-        existe_ciclo, __ = verificar_ciclos(G)
+        existe_ciclo, __ = check_ciclos(G)
         if existe_ciclo:
             return not errors, errors, warnings
 
-        grafos_desconectados = verificar_grafos_desconectados(G)
+        grafos_desconectados = check_grafos_desconectados(G)
         if grafos_desconectados:
             return not errors, errors, warnings
         
@@ -263,5 +256,75 @@ def verify_unique_titles_description_composition(descricao, composicao):
             warnings += warnings_i
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_COMPOSITION_COLUMNS.NAME_SP}: {e}.")
+
+    return not errors, errors, warnings
+
+def verify_graph_sp_description_composition_values_proportionalities_leafs(descricao, composicao, valores, proporcionalidades):
+    errors, warnings = [], []
+    try:
+        descricao = descricao.copy()
+        composicao = composicao.copy()
+        valores = valores.copy()
+
+        # Se for empty, retorna True
+        if descricao.empty or composicao.empty or valores.empty:
+            return True, errors, warnings
+        
+        if not proporcionalidades.empty:
+            proporcionalidades = proporcionalidades.copy()
+
+        # Validação das colunas esperadas
+        __, errors_description = check_validate_columns(SP_DESCRIPTION_COLUMNS.NAME_SP, descricao.columns.tolist(), [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL])
+        __, errors_composition = check_validate_columns(SP_COMPOSITION_COLUMNS.NAME_SP, composicao.columns.tolist(), [SP_COMPOSITION_COLUMNS.CODIGO_PAI, SP_COMPOSITION_COLUMNS.CODIGO_FILHO])
+        __, errors_values = check_validate_columns(SP_DESCRIPTION_COLUMNS.NAME_SP, valores.columns.tolist(), [SP_VALUES_COLUMNS.ID])
+        errors.extend(errors_description)
+        errors.extend(errors_composition)
+        errors.extend(errors_values)
+        if not proporcionalidades.empty:
+            # SOMENTE COLUNAS NIVEL 2
+            __, errors_prop = check_validate_columns(SP_PROPORTIONALITIES_COLUMNS.NAME_SP, proporcionalidades.columns.get_level_values(1).unique().tolist(), [SP_PROPORTIONALITIES_COLUMNS.ID])
+            errors.extend(errors_prop)
+
+        if errors:
+            return not errors, errors, warnings
+        
+        # Limpando os dados
+        composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_PAI], 0)
+        composicao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(composicao, SP_COMPOSITION_COLUMNS.NAME_SP, [SP_COMPOSITION_COLUMNS.CODIGO_FILHO], 1)
+        descricao, _ = clean_non_numeric_and_less_than_value_integers_dataframe(descricao, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.CODIGO, SP_DESCRIPTION_COLUMNS.NIVEL], 1)
+        
+        # Montar o grafo
+        G = montar_grafo(composicao)
+        folhas = get_indicadores_folhas(G) 
+        
+        # VALIDACAO PARA VALORES
+        codigos_valores = valores.columns.tolist()
+        codigo_valores = [codigo.split('-')[0] for codigo in codigos_valores]
+        for folha in folhas:
+            if folha not in codigo_valores:
+                errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Indicador folha '{folha}' não tem dados associados na planilha {SP_VALUES_COLUMNS.NAME_SP}.")
+
+        # VALIDACAO PARA PROPORCIONALIDADES (se existir)
+        if not proporcionalidades.empty:
+            # Lista com todos as colunas nivel 1
+            level_two_columns = proporcionalidades.columns.get_level_values(1).unique().tolist()
+
+            # Verifica se id existe em level_two_columns
+            if SP_PROPORTIONALITIES_COLUMNS.ID in level_two_columns:
+                level_two_columns.remove(SP_PROPORTIONALITIES_COLUMNS.ID)
+            
+            level_two_columns = [col for col in level_two_columns if not col.startswith('Unnamed')]
+            level_two_columns = [col for col in level_two_columns if not col.startswith('unnamed')]
+            
+            level_two_columns = [col.split('-')[0] for col in level_two_columns]
+            all_columns = list(set(level_two_columns))
+
+            # Verifica se todos os códigos folhas estão presentes em level_one_columns
+            for folha in folhas:
+                if folha not in all_columns:
+                    errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Indicador folha '{folha}' não tem dados associados na planilha {SP_PROPORTIONALITIES_COLUMNS.NAME_SP}.")
+          
+    except Exception as e:
+            errors.append(f"Erro ao processar o arquivo {SP_COMPOSITION_COLUMNS.NAME_SP}: {e}.")
 
     return not errors, errors, warnings

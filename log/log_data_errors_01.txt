@@ -108,6 +108,12 @@ valores.xlsx: O indicador '5009-2015' não está presente na planilha proporcion
 valores.xlsx: O indicador '5010-2015' não está presente na planilha proporcionalidades.xlsx.
 valores.xlsx: O indicador '5011-2015' não está presente na planilha proporcionalidades.xlsx.
 Existem mais 21 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
+composicao.xlsx: Indicador folha '5002' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5003' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5006' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5007' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5010' não tem dados associados na planilha proporcionalidades.xlsx.
 Verificação: Códigos HTML nas descrições simples
 descricao.xlsx, linha 2: Coluna desc_simples não pode conter código HTML.
 descricao.xlsx, linha 3: Coluna desc_simples não pode conter código HTML.
@@ -153,9 +159,9 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 83
+Número de erros: 88
 Número de avisos: 34
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_01/data_errors_01_report.html

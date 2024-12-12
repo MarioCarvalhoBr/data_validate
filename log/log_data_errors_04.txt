@@ -107,6 +107,11 @@ proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha
 proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.
 Existem mais 11 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
+composicao.xlsx: Indicador folha '5003' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5005' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5006' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '5007' não tem dados associados na planilha proporcionalidades.xlsx.
 Verificação: Estrutura dos arquivos da pasta de entrada
 composicao.xlsx: Coluna 'Unnamed: 2' será ignorada pois não está na especificação.
 Verificação: Ortografia
@@ -122,9 +127,9 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 67
+Número de erros: 71
 Número de avisos: 8
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_04/data_errors_04_report.html

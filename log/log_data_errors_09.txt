@@ -111,14 +111,19 @@ proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha
 proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '5021-2010' não está presente na planilha valores.xlsx.
 Existem mais 10 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
+composicao.xlsx: Indicador folha '5' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '7' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '8' não tem dados associados na planilha proporcionalidades.xlsx.
+composicao.xlsx: Indicador folha '9' não tem dados associados na planilha proporcionalidades.xlsx.
 Verificação: Estrutura dos arquivos da pasta de entrada
 1.qml: Arquivo de legenda não esperado.
 99.qml: Arquivo de legenda não esperado.
 
 
-Número de erros: 67
+Número de erros: 71
 Número de avisos: 2
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_09/data_errors_09_report.html
