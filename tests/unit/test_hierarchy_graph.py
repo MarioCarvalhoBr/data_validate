@@ -111,10 +111,10 @@ def test_count_errors_verify_graph_sp_description_composition_values_proportiona
     assert len(errors) == 4
     assert len(warnings) == 0
 
-    assert errors[0] == "composicao.xlsx: Indicador folha '4' não tem dados associados na planilha valores.xlsx."
-    assert errors[1] == "composicao.xlsx: Indicador folha '9' não tem dados associados na planilha valores.xlsx."
-    assert errors[2] == "composicao.xlsx: Indicador folha '8' não tem dados associados na planilha proporcionalidades.xlsx."
-    assert errors[3] == "composicao.xlsx: Indicador folha '9' não tem dados associados na planilha proporcionalidades.xlsx."
+    assert errors[0] == "valores.xlsx: Indicador folha '4' não possui dados associados."
+    assert errors[1] == "valores.xlsx: Indicador folha '9' não possui dados associados."
+    assert errors[2] == "proporcionalidades.xlsx: Indicador folha '8' não possui dados associados."
+    assert errors[3] == "proporcionalidades.xlsx: Indicador folha '9' não possui dados associados."
 
 def test_imprimir_grafo_with_no_edges():
     G = nx.DiGraph()

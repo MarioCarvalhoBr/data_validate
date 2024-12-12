@@ -86,11 +86,11 @@ proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha
 proporcionalidades.xlsx: O indicador '5021-2010' não está presente na planilha valores.xlsx.
 Existem mais 10 erros similares aos anteriores que foram omitidos.
 Verificação: Indicadores folhas sem dados associados
-composicao.xlsx: Indicador folha '5' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '4' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '7' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '8' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '9' não tem dados associados na planilha proporcionalidades.xlsx.
+proporcionalidades.xlsx: Indicador folha '5' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '4' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '7' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.
 
 
 Número de erros: 46

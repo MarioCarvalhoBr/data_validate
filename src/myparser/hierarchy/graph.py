@@ -302,7 +302,7 @@ def verify_graph_sp_description_composition_values_proportionalities_leafs(descr
         codigo_valores = [codigo.split('-')[0] for codigo in codigos_valores]
         for folha in folhas:
             if folha not in codigo_valores:
-                errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Indicador folha '{folha}' não tem dados associados na planilha {SP_VALUES_COLUMNS.NAME_SP}.")
+                errors.append(f"{SP_VALUES_COLUMNS.NAME_SP}: Indicador folha '{folha}' não possui dados associados.")
 
         # VALIDACAO PARA PROPORCIONALIDADES (se existir)
         if not proporcionalidades.empty:
@@ -322,7 +322,7 @@ def verify_graph_sp_description_composition_values_proportionalities_leafs(descr
             # Verifica se todos os códigos folhas estão presentes em level_one_columns
             for folha in folhas:
                 if folha not in all_columns:
-                    errors.append(f"{SP_COMPOSITION_COLUMNS.NAME_SP}: Indicador folha '{folha}' não tem dados associados na planilha {SP_PROPORTIONALITIES_COLUMNS.NAME_SP}.")
+                    errors.append(f"{SP_PROPORTIONALITIES_COLUMNS.NAME_SP}: Indicador folha '{folha}' não possui dados associados.")
           
     except Exception as e:
             errors.append(f"Erro ao processar o arquivo {SP_COMPOSITION_COLUMNS.NAME_SP}: {e}.")

@@ -97,11 +97,11 @@ proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha
 proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.
 Existem mais 11 erros similares aos anteriores que foram omitidos.
 Verificação: Indicadores folhas sem dados associados
-composicao.xlsx: Indicador folha '5002' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '5003' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '5005' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '5006' não tem dados associados na planilha proporcionalidades.xlsx.
-composicao.xlsx: Indicador folha '5007' não tem dados associados na planilha proporcionalidades.xlsx.
+proporcionalidades.xlsx: Indicador folha '5002' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5003' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5005' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5006' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5007' não possui dados associados.
 Verificação: Ortografia
 descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 Verificação: Padrão para nomes dos indicadores
