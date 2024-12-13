@@ -2,6 +2,7 @@ from src.util.utilities import clean_non_numeric_and_less_than_value_integers_da
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_DESCRIPTION_COLUMNS, SP_VALUES_COLUMNS,SP_SCENARIO_COLUMNS, SP_TEMPORAL_REFERENCE_COLUMNS
 import pandas as pd
+from decimal import Decimal
 
 def extract_ids_from_list_from_description(df_description):
     # Remove a linha que o nivel == 1
@@ -278,6 +279,11 @@ def verify_unavailable_values(df_values, df_sp_scenario):
             df_values.drop(columns=[SP_VALUES_COLUMNS.ID], inplace=True)
 
         colunas_sp_valores, __ = extract_ids_from_list(df_values.columns, lista_simbolos_cenarios)
+
+        has_more_than_2_decimal_places = False
+        count_values_has_more_than_2_decimal_places = 0
+        line_init_values = 0
+
         
         for column in colunas_sp_valores:
             line_init = None
@@ -297,12 +303,33 @@ def verify_unavailable_values(df_values, df_sp_scenario):
                     count_errors += 1
                     
                     line_end = index + 2
+                    continue
+
+                obj_value_decimal = Decimal(str(value).replace(',', '.'))
+
+                # Verifica se o valor tem mais de 3 casas decimais
+                if obj_value_decimal.as_tuple().exponent < -2:
+                    if not has_more_than_2_decimal_places:
+                        line_init_values = index + 3
+                    has_more_than_2_decimal_places = True
+                    count_values_has_more_than_2_decimal_places += 1
+
             if count_errors > 1:
                 errors_column.clear()
                 errors_column.append(f"{SP_VALUES_COLUMNS.NAME_SP}: {count_errors} valores que não são número válido nem DI (Dado Indisponível) para a coluna '{column}', entre as linhas {line_init} e {line_end}.")
             
             errors.extend(errors_column)
+
+        if has_more_than_2_decimal_places:
+            text_existem = "Existem" if count_values_has_more_than_2_decimal_places > 1 else "Existe"
+            text_valores = "valores" if count_values_has_more_than_2_decimal_places > 1 else "valor"
+            # TODO: No futuro, verificar como vai ficar essa questão de reportar a linha
+            warnings.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {line_init_values}: {text_existem} {count_values_has_more_than_2_decimal_places} {text_valores} com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.")
+        
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")
+        # Imprima toda a stack de erro e inclusive a linha
+        import traceback
+        traceback.print_exc()
     
     return not errors, errors, warnings

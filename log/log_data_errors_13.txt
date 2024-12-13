@@ -43,7 +43,6 @@ Verificação: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
-Verificação: Valores indisponíveis
 Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
@@ -62,10 +61,12 @@ Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
 Verificação: Indicadores em valores e proporcionalidades
 Verificação: Indicadores folhas sem dados associados
+Verificação: Valores indisponíveis e inválidos
+valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.
 
 
 Número de erros: 8
-Número de avisos: 0
+Número de avisos: 1
 Número de verificações realizadas: 31
 
 

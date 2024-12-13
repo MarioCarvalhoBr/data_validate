@@ -403,7 +403,7 @@ def run(args):
         results_tests.append(["Relações de combinações de valores", *flatten(*sp_values.verify_combination_sp_description_values_scenario_temporal_reference(df_sp_description, df_sp_values, df_sp_scenario, df_sp_temporal_reference))])
         
         # 11.2  - Valores indisponiveis #149: verify_unavailable_values(df_values):
-        results_tests.append(["Valores indisponíveis", *flatten(*sp_values.verify_unavailable_values(df_sp_values, df_sp_scenario))])
+        results_tests.append(["Valores indisponíveis e inválidos", *flatten(*sp_values.verify_unavailable_values(df_sp_values, df_sp_scenario))])
 
 
         # ------------------------------------------------------------------------------------------------------------------------------------

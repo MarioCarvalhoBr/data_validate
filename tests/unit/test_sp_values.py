@@ -61,10 +61,12 @@ def test_count_errors_verify_unavailable_values_data_errors_07():
     is_correct, errors, warnings = verify_unavailable_values(df_sp_values_errors_07, df_sp_scenario_errors_07)
     assert is_correct is False
     assert len(errors) == 2
-    assert len(warnings) == 0
+    assert len(warnings) == 1
     
     assert errors[0] == "valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'."
     assert errors[1] == "valores.xlsx: 3 valores que não são número válido nem DI (Dado Indisponível) para a coluna '2-2050-O', entre as linhas 12 e 14."
+
+    assert warnings[0] == "valores.xlsx, linha 3: Existem 203 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais."
 
 # Testes: verify_ids_sp_description_values
 def test_true_verify_ids_sp_description_values_data_ground_truth_01():

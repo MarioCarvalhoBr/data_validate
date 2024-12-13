@@ -1,4 +1,4 @@
-name: Run Unit Test via Pytest
+name: Ubuntu 24.04 whin PyTest and Python 3.12
 
 on: 
   push:

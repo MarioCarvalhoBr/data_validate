@@ -48,7 +48,7 @@ Verificação: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
-Verificação: Valores indisponíveis
+Verificação: Valores indisponíveis e inválidos
 valores.xlsx, linha 11: O valor não é um número válido e nem DI (Dado Indisponível) para a coluna '2-2030-O'.
 valores.xlsx: 3 valores que não são número válido nem DI (Dado Indisponível) para a coluna '2-2050-O', entre as linhas 12 e 14.
 Verificação: Quebra de linha para descrição
@@ -101,14 +101,16 @@ proporcionalidades.xlsx: Indicador folha '5' não possui dados associados.
 proporcionalidades.xlsx: Indicador folha '7' não possui dados associados.
 proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.
 proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.
+Verificação: Valores indisponíveis e inválidos
+valores.xlsx, linha 3: Existem 203 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.
-proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
+proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
 Número de erros: 56
-Número de avisos: 3
+Número de avisos: 4
 Número de verificações realizadas: 31
 
 

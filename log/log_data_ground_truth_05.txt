@@ -43,7 +43,7 @@ Verificação: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
-Verificação: Valores indisponíveis
+Verificação: Valores indisponíveis e inválidos
 Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
