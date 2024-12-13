@@ -82,11 +82,12 @@ proporcionalidades.csv: O indicador '5009-2010' não está presente na planilha 
 proporcionalidades.csv: O indicador '5010-2010' não está presente na planilha valores.csv.
 proporcionalidades.csv: O indicador '5021-2010' não está presente na planilha valores.csv.
 Existem mais 10 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
 
 
 Número de erros: 38
 Número de avisos: 0
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_08/data_errors_08_report.html

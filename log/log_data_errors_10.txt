@@ -85,11 +85,17 @@ proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha
 proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '5021-2010' não está presente na planilha valores.xlsx.
 Existem mais 10 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
+proporcionalidades.xlsx: Indicador folha '5' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '4' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '7' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.
 
 
-Número de erros: 41
+Número de erros: 46
 Número de avisos: 0
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_10/data_errors_10_report.html

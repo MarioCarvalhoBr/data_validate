@@ -103,11 +103,13 @@ proporcionalidades.xlsx: O indicador '4-2030-P' não está presente na planilha 
 proporcionalidades.xlsx: O indicador '6-2030-O' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '7-2030-P' não está presente na planilha valores.xlsx.
 Existem mais 6 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
+valores.xlsx: Indicador folha '4' não possui dados associados.
 
 
-Número de erros: 55
+Número de erros: 56
 Número de avisos: 0
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_11/data_errors_11_report.html

@@ -53,11 +53,12 @@ Verificação: Propriedades de soma nos fatores influenciadores
 Verificação: Indicadores repetidos em proporcionalidades
 Verificação: Relações de indicadores em proporcionalidades
 Verificação: Indicadores em valores e proporcionalidades
+Verificação: Indicadores folhas sem dados associados
 
 
 Número de erros: 0
 Número de avisos: 0
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_ground_truth_01/data_ground_truth_01_report.html

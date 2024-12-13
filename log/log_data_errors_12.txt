@@ -75,11 +75,12 @@ proporcionalidades.xlsx: O indicador '7-2050-P' não está presente na planilha 
 proporcionalidades.xlsx: O indicador '8-2030-O' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '9-2030-O' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '9-2050-O' não está presente na planilha valores.xlsx.
+Verificação: Indicadores folhas sem dados associados
 
 
 Número de erros: 22
 Número de avisos: 0
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_12/data_errors_12_report.html

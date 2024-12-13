@@ -96,6 +96,12 @@ proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha
 proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.
 proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.
 Existem mais 11 erros similares aos anteriores que foram omitidos.
+Verificação: Indicadores folhas sem dados associados
+proporcionalidades.xlsx: Indicador folha '5002' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5003' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5005' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5006' não possui dados associados.
+proporcionalidades.xlsx: Indicador folha '5007' não possui dados associados.
 Verificação: Ortografia
 descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].
 Verificação: Padrão para nomes dos indicadores
@@ -129,9 +135,9 @@ proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2
 proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
 
 
-Número de erros: 59
+Número de erros: 64
 Número de avisos: 24
-Número de verificações realizadas: 30
+Número de verificações realizadas: 31
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_02/data_errors_02_report.html

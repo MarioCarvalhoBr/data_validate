@@ -54,11 +54,12 @@ Verificação: Intervalo dos dados da legenda
 descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.
 Verificação: Sobreposição de valores na legenda
 descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.
+Verificação: Indicadores folhas sem dados associados
 
 
 Número de erros: 8
 Número de avisos: 0
-Número de verificações realizadas: 23
+Número de verificações realizadas: 24
 
 
 Foi criado um arquivo de relatório em HTML no caminho: output_data/data_errors_00/data_errors_00_report.html

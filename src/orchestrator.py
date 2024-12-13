@@ -439,10 +439,13 @@ def run(args):
         if sp_proportionalities_exists:
             results_tests.append(["Relações de indicadores em proporcionalidades", *flatten(*sp_proportionalities.verify_parent_child_relationships(df_sp_proportionalities, df_sp_composition, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_COMPOSITION_COLUMNS.NAME_SP))])
 
-        # Verificar indicadores em valores e proporcionalidades
+        # 18 - Verificar indicadores em valores e proporcionalidades
         if sp_proportionalities_exists:
             results_tests.append(["Indicadores em valores e proporcionalidades", *flatten(*sp_proportionalities.verify_ids_values_proportionalities(df_sp_proportionalities, df_sp_values, SP_PROPORTIONALITIES_COLUMNS.NAME_SP, SP_VALUES_COLUMNS.NAME_SP))])
-    
+
+        # 19 - Verificar de indcadores folhas: verify_graph_sp_description_composition_values_proportionalities_leafs(descricao, composicao, valores, proporcionalidades)
+        results_tests.append(["Indicadores folhas sem dados associados", *flatten(*graph.verify_graph_sp_description_composition_values_proportionalities_leafs(df_sp_description, df_sp_composition, df_sp_values, df_sp_proportionalities))])
+        
     # Número de verificações realizadas
     number_tests = str(len(results_tests))
     if debug:
