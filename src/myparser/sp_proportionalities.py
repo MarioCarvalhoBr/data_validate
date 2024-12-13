@@ -46,6 +46,8 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
     warnings = []
 
     has_more_than_3_decimal_places = False
+    count_values_has_more_than_3_decimal_places = 0
+    line_init_values = 0
 
     for parent_id, subdataset in subdatasets.items():
 
@@ -93,9 +95,11 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
                 a = Decimal(str(cell))
                 
                 # Verifica se o valor tem mais de 3 casas decimais
-                if not has_more_than_3_decimal_places and a.as_tuple().exponent < -3:
+                if a.as_tuple().exponent < -3:
+                    if not has_more_than_3_decimal_places:
+                        line_init_values = index + 3
                     has_more_than_3_decimal_places = True
-                    warnings.append(f"{name_sp_proporcionalities_name}, linha {index + 3}: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.")
+                    count_values_has_more_than_3_decimal_places += 1
                 
                 all_cells.append(str(new_value))
             
@@ -122,7 +126,14 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
             errors_column.clear()
             errors_column.append(f"{name_sp_proporcionalities_name}: {count_errors} valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}.")
             
-        errors.extend(errors_column)  
+        errors.extend(errors_column)
+
+    if has_more_than_3_decimal_places:
+        text_existem = "Existem" if count_values_has_more_than_3_decimal_places > 1 else "Existe"
+        text_valores = "valores" if count_values_has_more_than_3_decimal_places > 1 else "valor"
+        # TODO: No futuro, verificar como vai ficar essa questão de reportar a linha
+        warnings.append(f"{name_sp_proporcionalities_name}, linha {line_init_values}: {text_existem} {count_values_has_more_than_3_decimal_places} {text_valores} com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.")
+        
     return errors, warnings
 
 def count_repeated_values(string_list):

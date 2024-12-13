@@ -63,7 +63,6 @@ Verificação: Pontuações obrigatórias e proibidas em referência temporal
 Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
-Verificação: Valores indisponíveis
 Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
@@ -121,14 +120,16 @@ descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "IDEB séries 
 descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Vulnerabilidade do IDEB". Encontrado: "Vulnerabilidade Do IDEB".
 Verificação: Descrições simples com mais de 150 caracteres
 descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
+Verificação: Valores indisponíveis e inválidos
+valores.xlsx, linha 3: Existem 190 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.
-proporcionalidades.xlsx, linha 4: Existem valores com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
+proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.
 
 
 Número de erros: 71
-Número de avisos: 8
+Número de avisos: 9
 Número de verificações realizadas: 31
 
 

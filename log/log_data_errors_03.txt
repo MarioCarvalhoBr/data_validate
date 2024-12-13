@@ -63,7 +63,6 @@ Verificação: Relações de valores únicos em cenários
 Verificação: Relações de valores únicos em referência temporal
 Verificação: Relações de combinações de valores
 valores.xlsx: Verificação de combinação de cenários e referência temporal foi abortada porque a coluna 'id' está ausente.
-Verificação: Valores indisponíveis
 Verificação: Intervalo dos dados da legenda
 Verificação: Sobreposição de valores na legenda
 legenda.qml: Existe uma descontinuidade nos valores das fatias da legenda: 0.46 e 0.49.
@@ -95,6 +94,8 @@ descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR
 descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".
 Verificação: Descrições simples com mais de 150 caracteres
 descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.
+Verificação: Valores indisponíveis e inválidos
+valores.xlsx, linha 3: Existem 228 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 Verificação: Quebra de linha para descrição
 descricao.xlsx: A verificação de CR e LF foi abortada para as colunas: ['meta'].
 descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.
@@ -115,7 +116,7 @@ referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracte
 
 
 Número de erros: 30
-Número de avisos: 27
+Número de avisos: 28
 Número de verificações realizadas: 31
 
 

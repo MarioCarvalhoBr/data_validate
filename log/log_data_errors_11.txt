@@ -57,7 +57,6 @@ valores.xlsx: A coluna '2-2090-O' é desnecessária.
 valores.xlsx: A coluna '3-2015' é obrigatória.
 valores.xlsx: A coluna '4-2015' é obrigatória.
 valores.xlsx: A coluna '9-2015' é desnecessária para o indicador de nível 1.
-Verificação: Valores indisponíveis
 Verificação: Quebra de linha para descrição
 Verificação: Quebra de linha para cenários
 Verificação: Quebra de linha para referência temporal
@@ -105,10 +104,12 @@ proporcionalidades.xlsx: O indicador '7-2030-P' não está presente na planilha 
 Existem mais 6 erros similares aos anteriores que foram omitidos.
 Verificação: Indicadores folhas sem dados associados
 valores.xlsx: Indicador folha '4' não possui dados associados.
+Verificação: Valores indisponíveis e inválidos
+valores.xlsx, linha 5: Existem 167 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 
 
 Número de erros: 56
-Número de avisos: 0
+Número de avisos: 1
 Número de verificações realizadas: 31
 
 

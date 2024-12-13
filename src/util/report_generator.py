@@ -82,7 +82,7 @@ class ReportGenerator:
                                         <strong>Erros</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong class="card-text">{{ errors }}</strong>
+                                        {{ errors }}
                                     </div>
                                 </div>
                                 <div class="card mb-4">
@@ -90,7 +90,7 @@ class ReportGenerator:
                                         <strong>Avisos</strong>
                                     </div>
                                     <div class="card-body">
-                                        <strong class="card-text">{{ warnings }}</strong>
+                                        {{ warnings }}
                                     </div>
                                 </div>
 
@@ -108,17 +108,26 @@ class ReportGenerator:
             """ Preenche o template HTML com dados e salva o resultado. """
             template = self.env.get_template(self.template_name)
             
+            # Criando a string de erros
             errors = "".join(
-                f"\n<br><span style='color: blue;'>{name}</span>:\n" +
+                f"\n<br><span style='color: blue; font-weight: bold;'>{name}</span>\n" +
                 "\n".join(f"<br><span style='color: red;'>{error}</span>" for error in errors)
                 for name, _, errors, _ in results_tests
             )
-
+            # Remover a quebra de linha e a tag <br> no início da string
+            if errors.startswith("\n<br>"):
+                errors = errors[5:]
+            
+            # Criando a string de avisos
             warnings = "".join(
-                f"\n<br><span style='color: blue;'>{name}</span>:\n" +
+                f"\n<br><span style='color: blue; font-weight: bold;'>{name}</span>\n" +
                 "\n".join(f"<br><span style='color: orange;'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
+            # Remover a quebra de linha e a tag <br> no início da string
+            if warnings.startswith("\n<br>"):
+                warnings = warnings[5:]
+                
             display_tests_not_executed = "block" if results_tests_not_executed else "none"
 
             results_tests_not_executed = "\n".join([f"<li>{test_name}</li>" for test_name in results_tests_not_executed])
