@@ -1,4 +1,4 @@
-name: Ubuntu Run Unit Test on Pytest 3.12
+name: Run Unit Test via Pytest
 
 on: 
   push:
@@ -8,7 +8,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-lasted  # Especifica a última versão do Ubuntu como o ambiente
+    # runs-on: ubuntu-24.04  # Especifica o Ubuntu 22.04 como o ambiente
+    runs-on: ubuntu-latest  # Especifica a última versão do Ubuntu como o ambiente
     strategy:
       matrix:
         python-version: ["3.12"]
