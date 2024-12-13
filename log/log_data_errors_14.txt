@@ -70,7 +70,7 @@ descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impact
 descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].
 descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].
 Verificação: Valores indisponíveis e inválidos
-valores.xlsx, linha 3: Existem 205 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.
+valores.xlsx, linha 3: Existem 205 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 
 
 Número de erros: 12

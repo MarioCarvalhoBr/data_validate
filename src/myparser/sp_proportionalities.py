@@ -132,7 +132,7 @@ def check_sum_equals_one(subdatasets, sp_df_values, name_sp_df_values, name_sp_p
         text_existem = "Existem" if count_values_has_more_than_3_decimal_places > 1 else "Existe"
         text_valores = "valores" if count_values_has_more_than_3_decimal_places > 1 else "valor"
         # TODO: No futuro, verificar como vai ficar essa questão de reportar a linha
-        warnings.append(f"{name_sp_proporcionalities_name}, linha {line_init_values}: {text_existem} {count_values_has_more_than_3_decimal_places} {text_valores} com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.")
+        warnings.append(f"{name_sp_proporcionalities_name}, linha {line_init_values}: {text_existem} {count_values_has_more_than_3_decimal_places} {text_valores} com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.")
         
     return errors, warnings
 

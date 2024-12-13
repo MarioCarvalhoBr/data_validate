@@ -153,11 +153,11 @@ cenarios.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.
 Verificação: Pontuações obrigatórias e proibidas em referência temporal
 referencia_temporal.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.
 Verificação: Valores indisponíveis e inválidos
-valores.xlsx, linha 3: Existem 383 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.
+valores.xlsx, linha 3: Existem 383 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 Verificação: Propriedades de soma nos fatores influenciadores
 proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.
 proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.
-proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais na planilha, serão consideradas apenas as 3 primeiras casas decimais.
+proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.
 
 
 Número de erros: 88

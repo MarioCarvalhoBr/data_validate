@@ -62,7 +62,7 @@ Verificação: Relações de indicadores em proporcionalidades
 Verificação: Indicadores em valores e proporcionalidades
 Verificação: Indicadores folhas sem dados associados
 Verificação: Valores indisponíveis e inválidos
-valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.
+valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 
 
 Número de erros: 8

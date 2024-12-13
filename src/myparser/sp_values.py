@@ -324,7 +324,7 @@ def verify_unavailable_values(df_values, df_sp_scenario):
             text_existem = "Existem" if count_values_has_more_than_2_decimal_places > 1 else "Existe"
             text_valores = "valores" if count_values_has_more_than_2_decimal_places > 1 else "valor"
             # TODO: No futuro, verificar como vai ficar essa questão de reportar a linha
-            warnings.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {line_init_values}: {text_existem} {count_values_has_more_than_2_decimal_places} {text_valores} com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.")
+            warnings.append(f"{SP_VALUES_COLUMNS.NAME_SP}, linha {line_init_values}: {text_existem} {count_values_has_more_than_2_decimal_places} {text_valores} com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.")
         
     except Exception as e:
         errors.append(f"Erro ao processar o arquivo {SP_VALUES_COLUMNS.NAME_SP}: {e}.")

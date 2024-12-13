@@ -119,7 +119,7 @@ Verificação: Estrutura dos arquivos da pasta de entrada
 1.qml: Arquivo de legenda não esperado.
 99.qml: Arquivo de legenda não esperado.
 Verificação: Valores indisponíveis e inválidos
-valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais na planilha, serão consideradas apenas as 2 primeiras casas decimais.
+valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.
 
 
 Número de erros: 71
