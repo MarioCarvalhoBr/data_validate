@@ -6,7 +6,7 @@ source "$SCRIPT_DIR/constants.sh"
 
 echo "Executando verificações..."
 
-for folder in "${data_names[@]}"; do
+for folder in "${folder_input_names[@]}"; do
     if [ -d "$INPUT_DATA/$folder" ]; then
         echo ""
         echo "Processando a pasta '$INPUT_DATA/$folder'..."
