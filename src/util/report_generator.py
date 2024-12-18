@@ -34,25 +34,182 @@ class ReportGenerator:
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
                             <title>Canoa Report</title>
                             <style>
+                                /* Estilo CSS minimalista baseado no design do Bootstrap: By Mário Carvalho */
+                                :root {
+                                    /* TEXT COLORS */
+                                    --color-primary: blue; /* Cor azul */
+                                    --color-secondary: #007bff; /* Cor cinza */
+                                    --color-danger: red; /* Cor vermelha */
+                                    --color-warning: orange; /* Cor laranja */
+                                    --color-green: green; /* Cor verde */
+                                    --color-info: #17a2b8; /* Cor azul clara */
+                                    --color-white: #ffffff; /* Cor branca */
+                                    --color-black: #000000; /* Cor preta */
+                                    --color-gray: #343a40; /* Cor cinza */
+
+                                    /* BACKGROUND COLORS */
+                                    --bg-primary: blue; /* Cor azul */
+                                    --bg-secondary: #007bff; /* Cor cinza */
+                                    --bg-danger: red; /* Cor vermelha */
+                                    --bg-warning: orange; /* Cor laranja */
+                                    --bg-success: green; /* Cor verde */
+                                    --bg-info: #17a2b8; /* Cor azul clara */
+                                    --bg-light: #f8f9fa; /* Cor cinza claro */
+                                    --bg-white: #ffffff; /* Cor branca */
+                                    --bg-black: #000000; /* Cor preta */
+                                    --bg-gray: #343a40; /* Cor cinza */
+                                }
+
+                                /* DIVS */
                                 .container {
                                     max-width: 98%;
                                 }
+
+                                /* CARDS */
+                                .card {
+                                    border: 1px solid #dee2e6;
+                                    border-radius: 0.25rem;
+                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    overflow: hidden;
+                                    margin: 5px auto;
+                                }
+                                .card-header {
+                                    padding: 0.75rem 1rem;
+                                    background-color: var(--bg-secondary); /* Cor padrão da faixa */
+                                    color: white; /* Cor padrão do texto na faixa */
+                                }
+                                .card-body {
+                                    padding: 1rem;
+                                    background-color: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    font-family: Arial, sans-serif;
+                                    font-weight: bold;
+                                }
+                                .card-title {
+                                    margin: 0;
+                                    font-size: 1.25rem;
+                                    font-weight: bold;
+                                }
+                                .card-text {
+                                    margin-top: 0px;
+                                    font-size: 1rem;
+                                    color: var(--color-black);
+                                }
+
+                                /* HEADER CENTER */
+                                .info-header-center {
+                                    text-align: center; /* Centraliza os itens horizontalmente */
+                                    padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+                                }
+                                .info-header-center h1 {
+                                    margin: 0; /* Remove margem padrão do h1 */
+                                    font-size: 2rem; /* Tamanho da fonte */
+                                }
+                                .info-header-center h2 {
+                                    margin: 0; /* Remove margem padrão do h2 */
+                                    font-size: 1.5rem; /* Tamanho da fonte */
+                                    color: var(--color-gray); /* Cor do texto */
+                                }
+                                .info-header-center strong {
+                                    font-weight: bold; /* Deixa o texto em negrito */
+                                }
+
+                                /* HEADER LEFT */
+                                .info-header-left {
+                                    text-align: left; /* Centraliza os itens a esquerda */
+                                    padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+                                }
+                                .info-header-left strong {
+                                    font-weight: bold; /* Deixa o texto em negrito */
+                                    margin: 0; /* Remove margem padrão do strong */
+                                    padding: 0; /* Remove padding padrão do strong */
+                                }
+                                .info-header-left li {
+                                    font-weight: bold; /* Deixa o texto em negrito */
+                                    margin: 0; /* Remove margem padrão do strong */
+                                    padding: 0; /* Remove padding padrão do strong */
+                                }
+
+                                /* TEXT COLORS */
+                                .text-primary {
+                                    color: var(--color-primary);
+                                    font-weight: bold;
+                                }
+                                .text-secondary {
+                                    color: var(--color-secondary);
+                                }
+                                .text-danger {
+                                    color: var(--color-danger);
+                                }
+                                .text-warning {
+                                    color: var(--color-warning);
+                                }
+                                .text-green {
+                                    color: var(--color-green);
+                                }
+                                .text-info {
+                                    color: var(--color-info);
+                                }
+                                .text-white {
+                                    color: var(--color-white);
+                                }
+                                .text-black {
+                                    color: var(--color-black);
+                                }
+                                .text-gray {
+                                    color: var(--color-gray);
+                                }
+
+                                /* BACKGROUND COLORS */
+                                .bg-primary {
+                                    background-color: var(--bg-primary);
+                                }
+                                .bg-secondary {
+                                    background-color: var(--bg-secondary);
+                                }
+                                .bg-danger {
+                                    background-color: var(--bg-danger);
+                                }
+                                .bg-warning {
+                                    background-color: var(--bg-warning);
+                                }
+                                .bg-success {
+                                    background-color: var(--bg-success);
+                                }
+                                .bg-info {
+                                    background-color: var(--bg-info);
+                                }
+                                .bg-light {
+                                    background-color: var(--bg-light);
+                                }
+                                .bg-white {
+                                    background-color: var(--bg-white);
+                                }
+                                .bg-black {
+                                    background-color: var(--bg-black);
+                                }
+                                .bg-gray {
+                                    background-color: var(--bg-gray);
+                                }
+
                             </style>
+
                         </head>
                         <body>
-                            <div class="container my-5">
+                            <!-- DIV PRINCIPAL -->
+                            <div class="container">
 
-                                <div class="text-center mb-12">
+                                <!-- DIV HEADER -->
+                                <div class="info-header-center">
                                     <h1><strong>{{ name }}</strong></h1>
-                                    <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
+                                    <h2 class="text-subtitle">Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
                                 </div>
 
-                                <div class="card mb-12">
-                                    <div class="card-header bg-primary text-white">
-                                        <strong>Informa&ccedil;&otilde;es</strong>
+                                <!-- CARD DE INFORMAÇÕES -->
+                                <div class="card">
+                                    <div class="card-header bg-secondary">
+                                        <h5 class="card-title text-white">Informa&ccedil;&otilde;es</h5>
                                     </div>
                                     <div class="card-body">
                                         {{ text_display_user }}
@@ -64,30 +221,39 @@ class ReportGenerator:
                                     </div>
                                 </div>
 
+                                <!-- CARD DE RESUMO -->
                                 <div class="card">
-                                    <div class="card-header bg-primary text-white">
-                                        <strong>Resumo da valida&ccedil;&atilde;o</strong>
+                                    <div class="card-header bg-primary">
+                                        <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
                                     </div>
                                     <div class="card-body">
                                         <strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong><br>
                                         <strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong><br>
-                                        <strong style="color: green;">N&uacute;mero de testes executados: {{ number_tests }}</strong><br>
-                                        <strong id="tests_not_executed" style="display: {{ display_tests_not_executed }}">Testes n&atilde;o executados: {{ tests_not_executed }}</strong> 
+                                        <strong class="text-green">N&uacute;mero de testes executados: {{ number_tests }}</strong><br>
+                                        <div class="info-header-left" id="tests_not_executed" style="display: {{ display_tests_not_executed }}">
+                                            <strong >Testes n&atilde;o executados: </strong>
+                                            {{ tests_not_executed }}
+                                        </div>
 
                                     </div>
                                 </div>
 
-                                <div class="card mb-12">
-                                    <div class="card-header bg-danger text-white">
-                                        <strong>Erros</strong>
+                                <!-- CARD DE ERROS -->
+                                <div class="card">
+                                    <!-- Faixa do título -->
+                                    <div class="card-header bg-danger">
+                                        <h5 class="card-title text-white">Erros</h5>
                                     </div>
                                     <div class="card-body">
                                         {{ errors }}
                                     </div>
                                 </div>
-                                <div class="card mb-4">
-                                    <div class="card-header text-dark bg-warning">
-                                        <strong>Avisos</strong>
+
+                                <!-- CARD DE AVISOS -->
+                                <div class="card">
+                                    <!-- Faixa do título -->
+                                    <div class="card-header bg-warning">
+                                        <h5 class="card-title text-white">Avisos</h5>
                                     </div>
                                     <div class="card-body">
                                         {{ warnings }}
@@ -110,8 +276,8 @@ class ReportGenerator:
             
             # Criando a string de erros
             errors = "".join(
-                f"\n<br><span style='color: blue; font-weight: bold;'>{name}</span>\n" +
-                "\n".join(f"<br><span style='color: red;'>{error}</span>" for error in errors)
+                f"\n<br><span class='text-primary'>{name}</span>\n" +
+                "\n".join(f"<br><span class='text-danger'>{error}</span>" for error in errors)
                 for name, _, errors, _ in results_tests
             )
             # Remover a quebra de linha e a tag <br> no início da string
@@ -120,8 +286,8 @@ class ReportGenerator:
             
             # Criando a string de avisos
             warnings = "".join(
-                f"\n<br><span style='color: blue; font-weight: bold;'>{name}</span>\n" +
-                "\n".join(f"<br><span style='color: orange;'>{warning}</span>" for warning in warnings)
+                f"\n<br><span class='text-primary'>{name}</span>\n" +
+                "\n".join(f"<br><span class='text-warning'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
             # Remover a quebra de linha e a tag <br> no início da string
@@ -135,11 +301,11 @@ class ReportGenerator:
 
             date_now = ""
             if not self.no_version:
-                date_now = f"<strong>Vers&atilde;o do validador: { info.__version__ }</strong>"
+                date_now = f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{ info.__version__ }</strong></strong>"
 
             app_version = ""
             if not self.no_time:
-                app_version = f"<strong>Data e hora do processo: { info.__date_now__ } </strong><br>"
+                app_version = f"<strong>Data e hora do processo: <strong class='text-gray'>{ info.__date_now__ }</strong></strong><br>"
 
             if not self.no_version and not self.no_time:
                 date_now = date_now + "<br>"
@@ -151,16 +317,16 @@ class ReportGenerator:
             text_display_file = ""
             
             if self.sector is not None:
-                text_display_sector = f"<strong>Setor estrat&eacute;gico: {self.sector}</strong><br>"
+                text_display_sector = f"<strong>Setor estrat&eacute;gico: <strong class='text-gray'>{self.sector}</strong></strong><br>"
             
             if self.protocol is not None:
-                text_display_protocol = f"<strong>Protocolo: {self.protocol}</strong><br>"
+                text_display_protocol = f"<strong>Protocolo: <strong class='text-gray'>{self.protocol}</strong></strong><br>"
 
             if self.user is not None:
-                text_display_user = f"<strong>Usu&aacute;rio: {self.user}</strong><br>"
+                text_display_user = f"<strong>Usu&aacute;rio: <strong class='text-gray'>{self.user}</strong></strong><br>"
 
             if self.file is not None:
-                text_display_file = f"<strong>Arquivo submetido: {self.file}</strong><br>"
+                text_display_file = f"<strong>Arquivo submetido: <strong class='text-gray'>{self.file}</strong></strong><br>"
 
             template_vars = {
                 "name": info.__name__,

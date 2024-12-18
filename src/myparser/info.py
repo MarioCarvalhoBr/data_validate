@@ -36,7 +36,7 @@ def print_versions():
 # Informações da ferramenta
 
 __name__ = "Canoa"
-__version__ = "0.4.12"
+__version__ = "0.4.13"
 
 __author__ = "Mário de Araújo Carvalho"
 __email__ = "mariodearaujocarvalho@gmail.com"
@@ -51,4 +51,4 @@ __python_version__ = "3.12"
 __packages__ = ["colorama", "matplotlib", "networkx", "openpyxl", "pandas", "pyarrow", "pytest", "pipreqs", "coverage", "pre_commit"]
 
 # UTILS
-__date_now__ = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+__date_now__ = datetime.datetime.now().strftime('%d/%m/%Y %H:%M:%S')

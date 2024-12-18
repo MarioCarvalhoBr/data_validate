@@ -4,137 +4,303 @@
                         <head>
                             <meta charset="UTF-8">
                             <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
                             <title>Canoa Report</title>
                             <style>
+                                /* Estilo CSS minimalista baseado no design do Bootstrap: By Mário Carvalho */
+                                :root {
+                                    /* TEXT COLORS */
+                                    --color-primary: blue; /* Cor azul */
+                                    --color-secondary: #007bff; /* Cor cinza */
+                                    --color-danger: red; /* Cor vermelha */
+                                    --color-warning: orange; /* Cor laranja */
+                                    --color-green: green; /* Cor verde */
+                                    --color-info: #17a2b8; /* Cor azul clara */
+                                    --color-white: #ffffff; /* Cor branca */
+                                    --color-black: #000000; /* Cor preta */
+                                    --color-gray: #343a40; /* Cor cinza */
+
+                                    /* BACKGROUND COLORS */
+                                    --bg-primary: blue; /* Cor azul */
+                                    --bg-secondary: #007bff; /* Cor cinza */
+                                    --bg-danger: red; /* Cor vermelha */
+                                    --bg-warning: orange; /* Cor laranja */
+                                    --bg-success: green; /* Cor verde */
+                                    --bg-info: #17a2b8; /* Cor azul clara */
+                                    --bg-light: #f8f9fa; /* Cor cinza claro */
+                                    --bg-white: #ffffff; /* Cor branca */
+                                    --bg-black: #000000; /* Cor preta */
+                                    --bg-gray: #343a40; /* Cor cinza */
+                                }
+
+                                /* DIVS */
                                 .container {
                                     max-width: 98%;
                                 }
+
+                                /* CARDS */
+                                .card {
+                                    border: 1px solid #dee2e6;
+                                    border-radius: 0.25rem;
+                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    overflow: hidden;
+                                    margin: 5px auto;
+                                }
+                                .card-header {
+                                    padding: 0.75rem 1rem;
+                                    background-color: var(--bg-secondary); /* Cor padrão da faixa */
+                                    color: white; /* Cor padrão do texto na faixa */
+                                }
+                                .card-body {
+                                    padding: 1rem;
+                                    background-color: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    font-family: Arial, sans-serif;
+                                    font-weight: bold;
+                                }
+                                .card-title {
+                                    margin: 0;
+                                    font-size: 1.25rem;
+                                    font-weight: bold;
+                                }
+                                .card-text {
+                                    margin-top: 0px;
+                                    font-size: 1rem;
+                                    color: var(--color-black);
+                                }
+
+                                /* HEADER CENTER */
+                                .info-header-center {
+                                    text-align: center; /* Centraliza os itens horizontalmente */
+                                    padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+                                }
+                                .info-header-center h1 {
+                                    margin: 0; /* Remove margem padrão do h1 */
+                                    font-size: 2rem; /* Tamanho da fonte */
+                                }
+                                .info-header-center h2 {
+                                    margin: 0; /* Remove margem padrão do h2 */
+                                    font-size: 1.5rem; /* Tamanho da fonte */
+                                    color: var(--color-gray); /* Cor do texto */
+                                }
+                                .info-header-center strong {
+                                    font-weight: bold; /* Deixa o texto em negrito */
+                                }
+
+                                /* HEADER LEFT */
+                                .info-header-left {
+                                    text-align: left; /* Centraliza os itens a esquerda */
+                                    padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+                                }
+                                .info-header-left strong {
+                                    font-weight: bold; /* Deixa o texto em negrito */
+                                    margin: 0; /* Remove margem padrão do strong */
+                                    padding: 0; /* Remove padding padrão do strong */
+                                }
+                                .info-header-left li {
+                                    font-weight: bold; /* Deixa o texto em negrito */
+                                    margin: 0; /* Remove margem padrão do strong */
+                                    padding: 0; /* Remove padding padrão do strong */
+                                }
+
+                                /* TEXT COLORS */
+                                .text-primary {
+                                    color: var(--color-primary);
+                                    font-weight: bold;
+                                }
+                                .text-secondary {
+                                    color: var(--color-secondary);
+                                }
+                                .text-danger {
+                                    color: var(--color-danger);
+                                }
+                                .text-warning {
+                                    color: var(--color-warning);
+                                }
+                                .text-green {
+                                    color: var(--color-green);
+                                }
+                                .text-info {
+                                    color: var(--color-info);
+                                }
+                                .text-white {
+                                    color: var(--color-white);
+                                }
+                                .text-black {
+                                    color: var(--color-black);
+                                }
+                                .text-gray {
+                                    color: var(--color-gray);
+                                }
+
+                                /* BACKGROUND COLORS */
+                                .bg-primary {
+                                    background-color: var(--bg-primary);
+                                }
+                                .bg-secondary {
+                                    background-color: var(--bg-secondary);
+                                }
+                                .bg-danger {
+                                    background-color: var(--bg-danger);
+                                }
+                                .bg-warning {
+                                    background-color: var(--bg-warning);
+                                }
+                                .bg-success {
+                                    background-color: var(--bg-success);
+                                }
+                                .bg-info {
+                                    background-color: var(--bg-info);
+                                }
+                                .bg-light {
+                                    background-color: var(--bg-light);
+                                }
+                                .bg-white {
+                                    background-color: var(--bg-white);
+                                }
+                                .bg-black {
+                                    background-color: var(--bg-black);
+                                }
+                                .bg-gray {
+                                    background-color: var(--bg-gray);
+                                }
+
                             </style>
+
                         </head>
                         <body>
-                            <div class="container my-5">
+                            <!-- DIV PRINCIPAL -->
+                            <div class="container">
 
-                                <div class="text-center mb-12">
+                                <!-- DIV HEADER -->
+                                <div class="info-header-center">
                                     <h1><strong>Canoa</strong></h1>
-                                    <h2>Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
+                                    <h2 class="text-subtitle">Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
                                 </div>
 
-                                <div class="card mb-12">
-                                    <div class="card-header bg-primary text-white">
-                                        <strong>Informa&ccedil;&otilde;es</strong>
+                                <!-- CARD DE INFORMAÇÕES -->
+                                <div class="card">
+                                    <div class="card-header bg-secondary">
+                                        <h5 class="card-title text-white">Informa&ccedil;&otilde;es</h5>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Usu&aacute;rio: Usuário C</strong><br>
-                                        <strong>Setor estrat&eacute;gico: Setor A</strong><br>
-                                        <strong>Protocolo: Protocolo B</strong><br>
+                                        <strong>Usu&aacute;rio: <strong class='text-gray'>Usuário C</strong></strong><br>
+                                        <strong>Setor estrat&eacute;gico: <strong class='text-gray'>Setor A</strong></strong><br>
+                                        <strong>Protocolo: <strong class='text-gray'>Protocolo B</strong></strong><br>
                                         
                                         
                                         
                                     </div>
                                 </div>
 
+                                <!-- CARD DE RESUMO -->
                                 <div class="card">
-                                    <div class="card-header bg-primary text-white">
-                                        <strong>Resumo da valida&ccedil;&atilde;o</strong>
+                                    <div class="card-header bg-primary">
+                                        <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
                                     </div>
                                     <div class="card-body">
                                         <strong class="text-danger">N&uacute;mero de Erros: 18</strong><br>
                                         <strong class="text-warning">N&uacute;mero de Avisos: 1</strong><br>
-                                        <strong style="color: green;">N&uacute;mero de testes executados: 31</strong><br>
-                                        <strong id="tests_not_executed" style="display: none">Testes n&atilde;o executados: <ul></ul></strong> 
+                                        <strong class="text-green">N&uacute;mero de testes executados: 31</strong><br>
+                                        <div class="info-header-left" id="tests_not_executed" style="display: none">
+                                            <strong >Testes n&atilde;o executados: </strong>
+                                            <ul></ul>
+                                        </div>
 
                                     </div>
                                 </div>
 
-                                <div class="card mb-12">
-                                    <div class="card-header bg-danger text-white">
-                                        <strong>Erros</strong>
+                                <!-- CARD DE ERROS -->
+                                <div class="card">
+                                    <!-- Faixa do título -->
+                                    <div class="card-header bg-danger">
+                                        <h5 class="card-title text-white">Erros</h5>
                                     </div>
                                     <div class="card-body">
-                                        <span style='color: blue; font-weight: bold;'>Estrutura dos arquivos da pasta de entrada</span>
+                                        <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
 
-<br><span style='color: blue; font-weight: bold;'>Limpeza dos arquivos</span>
+<br><span class='text-primary'>Limpeza dos arquivos</span>
 
-<br><span style='color: blue; font-weight: bold;'>Relações entre indicadores</span>
-<br><span style='color: red;'>descricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [9, 4].</span>
-<br><span style='color: red;'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [8, 9].</span>
-<br><span style='color: blue; font-weight: bold;'>Hierarquia como árvore</span>
+<br><span class='text-primary'>Relações entre indicadores</span>
+<br><span class='text-danger'>descricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [9, 4].</span>
+<br><span class='text-danger'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [8, 9].</span>
+<br><span class='text-primary'>Hierarquia como árvore</span>
 
-<br><span style='color: blue; font-weight: bold;'>Níveis de indicadores</span>
+<br><span class='text-primary'>Níveis de indicadores</span>
 
-<br><span style='color: blue; font-weight: bold;'>Unicidade dos códigos</span>
+<br><span class='text-primary'>Unicidade dos códigos</span>
 
-<br><span style='color: blue; font-weight: bold;'>Códigos HTML nas descrições simples</span>
+<br><span class='text-primary'>Códigos HTML nas descrições simples</span>
 
-<br><span style='color: blue; font-weight: bold;'>Ortografia</span>
+<br><span class='text-primary'>Ortografia</span>
 
-<br><span style='color: blue; font-weight: bold;'>Títulos únicos</span>
+<br><span class='text-primary'>Títulos únicos</span>
 
-<br><span style='color: blue; font-weight: bold;'>Códigos sequenciais</span>
+<br><span class='text-primary'>Códigos sequenciais</span>
 
-<br><span style='color: blue; font-weight: bold;'>Campos vazios</span>
+<br><span class='text-primary'>Campos vazios</span>
 
-<br><span style='color: blue; font-weight: bold;'>Padrão para nomes dos indicadores</span>
+<br><span class='text-primary'>Padrão para nomes dos indicadores</span>
 
-<br><span style='color: blue; font-weight: bold;'>Títulos com mais de 40 caracteres</span>
+<br><span class='text-primary'>Títulos com mais de 40 caracteres</span>
 
-<br><span style='color: blue; font-weight: bold;'>Descrições simples com mais de 150 caracteres</span>
+<br><span class='text-primary'>Descrições simples com mais de 150 caracteres</span>
 
-<br><span style='color: blue; font-weight: bold;'>Pontuações obrigatórias e proibidas em descrições</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em descrições</span>
 
-<br><span style='color: blue; font-weight: bold;'>Pontuações obrigatórias e proibidas em cenários</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em cenários</span>
 
-<br><span style='color: blue; font-weight: bold;'>Pontuações obrigatórias e proibidas em referência temporal</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em referência temporal</span>
 
-<br><span style='color: blue; font-weight: bold;'>Relações de valores únicos em cenários</span>
+<br><span class='text-primary'>Relações de valores únicos em cenários</span>
 
-<br><span style='color: blue; font-weight: bold;'>Relações de valores únicos em referência temporal</span>
+<br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
 
-<br><span style='color: blue; font-weight: bold;'>Relações de combinações de valores</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '4-2015' é obrigatória.</span>
-<br><span style='color: red;'>valores.xlsx: A coluna '9-2015' é obrigatória.</span>
-<br><span style='color: blue; font-weight: bold;'>Valores indisponíveis e inválidos</span>
+<br><span class='text-primary'>Relações de combinações de valores</span>
+<br><span class='text-danger'>valores.xlsx: A coluna '4-2015' é obrigatória.</span>
+<br><span class='text-danger'>valores.xlsx: A coluna '9-2015' é obrigatória.</span>
+<br><span class='text-primary'>Valores indisponíveis e inválidos</span>
 
-<br><span style='color: blue; font-weight: bold;'>Quebra de linha para descrição</span>
+<br><span class='text-primary'>Quebra de linha para descrição</span>
 
-<br><span style='color: blue; font-weight: bold;'>Quebra de linha para cenários</span>
+<br><span class='text-primary'>Quebra de linha para cenários</span>
 
-<br><span style='color: blue; font-weight: bold;'>Quebra de linha para referência temporal</span>
+<br><span class='text-primary'>Quebra de linha para referência temporal</span>
 
-<br><span style='color: blue; font-weight: bold;'>Intervalo dos dados da legenda</span>
+<br><span class='text-primary'>Intervalo dos dados da legenda</span>
 
-<br><span style='color: blue; font-weight: bold;'>Sobreposição de valores na legenda</span>
+<br><span class='text-primary'>Sobreposição de valores na legenda</span>
 
-<br><span style='color: blue; font-weight: bold;'>Propriedades de soma nos fatores influenciadores</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '6-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '6-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '7-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '7-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '6-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '6-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '7-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '7-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span style='color: blue; font-weight: bold;'>Indicadores repetidos em proporcionalidades</span>
+<br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '6-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '6-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '7-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '7-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '6-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '6-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '7-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '7-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
 
-<br><span style='color: blue; font-weight: bold;'>Relações de indicadores em proporcionalidades</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '8' com o indicador pai '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '9' com o indicador pai '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: O indicador '6' (em '6-2015') não é filho do indicador '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: O indicador '7' (em '7-2015') não é filho do indicador '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span style='color: blue; font-weight: bold;'>Indicadores em valores e proporcionalidades</span>
-<br><span style='color: red;'>valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: O indicador '4-2015' não está presente na planilha valores.xlsx.</span>
-<br><span style='color: blue; font-weight: bold;'>Indicadores folhas sem dados associados</span>
-<br><span style='color: red;'>valores.xlsx: Indicador folha '4' não possui dados associados.</span>
-<br><span style='color: red;'>valores.xlsx: Indicador folha '9' não possui dados associados.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.</span>
-<br><span style='color: red;'>proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.</span>
+<br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '8' com o indicador pai '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '9' com o indicador pai '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '6' (em '6-2015') não é filho do indicador '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '7' (em '7-2015') não é filho do indicador '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
+<br><span class='text-danger'>valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '4-2015' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-primary'>Indicadores folhas sem dados associados</span>
+<br><span class='text-danger'>valores.xlsx: Indicador folha '4' não possui dados associados.</span>
+<br><span class='text-danger'>valores.xlsx: Indicador folha '9' não possui dados associados.</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.</span>
+<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.</span>
                                     </div>
                                 </div>
-                                <div class="card mb-4">
-                                    <div class="card-header text-dark bg-warning">
-                                        <strong>Avisos</strong>
+
+                                <!-- CARD DE AVISOS -->
+                                <div class="card">
+                                    <!-- Faixa do título -->
+                                    <div class="card-header bg-warning">
+                                        <h5 class="card-title text-white">Avisos</h5>
                                     </div>
                                     <div class="card-body">
-                                        <span style='color: blue; font-weight: bold;'>Valores indisponíveis e inválidos</span>
-<br><span style='color: orange;'>valores.xlsx, linha 3: Existem 169 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
+                                        <span class='text-primary'>Valores indisponíveis e inválidos</span>
+<br><span class='text-warning'>valores.xlsx, linha 3: Existem 169 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
                                     </div>
                                 </div>
 

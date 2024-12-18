@@ -32,7 +32,13 @@ def check_validate_columns(name_sp, dataframe_columns, expected_columns):
     def format_columns(columns):
         if len(columns) == 1:
             return f"'{columns[0]}'"
-        return f"{', '.join(f"'{col}'" for col in columns[:-1])} e '{columns[-1]}'"
+        if len(columns) == 2:
+            return f"'{columns[0]}' e '{columns[1]}'"
+        formatted_columns = ""
+        for i in range(len(columns) - 1):
+            formatted_columns += f"'{columns[i]}', "
+        formatted_columns += f"e '{columns[-1]}'"
+        return formatted_columns
 
     # Retornar erro se houver colunas ausentes
     if missing_columns:
