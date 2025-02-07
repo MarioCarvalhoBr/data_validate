@@ -6,10 +6,10 @@ from argparse import ArgumentParser
 import src.orchestrator as orc
 
 if __name__ == "__main__":
-    parser = ArgumentParser(description="Analizador de arquivos .xlsx.")
+    parser = ArgumentParser(description="Analisador de arquivos .xlsx para AdaptaBrasil")
     # Args
-    parser.add_argument("--input_folder", type=str, required=True, help="Caminnho para a pasta de entrada.")
-    parser.add_argument("--output_folder", default="output_data/", type=str, required=False, help="Caminnho para a pasta de saída.")
+    parser.add_argument("--input_folder", type=str, required=True, help="Caminho para a pasta de entrada.")
+    parser.add_argument("--output_folder", default="output_data/", type=str, required=False, help="Caminho para a pasta de saída.")
     parser.add_argument("--no-spellchecker", action="store_true", help="Não executa o verificador ortográfico.")
     parser.add_argument("--lang-dict", type=str, default="pt", help="Define qual a linguagem do dicionário ortográfico: pt ou en.")
     parser.add_argument("--no-warning-titles-length", action="store_true", help="Desabilita o aviso para nomes e títulos com uma quantidade de caracteres definidas.")

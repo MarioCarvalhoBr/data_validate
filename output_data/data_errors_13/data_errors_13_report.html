@@ -7,39 +7,60 @@
                             <title>Canoa Report</title>
                             <style>
                                 /* Estilo CSS minimalista baseado no design do Bootstrap: By Mário Carvalho */
+
+                                /* COLORS */
+                                /* ---------------------------------------------------------- */
                                 :root {
                                     /* TEXT COLORS */
-                                    --color-primary: blue; /* Cor azul */
+                                    --color-primary: #0000FF; /* Cor azul */
                                     --color-secondary: #007bff; /* Cor cinza */
-                                    --color-danger: red; /* Cor vermelha */
-                                    --color-warning: orange; /* Cor laranja */
-                                    --color-green: green; /* Cor verde */
+                                    --color-danger: #FF0000; /* Cor vermelha */
+                                    --color-warning: #FFA500; /* Cor laranja */
+                                    --color-green: #008000; /* Cor verde */
                                     --color-info: #17a2b8; /* Cor azul clara */
                                     --color-white: #ffffff; /* Cor branca */
                                     --color-black: #000000; /* Cor preta */
                                     --color-gray: #343a40; /* Cor cinza */
 
                                     /* BACKGROUND COLORS */
-                                    --bg-primary: blue; /* Cor azul */
+                                    --bg-primary: #0000FF; /* Cor azul */
                                     --bg-secondary: #007bff; /* Cor cinza */
-                                    --bg-danger: red; /* Cor vermelha */
-                                    --bg-warning: orange; /* Cor laranja */
-                                    --bg-success: green; /* Cor verde */
+                                    --bg-danger: #FF0000; /* Cor vermelha */
+                                    --bg-warning: #FFA500; /* Cor laranja */
+                                    --bg-success: #008000; /* Cor verde */
                                     --bg-info: #17a2b8; /* Cor azul clara */
                                     --bg-light: #f8f9fa; /* Cor cinza claro */
                                     --bg-white: #ffffff; /* Cor branca */
                                     --bg-black: #000000; /* Cor preta */
                                     --bg-gray: #343a40; /* Cor cinza */
+
+                                    /* CARD COLORS */
+                                    --color-card-border: #dee2e6; /* Cor da borda do card */
+                                    --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+
+                                    /* OTHER COLORS */
+                                    --color-sepia-light: #EEEDEA; /* Cor sepia suave */
+                                }
+                                /* END COLORS */
+                                /* ---------------------------------------------------------- */
+
+                                /* START MY CUSTOM STYLES */
+                                /* ---------------------------------------------------------- */
+
+                                /* BODY */
+                                body {
+                                    background-color: var(--color-sepia-light); /* Cor de fundo do corpo */
+                                    color: var(--color-black); /* Cor padrão do texto */
                                 }
 
                                 /* DIVS */
                                 .container {
-                                    max-width: 98%;
+                                    max-width: 100%;
                                 }
 
                                 /* CARDS */
                                 .card {
-                                    border: 1px solid #dee2e6;
+                                    border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
                                     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                                     overflow: hidden;
@@ -52,7 +73,7 @@
                                 }
                                 .card-body {
                                     padding: 1rem;
-                                    background-color: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    background-color: var(--color-card-body); /* Cor de fundo do corpo */
                                     font-family: Arial, sans-serif;
                                     font-weight: bold;
                                 }
@@ -162,6 +183,8 @@
                                 .bg-gray {
                                     background-color: var(--bg-gray);
                                 }
+                                /* END MY CUSTOM STYLES */
+                                /* ---------------------------------------------------------- */
 
                             </style>
 

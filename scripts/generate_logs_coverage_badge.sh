@@ -1,5 +1,6 @@
 #!/bin/bash
 
+
 echo "1. Ativando o ambiente..."
 . ~/anaconda3/etc/profile.d/conda.sh
 conda activate adapta_data
@@ -8,9 +9,8 @@ conda activate adapta_data
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/constants.sh"
 
-# Removendo todos os arquivos e subpastas do diretório de OUTPUT_DATA e LOG_FOLDER
+# Removendo todos os arquivos e subpastas do diretório de OUTPUT_DATA
 rm -rf $OUTPUT_DATA/*
-rm -rf $LOG_FOLDER/*
 
 echo "2. Gerando o relatório de cobertura..."
 coverage run -m pytest --junitxml=reports/junit/junit.xml
@@ -26,12 +26,12 @@ if [ $? -eq 0 ]; then
     # Adicionando arquivos ao staging area
     git add .
 
-    echo "4. Gerando os logs (.txt, html, pdf) e adicionando arquivos ao staging area..."
+    echo "4. Gerando os logs (html, pdf) e adicionando arquivos ao staging area..."
     for name in "${folder_input_names[@]}"; do
         if [ -d "$INPUT_DATA/$name" ]; then
             echo ""
             echo "Processando a pasta '$INPUT_DATA/$name'..."
-            python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"> log/log_$name.txt
+            python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
             
             # Adicionando arquivos ao staging area
             git add .
