@@ -8,7 +8,7 @@ echo "Executando verificações..."
 
 for folder in "${folder_input_names[@]}"; do
     if [ -d "$INPUT_DATA/$folder" ]; then
-        echo ""
+        echo -e "\n"
         echo "Processando a pasta '$INPUT_DATA/$folder'..."
         
         python3 main.py --input_folder=$INPUT_DATA/$folder/ --output_folder=$OUTPUT_DATA/$folder/ --debug --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
@@ -23,4 +23,4 @@ for folder in "${folder_input_names[@]}"; do
     fi
 done
 
-echo "Verificações concluídas"
+echo "Verificações concluídas!"
