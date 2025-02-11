@@ -37,6 +37,7 @@
                                     /* CARD COLORS */
                                     --color-card-border: #dee2e6; /* Cor da borda do card */
                                     --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    --color-card-gray-light: #0000001A; /* Cor cinza suave */
 
                                     /* OTHER COLORS */
                                     --color-sepia-light: #EEEDEA; /* Cor sepia suave */
@@ -56,13 +57,16 @@
                                 /* DIVS */
                                 .container {
                                     max-width: 100%;
+                                    margin-left: 0.10in;
+                                    margin-right: 0.10in;
                                 }
 
                                 /* CARDS */
                                 .card {
                                     border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    box-shadow: 0 4px 6px var(--color-card-gray-light);
+
                                     overflow: hidden;
                                     margin: 5px auto;
                                 }
@@ -133,8 +137,16 @@
                                 .text-danger {
                                     color: var(--color-danger);
                                 }
+                                .text-danger-errors {
+                                    color: var(--color-danger);
+                                    font-weight: normal;
+                                }
                                 .text-warning {
                                     color: var(--color-warning);
+                                }
+                                .text-orange-warning {
+                                    color: var(--color-warning);
+                                    font-weight: normal;
                                 }
                                 .text-green {
                                     color: var(--color-green);
@@ -287,16 +299,16 @@
 <br><span class='text-primary'>Quebra de linha para referência temporal</span>
 
 <br><span class='text-primary'>Intervalo dos dados da legenda</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
 <br><span class='text-primary'>Sobreposição de valores na legenda</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
 <br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
 <br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
 
 <br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
@@ -316,7 +328,7 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Valores indisponíveis e inválidos</span>
-<br><span class='text-warning'>valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
+<br><span class='text-orange-warning'>valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
                                     </div>
                                 </div>
 

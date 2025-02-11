@@ -37,6 +37,7 @@
                                     /* CARD COLORS */
                                     --color-card-border: #dee2e6; /* Cor da borda do card */
                                     --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    --color-card-gray-light: #0000001A; /* Cor cinza suave */
 
                                     /* OTHER COLORS */
                                     --color-sepia-light: #EEEDEA; /* Cor sepia suave */
@@ -56,13 +57,16 @@
                                 /* DIVS */
                                 .container {
                                     max-width: 100%;
+                                    margin-left: 0.10in;
+                                    margin-right: 0.10in;
                                 }
 
                                 /* CARDS */
                                 .card {
                                     border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    box-shadow: 0 4px 6px var(--color-card-gray-light);
+
                                     overflow: hidden;
                                     margin: 5px auto;
                                 }
@@ -133,8 +137,16 @@
                                 .text-danger {
                                     color: var(--color-danger);
                                 }
+                                .text-danger-errors {
+                                    color: var(--color-danger);
+                                    font-weight: normal;
+                                }
                                 .text-warning {
                                     color: var(--color-warning);
+                                }
+                                .text-orange-warning {
+                                    color: var(--color-warning);
+                                    font-weight: normal;
                                 }
                                 .text-green {
                                     color: var(--color-green);
@@ -239,12 +251,12 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-<br><span class='text-danger'>referencia_temporal.csv: O arquivo esperado não foi encontrado.</span>
-<br><span class='text-danger'>descricao.csv: O arquivo esperado não foi encontrado.</span>
-<br><span class='text-danger'>composicao.csv: O arquivo esperado não foi encontrado.</span>
-<br><span class='text-danger'>valores.csv: O arquivo esperado não foi encontrado.</span>
-<br><span class='text-danger'>Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.</span>
-<br><span class='text-danger'>descricao.xlsx: Verificação de legenda não realizada. Coluna 'nivel' não encontrada.</span>
+<br><span class='text-danger-errors'>referencia_temporal.csv: O arquivo esperado não foi encontrado.</span>
+<br><span class='text-danger-errors'>descricao.csv: O arquivo esperado não foi encontrado.</span>
+<br><span class='text-danger-errors'>composicao.csv: O arquivo esperado não foi encontrado.</span>
+<br><span class='text-danger-errors'>valores.csv: O arquivo esperado não foi encontrado.</span>
+<br><span class='text-danger-errors'>Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Verificação de legenda não realizada. Coluna 'nivel' não encontrada.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 
 <br><span class='text-primary'>Relações entre indicadores</span>
@@ -286,9 +298,9 @@
 <br><span class='text-primary'>Quebra de linha para referência temporal</span>
 
 <br><span class='text-primary'>Intervalo dos dados da legenda</span>
-<br><span class='text-danger'>descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.</span>
 <br><span class='text-primary'>Sobreposição de valores na legenda</span>
-<br><span class='text-danger'>descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Verificação foi abortada porque a coluna 'nivel' não está ausente.</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
 
                                     </div>

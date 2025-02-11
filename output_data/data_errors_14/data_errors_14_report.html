@@ -37,6 +37,7 @@
                                     /* CARD COLORS */
                                     --color-card-border: #dee2e6; /* Cor da borda do card */
                                     --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    --color-card-gray-light: #0000001A; /* Cor cinza suave */
 
                                     /* OTHER COLORS */
                                     --color-sepia-light: #EEEDEA; /* Cor sepia suave */
@@ -56,13 +57,16 @@
                                 /* DIVS */
                                 .container {
                                     max-width: 100%;
+                                    margin-left: 0.10in;
+                                    margin-right: 0.10in;
                                 }
 
                                 /* CARDS */
                                 .card {
                                     border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    box-shadow: 0 4px 6px var(--color-card-gray-light);
+
                                     overflow: hidden;
                                     margin: 5px auto;
                                 }
@@ -133,8 +137,16 @@
                                 .text-danger {
                                     color: var(--color-danger);
                                 }
+                                .text-danger-errors {
+                                    color: var(--color-danger);
+                                    font-weight: normal;
+                                }
                                 .text-warning {
                                     color: var(--color-warning);
+                                }
+                                .text-orange-warning {
+                                    color: var(--color-warning);
+                                    font-weight: normal;
                                 }
                                 .text-green {
                                     color: var(--color-green);
@@ -239,10 +251,10 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-<br><span class='text-danger'>valores.xlsx: A coluna ':5-2050-P' não é esperada.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A coluna ':8-2015' não é esperada.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A coluna ':8-2015' não é esperada.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: A coluna ':9-2015' não é esperada.</span>
+<br><span class='text-danger-errors'>valores.xlsx: A coluna ':5-2050-P' não é esperada.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A coluna ':8-2015' não é esperada.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A coluna ':8-2015' não é esperada.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: A coluna ':9-2015' não é esperada.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 
 <br><span class='text-primary'>Relações entre indicadores</span>
@@ -280,7 +292,7 @@
 <br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
 
 <br><span class='text-primary'>Relações de combinações de valores</span>
-<br><span class='text-danger'>valores.xlsx: A coluna '5-2050-P' é obrigatória.</span>
+<br><span class='text-danger-errors'>valores.xlsx: A coluna '5-2050-P' é obrigatória.</span>
 <br><span class='text-primary'>Valores indisponíveis e inválidos</span>
 
 <br><span class='text-primary'>Quebra de linha para descrição</span>
@@ -298,14 +310,14 @@
 <br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
 
 <br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '6' (em '6-2015') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '6' (em '6-2015') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
 <br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5-2050-P' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5-2050-P' não está presente na planilha valores.xlsx.</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
 
                                     </div>
@@ -319,12 +331,12 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Títulos únicos</span>
-<br><span class='text-warning'>descricao.xlsx: Existem nomes simples duplicados: ['Seca'].</span>
-<br><span class='text-warning'>descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca'].</span>
-<br><span class='text-warning'>descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].</span>
-<br><span class='text-warning'>descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes simples duplicados: ['Seca'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].</span>
 <br><span class='text-primary'>Valores indisponíveis e inválidos</span>
-<br><span class='text-warning'>valores.xlsx, linha 3: Existem 205 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
+<br><span class='text-orange-warning'>valores.xlsx, linha 3: Existem 205 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
                                     </div>
                                 </div>
 
