@@ -37,6 +37,7 @@
                                     /* CARD COLORS */
                                     --color-card-border: #dee2e6; /* Cor da borda do card */
                                     --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    --color-card-gray-light: #0000001A; /* Cor cinza suave */
 
                                     /* OTHER COLORS */
                                     --color-sepia-light: #EEEDEA; /* Cor sepia suave */
@@ -56,13 +57,16 @@
                                 /* DIVS */
                                 .container {
                                     max-width: 100%;
+                                    margin-left: 0.10in;
+                                    margin-right: 0.10in;
                                 }
 
                                 /* CARDS */
                                 .card {
                                     border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    box-shadow: 0 4px 6px var(--color-card-gray-light);
+
                                     overflow: hidden;
                                     margin: 5px auto;
                                 }
@@ -133,8 +137,16 @@
                                 .text-danger {
                                     color: var(--color-danger);
                                 }
+                                .text-danger-errors {
+                                    color: var(--color-danger);
+                                    font-weight: normal;
+                                }
                                 .text-warning {
                                     color: var(--color-warning);
+                                }
+                                .text-orange-warning {
+                                    color: var(--color-warning);
+                                    font-weight: normal;
                                 }
                                 .text-green {
                                     color: var(--color-green);
@@ -239,13 +251,13 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-<br><span class='text-danger'>legenda.qml: O arquivo legenda.qml foi entregue junto com os outros 9 arquivos QML. Os outros arquivos serão ignorados.</span>
+<br><span class='text-danger-errors'>legenda.qml: O arquivo legenda.qml foi entregue junto com os outros 9 arquivos QML. Os outros arquivos serão ignorados.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 
 <br><span class='text-primary'>Relações entre indicadores</span>
-<br><span class='text-danger'>composicao.xlsx: Indicadores desconectados encontrados: [1 -> 2, 2 -> 4, 2 -> 5].</span>
-<br><span class='text-danger'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 3, 4, 5, 6, 7, 8, 9].</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Indicadores desconectados encontrados: [1 -> 2, 2 -> 4, 2 -> 5].</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 3, 4, 5, 6, 7, 8, 9].</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].</span>
 <br><span class='text-primary'>Hierarquia como árvore</span>
 
 <br><span class='text-primary'>Níveis de indicadores</span>
@@ -289,47 +301,47 @@
 <br><span class='text-primary'>Quebra de linha para referência temporal</span>
 
 <br><span class='text-primary'>Intervalo dos dados da legenda</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
 <br><span class='text-primary'>Sobreposição de valores na legenda</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
-<br><span class='text-danger'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponivel' na coluna 'symbol'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Não foi encontrado o valor 'Dado indisponível' na coluna 'label'.</span>
 <br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
 
 <br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
 
 <br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
 <br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '2-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '2-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '2-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '2-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '2-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '3-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '4-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '6-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '7-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '9-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5021-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>Existem mais 10 erros similares aos anteriores que foram omitidos.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '2-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '2-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '2-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '2-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '2-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '3-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '4-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '6-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '7-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '9-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5021-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>Existem mais 10 erros similares aos anteriores que foram omitidos.</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '5' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '4' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '7' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '4' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '7' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.</span>
                                     </div>
                                 </div>
 
@@ -341,7 +353,7 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Valores indisponíveis e inválidos</span>
-<br><span class='text-warning'>valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
+<br><span class='text-orange-warning'>valores.xlsx, linha 3: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
                                     </div>
                                 </div>
 

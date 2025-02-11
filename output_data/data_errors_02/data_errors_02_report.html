@@ -37,6 +37,7 @@
                                     /* CARD COLORS */
                                     --color-card-border: #dee2e6; /* Cor da borda do card */
                                     --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    --color-card-gray-light: #0000001A; /* Cor cinza suave */
 
                                     /* OTHER COLORS */
                                     --color-sepia-light: #EEEDEA; /* Cor sepia suave */
@@ -56,13 +57,16 @@
                                 /* DIVS */
                                 .container {
                                     max-width: 100%;
+                                    margin-left: 0.10in;
+                                    margin-right: 0.10in;
                                 }
 
                                 /* CARDS */
                                 .card {
                                     border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    box-shadow: 0 4px 6px var(--color-card-gray-light);
+
                                     overflow: hidden;
                                     margin: 5px auto;
                                 }
@@ -133,8 +137,16 @@
                                 .text-danger {
                                     color: var(--color-danger);
                                 }
+                                .text-danger-errors {
+                                    color: var(--color-danger);
+                                    font-weight: normal;
+                                }
                                 .text-warning {
                                     color: var(--color-warning);
+                                }
+                                .text-orange-warning {
+                                    color: var(--color-warning);
+                                    font-weight: normal;
                                 }
                                 .text-green {
                                     color: var(--color-green);
@@ -239,22 +251,22 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-<br><span class='text-danger'>cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>descricao.xlsx, linha 8: A coluna 'meta' não pode conter o caracter '|'.</span>
-<br><span class='text-danger'>O arquivo 'arquivo_aleatorio.xlsx' não é esperado.</span>
+<br><span class='text-danger-errors'>cenarios.xlsx, linha 2: A coluna 'nome' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>cenarios.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>referencia_temporal.xlsx, linha 3: A coluna 'descricao' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 8: A coluna 'nome_simples' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 9: A coluna 'nome_simples' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 8: A coluna 'nome_completo' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 8: A coluna 'desc_simples' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 8: A coluna 'desc_completa' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 8: A coluna 'fontes' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 8: A coluna 'meta' não pode conter o caracter '|'.</span>
+<br><span class='text-danger-errors'>O arquivo 'arquivo_aleatorio.xlsx' não é esperado.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
-<br><span class='text-danger'>composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.</span>
+<br><span class='text-danger-errors'>composicao.xlsx, linha 2: A coluna 'codigo_pai' contém um valor inválido: O valor '0' é menor que 1.</span>
 <br><span class='text-primary'>Relações entre indicadores</span>
-<br><span class='text-danger'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007].</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007].</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031, 5008, 5009, 5010, 5021, 5022, 5023].</span>
 <br><span class='text-primary'>Hierarquia como árvore</span>
 
 <br><span class='text-primary'>Níveis de indicadores</span>
@@ -266,10 +278,10 @@
 <br><span class='text-primary'>Ortografia</span>
 
 <br><span class='text-primary'>Títulos únicos</span>
-<br><span class='text-danger'>composicao.xlsx: Nó raiz '1' não encontrado.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Nó raiz '1' não encontrado.</span>
 <br><span class='text-primary'>Códigos sequenciais</span>
-<br><span class='text-danger'>descricao.xlsx: A coluna 'codigo' deve começar em 1.</span>
-<br><span class='text-danger'>descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).</span>
+<br><span class='text-danger-errors'>descricao.xlsx: A coluna 'codigo' deve começar em 1.</span>
+<br><span class='text-danger-errors'>descricao.xlsx: A coluna 'codigo' deve conter valores sequenciais (1, 2, 3, ...).</span>
 <br><span class='text-primary'>Campos vazios</span>
 
 <br><span class='text-primary'>Padrão para nomes dos indicadores</span>
@@ -289,7 +301,7 @@
 <br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
 
 <br><span class='text-primary'>Relações de combinações de valores</span>
-<br><span class='text-danger'>valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.</span>
+<br><span class='text-danger-errors'>valores.xlsx: A coluna '2-2015' é desnecessária para o indicador de nível 1.</span>
 <br><span class='text-primary'>Valores indisponíveis e inválidos</span>
 
 <br><span class='text-primary'>Quebra de linha para descrição</span>
@@ -299,49 +311,49 @@
 <br><span class='text-primary'>Quebra de linha para referência temporal</span>
 
 <br><span class='text-primary'>Intervalo dos dados da legenda</span>
-<br><span class='text-danger'>legenda.qml: Uma das fatias possui um valor não numérico: 'nan'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Uma das fatias possui um valor não numérico: 'nan'.</span>
 <br><span class='text-primary'>Sobreposição de valores na legenda</span>
-<br><span class='text-danger'>legenda.qml: Uma das fatias possui um valor não numérico: 'PHP'.</span>
+<br><span class='text-danger-errors'>legenda.qml: Uma das fatias possui um valor não numérico: 'PHP'.</span>
 <br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
-<br><span class='text-danger'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: 2 valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '5010-2010' entre as linhas 5 e 6.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1.548, e não 1.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0.462, e não 1.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0.902, e não 1.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: 2 valores que não são número válido nem DI (Dado Indisponível) para o indicador pai '5010-2010' entre as linhas 5 e 6.</span>
 <br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
 
 <br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
 <br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '2-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5000-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5000-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5000-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5000-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5000-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5001-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5002-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5003-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5003-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5003-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5003-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5003-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5004-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5005-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5006-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>valores.xlsx: O indicador '5007-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-danger'>Existem mais 11 erros similares aos anteriores que foram omitidos.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '2-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5000-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5000-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5000-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5000-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5000-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5001-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5002-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5003-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5003-2030-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5003-2030-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5003-2050-O' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5003-2050-P' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5004-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5005-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5006-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>valores.xlsx: O indicador '5007-2015' não está presente na planilha proporcionalidades.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5008-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5009-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '5010-2010' não está presente na planilha valores.xlsx.</span>
+<br><span class='text-danger-errors'>Existem mais 11 erros similares aos anteriores que foram omitidos.</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '5002' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '5003' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '5005' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '5006' não possui dados associados.</span>
-<br><span class='text-danger'>proporcionalidades.xlsx: Indicador folha '5007' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5002' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5003' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5005' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5006' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5007' não possui dados associados.</span>
                                     </div>
                                 </div>
 
@@ -353,38 +365,38 @@
                                     </div>
                                     <div class="card-body">
                                         <span class='text-primary'>Ortografia</span>
-<br><span class='text-warning'>descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização'].</span>
 <br><span class='text-primary'>Padrão para nomes dos indicadores</span>
-<br><span class='text-warning'>descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".</span>
-<br><span class='text-warning'>descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".</span>
-<br><span class='text-warning'>descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".</span>
-<br><span class='text-warning'>descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".</span>
-<br><span class='text-warning'>descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".</span>
-<br><span class='text-warning'>descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: Nome simples fora do padrão. Esperado: "Exemplo com CR meio". Encontrado: "Exemplo com<LF> CR meio".</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 3: Nome simples fora do padrão. Esperado: "Exemplo com LF meio". Encontrado: "Exemplo com<LF> LF meio".</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 4: Nome simples fora do padrão. Esperado: "Exemplo com CR início". Encontrado: "<LF>Exemplo com CR início".</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 5: Nome simples fora do padrão. Esperado: "Exemplo com LF início". Encontrado: "<LF>Exemplo com LF início".</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 6: Nome simples fora do padrão. Esperado: "Exemplo com CR fim". Encontrado: "Exemplo com CR fim<LF>".</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 7: Nome simples fora do padrão. Esperado: "Exemplo com LF fim". Encontrado: "Exemplo com LF fim<LF>".</span>
 <br><span class='text-primary'>Descrições simples com mais de 150 caracteres</span>
-<br><span class='text-warning'>descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 9: "Sensibilidade do sistema socioecológico quanto à disponibilidade de alimento e as possíveis limitações na sua comercialização no presente e no futuro considerando uma situação de seca.". Descrição simples fora do padrão. Esperado: Até 150 caracteres. Encontrado: 184 caracteres.</span>
 <br><span class='text-primary'>Valores indisponíveis e inválidos</span>
-<br><span class='text-warning'>valores.xlsx, linha 3: Existem 228 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
+<br><span class='text-orange-warning'>valores.xlsx, linha 3: Existem 228 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
 <br><span class='text-primary'>Quebra de linha para descrição</span>
-<br><span class='text-warning'>descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.</span>
-<br><span class='text-warning'>descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 3: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 4: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) no início do texto. Remova o primeiro caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 5: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 1. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 6: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) no final do texto. Remova o último caractere do texto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 7: O texto da coluna nome_simples possui um caracter inválido (LF) na posição 19. Remova o caractere do texto.</span>
 <br><span class='text-primary'>Quebra de linha para cenários</span>
-<br><span class='text-warning'>cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.</span>
-<br><span class='text-warning'>cenarios.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 2: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 40. Remova o caractere do texto.</span>
 <br><span class='text-primary'>Quebra de linha para referência temporal</span>
-<br><span class='text-warning'>referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.</span>
+<br><span class='text-orange-warning'>referencia_temporal.xlsx, linha 3: O texto da coluna descricao possui um caracter inválido (LF) na posição 12. Remova o caractere do texto.</span>
 <br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
-<br><span class='text-warning'>proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.</span>
-<br><span class='text-warning'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.</span>
-<br><span class='text-warning'>proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.</span>
+<br><span class='text-orange-warning'>proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0.999, e não 1.</span>
+<br><span class='text-orange-warning'>proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1.001, e não 1.</span>
+<br><span class='text-orange-warning'>proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.</span>
                                     </div>
                                 </div>
 

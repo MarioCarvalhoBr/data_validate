@@ -73,6 +73,7 @@ class ReportGenerator:
                                     /* CARD COLORS */
                                     --color-card-border: #dee2e6; /* Cor da borda do card */
                                     --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
+                                    --color-card-gray-light: #0000001A; /* Cor cinza suave */
 
                                     /* OTHER COLORS */
                                     --color-sepia-light: #EEEDEA; /* Cor sepia suave */
@@ -92,13 +93,16 @@ class ReportGenerator:
                                 /* DIVS */
                                 .container {
                                     max-width: 100%;
+                                    margin-left: 0.10in;
+                                    margin-right: 0.10in;
                                 }
 
                                 /* CARDS */
                                 .card {
                                     border: 1px solid var(--color-card-border);
                                     border-radius: 0.25rem;
-                                    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                                    box-shadow: 0 4px 6px var(--color-card-gray-light);
+
                                     overflow: hidden;
                                     margin: 5px auto;
                                 }
@@ -169,8 +173,16 @@ class ReportGenerator:
                                 .text-danger {
                                     color: var(--color-danger);
                                 }
+                                .text-danger-errors {
+                                    color: var(--color-danger);
+                                    font-weight: normal;
+                                }
                                 .text-warning {
                                     color: var(--color-warning);
+                                }
+                                .text-orange-warning {
+                                    color: var(--color-warning);
+                                    font-weight: normal;
                                 }
                                 .text-green {
                                     color: var(--color-green);
@@ -313,7 +325,7 @@ class ReportGenerator:
             # Criando a string de erros
             errors = "".join(
                 f"\n<br><span class='text-primary'>{name}</span>\n" +
-                "\n".join(f"<br><span class='text-danger'>{error}</span>" for error in errors)
+                "\n".join(f"<br><span class='text-danger-errors'>{error}</span>" for error in errors)
                 for name, _, errors, _ in results_tests
             )
             # Remover a quebra de linha e a tag <br> no início da string
@@ -323,7 +335,7 @@ class ReportGenerator:
             # Criando a string de avisos
             warnings = "".join(
                 f"\n<br><span class='text-primary'>{name}</span>\n" +
-                "\n".join(f"<br><span class='text-warning'>{warning}</span>" for warning in warnings)
+                "\n".join(f"<br><span class='text-orange-warning'>{warning}</span>" for warning in warnings)
                 for name, _, _, warnings in results_tests if warnings
             )
             # Remover a quebra de linha e a tag <br> no início da string
@@ -417,7 +429,21 @@ class ReportGenerator:
         try:             
             output_path_file_pdf = output_path_file_html.replace(".html", ".pdf")
 
-            pdfkit.from_file(output_path_file_html, output_path_file_pdf)
+            options = {
+                'page-size': 'Letter',
+                'margin-top': '0.0in',
+                'margin-right': '0.0in',
+                'margin-bottom': '0.0in',
+                'margin-left': '0.0in',
+                'encoding': "UTF-8",
+                'custom-header': [
+                    ('Accept-Encoding', 'gzip')
+                ],
+                'cookie': [],
+                'no-outline': None
+            }
+
+            pdfkit.from_file(output_path_file_html, output_path_file_pdf, options=options)
             print(f'\nFoi criado um arquivo de relatório em PDF no caminho: {output_path_file_pdf}\n')
             
 
