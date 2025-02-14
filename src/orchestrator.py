@@ -419,6 +419,9 @@ def run(args):
         # 12.1 - Quebra de linha para referência temporal
         results_tests.append(["Quebra de linha para referência temporal", *flatten(*sp_description.verify_sp_description_cr_lf(df_sp_temporal_reference,SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, columns_start_end=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], columns_anywhere=[SP_TEMPORAL_REFERENCE_COLUMNS.NOME, SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO]))])
         
+        #12.2 - Anos em referência temporal
+        results_tests.append(["Anos em referência temporal", *flatten(*sp_temporal_reference.verify_sp_temporal_reference_years(df_sp_temporal_reference))]) 
+        
         # 13 - Verificar range dos dados #16: 
         results_tests.append(["Intervalo dos dados da legenda", *flatten(*sp_legend.verify_values_range_multiple_legend(input_folder, df_sp_values, df_sp_description, df_sp_scenario))])
 

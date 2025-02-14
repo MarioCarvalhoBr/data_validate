@@ -1,4 +1,5 @@
 from src.util.utilities import check_punctuation, check_unique_values
+import datetime
 # Spreadsheets classes and constants
 from src.myparser.model.spreadsheets import SP_TEMPORAL_REFERENCE_COLUMNS
 
@@ -43,3 +44,37 @@ def verify_sp_temporal_reference_punctuation(df, columns_dont_punctuation, colum
         errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 
     return not errors, errors, warnings
+
+def verify_sp_temporal_reference_years(df_temporal_reference):
+    errors, warnings = [], []
+    CURRENT_YEAR = datetime.datetime.now().year
+
+    try:
+        df_temporal_reference = df_temporal_reference.copy()
+        if df_temporal_reference.empty:
+            return True, errors, warnings
+
+        if SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO not in df_temporal_reference.columns:
+            return True, errors, warnings
+
+        # Remover a primeira linha do dataframe df_temporal_reference
+        df_temporal_reference = df_temporal_reference.iloc[1:]
+
+        # Get all years
+        years = df_temporal_reference[SP_TEMPORAL_REFERENCE_COLUMNS.SIMBOLO].unique()
+
+        # Check if all years are greater than the current year
+        for year in years:
+            # Verifica se year é um número inteiro válido
+            try:
+                year = int(year)
+            except ValueError:
+                errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O valor {year} não é um número inteiro válido.")
+                continue            
+            if year <= CURRENT_YEAR:
+                errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O ano {year} não pode estar associado a cenários.")
+    except Exception as e:
+        errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
+
+    return not errors, errors, warnings
+
