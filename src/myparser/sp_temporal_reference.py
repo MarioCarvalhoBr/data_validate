@@ -72,7 +72,7 @@ def verify_sp_temporal_reference_years(df_temporal_reference):
                 errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O valor {year} não é um número inteiro válido.")
                 continue            
             if year <= CURRENT_YEAR:
-                errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O ano {year} não pode estar associado a cenários.")
+                errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.")
     except Exception as e:
         errors.append(f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: Erro ao processar a verificação: {e}.")
 

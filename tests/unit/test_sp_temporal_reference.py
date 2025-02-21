@@ -7,10 +7,10 @@ from src.myparser.sp_temporal_reference import verify_sp_temporal_reference_punc
 from src.myparser.model.spreadsheets import SP_TEMPORAL_REFERENCE_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
-from tests.unit.test_constants import df_sp_temporal_reference_data_ground_truth_01
+from tests.unit.test_constants import df_sp_temporal_reference_data_ground_truth_01, df_sp_temporal_reference_data_ground_truth_04_csv_xlsx
 
 # DATA FRAMES - ERROS 01
-from tests.unit.test_constants import df_sp_temporal_reference_errors_01
+from tests.unit.test_constants import df_sp_temporal_reference_errors_01, df_sp_temporal_reference_errors_16
 
 # Testes: verify_sp_temporal_reference_punctuation
 def test_true_verify_sp_temporal_reference_punctuation_data_ground_truth_01():
@@ -44,6 +44,22 @@ def test_verify_sp_temporal_reference_years_true_data_ground_truth_01():
     assert is_correct is True
     assert len(errors) == 0
     assert len(warnings) == 0
+
+
+def test_verify_sp_temporal_reference_years_true_data_ground_truth_04_csv_xlsx():
+    is_correct, errors, warnings = verify_sp_temporal_reference_years(df_sp_temporal_reference_data_ground_truth_04_csv_xlsx)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_verify_sp_temporal_reference_years_errors_16():
+    is_correct, errors, warnings = verify_sp_temporal_reference_years(df_sp_temporal_reference_errors_16)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+    assert errors[0] == "referencia_temporal.xlsx: O ano 2025 não pode estar associado a cenários por não ser um ano futuro."
+
+
 
 # Test when the dataframe is empty.
 def test_verify_sp_temporal_reference_years_empty_dataframe():
@@ -82,9 +98,10 @@ def test_verify_sp_temporal_reference_years_with_past_year():
     df = pd.DataFrame(data)
     is_correct, errors, warnings = verify_sp_temporal_reference_years(df)
     assert is_correct is False
-    assert any(f"O ano {current_year}" in error for error in errors)
-    assert warnings == []
-
+    assert len(errors) == 1
+    assert len(warnings) == 0
+    assert errors[0] == f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O ano {current_year} não pode estar associado a cenários por não ser um ano futuro."
+    
 # Test with a non-integer value in the year column.
 def test_verify_sp_temporal_reference_years_with_non_integer_value():
     data = {
@@ -93,7 +110,7 @@ def test_verify_sp_temporal_reference_years_with_non_integer_value():
     df = pd.DataFrame(data)
     is_correct, errors, warnings = verify_sp_temporal_reference_years(df)
     assert is_correct is False
-    assert any("não é um número inteiro válido" in error for error in errors)
+    assert errors[0] == f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O valor notayear não é um número inteiro válido."
     assert warnings == []
 
 # Test with multiple errors: a non-integer value and a past/current year.
@@ -106,7 +123,8 @@ def test_verify_sp_temporal_reference_years_with_multiple_errors():
     is_correct, errors, warnings = verify_sp_temporal_reference_years(df)
     assert is_correct is False
     # Expect at least two errors: one for non-integer and one for the past/current year.
-    assert len(errors) >= 2
-    assert any("não é um número inteiro válido" in error for error in errors)
-    assert any(f"O ano {current_year}" in error for error in errors)
-    assert warnings == []
+    assert len(errors) == 2
+    assert len(warnings) == 0
+
+    assert errors[0] == f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O valor notayear não é um número inteiro válido."
+    assert errors[1] == f"{SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP}: O ano {current_year} não pode estar associado a cenários por não ser um ano futuro."
