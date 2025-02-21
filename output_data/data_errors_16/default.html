@@ -207,7 +207,7 @@
 
                                 <!-- DIV HEADER -->
                                 <div class="info-header-center">
-                                    <h1><strong>Canoa</strong></h1>
+                                    <h1><strong>{{ name }}</strong></h1>
                                     <h2 class="text-subtitle">Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
                                 </div>
 
@@ -217,12 +217,12 @@
                                         <h5 class="card-title text-white">Informa&ccedil;&otilde;es</h5>
                                     </div>
                                     <div class="card-body">
-                                        <strong>Usu&aacute;rio: <strong class='text-gray'>Usuário C</strong></strong><br>
-                                        <strong>Setor estrat&eacute;gico: <strong class='text-gray'>Setor A</strong></strong><br>
-                                        <strong>Protocolo: <strong class='text-gray'>Protocolo B</strong></strong><br>
-                                        
-                                        
-                                        
+                                        {{ text_display_user }}
+                                        {{ text_display_sector }}
+                                        {{ text_display_protocol }}
+                                        {{ text_display_date }}
+                                        {{ text_display_version }}
+                                        {{ text_display_file }}
                                     </div>
                                 </div>
 
@@ -232,12 +232,12 @@
                                         <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
                                     </div>
                                     <div class="card-body">
-                                        <strong class="text-danger">N&uacute;mero de Erros: 18</strong><br>
-                                        <strong class="text-warning">N&uacute;mero de Avisos: 1</strong><br>
-                                        <strong class="text-green">N&uacute;mero de testes executados: 32</strong><br>
-                                        <div class="info-header-left" id="tests_not_executed" style="display: none">
+                                        <strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong><br>
+                                        <strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong><br>
+                                        <strong class="text-green">N&uacute;mero de testes executados: {{ number_tests }}</strong><br>
+                                        <div class="info-header-left" id="tests_not_executed" style="display: {{ display_tests_not_executed }}">
                                             <strong >Testes n&atilde;o executados: </strong>
-                                            <ul></ul>
+                                            {{ tests_not_executed }}
                                         </div>
 
                                     </div>
@@ -250,82 +250,7 @@
                                         <h5 class="card-title text-white">Erros</h5>
                                     </div>
                                     <div class="card-body">
-                                        <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-
-<br><span class='text-primary'>Limpeza dos arquivos</span>
-
-<br><span class='text-primary'>Relações entre indicadores</span>
-<br><span class='text-danger-errors'>descricao.xlsx: Códigos dos indicadores ausentes em valores.xlsx: [9, 4].</span>
-<br><span class='text-danger-errors'>descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [8, 9].</span>
-<br><span class='text-primary'>Hierarquia como árvore</span>
-
-<br><span class='text-primary'>Níveis de indicadores</span>
-
-<br><span class='text-primary'>Unicidade dos códigos</span>
-
-<br><span class='text-primary'>Códigos HTML nas descrições simples</span>
-
-<br><span class='text-primary'>Ortografia</span>
-
-<br><span class='text-primary'>Títulos únicos</span>
-
-<br><span class='text-primary'>Códigos sequenciais</span>
-
-<br><span class='text-primary'>Campos vazios</span>
-
-<br><span class='text-primary'>Padrão para nomes dos indicadores</span>
-
-<br><span class='text-primary'>Títulos com mais de 40 caracteres</span>
-
-<br><span class='text-primary'>Descrições simples com mais de 150 caracteres</span>
-
-<br><span class='text-primary'>Pontuações obrigatórias e proibidas em descrições</span>
-
-<br><span class='text-primary'>Pontuações obrigatórias e proibidas em cenários</span>
-
-<br><span class='text-primary'>Pontuações obrigatórias e proibidas em referência temporal</span>
-
-<br><span class='text-primary'>Relações de valores únicos em cenários</span>
-
-<br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
-
-<br><span class='text-primary'>Relações de combinações de valores</span>
-<br><span class='text-danger-errors'>valores.xlsx: A coluna '4-2015' é obrigatória.</span>
-<br><span class='text-danger-errors'>valores.xlsx: A coluna '9-2015' é obrigatória.</span>
-<br><span class='text-primary'>Valores indisponíveis e inválidos</span>
-
-<br><span class='text-primary'>Quebra de linha para descrição</span>
-
-<br><span class='text-primary'>Quebra de linha para cenários</span>
-
-<br><span class='text-primary'>Quebra de linha para referência temporal</span>
-
-<br><span class='text-primary'>Anos em referência temporal</span>
-
-<br><span class='text-primary'>Intervalo dos dados da legenda</span>
-
-<br><span class='text-primary'>Sobreposição de valores na legenda</span>
-
-<br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '6-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '6-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '7-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '7-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '6-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '6-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '7-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '7-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).</span>
-<br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
-
-<br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '8' com o indicador pai '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: Deve existir pelo menos uma relação do indicador filho '9' com o indicador pai '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '6' (em '6-2015') não é filho do indicador '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '7' (em '7-2015') não é filho do indicador '6' (em '6-2015') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
-<br><span class='text-danger-errors'>valores.xlsx: O indicador '8-2015' não está presente na planilha proporcionalidades.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '4-2015' não está presente na planilha valores.xlsx.</span>
-<br><span class='text-primary'>Indicadores folhas sem dados associados</span>
-<br><span class='text-danger-errors'>valores.xlsx: Indicador folha '4' não possui dados associados.</span>
-<br><span class='text-danger-errors'>valores.xlsx: Indicador folha '9' não possui dados associados.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '9' não possui dados associados.</span>
+                                        {{ errors }}
                                     </div>
                                 </div>
 
@@ -336,8 +261,7 @@
                                         <h5 class="card-title text-white">Avisos</h5>
                                     </div>
                                     <div class="card-body">
-                                        <span class='text-primary'>Valores indisponíveis e inválidos</span>
-<br><span class='text-orange-warning'>valores.xlsx, linha 3: Existem 169 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais.</span>
+                                        {{ warnings }}
                                     </div>
                                 </div>
 
