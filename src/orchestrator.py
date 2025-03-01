@@ -449,6 +449,9 @@ def run(args):
         # 19 - Verificar de indcadores folhas: verify_graph_sp_description_composition_values_proportionalities_leafs(descricao, composicao, valores, proporcionalidades)
         results_tests.append(["Indicadores folhas sem dados associados", *flatten(*graph.verify_graph_sp_description_composition_values_proportionalities_leafs(df_sp_description, df_sp_composition, df_sp_values, df_sp_proportionalities))])
         
+        # 20 - verify_tree_sp_description_composition_levels_childs: Níveis dos indicadores filhos
+        results_tests.append(["Níveis dos indicadores filhos", *flatten(*tree.verify_tree_sp_description_composition_levels_childs(df_sp_composition, df_sp_description))])
+        
     # Número de verificações realizadas
     number_tests = str(len(results_tests))
     if debug:
