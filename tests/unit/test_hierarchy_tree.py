@@ -2,6 +2,7 @@ import pandas as pd
 
 from src.myparser.hierarchy.tree import verify_tree_sp_description_composition_hierarchy, dfs, criar_arvore
 from src.myparser.hierarchy.tree import verificar_ciclos, verificar_erros_niveis
+from src.myparser.hierarchy.tree import verify_tree_sp_description_composition_levels_childs
 from src.myparser.model.spreadsheets import SP_COMPOSITION_COLUMNS, SP_DESCRIPTION_COLUMNS
 
 # DATA FRAMES - GROUND TRUTH
@@ -13,6 +14,9 @@ from tests.unit.test_constants import df_sp_description_errors_01, df_sp_composi
 
 # DATA FRAMES - ERRORS 09
 from tests.unit.test_constants import df_sp_description_errors_09, df_sp_composition_errors_09
+
+# DATA FRAMES - ERROS 16
+from tests.unit.test_constants import df_sp_description_errors_16, df_sp_composition_errors_16
 
 
 def test_true_verify_tree_sp_composition_hierarchy_data_ground_truth_01():
@@ -173,3 +177,17 @@ def test_verificar_erros_niveis_with_major_levels():
     })
     erros = verificar_erros_niveis(composicao, descricao)
     assert len(erros) == 0
+
+# Testes para def verify_tree_sp_description_composition_levels_childs(df_composicao, df_descricao):
+def test_true_verify_tree_sp_description_composition_levels_childs_data_ground_truth_01():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_levels_childs(df_sp_composition_data_ground_truth_01, df_sp_description_data_ground_truth_01)
+    assert is_correct is True
+    assert len(errors) == 0
+    assert len(warnings) == 0
+
+def test_count_errors_verify_tree_sp_description_composition_levels_childs_errors_16():
+    is_correct, errors, warnings = verify_tree_sp_description_composition_levels_childs(df_sp_composition_errors_16, df_sp_description_errors_16)
+    assert is_correct is False
+    assert len(errors) == 1
+    assert len(warnings) == 0
+    assert errors[0] == "descricao.xlsx: Indicadores filhos do pai 6 não estão no mesmo nível: [indicador 8 possui nível '5', indicador 9 possui nível '200']."

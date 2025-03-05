@@ -423,6 +423,7 @@ class ReportGenerator:
             }
 
         string_final = f'<{info_minimized_results_json}>'  # Saída final para o usuário
+        string_final = string_final.replace("'", '"')
         print(f'\n{string_final}\n')
     
     def save_pdf_report(self, output_path_file_html):
