@@ -15,6 +15,9 @@ from tests.unit.test_constants import df_sp_scenario_errors_02, df_sp_temporal_r
 
 # DATA FRAMES - ERROS 03
 from tests.unit.test_constants import df_sp_scenario_errors_03, df_sp_temporal_reference_errors_03, df_sp_description_errors_03
+
+# DATA FRAMES - ERROS 17
+from tests.unit.test_constants import df_sp_scenario_errors_17, df_sp_temporal_reference_errors_17, df_sp_description_errors_17
     
 def test_true_verify_spelling_text_pt_BR_data_ground_truth_01():
     lang_dict_spell = "pt_BR"
@@ -148,3 +151,38 @@ def test_count_errors_verify_spelling_text_pt_BR_data_errors_03():
     assert len(all_errors) == 0
 
     assert all_warnings[0] == "descricao.xlsx, linha 9: Palavras com possíveis erros ortográficos na coluna nome_simples: ['rcialização']."
+
+def test_count_errors_verify_spelling_text_pt_BR_data_errors_17():
+    lang_dict_spell = "pt_BR"
+    
+    is_all_correct = True
+    all_errors = []
+    all_warnings = []
+    
+    is_correct_desc, errors_spell_desc, warnings_spell_desc = verify_spelling_text(df_sp_description_errors_17, SP_DESCRIPTION_COLUMNS.NAME_SP, [SP_DESCRIPTION_COLUMNS.NOME_SIMPLES, SP_DESCRIPTION_COLUMNS.NOME_COMPLETO, SP_DESCRIPTION_COLUMNS.DESC_SIMPLES, SP_DESCRIPTION_COLUMNS.DESC_COMPLETA], lang_dict_spell)
+
+    is_all_correct = is_all_correct and is_correct_desc
+    all_errors.extend(errors_spell_desc)
+    all_warnings.extend(warnings_spell_desc)
+    
+    is_correct_scenario, errors_spell_scenario, warnings_spell_scenario = verify_spelling_text(df_sp_scenario_errors_17, SP_SCENARIO_COLUMNS.NAME_SP, [SP_SCENARIO_COLUMNS.NOME, SP_SCENARIO_COLUMNS.DESCRICAO], lang_dict_spell)
+
+    is_all_correct = is_all_correct and is_correct_scenario
+    all_errors.extend(errors_spell_scenario)
+    all_warnings.extend(warnings_spell_scenario)
+
+    is_correct_temporal_reference, errors_spell_temporal_reference, warnings_spell_temporal_reference = verify_spelling_text(df_sp_temporal_reference_errors_17, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP, [SP_TEMPORAL_REFERENCE_COLUMNS.DESCRICAO], lang_dict_spell)
+
+    is_all_correct = is_all_correct and is_correct_temporal_reference
+    all_errors.extend(errors_spell_temporal_reference)
+    all_warnings.extend(warnings_spell_temporal_reference)
+    
+    assert is_all_correct is True
+    assert len(all_warnings) == 5
+    assert len(all_errors) == 0
+
+    assert all_warnings[0] == "descricao.xlsx, linha 3: Há dois ou mais espaços seguidos na coluna desc_simples."
+    assert all_warnings[1] == "descricao.xlsx, linha 5: Há dois ou mais espaços seguidos na coluna desc_simples."
+    assert all_warnings[2] == "cenarios.xlsx, linha 2: Há dois ou mais espaços seguidos na coluna descricao."
+    assert all_warnings[3] == "cenarios.xlsx, linha 3: Há dois ou mais espaços seguidos na coluna descricao."
+    assert all_warnings[4] == "referencia_temporal.xlsx, linha 2: Há dois ou mais espaços seguidos na coluna descricao."

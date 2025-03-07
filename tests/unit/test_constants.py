@@ -51,6 +51,7 @@ path_input_data_errors_13 = "input_data/data_errors_13"
 path_input_data_errors_14 = "input_data/data_errors_14"
 path_input_data_errors_15 = "input_data/data_errors_15"
 path_input_data_errors_16 = "input_data/data_errors_16"
+path_input_data_errors_17 = "input_data/data_errors_17"
 
 
 # 1. DATA FRAMES - GROUND TRUTH: path_input_data_ground_truth_01
@@ -185,8 +186,13 @@ df_sp_composition_errors_15, errors_read_file = read_excel_file(os.path.join(pat
 df_sp_values_errors_15, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_15, SP_VALUES_COLUMNS.NAME_SP))
 df_sp_proportionalities_errors_15, errors_read_file = read_file_proporcionalites(os.path.join(path_input_data_errors_15, SP_PROPORTIONALITIES_COLUMNS.NAME_SP))
 
-# 
 # 17. DATA FRAMES - ERROS 16: path_input_data_errors_16
 df_sp_description_errors_16, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_16, SP_DESCRIPTION_COLUMNS.NAME_SP))
 df_sp_composition_errors_16, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_16, SP_COMPOSITION_COLUMNS.NAME_SP))
 df_sp_temporal_reference_errors_16, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_16, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP))
+
+
+# 18. DATA FRAMES - ERROS 17: path_input_data_errors_17
+df_sp_description_errors_17, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_17, SP_DESCRIPTION_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
+df_sp_temporal_reference_errors_17, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_17, SP_TEMPORAL_REFERENCE_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
+df_sp_scenario_errors_17, errors_read_file = read_excel_file(os.path.join(path_input_data_errors_17, SP_SCENARIO_COLUMNS.NAME_SP.replace(".xlsx", ".csv")))
