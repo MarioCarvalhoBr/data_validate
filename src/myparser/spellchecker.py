@@ -15,6 +15,10 @@ def process_sheet(df, columns, meu_analizador, sheet_name):
             # Verifique se o texto está vazio ou nan 
             if pd.isna(text) or text == "":
                 text = ""
+ 
+            if re.search(r'[ \t\f\v]{2,}', text):
+                warnings.append(f"{sheet_name}, linha {index + 2}: Há dois ou mais espaços seguidos na coluna {column}.")
+
             warning = check_text(column, text, meu_analizador, index, sheet_name)
             if warning:
                 warnings.append(warning)
