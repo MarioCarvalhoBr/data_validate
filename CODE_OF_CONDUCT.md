@@ -280,3 +280,43 @@ A próxima pessoa que vai te agradecer pode ser você mesmo.
 - plugin GitToolbox para PHP Storm
 
 [1]: https://chris.beams.io/posts/git-commit/#seven-rules
+
+## Dicas para PULL REQUEST
+Utilizar tags nos nomes dos pull requests (PRs) é uma prática comum para categorizar e facilitar a identificação do tipo de alteração que está sendo proposta. Embora não exista um padrão universal, algumas tags são amplamente utilizadas:
+
+**Tags Comuns e Seus Usos:**
+
+* **FIX:**
+    * Utilizada quando o PR corrige um bug ou problema existente no código.
+    * Exemplo: `FIX: correção de erro de login`
+* **FEAT:**
+    * Utilizada quando o PR introduz uma nova funcionalidade ou recurso.
+    * Exemplo: `FEAT: implementação do novo sistema de pagamento`
+* **CHORE:**
+    * Utilizada para tarefas de manutenção, como atualizações de dependências, refatoração de código sem alterar a funcionalidade, ou alterações de configuração.
+    * Exemplo: `CHORE: atualização de dependências do projeto`
+* **DOCS:**
+    * Utilizada quando o PR contém alterações na documentação do projeto.
+    * Exemplo: `DOCS: atualização da documentação da API`
+* **REFACTOR:**
+    * Utilizada para melhorias no código que não alteram a funcionalidade principal, focando em otimizações, legibilidade ou manutenibilidade.
+    * Exemplo: `REFACTOR: otimização de consulta ao banco de dados`
+* **TEST:**
+    * Usada para alterações relacionadas a testes, como adição de novos testes unitários ou de integração.
+    * Exemplo: `TEST: adição de testes para o módulo de autenticação`
+* **STYLE:**
+    * Utilizada para alterações no estilo do código, como formatação, padronização de nomenclatura, ou correções de linting.
+    * Exemplo: `STYLE: padronização da formatação do código`
+
+**Quando Usar:**
+
+* **Consistência:** Utilize as tags de forma consistente em todos os PRs do projeto.
+* **Clareza:** Escolha a tag que melhor representa o tipo de alteração que está sendo proposta.
+* **Facilitar a Busca:** As tags facilitam a busca e filtragem de PRs, tornando mais fácil encontrar alterações específicas.
+* **Automatização:** Em alguns fluxos de trabalho, as tags podem ser usadas para acionar automaticamente scripts ou ferramentas de integração contínua.
+
+**Dicas Adicionais:**
+
+* Além das tags, é importante que o nome do PR seja descritivo e conciso, resumindo a alteração que está sendo proposta.
+* Em alguns casos, as empresas adotam padrões proprios, então se atente ao repositório que irá trabalhar.
+* Ferramentas como o GitHub oferecem a possibilidade de adicionar labels, que são formas de categorizar os pull requests. Essa utilização, em conjunto com as tags, pode ajudar a ter uma melhor organização do versionamento de código.
