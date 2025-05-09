@@ -1,0 +1,25 @@
+[project]
+name = "adapta-parser"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Mário Carvalho",email = "mariodearaujocarvalho@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pandas (>=2.2.3,<3.0.0)",
+    "chardet (>=5.2.0,<6.0.0)",
+    "pytest (>=8.3.5,<9.0.0)",
+    "coverage (>=7.8.0,<8.0.0)",
+    "pdoc (>=15.0.3,<16.0.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [{include = "adapta_parser"}]

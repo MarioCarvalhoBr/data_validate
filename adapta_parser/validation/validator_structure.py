@@ -1,0 +1,157 @@
+import os
+from typing import List
+from common.utils.file_system_utils import FileSystemUtils
+
+
+class ValidatorStructureFiles:
+    """
+    A class to validate the structure of files in a given input folder.
+
+    Attributes:
+        input_folder (str): The path to the input folder.
+        fs_utils (FileSystemUtils): Utility class for file system operations.
+        errors (List[str]): List of validation errors.
+        warnings (List[str]): List of validation warnings.
+        dir_files (List[str]): List of files in the input folder.
+        lm: Locale manager for retrieving localized messages.
+    """
+
+    # Expected and optional files with their respective extensions
+    EXPECTED_FILES = {
+        "referencia_temporal": [".csv", ".xlsx"],
+        "descricao": [".csv", ".xlsx"],
+        "composicao": [".csv", ".xlsx"],
+        "valores": [".csv", ".xlsx"]
+    }
+    OPTIONAL_FILES = {
+        "proporcionalidades": [".csv", ".xlsx"],
+        "cenarios": [".csv", ".xlsx"],
+        "legenda": [".qml"],
+        "dicionario": [".csv", ".xlsx"]
+    }
+
+    def __init__(self, input_folder: str, fs_utils: FileSystemUtils):
+        """
+        Initialize the ValidatorStructureFiles class.
+
+        Args:
+            input_folder (str): The path to the input folder.
+            fs_utils (FileSystemUtils): Utility class for file system operations.
+        """
+        self.input_folder = input_folder
+        self.fs_utils = fs_utils
+        self.errors = []
+        self.warnings = []
+        self.dir_files = os.listdir(self.input_folder)
+        self.lm = fs_utils.locale_manager
+
+    def check_empty_directory(self) -> tuple[bool, List[str]]:
+        """
+        Check if the input directory is empty.
+
+        Returns:
+            bool: True if the directory is empty, False otherwise.
+        """
+        local_errors = []
+        is_empty, message = self.fs_utils.check_directory_is_empty(self.input_folder)
+        if is_empty:
+            local_errors.append(self.lm.get_text_locale("validator_structure_error_empty_directory"))
+        return not local_errors, local_errors
+
+    def check_not_expected_files_in_folder_root(self) -> tuple[bool, List[str]]:
+        """
+        Check for unexpected folders or files in the input directory.
+        """
+        local_errors = []
+        expected_files = ValidatorStructureFiles.EXPECTED_FILES
+        optional_files = ValidatorStructureFiles.OPTIONAL_FILES
+
+        if len(self.dir_files) == 1:
+            dir_path = os.path.join(self.input_folder, self.dir_files[0])
+            is_dir, _ = self.fs_utils.check_directory_exists(dir_path)
+            if is_dir:
+                local_errors.append(self.lm.get_text_locale("validator_structure_error_files_not_in_folder"))
+                return not local_errors, local_errors
+
+        for file_name in self.dir_files:
+            file_path = os.path.join(self.input_folder, file_name)
+            is_file, _ = self.fs_utils.check_file_exists(file_path)
+            if not is_file:
+                local_errors.append(
+                    self.lm.get_text_locale("validator_structure_error_unexpected_folder").format(file_name=file_name))
+                continue
+
+            file_base, file_ext = os.path.splitext(file_name)
+            if file_base in expected_files and file_ext in expected_files[file_base]:
+                continue
+            if file_base in optional_files and file_ext in optional_files[file_base]:
+                continue
+            if file_base == "legenda.qml" or file_ext == ".qml":
+                continue
+
+            local_errors.append(
+                self.lm.get_text_locale("validator_structure_error_unexpected_file").format(file_name=file_name))
+
+        return not local_errors, local_errors
+
+    def check_expected_files_in_folder_root(self) -> tuple[bool, List[str]]:
+        """
+        Check if all expected files are present in the input directory.
+        """
+        local_errors = []
+        expected_files = ValidatorStructureFiles.EXPECTED_FILES
+
+        for file_base, extensions in expected_files.items():
+            file_found = False
+            for ext in extensions:
+                file_path = os.path.join(self.input_folder, f"{file_base}{ext}")
+                is_file, _ = self.fs_utils.check_file_exists(file_path)
+                if is_file:
+                    file_found = True
+                    break
+            if not file_found:
+                local_errors.append(
+                    self.lm.get_text_locale("validator_structure_error_missing_file").format(file_base=file_base))
+        return not local_errors, local_errors
+
+    def check_ignored_files_in_folder_root(self) -> tuple[bool, List[str]]:
+        """
+        Check for files that will be ignored in the root folder.
+        Emit an error if both .xlsx and .csv files with the same name exist.
+        """
+        local_errors = []
+        file_groups = {}
+
+        for file_name in self.dir_files:
+            file_base, file_ext = os.path.splitext(file_name)
+            if file_ext in [".xlsx", ".csv"]:
+                if file_base not in file_groups:
+                    file_groups[file_base] = []
+                file_groups[file_base].append(file_ext)
+
+        for file_base, extensions in file_groups.items():
+            if ".xlsx" in extensions and ".csv" in extensions:
+                local_errors.append(
+                    self.lm.get_text_locale("validator_structure_error_conflicting_files").format(file_base=file_base))
+
+        return not local_errors, local_errors
+
+    def validate(self) -> List[str]:
+        """
+        Perform all validation checks on the input folder.
+
+        Returns:
+            List[str]: A list of validation errors.
+        """
+        all_errors = [
+            [self.check_empty_directory()],
+            [self.check_not_expected_files_in_folder_root()],
+            [self.check_expected_files_in_folder_root()],
+            [self.check_ignored_files_in_folder_root()],
+        ]
+        for check in all_errors:
+            is_valid, errors = check[0]
+            if not is_valid:
+                self.errors.extend(errors)
+
+        return self.errors

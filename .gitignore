@@ -5,6 +5,13 @@ test.py
 issues/
 TODO.md
 
+assets/
+.idea/
+docs/
+assets/
+data/
+*.log
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
