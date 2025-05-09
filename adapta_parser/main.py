@@ -1,10 +1,9 @@
-from common.utils.data_args import DataArgs
-
-from common.utils.logger_manager import LoggerManager
-from common.utils.file_system_utils import FileSystemUtils
 from common.locale.language_manager import LanguageManager
-from middleware.bootstrap import Bootstrap
+from common.utils.data_args import DataArgs
+from common.utils.file_system_utils import FileSystemUtils
+from common.utils.logger_manager import LoggerManager
 from core.processor import ProcessadorPlanilhas
+from middleware.bootstrap import Bootstrap
 
 if __name__ == "__main__":
 
