@@ -3,13 +3,6 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import List
 
-import sys
-from pathlib import Path
-
-# Adiciona o diretório raiz do projeto ao sys.path
-project_root = Path(__file__).resolve().parent.parent.parent
-sys.path.append(str(project_root))
-
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 

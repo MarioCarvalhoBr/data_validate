@@ -9,7 +9,7 @@ import pandas as pd
 from common.locale.language_manager import LanguageManager
 from common.utils.file_system_utils import FileSystemUtils
 from controller import DataImporterFacade
-from data_model.sp_description import SpDescription
+from data_model import SpDescription, SpComposition, SpValues, SpProportionalities, SpScenario, SpTemporalReference
 from validation.validator_structure import ValidatorStructureFiles
 
 
@@ -42,13 +42,28 @@ class ProcessadorPlanilhas:
         structure_validator = ValidatorStructureFiles(self.pasta_entrada, self.fs_utils)
         errors = structure_validator.validate()
 
-        # Test the SpDescription class
-        input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/adapta_parser/data/input/data_ground_truth_01'
-        importer = DataImporterFacade(input_dir)
-        data = importer.load_all
+        if not errors:
+            # input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/adapta_parser/data/input/data_ground_truth_01'
+            importer = DataImporterFacade(self.pasta_entrada)
+            data = importer.load_all
 
-        sp_description = SpDescription(data_model=data[SpDescription.INFO["SP_NAME"]])
-        print(sp_description)
+            sp_description = SpDescription(data_model=data[SpDescription.INFO["SP_NAME"]])
+            print(sp_description)
+
+            sp_composition = SpComposition(data_model=data[SpComposition.INFO["SP_NAME"]])
+            print(sp_composition)
+
+            sp_values = SpValues(data_model=data[SpValues.INFO["SP_NAME"]])
+            print(sp_values)
+
+            sp_proportionalities = SpProportionalities(data_model=data[SpProportionalities.INFO["SP_NAME"]])
+            print(sp_proportionalities)
+
+            sp_scenario = SpScenario(data_model=data[SpScenario.INFO["SP_NAME"]])
+            print(sp_scenario)
+
+            sp_temporal_reference = SpTemporalReference(data_model=data[SpTemporalReference.INFO["SP_NAME"]])
+            print(sp_temporal_reference)
 
         for error in errors:
             self.logger.error(error)

@@ -6,7 +6,7 @@ import pandas as pd
 import os
 from pathlib import Path
 
-from controller.data_importer.api.facade import DataModelImporter
+from adapta_parser.controller.data_importer.api.facade import DataModelImporter
 
 
 class SpModelABC(ABC):
