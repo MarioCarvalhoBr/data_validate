@@ -2,7 +2,7 @@
 
 import pytest
 from unittest.mock import patch, mock_open
-from adapta_parser.common.utils.file_system_utils import (
+from data_validate.common.utils.file_system_utils import (
     detect_encoding,
     create_directory,
     check_file_exists,
@@ -16,7 +16,7 @@ from adapta_parser.common.utils.file_system_utils import (
 @pytest.fixture
 def mock_get_text_locale():
     """Mock the get_text_locale function."""
-    with patch("adapta_parser.common.utils.functions_io.get_text_locale") as mock_locale:
+    with patch("data_validate.common.utils.functions_io.get_text_locale") as mock_locale:
         mock_locale.side_effect = lambda key, **kwargs: f"{key} {kwargs}"
         yield mock_locale
 

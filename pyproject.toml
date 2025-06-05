@@ -1,5 +1,5 @@
 [project]
-name = "adapta-parser"
+name = "data_validate"
 version = "0.1.0"
 description = ""
 authors = [
@@ -22,4 +22,4 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-packages = [{include = "adapta_parser"}]
+packages = [{include = "data_validate"}]
