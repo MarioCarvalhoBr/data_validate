@@ -1,13 +1,11 @@
-# src/validacao/validator_abc.py
 from abc import ABC, abstractmethod
 from types import MappingProxyType
 from typing import List, Dict, Any
 import pandas as pd
-import os
-from pathlib import Path
+
 
 from data_validate.controller.data_importer.api.facade import DataModelImporter
-
+from data_validate.common.utils.validation.data_validation import check_vertical_bar, check_unnamed_columns
 
 class SpModelABC(ABC):
     INFO = MappingProxyType({
@@ -15,10 +13,27 @@ class SpModelABC(ABC):
         "CSV": ".csv",
         "XLSX": ".xlsx",
     })
-    def __init__(self, data_model: DataModelImporter):
+    def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         # Config vars
         self.FILENAME = data_model.filename
         self.DATA_MODEL = data_model
+
+        self.ERROR_STRUCTURE_LIST: List[str] = []
+
+        self.LIST_SCENARIOS: List[str] = kwargs.get("list_scenarios", [])
+        self.EXPECTED_COLUMNS: List[str] = []
+
+        self.init()
+
+
+    def init(self):
+        # CHECK 1: Vertical Bar Check
+        is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
+        self.ERROR_STRUCTURE_LIST.extend(errors_vertical_bar)
+
+        # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
+        is_error_unnamed_columns, errors_unnamed_columns = check_unnamed_columns(self.DATA_MODEL.df_data, self.FILENAME)
+        self.ERROR_STRUCTURE_LIST.extend(errors_unnamed_columns)
 
     @abstractmethod
     def pre_processing(self):
@@ -34,14 +49,11 @@ class SpModelABC(ABC):
         pass
 
     @abstractmethod
-    def expected_structure_columns(self) -> List[str]:
-        """
-        Retorna a estrutura esperada das colunas.
-
-        Returns:
-            List[str]: Lista de nomes de colunas esperadas.
-        """
+    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+        # Check if there is a vertical bar in the column name
         pass
+
+
 
     @abstractmethod
     def run(self):

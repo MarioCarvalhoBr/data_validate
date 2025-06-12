@@ -44,6 +44,7 @@ class DataModelImporter:
         self.extension = path.suffix
         self.path = path
         self.df_data = df_data
+        self.header_type = 'single' if self.df_data.columns.nlevels == 1 else 'double'
 
     def __str__(self):
         return f"DataModelImporter({self.name}):\n" + \
@@ -55,7 +56,8 @@ class DataModelImporter:
             f"  df_data: \n{self.df_data.head()}\n" + \
             f"  df_data shape: {self.df_data.shape}\n" + \
             f"  df_data columns: {self.df_data.columns}\n" + \
-            f"  df_data dtypes: {self.df_data.dtypes}\n"
+            f"  df_data dtypes: {self.df_data.dtypes}\n" + \
+            f"  header_type: {self.header_type}\n"
 
 
 
@@ -90,7 +92,7 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
             try:
                 df_local = reader.read()
             except (FileNotFoundError, pd.errors.ParserError, IOError, Exception) as e:
-                errors.append(f"'{path.name}': Erro ao abrir o arquivo: {e}")
+                errors.append(f"{path.name}: Erro ao abrir o arquivo: {e}")
                 pass
 
             data_model = DataModelImporter(

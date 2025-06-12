@@ -65,19 +65,19 @@ class LanguageManager:
                 self.current_language = lang_code
                 return True
             else:
-                print(self.get_text_locale('lang_load_error', lang=lang_code, default_lang=self.default_language))
+                print(self.text('lang_load_error', lang=lang_code, default_lang=self.default_language))
                 if self._load_translations(self.default_language):
                     self.current_language = self.default_language
                     return False
                 return None
         else:
-            print(self.get_text_locale('invalid_language', default_lang=self.default_language))
+            print(self.text('invalid_language', default_lang=self.default_language))
             if self.current_language != self.default_language:
                 if self._load_translations(self.default_language):
                     self.current_language = self.default_language
             return False
 
-    def get_text_locale(self, key, **kwargs):
+    def text(self, key, **kwargs):
         """
         Retrieves the translated string for the given key in the current language.
 

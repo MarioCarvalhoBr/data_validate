@@ -1,10 +1,11 @@
 from pathlib import Path
 from types import MappingProxyType
-from typing import List
+from typing import List, Dict, Any
 
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
-
+from data_validate.common.utils.validation.column_validation import check_column_names
+from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
 class SpDictionary(SpModelABC):
     INFO = MappingProxyType({
@@ -18,12 +19,12 @@ class SpDictionary(SpModelABC):
     OPTIONAL_COLUMNS = MappingProxyType({})
     COLUMNS_PLURAL = MappingProxyType({})
 
-    def __init__(self, data_model: DataModelImporter):
+    def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model)
 
         # Vars
-        structure_errors = []
-        structure_warnings = []
+        self.structure_errors = []
+        self.structure_warnings = []
         self.words_to_ignore: List[str] = []
 
         self.run()
@@ -46,17 +47,18 @@ class SpDictionary(SpModelABC):
 
                 self.words_to_ignore = remaining_words
 
-    def expected_structure_columns(self) -> List[str]:
-        # Para um arquivo de dicionário simples, não há uma estrutura de colunas definida.
-        # Retornar uma lista vazia ou talvez o nome de uma única coluna genérica se o importer assim o fizer.
-        return []
+    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+        # Check missing columns expected columns and extra columns
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
+                                                            list(self.REQUIRED_COLUMNS.values()))
+        col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
+
+        self.structure_errors.extend(col_errors)
+        self.structure_warnings.extend(col_warnings)
 
     def run(self):
         self.pre_processing()
-        # A lógica principal aqui seria disponibilizar self.words_to_ignore
-        # para o sistema de verificação ortográfica.
-        # Por enquanto, apenas imprimimos as palavras carregadas para teste.
-        print(f"Palavras carregadas do dicionário ({self.FILENAME}): {self.words_to_ignore}")
+        self.expected_structure_columns()
 
 
 if __name__ == '__main__':

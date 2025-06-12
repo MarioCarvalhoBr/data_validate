@@ -55,8 +55,8 @@ class ValidatorStructureFiles:
         local_errors = []
         is_empty, message = self.fs_utils.check_directory_is_empty(self.input_folder)
         if is_empty:
-            local_errors.append(self.lm.get_text_locale("validator_structure_error_empty_directory",
-                                                         dir_path=self.input_folder))
+            local_errors.append(self.lm.text("validator_structure_error_empty_directory",
+                                             dir_path=self.input_folder))
         return not local_errors, local_errors
 
     def check_not_expected_files_in_folder_root(self) -> tuple[bool, List[str]]:
@@ -71,7 +71,7 @@ class ValidatorStructureFiles:
             dir_path = os.path.join(self.input_folder, self.dir_files[0])
             is_dir, _ = self.fs_utils.check_directory_exists(dir_path)
             if is_dir:
-                local_errors.append(self.lm.get_text_locale("validator_structure_error_files_not_in_folder"))
+                local_errors.append(self.lm.text("validator_structure_error_files_not_in_folder"))
                 return not local_errors, local_errors
 
         for file_name in self.dir_files:
@@ -79,7 +79,7 @@ class ValidatorStructureFiles:
             is_file, _ = self.fs_utils.check_file_exists(file_path)
             if not is_file:
                 local_errors.append(
-                    self.lm.get_text_locale("validator_structure_error_unexpected_folder").format(file_name=file_name))
+                    self.lm.text("validator_structure_error_unexpected_folder").format(file_name=file_name))
                 continue
 
             file_base, file_ext = os.path.splitext(file_name)
@@ -89,7 +89,7 @@ class ValidatorStructureFiles:
                 continue
 
             local_errors.append(
-                self.lm.get_text_locale("validator_structure_error_unexpected_file").format(file_name=file_name))
+                self.lm.text("validator_structure_error_unexpected_file").format(file_name=file_name))
 
         return not local_errors, local_errors
 
@@ -110,7 +110,7 @@ class ValidatorStructureFiles:
                     break
             if not file_found:
                 local_errors.append(
-                    self.lm.get_text_locale("validator_structure_error_missing_file").format(file_base=file_base))
+                    self.lm.text("validator_structure_error_missing_file").format(file_base=file_base))
         return not local_errors, local_errors
 
     def check_ignored_files_in_folder_root(self) -> tuple[bool, List[str]]:
@@ -131,7 +131,7 @@ class ValidatorStructureFiles:
         for file_base, extensions in file_groups.items():
             if ".xlsx" in extensions and ".csv" in extensions:
                 local_errors.append(
-                    self.lm.get_text_locale("validator_structure_error_conflicting_files").format(file_base=file_base))
+                    self.lm.text("validator_structure_error_conflicting_files").format(file_base=file_base))
 
         return not local_errors, local_errors
 

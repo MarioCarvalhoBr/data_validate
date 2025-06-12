@@ -118,5 +118,104 @@
   },
   "validator_structure_error_empty_directory": {
     "message": "O diretório '{dir_path}' está vazio. Por favor, adicione os arquivos necessários."
+  },
+   "verification_name_file_structure": {
+    "message": "Estrutura dos arquivos da pasta de entrada"
+  },
+  "verification_name_file_cleaning": {
+    "message": "Limpeza dos arquivos"
+  },
+  "verification_name_indicator_relations": {
+    "message": "Relações entre indicadores"
+  },
+  "verification_name_tree_hierarchy": {
+    "message": "Hierarquia como árvore"
+  },
+  "verification_name_indicator_levels": {
+    "message": "Níveis de indicadores"
+  },
+  "verification_name_code_uniqueness": {
+    "message": "Unicidade dos códigos"
+  },
+  "verification_name_html_codes_in_descriptions": {
+    "message": "Códigos HTML nas descrições simples"
+  },
+  "verification_name_spelling": {
+    "message": "Ortografia"
+  },
+  "verification_name_unique_titles": {
+    "message": "Títulos únicos"
+  },
+  "verification_name_sequential_codes": {
+    "message": "Códigos sequenciais"
+  },
+  "verification_name_empty_fields": {
+    "message": "Campos vazios"
+  },
+  "verification_name_indicator_name_pattern": {
+    "message": "Padrão para nomes dos indicadores"
+  },
+  "verification_name_titles_over_n_chars": {
+    "message": "Títulos com mais de {value} caracteres"
+  },
+  "verification_name_simple_descriptions_over_n_chars": {
+    "message": "Descrições simples com mais de {value} caracteres"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_descriptions": {
+    "message": "Pontuações obrigatórias e proibidas em descrições"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_scenarios": {
+    "message": "Pontuações obrigatórias e proibidas em cenários"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_temporal_reference": {
+    "message": "Pontuações obrigatórias e proibidas em referência temporal"
+  },
+  "verification_name_unique_value_relations_in_scenarios": {
+    "message": "Relações de valores únicos em cenários"
+  },
+  "verification_name_unique_value_relations_in_temporal_reference": {
+    "message": "Relações de valores únicos em referência temporal"
+  },
+  "verification_name_value_combination_relations": {
+    "message": "Relações de combinações de valores"
+  },
+  "verification_name_unavailable_and_invalid_values": {
+    "message": "Valores indisponíveis e inválidos"
+  },
+  "verification_name_line_break_in_description": {
+    "message": "Quebra de linha para descrição"
+  },
+  "verification_name_line_break_in_scenarios": {
+    "message": "Quebra de linha para cenários"
+  },
+  "verification_name_line_break_in_temporal_reference": {
+    "message": "Quebra de linha para referência temporal"
+  },
+  "verification_name_years_in_temporal_reference": {
+    "message": "Anos em referência temporal"
+  },
+  "verification_name_legend_data_range": {
+    "message": "Intervalo dos dados da legenda"
+  },
+  "verification_name_legend_value_overlap": {
+    "message": "Sobreposição de valores na legenda"
+  },
+  "verification_name_sum_properties_in_influencing_factors": {
+    "message": "Propriedades de soma nos fatores influenciadores"
+  },
+  "verification_name_repeated_indicators_in_proportionalities": {
+    "message": "Indicadores repetidos em proporcionalidades"
+  },
+  "verification_name_indicator_relations_in_proportionalities": {
+    "message": "Relações de indicadores em proporcionalidades"
+  },
+  "verification_name_indicators_in_values_and_proportionalities": {
+    "message": "Indicadores em valores e proporcionalidades"
+  },
+  "verification_name_leaf_indicators_without_associated_data": {
+    "message": "Indicadores folhas sem dados associados"
+  },
+  "verification_name_child_indicator_levels": {
+    "message": "Níveis dos indicadores filhos"
   }
 }
