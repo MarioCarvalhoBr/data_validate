@@ -23,10 +23,15 @@ class SpModelABC(ABC):
         self.LIST_SCENARIOS: List[str] = kwargs.get("list_scenarios", [])
         self.EXPECTED_COLUMNS: List[str] = []
 
+        self.DF_COLUMNS: List[str] = []
+
         self.init()
 
 
     def init(self):
+        # CHECK 0: Add COLUMNS
+        if not self.DATA_MODEL.df_data.empty:
+            self.DF_COLUMNS = list(self.DATA_MODEL.df_data.columns)
         # CHECK 1: Vertical Bar Check
         is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
         self.ERROR_STRUCTURE_LIST.extend(errors_vertical_bar)

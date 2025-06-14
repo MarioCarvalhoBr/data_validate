@@ -6,6 +6,8 @@ from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
+from data_validate.common.utils.processing.list_processing import extract_numeric_ids_and_unmatched_strings  # Added
+
 
 class SpValue(SpModelABC):
     INFO = MappingProxyType({
@@ -21,7 +23,7 @@ class SpValue(SpModelABC):
     COLUMNS_PLURAL = MappingProxyType({})
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
-        super().__init__(data_model)
+        super().__init__(data_model, **kwargs)
 
         # Vars
         self.structure_errors = []
@@ -30,20 +32,26 @@ class SpValue(SpModelABC):
         self.run()
 
     def pre_processing(self):
-        pass
+        self.EXPECTED_COLUMNS = list(self.REQUIRED_COLUMNS.values())
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
-        # Check missing columns expected columns and extra columns
-        """missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
-                                                            list(self.REQUIRED_COLUMNS.values()))
-        col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
-        self.structure_errors.extend(col_errors)
-        self.structure_warnings.extend(col_warnings)
-        :param *args:
-        :param **kwargs: """
+        __, extras_columns = extract_numeric_ids_and_unmatched_strings(
+            source_list=self.DF_COLUMNS,
+            strings_to_ignore=[self.REQUIRED_COLUMNS["COLUMN_ID"]],
+            scenario_suffixes_for_matching=self.LIST_SCENARIOS
+        )
+
+        for extra_column in extras_columns:
+            if extra_column.lower().startswith("unnamed"):
+                continue
+            self.structure_errors.append(f"{self.FILENAME}: A coluna '{extra_column}' não é esperada.")
+        for col in self.EXPECTED_COLUMNS:
+            if col not in self.DF_COLUMNS:
+                self.structure_errors.append(f"{self.FILENAME}: Coluna '{col}' esperada mas não foi encontrada.")
 
     def run(self):
+        self.pre_processing()
         self.expected_structure_columns()
 
 

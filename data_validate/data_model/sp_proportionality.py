@@ -40,9 +40,8 @@ class SpProportionality(SpModelABC):
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.structure_errors.extend(col_errors)
-        self.structure_warnings.extend(col_warnings)
-        :param *args:
-        :param **kwargs: """
+        self.structure_warnings.extend(col_warnings)"""
+
 
     def run(self):
         self.expected_structure_columns()
