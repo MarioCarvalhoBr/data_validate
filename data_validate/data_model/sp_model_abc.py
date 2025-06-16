@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
 from types import MappingProxyType
 from typing import List, Dict, Any
-import pandas as pd
 
 
 from data_validate.controller.data_importer.api.facade import DataModelImporter
@@ -14,9 +13,10 @@ class SpModelABC(ABC):
         "XLSX": ".xlsx",
     })
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
+
         # Config vars
-        self.FILENAME = data_model.filename
-        self.DATA_MODEL = data_model
+        self.FILENAME: str = data_model.filename
+        self.DATA_MODEL: DataModelImporter = data_model
 
         self.ERROR_STRUCTURE_LIST: List[str] = []
 
@@ -33,11 +33,11 @@ class SpModelABC(ABC):
         if not self.DATA_MODEL.df_data.empty:
             self.DF_COLUMNS = list(self.DATA_MODEL.df_data.columns)
         # CHECK 1: Vertical Bar Check
-        is_error_vertical_bar, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
+        _, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
         self.ERROR_STRUCTURE_LIST.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        is_error_unnamed_columns, errors_unnamed_columns = check_unnamed_columns(self.DATA_MODEL.df_data, self.FILENAME)
+        _, errors_unnamed_columns = check_unnamed_columns(self.DATA_MODEL.df_data, self.FILENAME)
         self.ERROR_STRUCTURE_LIST.extend(errors_unnamed_columns)
 
     @abstractmethod

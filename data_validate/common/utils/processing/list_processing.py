@@ -100,13 +100,14 @@ def extract_numeric_ids_and_unmatched_strings(source_list=None, strings_to_ignor
 
 if __name__ == '__main__':
     # Example usage
-    list_values = ['ID', 'ABABA', '18888-2020', '2-2021', '3-2022', '4-2023', '5-2024']
+    list_values = ['ID', 'ABABA', '18888-2020', '2-2021', '3-2022', '4-2023', '5-2024', '6-ano-M', '7-O-2026-O', '8-2027-P',]
     list_ignore = ['ID']
     lista_cenarios = ['M', 'O', 'P']
 
     ids_valids, filtered_extras_columns = extract_numeric_ids_and_unmatched_strings(list_values, list_ignore, lista_cenarios)
 
     print("Valid IDs:", ids_valids)
+    print("Lista de cenários:", lista_cenarios)
     print("Filtered Extra Columns:", filtered_extras_columns)
 
 
@@ -122,4 +123,5 @@ if __name__ == '__main__':
     lista_cenarios = ['O', 'P','O']
     ids_valids, filtered_extras_columns = extract_numeric_ids_and_unmatched_strings(list_values, list_ignore, lista_cenarios)
     print("\n\n\nTeste 2: \nValid IDs:", ids_valids)
+    print("Lista de cenários:", lista_cenarios)
     print("Filtered Extra Columns:", filtered_extras_columns)

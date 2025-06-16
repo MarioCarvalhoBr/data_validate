@@ -56,6 +56,7 @@ class ProcessorSpreadsheet:
         # APPEND ERRORS TO REPORT LIST
         self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=errors_data_importer)
 
+
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
         self.structure_validator = ValidatorStructureFiles(self.input_folder, self.fs_utils)
 
@@ -71,10 +72,12 @@ class ProcessorSpreadsheet:
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.models_to_initialize:
             sp_name_key = model_class.INFO["SP_NAME"]
+
             # Dynamically create the attribute name, e.g., "sp_description"
             attribute_name = f"sp_{sp_name_key.lower()}"
+
             # Model instance creation and initialization
-            model_instance = model_class(data_model=data[sp_name_key], **{"list_scenarios": self.list_scenarios})
+            model_instance = model_class(data_model=data.get(sp_name_key), **{"list_scenarios": self.list_scenarios})
             setattr(self, attribute_name, model_instance)
 
             self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=model_instance.ERROR_STRUCTURE_LIST)

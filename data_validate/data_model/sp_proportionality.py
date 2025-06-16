@@ -1,12 +1,11 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from pathlib import Path
 from types import MappingProxyType
 from typing import List, Dict, Any
 
+from data_validate.common.utils.processing.list_processing import extract_numeric_ids_and_unmatched_strings  # Added
+from data_validate.controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from .sp_model_abc import SpModelABC
-from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
-from data_validate.common.utils.validation.column_validation import check_column_names
-from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
+
 
 class SpProportionality(SpModelABC):
     INFO = MappingProxyType({
@@ -19,10 +18,8 @@ class SpProportionality(SpModelABC):
 
     OPTIONAL_COLUMNS = MappingProxyType({})
 
-    COLUMNS_PLURAL = MappingProxyType({})
-
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
-        super().__init__(data_model)
+        super().__init__(data_model, **kwargs)
 
         # Vars
         self.structure_errors = []
@@ -31,27 +28,47 @@ class SpProportionality(SpModelABC):
         self.run()
 
     def pre_processing(self):
-        pass
+        self.EXPECTED_COLUMNS = list(self.REQUIRED_COLUMNS.values())
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
-        # Check missing columns expected columns and extra columns
-        """missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
-                                                            list(self.REQUIRED_COLUMNS.values()))
-        col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
+        colunas_nivel_1 = self.DATA_MODEL.df_data.columns.get_level_values(0).unique().tolist()
+        colunas_nivel_2 = self.DATA_MODEL.df_data.columns.get_level_values(1).unique().tolist()
 
-        self.structure_errors.extend(col_errors)
-        self.structure_warnings.extend(col_warnings)"""
+        # Check extra columns in level 1 (do not ignore 'id')
+        _, extras_level_1 = extract_numeric_ids_and_unmatched_strings(
+            source_list=colunas_nivel_1,
+            strings_to_ignore=[],  # Do not ignore 'id' here
+            scenario_suffixes_for_matching=self.LIST_SCENARIOS
+        )
+        for extra_column in extras_level_1:
+            if not extra_column.lower().startswith("unnamed"):
+                self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 1 '{extra_column}' não é esperada.")
 
+        # Check extra columns in level 2 (ignore 'id')
+        _, extras_level_2 = extract_numeric_ids_and_unmatched_strings(
+            source_list=colunas_nivel_2,
+            strings_to_ignore=[self.REQUIRED_COLUMNS["COLUMN_ID"]],
+            scenario_suffixes_for_matching=self.LIST_SCENARIOS
+        )
+        for extra_column in extras_level_2:
+            if not extra_column.lower().startswith("unnamed"):
+                self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 2 '{extra_column}' não é esperada.")
+
+        # Check for missing expected columns in level 2
+        for col in self.EXPECTED_COLUMNS:
+            if col not in colunas_nivel_2:
+                self.structure_errors.append(f"{self.FILENAME}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
 
     def run(self):
+        self.pre_processing()
         self.expected_structure_columns()
 
 
 if __name__ == '__main__':
-    # Test the SpProportionalities class
+    # Test the SpValues class
     input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
     importer = DataImporterFacade(input_dir)
     data = importer.load_all
 
-    sp_proportionalities = SpProportionality(data_model=data[SpProportionality.INFO["SP_NAME"]])
-    print(sp_proportionalities)
+    sp_values = SpValue(data_model=data[SpValue.INFO["SP_NAME"]])
+    print(sp_values)
