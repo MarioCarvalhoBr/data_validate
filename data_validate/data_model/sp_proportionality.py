@@ -31,33 +31,34 @@ class SpProportionality(SpModelABC):
         self.EXPECTED_COLUMNS = list(self.REQUIRED_COLUMNS.values())
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
-        colunas_nivel_1 = self.DATA_MODEL.df_data.columns.get_level_values(0).unique().tolist()
-        colunas_nivel_2 = self.DATA_MODEL.df_data.columns.get_level_values(1).unique().tolist()
+        if self.DATA_MODEL.header_type == "double":
+            colunas_nivel_1 = self.DATA_MODEL.df_data.columns.get_level_values(0).unique().tolist()
+            colunas_nivel_2 = self.DATA_MODEL.df_data.columns.get_level_values(1).unique().tolist()
 
-        # Check extra columns in level 1 (do not ignore 'id')
-        _, extras_level_1 = extract_numeric_ids_and_unmatched_strings(
-            source_list=colunas_nivel_1,
-            strings_to_ignore=[],  # Do not ignore 'id' here
-            scenario_suffixes_for_matching=self.LIST_SCENARIOS
-        )
-        for extra_column in extras_level_1:
-            if not extra_column.lower().startswith("unnamed"):
-                self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 1 '{extra_column}' não é esperada.")
+            # Check extra columns in level 1 (do not ignore 'id')
+            _, extras_level_1 = extract_numeric_ids_and_unmatched_strings(
+                source_list=colunas_nivel_1,
+                strings_to_ignore=[],  # Do not ignore 'id' here
+                scenario_suffixes_for_matching=self.LIST_SCENARIOS
+            )
+            for extra_column in extras_level_1:
+                if not extra_column.lower().startswith("unnamed"):
+                    self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 1 '{extra_column}' não é esperada.")
 
-        # Check extra columns in level 2 (ignore 'id')
-        _, extras_level_2 = extract_numeric_ids_and_unmatched_strings(
-            source_list=colunas_nivel_2,
-            strings_to_ignore=[self.REQUIRED_COLUMNS["COLUMN_ID"]],
-            scenario_suffixes_for_matching=self.LIST_SCENARIOS
-        )
-        for extra_column in extras_level_2:
-            if not extra_column.lower().startswith("unnamed"):
-                self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 2 '{extra_column}' não é esperada.")
+            # Check extra columns in level 2 (ignore 'id')
+            _, extras_level_2 = extract_numeric_ids_and_unmatched_strings(
+                source_list=colunas_nivel_2,
+                strings_to_ignore=[self.REQUIRED_COLUMNS["COLUMN_ID"]],
+                scenario_suffixes_for_matching=self.LIST_SCENARIOS
+            )
+            for extra_column in extras_level_2:
+                if not extra_column.lower().startswith("unnamed"):
+                    self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 2 '{extra_column}' não é esperada.")
 
-        # Check for missing expected columns in level 2
-        for col in self.EXPECTED_COLUMNS:
-            if col not in colunas_nivel_2:
-                self.structure_errors.append(f"{self.FILENAME}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
+            # Check for missing expected columns in level 2
+            for col in self.EXPECTED_COLUMNS:
+                if col not in colunas_nivel_2:
+                    self.structure_errors.append(f"{self.FILENAME}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
 
     def run(self):
         self.pre_processing()

@@ -1,4 +1,3 @@
-
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
 # File: data_importer/facade.py
@@ -91,9 +90,18 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
             df_local = pd.DataFrame()
             try:
                 df_local = reader.read()
-            except (FileNotFoundError, pd.errors.ParserError, IOError, Exception) as e:
-                errors.append(f"{path.name}: Erro ao abrir o arquivo: {e}")
-                pass
+            except FileNotFoundError as e:
+                errors.append(f"{path.name}: Arquivo não encontrado no diretório. Detalhes: {e} ({type(e)})")
+            except UnicodeDecodeError as e:
+                errors.append(f"{path.name}: Erro de codificação do arquivo. Verifique se está em UTF-8. Detalhes: {e} ({type(e)})")
+            except pd.errors.ParserError as e:
+                errors.append(f"{path.name}: Erro na estrutura da planilha. Verifique se há células mescladas ou formato inválido. Detalhes: {e} ({type(e)})")
+            except ValueError as e:
+                errors.append(f"{path.name}: Erro nos valores da planilha. Verifique se os tipos de dados estão corretos. Detalhes: {e} ({type(e)})")
+            except IOError as e:
+                errors.append(f"{path.name}: Erro de entrada/saída ao ler o arquivo. Verifique se ele não está aberto em outro programa. Detalhes: {e} ({type(e)})")
+            except Exception as e:
+                errors.append(f"{path.name}: Erro inesperado ao processar o arquivo. Detalhes: {e} ({type(e)})")
 
             data_model = DataModelImporter(
                 input_folder=str(self.input_dir),
