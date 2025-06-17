@@ -17,7 +17,7 @@ def check_vertical_bar(dataframe: pd.DataFrame, name_file: str) -> Tuple[bool, L
         else:
             for column_name in df_copy.columns:
                 if '|' in str(column_name):
-                    errors.append(f"{name_file}: A coluna '{column_name}' não pode conter o caracter '|'.")
+                    errors.append(f"{name_file}: A coluna '{column_name}' não pode conter o caractere '|'.")
 
         # Verifica se há barra vertical nos dados das colunas
         mask = df_copy.map(lambda x: '|' in str(x) if pd.notna(x) else False)
