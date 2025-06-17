@@ -1,11 +1,23 @@
 [project]
 name = "data_validate"
-version = "0.1.0"
-description = ""
+version = "0.6.0"
+description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
 authors = [
-    {name = "Mário Carvalho",email = "mariodearaujocarvalho@gmail.com"}
+    {name = "Mário de Araújo Carvalho", email = "mariodearaujocarvalho@gmail.com"},
+    {name = "Mauro Assis", email = "assismauro@hotmail.com"},
+    {name = "Miguel Gastelumendi", email = "miguelgastelumendi@gmail.com"},
+    {name = "Pedro Andrade", email = "pedro.andrade@inpe.br"}
 ]
+
 readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+keywords = ["data validation", "data processing", "spreadsheet validation", "data integrity", "tabular data", "scientific research", "environmental data", "indicator systems"]
+classifiers = [
+  "Development Status :: 0.6.0 - Beta",
+  "Programming Language :: Python"
+]
+
 requires-python = ">=3.12"
 dependencies = [
     "pandas (>=2.2.3,<3.0.0)",
@@ -15,6 +27,13 @@ dependencies = [
     "pdoc (>=15.0.3,<16.0.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
 ]
+
+[project.urls]
+Homepage = "https://github.com/AdaptaBrasil/"
+Documentation = "https://github.com/AdaptaBrasil/data_validate/docs"
+Repository = "https://github.com/AdaptaBrasil/data_validate.git"
+"Bug Tracker" = "https://github.com/AdaptaBrasil/data_validate/issues"
+Changelog = "https://github.com/AdaptaBrasil/data_validate/blob/dev/CHANGELOG.md"
 
 
 [build-system]
