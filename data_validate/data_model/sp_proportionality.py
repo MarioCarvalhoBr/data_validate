@@ -21,10 +21,6 @@ class SpProportionality(SpModelABC):
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
-        # Vars
-        self.structure_errors = []
-        self.structure_warnings = []
-
         self.run()
 
     def pre_processing(self):
@@ -43,7 +39,7 @@ class SpProportionality(SpModelABC):
             )
             for extra_column in extras_level_1:
                 if not extra_column.lower().startswith("unnamed"):
-                    self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 1 '{extra_column}' não é esperada.")
+                    self.STRUCTURE_LIST_ERRORS.append(f"{self.FILENAME}: A coluna de nível 1 '{extra_column}' não é esperada.")
 
             # Check extra columns in level 2 (ignore 'id')
             _, extras_level_2 = extract_numeric_ids_and_unmatched_strings(
@@ -53,12 +49,15 @@ class SpProportionality(SpModelABC):
             )
             for extra_column in extras_level_2:
                 if not extra_column.lower().startswith("unnamed"):
-                    self.structure_errors.append(f"{self.FILENAME}: A coluna de nível 2 '{extra_column}' não é esperada.")
+                    self.STRUCTURE_LIST_ERRORS.append(f"{self.FILENAME}: A coluna de nível 2 '{extra_column}' não é esperada.")
 
             # Check for missing expected columns in level 2
             for col in self.EXPECTED_COLUMNS:
                 if col not in colunas_nivel_2:
-                    self.structure_errors.append(f"{self.FILENAME}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
+                    self.STRUCTURE_LIST_ERRORS.append(f"{self.FILENAME}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
+
+    def data_cleaning(self, *args, **kwargs) -> List[str]:
+        pass
 
     def run(self):
         self.pre_processing()

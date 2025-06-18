@@ -7,7 +7,7 @@ from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
-
+from data_validate.common.utils.processing.data_cleaning import clean_dataframe
 
 class SpDescription(SpModelABC):
     INFO = MappingProxyType({
@@ -42,10 +42,6 @@ class SpDescription(SpModelABC):
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
-        # Vars
-        self.structure_errors = []
-        self.structure_warnings = []
-
         self.run()
 
     def pre_processing(self):
@@ -54,7 +50,7 @@ class SpDescription(SpModelABC):
         if not self.LIST_SCENARIOS:
             ## 1.1: Se não houver cenários, remove a coluna de cenário
             if self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"] in self.DATA_MODEL.df_data.columns:
-                self.structure_errors.append(
+                self.STRUCTURE_LIST_ERRORS.append(
                     f"{self.FILENAME}: A coluna '{self.REQUIRED_DYNAMIC_COLUMNS['COLUMN_SCENARIO']}' não pode existir se o arquivo '{SpScenario.INFO['SP_NAME']}' não estiver configurado ou não existir.")
                 self.DATA_MODEL.df_data = self.DATA_MODEL.df_data.drop(
                     columns=[self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"]])
@@ -76,18 +72,36 @@ class SpDescription(SpModelABC):
 
         self.EXPECTED_COLUMNS = expected_columns
 
-    def expected_structure_columns(self, *args, **kwargs) -> None:
+    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
 
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, self.EXPECTED_COLUMNS)
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
-        self.structure_errors.extend(col_errors)
-        self.structure_warnings.extend(col_warnings)
+        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
+        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+
+    def data_cleaning(self, *args, **kwargs) -> List[str]:
+        # Limpeza e validação das colunas principais usando clean_dataframe
+        # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
+        col_codigo = self.REQUIRED_COLUMNS["COLUMN_CODE"]
+        df, errors_codigo = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_codigo], min_value=1)
+        self.DATA_CLEAN_ERRORS.extend(errors_codigo)
+
+        # 2. Limpar e validar a coluna 'nivel' (mínimo 1)
+        col_nivel = self.REQUIRED_COLUMNS["COLUMN_LEVEL"]
+        df, errors_nivel = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_nivel], min_value=1)
+        self.DATA_CLEAN_ERRORS.extend(errors_nivel)
+
+        # 3. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
+        col_cenario = self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"]
+        df, errors_cenario = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_cenario], min_value=-1)
+        self.DATA_CLEAN_ERRORS.extend(errors_cenario)
 
     def run(self):
         self.pre_processing()
         self.expected_structure_columns()
+        self.data_cleaning()
 
 
 if __name__ == '__main__':

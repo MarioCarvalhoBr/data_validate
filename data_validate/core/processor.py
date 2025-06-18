@@ -80,9 +80,11 @@ class ProcessorSpreadsheet:
             model_instance = model_class(data_model=data.get(sp_name_key), **{"list_scenarios": self.list_scenarios})
             setattr(self, attribute_name, model_instance)
 
-            self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=model_instance.ERROR_STRUCTURE_LIST)
-            self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=model_instance.structure_errors,
-                                    warnings=model_instance.structure_warnings)
+            self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=model_instance.STRUCTURE_LIST_ERRORS,
+                                    warnings=model_instance.STRUCTURE_LIST_WARNINGS)
+            self.report_list.extend(self.TITLES_VERITY[NamesEnum.FC.value], errors=model_instance.DATA_CLEAN_ERRORS,
+                                    warnings=model_instance.DATA_CLEAN_WARNINGS)
+
 
             if FLAG is not None:
                 print(f"Initialized model: {attribute_name} = {model_instance}")
@@ -94,7 +96,10 @@ class ProcessorSpreadsheet:
 
     def _report(self) -> None:
         # Print all reports and their errors
+        COUNT = 2
         for report in self.report_list:
+            if COUNT <= 0:
+                break
             print(f"Report: {report.name_test}")
             print(f"  Errors: {len(report.errors)}")
             for error in report.errors:
@@ -103,7 +108,7 @@ class ProcessorSpreadsheet:
             for warning in report.warnings:
                 print(f"    - {warning}")
             print()
-            break
+            COUNT -= 1
 
     def run(self):
         self.logger.info("Iniciando processamento...")

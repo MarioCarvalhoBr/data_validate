@@ -25,10 +25,6 @@ class SpValue(SpModelABC):
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
-        # Vars
-        self.structure_errors = []
-        self.structure_warnings = []
-
         self.run()
 
     def pre_processing(self):
@@ -45,10 +41,13 @@ class SpValue(SpModelABC):
         for extra_column in extras_columns:
             if extra_column.lower().startswith("unnamed"):
                 continue
-            self.structure_errors.append(f"{self.FILENAME}: A coluna '{extra_column}' não é esperada.")
+            self.STRUCTURE_LIST_ERRORS.append(f"{self.FILENAME}: A coluna '{extra_column}' não é esperada.")
         for col in self.EXPECTED_COLUMNS:
             if col not in self.DF_COLUMNS:
-                self.structure_errors.append(f"{self.FILENAME}: Coluna '{col}' esperada mas não foi encontrada.")
+                self.STRUCTURE_LIST_ERRORS.append(f"{self.FILENAME}: Coluna '{col}' esperada mas não foi encontrada.")
+
+    def data_cleaning(self, *args, **kwargs) -> List[str]:
+        pass
 
     def run(self):
         self.pre_processing()

@@ -22,9 +22,6 @@ class SpDictionary(SpModelABC):
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model)
 
-        # Vars
-        self.structure_errors = []
-        self.structure_warnings = []
         self.words_to_ignore: List[str] = []
 
         self.run()
@@ -53,8 +50,11 @@ class SpDictionary(SpModelABC):
                                                             list(self.REQUIRED_COLUMNS.values()))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
-        self.structure_errors.extend(col_errors)
-        self.structure_warnings.extend(col_warnings)
+        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
+        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+
+    def data_cleaning(self, *args, **kwargs) -> List[str]:
+        pass
 
     def run(self):
         self.pre_processing()

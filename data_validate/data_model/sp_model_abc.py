@@ -17,12 +17,17 @@ class SpModelABC(ABC):
         # Config vars
         self.FILENAME: str = data_model.filename
         self.DATA_MODEL: DataModelImporter = data_model
-
-        self.ERROR_STRUCTURE_LIST: List[str] = []
-
         self.LIST_SCENARIOS: List[str] = kwargs.get("list_scenarios", [])
-        self.EXPECTED_COLUMNS: List[str] = []
 
+        # Initialize errors and warnings
+        self.STRUCTURE_LIST_ERRORS: List[str] = []
+        self.STRUCTURE_LIST_WARNINGS: List[str] = []
+
+        self.DATA_CLEAN_ERRORS: List[str] = []
+        self.DATA_CLEAN_WARNINGS: List[str] = []
+
+        # DataFrame setup
+        self.EXPECTED_COLUMNS: List[str] = []
         self.DF_COLUMNS: List[str] = []
 
         self.init()
@@ -34,11 +39,11 @@ class SpModelABC(ABC):
             self.DF_COLUMNS = list(self.DATA_MODEL.df_data.columns)
         # CHECK 1: Vertical Bar Check
         _, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
-        self.ERROR_STRUCTURE_LIST.extend(errors_vertical_bar)
+        self.STRUCTURE_LIST_ERRORS.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
         _, errors_unnamed_columns = check_unnamed_columns(self.DATA_MODEL.df_data, self.FILENAME)
-        self.ERROR_STRUCTURE_LIST.extend(errors_unnamed_columns)
+        self.STRUCTURE_LIST_ERRORS.extend(errors_unnamed_columns)
 
     @abstractmethod
     def pre_processing(self):
@@ -56,6 +61,20 @@ class SpModelABC(ABC):
     @abstractmethod
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         # Check if there is a vertical bar in the column name
+        pass
+
+
+    @abstractmethod
+    def data_cleaning(self, *args, **kwargs) -> List[str]:
+        """
+        Defines an abstract method for data cleaning. This method is intended to be implemented
+        by subclasses to perform necessary operations for cleaning the data.
+
+        This serves as a placeholder for subclass-specific data cleaning logic, and forces derived
+        classes to provide their own implementation.
+
+        :raises NotImplementedError: If the method is not overridden in a subclass.
+        """
         pass
 
 
