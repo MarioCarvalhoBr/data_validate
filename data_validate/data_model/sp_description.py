@@ -41,10 +41,11 @@ class SpDescription(SpModelABC):
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
-
+        self.color = "blue"
         self.run()
 
     def pre_processing(self):
+        self.color = "yellow"
         expected_columns = list(self.REQUIRED_COLUMNS.values())
         # 1. Tratamento de colunas dinâmicas: cenarios
         if not self.LIST_SCENARIOS:

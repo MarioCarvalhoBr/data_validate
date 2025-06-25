@@ -73,3 +73,37 @@ def check_unnamed_columns(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool
         errors.append(f"{file_name}: Erro ao processar a checagem de colunas sem nome: {str(e)}")
 
     return not errors, errors
+
+
+def check_punctuation(df, name_file, columns_dont_punctuation=None, columns_must_end_with_dot=None):
+    warnings = []
+    # columns_dont_punctuation = ['nome_simples', 'nome_completo']
+    # columns_must_end_with_dot = ['desc_simples', 'desc_completa']
+
+    columns_dont_punctuation = [col for col in columns_dont_punctuation if col in df.columns]
+    columns_must_end_with_dot = [col for col in columns_must_end_with_dot if col in df.columns]
+
+    for index, row in df.iterrows():
+        if columns_dont_punctuation is not None:
+            for column in columns_dont_punctuation:
+                text = row[column]
+                # Verifique se o texto está vazio ou nan
+                if pd.isna(text) or text == "":
+                    continue
+                text = str(text).strip()
+                if text[-1] in [',', '.', ';', ':', '!', '?']:
+                    warnings.append(
+                        f"{name_file}, linha {index + 2}: O valor da coluna '{column}' não deve terminar com pontuação.")
+
+        if columns_must_end_with_dot is not None:
+            for column in columns_must_end_with_dot:
+                text = row[column]
+                # Verifique se o texto está vazio ou nan
+                if pd.isna(text) or text == "":
+                    continue
+                text = str(text).strip()
+                if text[-1] != '.':
+                    warnings.append(
+                        f"{name_file}, linha {index + 2}: O valor da coluna '{column}' deve terminar com ponto.")
+
+    return not warnings, warnings

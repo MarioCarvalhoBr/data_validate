@@ -12,7 +12,9 @@ from data_model import (
     SpDescription, SpComposition, SpValue, SpTemporalReference,
     SpProportionality, SpScenario, SpLegend, SpDictionary
 )
+from validation.description_validator import SpDescriptionValidator
 from validation.validator_structure import ValidatorStructureFiles
+from validation.data_context import DataContext
 from .report import Report, ReportList
 
 FLAG = None
@@ -41,10 +43,11 @@ class ProcessorSpreadsheet:
 
         # Data Model Initialization
         # CONFIGURE
-        self.models_to_initialize = [
+        self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
             SpProportionality, SpScenario, SpLegend, SpDictionary
         ]
+        self.models_to_use = []
 
         # Running the main processing function
         self.run()
@@ -70,7 +73,7 @@ class ProcessorSpreadsheet:
                     SpScenario.REQUIRED_COLUMNS["COLUMN_SYMBOL"]].tolist()
 
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
-        for model_class in self.models_to_initialize:
+        for model_class in self.classes_to_initialize:
             sp_name_key = model_class.INFO["SP_NAME"]
 
             # Dynamically create the attribute name, e.g., "sp_description"
@@ -79,15 +82,21 @@ class ProcessorSpreadsheet:
             # Model instance creation and initialization
             model_instance = model_class(data_model=data.get(sp_name_key), **{"list_scenarios": self.list_scenarios})
             setattr(self, attribute_name, model_instance)
+            self.models_to_use.append(model_instance)
 
             self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=model_instance.STRUCTURE_LIST_ERRORS,
                                     warnings=model_instance.STRUCTURE_LIST_WARNINGS)
             self.report_list.extend(self.TITLES_VERITY[NamesEnum.FC.value], errors=model_instance.DATA_CLEAN_ERRORS,
                                     warnings=model_instance.DATA_CLEAN_WARNINGS)
 
-
             if FLAG is not None:
-                print(f"Initialized model: {attribute_name} = {model_instance}")
+                self.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
+
+        # Process errors and warnings from the data model
+        data_context = DataContext(self.models_to_use)
+
+        # RUN ALL VALIDATIONS
+        desc_validator = SpDescriptionValidator(data_context=data_context, config=self.config, report_list=self.report_list)
 
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
@@ -96,24 +105,28 @@ class ProcessorSpreadsheet:
 
     def _report(self) -> None:
         # Print all reports and their errors
-        COUNT = 2
+        COUNT = 100
         for report in self.report_list:
             if COUNT <= 0:
                 break
-            print(f"Report: {report.name_test}")
-            print(f"  Errors: {len(report.errors)}")
+            self.logger.info(f"Report: {report.name_test}")
+            self.logger.info(f"  Errors: {len(report.errors)}")
             for error in report.errors:
-                print(f"    - {error}")
-            print(f"  Warnings: {len(report.warnings)}")
+                self.logger.info(f"    - {error}")
+            self.logger.info(f"  Warnings: {len(report.warnings)}")
             for warning in report.warnings:
-                print(f"    - {warning}")
-            print()
+                self.logger.info(f"    - {warning}")
+            self.logger.info("---------------------------------------------------------------")
             COUNT -= 1
+
+        # Imprime o número total de erros e avisos
+        total_errors = sum(len(report.errors) for report in self.report_list)
+        total_warnings = sum(len(report.warnings) for report in self.report_list)
+        self.logger.info(f"Total errors: {total_errors}")
+        self.logger.info(f"Total warnings: {total_warnings}")
 
     def run(self):
         self.logger.info("Iniciando processamento...")
         self._configure()
         self._read_data()
         self._report()
-
-

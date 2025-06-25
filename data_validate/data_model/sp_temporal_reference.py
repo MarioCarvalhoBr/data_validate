@@ -49,7 +49,7 @@ class SpTemporalReference(SpModelABC):
         else:
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
             col_symbol = self.REQUIRED_COLUMNS["COLUMN_SYMBOL"]
-            df, errors_symbol = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_symbol], min_value=1)
+            df, errors_symbol = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_symbol], min_value=0)
             self.DATA_CLEAN_ERRORS.extend(errors_symbol)
 
 
