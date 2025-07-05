@@ -1,26 +1,35 @@
 from pathlib import Path
 from types import MappingProxyType
 from typing import List, Dict, Any
+import pandas as pd
 
+from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
 class SpDictionary(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "dicionario",
-        "SP_DESCRIPTION": "O arquivo de dicionário descreve palavras a serem ignoradas durante a verificação ortográfica. Este arquivo deverá conter uma palavra por linha, sem qualquer nome nas colunas. As palavras serão ignoradas somente se estiverem escritas exatamente como no dicionário, diferenciando maiúsculas e minúsculas.",
-    })
-    # Como o arquivo é uma lista de palavras, não há colunas obrigatórias ou opcionais no sentido tradicional.
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_WORD": "palavra",
-    })
-    OPTIONAL_COLUMNS = MappingProxyType({})
-    COLUMNS_PLURAL = MappingProxyType({})
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.SP_NAME = "dicionario"
+            self.SP_DESCRIPTION = "Planilha de dicionario"
+            self._finalize_initialization()
+
+    CONSTANTS = INFO()
+
+    # COLUMN SERIES
+    class RequiredColumn:
+        COLUMN_WORD = pd.Series(dtype="str", name="palavra")
+
+        ALL = [
+            COLUMN_WORD.name,
+        ]
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
-        super().__init__(data_model)
+        super().__init__(data_model, **kwargs)
 
         self.words_to_ignore: List[str] = []
 
@@ -44,10 +53,9 @@ class SpDictionary(SpModelABC):
 
                 self.words_to_ignore = remaining_words
 
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+    def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
-                                                            list(self.REQUIRED_COLUMNS.values()))
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)

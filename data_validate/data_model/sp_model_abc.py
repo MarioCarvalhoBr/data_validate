@@ -37,6 +37,7 @@ class SpModelABC(ABC):
         # CHECK 0: Add COLUMNS
         if not self.DATA_MODEL.df_data.empty:
             self.DF_COLUMNS = list(self.DATA_MODEL.df_data.columns)
+
         # CHECK 1: Vertical Bar Check
         _, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
         self.STRUCTURE_LIST_ERRORS.extend(errors_vertical_bar)

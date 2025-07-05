@@ -1,26 +1,32 @@
 from pathlib import Path
 from types import MappingProxyType
 from typing import List, Dict, Any
+import pandas as pd
 
+from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
-from data_validate.common.utils.validation.column_validation import check_column_names
-from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 from data_validate.common.utils.processing.list_processing import extract_numeric_ids_and_unmatched_strings  # Added
 
 
 class SpValue(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "valores",
-        "SP_DESCRIPTION": "This spreadsheet must contain information about the values associated with specific IDs.",
-    })
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_ID": "id",
-    })
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.SP_NAME = "valores"
+            self.SP_DESCRIPTION = "Planilha de valores"
+            self._finalize_initialization()
 
-    OPTIONAL_COLUMNS = MappingProxyType({})
+    CONSTANTS = INFO()
 
-    COLUMNS_PLURAL = MappingProxyType({})
+    # COLUMN SERIES
+    class RequiredColumn:
+        COLUMN_ID = pd.Series(dtype="int64", name="id")
+
+        ALL = [
+            COLUMN_ID.name,
+        ]
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
@@ -28,13 +34,13 @@ class SpValue(SpModelABC):
         self.run()
 
     def pre_processing(self):
-        self.EXPECTED_COLUMNS = list(self.REQUIRED_COLUMNS.values())
+        self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
 
         __, extras_columns = extract_numeric_ids_and_unmatched_strings(
             source_list=self.DF_COLUMNS,
-            strings_to_ignore=[self.REQUIRED_COLUMNS["COLUMN_ID"]],
+            strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
             scenario_suffixes_for_matching=self.LIST_SCENARIOS
         )
 

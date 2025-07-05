@@ -1,22 +1,37 @@
 from pathlib import Path
 from types import MappingProxyType
 from typing import List, Dict, Any
+import pandas as pd
 
+from common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
 class SpScenario(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "cenarios",
-        "SP_DESCRIPTION": "This spreadsheet must contain information about scenarios, including their names, descriptions, and symbols.",
-    })
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_NAME": "nome",
-        "COLUMN_DESCRIPTION": "descricao",
-        "COLUMN_SYMBOL": "simbolo",
-    })
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.SP_NAME = "cenarios"
+            self.SP_DESCRIPTION = "Planilha de cenarios"
+
+            self._finalize_initialization()
+    CONSTANTS = INFO()
+
+    # COLUMN SERIES
+    class RequiredColumn:
+
+        COLUMN_NAME = pd.Series(dtype="int64", name='nome')
+        COLUMN_DESCRIPTION = pd.Series(dtype="str", name='descricao')
+        COLUMN_SYMBOL = pd.Series(dtype="int64", name='simbolo')
+
+        ALL = [
+            COLUMN_NAME.name,
+            COLUMN_DESCRIPTION.name,
+            COLUMN_SYMBOL.name
+        ]
 
     OPTIONAL_COLUMNS = MappingProxyType({})
 
@@ -33,7 +48,7 @@ class SpScenario(SpModelABC):
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
-                                                            list(self.REQUIRED_COLUMNS.values()))
+                                                            list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)

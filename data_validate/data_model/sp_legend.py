@@ -1,42 +1,52 @@
-from pathlib import Path
-from types import MappingProxyType
 from typing import List, Dict, Any
+import pandas as pd
 
+from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
 class SpLegend(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "legendas",
-        "SP_DESCRIPTION": "Esta planilha deve conter informações sobre as legendas, incluindo seus códigos, rótulos, cores, valores mínimos e máximos, e ordem de exibição.",
-    })
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_CODE": "codigo",
-        "COLUMN_LABEL": "label",
-        "COLUMN_COLOR": "cor",
-        "COLUMN_MINIMUM": "minimo",
-        "COLUMN_MAXIMUM": "maximo",
-        "COLUMN_ORDER": "ordem",
-    })
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.SP_NAME = "legendas"
+            self.SP_DESCRIPTION = "Planilha de legendas"
+            self._finalize_initialization()
 
-    OPTIONAL_COLUMNS = MappingProxyType({})
+    CONSTANTS = INFO()
 
-    COLUMNS_PLURAL = MappingProxyType({})
+    # COLUMN SERIES
+    class RequiredColumn:
+        COLUMN_CODE = pd.Series(dtype="int64", name="codigo")
+        COLUMN_LABEL = pd.Series(dtype="str", name="label")
+        COLUMN_COLOR = pd.Series(dtype="str", name="cor")
+        COLUMN_MINIMUM = pd.Series(dtype="float64", name="minimo")
+        COLUMN_MAXIMUM = pd.Series(dtype="float64", name="maximo")
+        COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
+
+        ALL = [
+            COLUMN_CODE.name,
+            COLUMN_LABEL.name,
+            COLUMN_COLOR.name,
+            COLUMN_MINIMUM.name,
+            COLUMN_MAXIMUM.name,
+            COLUMN_ORDER.name,
+        ]
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
-        super().__init__(data_model)
+        super().__init__(data_model, **kwargs)
 
         self.run()
 
     def pre_processing(self):
         pass
 
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+    def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
-                                                            list(self.REQUIRED_COLUMNS.values()))
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
@@ -46,6 +56,7 @@ class SpLegend(SpModelABC):
         pass
 
     def run(self):
+        self.pre_processing()
         self.expected_structure_columns()
 
 

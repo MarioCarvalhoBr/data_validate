@@ -1,22 +1,31 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from types import MappingProxyType
 from typing import List, Dict, Any
+import pandas as pd
 
+from data_validate.common.base.constant_base import ConstantBase
 from data_validate.common.utils.processing.list_processing import extract_numeric_ids_and_unmatched_strings  # Added
 from data_validate.controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from .sp_model_abc import SpModelABC
 
 
 class SpProportionality(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "proporcionalidades",
-        "SP_DESCRIPTION": "This spreadsheet must contain information about proportionalities associated with specific IDs.",
-    })
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_ID": "id",
-    })
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.SP_NAME = "proporcionalidades"
+            self.SP_DESCRIPTION = "Planilha de proporcionalidades"
+            self._finalize_initialization()
 
-    OPTIONAL_COLUMNS = MappingProxyType({})
+    CONSTANTS = INFO()
+
+    # COLUMN SERIES
+    class RequiredColumn:
+        COLUMN_ID = pd.Series(dtype="int64", name="id")
+
+        ALL = [
+            COLUMN_ID.name,
+        ]
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
@@ -24,7 +33,7 @@ class SpProportionality(SpModelABC):
         self.run()
 
     def pre_processing(self):
-        self.EXPECTED_COLUMNS = list(self.REQUIRED_COLUMNS.values())
+        self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         if self.DATA_MODEL.header_type == "double":
@@ -44,7 +53,7 @@ class SpProportionality(SpModelABC):
             # Check extra columns in level 2 (ignore 'id')
             _, extras_level_2 = extract_numeric_ids_and_unmatched_strings(
                 source_list=colunas_nivel_2,
-                strings_to_ignore=[self.REQUIRED_COLUMNS["COLUMN_ID"]],
+                strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
                 scenario_suffixes_for_matching=self.LIST_SCENARIOS
             )
             for extra_column in extras_level_2:
@@ -65,10 +74,10 @@ class SpProportionality(SpModelABC):
 
 
 if __name__ == '__main__':
-    # Test the SpValues class
+    # Test the SpProportionality class
     input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
     importer = DataImporterFacade(input_dir)
     data = importer.load_all
 
-    sp_values = SpValue(data_model=data[SpValue.INFO["SP_NAME"]])
-    print(sp_values)
+    sp_proportionality = SpProportionality(data_model=data[SpProportionality.INFO["SP_NAME"]])
+    print(sp_proportionality)

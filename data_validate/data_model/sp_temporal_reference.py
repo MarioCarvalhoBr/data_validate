@@ -3,6 +3,9 @@ from time import sleep
 from types import MappingProxyType
 from typing import List, Dict, Any
 
+import pandas as pd
+
+from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
@@ -12,20 +15,29 @@ from .sp_scenario import SpScenario
 
 
 class SpTemporalReference(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "referencia_temporal",
-        "SP_DESCRIPTION": "This spreadsheet must contain information about temporal references, including their names, descriptions, and symbols.",
-    })
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_NAME": "nome",
-        "COLUMN_DESCRIPTION": "descricao",
-        "COLUMN_SYMBOL": "simbolo",
-    })
 
-    OPTIONAL_COLUMNS = MappingProxyType({})
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
 
-    COLUMNS_PLURAL = MappingProxyType({})
+            self.SP_NAME = "referencia_temporal"
+            self.SP_DESCRIPTION = "Planilha de referência temporal"
 
+            self._finalize_initialization()
+
+    CONSTANTS = INFO()
+    # COLUMN SERIES
+    class RequiredColumn:
+        COLUMN_NAME = pd.Series(dtype="int64", name="nome")
+        COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
+        COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
+
+        ALL = [
+            COLUMN_NAME.name,
+            COLUMN_DESCRIPTION.name,
+            COLUMN_SYMBOL.name
+        ]
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
@@ -36,7 +48,7 @@ class SpTemporalReference(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, list(self.REQUIRED_COLUMNS.values()))
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
@@ -48,7 +60,7 @@ class SpTemporalReference(SpModelABC):
             self.DATA_CLEAN_ERRORS.append(f"{self.FILENAME}: A tabela deve ter apenas um valor porque o arquivo '{SpScenario.INFO["SP_NAME"]}' não existe ou está vazio.")
         else:
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
-            col_symbol = self.REQUIRED_COLUMNS["COLUMN_SYMBOL"]
+            col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
             df, errors_symbol = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_symbol], min_value=0)
             self.DATA_CLEAN_ERRORS.extend(errors_symbol)
 

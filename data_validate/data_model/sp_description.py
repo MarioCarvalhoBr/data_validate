@@ -1,8 +1,8 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Dict, Any
-from types import MappingProxyType
+import pandas as pd
 
-from .sp_scenario import SpScenario
+from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from controller.data_importer.api.facade import DataModelImporter, DataImporterFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
@@ -10,34 +10,58 @@ from data_validate.common.utils.formatting.error_formatting import format_errors
 from data_validate.common.utils.processing.data_cleaning import clean_dataframe
 
 class SpDescription(SpModelABC):
-    INFO = MappingProxyType({
-        "SP_NAME": "descricao",
-        "SP_DESCRIPTION": "Esta planilha deve conter informações necessárias para a identificar os índices e indicadores do SE.",
-    })
-    REQUIRED_COLUMNS = MappingProxyType({
-        "COLUMN_CODE": "codigo",
-        "COLUMN_LEVEL": "nivel",
-        "COLUMN_SIMPLE_NAME": "nome_simples",
-        "COLUMN_COMPLETE_NAME": "nome_completo",
-        "COLUMN_SIMPLE_DESC": "desc_simples",
-        "COLUMN_COMPLETE_DESC": "desc_completa",
-        "COLUMN_SOURCES": "fontes",
-        "COLUMN_META": "meta",
-    })
+    # CONSTANTS
+    class INFO(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.SP_NAME = "descricao"
+            self.SP_DESCRIPTION = "Planilha de descricao"
+            self.MAX_TITLE_LENGTH = 40
+            self.MAX_SIMPLE_DESC_LENGTH = 150
+            self.SP_SCENARIO_NAME = "cenarios"
+            self._finalize_initialization()
 
-    REQUIRED_DYNAMIC_COLUMNS = MappingProxyType({
-        "COLUMN_SCENARIO": "cenario",
-    })
-    OPTIONAL_COLUMNS = MappingProxyType({
-        "COLUMN_UNIT": "unidade",
-        "COLUMN_RELATION": "relacao",
-        "COLUMN_ORDER": "ordem",
-    })
+    CONSTANTS = INFO()
 
-    COLUMNS_PLURAL = MappingProxyType({
-        "COLUMN_SIMPLE_NAMES": "nomes_simples",
-        "COLUMN_COMPLETE_NAMES": "nomes_completos",
-    })
+    # COLUMN SERIES
+    class RequiredColumn:
+        COLUMN_CODE = pd.Series(dtype="int64", name="codigo")
+        COLUMN_LEVEL = pd.Series(dtype="int64", name="nivel")
+        COLUMN_SIMPLE_NAME = pd.Series(dtype="str", name="nome_simples")
+        COLUMN_COMPLETE_NAME = pd.Series(dtype="str", name="nome_completo")
+        COLUMN_SIMPLE_DESC = pd.Series(dtype="str", name="desc_simples")
+        COLUMN_COMPLETE_DESC = pd.Series(dtype="str", name="desc_completa")
+        COLUMN_SOURCES = pd.Series(dtype="str", name="fontes")
+        COLUMN_META = pd.Series(dtype="str", name="meta")
+
+        ALL = [
+            COLUMN_CODE.name,
+            COLUMN_LEVEL.name,
+            COLUMN_SIMPLE_NAME.name,
+            COLUMN_COMPLETE_NAME.name,
+            COLUMN_SIMPLE_DESC.name,
+            COLUMN_COMPLETE_DESC.name,
+            COLUMN_SOURCES.name,
+            COLUMN_META.name,
+        ]
+
+    class DynamicColumn:
+        COLUMN_SCENARIO = pd.Series(dtype="int64", name="cenario")
+
+        ALL = [
+            COLUMN_SCENARIO.name,
+        ]
+
+    class OptionalColumn:
+        COLUMN_UNIT = pd.Series(dtype="str", name="unidade")
+        COLUMN_RELATION = pd.Series(dtype="int64", name="relacao")
+        COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
+
+        ALL = [
+            COLUMN_UNIT.name,
+            COLUMN_RELATION.name,
+            COLUMN_ORDER.name,
+        ]
 
     def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
@@ -46,34 +70,34 @@ class SpDescription(SpModelABC):
 
     def pre_processing(self):
         self.color = "yellow"
-        expected_columns = list(self.REQUIRED_COLUMNS.values())
+        expected_columns = list(self.RequiredColumn.ALL)
         # 1. Tratamento de colunas dinâmicas: cenarios
         if not self.LIST_SCENARIOS:
             ## 1.1: Se não houver cenários, remove a coluna de cenário
-            if self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"] in self.DATA_MODEL.df_data.columns:
+            if self.DynamicColumn.COLUMN_SCENARIO.name in self.DATA_MODEL.df_data.columns:
                 self.STRUCTURE_LIST_ERRORS.append(
-                    f"{self.FILENAME}: A coluna '{self.REQUIRED_DYNAMIC_COLUMNS['COLUMN_SCENARIO']}' não pode existir se o arquivo '{SpScenario.INFO['SP_NAME']}' não estiver configurado ou não existir.")
+                    f"{self.FILENAME}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não estiver configurado ou não existir.")
                 self.DATA_MODEL.df_data = self.DATA_MODEL.df_data.drop(
-                    columns=[self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"]])
+                    columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         else:
             # 1.2: Se houver cenários, adiciona a coluna de cenário
-            expected_columns.append(self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"])
+            expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
 
-        # 2. Tratamento de colunas opicionais
+        # 2. Tratamento de colunas opcionais
         # 2.1: Adiciona colunas opcionais: relação
-        if self.OPTIONAL_COLUMNS["COLUMN_RELATION"] not in self.DATA_MODEL.df_data.columns:
-            self.DATA_MODEL.df_data[self.OPTIONAL_COLUMNS["COLUMN_RELATION"]] = 1
+        if self.OptionalColumn.COLUMN_RELATION.name not in self.DATA_MODEL.df_data.columns:
+            self.DATA_MODEL.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
         # 2.2: Adiciona colunas opcionais: unidade
-        if self.OPTIONAL_COLUMNS["COLUMN_UNIT"] not in self.DATA_MODEL.df_data.columns:
-            self.DATA_MODEL.df_data[self.OPTIONAL_COLUMNS["COLUMN_UNIT"]] = ""
+        if self.OptionalColumn.COLUMN_UNIT.name not in self.DATA_MODEL.df_data.columns:
+            self.DATA_MODEL.df_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
 
-        for opt_column_name in self.OPTIONAL_COLUMNS.values():
+        for opt_column_name in self.OptionalColumn.ALL:
             if (opt_column_name in self.DATA_MODEL.df_data.columns) and (opt_column_name not in expected_columns):
                 expected_columns.append(opt_column_name)
 
         self.EXPECTED_COLUMNS = expected_columns
 
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+    def expected_structure_columns(self, *args, **kwargs) -> None:
 
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, self.EXPECTED_COLUMNS)
@@ -85,19 +109,25 @@ class SpDescription(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Limpeza e validação das colunas principais usando clean_dataframe
         # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
-        col_codigo = self.REQUIRED_COLUMNS["COLUMN_CODE"]
-        df, errors_codigo = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_codigo], min_value=1)
+        df, errors_codigo = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [self.RequiredColumn.COLUMN_CODE.name], min_value=1)
         self.DATA_CLEAN_ERRORS.extend(errors_codigo)
+        if self.RequiredColumn.COLUMN_CODE.name in df.columns:
+            self.RequiredColumn.COLUMN_CODE = df[self.RequiredColumn.COLUMN_CODE.name]
 
         # 2. Limpar e validar a coluna 'nivel' (mínimo 1)
-        col_nivel = self.REQUIRED_COLUMNS["COLUMN_LEVEL"]
+        col_nivel = self.RequiredColumn.COLUMN_LEVEL.name
         df, errors_nivel = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_nivel], min_value=1)
         self.DATA_CLEAN_ERRORS.extend(errors_nivel)
+        if col_nivel in df.columns:
+            self.RequiredColumn.COLUMN_LEVEL = df[col_nivel]
 
         # 3. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
-        col_cenario = self.REQUIRED_DYNAMIC_COLUMNS["COLUMN_SCENARIO"]
-        df, errors_cenario = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_cenario], min_value=-1)
-        self.DATA_CLEAN_ERRORS.extend(errors_cenario)
+        if self.LIST_SCENARIOS:
+            col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
+            df, errors_cenario = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_cenario], min_value=-1)
+            if col_cenario in df.columns:
+                self.DynamicColumn.COLUMN_SCENARIO = df[col_cenario]
+            self.DATA_CLEAN_ERRORS.extend(errors_cenario)
 
     def run(self):
         self.pre_processing()

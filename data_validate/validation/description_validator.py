@@ -31,52 +31,40 @@ class SpDescriptionValidator:
 
         self.run_all_validations()
 
-    def run_all_validations(self) -> Tuple[List[str], List[str]]:
-        """Runs all content validations for SpDescription."""
-        if self.df_description.empty:
-            return self.errors, self.warnings
-
-        validations = [
-            (self._validate_html_in_descriptions, NamesEnum.HTML_DESC.value),
-            (self._validate_sequential_codes, NamesEnum.SC.value),
-            (self._validate_unique_codes, NamesEnum.CU.value),
-            (self._validate_text_capitalization, NamesEnum.INP.value),
-            (self._validate_indicator_levels, NamesEnum.IL.value),
-            (self._validate_punctuation, NamesEnum.MAND_PUNC_DESC.value),
-            (self._validate_empty_strings, NamesEnum.EF.value),
-            (self._validate_cr_lf_characters, NamesEnum.LB_DESC.value),
-            (self._validate_title_length, NamesEnum.TITLES_N.value),
-            (self._validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
-        ]
-
-        for func, report_key in validations:
-            errors, warnings = func()
-            if errors or warnings:
-                self.report_list.extend(self.TITLES_VERITY[report_key], errors=errors, warnings=warnings)
-            self.errors.extend(errors)
-            self.warnings.extend(warnings)
-
-        return self.errors, self.warnings
-
-    def _column_exists(self, column: str) -> Tuple[bool, List[str]]:
+    def _column_exists(self, column: str) -> Tuple[bool, str]:
         if column not in self.df_description.columns:
             return False, f"{self.filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
-        return True, []
+        return True, ""
 
-    def _validate_html_in_descriptions(self) -> Tuple[List[str], List[str]]:
+    def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:
+        """Helper function to validate text length in a column."""
         warnings = []
-        column = SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_DESC"]
+        exists_column, msg_error_column = self._column_exists(column)
+        if not exists_column:
+            return [msg_error_column], []
+        for index, row in self.df_description.iterrows():
+            text = str(row[column])
+            if pd.isna(text):
+                continue
+            if len(text) > max_len:
+                warnings.append(f'{self.filename}, linha {index + 2}: O texto da coluna "{column}" excede o limite de {max_len} caracteres (encontrado: {len(text)}).')
+        return [], warnings
+
+    def validate_html_in_descriptions(self) -> Tuple[List[str], List[str]]:
+        warnings = []
+        column = SpDescription.RequiredColumn.COLUMN_SIMPLE_DESC.name
         exists_column, msg_error_column = self._column_exists(column)
         if not exists_column:
             return [msg_error_column], []
         for index, row in self.df_description.iterrows():
             if re.search('<.*?>', str(row[column])):
+                index = int(str(index))
                 warnings.append(f"{self.filename}, linha {index + 2}: Coluna '{column}' não pode conter código HTML.")
         return [], warnings
 
-    def _validate_sequential_codes(self) -> Tuple[List[str], List[str]]:
+    def validate_sequential_codes(self) -> Tuple[List[str], List[str]]:
         errors = []
-        column = SpDescription.REQUIRED_COLUMNS["COLUMN_CODE"]
+        column = SpDescription.RequiredColumn.COLUMN_CODE.name
         exists_column, msg_error_column = self._column_exists(column)
         if not exists_column:
             return [msg_error_column], []
@@ -92,9 +80,9 @@ class SpDescriptionValidator:
             errors.append(f"{self.filename}: A coluna '{column}' deve conter valores inteiros e sequenciais.")
         return errors, []
 
-    def _validate_unique_codes(self) -> Tuple[List[str], List[str]]:
+    def validate_unique_codes(self) -> Tuple[List[str], List[str]]:
         errors = []
-        column = SpDescription.REQUIRED_COLUMNS["COLUMN_CODE"]
+        column = SpDescription.RequiredColumn.COLUMN_CODE.name
         exists_column, msg_error_column = self._column_exists(column)
         if not exists_column:
             return [msg_error_column], []
@@ -104,11 +92,11 @@ class SpDescriptionValidator:
             errors.append(f"{self.filename}: A coluna '{column}' contém códigos duplicados: {duplicated_codes}.")
         return errors, []
 
-    def _validate_text_capitalization(self) -> Tuple[List[str], List[str]]:
+    def validate_text_capitalization(self) -> Tuple[List[str], List[str]]:
         warnings = []
         columns_to_check = [
-            SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_NAME"],
-            SpDescription.REQUIRED_COLUMNS["COLUMN_COMPLETE_NAME"]
+            SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
+            SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name
         ]
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
@@ -125,9 +113,9 @@ class SpDescriptionValidator:
                     warnings.append(f"{self.filename}, linha {index + 2}: Coluna '{column}' fora do padrão. Esperado: '{corrected_text}'. Encontrado: '{original_text}'.")
         return [], warnings
 
-    def _validate_indicator_levels(self) -> Tuple[List[str], List[str]]:
+    def validate_indicator_levels(self) -> Tuple[List[str], List[str]]:
         errors = []
-        column = SpDescription.REQUIRED_COLUMNS["COLUMN_LEVEL"]
+        column = SpDescription.RequiredColumn.COLUMN_LEVEL.name
         exists_column, msg_error_column = self._column_exists(column)
         if not exists_column:
             return [msg_error_column], []
@@ -139,10 +127,10 @@ class SpDescriptionValidator:
                 errors.append(f"{self.filename}, linha {line_updated}: O nível do indicador na coluna '{column}' deve ser um número inteiro maior que 0.")
         return errors, []
 
-    def _validate_punctuation(self) -> Tuple[List[str], List[str]]:
+    def validate_punctuation(self) -> Tuple[List[str], List[str]]:
         warnings = []
-        columns_dont_punctuation = [SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_NAME"], SpDescription.REQUIRED_COLUMNS["COLUMN_COMPLETE_NAME"]]
-        columns_must_end_with_dot = [SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_DESC"], SpDescription.REQUIRED_COLUMNS["COLUMN_COMPLETE_DESC"]]
+        columns_dont_punctuation = [SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name, SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name]
+        columns_must_end_with_dot = [SpDescription.RequiredColumn.COLUMN_SIMPLE_DESC.name, SpDescription.RequiredColumn.COLUMN_COMPLETE_DESC.name]
 
         for column in list(columns_dont_punctuation + columns_must_end_with_dot):
             exists_column, msg_error_column = self._column_exists(column)
@@ -153,9 +141,9 @@ class SpDescriptionValidator:
         warnings.extend(punctuation_warnings)
         return [], warnings
 
-    def _validate_empty_strings(self) -> Tuple[List[str], List[str]]:
+    def validate_empty_strings(self) -> Tuple[List[str], List[str]]:
         errors = []
-        columns_to_check = list(SpDescription.REQUIRED_COLUMNS.values())
+        columns_to_check = list(SpDescription.RequiredColumn.ALL)
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
             if not exists_column:
@@ -167,11 +155,11 @@ class SpDescriptionValidator:
                     errors.append(f"{self.filename}, linha {index + 2}: Nenhum item da coluna '{column}' pode ser vazio.")
         return errors, []
 
-    def _validate_cr_lf_characters(self) -> Tuple[List[str], List[str]]:
+    def validate_cr_lf_characters(self) -> Tuple[List[str], List[str]]:
         warnings = []
         columns_to_check = [
-            SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_NAME"],
-            SpDescription.REQUIRED_COLUMNS["COLUMN_COMPLETE_NAME"]
+            SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
+            SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name
         ]
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
@@ -188,32 +176,43 @@ class SpDescriptionValidator:
                     warnings.append(f"{self.filename}, linha {index + 2}: O texto na coluna '{column}' contém caracteres de nova linha (CR/LF) inválidos.")
         return [], warnings
 
-    def _validate_title_length(self) -> Tuple[List[str], List[str]]:
-        warnings = []
-        column = SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_NAME"]
-        max_len = SpDescription.INFO.get("MAX_TITLE_LENGTH", 80)
-        exists_column, msg_error_column = self._column_exists(column)
-        if not exists_column:
-            return [msg_error_column], []
-        for index, row in self.df_description.iterrows():
-            text = str(row[column])
-            if pd.isna(text):
-                continue
-            if len(text) > max_len:
-                warnings.append(f'{self.filename}, linha {index + 2}: O título em "{column}" excede o limite de {max_len} caracteres (encontrado: {len(text)}).')
-        return [], warnings
 
-    def _validate_simple_description_length(self) -> Tuple[List[str], List[str]]:
-        warnings = []
-        column = SpDescription.REQUIRED_COLUMNS["COLUMN_SIMPLE_DESC"]
-        max_len = SpDescription.INFO.get("MAX_SIMPLE_DESC_LENGTH", 200)
-        exists_column, msg_error_column = self._column_exists(column)
-        if not exists_column:
-            return [msg_error_column], []
-        for index, row in self.df_description.iterrows():
-            text = str(row[column])
-            if pd.isna(text):
-                continue
-            if len(text) > max_len:
-                warnings.append(f'{self.filename}, linha {index + 2}: A descrição em "{column}" excede o limite de {max_len} caracteres (encontrado: {len(text)}).')
-        return [], warnings
+    def validate_title_length(self) -> Tuple[List[str], List[str]]:
+        """Validate the length of titles."""
+        column = SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name
+        max_len = SpDescription.CONSTANTS.MAX_TITLE_LENGTH
+        return self._check_text_length(column, max_len)
+
+    def validate_simple_description_length(self) -> Tuple[List[str], List[str]]:
+        """Validate the length of simple descriptions."""
+        column = SpDescription.RequiredColumn.COLUMN_SIMPLE_DESC.name
+        max_len = SpDescription.CONSTANTS.MAX_SIMPLE_DESC_LENGTH
+        return self._check_text_length(column, max_len)
+
+    def run_all_validations(self) -> Tuple[List[str], List[str]]:
+        """Runs all content validations for SpDescription."""
+        if self.df_description.empty:
+            return self.errors, self.warnings
+
+        validations = [
+            (self.validate_html_in_descriptions, NamesEnum.HTML_DESC.value),
+            (self.validate_sequential_codes, NamesEnum.SC.value),
+            (self.validate_unique_codes, NamesEnum.CU.value),
+            (self.validate_text_capitalization, NamesEnum.INP.value),
+            (self.validate_indicator_levels, NamesEnum.IL.value),
+
+            (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value),
+            (self.validate_empty_strings, NamesEnum.EF.value),
+            (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value),
+            (self.validate_title_length, NamesEnum.TITLES_N.value),
+            (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
+        ]
+
+        for func, report_key in validations:
+            errors, warnings = func()
+            if errors or warnings:
+                self.report_list.extend(self.TITLES_VERITY[report_key], errors=errors, warnings=warnings)
+            self.errors.extend(errors)
+            self.warnings.extend(warnings)
+
+        return self.errors, self.warnings

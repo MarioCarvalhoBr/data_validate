@@ -59,22 +59,22 @@ class ProcessorSpreadsheet:
         # APPEND ERRORS TO REPORT LIST
         self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=errors_data_importer)
 
-
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
         self.structure_validator = ValidatorStructureFiles(self.input_folder, self.fs_utils)
 
         # 1.1 GENERAL STRUCTURE VALIDATION ERRORS: Errors from the general structure validation
         errors_structure_general = self.structure_validator.validate()
         self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=errors_structure_general)
+        constants = SpScenario.CONSTANTS
 
-        if not data[SpScenario.INFO["SP_NAME"]].df_data.empty:
-            if SpScenario.REQUIRED_COLUMNS["COLUMN_SYMBOL"] in data[SpScenario.INFO["SP_NAME"]].df_data.columns:
-                self.list_scenarios = data[SpScenario.INFO["SP_NAME"]].df_data[
-                    SpScenario.REQUIRED_COLUMNS["COLUMN_SYMBOL"]].tolist()
+        if not data[SpScenario.CONSTANTS.SP_NAME].df_data.empty:
+            if SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns:
+                self.list_scenarios = data[SpScenario.CONSTANTS.SP_NAME].df_data[
+                    SpScenario.RequiredColumn.COLUMN_SYMBOL.name].tolist()
 
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.classes_to_initialize:
-            sp_name_key = model_class.INFO["SP_NAME"]
+            sp_name_key = model_class.CONSTANTS.SP_NAME
 
             # Dynamically create the attribute name, e.g., "sp_description"
             attribute_name = f"sp_{sp_name_key.lower()}"
@@ -96,7 +96,8 @@ class ProcessorSpreadsheet:
         data_context = DataContext(self.models_to_use)
 
         # RUN ALL VALIDATIONS
-        desc_validator = SpDescriptionValidator(data_context=data_context, config=self.config, report_list=self.report_list)
+        desc_validator = SpDescriptionValidator(data_context=data_context, config=self.config,
+                                                report_list=self.report_list)
 
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
@@ -105,25 +106,21 @@ class ProcessorSpreadsheet:
 
     def _report(self) -> None:
         # Print all reports and their errors
-        COUNT = 100
         for report in self.report_list:
-            if COUNT <= 0:
-                break
-            self.logger.info(f"Report: {report.name_test}")
-            self.logger.info(f"  Errors: {len(report.errors)}")
+            print(f"Report: {report.name_test}")
+            print(f"  Errors: {len(report.errors)}")
             for error in report.errors:
-                self.logger.info(f"    - {error}")
-            self.logger.info(f"  Warnings: {len(report.warnings)}")
+                print(f"    - {error}")
+            print(f"  Warnings: {len(report.warnings)}")
             for warning in report.warnings:
-                self.logger.info(f"    - {warning}")
-            self.logger.info("---------------------------------------------------------------")
-            COUNT -= 1
+                print(f"    - {warning}")
+            print("---------------------------------------------------------------")
 
         # Imprime o número total de erros e avisos
         total_errors = sum(len(report.errors) for report in self.report_list)
         total_warnings = sum(len(report.warnings) for report in self.report_list)
-        self.logger.info(f"Total errors: {total_errors}")
-        self.logger.info(f"Total warnings: {total_warnings}")
+        self.logger.error(f"Total errors: {total_errors}")
+        self.logger.warning(f"Total warnings: {total_warnings}")
 
     def run(self):
         self.logger.info("Iniciando processamento...")
