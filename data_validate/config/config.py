@@ -8,7 +8,7 @@ class NamesEnum(Enum):
     IR = "verification_name_indicator_relations"
     TH = "verification_name_tree_hierarchy"
     IL = "verification_name_indicator_levels"
-    CU = "verification_name_code_uniqueness"
+    CO_UN = "verification_name_code_uniqueness"
     HTML_DESC = "verification_name_html_codes_in_descriptions"
     SPELL = "verification_name_spelling"
     UT = "verification_name_unique_titles"

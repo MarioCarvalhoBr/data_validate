@@ -11,7 +11,6 @@ from controller.data_importer.api.facade import DataModelImporter, DataImporterF
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 from data_validate.common.utils.processing.data_cleaning import clean_dataframe
-from .sp_scenario import SpScenario
 
 
 class SpTemporalReference(SpModelABC):
@@ -23,7 +22,7 @@ class SpTemporalReference(SpModelABC):
 
             self.SP_NAME = "referencia_temporal"
             self.SP_DESCRIPTION = "Planilha de referência temporal"
-
+            self.SP_SCENARIO_NAME = "cenarios"
             self._finalize_initialization()
 
     CONSTANTS = INFO()
@@ -57,7 +56,7 @@ class SpTemporalReference(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Verify if the scenario file exists: Verifica se self.LIST_SCENARIOS: está vazio
         if (not self.LIST_SCENARIOS) and (len(self.DATA_MODEL.df_data) != 1):
-            self.DATA_CLEAN_ERRORS.append(f"{self.FILENAME}: A tabela deve ter apenas um valor porque o arquivo '{SpScenario.INFO["SP_NAME"]}' não existe ou está vazio.")
+            self.DATA_CLEAN_ERRORS.append(f"{self.FILENAME}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
         else:
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name

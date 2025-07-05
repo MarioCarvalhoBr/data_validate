@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from types import MappingProxyType
 from typing import List, Dict, Any
 
-
 from data_validate.controller.data_importer.api.facade import DataModelImporter
 from data_validate.common.utils.validation.data_validation import check_vertical_bar, check_unnamed_columns
 

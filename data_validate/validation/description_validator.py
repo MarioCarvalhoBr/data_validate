@@ -64,20 +64,30 @@ class SpDescriptionValidator:
 
     def validate_sequential_codes(self) -> Tuple[List[str], List[str]]:
         errors = []
+
+        # 0. Check if the column exists
         column = SpDescription.RequiredColumn.COLUMN_CODE.name
         exists_column, msg_error_column = self._column_exists(column)
         if not exists_column:
             return [msg_error_column], []
 
-        codes = pd.to_numeric(self.df_description[column], errors='coerce')
-        if codes.isnull().any():
+        # Load the original codes and cleaned codes
+        original_codes = pd.to_numeric(self.df_description[column], errors='coerce')
+        codes_cleaned = self.sp_model.RequiredColumn.COLUMN_CODE
+
+        # 1. Check if the column has only integers
+        if original_codes.size != codes_cleaned.size:
             errors.append(f"{self.filename}: A verificação foi abortada porque a coluna '{column}' contém valores não numéricos.")
             return errors, []
-        codes = codes.dropna().astype(int)
-        if codes.iloc[0] != 1:
+
+        # 2. Check if the first code is 1
+        if codes_cleaned.at[0] != 1:
             errors.append(f"{self.filename}: A coluna '{column}' deve começar em 1.")
-        if codes.tolist() != list(range(codes.iloc[0], codes.iloc[-1] + 1)):
-            errors.append(f"{self.filename}: A coluna '{column}' deve conter valores inteiros e sequenciais.")
+
+        # 3. Check if the codes are sequential and starting from 1
+        if not codes_cleaned.equals(pd.Series(range(1, len(codes_cleaned) + 1))):
+            errors.append(f"{self.filename}: A coluna '{column}' deve conter valores inteiros e sequenciais (1, 2, 3, ...).")
+
         return errors, []
 
     def validate_unique_codes(self) -> Tuple[List[str], List[str]]:
@@ -87,9 +97,12 @@ class SpDescriptionValidator:
         if not exists_column:
             return [msg_error_column], []
 
-        duplicated_codes = self.df_description[self.df_description[column].duplicated()][column].tolist()
+        codes_cleaned = self.sp_model.RequiredColumn.COLUMN_CODE
+        duplicated_codes = codes_cleaned[codes_cleaned.duplicated()].tolist()
+
         if duplicated_codes:
             errors.append(f"{self.filename}: A coluna '{column}' contém códigos duplicados: {duplicated_codes}.")
+
         return errors, []
 
     def validate_text_capitalization(self) -> Tuple[List[str], List[str]]:
@@ -103,14 +116,20 @@ class SpDescriptionValidator:
             if not exists_column:
                 warnings.append(msg_error_column)
                 continue
+
             for index, row in self.df_description.iterrows():
-                text = row[column]
-                if pd.isna(text) or text == "":
+                if pd.isna(row[column]) or row[column] == "":
                     continue
-                original_text = str(text).replace('\r', '<CR>').replace('\n', '<LF>')
-                corrected_text = capitalize_text_keep_acronyms(str(text).strip())
-                if original_text != corrected_text:
-                    warnings.append(f"{self.filename}, linha {index + 2}: Coluna '{column}' fora do padrão. Esperado: '{corrected_text}'. Encontrado: '{original_text}'.")
+                text = str(row[column])
+
+                original_text = text.replace('\r', '<CR>').replace('\n', '<LF>')
+                original_text = original_text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
+
+                expected_corect_text = text.replace('\x0D', '').replace('\x0A', '').strip()
+                expected_corect_text = capitalize_text_keep_acronyms(expected_corect_text.strip())
+
+                if original_text != expected_corect_text:
+                    warnings.append(f"{self.filename}, linha {index + 2}: Valor da coluna '{column}' fora do padrão. Esperado: '{expected_corect_text}'. Encontrado: '{original_text}'.")
         return [], warnings
 
     def validate_indicator_levels(self) -> Tuple[List[str], List[str]]:
@@ -195,10 +214,10 @@ class SpDescriptionValidator:
             return self.errors, self.warnings
 
         validations = [
-            (self.validate_html_in_descriptions, NamesEnum.HTML_DESC.value),
-            (self.validate_sequential_codes, NamesEnum.SC.value),
-            (self.validate_unique_codes, NamesEnum.CU.value),
-            (self.validate_text_capitalization, NamesEnum.INP.value),
+            (self.validate_html_in_descriptions, NamesEnum.HTML_DESC.value), # COMPLETE
+            (self.validate_sequential_codes, NamesEnum.SC.value), # COMPLETE
+            (self.validate_unique_codes, NamesEnum.CO_UN.value), # COMPLETE
+            (self.validate_text_capitalization, NamesEnum.INP.value), # COMPLETE
             (self.validate_indicator_levels, NamesEnum.IL.value),
 
             (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value),
