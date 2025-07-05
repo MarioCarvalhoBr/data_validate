@@ -1,6 +1,6 @@
 import pandas as pd
 import math
-from typing import Tuple, List, Any
+from typing import Tuple, Any
 
 
 def is_nan(value: Any) -> bool:

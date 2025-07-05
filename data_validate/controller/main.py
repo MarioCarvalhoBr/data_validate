@@ -5,7 +5,6 @@
 """
 Script de teste para o diretório dado.
 """
-import pandas as pd
 from data_importer.api.facade import DataImporterFacade, DataModelImporter
 
 

@@ -1,6 +1,5 @@
 import pandas as pd
-import math
-from typing import Tuple, List, Any
+from typing import Tuple, List
 from data_validate.common.utils.formatting.number_formatting import check_cell
 
 

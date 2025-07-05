@@ -1,5 +1,4 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-import os
 from typing import List, Any
 from typing import Type, Optional
 from data_model.sp_model_abc import SpModelABC
@@ -26,7 +25,6 @@ class DataContext:
     # file: data_validate/validation/data_context.py
 
     # file: data_validate/validation/data_context.py
-    from typing import Type, Optional
 
     def get_instance_of(self, model_class: Type[SpModelABC]) -> Optional[SpModelABC]:
         """

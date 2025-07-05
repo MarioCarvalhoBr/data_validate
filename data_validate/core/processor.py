@@ -1,9 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from logging import Logger
-from types import MappingProxyType
-from typing import List
 
-import pandas as pd
 
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config, NamesEnum
@@ -15,7 +12,7 @@ from data_model import (
 from validation.description_validator import SpDescriptionValidator
 from validation.validator_structure import ValidatorStructureFiles
 from validation.data_context import DataContext
-from .report import Report, ReportList
+from .report import ReportList
 
 FLAG = None
 
@@ -65,7 +62,6 @@ class ProcessorSpreadsheet:
         # 1.1 GENERAL STRUCTURE VALIDATION ERRORS: Errors from the general structure validation
         errors_structure_general = self.structure_validator.validate()
         self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=errors_structure_general)
-        constants = SpScenario.CONSTANTS
 
         if not data[SpScenario.CONSTANTS.SP_NAME].df_data.empty:
             if SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns:
@@ -95,9 +91,8 @@ class ProcessorSpreadsheet:
         # Process errors and warnings from the data model
         data_context = DataContext(self.models_to_use)
 
-        # RUN ALL VALIDATIONS
-        desc_validator = SpDescriptionValidator(data_context=data_context, config=self.config,
-                                                report_list=self.report_list)
+        # RUN ALL VALIDATIONS PIPELINE
+        SpDescriptionValidator(data_context=data_context, config=self.config, report_list=self.report_list)
 
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente

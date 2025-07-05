@@ -8,7 +8,6 @@ Escaneia diretório de entrada e valida existência de arquivos.
 
 from pathlib import Path
 from ..common.config import Config
-from ..common.exceptions import MissingFileError
 
 class FileScanner:
     def __init__(self, directory: Path):

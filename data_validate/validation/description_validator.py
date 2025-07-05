@@ -8,6 +8,7 @@ from core.report import ReportList
 from data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation
+from data_validate.common.utils.formatting.number_formatting import check_cell
 from validation.data_context import DataContext
 
 
@@ -111,25 +112,42 @@ class SpDescriptionValidator:
             SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
             SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name
         ]
+
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
             if not exists_column:
                 warnings.append(msg_error_column)
                 continue
 
-            for index, row in self.df_description.iterrows():
-                if pd.isna(row[column]) or row[column] == "":
-                    continue
-                text = str(row[column])
+            # Filter non-empty values
+            mask = self.df_description[column].notna() & (self.df_description[column] != "")
+            filtered_data = self.df_description[mask]
 
-                original_text = text.replace('\r', '<CR>').replace('\n', '<LF>')
-                original_text = original_text.replace('\x0D', '<CR>').replace('\x0A', '<LF>')
+            if not filtered_data.empty:
+                # Process original text with all replacements
+                original_series = (filtered_data[column].astype(str)
+                                   .str.replace('\r', '<CR>')
+                                   .str.replace('\n', '<LF>')
+                                   .str.replace('\x0D', '<CR>')
+                                   .str.replace('\x0A', '<LF>'))
 
-                expected_corect_text = text.replace('\x0D', '').replace('\x0A', '').strip()
-                expected_corect_text = capitalize_text_keep_acronyms(expected_corect_text.strip())
+                # Process expected correct text with all replacements and capitalization
+                expected_series = (filtered_data[column].astype(str)
+                                   .str.replace('\x0D', '')
+                                   .str.replace('\x0A', '')
+                                   .str.strip()
+                                   .apply(lambda x: capitalize_text_keep_acronyms(x.strip())))
 
-                if original_text != expected_corect_text:
-                    warnings.append(f"{self.filename}, linha {index + 2}: Valor da coluna '{column}' fora do padrão. Esperado: '{expected_corect_text}'. Encontrado: '{original_text}'.")
+                # Find mismatches
+                mismatches_mask = original_series != expected_series
+                mismatches_indices = original_series[mismatches_mask].index
+
+                for idx in mismatches_indices:
+                    original_text = original_series.loc[idx]
+                    expected_text = expected_series.loc[idx]
+                    warnings.append(
+                        f"{self.filename}, linha {idx + 2}: Valor da coluna '{column}' fora do padrão. Esperado: '{expected_text}'. Encontrado: '{original_text}'.")
+
         return [], warnings
 
     def validate_indicator_levels(self) -> Tuple[List[str], List[str]]:
@@ -140,8 +158,9 @@ class SpDescriptionValidator:
             return [msg_error_column], []
 
         for index, row in self.df_description.iterrows():
-            level = pd.to_numeric(row[column], errors='coerce')
-            if pd.isna(level) or level < 1 or int(level) != level:
+            level = row[column]
+            is_valid, __ = check_cell(level, min_value=1)
+            if not is_valid:
                 line_updated = int(index) + 2
                 errors.append(f"{self.filename}, linha {line_updated}: O nível do indicador na coluna '{column}' deve ser um número inteiro maior que 0.")
         return errors, []
@@ -218,7 +237,7 @@ class SpDescriptionValidator:
             (self.validate_sequential_codes, NamesEnum.SC.value), # COMPLETE
             (self.validate_unique_codes, NamesEnum.CO_UN.value), # COMPLETE
             (self.validate_text_capitalization, NamesEnum.INP.value), # COMPLETE
-            (self.validate_indicator_levels, NamesEnum.IL.value),
+            (self.validate_indicator_levels, NamesEnum.IL.value), # COMPLETE
 
             (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value),
             (self.validate_empty_strings, NamesEnum.EF.value),
