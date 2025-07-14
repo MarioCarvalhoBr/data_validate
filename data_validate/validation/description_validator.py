@@ -181,7 +181,13 @@ class SpDescriptionValidator:
 
     def validate_empty_strings(self) -> Tuple[List[str], List[str]]:
         errors = []
-        columns_to_check = list(SpDescription.RequiredColumn.ALL)
+
+        columns_to_check = [
+            SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
+            SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name,
+            SpDescription.RequiredColumn.COLUMN_SIMPLE_DESC.name,
+            SpDescription.RequiredColumn.COLUMN_COMPLETE_DESC.name
+        ]
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
             if not exists_column:
@@ -240,7 +246,7 @@ class SpDescriptionValidator:
             (self.validate_indicator_levels, NamesEnum.IL.value), # COMPLETE
 
             (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value), # COMPLETE
-            (self.validate_empty_strings, NamesEnum.EF.value),
+            (self.validate_empty_strings, NamesEnum.EF.value), # COMPLETE
             (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value),
             (self.validate_title_length, NamesEnum.TITLES_N.value),
             (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
