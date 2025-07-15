@@ -252,7 +252,7 @@ class SpDescriptionValidator:
             (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value), # COMPLETE
             (self.validate_empty_strings, NamesEnum.EF.value), # COMPLETE
             (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value), # COMPLETE
-            (self.validate_title_length, NamesEnum.TITLES_N.value),
+            (self.validate_title_length, NamesEnum.TITLES_N.value), # COMPLETE
             (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
         ]
 
