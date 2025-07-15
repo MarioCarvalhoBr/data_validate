@@ -256,9 +256,9 @@ class SpDescriptionValidator:
             (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value),
             (self.validate_empty_strings, NamesEnum.EF.value),
             (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value),
-
             (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
         ]
+        # Add title length validation if the flag is not set to skip it
         if not self.data_context.data_args.data_action.no_warning_titles_length:
             validations.append((self.validate_title_length, NamesEnum.TITLES_N.value))
 

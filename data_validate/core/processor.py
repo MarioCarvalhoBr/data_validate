@@ -36,16 +36,16 @@ class ProcessorSpreadsheet:
         # SETUP CONFIGURE VARIABLES
         self.input_folder = data_args.data_file.input_folder
         self.output_folder = data_args.data_file.output_folder
-        self.list_scenarios = []
-        self.data_context: DataContext = DataContext(None, None, None, None)
-        self.report_list = ReportList()
-        self.models_to_use = []
 
-        # Data Model Initialization
+        self.list_scenarios = []
+        self.models_to_use = []
         self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
             SpProportionality, SpScenario, SpLegend, SpDictionary
         ]
+
+        self.data_context: DataContext = DataContext(None, None, None, None)
+        self.report_list = ReportList()
 
         # Running the main processing function
         self.run()
@@ -89,9 +89,6 @@ class ProcessorSpreadsheet:
             if FLAG is not None:
                 self.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
 
-        # Create the DataContext with the initialized models
-        self.data_context = DataContext(models_to_use=self.models_to_use, config=self.config, fs_utils=self.fs_utils, data_args=self.data_args)
-
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
         for name in NamesEnum:
@@ -119,6 +116,10 @@ class ProcessorSpreadsheet:
         Build the validation pipeline by initializing the data context and running the validations.
         """
         self.logger.info("Building validation pipeline...")
+
+        # Create the DataContext with the initialized models
+        self.data_context = DataContext(models_to_use=self.models_to_use, config=self.config, fs_utils=self.fs_utils, data_args=self.data_args)
+
         # RUN ALL VALIDATIONS PIPELINE
         SpDescriptionValidator(data_context=self.data_context, report_list=self.report_list)
 
