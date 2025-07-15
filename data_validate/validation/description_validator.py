@@ -1,13 +1,14 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import re
-import pandas as pd
+from collections import OrderedDict
 from typing import List, Tuple
+import pandas as pd
 
 from config.config import Config, NamesEnum
 from core.report import ReportList
 from data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
-from data_validate.common.utils.validation.data_validation import check_punctuation
+from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf
 from data_validate.common.utils.formatting.number_formatting import check_cell
 from validation.data_context import DataContext
 
@@ -201,25 +202,28 @@ class SpDescriptionValidator:
 
     def validate_cr_lf_characters(self) -> Tuple[List[str], List[str]]:
         warnings = []
-        columns_to_check = [
+
+        columns_start_end = self.sp_model.EXPECTED_COLUMNS
+        columns_anywhere = [
             SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
-            SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name
+            SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name,
         ]
+
+        # Create an ordered dictionary with the columns
+        columns_to_check = list(OrderedDict.fromkeys(columns_anywhere + columns_start_end).keys())
+
+        # Check if the columns exist
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
             if not exists_column:
                 warnings.append(msg_error_column)
                 continue
-            for index, row in self.df_description.iterrows():
-                text = str(row[column])
-                if pd.isna(text) or text == "":
-                    continue
-                if text.strip() != text:
-                    warnings.append(f"{self.filename}, linha {index + 2}: O texto na coluna '{column}' possui espaços em branco no início ou no fim.")
-                if '\r' in text or '\n' in text:
-                    warnings.append(f"{self.filename}, linha {index + 2}: O texto na coluna '{column}' contém caracteres de nova linha (CR/LF) inválidos.")
-        return [], warnings
 
+        # Run the checks for CR/LF characters
+        __, all_warnings_cr_lf = check_special_characters_cr_lf(self.df_description, self.filename, columns_start_end, columns_anywhere)
+
+        warnings.extend(all_warnings_cr_lf)
+        return [], warnings
 
     def validate_title_length(self) -> Tuple[List[str], List[str]]:
         """Validate the length of titles."""
@@ -247,7 +251,7 @@ class SpDescriptionValidator:
 
             (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value), # COMPLETE
             (self.validate_empty_strings, NamesEnum.EF.value), # COMPLETE
-            (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value),
+            (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value), # COMPLETE
             (self.validate_title_length, NamesEnum.TITLES_N.value),
             (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
         ]
