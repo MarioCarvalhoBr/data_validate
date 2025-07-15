@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from logging import Logger
 
-
+from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config, NamesEnum
 from controller import DataImporterFacade
@@ -22,29 +22,30 @@ class ProcessorSpreadsheet:
     Classe principal para processar as planilhas, validar dados e gerar relatórios.
     """
 
-    def __init__(self, input_folder: str, output_folder: str, logger: Logger, fs_utils: FileSystemUtils):
-        # Configure variables
-        self.input_folder = input_folder
-        self.output_folder = output_folder
+    def __init__(self, data_args: DataArgs, logger: Logger, fs_utils: FileSystemUtils):
+        # SETUP
+        self.data_args = data_args
         self.logger = logger
         self.fs_utils = fs_utils
-        self.language_manager = fs_utils.locale_manager
 
+        # UNPACKING DATA ARGS
+        self.language_manager = fs_utils.locale_manager
         self.config = Config(self.language_manager)
         self.TITLES_VERITY = self.config.get_verify_names()
 
+        # SETUP CONFIGURE VARIABLES
+        self.input_folder = data_args.data_file.input_folder
+        self.output_folder = data_args.data_file.output_folder
         self.list_scenarios = []
-
-        # Lista de reportes: inicializa com um dicionário vazio
+        self.data_context: DataContext = DataContext(None, None, None, None)
         self.report_list = ReportList()
+        self.models_to_use = []
 
         # Data Model Initialization
-        # CONFIGURE
         self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
             SpProportionality, SpScenario, SpLegend, SpDictionary
         ]
-        self.models_to_use = []
 
         # Running the main processing function
         self.run()
@@ -88,11 +89,8 @@ class ProcessorSpreadsheet:
             if FLAG is not None:
                 self.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
 
-        # Process errors and warnings from the data model
-        data_context = DataContext(self.models_to_use)
-
-        # RUN ALL VALIDATIONS PIPELINE
-        SpDescriptionValidator(data_context=data_context, config=self.config, report_list=self.report_list)
+        # Create the DataContext with the initialized models
+        self.data_context = DataContext(models_to_use=self.models_to_use, config=self.config, fs_utils=self.fs_utils, data_args=self.data_args)
 
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
@@ -116,9 +114,17 @@ class ProcessorSpreadsheet:
         total_warnings = sum(len(report.warnings) for report in self.report_list)
         self.logger.error(f"Total errors: {total_errors}")
         self.logger.warning(f"Total warnings: {total_warnings}")
+    def _build_pipeline(self) -> None:
+        """
+        Build the validation pipeline by initializing the data context and running the validations.
+        """
+        self.logger.info("Building validation pipeline...")
+        # RUN ALL VALIDATIONS PIPELINE
+        SpDescriptionValidator(data_context=self.data_context, report_list=self.report_list)
 
     def run(self):
         self.logger.info("Iniciando processamento...")
         self._configure()
         self._read_data()
+        self._build_pipeline()
         self._report()

@@ -18,16 +18,21 @@ class SpDescriptionValidator:
     Validates the content of the SpDescription spreadsheet.
     """
 
-    def __init__(self, data_context: DataContext, config: Config, report_list: ReportList):
-        self.sp_model = data_context.get_instance_of(SpDescription)
-        self.config = config
+    def __init__(self, data_context: DataContext, report_list: ReportList):
+        # SETUP
+        self.data_context = data_context
         self.report_list = report_list
 
+        # UNPACK DATA
+        self.sp_model = data_context.get_instance_of(SpDescription)
+        self.config = data_context.config
+        self.fs_utils = data_context.fs_utils
         self.data_model = self.sp_model.DATA_MODEL
         self.filename = self.sp_model.FILENAME
         self.df_description = self.data_model.df_data.copy()
 
-        self.TITLES_VERITY = config.get_verify_names()
+        # SETUP VALIDATION
+        self.TITLES_VERITY = self.config.get_verify_names()
         self.errors: List[str] = []
         self.warnings: List[str] = []
 
@@ -243,18 +248,19 @@ class SpDescriptionValidator:
             return self.errors, self.warnings
 
         validations = [
-            (self.validate_html_in_descriptions, NamesEnum.HTML_DESC.value), # COMPLETE
-            (self.validate_sequential_codes, NamesEnum.SC.value), # COMPLETE
-            (self.validate_unique_codes, NamesEnum.CO_UN.value), # COMPLETE
-            (self.validate_text_capitalization, NamesEnum.INP.value), # COMPLETE
-            (self.validate_indicator_levels, NamesEnum.IL.value), # COMPLETE
+            (self.validate_html_in_descriptions, NamesEnum.HTML_DESC.value),
+            (self.validate_sequential_codes, NamesEnum.SC.value),
+            (self.validate_unique_codes, NamesEnum.CO_UN.value),
+            (self.validate_text_capitalization, NamesEnum.INP.value),
+            (self.validate_indicator_levels, NamesEnum.IL.value),
+            (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value),
+            (self.validate_empty_strings, NamesEnum.EF.value),
+            (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value),
 
-            (self.validate_punctuation, NamesEnum.MAND_PUNC_DESC.value), # COMPLETE
-            (self.validate_empty_strings, NamesEnum.EF.value), # COMPLETE
-            (self.validate_cr_lf_characters, NamesEnum.LB_DESC.value), # COMPLETE
-            (self.validate_title_length, NamesEnum.TITLES_N.value), # COMPLETE
-            (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value), # COMPLETE
+            (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
         ]
+        if not self.data_context.data_args.data_action.no_warning_titles_length:
+            validations.append((self.validate_title_length, NamesEnum.TITLES_N.value))
 
         for func, report_key in validations:
             errors, warnings = func()

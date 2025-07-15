@@ -20,7 +20,7 @@ if __name__ == "__main__":
         fs_utils = FileSystemUtils(language_manager)
 
         # Bussiness Logic
-        processador = ProcessorSpreadsheet(input_folder=data_args.data_file.input_folder, output_folder=data_args.data_file.output_folder, logger=file_logger, fs_utils=fs_utils)
+        processador = ProcessorSpreadsheet(data_args=data_args, logger=file_logger, fs_utils=fs_utils)
 
 
     except ValueError as e:
