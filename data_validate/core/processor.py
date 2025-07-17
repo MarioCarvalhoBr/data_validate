@@ -10,6 +10,7 @@ from data_model import (
     SpProportionality, SpScenario, SpLegend, SpDictionary
 )
 from validation.description_validator import SpDescriptionValidator
+from validation.scenario_validator import SpScenarioValidator
 from validation.temporal_reference_validator import SpTemporalReferenceValidator
 from validation.validator_structure import ValidatorStructureFiles
 from validation.data_context import DataContext
@@ -124,7 +125,7 @@ class ProcessorSpreadsheet:
         # RUN ALL VALIDATIONS PIPELINE
         SpDescriptionValidator(data_context=self.data_context, report_list=self.report_list)
         SpTemporalReferenceValidator(data_context=self.data_context, report_list=self.report_list)
-
+        SpScenarioValidator(data_context=self.data_context, report_list=self.report_list)
     def run(self):
         self.logger.info("Iniciando processamento...")
         self._configure()
