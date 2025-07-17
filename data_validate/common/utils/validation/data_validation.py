@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple # Added for type hinting clarity
+from typing import List, Tuple, Dict, Any
 import pandas as pd
 
 def check_vertical_bar(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool, List[str]]:
@@ -198,3 +198,22 @@ def check_unique_values(df: pd.DataFrame, file_name: str, columns_uniques: list)
         if not df[column].is_unique:
             warnings.append(f"{file_name}: A coluna '{column}' não deve conter valores repetidos.")
     return not warnings, warnings
+
+def column_exists(dataframe, file_name, column) -> Tuple[bool, str]:
+    if column not in dataframe.columns:
+        return False, f"{file_name}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+    return True, ""
+
+def check_text_length(dataframe, file_name, column, max_len) -> Tuple[List[str], List[str]]:
+        """Helper function to validate text length in a column."""
+        errors = []
+        exists_column, msg_error_column = column_exists(dataframe, file_name, column)
+        if not exists_column:
+            return [msg_error_column], []
+        for index, row in dataframe.iterrows():
+            text = str(row[column])
+            if pd.isna(text):
+                continue
+            if len(text) > max_len:
+                errors.append(f'{file_name}, linha {index + 2}: O texto da coluna "{column}" excede o limite de {max_len} caracteres (encontrado: {len(text)}).')
+        return not errors, errors

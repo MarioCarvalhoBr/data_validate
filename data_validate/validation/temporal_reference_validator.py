@@ -4,6 +4,7 @@ from collections import OrderedDict
 from typing import List, Tuple, Dict, Any
 import pandas as pd
 
+from common.utils.validation.data_validation import column_exists
 from config.config import Config, NamesEnum
 from core.report import ReportList
 from data_model import SpTemporalReference
@@ -22,25 +23,6 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
     def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
 
         super().__init__(data_context=data_context, report_list=report_list, type_class=SpTemporalReference, **kwargs)
-
-    def _column_exists(self, column: str) -> Tuple[bool, str]:
-        if column not in self._dataframe.columns:
-            return False, f"{self._filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
-        return True, ""
-
-    def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:
-        """Helper function to validate text length in a column."""
-        warnings = []
-        exists_column, msg_error_column = self._column_exists(column)
-        if not exists_column:
-            return [msg_error_column], []
-        for index, row in self._dataframe.iterrows():
-            text = str(row[column])
-            if pd.isna(text):
-                continue
-            if len(text) > max_len:
-                warnings.append(f'{self._filename}, linha {index + 2}: O texto da coluna "{column}" excede o limite de {max_len} caracteres (encontrado: {len(text)}).')
-        return [], warnings
 
     def validate_punctuation(self) -> Tuple[List[str], List[str]]:
         warnings = []

@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Type
+from typing import Dict, Any, List, Type, Tuple
 
+from common.utils.validation.data_validation import check_text_length, column_exists
 from core.report import ReportList
 from data_model.sp_model_abc import SpModelABC
 from validation.data_context import DataContext
@@ -28,6 +29,17 @@ class ValidatorModelABC(ABC):
 
     def init(self):
         self.run()
+
+    def _column_exists(self, column: str) -> Tuple[bool, str]:
+        exists, msg_error_column = column_exists(self._dataframe, self._filename, column)
+        return exists, msg_error_column
+
+    def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:
+        """Helper function to validate text length in a column."""
+        warnings = []
+        __, warnings_text_length = check_text_length(dataframe=self._dataframe, file_name=self._filename, column=column, max_len=max_len)
+        warnings.extend(warnings_text_length)
+        return [], warnings
 
     def build_reports(self, validations):
         for func, report_key in validations:
