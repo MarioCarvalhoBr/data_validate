@@ -44,7 +44,7 @@ class SpTemporalReference(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, list(self.RequiredColumn.ALL))
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
@@ -52,16 +52,16 @@ class SpTemporalReference(SpModelABC):
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Verify if the scenario file exists: Verifica se self.LIST_SCENARIOS: está vazio
-        if (not self.LIST_SCENARIOS) and (len(self.DATA_MODEL.df_data) != 1):
+        if (not self.LIST_SCENARIOS) and (len(self.DATA_MODEL_IMPORTER.df_data) != 1):
             self.DATA_CLEAN_ERRORS.append(f"{self.FILENAME}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
 
-            if self.RequiredColumn.COLUMN_SYMBOL.name in self.DATA_MODEL.df_data.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = self.DATA_MODEL.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
+            if self.RequiredColumn.COLUMN_SYMBOL.name in self.DATA_MODEL_IMPORTER.df_data.columns:
+                self.RequiredColumn.COLUMN_SYMBOL = self.DATA_MODEL_IMPORTER.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
         else:
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
-            df, errors_symbol = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_symbol], min_value=0)
+            df, errors_symbol = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [col_symbol], min_value=0)
             self.DATA_CLEAN_ERRORS.extend(errors_symbol)
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:

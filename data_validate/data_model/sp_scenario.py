@@ -46,7 +46,7 @@ class SpScenario(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data,
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data,
                                                             list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 

@@ -36,9 +36,9 @@ class SpProportionality(SpModelABC):
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
-        if self.DATA_MODEL.header_type == "double":
-            colunas_nivel_1 = self.DATA_MODEL.df_data.columns.get_level_values(0).unique().tolist()
-            colunas_nivel_2 = self.DATA_MODEL.df_data.columns.get_level_values(1).unique().tolist()
+        if self.DATA_MODEL_IMPORTER.header_type == "double":
+            colunas_nivel_1 = self.DATA_MODEL_IMPORTER.df_data.columns.get_level_values(0).unique().tolist()
+            colunas_nivel_2 = self.DATA_MODEL_IMPORTER.df_data.columns.get_level_values(1).unique().tolist()
 
             # Check extra columns in level 1 (do not ignore 'id')
             _, extras_level_1 = extract_numeric_ids_and_unmatched_strings(

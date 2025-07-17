@@ -33,7 +33,7 @@ class ProcessorSpreadsheet:
         # UNPACKING DATA ARGS
         self.language_manager = fs_utils.locale_manager
         self.config = Config(self.language_manager)
-        self.TITLES_VERITY = self.config.get_verify_names()
+        self.TITLES_INFO = self.config.get_verify_names()
 
         # SETUP CONFIGURE VARIABLES
         self.input_folder = data_args.data_file.input_folder
@@ -57,14 +57,14 @@ class ProcessorSpreadsheet:
         importer = DataImporterFacade(self.input_folder)
         data, errors_data_importer = importer.load_all
         # APPEND ERRORS TO REPORT LIST
-        self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=errors_data_importer)
+        self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_data_importer)
 
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
         self.structure_validator = ValidatorStructureFiles(self.input_folder, self.fs_utils)
 
         # 1.1 GENERAL STRUCTURE VALIDATION ERRORS: Errors from the general structure validation
         errors_structure_general = self.structure_validator.validate()
-        self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=errors_structure_general)
+        self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_structure_general)
 
         if not data[SpScenario.CONSTANTS.SP_NAME].df_data.empty:
             if SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns:
@@ -83,9 +83,9 @@ class ProcessorSpreadsheet:
             setattr(self, attribute_name, model_instance)
             self.models_to_use.append(model_instance)
 
-            self.report_list.extend(self.TITLES_VERITY[NamesEnum.FS.value], errors=model_instance.STRUCTURE_LIST_ERRORS,
+            self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=model_instance.STRUCTURE_LIST_ERRORS,
                                     warnings=model_instance.STRUCTURE_LIST_WARNINGS)
-            self.report_list.extend(self.TITLES_VERITY[NamesEnum.FC.value], errors=model_instance.DATA_CLEAN_ERRORS,
+            self.report_list.extend(self.TITLES_INFO[NamesEnum.FC.value], errors=model_instance.DATA_CLEAN_ERRORS,
                                     warnings=model_instance.DATA_CLEAN_WARNINGS)
 
             if FLAG is not None:
@@ -94,7 +94,7 @@ class ProcessorSpreadsheet:
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
         for name in NamesEnum:
-            self.report_list.add_by_name(self.TITLES_VERITY[name.value])
+            self.report_list.add_by_name(self.TITLES_INFO[name.value])
 
     def _report(self) -> None:
         # Print all reports and their errors

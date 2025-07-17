@@ -15,7 +15,7 @@ class SpModelABC(ABC):
 
         # Config vars
         self.FILENAME: str = data_model.filename
-        self.DATA_MODEL: DataModelImporter = data_model
+        self.DATA_MODEL_IMPORTER: DataModelImporter = data_model
         self.LIST_SCENARIOS: List[str] = kwargs.get("list_scenarios", [])
 
         # Initialize errors and warnings
@@ -34,18 +34,18 @@ class SpModelABC(ABC):
 
     def init(self):
         # CHECK 0: Add COLUMNS
-        if not self.DATA_MODEL.df_data.empty:
-            self.DF_COLUMNS = list(self.DATA_MODEL.df_data.columns)
+        if not self.DATA_MODEL_IMPORTER.df_data.empty:
+            self.DF_COLUMNS = list(self.DATA_MODEL_IMPORTER.df_data.columns)
 
-        if self.DATA_MODEL.df_data.empty and self.DATA_MODEL.read_success:
+        if self.DATA_MODEL_IMPORTER.df_data.empty and self.DATA_MODEL_IMPORTER.read_success:
             self.STRUCTURE_LIST_ERRORS.append(f"{self.FILENAME}: O arquivo enviado está vazio.")
 
         # CHECK 1: Vertical Bar Check
-        _, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL.df_data, self.FILENAME)
+        _, errors_vertical_bar = check_vertical_bar(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME)
         self.STRUCTURE_LIST_ERRORS.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        _, errors_unnamed_columns = check_unnamed_columns(self.DATA_MODEL.df_data, self.FILENAME)
+        _, errors_unnamed_columns = check_unnamed_columns(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME)
         self.STRUCTURE_LIST_ERRORS.extend(errors_unnamed_columns)
 
     @abstractmethod
@@ -97,4 +97,4 @@ class SpModelABC(ABC):
             str: Representação em string do objeto.
         """
         return f"SpModelABC(FILENAME: {self.FILENAME}):\n" + \
-               f"  DATA_MODEL: {self.DATA_MODEL}\n"
+               f"  DATA_MODEL: {self.DATA_MODEL_IMPORTER}\n"

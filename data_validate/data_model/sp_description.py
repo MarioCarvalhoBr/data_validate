@@ -74,10 +74,10 @@ class SpDescription(SpModelABC):
         # 1. Tratamento de colunas dinâmicas: cenarios
         if not self.LIST_SCENARIOS:
             ## 1.1: Se não houver cenários, remove a coluna de cenário
-            if self.DynamicColumn.COLUMN_SCENARIO.name in self.DATA_MODEL.df_data.columns:
+            if self.DynamicColumn.COLUMN_SCENARIO.name in self.DATA_MODEL_IMPORTER.df_data.columns:
                 self.STRUCTURE_LIST_ERRORS.append(
                     f"{self.FILENAME}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não estiver configurado ou não existir.")
-                self.DATA_MODEL.df_data = self.DATA_MODEL.df_data.drop(
+                self.DATA_MODEL_IMPORTER.df_data = self.DATA_MODEL_IMPORTER.df_data.drop(
                     columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         else:
             # 1.2: Se houver cenários, adiciona a coluna de cenário
@@ -85,14 +85,14 @@ class SpDescription(SpModelABC):
 
         # 2. Tratamento de colunas opcionais
         # 2.1: Adiciona colunas opcionais: relação
-        if self.OptionalColumn.COLUMN_RELATION.name not in self.DATA_MODEL.df_data.columns:
-            self.DATA_MODEL.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
+        if self.OptionalColumn.COLUMN_RELATION.name not in self.DATA_MODEL_IMPORTER.df_data.columns:
+            self.DATA_MODEL_IMPORTER.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
         # 2.2: Adiciona colunas opcionais: unidade
-        if self.OptionalColumn.COLUMN_UNIT.name not in self.DATA_MODEL.df_data.columns:
-            self.DATA_MODEL.df_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
+        if self.OptionalColumn.COLUMN_UNIT.name not in self.DATA_MODEL_IMPORTER.df_data.columns:
+            self.DATA_MODEL_IMPORTER.df_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
 
         for opt_column_name in self.OptionalColumn.ALL:
-            if (opt_column_name in self.DATA_MODEL.df_data.columns) and (opt_column_name not in expected_columns):
+            if (opt_column_name in self.DATA_MODEL_IMPORTER.df_data.columns) and (opt_column_name not in expected_columns):
                 expected_columns.append(opt_column_name)
 
         self.EXPECTED_COLUMNS = expected_columns
@@ -100,7 +100,7 @@ class SpDescription(SpModelABC):
     def expected_structure_columns(self, *args, **kwargs) -> None:
 
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, self.EXPECTED_COLUMNS)
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data, self.EXPECTED_COLUMNS)
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
@@ -109,14 +109,14 @@ class SpDescription(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Limpeza e validação das colunas principais usando clean_dataframe
         # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
-        df, errors_codigo = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [self.RequiredColumn.COLUMN_CODE.name], min_value=1)
+        df, errors_codigo = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [self.RequiredColumn.COLUMN_CODE.name], min_value=1)
         self.DATA_CLEAN_ERRORS.extend(errors_codigo)
         if self.RequiredColumn.COLUMN_CODE.name in df.columns:
             self.RequiredColumn.COLUMN_CODE = df[self.RequiredColumn.COLUMN_CODE.name]
 
         # 2. Limpar e validar a coluna 'nivel' (mínimo 1)
         col_nivel = self.RequiredColumn.COLUMN_LEVEL.name
-        df, errors_nivel = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_nivel], min_value=1)
+        df, errors_nivel = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [col_nivel], min_value=1)
         self.DATA_CLEAN_ERRORS.extend(errors_nivel)
         if col_nivel in df.columns:
             self.RequiredColumn.COLUMN_LEVEL = df[col_nivel]
@@ -124,7 +124,7 @@ class SpDescription(SpModelABC):
         # 3. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
         if self.LIST_SCENARIOS:
             col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
-            df, errors_cenario = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_cenario], min_value=-1)
+            df, errors_cenario = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [col_cenario], min_value=-1)
             if col_cenario in df.columns:
                 self.DynamicColumn.COLUMN_SCENARIO = df[col_cenario]
             self.DATA_CLEAN_ERRORS.extend(errors_cenario)

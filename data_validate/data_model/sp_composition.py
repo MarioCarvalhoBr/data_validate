@@ -39,7 +39,7 @@ class SpComposition(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL.df_data, list(self.RequiredColumn.ALL))
+        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
@@ -48,12 +48,12 @@ class SpComposition(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # 1. Limpar e validar a coluna 'codigo_pai' (mínimo 1)
         col_parent = self.RequiredColumn.COLUMN_PARENT_CODE.name
-        df, errors_parent = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_parent], min_value=1)
+        df, errors_parent = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [col_parent], min_value=1)
         self.DATA_CLEAN_ERRORS.extend(errors_parent)
 
         # 2. Limpar e validar a coluna 'codigo_filho' (mínimo 1)
         col_child = self.RequiredColumn.COLUMN_CHILD_CODE.name
-        df, errors_child = clean_dataframe(self.DATA_MODEL.df_data, self.FILENAME, [col_child], min_value=1)
+        df, errors_child = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [col_child], min_value=1)
         self.DATA_CLEAN_ERRORS.extend(errors_child)
 
     def run(self):
