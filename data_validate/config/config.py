@@ -1,4 +1,5 @@
 from enum import Enum
+from datetime import datetime
 from types import MappingProxyType
 from common.locale.language_manager import LanguageManager
 
@@ -43,6 +44,7 @@ class Config:
     LIMIT_MESSAGES = 20
     OUTPUT_DEFAULT_HTML = "default.html"
     OUTPUT_REPORT_HTML = "_report.html"
+    CURRENT_YEAR = datetime.now().year
 
     def __init__(self, lm: LanguageManager):
         self.lm = lm

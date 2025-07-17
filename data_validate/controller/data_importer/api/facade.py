@@ -36,14 +36,20 @@ class DataModelImporter:
     :ivar df_data: Data extracted from the file as a pandas DataFrame.
     :type df_data: pd.DataFrame
     """
-    def __init__(self, input_folder: str, path: Path, df_data: pd.DataFrame):
+    def __init__(self, input_folder: str, path: Path, df_data: pd.DataFrame, read_success: bool = True):
+        # SETUP
         self.input_folder = input_folder
-        self.name = path.stem
-        self.filename = path.name
-        self.extension = path.suffix
         self.path = path
         self.df_data = df_data
+        self.read_success = read_success
+
+        # UNPACKING VARIABLES
+        self.name = self.path.stem
+        self.filename = self.path.name
+        self.extension = self.path.suffix
+        self.path = self.path
         self.header_type = 'single' if self.df_data.columns.nlevels == 1 else 'double'
+
 
     def __str__(self):
         return f"DataModelImporter({self.name}):\n" + \
@@ -56,7 +62,8 @@ class DataModelImporter:
             f"  df_data shape: {self.df_data.shape}\n" + \
             f"  df_data columns: {self.df_data.columns}\n" + \
             f"  df_data dtypes: {self.df_data.dtypes}\n" + \
-            f"  header_type: {self.header_type}\n"
+            f"  header_type: {self.header_type}\n" + \
+            f"  read_success: {self.read_success}\n"
 
 
 
@@ -87,7 +94,7 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
             reader = ReaderFactory.get_reader(path, strat)
 
             # Configure DataModel
-            df_local = pd.DataFrame()
+            df_local = None
             try:
                 df_local = reader.read()
             except FileNotFoundError as e:
@@ -106,7 +113,8 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
             data_model = DataModelImporter(
                 input_folder=str(self.input_dir),
                 path=path,
-                df_data = df_local
+                df_data = df_local if df_local is not None else pd.DataFrame(),
+                read_success = True if df_local is not None else False
             )
 
             data[name] = data_model
@@ -120,7 +128,8 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
                 data[name] = DataModelImporter(
                     input_folder=str(self.input_dir),
                     path=Path(name),
-                    df_data=pd.DataFrame()
+                    df_data=pd.DataFrame(),
+                    read_success=False
                 )
 
         return data, errors

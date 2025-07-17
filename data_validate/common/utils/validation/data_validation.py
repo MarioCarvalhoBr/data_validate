@@ -188,3 +188,13 @@ def check_special_characters_cr_lf(df, file_name, columns_start_end=None, column
         all_warnings.extend(warnings_anywhere)
 
     return not all_warnings, all_warnings
+
+def check_unique_values(df: pd.DataFrame, file_name: str, columns_uniques: list):
+    warnings = []
+
+    columns_uniques = [column for column in columns_uniques if column in df.columns]
+
+    for column in columns_uniques:
+        if not df[column].is_unique:
+            warnings.append(f"{file_name}: A coluna '{column}' não deve conter valores repetidos.")
+    return not warnings, warnings
