@@ -1,8 +1,10 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
 import re
+import os
 import pandas as pd
-import hunspell
+import enchant
+from enchant import Broker
 from pathlib import Path
 from typing import List, Tuple, Set
 from dataclasses import dataclass
@@ -40,43 +42,72 @@ class TextProcessor:
 
 
 class DictionaryManager:
-    """Gerenciador de dicionários Hunspell"""
+    """Gerenciador de dicionários Enchant"""
 
     def __init__(self, lang_dict_spell: str):
         self.lang_dict_spell = lang_dict_spell
-        self.analyzer = None
+        self.dictionary = None
+        self.broker = None
         self._setup_paths()
 
     def _setup_paths(self) -> None:
         """Configura os caminhos dos arquivos de dicionário"""
         current_file = Path(__file__)
         static_path = current_file.parent.parent.parent.parent / 'static'
+        enchant_config_dir = static_path / 'dictionaries'
 
-        self.dic_path = static_path / 'dictionaries/hunspell' / f'{self.lang_dict_spell}.dic'
-        self.aff_path = static_path / 'dictionaries/hunspell' / f'{self.lang_dict_spell}.aff'
-        self.extra_dic_path = static_path / 'dictionaries' / 'extra-words.dic'
+        # Define o diretório de configuração do Enchant
+        os.environ["ENCHANT_CONFIG_DIR"] = str(enchant_config_dir)
 
-    def validate_files(self) -> List[str]:
-        """Valida se os arquivos de dicionário existem"""
+    def validate_dictionary(self) -> List[str]:
+        """Valida se o dicionário existe"""
         errors = []
 
-        if not self.dic_path.exists():
-            errors.append(f"Arquivo de dicionário não encontrado: {self.dic_path}")
-
-        if not self.aff_path.exists():
-            errors.append(f"Arquivo de afixos não encontrado: {self.aff_path}")
+        try:
+            self.broker = Broker()
+            if not self.broker.dict_exists(self.lang_dict_spell):
+                errors.append(f"Dicionário {self.lang_dict_spell} não encontrado")
+        except Exception as e:
+            errors.append(f"Erro ao verificar dicionário: {e}")
 
         return errors
 
-    def initialize_analyzer(self) -> hunspell.HunSpell:
-        """Inicializa o analisador Hunspell"""
-        self.analyzer = hunspell.HunSpell(str(self.dic_path), str(self.aff_path))
+    def initialize_dictionary(self, list_words_user) -> enchant.Dict:
+        """Inicializa o dicionário Enchant e adiciona palavras extras"""
+        try:
+            if not self.broker:
+                self.broker = Broker()
 
-        if self.extra_dic_path.exists():
-            self.analyzer.add_dic(str(self.extra_dic_path))
+            self.dictionary = self.broker.request_dict(self.lang_dict_spell)
 
-        return self.analyzer
+            # Adiciona palavras extras do arquivo extra-words.dic
+            self._load_extra_words()
 
+            # Adiciona palavras do usuário
+            for word in list_words_user:
+                if word and not word.startswith('#'):
+                    self.dictionary.add(word)
+
+            return self.dictionary
+        except Exception as e:
+            raise RuntimeError(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
+
+    def _load_extra_words(self) -> None:
+        """Carrega palavras extras do arquivo extra-words.dic"""
+        try:
+            current_file = Path(__file__)
+            static_path = current_file.parent.parent.parent.parent / 'static'
+            extra_words_path = static_path / 'dictionaries' / 'extra-words.dic'
+
+            if extra_words_path.exists():
+                with open(extra_words_path, 'r', encoding='utf-8') as file:
+                    for line in file:
+                        word = line.strip()
+                        if word and not word.startswith('#'):  # Ignora linhas vazias e comentários
+                            self.dictionary.add(word)
+        except Exception as e:
+            # Log do erro mas não interrompe a execução
+            print(f"Aviso: Não foi possível carregar palavras extras: {e}")
 
 class SpellChecker:
     """Verificador ortográfico principal"""
@@ -84,7 +115,7 @@ class SpellChecker:
     def __init__(self, dictionary_manager: DictionaryManager):
         self.dictionary_manager = dictionary_manager
         self.text_processor = TextProcessor()
-        self.analyzer = None
+        self.dictionary = None
 
     def find_spelling_errors(self, text: str) -> List[str]:
         """Encontra erros ortográficos no texto"""
@@ -100,7 +131,7 @@ class SpellChecker:
             if self.text_processor.is_acronym(word):
                 continue
 
-            if not self.analyzer.spell(word):
+            if not self.dictionary.check(word):
                 errors.append(word)
 
         return errors
@@ -173,7 +204,10 @@ class DataFrameProcessor:
 class SpellCheckService:
     """Serviço principal para verificação ortográfica"""
 
-    def __init__(self, lang_dict_spell: str = 'pt_BR'):
+    def __init__(self, lang_dict_spell: str = 'pt_BR', list_words_user: List[str] = None):
+        self.list_words_user = list_words_user
+        if self.list_words_user is None:
+            self.list_words_user = []
         self.lang_dict_spell = lang_dict_spell
         self.dictionary_manager = DictionaryManager(lang_dict_spell)
         self.spell_checker = SpellChecker(self.dictionary_manager)
@@ -188,14 +222,14 @@ class SpellCheckService:
             if df.empty:
                 return SpellCheckResult(is_valid=True, errors=errors, warnings=warnings)
 
-            # Valida arquivos de dicionário
-            validation_errors = self.dictionary_manager.validate_files()
+            # Valida dicionário
+            validation_errors = self.dictionary_manager.validate_dictionary()
             if validation_errors:
                 errors.extend(validation_errors)
                 return SpellCheckResult(is_valid=False, errors=errors, warnings=warnings)
 
-            # Inicializa analisador
-            self.spell_checker.analyzer = self.dictionary_manager.initialize_analyzer()
+            # Inicializa dicionário
+            self.spell_checker.dictionary = self.dictionary_manager.initialize_dictionary(self.list_words_user)
 
             # Valida colunas
             valid_columns, column_warnings = self.df_processor.validate_columns(
@@ -226,8 +260,8 @@ def main():
 
     columns_sheets = ['texto_sem_erro', 'texto_com_erros_pt']
     file_name = 'example.xlsx'
-
-    service = SpellCheckService('pt_BR')
+    list_words_user = ['textoz', 'umumuuuu']
+    service = SpellCheckService('pt_BR', list_words_user)
     result = service.verify_spelling_text(df, file_name, columns_sheets)
 
     print("Valid:", result.is_valid)
