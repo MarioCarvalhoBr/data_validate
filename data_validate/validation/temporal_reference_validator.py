@@ -6,7 +6,7 @@ import pandas as pd
 
 from common.utils.validation.data_validation import column_exists
 from config.config import Config, NamesEnum
-from core.report import ReportList
+from controller.report import ReportList
 from data_model import SpTemporalReference
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf, check_unique_values

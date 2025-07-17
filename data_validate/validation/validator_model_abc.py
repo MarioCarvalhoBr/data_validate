@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Type, Tuple
 
 from common.utils.validation.data_validation import check_text_length, column_exists
-from core.report import ReportList
+from controller.report import ReportList
 from data_model.sp_model_abc import SpModelABC
 from validation.data_context import DataContext
 

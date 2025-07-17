@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict, Any
 import pandas as pd
 
 from config.config import Config, NamesEnum
-from core.report import ReportList
+from controller.report import ReportList
 from data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf

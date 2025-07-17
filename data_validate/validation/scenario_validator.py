@@ -4,7 +4,7 @@ from typing import List, Tuple, Dict, Any
 import pandas as pd
 
 from config.config import NamesEnum
-from core.report import ReportList
+from controller.report import ReportList
 from data_model import SpScenario
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_unique_values
 from validation.data_context import DataContext

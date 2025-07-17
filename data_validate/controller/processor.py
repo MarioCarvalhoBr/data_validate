@@ -4,7 +4,7 @@ from logging import Logger
 from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config, NamesEnum
-from controller import DataImporterFacade
+from tools import DataImporterFacade
 from data_model import (
     SpDescription, SpComposition, SpValue, SpTemporalReference,
     SpProportionality, SpScenario, SpLegend, SpDictionary
