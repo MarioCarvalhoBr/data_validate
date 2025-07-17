@@ -27,6 +27,7 @@ dependencies = [
     "pdoc (>=15.0.3,<16.0.0)",
     "openpyxl (>=3.1.5,<4.0.0)",
     "pandas-stubs (>=2.2.3.250527,<3.0.0)",
+    "enchant (>=0.0.1,<0.0.2)",
 ]
 
 [project.urls]
