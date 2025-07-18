@@ -24,15 +24,15 @@ class SpValueValidator(ValidatorModelABC):
         # Run pipeline
         self.run()
 
-    def validate_foo(self) -> Tuple[List[str], List[str]]:
+    def validate_codes_identification(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
         return errors, warnings
 
-    def validate_bar(self) -> Tuple[List[str], List[str]]:
+    def validate_value_combination_relation(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
         return errors, warnings
 
-    def validate_xyz(self) -> Tuple[List[str], List[str]]:
+    def validate_unavailable_codes_values(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
         return errors, warnings
 
@@ -40,9 +40,9 @@ class SpValueValidator(ValidatorModelABC):
         """Runs all content validations for SpScenario."""
 
         validations = [
-            (self.validate_foo, NamesEnum.HTML_DESC.value),
-            (self.validate_bar, NamesEnum.HTML_DESC.value),
-            (self.validate_xyz, NamesEnum.HTML_DESC.value),
+            (self.validate_codes_identification(), NamesEnum.HTML_DESC.value),
+            (self.validate_value_combination_relation, NamesEnum.HTML_DESC.value),
+            (self.validate_unavailable_codes_values, NamesEnum.HTML_DESC.value),
         ]
 
         # BUILD REPORTS
