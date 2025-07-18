@@ -17,9 +17,10 @@ class SpScenarioValidator(ValidatorModelABC):
     """
 
     def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
-
         super().__init__(data_context=data_context, report_list=report_list, type_class=SpScenario, **kwargs)
 
+        # Run pipeline
+        self.run()
     def validate_punctuation(self) -> Tuple[List[str], List[str]]:
         warnings = []
         columns_dont_punctuation = [SpScenario.RequiredColumn.COLUMN_NAME.name]

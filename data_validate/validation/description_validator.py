@@ -22,6 +22,8 @@ class SpDescriptionValidator(ValidatorModelABC):
     def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
         super().__init__(data_context=data_context, report_list=report_list, type_class=SpDescription, **kwargs)
 
+        # Run pipeline
+        self.run()
     def validate_html_in_descriptions(self) -> Tuple[List[str], List[str]]:
         warnings = []
         column = SpDescription.RequiredColumn.COLUMN_SIMPLE_DESC.name

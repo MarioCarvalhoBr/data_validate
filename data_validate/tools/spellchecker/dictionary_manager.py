@@ -14,11 +14,12 @@ class DictionaryManager:
         self.dictionary = None
         self.broker = None
         self._setup_paths()
+        self._errors = []
 
     def _setup_paths(self) -> None:
         """Configura os caminhos dos arquivos de dicionário"""
         current_file = Path(__file__)
-        static_path = current_file.parent.parent.parent.parent / 'static'
+        static_path = current_file.parent.parent.parent.parent / 'data_validate/static'
         enchant_config_dir = static_path / 'dictionaries'
 
         # Define o diretório de configuração do Enchant
@@ -26,16 +27,15 @@ class DictionaryManager:
 
     def validate_dictionary(self) -> List[str]:
         """Valida se o dicionário existe"""
-        errors = []
 
         try:
             self.broker = Broker()
             if not self.broker.dict_exists(self.lang_dict_spell):
-                errors.append(f"Dicionário {self.lang_dict_spell} não encontrado")
+                self._errors.append(f"Dicionário {self.lang_dict_spell} não encontrado")
         except Exception as e:
-            errors.append(f"Erro ao verificar dicionário: {e}")
+            self._errors.append(f"Erro ao verificar dicionário: {e}")
 
-        return errors
+        return self._errors
 
     def initialize_dictionary(self, list_words_user) -> enchant.Dict:
         """Inicializa o dicionário Enchant e adiciona palavras extras"""
@@ -55,21 +55,24 @@ class DictionaryManager:
 
             return self.dictionary
         except Exception as e:
-            raise RuntimeError(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
+            self._errors.append(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
 
     def _load_extra_words(self) -> None:
         """Carrega palavras extras do arquivo extra-words.dic"""
         try:
             current_file = Path(__file__)
-            static_path = current_file.parent.parent.parent.parent / 'static'
+            static_path = current_file.parent.parent.parent.parent / 'data_validate/static'
             extra_words_path = static_path / 'dictionaries' / 'extra-words.dic'
 
             if extra_words_path.exists():
                 with open(extra_words_path, 'r', encoding='utf-8') as file:
+                    all_lines = file.readlines()
                     for line in file:
                         word = line.strip()
                         if word and not word.startswith('#'):  # Ignora linhas vazias e comentários
                             self.dictionary.add(word)
+            else:
+                self._errors.append("Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema.")
         except Exception as e:
             # Log do erro mas não interrompe a execução
-            print(f"Aviso: Não foi possível carregar palavras extras: {e}")
+            self._errors.append(f"Aviso: Não foi possível carregar palavras extras: {e}")

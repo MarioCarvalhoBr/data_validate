@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import pandas as pd
 
-from tools.spellchecker.service import SpellCheckService
+from tools.spellchecker.spellchecker import SpellChecker
 
 
 def main():
@@ -15,12 +15,11 @@ def main():
     columns_sheets = ['texto_sem_erro', 'texto_com_erros_pt']
     file_name = 'example.xlsx'
     list_words_user = ['textoz', 'umumuuuu']
-    service = SpellCheckService('pt_BR', list_words_user)
-    result = service.verify_spelling_text(df, file_name, columns_sheets)
+    spellchecker = SpellChecker('pt_BR', list_words_user)
+    errors, warnings  = spellchecker.check_spelling_text(df, file_name, columns_sheets)
 
-    print("Valid:", result.is_valid)
-    print("Errors:", result.errors)
-    print("Warnings:", result.warnings)
+    print("Errors:", errors)
+    print("Warnings:", warnings)
 
 
 if __name__ == "__main__":

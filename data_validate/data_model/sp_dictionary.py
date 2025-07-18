@@ -66,7 +66,6 @@ class SpDictionary(SpModelABC):
         self.pre_processing()
         self.expected_structure_columns()
 
-
 if __name__ == '__main__':
     # Para testar esta classe, você precisaria de um arquivo 'dicionario.csv' ou 'dicionario.xlsx'
     # no diretório de entrada, com uma palavra por linha.
@@ -85,6 +84,5 @@ if __name__ == '__main__':
         sp_dictionary_instance = SpDictionary(data_model=data[SpDictionary.INFO["SP_NAME"]])
         # A impressão das palavras já ocorre dentro do run() quando __name__ == '__main__',
         # mas podemos adicionar outra aqui se necessário, ou acessar sp_dictionary_instance.words_to_ignore
-        # print(sp_dictionary_instance)
     else:
         print(f"Data for '{SpDictionary.INFO['SP_NAME']}' not found. Please check your input data and ensure a 'dicionario' file exists.")

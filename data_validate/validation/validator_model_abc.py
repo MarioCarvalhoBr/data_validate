@@ -28,7 +28,7 @@ class ValidatorModelABC(ABC):
         self.init()
 
     def init(self):
-        self.run()
+        pass
 
     def _column_exists(self, column: str) -> Tuple[bool, str]:
         exists, msg_error_column = column_exists(self._dataframe, self._filename, column)

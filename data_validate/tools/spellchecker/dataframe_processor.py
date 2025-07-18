@@ -3,13 +3,13 @@
 import pandas as pd
 from typing import List, Tuple
 
-from tools.spellchecker.spellchecker import SpellChecker
+from tools.spellchecker.spellchecker_controller import SpellCheckerController
 
 
 class DataFrameProcessor:
     """Processador de DataFrame para verificação ortográfica"""
 
-    def __init__(self, spell_checker: SpellChecker):
+    def __init__(self, spell_checker: SpellCheckerController):
         self.spell_checker = spell_checker
 
     def validate_columns(self, df: pd.DataFrame, columns: List[str], file_name: str) -> Tuple[List[str], List[str]]:
