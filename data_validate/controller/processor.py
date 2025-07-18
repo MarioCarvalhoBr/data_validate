@@ -15,6 +15,7 @@ from validation.spellchecker_validator import SpellCheckerValidator
 from validation.temporal_reference_validator import SpTemporalReferenceValidator
 from validation.validator_structure import ValidatorStructureFiles
 from validation.data_context import DataContext
+from validation.value_validator import SpValueValidator
 from .report import ReportList
 
 FLAG = None
@@ -128,6 +129,7 @@ class ProcessorSpreadsheet:
         SpTemporalReferenceValidator(data_context=self.data_context, report_list=self.report_list)
         SpScenarioValidator(data_context=self.data_context, report_list=self.report_list)
         SpellCheckerValidator(data_context=self.data_context, report_list=self.report_list)
+        SpValueValidator(data_context=self.data_context, report_list=self.report_list)
     def run(self):
         self.logger.info("Iniciando processamento...")
         self._configure()
