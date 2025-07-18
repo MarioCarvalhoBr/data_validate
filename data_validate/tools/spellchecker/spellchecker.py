@@ -42,7 +42,7 @@ class SpellChecker:
             valid_columns, column_warnings = self.df_processor.validate_columns(
                 df, columns_sheets, file_name
             )
-            warnings.extend(column_warnings)
+            # warnings.extend(column_warnings)
 
             # Processa DataFrame
             if valid_columns:

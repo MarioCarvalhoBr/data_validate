@@ -45,7 +45,7 @@ class DataContext:
         for model in self.models_to_use:
             # case A: model is already an instance
             if isinstance(model, model_class):
-                print(f"Model instance found: {model.__class__.__name__}")
+                # print(f"Model instance found: {model.__class__.__name__}")
                 return model
 
         return None
