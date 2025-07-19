@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/strategies/header.py
+# File: data_loader/strategies/header.py
 """
 Define como extrair o parâmetro `header` para pandas.read_*.
 """

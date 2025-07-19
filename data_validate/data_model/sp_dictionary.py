@@ -3,7 +3,7 @@ import pandas as pd
 
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
-from tools.data_importer.api.facade import DataModelImporter, DataImporterFacade
+from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
@@ -26,7 +26,7 @@ class SpDictionary(SpModelABC):
             COLUMN_WORD.name,
         ]
 
-    def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
+    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
         self.words_to_ignore: List[str] = []
@@ -41,8 +41,8 @@ class SpDictionary(SpModelABC):
         pelo leitor de DataFrame, comum quando não há cabeçalho explícito no arquivo.
         """
         self.words_to_ignore = []
-        if self.DATA_MODEL_IMPORTER and self.DATA_MODEL_IMPORTER.df_data is not None:
-            df = self.DATA_MODEL_IMPORTER.df_data
+        if self.data_loader_model and self.data_loader_model.df_data is not None:
+            df = self.data_loader_model.df_data
 
             if len(df.columns) > 0:
                 remaining_words = []
@@ -53,8 +53,8 @@ class SpDictionary(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data, list(self.RequiredColumn.ALL))
-        col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
@@ -77,7 +77,7 @@ if __name__ == '__main__':
     input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
     # Certifique-se de que o DataImporterFacade consegue lidar com arquivos sem cabeçalho
     # e que o nome do arquivo 'dicionario' está correto.
-    importer = DataImporterFacade(input_dir)
+    importer = DataLoaderFacade(input_dir)
     data = importer.load_all
 
     if SpDictionary.INFO["SP_NAME"] in data:

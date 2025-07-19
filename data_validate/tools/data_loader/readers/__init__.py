@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/readers/__init__.py
+# File: data_loader/readers/__init__.py
 """
 Pacote de leitores de arquivos.
 """

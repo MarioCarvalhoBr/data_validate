@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/exceptions.py
+# File: data_loader/exceptions.py
 """
 Errores customizados do pacote.
 """

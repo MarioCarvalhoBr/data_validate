@@ -4,7 +4,7 @@ import pandas as pd
 
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
-from tools.data_importer.api.facade import DataModelImporter, DataImporterFacade
+from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 from data_validate.common.utils.processing.data_cleaning import clean_dataframe
@@ -34,7 +34,7 @@ class SpTemporalReference(SpModelABC):
             COLUMN_DESCRIPTION.name,
             COLUMN_SYMBOL.name
         ]
-    def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
+    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
         self.run()
@@ -44,24 +44,24 @@ class SpTemporalReference(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data, list(self.RequiredColumn.ALL))
-        col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Verify if the scenario file exists: Verifica se self.LIST_SCENARIOS: está vazio
-        if (not self.LIST_SCENARIOS) and (len(self.DATA_MODEL_IMPORTER.df_data) != 1):
-            self.DATA_CLEAN_ERRORS.append(f"{self.FILENAME}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
+        if (not self.list_scenarios) and (len(self.data_loader_model.df_data) != 1):
+            self.DATA_CLEAN_ERRORS.append(f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
 
-            if self.RequiredColumn.COLUMN_SYMBOL.name in self.DATA_MODEL_IMPORTER.df_data.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = self.DATA_MODEL_IMPORTER.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
+            if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
+                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
         else:
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
-            df, errors_symbol = clean_dataframe(self.DATA_MODEL_IMPORTER.df_data, self.FILENAME, [col_symbol], min_value=0)
+            df, errors_symbol = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0)
             self.DATA_CLEAN_ERRORS.extend(errors_symbol)
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:
@@ -75,7 +75,7 @@ class SpTemporalReference(SpModelABC):
 if __name__ == '__main__':
     # Test the SpTemporalReference class
     input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
-    importer = DataImporterFacade(input_dir)
+    importer = DataLoaderFacade(input_dir)
     data = importer.load_all
 
     sp_temporal_reference = SpTemporalReference(data_model=data[SpTemporalReference.INFO["SP_NAME"]])

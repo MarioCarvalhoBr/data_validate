@@ -5,12 +5,12 @@
 """
 Script de teste para o diretório dado.
 """
-from data_importer.api.facade import DataImporterFacade, DataModelImporter
+from data_loader.api.facade import DataLoaderFacade, DataLoaderModel
 
 
 def main():
     input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
-    importer = DataImporterFacade(input_dir)
+    importer = DataLoaderFacade(input_dir)
     data = importer.load_all
     print(data.keys())
 
@@ -19,7 +19,7 @@ def main():
         print('-----'*20)
         print(f"Loaded {key}: {type(value)}")
         # Imprimir o header do DataFrame
-        if isinstance(value, DataModelImporter):
+        if isinstance(value, DataLoaderModel):
             print('\n', value)
         elif isinstance(value, list):
             for qml in value:

@@ -3,7 +3,7 @@ import pandas as pd
 
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
-from tools.data_importer.api.facade import DataModelImporter, DataImporterFacade
+from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
@@ -36,7 +36,7 @@ class SpLegend(SpModelABC):
             COLUMN_ORDER.name,
         ]
 
-    def __init__(self, data_model: DataModelImporter, **kwargs: Dict[str, Any]):
+    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
 
         self.run()
@@ -46,8 +46,8 @@ class SpLegend(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.DATA_MODEL_IMPORTER.df_data, list(self.RequiredColumn.ALL))
-        col_errors, col_warnings = format_errors_and_warnings(self.FILENAME, missing_columns, extra_columns)
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.STRUCTURE_LIST_ERRORS.extend(col_errors)
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
@@ -63,7 +63,7 @@ class SpLegend(SpModelABC):
 if __name__ == '__main__':
     # Test the SpLegends class
     input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
-    importer = DataImporterFacade(input_dir)
+    importer = DataLoaderFacade(input_dir)
     data = importer.load_all
 
     # Assuming 'legendas' is a valid key in the data loaded by the importer

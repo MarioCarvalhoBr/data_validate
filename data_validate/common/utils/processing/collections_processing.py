@@ -1,6 +1,10 @@
 import re
+from typing import List, Set
 
-def categorize_strings_by_id_pattern(items_to_categorize, allowed_scenario_suffixes=None):
+from common.utils.formatting.number_formatting import check_cell
+
+
+def categorize_strings_by_id_pattern_from_list(items_to_categorize, allowed_scenario_suffixes=None):
     """
     Categorizes a list of items (converted to strings) based on predefined ID patterns.
 
@@ -30,7 +34,7 @@ def categorize_strings_by_id_pattern(items_to_categorize, allowed_scenario_suffi
         scenario_pattern_id_year_suffix = re.compile(r'^\d{1,}-\d{4}-(?:' + '|'.join(escaped_suffixes) + ')$')
     else:
         # Create a regex that matches nothing if no scenario suffixes are provided
-        scenario_pattern_id_year_suffix = re.compile(r"(?!)") # (?!) is a negative lookahead that always fails
+        scenario_pattern_id_year_suffix = re.compile(r"(?!)")  # (?!) is a negative lookahead that always fails
 
     # Convert all input items to strings
     string_items_to_categorize = [str(item) for item in items_to_categorize]
@@ -51,7 +55,38 @@ def categorize_strings_by_id_pattern(items_to_categorize, allowed_scenario_suffi
 
     return matched_by_pattern, not_matched_by_pattern
 
-def extract_numeric_ids_and_unmatched_strings(source_list=None, strings_to_ignore=None, scenario_suffixes_for_matching=None):
+
+def extract_numeric_integer_ids_from_list(id_values_list):
+    """
+    Extract and categorize valid and invalid IDs from a list of values.
+
+    Validates each value as a numeric ID and separates them into valid integers
+    and invalid values that couldn't be processed.
+
+    Args:
+        id_values_list: List of values to validate and categorize as IDs
+
+    Returns:
+        tuple: (valid_ids_set, invalid_ids_set) where:
+            - valid_ids_set: Set of valid integer IDs
+            - invalid_ids_set: Set of invalid values that couldn't be converted
+    """
+    valid_ids = set()
+    invalid_ids = set()
+
+    for value in id_values_list:
+        is_valid, _ = check_cell(value, 1)
+
+        if is_valid:
+            valid_ids.add(int(value))
+        else:
+            invalid_ids.add(value)
+
+    return valid_ids, invalid_ids
+
+
+def extract_numeric_ids_and_unmatched_strings_from_list(source_list=None, strings_to_ignore=None,
+                                                        suffixes_for_matching=None):
     """
     Extracts numeric IDs from a list of strings that match specific patterns
     and returns a list of strings that do not match or are not ignored.
@@ -60,7 +95,7 @@ def extract_numeric_ids_and_unmatched_strings(source_list=None, strings_to_ignor
         source_list (list, optional): The list of source strings to process. Defaults to None (empty list).
         strings_to_ignore (list, optional): A list of strings to ignore from the unmatched items.
                                            Defaults to None (empty list).
-        scenario_suffixes_for_matching (list, optional): A list of scenario suffixes used for pattern matching.
+        suffixes_for_matching (list, optional): A list of scenario suffixes used for pattern matching.
                                                        Defaults to None (empty list).
 
     Returns:
@@ -72,16 +107,16 @@ def extract_numeric_ids_and_unmatched_strings(source_list=None, strings_to_ignor
         source_list = []
     if strings_to_ignore is None:
         strings_to_ignore = []
-    if scenario_suffixes_for_matching is None:
-        scenario_suffixes_for_matching = []
+    if suffixes_for_matching is None:
+        suffixes_for_matching = []
 
     # Convert strings_to_ignore items to strings and store in a set for efficient lookup
     set_of_strings_to_ignore = {str(item) for item in strings_to_ignore}
 
     # Categorize strings from the source_list based on patterns
-    pattern_matched_strings, initially_unmatched_strings = categorize_strings_by_id_pattern(
+    pattern_matched_strings, initially_unmatched_strings = categorize_strings_by_id_pattern_from_list(
         source_list,
-        scenario_suffixes_for_matching
+        suffixes_for_matching
     )
 
     # Filter initially_unmatched_strings based on the set_of_strings_to_ignore
@@ -98,30 +133,38 @@ def extract_numeric_ids_and_unmatched_strings(source_list=None, strings_to_ignor
 
     return extracted_numeric_ids, final_unmatched_strings
 
-if __name__ == '__main__':
-    # Example usage
-    list_values = ['ID', 'ABABA', '18888-2020', '2-2021', '3-2022', '4-2023', '5-2024', '6-ano-M', '7-O-2026-O', '8-2027-P',]
-    list_ignore = ['ID']
-    lista_cenarios = ['M', 'O', 'P']
+def find_differences_in_two_set(first_set: Set, label_1: str, second_set: Set, label_2: str) -> List[str]:
+    """
+    Compares two sets and identifies missing elements in each set.
 
-    ids_valids, filtered_extras_columns = extract_numeric_ids_and_unmatched_strings(list_values, list_ignore, lista_cenarios)
+    Args:
+        first_set (set): First set to compare
+        second_set (set): Second set to compare
+        label_1 (str): Label for the first set (used in error messages)
+        label_2 (str): Label for the second set (used in error messages)
 
-    print("Valid IDs:", ids_valids)
-    print("Lista de cenários:", lista_cenarios)
-    print("Filtered Extra Columns:", filtered_extras_columns)
+    Returns:
+        list: List of error messages describing missing elements in each set
+    """
+    errors = []
 
+    if first_set is None:
+        first_set = []
+    if second_set is None:
+        second_set = []
 
-    # TEste 2:
-    list_values = ['id', '5000-2015', '5000-2080-M', '5000-2050-O', '5000-2030-P',
-       '5000-2050-P', '5001-2015', '5002-2015', '5003-2015', '5003-2030-O',
-       '5003-2050-O', '5003-2030-P', '5003-2050-P', '5004-2015', '5005-2015',
-       '5006-2015', '5007-2015', '5008-2015', '5009-2015', '5010-2015',
-       '5011-2015', '5012-2015', '5013-2015', '5014-2015', '5015-2017',
-       '5016-2017', '5017-2017', '5018-2017']
-    list_ignore = ['id']
+    # Elements in set_a but not in set_b
+    missing_in_b = first_set - second_set
+    if missing_in_b:
+        errors.append(
+            f"{label_1}: Códigos dos indicadores ausentes em {label_2}: {sorted(list(missing_in_b))}."
+        )
 
-    lista_cenarios = ['O', 'P','O']
-    ids_valids, filtered_extras_columns = extract_numeric_ids_and_unmatched_strings(list_values, list_ignore, lista_cenarios)
-    print("\n\n\nTeste 2: \nValid IDs:", ids_valids)
-    print("Lista de cenários:", lista_cenarios)
-    print("Filtered Extra Columns:", filtered_extras_columns)
+    # Elements in set_b but not in set_a
+    missing_in_a = second_set - first_set
+    if missing_in_a:
+        errors.append(
+            f"{label_2}: Códigos dos indicadores ausentes emn {label_1}: {sorted(list(missing_in_a))}."
+        )
+
+    return errors

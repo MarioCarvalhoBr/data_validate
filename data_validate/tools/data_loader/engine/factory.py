@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/factory.py
+# File: data_loader/factory.py
 """
 Factory Method para instanciar leitores adequados.
 """

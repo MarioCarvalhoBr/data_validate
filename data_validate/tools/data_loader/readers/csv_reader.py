@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/readers/csv_reader.py
+# File: data_loader/readers/csv_reader.py
 """
 Lê CSV com pandas, corrige cabeçalho duplo e separador custom.
 """

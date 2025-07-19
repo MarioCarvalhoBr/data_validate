@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/readers/excel_reader.py
+# File: data_loader/readers/excel_reader.py
 """
 Lê XLSX com pandas.
 """

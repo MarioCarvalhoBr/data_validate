@@ -60,8 +60,8 @@ class SpellCheckerValidator(ValidatorModelABC):
 
         # Configure local instances
         self._data_model = self._data_context.get_instance_of(model_class)
-        self._dataframe = self._data_model.DATA_MODEL_IMPORTER.df_data.copy()
-        self._filename = self._data_model.FILENAME
+        self._dataframe = self._data_model.data_loader_model.df_data.copy()
+        self._filename = self._data_model.filename
 
         # Get columns to check for this model
         columns_to_check = self.model_columns_map.get(model_class, [])
@@ -101,7 +101,7 @@ class SpellCheckerValidator(ValidatorModelABC):
             validations.append((lambda: self.validate_spellchecker(SpTemporalReference), NamesEnum.SPELL.value))
 
             # Add validation for Scenario if scenarios exist
-            if self._data_model.LIST_SCENARIOS:
+            if self._data_model.list_scenarios:
                 validations.append((lambda: self.validate_spellchecker(SpScenario), NamesEnum.SPELL.value))
 
         # BUILD REPORTS

@@ -17,8 +17,8 @@ class ValidatorModelABC(ABC):
 
         # UNPACK DATA
         self._data_model = self._data_context.get_instance_of(self._type_class)
-        self._filename = self._data_model.FILENAME
-        self._dataframe = self._data_model.DATA_MODEL_IMPORTER.df_data.copy()
+        self._filename = self._data_model.filename
+        self._dataframe = self._data_model.data_loader_model.df_data.copy()
         self.TITLES_INFO = self._data_context.config.get_verify_names()
 
         # LIST OF ERRORS AND WARNINGS
@@ -32,6 +32,10 @@ class ValidatorModelABC(ABC):
 
     def _column_exists(self, column: str) -> Tuple[bool, str]:
         exists, msg_error_column = column_exists(self._dataframe, self._filename, column)
+        return exists, msg_error_column
+
+    def _column_exists_dataframe(self, dataframe, column: str) -> Tuple[bool, str]:
+        exists, msg_error_column = column_exists(dataframe, self._filename, column)
         return exists, msg_error_column
 
     def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:

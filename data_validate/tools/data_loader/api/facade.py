@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/facade.py
+# File: data_loader/facade.py
 """
 Facade para importar todos os arquivos esperados de forma simples.
 """
@@ -13,7 +13,7 @@ from ..common.config import Config
 from ..strategies.header import SingleHeaderStrategy, DoubleHeaderStrategy
 import pandas as pd
 
-class DataModelImporter:
+class DataLoaderModel:
     """
     Handles the importation and management of data models from a specified file path,
     providing access to metadata and data for further operations.
@@ -42,6 +42,7 @@ class DataModelImporter:
         self.path = path
         self.df_data = df_data
         self.read_success = read_success
+        self.exists_file = self.path.exists() if isinstance(self.path, Path) else False
 
         # UNPACKING VARIABLES
         self.name = self.path.stem
@@ -52,7 +53,7 @@ class DataModelImporter:
 
 
     def __str__(self):
-        return f"DataModelImporter({self.name}):\n" + \
+        return f"DataLoaderModel({self.name}):\n" + \
             f"  input_folder: {self.input_folder}\n" + \
             f"  name: {self.name}\n" + \
             f"  filename: {self.filename}\n" + \
@@ -63,11 +64,12 @@ class DataModelImporter:
             f"  df_data columns: {self.df_data.columns}\n" + \
             f"  df_data dtypes: {self.df_data.dtypes}\n" + \
             f"  header_type: {self.header_type}\n" + \
-            f"  read_success: {self.read_success}\n"
+            f"  read_success: {self.read_success}\n" + \
+            f"  exists_file: {self.exists_file}\n"
 
 
 
-class DataImporterFacade:
+class DataLoaderFacade:
     """
 Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto).
 """
@@ -110,7 +112,7 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
             except Exception as e:
                 errors.append(f"{path.name}: Erro inesperado ao processar o arquivo. Detalhes: {e} ({type(e)})")
 
-            data_model = DataModelImporter(
+            data_model = DataLoaderModel(
                 input_folder=str(self.input_dir),
                 path=path,
                 df_data = df_local if df_local is not None else pd.DataFrame(),
@@ -125,7 +127,7 @@ Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto
         # Adiciona arquivos faltando ou não obrigatórios como vazios
         for name, (req, _, _) in self.config.file_specs.items():
             if name not in data:
-                data[name] = DataModelImporter(
+                data[name] = DataLoaderModel(
                     input_folder=str(self.input_dir),
                     path=Path(name),
                     df_data=pd.DataFrame(),

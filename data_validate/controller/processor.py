@@ -4,7 +4,7 @@ from logging import Logger
 from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config, NamesEnum
-from tools import DataImporterFacade
+from tools import DataLoaderFacade
 from data_model import (
     SpDescription, SpComposition, SpValue, SpTemporalReference,
     SpProportionality, SpScenario, SpLegend, SpDictionary
@@ -42,6 +42,7 @@ class ProcessorSpreadsheet:
         self.output_folder = data_args.data_file.output_folder
 
         self.list_scenarios = []
+        self.exists_scenario = False
         self.models_to_use = []
         self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
@@ -56,7 +57,7 @@ class ProcessorSpreadsheet:
 
     def _read_data(self) -> None:
         # 0 ETL: Extract, Transform, Load
-        importer = DataImporterFacade(self.input_folder)
+        importer = DataLoaderFacade(self.input_folder)
         data, errors_data_importer = importer.load_all
         # APPEND ERRORS TO REPORT LIST
         self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_data_importer)
@@ -68,10 +69,10 @@ class ProcessorSpreadsheet:
         errors_structure_general = self.structure_validator.validate()
         self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_structure_general)
 
-        if not data[SpScenario.CONSTANTS.SP_NAME].df_data.empty:
+        if data[SpScenario.CONSTANTS.SP_NAME].exists_file and data[SpScenario.CONSTANTS.SP_NAME].read_success:
+            self.exists_scenario = True
             if SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns:
-                self.list_scenarios = data[SpScenario.CONSTANTS.SP_NAME].df_data[
-                    SpScenario.RequiredColumn.COLUMN_SYMBOL.name].tolist()
+                self.list_scenarios = data[SpScenario.CONSTANTS.SP_NAME].df_data[SpScenario.RequiredColumn.COLUMN_SYMBOL.name].unique().tolist()
 
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.classes_to_initialize:
@@ -81,7 +82,7 @@ class ProcessorSpreadsheet:
             attribute_name = f"sp_{sp_name_key.lower()}"
 
             # Model instance creation and initialization
-            model_instance = model_class(data_model=data.get(sp_name_key), **{"list_scenarios": self.list_scenarios})
+            model_instance = model_class(data_model=data.get(sp_name_key), **{"exists_scenario": self.exists_scenario, "list_scenarios": self.list_scenarios})
             setattr(self, attribute_name, model_instance)
             self.models_to_use.append(model_instance)
 

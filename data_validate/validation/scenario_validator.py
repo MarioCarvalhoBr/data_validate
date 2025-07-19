@@ -1,8 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Tuple, Dict, Any
 
-import pandas as pd
-
 from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpScenario

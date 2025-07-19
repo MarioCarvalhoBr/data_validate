@@ -1,11 +1,16 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Tuple, Dict, Any
-
+import pandas as pd
+import re
+from common.utils.formatting.number_formatting import check_cell
+from common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
+    extract_numeric_integer_ids_from_list, find_differences_in_two_set
 from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpDescription, SpTemporalReference, SpScenario, SpValue
 from validation.data_context import DataContext
 from validation.validator_model_abc import ValidatorModelABC
+
 
 class SpValueValidator(ValidatorModelABC):
     """
@@ -24,8 +29,111 @@ class SpValueValidator(ValidatorModelABC):
         # Run pipeline
         self.run()
 
-    def validate_codes_identification(self) -> Tuple[List[str], List[str]]:
+    def _validate_required_columns(self, exists_scenario: bool) -> List[str]:
+        """Validate that all required columns exist in the respective dataframes."""
+        errors = []
+
+        # Define required columns for each model
+        description_columns = [
+            SpDescription.RequiredColumn.COLUMN_CODE.name,
+            SpDescription.RequiredColumn.COLUMN_LEVEL.name
+        ]
+
+        scenario_columns = [SpScenario.RequiredColumn.COLUMN_SYMBOL.name] if exists_scenario else []
+
+        # Check description columns
+        for column in description_columns:
+            exists_column, error_msg = self._column_exists_dataframe(self.model_sp_description.data_loader_model.df_data, column)
+            if not exists_column:
+                errors.append(error_msg)
+
+        # Check scenario columns if scenarios exist
+        for column in scenario_columns:
+            exists_column, error_msg = self._column_exists_dataframe(self.model_sp_scenario.data_loader_model.df_data, column)
+            if not exists_column:
+                errors.append(error_msg)
+
+        return errors
+
+    def _get_filtered_description_dataframe(self) -> pd.DataFrame:
+        """Get cleaned description dataframe with level filters applied."""
+        df_code_level = self.model_sp_description.df_code_level_cleanned.copy()
+
+        # Remove level 1 indicators
+        df_filtered = df_code_level[df_code_level[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != '1']
+
+        # Remove level 2 indicators with scenario 0 if scenario column exists
+        scenario_column = SpDescription.DynamicColumn.COLUMN_SCENARIO.name
+        if scenario_column in df_filtered.columns:
+            df_filtered = df_filtered[~((df_filtered[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == '2') & (df_filtered[scenario_column] == '0'))]
+
+        return df_filtered
+
+    def _extract_level_one_codes(self) -> List[str]:
+        """Extract level 1 codes to be ignored during validation."""
+        df_code_level = self.model_sp_description.df_code_level_cleanned.copy()
+        column_code = SpDescription.RequiredColumn.COLUMN_CODE.name
+        column_level = SpDescription.RequiredColumn.COLUMN_LEVEL.name
+
+        return df_code_level[df_code_level[column_level] == '1'][column_code].astype(str).tolist()
+
+    def _process_invalid_columns(self, invalid_columns: List[str]) -> List[str]:
+        """Process and clean invalid column names, returning sorted list."""
+        # Filter out columns containing ':'
+        filtered_columns = {col for col in invalid_columns if ':' not in col}
+        return sorted(filtered_columns)
+
+    def validate_relation_indicators_in_values(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate indicator relationships between values and descriptions.
+
+        Returns:
+            Tuple of (errors, warnings) lists
+        """
         errors, warnings = [], []
+
+        # Get model properties
+        exists_scenario = self.model_sp_value.exists_scenario
+        list_scenarios = self.model_sp_value.list_scenarios
+
+        # Validate required columns first
+        column_errors = self._validate_required_columns(exists_scenario)
+        if column_errors:
+            return column_errors, warnings
+
+        # Extract level 1 codes to ignore
+        level_one_codes = self._extract_level_one_codes()
+
+        # Process value columns
+        value_columns = self._dataframe.columns.tolist()
+        columns_to_ignore = [SpValue.RequiredColumn.COLUMN_ID.name] + level_one_codes
+
+        valid_value_codes, invalid_columns = extract_numeric_ids_and_unmatched_strings_from_list(
+            value_columns, columns_to_ignore, list_scenarios
+        )
+
+        # Process invalid columns
+        processed_invalid_columns = self._process_invalid_columns(invalid_columns)
+        if processed_invalid_columns:
+            errors.append(f"{self._filename}: Colunas inválidas: {processed_invalid_columns}.")
+
+        # Get filtered description codes
+        filtered_description_df = self._get_filtered_description_dataframe()
+        description_code_values = set(
+            filtered_description_df[SpDescription.RequiredColumn.COLUMN_CODE.name].astype(str)
+        )
+
+        valid_description_codes, _ = extract_numeric_integer_ids_from_list(description_code_values)
+
+        # Compare codes between description and values
+        comparison_errors = find_differences_in_two_set(
+            first_set=valid_description_codes,
+            label_1=self.model_sp_description.filename,
+            second_set=valid_value_codes,
+            label_2=self._filename
+        )
+        errors.extend(comparison_errors)
+
         return errors, warnings
 
     def validate_value_combination_relation(self) -> Tuple[List[str], List[str]]:
@@ -40,7 +148,7 @@ class SpValueValidator(ValidatorModelABC):
         """Runs all content validations for SpScenario."""
 
         validations = [
-            (self.validate_codes_identification(), NamesEnum.HTML_DESC.value),
+            (self.validate_relation_indicators_in_values, NamesEnum.IR.value),
             (self.validate_value_combination_relation, NamesEnum.HTML_DESC.value),
             (self.validate_unavailable_codes_values, NamesEnum.HTML_DESC.value),
         ]
@@ -49,3 +157,4 @@ class SpValueValidator(ValidatorModelABC):
         self.build_reports(validations)
 
         return self._errors, self._warnings
+

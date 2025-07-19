@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/scanner.py
+# File: data_loader/scanner.py
 """
 Escaneia diretório de entrada e valida existência de arquivos.
 """

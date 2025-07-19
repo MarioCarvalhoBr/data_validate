@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/config.py
+# File: data_loader/config.py
 """
 Singleton de configuração central de arquivos.
 """

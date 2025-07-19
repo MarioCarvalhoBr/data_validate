@@ -1,7 +1,7 @@
 
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-# File: data_importer/readers/qml_reader.py
+# File: data_loader/readers/qml_reader.py
 """
 Retorna o conteúdo textual de um arquivo QML.
 """
