@@ -1,8 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Tuple, Dict, Any
-import pandas as pd
 
-from common.utils.formatting.number_formatting import check_cell
 from common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
     extract_numeric_integer_ids_from_list, find_differences_in_two_set, categorize_strings_by_id_pattern_from_list
 from common.utils.validation.value_data_validation import (
