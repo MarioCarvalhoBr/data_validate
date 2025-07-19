@@ -81,7 +81,7 @@ class SpValueValidator(ValidatorModelABC):
         )
 
         # Process value columns
-        value_columns = self._dataframe.columns.tolist()
+        value_columns = self.model_sp_value.data_loader_model.df_data.columns.tolist()
         columns_to_ignore = [SpValue.RequiredColumn.COLUMN_ID.name] + level_one_codes
 
         valid_value_codes, invalid_columns = extract_numeric_ids_and_unmatched_strings_from_list(
@@ -91,7 +91,7 @@ class SpValueValidator(ValidatorModelABC):
         # Process invalid columns using generic function
         processed_invalid_columns = process_invalid_columns(invalid_columns)
         if processed_invalid_columns:
-            errors.append(f"{self._filename}: Colunas inválidas: {processed_invalid_columns}.")
+            errors.append(f"{self.model_sp_value.filename}: Colunas inválidas: {processed_invalid_columns}.")
 
         # Get filtered description codes using generic function
         filtered_description_df = get_filtered_description_dataframe(
@@ -110,7 +110,7 @@ class SpValueValidator(ValidatorModelABC):
             first_set=valid_description_codes,
             label_1=self.model_sp_description.filename,
             second_set=valid_value_codes,
-            label_2=self._filename
+            label_2=self.model_sp_value.filename
         )
         errors.extend(comparison_errors)
 
@@ -150,7 +150,7 @@ class SpValueValidator(ValidatorModelABC):
 
         # Prepare dataframe for validation using generic function
         df_values = prepare_values_dataframe(
-            self._dataframe,
+            self.model_sp_value.data_loader_model.df_data,
             SpValue.RequiredColumn.COLUMN_ID.name
         )
 
@@ -161,7 +161,7 @@ class SpValueValidator(ValidatorModelABC):
 
         # Validate data values in columns using generic function
         validation_errors, validation_warnings = validate_data_values_in_columns(
-            df_values, valid_columns, self._filename
+            df_values, valid_columns, self.model_sp_value.filename
         )
 
         errors.extend(validation_errors)
