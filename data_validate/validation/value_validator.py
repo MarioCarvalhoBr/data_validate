@@ -1,10 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Tuple, Dict, Any
 import pandas as pd
+from decimal import Decimal
+
 import re
 from common.utils.formatting.number_formatting import check_cell
 from common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
-    extract_numeric_integer_ids_from_list, find_differences_in_two_set
+    extract_numeric_integer_ids_from_list, find_differences_in_two_set, categorize_strings_by_id_pattern_from_list
 from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpDescription, SpTemporalReference, SpScenario, SpValue
@@ -28,32 +30,6 @@ class SpValueValidator(ValidatorModelABC):
 
         # Run pipeline
         self.run()
-
-    def _validate_required_columns(self, exists_scenario: bool) -> List[str]:
-        """Validate that all required columns exist in the respective dataframes."""
-        errors = []
-
-        # Define required columns for each model
-        description_columns = [
-            SpDescription.RequiredColumn.COLUMN_CODE.name,
-            SpDescription.RequiredColumn.COLUMN_LEVEL.name
-        ]
-
-        scenario_columns = [SpScenario.RequiredColumn.COLUMN_SYMBOL.name] if exists_scenario else []
-
-        # Check description columns
-        for column in description_columns:
-            exists_column, error_msg = self._column_exists_dataframe(self.model_sp_description.data_loader_model.df_data, column)
-            if not exists_column:
-                errors.append(error_msg)
-
-        # Check scenario columns if scenarios exist
-        for column in scenario_columns:
-            exists_column, error_msg = self._column_exists_dataframe(self.model_sp_scenario.data_loader_model.df_data, column)
-            if not exists_column:
-                errors.append(error_msg)
-
-        return errors
 
     def _get_filtered_description_dataframe(self) -> pd.DataFrame:
         """Get cleaned description dataframe with level filters applied."""
@@ -96,10 +72,30 @@ class SpValueValidator(ValidatorModelABC):
         exists_scenario = self.model_sp_value.exists_scenario
         list_scenarios = self.model_sp_value.list_scenarios
 
-        # Validate required columns first
-        column_errors = self._validate_required_columns(exists_scenario)
-        if column_errors:
-            return column_errors, warnings
+        # Define required columns for each model
+        description_columns = [
+            SpDescription.RequiredColumn.COLUMN_CODE.name,
+            SpDescription.RequiredColumn.COLUMN_LEVEL.name
+        ]
+
+        scenario_columns = [SpScenario.RequiredColumn.COLUMN_SYMBOL.name] if exists_scenario else []
+
+        # Check description columns
+        for column in description_columns:
+            exists_column, error_msg = self._column_exists_dataframe(
+                self.model_sp_description.data_loader_model.df_data, column)
+            if not exists_column:
+                errors.append(error_msg)
+
+        # Check scenario columns if scenarios exist
+        for column in scenario_columns:
+            exists_column, error_msg = self._column_exists_dataframe(self.model_sp_scenario.data_loader_model.df_data,
+                                                                     column)
+            if not exists_column:
+                errors.append(error_msg)
+
+        if errors:
+            return errors, warnings
 
         # Extract level 1 codes to ignore
         level_one_codes = self._extract_level_one_codes()
@@ -140,8 +136,165 @@ class SpValueValidator(ValidatorModelABC):
         errors, warnings = [], []
         return errors, warnings
 
+    def _validate_scenario_columns(self, exists_scenario: bool) -> List[str]:
+        """Validate scenario columns if scenarios exist."""
+        if not exists_scenario:
+            return []
+
+        errors = []
+        scenario_columns = [SpScenario.RequiredColumn.COLUMN_SYMBOL.name]
+
+        for column in scenario_columns:
+            exists_column, error_msg = self._column_exists_dataframe(
+                self.model_sp_scenario.data_loader_model.df_data, column
+            )
+            if not exists_column:
+                errors.append(error_msg)
+
+        return errors
+
+    def _prepare_values_dataframe(self) -> pd.DataFrame:
+        """Prepare values dataframe by removing ID column if it exists."""
+        df_values = self._dataframe.copy()
+        id_column = SpValue.RequiredColumn.COLUMN_ID.name
+
+        if id_column in df_values.columns:
+            df_values = df_values.drop(columns=[id_column])
+
+        return df_values
+
+    def _validate_numeric_value(self, value: Any, row_index: int, column: str) -> Tuple[bool, str, bool]:
+        """
+        Validate a single numeric value.
+
+        Returns:
+            Tuple of (is_valid, error_message, has_excessive_decimals)
+        """
+        # Skip DI (Data Unavailable) values
+        if value == "DI":
+            return True, "", False
+
+        # Check if value is NaN or can't be converted to numeric
+        numeric_value = pd.to_numeric(str(value).replace(',', '.'), errors='coerce')
+        if pd.isna(value) or pd.isna(numeric_value):
+            error_msg = (f"{self._filename}, linha {row_index + 2}: "
+                        f"O valor não é um número válido e nem DI (Dado Indisponível) "
+                        f"para a coluna '{column}'.")
+            return False, error_msg, False
+
+        # Check decimal places using Decimal for precision
+        try:
+            decimal_value = Decimal(str(value).replace(',', '.'))
+            has_excessive_decimals = decimal_value.as_tuple().exponent < -2
+            return True, "", has_excessive_decimals
+        except (ValueError, TypeError):
+            error_msg = (f"{self._filename}, linha {row_index + 2}: "
+                        f"Erro ao processar valor decimal para a coluna '{column}'.")
+            return False, error_msg, False
+
+    def _process_column_validation(self, df_values: pd.DataFrame, column: str) -> Tuple[List[str], set]:
+        """
+        Process validation for a single column.
+
+        Returns:
+            Tuple of (error_messages, rows_with_excessive_decimals)
+        """
+        errors = []
+        excessive_decimal_rows = set()
+
+        invalid_values = []
+        first_invalid_row = None
+        last_invalid_row = None
+
+        for index, value in df_values[column].items():
+            is_valid, error_msg, has_excessive_decimals = self._validate_numeric_value(
+                value, index, column
+            )
+
+            if not is_valid:
+                invalid_values.append((index + 2, error_msg))
+                if first_invalid_row is None:
+                    first_invalid_row = index + 2
+                last_invalid_row = index + 2
+
+            if has_excessive_decimals:
+                excessive_decimal_rows.add(index + 2)
+
+        # Generate error messages based on count
+        if len(invalid_values) == 1:
+            errors.append(invalid_values[0][1])
+        elif len(invalid_values) > 1:
+            error_msg = (f"{self._filename}: {len(invalid_values)} valores que não são "
+                        f"número válido nem DI (Dado Indisponível) para a coluna '{column}', "
+                        f"entre as linhas {first_invalid_row} e {last_invalid_row}.")
+            errors.append(error_msg)
+
+        return errors, excessive_decimal_rows
+
+    def _generate_decimal_warning(self, all_excessive_decimal_rows: set, count_excessive_decimal_rows: int) -> str:
+        """Generate warning message for values with excessive decimal places."""
+        if not all_excessive_decimal_rows:
+            return ""
+
+        count = len(all_excessive_decimal_rows)
+        text_existem = "Existem" if count > 1 else "Existe"
+        text_valores = "valores" if count > 1 else "valor"
+
+        sorted_rows = sorted(all_excessive_decimal_rows)
+        first_row = sorted_rows[0]
+        last_row = sorted_rows[-1]
+
+        return (f"{self._filename}: {text_existem} {count_excessive_decimal_rows} {text_valores} com mais de 2 "
+               f"casas decimais, serão consideradas apenas as 2 primeiras casas decimais. "
+               f"Entre as linhas {first_row} e {last_row}.")
+
     def validate_unavailable_codes_values(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate unavailable and invalid values in the data.
+
+        Checks for:
+        1. Invalid numeric values (not numbers and not "DI")
+        2. Values with more than 2 decimal places
+
+        Returns:
+            Tuple of (errors, warnings) lists
+        """
         errors, warnings = [], []
+
+        # Get model properties
+        exists_scenario = self.model_sp_value.exists_scenario
+        list_scenarios = self.model_sp_value.list_scenarios
+
+        # Validate scenario columns if they exist
+        scenario_errors = self._validate_scenario_columns(exists_scenario)
+        if scenario_errors:
+            return scenario_errors, warnings
+
+        # Prepare dataframe for validation
+        df_values = self._prepare_values_dataframe()
+
+        # Get valid columns that match ID patterns
+        valid_columns, _ = categorize_strings_by_id_pattern_from_list(
+            df_values.columns, list_scenarios
+        )
+
+        # Process each valid column
+        all_excessive_decimal_rows = set()
+        count_excessive_decimal_rows = 0
+
+        for column in valid_columns:
+            column_errors, excessive_decimal_rows = self._process_column_validation(
+                df_values, column
+            )
+            errors.extend(column_errors)
+            count_excessive_decimal_rows += len(excessive_decimal_rows)
+            all_excessive_decimal_rows.update(excessive_decimal_rows)
+
+        # Generate warning for excessive decimal places
+        decimal_warning = self._generate_decimal_warning(all_excessive_decimal_rows, count_excessive_decimal_rows)
+        if decimal_warning:
+            warnings.append(decimal_warning)
+
         return errors, warnings
 
     def run(self) -> Tuple[List[str], List[str]]:
@@ -150,7 +303,7 @@ class SpValueValidator(ValidatorModelABC):
         validations = [
             (self.validate_relation_indicators_in_values, NamesEnum.IR.value),
             (self.validate_value_combination_relation, NamesEnum.HTML_DESC.value),
-            (self.validate_unavailable_codes_values, NamesEnum.HTML_DESC.value),
+            (self.validate_unavailable_codes_values, NamesEnum.UNAV_INV.value),
         ]
 
         # BUILD REPORTS
