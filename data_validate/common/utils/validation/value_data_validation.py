@@ -1,53 +1,8 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from typing import List, Tuple, Dict, Any, Set
-import pandas as pd
 from decimal import Decimal
+from typing import List, Tuple, Any, Set
 
-def validate_scenario_columns_exist(
-    scenario_dataframe: pd.DataFrame,
-    scenario_column_names: List[str],
-    exists_scenario: bool
-) -> List[str]:
-    """
-    Validate scenario columns if scenarios exist.
-
-    Args:
-        scenario_dataframe: The scenario dataframe to check
-        scenario_column_names: List of required scenario column names
-        exists_scenario: Whether scenarios should exist
-
-    Returns:
-        List of error messages
-    """
-    if not exists_scenario:
-        return []
-
-    errors = []
-    for column in scenario_column_names:
-        if column not in scenario_dataframe.columns:
-            errors.append(f"Coluna obrigatória '{column}' não encontrada no arquivo de cenários.")
-
-    return errors
-
-
-def prepare_values_dataframe(dataframe: pd.DataFrame, id_column_name: str) -> pd.DataFrame:
-    """
-    Prepare values dataframe by removing ID column if it exists.
-
-    Args:
-        dataframe: The input dataframe
-        id_column_name: Name of the ID column to remove
-
-    Returns:
-        Dataframe with ID column removed if it existed
-    """
-    df_values = dataframe.copy()
-
-    if id_column_name in df_values.columns:
-        df_values = df_values.drop(columns=[id_column_name])
-
-    return df_values
-
+import pandas as pd
 
 def validate_numeric_value(
     value: Any,
