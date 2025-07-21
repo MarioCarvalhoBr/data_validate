@@ -11,6 +11,7 @@ class SpModelABC(ABC):
         "CSV": ".csv",
         "XLSX": ".xlsx",
     })
+    CONSTANTS = None
     def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
 
         # SETUP

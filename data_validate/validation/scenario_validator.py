@@ -56,6 +56,9 @@ class SpScenarioValidator(ValidatorModelABC):
 
         return errors, []
 
+    def _prepare_statement(self):
+        pass
+
     def run(self) -> Tuple[List[str], List[str]]:
         """Runs all content validations for SpScenario."""
         if self._dataframe.empty:

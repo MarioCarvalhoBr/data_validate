@@ -89,6 +89,9 @@ class SpellCheckerValidator(ValidatorModelABC):
 
         return errors, warnings
 
+    def _prepare_statement(self):
+        pass
+
     def run(self) -> Tuple[List[str], List[str]]:
         """Runs all content validations for SpScenario."""
 

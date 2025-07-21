@@ -23,3 +23,14 @@ def generate_combinations(code, start_year, temporal_symbols, scenario_symbols):
             combinations.append(f"{code}-{year}-{symbol}")
 
     return combinations
+
+def processar_combinacoes_extras(lista_combinacoes, lista_combinacoes_sp_values):
+    for i in lista_combinacoes:
+        # Se existe em lista_combinacoes_sp_values então pop
+        if i in lista_combinacoes_sp_values:
+            lista_combinacoes_sp_values.pop(lista_combinacoes_sp_values.index(i))
+
+    # Criando mensagens de erro se houver elementos extras
+    if lista_combinacoes_sp_values:
+        return True, lista_combinacoes_sp_values
+    return False, []

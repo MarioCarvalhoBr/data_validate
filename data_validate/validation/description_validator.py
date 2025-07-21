@@ -209,6 +209,9 @@ class SpDescriptionValidator(ValidatorModelABC):
         max_len = SpDescription.CONSTANTS.MAX_SIMPLE_DESC_LENGTH
         return self._check_text_length(column, max_len)
 
+    def _prepare_statement(self):
+        pass
+
     def run(self) -> Tuple[List[str], List[str]]:
         """Runs all content validations for SpDescription."""
         if self._dataframe.empty:

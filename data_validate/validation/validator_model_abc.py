@@ -56,3 +56,7 @@ class ValidatorModelABC(ABC):
     @abstractmethod
     def run(self):
         pass
+
+    @abstractmethod
+    def _prepare_statement(self):
+        pass
