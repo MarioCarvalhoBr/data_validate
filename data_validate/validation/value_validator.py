@@ -66,9 +66,6 @@ class SpValueValidator(ValidatorModelABC):
             self.sp_name_scenario: [SpScenario.RequiredColumn.COLUMN_SYMBOL.name] if self.exists_scenario else []
         }
 
-        if self.exists_scenario:
-            self.required_columns[self.sp_name_description].append(SpDescription.DynamicColumn.COLUMN_SCENARIO.name)
-
         # Validate all required columns exist
         self.model_dataframes = {
             self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
@@ -166,6 +163,9 @@ class SpValueValidator(ValidatorModelABC):
         in the values dataframe based on its level and scenario configuration.
         """
         errors, warnings = [], []
+
+        if self.exists_scenario:
+            self.required_columns[self.sp_name_description].append(SpDescription.DynamicColumn.COLUMN_SCENARIO.name)
 
         for model_name, columns in self.required_columns.items():
             dataframe = self.model_dataframes[model_name]
