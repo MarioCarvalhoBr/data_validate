@@ -2,16 +2,24 @@ from abc import ABC, abstractmethod
 from types import MappingProxyType
 from typing import List, Dict, Any
 
+from common.base.constant_base import ConstantBase
 from data_validate.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.common.utils.validation.data_validation import check_vertical_bar, check_unnamed_columns
 
 class SpModelABC(ABC):
-    INFO = MappingProxyType({
-        "EXTENSIONS": [".csv", ".xlsx"],
-        "CSV": ".csv",
-        "XLSX": ".xlsx",
-    })
-    CONSTANTS = None
+    class DEFINITIONS(ConstantBase):
+        def __init__(self):
+            super().__init__()
+            self.CSV = ".csv"
+            self.XLSX = ".xlsx"
+            self.EXTENSIONS = [self.CSV, self.XLSX]
+            self.EXISTING_SCENARIO = "exists_scenario"
+            self.LIST_SCENARIOS = "list_scenarios"
+            self.SP_NAMAE_SCENARIO = "cenarios"
+
+            self._finalize_initialization()
+    VAR_CONSTS = DEFINITIONS()
+
     def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
 
         # SETUP
@@ -20,8 +28,9 @@ class SpModelABC(ABC):
 
         # UNPACKING DATA ARGS
         self.filename: str =  self.data_loader_model.filename
-        self.exists_scenario: bool = kwargs.get("exists_scenario", False)
-        self.list_scenarios: List[str] = kwargs.get("list_scenarios", [])
+
+        self.exists_scenario: bool = self._kwargs.get(self.VAR_CONSTS.EXISTING_SCENARIO, False)
+        self.list_scenarios: List[str] = self._kwargs.get(self.VAR_CONSTS.LIST_SCENARIOS, [])
 
         # CONFIGURE VARIABLES AND LISTS
         self.STRUCTURE_LIST_ERRORS: List[str] = []

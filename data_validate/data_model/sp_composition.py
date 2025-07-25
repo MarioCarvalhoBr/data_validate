@@ -46,15 +46,15 @@ class SpComposition(SpModelABC):
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
-        # 1. Limpar e validar a coluna 'codigo_pai' (mínimo 1)
-        col_parent = self.RequiredColumn.COLUMN_PARENT_CODE.name
-        df, errors_parent = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_parent], min_value=1)
-        self.DATA_CLEAN_ERRORS.extend(errors_parent)
+        # 1. Limpar e validar as coluna 'codigo_pai' (mínimo 1) e 'codigo_filho' (mínimo 1)
 
-        # 2. Limpar e validar a coluna 'codigo_filho' (mínimo 1)
-        col_child = self.RequiredColumn.COLUMN_CHILD_CODE.name
-        df, errors_child = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_child], min_value=1)
-        self.DATA_CLEAN_ERRORS.extend(errors_child)
+        col_names = [self.RequiredColumn.COLUMN_PARENT_CODE.name, self.RequiredColumn.COLUMN_CHILD_CODE.name]
+        for col_name in col_names:
+            col_name = str(col_name)
+            df, errors = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_name], min_value=1)
+            self.DATA_CLEAN_ERRORS.extend(errors)
+            if col_name in df.columns:
+                setattr(self.RequiredColumn, col_name, df[col_name])
 
     def run(self):
         self.pre_processing()

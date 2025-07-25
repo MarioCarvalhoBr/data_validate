@@ -10,6 +10,7 @@ from data_validate.common.utils.formatting.error_formatting import format_errors
 from data_validate.common.utils.processing.data_cleaning import clean_dataframe
 
 class SpDescription(SpModelABC):
+
     # CONSTANTS
     class INFO(ConstantBase):
         def __init__(self):
@@ -18,7 +19,6 @@ class SpDescription(SpModelABC):
             self.SP_DESCRIPTION = "Planilha de descricao"
             self.MAX_TITLE_LENGTH = 40
             self.MAX_SIMPLE_DESC_LENGTH = 150
-            self.SP_SCENARIO_NAME = "cenarios"
             self._finalize_initialization()
 
     CONSTANTS = INFO()
@@ -65,40 +65,36 @@ class SpDescription(SpModelABC):
 
     def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
         super().__init__(data_model, **kwargs)
-        self.df_code_level_cleanned = pd.DataFrame()
         self.run()
 
     def pre_processing(self):
-        self.color = "yellow"
-        expected_columns = list(self.RequiredColumn.ALL)
+        local_expected_columns = list(self.RequiredColumn.ALL)
+
         # 1. Tratamento de colunas dinâmicas: cenarios
         if not self.list_scenarios:
-            ## 1.1: Se não houver cenários, remove a coluna de cenário
+            ## 1.1: Se não houver cenários, remove a coluna de cenário se existir no dataframe
             if self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns:
                 self.STRUCTURE_LIST_ERRORS.append(
-                    f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não estiver configurado ou não existir.")
+                    f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.VAR_CONSTS.SP_NAMAE_SCENARIO}' não estiver configurado ou não existir.")
                 self.data_loader_model.df_data = self.data_loader_model.df_data.drop(
                     columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         else:
             # 1.2: Se houver cenários, adiciona a coluna de cenário
-            expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
+            local_expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
 
         # 2. Tratamento de colunas opcionais
-        # 2.1: Adiciona colunas opcionais: relação
         if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.df_data.columns:
             self.data_loader_model.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
-        # 2.2: Adiciona colunas opcionais: unidade
         if self.OptionalColumn.COLUMN_UNIT.name not in self.data_loader_model.df_data.columns:
             self.data_loader_model.df_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
 
         for opt_column_name in self.OptionalColumn.ALL:
-            if (opt_column_name in self.data_loader_model.df_data.columns) and (opt_column_name not in expected_columns):
-                expected_columns.append(opt_column_name)
+            if (opt_column_name in self.data_loader_model.df_data.columns) and (opt_column_name not in local_expected_columns):
+                local_expected_columns.append(opt_column_name)
 
-        self.EXPECTED_COLUMNS = expected_columns
+        self.EXPECTED_COLUMNS = local_expected_columns
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
-
         # Check missing columns expected columns and extra columns
         missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, self.EXPECTED_COLUMNS)
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
@@ -113,9 +109,6 @@ class SpDescription(SpModelABC):
         self.DATA_CLEAN_ERRORS.extend(errors_codigo)
         if self.RequiredColumn.COLUMN_CODE.name in df.columns:
             self.RequiredColumn.COLUMN_CODE = df[self.RequiredColumn.COLUMN_CODE.name]
-
-        # Configure df_code_level_cleanned
-        self.df_code_level_cleanned = df.copy()
 
         # 2. Limpar e validar a coluna 'nivel' (mínimo 1)
         col_nivel = self.RequiredColumn.COLUMN_LEVEL.name

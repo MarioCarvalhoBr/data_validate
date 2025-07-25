@@ -82,7 +82,7 @@ class ProcessorSpreadsheet:
             attribute_name = f"sp_{sp_name_key.lower()}"
 
             # Model instance creation and initialization
-            model_instance = model_class(data_model=data.get(sp_name_key), **{"exists_scenario": self.exists_scenario, "list_scenarios": self.list_scenarios})
+            model_instance = model_class(data_model=data.get(sp_name_key), **{model_class.VAR_CONSTS.EXISTING_SCENARIO: self.exists_scenario, model_class.VAR_CONSTS.LIST_SCENARIOS: self.list_scenarios})
             setattr(self, attribute_name, model_instance)
             self.models_to_use.append(model_instance)
 
