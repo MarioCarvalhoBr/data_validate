@@ -46,15 +46,21 @@ class SpComposition(SpModelABC):
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
-        # 1. Limpar e validar as coluna 'codigo_pai' (mínimo 1) e 'codigo_filho' (mínimo 1)
+        # 1. Create mapping of column names to their corresponding class attributes 'codigo_pai' (mínimo 1) e 'codigo_filho' (mínimo 1)
+        column_attribute_mapping = {
+            self.RequiredColumn.COLUMN_PARENT_CODE.name: "COLUMN_PARENT_CODE",
+            self.RequiredColumn.COLUMN_CHILD_CODE.name: "COLUMN_CHILD_CODE"
+        }
 
-        col_names = [self.RequiredColumn.COLUMN_PARENT_CODE.name, self.RequiredColumn.COLUMN_CHILD_CODE.name]
-        for col_name in col_names:
-            col_name = str(col_name)
-            df, errors = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_name], min_value=1)
+        # Clean and validate required columns (minimum value: 1)
+        for column_name in column_attribute_mapping.keys():
+            df, errors = clean_dataframe(self.data_loader_model.df_data, self.filename, [column_name],  min_value=1)
             self.DATA_CLEAN_ERRORS.extend(errors)
-            if col_name in df.columns:
-                setattr(self.RequiredColumn, col_name, df[col_name])
+
+            if column_name in df.columns:
+                # Use setattr to dynamically set the attribute
+                attribute_name = column_attribute_mapping[column_name]
+                setattr(self.RequiredColumn, attribute_name, df[column_name])
 
     def run(self):
         self.pre_processing()

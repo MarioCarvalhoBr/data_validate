@@ -103,21 +103,23 @@ class SpDescription(SpModelABC):
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
-        # Limpeza e validação das colunas principais usando clean_dataframe
-        # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
-        df, errors_codigo = clean_dataframe(self.data_loader_model.df_data, self.filename, [self.RequiredColumn.COLUMN_CODE.name], min_value=1)
-        self.DATA_CLEAN_ERRORS.extend(errors_codigo)
-        if self.RequiredColumn.COLUMN_CODE.name in df.columns:
-            self.RequiredColumn.COLUMN_CODE = df[self.RequiredColumn.COLUMN_CODE.name]
+        # 1. Create mapping of column names to their corresponding class attributes codigo (mínimo 1) e nivel (mínimo 1)
+        column_attribute_mapping = {
+            self.RequiredColumn.COLUMN_CODE.name: "COLUMN_CODE",
+            self.RequiredColumn.COLUMN_LEVEL.name: "COLUMN_LEVEL"
+        }
 
-        # 2. Limpar e validar a coluna 'nivel' (mínimo 1)
-        col_nivel = self.RequiredColumn.COLUMN_LEVEL.name
-        df, errors_nivel = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_nivel], min_value=1)
-        self.DATA_CLEAN_ERRORS.extend(errors_nivel)
-        if col_nivel in df.columns:
-            self.RequiredColumn.COLUMN_LEVEL = df[col_nivel]
+        # Clean and validate required columns (minimum value: 1)
+        for column_name in column_attribute_mapping.keys():
+            df, errors = clean_dataframe(self.data_loader_model.df_data, self.filename, [column_name], min_value=1)
+            self.DATA_CLEAN_ERRORS.extend(errors)
 
-        # 3. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
+            if column_name in df.columns:
+                # Use setattr to dynamically set the attribute
+                attribute_name = column_attribute_mapping[column_name]
+                setattr(self.RequiredColumn, attribute_name, df[column_name])
+
+        # 2. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
         if self.list_scenarios:
             col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
             df, errors_cenario = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_cenario], min_value=-1)
