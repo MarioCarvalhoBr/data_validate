@@ -255,10 +255,6 @@ class SpValueValidator(ValidatorModelABC):
             self.sp_name_scenario: self.global_required_columns[self.sp_name_scenario] if self.exists_scenario else []
         }
         id_column_name = SpValue.RequiredColumn.COLUMN_ID.name
-        code_column_name = SpDescription.RequiredColumn.COLUMN_CODE.name
-        level_column_name = SpDescription.RequiredColumn.COLUMN_LEVEL.name
-        scenario_column_name = SpDescription.DynamicColumn.COLUMN_SCENARIO.name
-        symbol_column_name = SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name
 
         for model_name, columns in local_required_columns.items():
             dataframe = self.model_dataframes[model_name]

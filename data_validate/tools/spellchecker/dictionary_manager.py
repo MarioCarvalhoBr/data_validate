@@ -66,7 +66,6 @@ class DictionaryManager:
 
             if extra_words_path.exists():
                 with open(extra_words_path, 'r', encoding='utf-8') as file:
-                    all_lines = file.readlines()
                     for line in file:
                         word = line.strip()
                         if word and not word.startswith('#'):  # Ignora linhas vazias e comentários

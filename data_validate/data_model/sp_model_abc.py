@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-from types import MappingProxyType
 from typing import List, Dict, Any
 
 from common.base.constant_base import ConstantBase

@@ -12,37 +12,24 @@ class ValidatorStructureFiles:
     A class to validate the structure of files in a given input folder.
 
     Attributes:
-        input_folder (str): The path to the input folder.
-        fs_utils (FileSystemUtils): Utility class for file system operations.
+        context (GeneralContext): The context containing configuration and file system utilities.
         errors (List[str]): List of validation errors.
         warnings (List[str]): List of validation warnings.
-        dir_files (List[str]): List of files in the input folder.
-        lm: Locale manager for retrieving localized messages.
+        dir_files (List[str]): List of files in the input directory.
     """
-
-    # Expected and optional files with their respective extensions
-    EXPECTED_FILES = Config.EXPECTED_FILES
-    OPTIONAL_FILES = Config.OPTIONAL_FILES
 
     def __init__(self, context: GeneralContext):
         """
         Initialize the ValidatorStructureFiles class.
 
         Args:
-            input_folder (str): The path to the input folder.
-            fs_utils (FileSystemUtils): Utility class for file system operations.
+            context: GeneralContext: The context containing configuration and file system utilities.
         """
         self.context = context
 
-        self.input_folder: str = self.context.data_args.data_file.input_folder
-        self.config: Config = self.context.config
-        self.fs_utils: FileSystemUtils = self.context.fs_utils
-        self.lm: LanguageManager = self.context.locale_manager
-
         self.errors = []
         self.warnings = []
-        self.dir_files = os.listdir(self.input_folder)
-
+        self.dir_files = os.listdir(self.context.data_args.data_file.input_folder)
 
     def check_empty_directory(self) -> tuple[bool, List[str]]:
         """
@@ -52,10 +39,10 @@ class ValidatorStructureFiles:
             bool: True if the directory is empty, False otherwise.
         """
         local_errors = []
-        is_empty, message = self.fs_utils.check_directory_is_empty(self.input_folder)
+        is_empty, message = self.context.fs_utils.check_directory_is_empty(self.context.data_args.data_file.input_folder)
         if is_empty:
             local_errors.append(self.lm.text("validator_structure_error_empty_directory",
-                                             dir_path=self.input_folder))
+                                             dir_path=self.context.data_args.data_file.input_folder))
         return not local_errors, local_errors
 
     def check_not_expected_files_in_folder_root(self) -> tuple[bool, List[str]]:
@@ -63,19 +50,19 @@ class ValidatorStructureFiles:
         Check for unexpected folders or files in the input directory.
         """
         local_errors = []
-        expected_files = ValidatorStructureFiles.EXPECTED_FILES
-        optional_files = ValidatorStructureFiles.OPTIONAL_FILES
+        expected_files = self.context.config.EXPECTED_FILES
+        optional_files = self.context.config.OPTIONAL_FILES
 
         if len(self.dir_files) == 1:
-            dir_path = os.path.join(self.input_folder, self.dir_files[0])
-            is_dir, _ = self.fs_utils.check_directory_exists(dir_path)
+            dir_path = os.path.join(self.context.data_args.data_file.input_folder, self.dir_files[0])
+            is_dir, _ = self.context.fs_utils.check_directory_exists(dir_path)
             if is_dir:
                 local_errors.append(self.lm.text("validator_structure_error_files_not_in_folder"))
                 return not local_errors, local_errors
 
         for file_name in self.dir_files:
-            file_path = os.path.join(self.input_folder, file_name)
-            is_file, _ = self.fs_utils.check_file_exists(file_path)
+            file_path = os.path.join(self.context.data_args.data_file.input_folder, file_name)
+            is_file, _ = self.context.fs_utils.check_file_exists(file_path)
             if not is_file:
                 local_errors.append(
                     self.lm.text("validator_structure_error_unexpected_folder").format(file_name=file_name))
@@ -97,13 +84,13 @@ class ValidatorStructureFiles:
         Check if all expected files are present in the input directory.
         """
         local_errors = []
-        expected_files = ValidatorStructureFiles.EXPECTED_FILES
+        expected_files = self.context.config.EXPECTED_FILES
 
         for file_base, extensions in expected_files.items():
             file_found = False
             for ext in extensions:
-                file_path = os.path.join(self.input_folder, f"{file_base}{ext}")
-                is_file, _ = self.fs_utils.check_file_exists(file_path)
+                file_path = os.path.join(self.context.data_args.data_file.input_folder, f"{file_base}{ext}")
+                is_file, _ = self.context.fs_utils.check_file_exists(file_path)
                 if is_file:
                     file_found = True
                     break

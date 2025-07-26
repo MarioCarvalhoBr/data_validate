@@ -1,5 +1,5 @@
 import re
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple
 import pandas as pd
 
 def check_vertical_bar(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool, List[str]]:
