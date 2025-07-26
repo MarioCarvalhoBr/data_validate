@@ -4,14 +4,14 @@ from collections import OrderedDict
 from typing import List, Tuple, Dict, Any
 import pandas as pd
 
-from config.config import Config, NamesEnum
+from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf
 from data_validate.common.utils.formatting.number_formatting import check_cell
-from validation.data_context import DataContext
-from validation.validator_model_abc import ValidatorModelABC
+from controller.data_context import DataModelsContext
+from services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 
 class SpDescriptionValidator(ValidatorModelABC):
@@ -19,8 +19,8 @@ class SpDescriptionValidator(ValidatorModelABC):
     Validates the content of the SpDescription spreadsheet.
     """
 
-    def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
-        super().__init__(data_context=data_context, report_list=report_list, type_class=SpDescription, **kwargs)
+    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpDescription, **kwargs)
 
         # Run pipeline
         self.run()
@@ -229,7 +229,7 @@ class SpDescriptionValidator(ValidatorModelABC):
             (self.validate_simple_description_length, NamesEnum.SIMP_DESC_N.value),
         ]
         # Add title length validation if the flag is not set to skip it
-        if not self._data_context.data_args.data_action.no_warning_titles_length:
+        if not self._data_models_context.data_args.data_action.no_warning_titles_length:
             validations.append((self.validate_title_length, NamesEnum.TITLES_N.value))
 
         # BUILD REPORTS

@@ -23,7 +23,7 @@ class GeneralContext:
         self.data_args = data_args
         self.locale_manager = fs_utils.locale_manager if fs_utils else None
 
-class DataContext(GeneralContext):
+class DataModelsContext(GeneralContext):
     def __init__(self, context: GeneralContext, models_to_use: List[Any]=None):
         """
         Initialize the DataContext with a list of models to initialize.

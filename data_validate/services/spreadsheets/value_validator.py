@@ -13,8 +13,8 @@ from common.utils.validation.value_data_validation import (
 from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpDescription, SpTemporalReference, SpScenario, SpValue
-from validation.data_context import DataContext
-from validation.validator_model_abc import ValidatorModelABC
+from controller.data_context import DataModelsContext
+from services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 
 class SpValueValidator(ValidatorModelABC):
@@ -22,14 +22,14 @@ class SpValueValidator(ValidatorModelABC):
     Validates the content of the SpValue spreadsheet.
     """
 
-    def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
-        super().__init__(data_context=data_context, report_list=report_list, type_class=SpValue, **kwargs)
+    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpValue, **kwargs)
 
         # Configure
         self.model_sp_value = self._data_model
-        self.model_sp_description = self._data_context.get_instance_of(SpDescription)
-        self.model_sp_temporal_reference = self._data_context.get_instance_of(SpTemporalReference)
-        self.model_sp_scenario = self._data_context.get_instance_of(SpScenario)
+        self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
+        self.model_sp_temporal_reference = self._data_models_context.get_instance_of(SpTemporalReference)
+        self.model_sp_scenario = self._data_models_context.get_instance_of(SpScenario)
 
         # Get model properties once
         self.exists_scenario = self.model_sp_value.exists_scenario

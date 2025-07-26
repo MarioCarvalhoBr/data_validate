@@ -5,20 +5,20 @@ from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpDictionary, SpDescription, SpTemporalReference, SpScenario
 from tools.spellchecker.spellchecker import SpellChecker
-from validation.data_context import DataContext
-from validation.validator_model_abc import ValidatorModelABC
+from controller.data_context import DataModelsContext
+from services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 class SpellCheckerValidator(ValidatorModelABC):
     """
     Validates the content of the SpScenario spreadsheet.
     """
 
-    def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
-        super().__init__(data_context=data_context, report_list=report_list, type_class=SpDictionary, **kwargs)
+    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpDictionary, **kwargs)
 
         # Configure
-        self.dictionary = self._data_context.get_instance_of(SpDictionary)
-        self.lang_dict_spell = self._data_context.data_args.data_file.locale
+        self.dictionary = self._data_models_context.get_instance_of(SpDictionary)
+        self.lang_dict_spell = self._data_models_context.data_args.data_file.locale
 
         # From SpDictionary extract words to ignore
         self.list_words_user = self.dictionary.words_to_ignore
@@ -59,7 +59,7 @@ class SpellCheckerValidator(ValidatorModelABC):
         errors, warnings = [], []
 
         # Configure local instances
-        self._data_model = self._data_context.get_instance_of(model_class)
+        self._data_model = self._data_models_context.get_instance_of(model_class)
         self._dataframe = self._data_model.data_loader_model.df_data.copy()
         self._filename = self._data_model.filename
 
@@ -96,7 +96,7 @@ class SpellCheckerValidator(ValidatorModelABC):
         """Runs all content validations for SpScenario."""
 
         validations = []
-        if not self._data_context.data_args.data_action.no_spellchecker:
+        if not self._data_models_context.data_args.data_action.no_spellchecker:
             # Add validation for Description
             validations.append((lambda: self.validate_spellchecker(SpDescription), NamesEnum.SPELL.value))
 

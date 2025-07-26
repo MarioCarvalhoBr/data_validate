@@ -4,22 +4,22 @@ from typing import Dict, Any, List, Type, Tuple
 from common.utils.validation.data_validation import check_text_length, column_exists
 from controller.report import ReportList
 from data_model.sp_model_abc import SpModelABC
-from validation.data_context import DataContext
+from controller.data_context import DataModelsContext
 
 
 class ValidatorModelABC(ABC):
 
-    def __init__(self, data_context: DataContext, report_list: ReportList, type_class: Type[SpModelABC], **kwargs: Dict[str, Any]):
+    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, type_class: Type[SpModelABC], **kwargs: Dict[str, Any]):
         # SETUP
-        self._data_context = data_context
+        self._data_models_context = data_models_context
         self._report_list = report_list
         self._type_class = type_class
 
         # UNPACK DATA
-        self._data_model = self._data_context.get_instance_of(self._type_class)
+        self._data_model = self._data_models_context.get_instance_of(self._type_class)
         self._filename = self._data_model.filename
         self._dataframe = self._data_model.data_loader_model.df_data.copy()
-        self.TITLES_INFO = self._data_context.config.get_verify_names()
+        self.TITLES_INFO = self._data_models_context.config.get_verify_names()
 
         # LIST OF ERRORS AND WARNINGS
         self._errors: List[str] = []

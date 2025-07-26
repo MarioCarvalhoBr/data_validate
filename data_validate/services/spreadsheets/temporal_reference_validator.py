@@ -1,18 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-import re
-from collections import OrderedDict
 from typing import List, Tuple, Dict, Any
-import pandas as pd
 
-from common.utils.validation.data_validation import column_exists
-from config.config import Config, NamesEnum
+from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpTemporalReference
-from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
-from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf, check_unique_values
-from data_validate.common.utils.formatting.number_formatting import check_cell
-from validation.data_context import DataContext
-from validation.validator_model_abc import ValidatorModelABC
+from data_validate.common.utils.validation.data_validation import check_punctuation, check_unique_values
+from controller.data_context import DataModelsContext
+from services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 
 class SpTemporalReferenceValidator(ValidatorModelABC):
@@ -20,8 +14,8 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
     Validates the content of the SpTemporalReference spreadsheet.
     """
 
-    def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
-        super().__init__(data_context=data_context, report_list=report_list, type_class=SpTemporalReference, **kwargs)
+    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpTemporalReference, **kwargs)
 
         # Run pipeline
         self.run()
@@ -58,7 +52,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
 
         # Check if all years are greater than the current year
         for year in years:
-            if year <= self._data_context.config.CURRENT_YEAR:
+            if year <= self._data_models_context.config.CURRENT_YEAR:
                 errors.append(f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.")
 
         return errors, []

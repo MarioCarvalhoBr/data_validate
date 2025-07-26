@@ -1,8 +1,10 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+
 import os
 from typing import List
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config
-from validation.data_context import GeneralContext
+from controller.data_context import GeneralContext
 
 
 class ValidatorStructureFiles:

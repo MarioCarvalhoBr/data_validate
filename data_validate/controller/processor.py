@@ -9,13 +9,13 @@ from data_model import (
     SpDescription, SpComposition, SpValue, SpTemporalReference,
     SpProportionality, SpScenario, SpLegend, SpDictionary
 )
-from validation.description_validator import SpDescriptionValidator
-from validation.scenario_validator import SpScenarioValidator
-from validation.spellchecker_validator import SpellCheckerValidator
-from validation.temporal_reference_validator import SpTemporalReferenceValidator
-from validation.validator_structure import ValidatorStructureFiles
-from validation.data_context import DataContext, GeneralContext
-from validation.value_validator import SpValueValidator
+from services.spreadsheets.description_validator import SpDescriptionValidator
+from services.spreadsheets.scenario_validator import SpScenarioValidator
+from services.spell.spellchecker_validator import SpellCheckerValidator
+from services.spreadsheets.temporal_reference_validator import SpTemporalReferenceValidator
+from services.structure.validator_structure import ValidatorStructureFiles
+from controller.data_context import DataModelsContext, GeneralContext
+from services.spreadsheets.value_validator import SpValueValidator
 from .report import ReportList
 
 FLAG = None
@@ -45,7 +45,7 @@ class ProcessorSpreadsheet:
         self.output_folder = self.general_context.data_args.data_file.output_folder
 
         # ARRAYS AND VARIABLES
-        self.data_context: DataContext = None
+        self.data_models_context: DataModelsContext = None
         self.exists_scenario = False
         self.list_scenarios = []
         self.models_to_use = []
@@ -126,14 +126,14 @@ class ProcessorSpreadsheet:
         self.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_context = DataContext(context=self.general_context, models_to_use=self.models_to_use)
+        self.data_models_context = DataModelsContext(context=self.general_context, models_to_use=self.models_to_use)
 
         # RUN ALL VALIDATIONS PIPELINE
-        SpDescriptionValidator(data_context=self.data_context, report_list=self.report_list)
-        SpTemporalReferenceValidator(data_context=self.data_context, report_list=self.report_list)
-        SpScenarioValidator(data_context=self.data_context, report_list=self.report_list)
-        SpellCheckerValidator(data_context=self.data_context, report_list=self.report_list)
-        SpValueValidator(data_context=self.data_context, report_list=self.report_list)
+        SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
     def run(self):
         self.logger.info("Iniciando processamento...")
         self._configure()

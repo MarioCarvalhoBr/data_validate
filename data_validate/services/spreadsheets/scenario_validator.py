@@ -5,8 +5,8 @@ from config.config import NamesEnum
 from controller.report import ReportList
 from data_model import SpScenario
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_unique_values
-from validation.data_context import DataContext
-from validation.validator_model_abc import ValidatorModelABC
+from controller.data_context import DataModelsContext
+from services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 
 class SpScenarioValidator(ValidatorModelABC):
@@ -14,8 +14,8 @@ class SpScenarioValidator(ValidatorModelABC):
     Validates the content of the SpScenario spreadsheet.
     """
 
-    def __init__(self, data_context: DataContext, report_list: ReportList, **kwargs: Dict[str, Any]):
-        super().__init__(data_context=data_context, report_list=report_list, type_class=SpScenario, **kwargs)
+    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpScenario, **kwargs)
 
         # Run pipeline
         self.run()
