@@ -1,4 +1,5 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+from logging import Logger
 from typing import List, Any, Dict
 from typing import Type, Optional
 
@@ -8,7 +9,7 @@ from config.config import Config
 from data_model.sp_model_abc import SpModelABC
 
 class GeneralContext:
-    def __init__(self, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None, **kwargs: Dict[str, Any]):
+    def __init__(self, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None, logger: Logger=None, **kwargs: Dict[str, Any]):
         """
         Initialize the DataContext with a list of models to initialize.
 
@@ -21,6 +22,7 @@ class GeneralContext:
         self.config = config
         self.fs_utils = fs_utils
         self.data_args = data_args
+        self.logger = logger
         self.locale_manager = fs_utils.locale_manager if fs_utils else None
 
 class DataModelsContext(GeneralContext):

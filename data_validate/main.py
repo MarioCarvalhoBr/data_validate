@@ -2,6 +2,7 @@ from common.locale.language_manager import LanguageManager
 from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from common.utils.logger_manager import LoggerManager
+from config.config import Config
 from controller.processor import ProcessorSpreadsheet
 from middleware.bootstrap import Bootstrap
 
@@ -15,12 +16,13 @@ if __name__ == "__main__":
         bootstrap = Bootstrap(data_args)
 
         # Configure the Toolkit
-        language_manager = LanguageManager()
         file_logger = LoggerManager(log_folder="data/output/logs", console_logger="console_logger", prefix="data_validate", logger_name="data_validate_file_logger").file_logger
-        fs_utils = FileSystemUtils(language_manager)
+        lm: LanguageManager = LanguageManager()
+        fs_utils: FileSystemUtils = FileSystemUtils(lm=lm)
+        config: Config = Config(lm=lm)
 
         # Bussiness Logic
-        processador = ProcessorSpreadsheet(data_args=data_args, logger=file_logger, fs_utils=fs_utils)
+        processador = ProcessorSpreadsheet(logger=file_logger, data_args=data_args, config=config, fs_utils=fs_utils)
 
 
     except ValueError as e:

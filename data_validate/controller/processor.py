@@ -26,27 +26,21 @@ class ProcessorSpreadsheet:
     Classe principal para processar as planilhas, validar dados e gerar relatórios.
     """
 
-    def __init__(self, data_args: DataArgs, logger: Logger, fs_utils: FileSystemUtils):
-        # SETUP
-        self.data_args = data_args
-        self.logger = logger
-        self.fs_utils = fs_utils
-        self.config: Config = Config(self.fs_utils.locale_manager)
-
-        # GENERAL CONTEXT
-        self.general_context = GeneralContext(config=self.config, fs_utils=self.fs_utils, data_args=self.data_args)
+    def __init__(self,  logger: Logger=None, data_args: DataArgs=None, config: Config=None, fs_utils: FileSystemUtils=None):
+        # SETUP GENERAL CONTEXT
+        self.context = GeneralContext(config=config, fs_utils=fs_utils, data_args=data_args, logger=logger)
 
         # CONFIGURE VARIABLES
-        self.language_manager = self.general_context.locale_manager
-        self.TITLES_INFO = self.config.get_verify_names()
+        self.language_manager = self.context.locale_manager
+        self.TITLES_INFO=self.context.config.get_verify_names()
 
         # SETUP CONFIGURE VARIABLES
-        self.input_folder = self.general_context.data_args.data_file.input_folder
-        self.output_folder = self.general_context.data_args.data_file.output_folder
-
-        # ARRAYS AND VARIABLES
-        self.data_models_context: DataModelsContext = None
+        self.input_folder = self.context.data_args.data_file.input_folder
+        self.output_folder = self.context.data_args.data_file.output_folder
         self.exists_scenario = False
+
+        # OBJECTS AND ARRAYS
+        self.data_models_context: DataModelsContext = None
         self.list_scenarios = []
         self.models_to_use = []
         self.classes_to_initialize = [
@@ -62,11 +56,10 @@ class ProcessorSpreadsheet:
         # 0 ETL: Extract, Transform, Load
         importer = DataLoaderFacade(self.input_folder)
         data, errors_data_importer = importer.load_all
-        # APPEND ERRORS TO REPORT LIST
         self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_data_importer)
 
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
-        self.structure_validator = ValidatorStructureFiles(context=self.general_context)
+        self.structure_validator = ValidatorStructureFiles(context=self.context)
 
         # 1.1 GENERAL STRUCTURE VALIDATION ERRORS: Errors from the general structure validation
         errors_structure_general = self.structure_validator.validate()
@@ -95,7 +88,7 @@ class ProcessorSpreadsheet:
                                     warnings=model_instance.DATA_CLEAN_WARNINGS)
 
             if FLAG is not None:
-                self.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
+                self.context.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
 
     def _configure(self) -> None:
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
@@ -117,16 +110,16 @@ class ProcessorSpreadsheet:
         # Imprime o número total de erros e avisos
         total_errors = sum(len(report.errors) for report in self.report_list)
         total_warnings = sum(len(report.warnings) for report in self.report_list)
-        self.logger.error(f"Total errors: {total_errors}")
-        self.logger.warning(f"Total warnings: {total_warnings}")
+        self.context.logger.error(f"Total errors: {total_errors}")
+        self.context.logger.warning(f"Total warnings: {total_warnings}")
     def _build_pipeline(self) -> None:
         """
         Build the validation pipeline by initializing the data context and running the validations.
         """
-        self.logger.info("Building validation pipeline...")
+        self.context.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_models_context = DataModelsContext(context=self.general_context, models_to_use=self.models_to_use)
+        self.data_models_context = DataModelsContext(context=self.context, models_to_use=self.models_to_use)
 
         # RUN ALL VALIDATIONS PIPELINE
         SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
@@ -135,7 +128,7 @@ class ProcessorSpreadsheet:
         SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
     def run(self):
-        self.logger.info("Iniciando processamento...")
+        self.context.logger.info("Iniciando processamento...")
         self._configure()
         self._read_data()
         self._build_pipeline()
