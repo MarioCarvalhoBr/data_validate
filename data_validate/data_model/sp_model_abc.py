@@ -12,6 +12,7 @@ class SpModelABC(ABC):
             self.CSV = ".csv"
             self.XLSX = ".xlsx"
             self.EXTENSIONS = [self.CSV, self.XLSX]
+            self.EXISTING_LEGEND = "exists_legend"
             self.EXISTING_SCENARIO = "exists_scenario"
             self.LIST_SCENARIOS = "list_scenarios"
             self.SP_NAMAE_SCENARIO = "cenarios"
@@ -28,6 +29,7 @@ class SpModelABC(ABC):
         # UNPACKING DATA ARGS
         self.filename: str =  self.data_loader_model.filename
 
+        self.exists_legend: bool = self._kwargs.get(self.VAR_CONSTS.EXISTING_LEGEND, False)
         self.exists_scenario: bool = self._kwargs.get(self.VAR_CONSTS.EXISTING_SCENARIO, False)
         self.list_scenarios: List[str] = self._kwargs.get(self.VAR_CONSTS.LIST_SCENARIOS, [])
 

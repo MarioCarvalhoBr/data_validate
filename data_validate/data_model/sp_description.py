@@ -47,22 +47,21 @@ class SpDescription(SpModelABC):
 
     class DynamicColumn:
         COLUMN_SCENARIO = pd.Series(dtype="int64", name="cenario")
-
+        COLUMN_LEGEND = pd.Series(dtype="str", name="legenda")
         ALL = [
             COLUMN_SCENARIO.name,
+            COLUMN_LEGEND.name
         ]
 
     class OptionalColumn:
         COLUMN_UNIT = pd.Series(dtype="str", name="unidade")
         COLUMN_RELATION = pd.Series(dtype="int64", name="relacao")
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
-        COLUMN_LEGEND = pd.Series(dtype="str", name="legenda")
 
         ALL = [
             COLUMN_UNIT.name,
             COLUMN_RELATION.name,
             COLUMN_ORDER.name,
-            COLUMN_LEGEND.name
         ]
 
     def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
@@ -84,6 +83,14 @@ class SpDescription(SpModelABC):
             # 1.2: Se houver cenários, adiciona a coluna de cenário
             local_expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
 
+        # 1. Tratamento de colunas dinâmicas: legenda
+        if not self.exists_legend:
+            if self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns:
+                self.STRUCTURE_LIST_ERRORS.append(
+                    f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir.")
+        else:
+            local_expected_columns.append(self.DynamicColumn.COLUMN_LEGEND.name)
+
         # 2. Tratamento de colunas opcionais
         if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.df_data.columns:
             self.data_loader_model.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
@@ -93,7 +100,6 @@ class SpDescription(SpModelABC):
         for opt_column_name in self.OptionalColumn.ALL:
             if (opt_column_name in self.data_loader_model.df_data.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
-
         self.EXPECTED_COLUMNS = local_expected_columns
 
     def expected_structure_columns(self, *args, **kwargs) -> None:

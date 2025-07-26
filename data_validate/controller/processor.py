@@ -38,6 +38,7 @@ class ProcessorSpreadsheet:
         self.input_folder = self.context.data_args.data_file.input_folder
         self.output_folder = self.context.data_args.data_file.output_folder
         self.exists_scenario = False
+        self.exists_legend = False
 
         # OBJECTS AND ARRAYS
         self.data_models_context: DataModelsContext = None
@@ -65,10 +66,14 @@ class ProcessorSpreadsheet:
         errors_structure_general = self.structure_validator.validate()
         self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_structure_general)
 
+        # Verify scenarios and legend existence
         if data[SpScenario.CONSTANTS.SP_NAME].exists_file and data[SpScenario.CONSTANTS.SP_NAME].read_success:
             self.exists_scenario = True
             if SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns:
                 self.list_scenarios = data[SpScenario.CONSTANTS.SP_NAME].df_data[SpScenario.RequiredColumn.COLUMN_SYMBOL.name].unique().tolist()
+
+        if data[SpLegend.CONSTANTS.SP_NAME].exists_file and data[SpLegend.CONSTANTS.SP_NAME].read_success:
+            self.exists_legend = True
 
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.classes_to_initialize:
@@ -78,7 +83,7 @@ class ProcessorSpreadsheet:
             attribute_name = f"sp_{sp_name_key.lower()}"
 
             # Model instance creation and initialization
-            model_instance = model_class(data_model=data.get(sp_name_key), **{model_class.VAR_CONSTS.EXISTING_SCENARIO: self.exists_scenario, model_class.VAR_CONSTS.LIST_SCENARIOS: self.list_scenarios})
+            model_instance = model_class(data_model=data.get(sp_name_key), **{model_class.VAR_CONSTS.EXISTING_SCENARIO: self.exists_scenario, model_class.VAR_CONSTS.LIST_SCENARIOS: self.list_scenarios, model_class.VAR_CONSTS.EXISTING_LEGEND: self.exists_legend})
             setattr(self, attribute_name, model_instance)
             self.models_to_use.append(model_instance)
 

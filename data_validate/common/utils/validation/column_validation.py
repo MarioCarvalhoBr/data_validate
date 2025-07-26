@@ -4,8 +4,6 @@ def check_column_names(df: pd.DataFrame, expected_columns: list):
     missing_columns = []
     extra_columns = []
 
-    if df.empty:
-        return missing_columns, extra_columns
     missing_columns = [col for col in expected_columns if col not in df.columns]
     extra_columns = [col for col in df.columns if col not in expected_columns]
 
