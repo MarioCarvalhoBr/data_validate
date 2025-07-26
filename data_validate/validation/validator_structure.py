@@ -1,6 +1,8 @@
 import os
 from typing import List
 from common.utils.file_system_utils import FileSystemUtils
+from config.config import Config
+from validation.data_context import GeneralContext
 
 
 class ValidatorStructureFiles:
@@ -17,20 +19,10 @@ class ValidatorStructureFiles:
     """
 
     # Expected and optional files with their respective extensions
-    EXPECTED_FILES = {
-        "descricao": [".csv", ".xlsx"],
-        "composicao": [".csv", ".xlsx"],
-        "valores": [".csv", ".xlsx"],
-        "referencia_temporal": [".csv", ".xlsx"]
-    }
-    OPTIONAL_FILES = {
-        "proporcionalidades": [".csv", ".xlsx"],
-        "cenarios": [".csv", ".xlsx"],
-        "legendas": [".csv", ".xlsx"],
-        "dicionario": [".csv", ".xlsx"]
-    }
+    EXPECTED_FILES = Config.EXPECTED_FILES
+    OPTIONAL_FILES = Config.OPTIONAL_FILES
 
-    def __init__(self, input_folder: str, fs_utils: FileSystemUtils):
+    def __init__(self, context: GeneralContext):
         """
         Initialize the ValidatorStructureFiles class.
 
@@ -38,12 +30,17 @@ class ValidatorStructureFiles:
             input_folder (str): The path to the input folder.
             fs_utils (FileSystemUtils): Utility class for file system operations.
         """
-        self.input_folder = input_folder
-        self.fs_utils = fs_utils
+        self.context = context
+
+        self.input_folder: str = self.context.data_args.data_file.input_folder
+        self.config: Config = self.context.config
+        self.fs_utils: FileSystemUtils = self.context.fs_utils
+        self.lm: LanguageManager = self.context.locale_manager
+
         self.errors = []
         self.warnings = []
         self.dir_files = os.listdir(self.input_folder)
-        self.lm = fs_utils.locale_manager
+
 
     def check_empty_directory(self) -> tuple[bool, List[str]]:
         """

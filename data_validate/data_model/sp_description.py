@@ -56,11 +56,13 @@ class SpDescription(SpModelABC):
         COLUMN_UNIT = pd.Series(dtype="str", name="unidade")
         COLUMN_RELATION = pd.Series(dtype="int64", name="relacao")
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
+        COLUMN_LEGEND = pd.Series(dtype="str", name="legenda")
 
         ALL = [
             COLUMN_UNIT.name,
             COLUMN_RELATION.name,
             COLUMN_ORDER.name,
+            COLUMN_LEGEND.name
         ]
 
     def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):

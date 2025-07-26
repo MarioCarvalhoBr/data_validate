@@ -27,7 +27,7 @@ class Config(metaclass=SingletonMeta):
 
             'proporcionalidades':   (False, 'double', '|'),
             'cenarios':             (False, 'single', '|'),
-            'legendas':             (False, 'single', '|'),
+            'legenda':             (False, 'single', '|'),
             'dicionario':           (False, 'single', '|'),
         }
         self.extensions = ['.csv', '.xlsx', '.qml']

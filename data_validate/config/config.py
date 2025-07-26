@@ -46,6 +46,20 @@ class Config:
     OUTPUT_REPORT_HTML = "_report.html"
     CURRENT_YEAR = datetime.now().year
 
+    # Expected and optional files with their respective extensions
+    EXPECTED_FILES = {
+        "descricao": [".csv", ".xlsx"],
+        "composicao": [".csv", ".xlsx"],
+        "valores": [".csv", ".xlsx"],
+        "referencia_temporal": [".csv", ".xlsx"]
+    }
+    OPTIONAL_FILES = {
+        "proporcionalidades": [".csv", ".xlsx"],
+        "cenarios": [".csv", ".xlsx"],
+        "legenda": [".csv", ".xlsx"],
+        "dicionario": [".csv", ".xlsx"]
+    }
+
     def __init__(self, lm: LanguageManager):
         self.lm = lm
 

@@ -12,7 +12,7 @@ class SpLegend(SpModelABC):
     class INFO(ConstantBase):
         def __init__(self):
             super().__init__()
-            self.SP_NAME = "legendas"
+            self.SP_NAME = "legenda"
             self.SP_DESCRIPTION = "Planilha de legendas"
             self._finalize_initialization()
 

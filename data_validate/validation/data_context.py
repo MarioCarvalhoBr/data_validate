@@ -7,9 +7,8 @@ from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config
 from data_model.sp_model_abc import SpModelABC
 
-
-class DataContext:
-    def __init__(self, models_to_use: List[Any]=None, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None):
+class GeneralContext:
+    def __init__(self, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None):
         """
         Initialize the DataContext with a list of models to initialize.
 
@@ -19,10 +18,25 @@ class DataContext:
             fs_utils (FileSystemUtils): File system utilities for file operations.
             data_args (DataArgs): Data arguments containing input and output folder paths.
         """
-        self.models_to_use = models_to_use or []
         self.config = config
         self.fs_utils = fs_utils
         self.data_args = data_args
+        self.locale_manager = fs_utils.locale_manager if fs_utils else None
+
+class DataContext(GeneralContext):
+    def __init__(self, context: GeneralContext, models_to_use: List[Any]=None):
+        """
+        Initialize the DataContext with a list of models to initialize.
+
+        Args:
+            models_to_use (List[Any]): List of models to initialize.
+            config (Config): Configuration object containing settings.
+            fs_utils (FileSystemUtils): File system utilities for file operations.
+            data_args (DataArgs): Data arguments containing input and output folder paths.
+        """
+        super().__init__(config=context.config, fs_utils=context.fs_utils, data_args=context.data_args)
+
+        self.models_to_use = models_to_use or []
 
         self.data = {}
         self.errors = []

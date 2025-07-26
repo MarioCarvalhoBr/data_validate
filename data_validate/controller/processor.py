@@ -14,7 +14,7 @@ from validation.scenario_validator import SpScenarioValidator
 from validation.spellchecker_validator import SpellCheckerValidator
 from validation.temporal_reference_validator import SpTemporalReferenceValidator
 from validation.validator_structure import ValidatorStructureFiles
-from validation.data_context import DataContext
+from validation.data_context import DataContext, GeneralContext
 from validation.value_validator import SpValueValidator
 from .report import ReportList
 
@@ -31,25 +31,28 @@ class ProcessorSpreadsheet:
         self.data_args = data_args
         self.logger = logger
         self.fs_utils = fs_utils
+        self.config: Config = Config(self.fs_utils.locale_manager)
 
-        # UNPACKING DATA ARGS
-        self.language_manager = fs_utils.locale_manager
-        self.config = Config(self.language_manager)
+        # GENERAL CONTEXT
+        self.general_context = GeneralContext(config=self.config, fs_utils=self.fs_utils, data_args=self.data_args)
+
+        # CONFIGURE VARIABLES
+        self.language_manager = self.general_context.locale_manager
         self.TITLES_INFO = self.config.get_verify_names()
 
         # SETUP CONFIGURE VARIABLES
-        self.input_folder = data_args.data_file.input_folder
-        self.output_folder = data_args.data_file.output_folder
+        self.input_folder = self.general_context.data_args.data_file.input_folder
+        self.output_folder = self.general_context.data_args.data_file.output_folder
 
-        self.list_scenarios = []
+        # ARRAYS AND VARIABLES
+        self.data_context: DataContext = None
         self.exists_scenario = False
+        self.list_scenarios = []
         self.models_to_use = []
         self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
             SpProportionality, SpScenario, SpLegend, SpDictionary
         ]
-
-        self.data_context: DataContext = DataContext(None, None, None, None)
         self.report_list = ReportList()
 
         # Running the main processing function
@@ -63,7 +66,7 @@ class ProcessorSpreadsheet:
         self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_data_importer)
 
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
-        self.structure_validator = ValidatorStructureFiles(self.input_folder, self.fs_utils)
+        self.structure_validator = ValidatorStructureFiles(context=self.general_context)
 
         # 1.1 GENERAL STRUCTURE VALIDATION ERRORS: Errors from the general structure validation
         errors_structure_general = self.structure_validator.validate()
@@ -123,7 +126,7 @@ class ProcessorSpreadsheet:
         self.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_context = DataContext(models_to_use=self.models_to_use, config=self.config, fs_utils=self.fs_utils, data_args=self.data_args)
+        self.data_context = DataContext(context=self.general_context, models_to_use=self.models_to_use)
 
         # RUN ALL VALIDATIONS PIPELINE
         SpDescriptionValidator(data_context=self.data_context, report_list=self.report_list)
