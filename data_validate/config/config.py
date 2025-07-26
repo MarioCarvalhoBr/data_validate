@@ -47,6 +47,7 @@ class Config:
     CURRENT_YEAR = datetime.now().year
 
     # Expected and optional files with their respective extensions
+    # Improve this logic in the future to allow more flexibility
     EXPECTED_FILES = {
         "descricao": [".csv", ".xlsx"],
         "composicao": [".csv", ".xlsx"],
