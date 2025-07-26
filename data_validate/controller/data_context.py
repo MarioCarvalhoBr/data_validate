@@ -1,5 +1,5 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from typing import List, Any
+from typing import List, Any, Dict
 from typing import Type, Optional
 
 from common.utils.data_args import DataArgs
@@ -8,7 +8,7 @@ from config.config import Config
 from data_model.sp_model_abc import SpModelABC
 
 class GeneralContext:
-    def __init__(self, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None):
+    def __init__(self, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None, **kwargs: Dict[str, Any]):
         """
         Initialize the DataContext with a list of models to initialize.
 
@@ -24,7 +24,7 @@ class GeneralContext:
         self.locale_manager = fs_utils.locale_manager if fs_utils else None
 
 class DataModelsContext(GeneralContext):
-    def __init__(self, context: GeneralContext, models_to_use: List[Any]=None):
+    def __init__(self, context: GeneralContext, models_to_use: List[Any]=None, **kwargs: Dict[str, Any]):
         """
         Initialize the DataContext with a list of models to initialize.
 
@@ -34,7 +34,7 @@ class DataModelsContext(GeneralContext):
             fs_utils (FileSystemUtils): File system utilities for file operations.
             data_args (DataArgs): Data arguments containing input and output folder paths.
         """
-        super().__init__(config=context.config, fs_utils=context.fs_utils, data_args=context.data_args)
+        super().__init__(config=context.config, fs_utils=context.fs_utils, data_args=context.data_args, **kwargs)
 
         self.models_to_use = models_to_use or []
 
