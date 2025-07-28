@@ -21,7 +21,6 @@ class SpScenario(SpModelABC):
 
     # COLUMN SERIES
     class RequiredColumn:
-
         COLUMN_NAME = pd.Series(dtype="int64", name='nome')
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name='descricao')
         COLUMN_SYMBOL = pd.Series(dtype="int64", name='simbolo')
@@ -46,7 +45,7 @@ class SpScenario(SpModelABC):
         list_scenarios = self.list_scenarios
 
         if exists_scenario and not list_scenarios:
-            self.STRUCTURE_LIST_ERRORS.extend([f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados"])
+            self.STRUCTURE_LIST_ERRORS.extend([f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."])
 
         # Reporta se tiver valroes reptidos na coluna 'simbolo'
         if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
@@ -68,9 +67,11 @@ class SpScenario(SpModelABC):
         pass
 
     def run(self):
-        self.pre_processing()
-        self.expected_structure_columns()
-        self.data_cleaning()
+
+        if self.data_loader_model.exists_file:
+            self.pre_processing()
+            self.expected_structure_columns()
+            self.data_cleaning()
 
 
 if __name__ == '__main__':

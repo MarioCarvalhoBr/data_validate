@@ -69,8 +69,11 @@ class SpProportionality(SpModelABC):
         pass
 
     def run(self):
-        self.pre_processing()
-        self.expected_structure_columns()
+        # Verificar se precisa do read_success também
+        if self.data_loader_model.exists_file:
+            self.pre_processing()
+            self.expected_structure_columns()
+            self.data_cleaning()
 
 
 if __name__ == '__main__':

@@ -88,6 +88,7 @@ class SpDescription(SpModelABC):
             if self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns:
                 self.STRUCTURE_LIST_ERRORS.append(
                     f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir.")
+                self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
         else:
             local_expected_columns.append(self.DynamicColumn.COLUMN_LEGEND.name)
 

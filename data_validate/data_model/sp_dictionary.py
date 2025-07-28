@@ -63,8 +63,10 @@ class SpDictionary(SpModelABC):
         pass
 
     def run(self):
-        self.pre_processing()
-        self.expected_structure_columns()
+        if self.data_loader_model.exists_file:
+            self.pre_processing()
+            self.expected_structure_columns()
+            self.data_cleaning()
 
 if __name__ == '__main__':
     # Para testar esta classe, você precisaria de um arquivo 'dicionario.csv' ou 'dicionario.xlsx'
