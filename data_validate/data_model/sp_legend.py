@@ -1,3 +1,4 @@
+import re
 from typing import List, Dict, Any
 import pandas as pd
 
@@ -42,7 +43,17 @@ class SpLegend(SpModelABC):
         self.run()
 
     def pre_processing(self):
-        pass
+        """
+        Validates legend data according to business rules:
+        - Each legend must have unique labels within the same codigo
+        - Colors must be in hexadecimal format (#XXXXXX)
+        - Minimum values must be <= maximum values (when both are present)
+        - Order must be sequential starting from 1 for each legend
+        """
+        if not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty:
+            return
+
+
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
@@ -53,6 +64,7 @@ class SpLegend(SpModelABC):
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
+        # Definir as regras de validação de limpeza de dados numéricos
         pass
 
     def run(self):

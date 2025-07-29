@@ -4,6 +4,7 @@ from logging import Logger
 from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config, NamesEnum
+from services.spreadsheets.legend_validator import SpLegendValidator
 from tools import DataLoaderFacade
 from data_model import (
     SpDescription, SpComposition, SpValue, SpTemporalReference,
@@ -129,9 +130,13 @@ class ProcessorSpreadsheet:
         # RUN ALL VALIDATIONS PIPELINE
         SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-        SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-        SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
+        SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
+        SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
     def run(self):
         self.context.logger.info("Iniciando processamento...")
         self._configure()
