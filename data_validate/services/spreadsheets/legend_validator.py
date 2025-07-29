@@ -120,24 +120,75 @@ class SpLegendValidator(ValidatorModelABC):
                 f"{self._filename}: Formato de cor inválido encontrado na legenda {code}: [{invalid_colors_str}]. Formato esperado: #XXXXXX.")
         return errors
     def _validate_min_max_values(self, legend_group: pd.DataFrame, code: int):
-        """Validate that minimum <= maximum when both values are present"""
+        """
+        Validate min/max values based on several rules:
+        1. Min and max values must have at most two decimal places.
+        2. Min value must be strictly less than the max value.
+        3. Intervals must be continuous, with a gap of 0.01 between them.
+        """
+        errors = []
+        column_minimum = SpLegend.RequiredColumn.COLUMN_MINIMUM.name
+        column_maximum = SpLegend.RequiredColumn.COLUMN_MAXIMUM.name
+        column_label = SpLegend.RequiredColumn.COLUMN_LABEL.name
+        column_order = SpLegend.RequiredColumn.COLUMN_ORDER.name
+
+        # Sort by order to check continuity
+        sorted_group = legend_group.sort_values(by=column_order).copy()
+
+        # Convert min/max to numeric, coercing errors to NaN
+        sorted_group[column_minimum] = pd.to_numeric(sorted_group[column_minimum], errors='coerce')
+        sorted_group[column_maximum] = pd.to_numeric(sorted_group[column_maximum], errors='coerce')
+
+        # Helper to check decimal places
+        def has_more_than_two_decimal_places(value):
+            return pd.notna(value) and (isinstance(value, float) or isinstance(value, int)) and len(str(value).split('.')[-1]) > 2
+
         invalid_ranges = []
+        decimal_errors = []
+        continuity_errors = []
 
-        for idx, row in legend_group.iterrows():
-            min_val = row['minimo']
-            max_val = row['maximo']
+        for i, row in enumerate(sorted_group.itertuples(index=False)):
+            min_val = getattr(row, column_minimum)
+            max_val = getattr(row, column_maximum)
+            label = getattr(row, column_label)
 
-            # Skip validation if either value is NaN (for "Dado indisponível")
-            if pd.isna(min_val) or pd.isna(max_val):
+            # Skip validation for "Dado indisponível" where values are NaN
+            if pd.isna(min_val) and pd.isna(max_val):
                 continue
 
-            if min_val > max_val:
-                invalid_ranges.append(f"'{row['label']}' (min: {min_val}, max: {max_val})")
+            # Rule 1: Check for more than two decimal places
+            if has_more_than_two_decimal_places(min_val):
+                decimal_errors.append(f"'{label}' (min: {min_val})")
+            if has_more_than_two_decimal_places(max_val):
+                decimal_errors.append(f"'{label}' (max: {max_val})")
 
+            # Rule 2: Validate that min < max
+            if pd.notna(min_val) and pd.notna(max_val) and min_val >= max_val:
+                invalid_ranges.append(f"'{label}' (min: {min_val}, max: {max_val})")
+
+            # Rule 3: Check for interval continuity
+            if i > 0:
+                prev_row = sorted_group.iloc[i - 1]
+                prev_max_val = prev_row[column_maximum]
+                prev_label = prev_row[column_label]
+
+                if pd.notna(prev_max_val) and pd.notna(min_val):
+                    # Using round to handle potential floating point inaccuracies
+                    if round(min_val - prev_max_val, 2) != 0.01:
+                        continuity_errors.append(
+                            f"'{prev_label}' (max: {prev_max_val}) e '{label}' (min: {min_val})")
+
+        if decimal_errors:
+            errors.append(
+                f"{self._filename}: Valores com mais de duas casas decimais na legenda {code}: [{', '.join(decimal_errors)}].")
         if invalid_ranges:
-            invalid_ranges_str = ', '.join(invalid_ranges)
-            self.STRUCTURE_LIST_ERRORS.append(
-                f"{self._filename}: Intervalos min/max inválidos encontrados na legenda {code}: [{invalid_ranges_str}]")
+            errors.append(
+                f"{self._filename}: Intervalos min/max inválidos (min >= max) na legenda {code}: [{', '.join(invalid_ranges)}].")
+        if continuity_errors:
+            errors.append(
+                f"{self._filename}: Intervalos não contínuos na legenda {code}: [{', '.join(continuity_errors)}].")
+
+        return errors
 
     def _validate_order_sequence(self, legend_group: pd.DataFrame, code: int):
         """Validate that order is sequential starting from 1"""
@@ -182,7 +233,7 @@ class SpLegendValidator(ValidatorModelABC):
         for code, legend_group in grouped:
             errors.extend(self._validate_legend_labels(legend_group, code))
             errors.extend(self._validate_color_format(legend_group, code))
-            # self._validate_min_max_values(legend_group, code)
+            errors.extend( self._validate_min_max_values(legend_group, code))
             errors.extend(self._validate_order_sequence(legend_group, code))
             pass
 
@@ -209,4 +260,3 @@ class SpLegendValidator(ValidatorModelABC):
         self.build_reports(validations)
 
         return self._errors, self._warnings
-
