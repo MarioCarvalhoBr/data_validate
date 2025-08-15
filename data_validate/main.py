@@ -3,6 +3,7 @@ from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from common.utils.logger_manager import LoggerManager
 from config.config import Config
+from controller.context.general_context import GeneralContext
 from controller.processor import ProcessorSpreadsheet
 from middleware.bootstrap import Bootstrap
 
@@ -16,13 +17,16 @@ if __name__ == "__main__":
         bootstrap = Bootstrap(data_args)
 
         # Configure the Toolkit
+        config: Config = Config(lm=LanguageManager())
+        fs_utils: FileSystemUtils = FileSystemUtils(lm=LanguageManager())
         file_logger = LoggerManager(log_folder="data/output/logs", console_logger="console_logger", prefix="data_validate", logger_name="data_validate_file_logger").file_logger
-        lm: LanguageManager = LanguageManager()
-        fs_utils: FileSystemUtils = FileSystemUtils(lm=lm)
-        config: Config = Config(lm=lm)
+
+
+
+        general_context = GeneralContext(config=config, fs_utils=fs_utils, data_args=data_args, logger=file_logger)
 
         # Bussiness Logic
-        processador = ProcessorSpreadsheet(logger=file_logger, data_args=data_args, config=config, fs_utils=fs_utils)
+        processor = ProcessorSpreadsheet(context=general_context)
 
 
     except ValueError as e:

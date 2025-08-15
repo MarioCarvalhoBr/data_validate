@@ -2,7 +2,7 @@
 
 import os
 from typing import List
-from controller.data_context import GeneralContext
+from controller.context.data_context import GeneralContext
 
 
 class ValidatorStructureFiles:

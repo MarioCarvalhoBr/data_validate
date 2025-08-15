@@ -4,7 +4,7 @@ from typing import Dict, Any, List, Type, Tuple
 from common.utils.validation.data_validation import check_text_length, column_exists
 from controller.report import ReportList
 from data_model.sp_model_abc import SpModelABC
-from controller.data_context import DataModelsContext
+from controller.context.data_context import DataModelsContext
 
 
 class ValidatorModelABC(ABC):

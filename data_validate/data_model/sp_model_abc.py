@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
 from common.base.constant_base import ConstantBase
+from controller.context.general_context import GeneralContext
 from data_validate.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.common.utils.validation.data_validation import check_vertical_bar, check_unnamed_columns
 
@@ -20,9 +21,12 @@ class SpModelABC(ABC):
             self._finalize_initialization()
     VAR_CONSTS = DEFINITIONS()
 
-    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
+    CONSTANTS = None
+
+    def __init__(self, context: GeneralContext, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
 
         # SETUP
+        self.context: GeneralContext = context
         self.data_loader_model: DataLoaderModel = data_model
         self._kwargs: Dict[str, Any] = kwargs
 

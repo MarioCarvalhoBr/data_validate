@@ -2,11 +2,13 @@ import re
 from typing import List, Dict, Any
 import pandas as pd
 
+from controller.context.general_context import GeneralContext
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
+from data_validate.common.utils.validation import legend_data_validation as legend_validator
 
 class SpLegend(SpModelABC):
     # CONSTANTS
@@ -37,23 +39,14 @@ class SpLegend(SpModelABC):
             COLUMN_ORDER.name,
         ]
 
-    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
-        super().__init__(data_model, **kwargs)
+    def __init__(self, context: GeneralContext, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
+        super().__init__(context, data_model, **kwargs)
 
         self.run()
 
     def pre_processing(self):
-        """
-        Validates legend data according to business rules:
-        - Each legend must have unique labels within the same codigo
-        - Colors must be in hexadecimal format (#XXXXXX)
-        - Minimum values must be <= maximum values (when both are present)
-        - Order must be sequential starting from 1 for each legend
-        """
         if not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty:
             return
-
-
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
@@ -64,8 +57,26 @@ class SpLegend(SpModelABC):
         self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
-        # Definir as regras de validação de limpeza de dados numéricos
-        pass
+        """
+        Performs data cleaning and validation on the legend data.
+        """
+        df = self.data_loader_model.df_data
+        if df.empty:
+            return
+
+        errors = []
+
+        # Validate code sequence
+        errors.extend(legend_validator.validate_code_sequence(df, self.RequiredColumn.COLUMN_CODE.name, self.filename))
+
+        # Group by legend code and perform group-wise validations
+        for code, group in df.groupby(self.RequiredColumn.COLUMN_CODE.name):
+            errors.extend(legend_validator.validate_legend_labels(group, code, self.filename, self.RequiredColumn.COLUMN_LABEL.name))
+            errors.extend(legend_validator.validate_color_format(group, code, self.filename, self.RequiredColumn.COLUMN_COLOR.name))
+            errors.extend(legend_validator.validate_min_max_values(group, code, self.filename, self.RequiredColumn.COLUMN_MINIMUM.name, self.RequiredColumn.COLUMN_MAXIMUM.name, self.RequiredColumn.COLUMN_LABEL.name))
+            errors.extend(legend_validator.validate_order_sequence(group, code, self.filename, self.RequiredColumn.COLUMN_ORDER.name))
+
+        self.DATA_CLEAN_ERRORS.extend(errors)
 
     def run(self):
         if self.data_loader_model.exists_file:

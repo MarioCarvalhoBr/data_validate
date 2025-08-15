@@ -42,6 +42,8 @@ class Config:
     TITLE_OVER_N_CHARS = 40
     SIMPLE_DESCRIPTIONS_OVER_N_CHARS = 150
     LIMIT_MESSAGES = 20
+    VALUE_DATA_UNAVAILABLE = "Dado indisponível"
+    VALUE_DI = "DI"
     OUTPUT_DEFAULT_HTML = "default.html"
     OUTPUT_REPORT_HTML = "_report.html"
     CURRENT_YEAR = datetime.now().year

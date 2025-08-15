@@ -7,7 +7,7 @@ from config.config import Config, NamesEnum
 from services.spreadsheets.legend_validator import SpLegendValidator
 from tools import DataLoaderFacade
 from data_model import (
-    SpDescription, SpComposition, SpValue, SpTemporalReference,
+    SpModelABC, SpDescription, SpComposition, SpValue, SpTemporalReference,
     SpProportionality, SpScenario, SpLegend, SpDictionary
 )
 from services.spreadsheets.description_validator import SpDescriptionValidator
@@ -15,8 +15,9 @@ from services.spreadsheets.scenario_validator import SpScenarioValidator
 from services.spell.spellchecker_validator import SpellCheckerValidator
 from services.spreadsheets.temporal_reference_validator import SpTemporalReferenceValidator
 from services.structure.validator_structure import ValidatorStructureFiles
-from controller.data_context import DataModelsContext, GeneralContext
+from controller.context.data_context import DataModelsContext
 from services.spreadsheets.value_validator import SpValueValidator
+from controller.context.general_context import GeneralContext
 from .report import ReportList
 
 FLAG = None
@@ -27,9 +28,9 @@ class ProcessorSpreadsheet:
     Classe principal para processar as planilhas, validar dados e gerar relatórios.
     """
 
-    def __init__(self,  logger: Logger=None, data_args: DataArgs=None, config: Config=None, fs_utils: FileSystemUtils=None):
+    def __init__(self,  context: GeneralContext):
         # SETUP GENERAL CONTEXT
-        self.context = GeneralContext(config=config, fs_utils=fs_utils, data_args=data_args, logger=logger)
+        self.context = context
 
         # CONFIGURE VARIABLES
         self.language_manager = self.context.locale_manager
@@ -38,12 +39,14 @@ class ProcessorSpreadsheet:
         # SETUP CONFIGURE VARIABLES
         self.input_folder = self.context.data_args.data_file.input_folder
         self.output_folder = self.context.data_args.data_file.output_folder
+
+        # Setup kwargs for model initialization
         self.exists_scenario = False
+        self.list_scenarios = []
         self.exists_legend = False
 
         # OBJECTS AND ARRAYS
         self.data_models_context: DataModelsContext = None
-        self.list_scenarios = []
         self.models_to_use = []
         self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
@@ -76,6 +79,13 @@ class ProcessorSpreadsheet:
         if data[SpLegend.CONSTANTS.SP_NAME].exists_file and data[SpLegend.CONSTANTS.SP_NAME].read_success:
             self.exists_legend = True
 
+        # Setup kwargs for model initialization
+        kwargs = {
+            SpModelABC.VAR_CONSTS.EXISTING_SCENARIO: self.exists_scenario,
+            SpModelABC.VAR_CONSTS.LIST_SCENARIOS: self.list_scenarios,
+            SpModelABC.VAR_CONSTS.EXISTING_LEGEND: self.exists_legend
+        }
+
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.classes_to_initialize:
             sp_name_key = model_class.CONSTANTS.SP_NAME
@@ -84,7 +94,7 @@ class ProcessorSpreadsheet:
             attribute_name = f"sp_{sp_name_key.lower()}"
 
             # Model instance creation and initialization
-            model_instance = model_class(data_model=data.get(sp_name_key), **{model_class.VAR_CONSTS.EXISTING_SCENARIO: self.exists_scenario, model_class.VAR_CONSTS.LIST_SCENARIOS: self.list_scenarios, model_class.VAR_CONSTS.EXISTING_LEGEND: self.exists_legend})
+            model_instance = model_class(context=self.context, data_model=data.get(sp_name_key), **kwargs)
             setattr(self, attribute_name, model_instance)
             self.models_to_use.append(model_instance)
 

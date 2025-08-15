@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 import pandas as pd
 
 from common.base.constant_base import ConstantBase
+from controller.context.general_context import GeneralContext
 from .sp_model_abc import SpModelABC
 from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
@@ -35,8 +36,8 @@ class SpScenario(SpModelABC):
 
     COLUMNS_PLURAL = MappingProxyType({})
 
-    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
-        super().__init__(data_model)
+    def __init__(self, context: GeneralContext, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
+        super().__init__(context, data_model, **kwargs)
 
         self.run()
 

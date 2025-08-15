@@ -1,6 +1,7 @@
 from typing import List, Dict, Any
 import pandas as pd
 
+from controller.context.general_context import GeneralContext
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
@@ -29,8 +30,8 @@ class SpComposition(SpModelABC):
             COLUMN_CHILD_CODE.name,
         ]
 
-    def __init__(self, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
-        super().__init__(data_model, **kwargs)
+    def __init__(self, context: GeneralContext, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
+        super().__init__(context, data_model, **kwargs)
 
         self.run()
 
