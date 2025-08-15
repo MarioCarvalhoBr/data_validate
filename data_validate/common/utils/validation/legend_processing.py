@@ -119,7 +119,7 @@ class LegendProcessing:
         hex_color_pattern = re.compile(r'^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$')
         for index, row in dataframe.iterrows():
             color = row[color_col]
-            if pd.notna(color) and not hex_color_pattern.match(str(color)):
+            if not hex_color_pattern.match(str(color)):
                 errors.append(
                     f"{self.filename} [código: {code}, linha: {index + 2}]: O formato da cor '{color}' é inválido. Use o formato hexadecimal (ex: #RRGGBB)."
                 )
@@ -183,7 +183,7 @@ class LegendProcessing:
         expected_sequence = list(range(1, len(sorted_order) + 1))
         if not sorted_order.tolist() == expected_sequence:
             errors.append(
-                f"{self.filename} [código: {code}]: A ordem dos labels não é sequencial ou não começa em 1. Valores encontrados: {sorted_order.tolist()}"
+                f"{self.filename} [código: {code}]: A coluna '{order_col}' da legenda não é sequencial ou não começa em 1. Valores encontrados: {sorted_order.tolist()}"
             )
         return errors
 
@@ -204,8 +204,14 @@ class LegendProcessing:
 
             return errors
 
-        unique_codes = sorted(local_dataframe[code_col].unique())
-        if not unique_codes == list(range(min(unique_codes), max(unique_codes) + 1)):
-             errors.append(f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {unique_codes}")
+        actual_sequence = []
+        for code in local_dataframe[code_col].tolist():
+            if code not in actual_sequence:
+                actual_sequence.append(int(code))
+
+        expected_sequence = list(range(1, len(actual_sequence) + 1))
+
+        if not actual_sequence == expected_sequence:
+             errors.append(f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}")
         return errors
 

@@ -76,6 +76,8 @@ class SpLegend(SpModelABC):
 
         legend_validator = LegendProcessing(self.context, self.filename)
 
+        errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code))
+
         # Group by legend code_value and perform group-wise validations
         exists_errors_dtypes = False
         for code_value, group in dataframe.groupby(self.column_name_code):
@@ -92,9 +94,6 @@ class SpLegend(SpModelABC):
                 errors.extend(legend_validator.validate_color_format(group, code_value, self.column_name_color))
                 errors.extend(legend_validator.validate_min_max_values(group, code_value, self.column_name_minimum, self.column_name_maximum, self.column_name_label))
                 errors.extend(legend_validator.validate_order_sequence(group, code_value, self.column_name_order))
-
-        if not exists_errors_dtypes:
-            errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code))
 
         self.DATA_CLEAN_ERRORS.extend(errors)
 
