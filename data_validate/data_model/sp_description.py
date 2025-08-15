@@ -8,7 +8,7 @@ from .sp_model_abc import SpModelABC
 from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
-from data_validate.common.utils.processing.data_cleaning import clean_dataframe
+from data_validate.common.utils.processing.data_cleaning import clean_dataframe_integers
 
 class SpDescription(SpModelABC):
 
@@ -121,7 +121,7 @@ class SpDescription(SpModelABC):
 
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
-            df, errors = clean_dataframe(self.data_loader_model.df_data, self.filename, [column_name], min_value=1)
+            df, errors = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [column_name], min_value=1)
             self.DATA_CLEAN_ERRORS.extend(errors)
 
             if column_name in df.columns:
@@ -132,7 +132,7 @@ class SpDescription(SpModelABC):
         # 2. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
         if self.list_scenarios:
             col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
-            df, errors_cenario = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_cenario], min_value=-1)
+            df, errors_cenario = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_cenario], min_value=-1)
             if col_cenario in df.columns:
                 self.DynamicColumn.COLUMN_SCENARIO = df[col_cenario]
             self.DATA_CLEAN_ERRORS.extend(errors_cenario)

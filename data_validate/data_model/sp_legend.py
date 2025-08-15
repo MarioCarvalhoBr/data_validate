@@ -2,13 +2,14 @@ import re
 from typing import List, Dict, Any
 import pandas as pd
 
+from common.utils.processing.data_cleaning import clean_dataframe_integers, clean_dataframe_floats
+from common.utils.validation.legend_processing import LegendProcessing
 from controller.context.general_context import GeneralContext
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
 from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
-from data_validate.common.utils.validation import legend_data_validation as legend_validator
 
 class SpLegend(SpModelABC):
     # CONSTANTS
@@ -42,6 +43,14 @@ class SpLegend(SpModelABC):
     def __init__(self, context: GeneralContext, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
         super().__init__(context, data_model, **kwargs)
 
+        # SETUP NAMES COLUMN
+        self.column_name_code = str(self.RequiredColumn.COLUMN_CODE.name)
+        self.column_name_label = str(self.RequiredColumn.COLUMN_LABEL.name)
+        self.column_name_color = str(self.RequiredColumn.COLUMN_COLOR.name)
+        self.column_name_minimum = str(self.RequiredColumn.COLUMN_MINIMUM.name)
+        self.column_name_maximum = str(self.RequiredColumn.COLUMN_MAXIMUM.name)
+        self.column_name_order = str(self.RequiredColumn.COLUMN_ORDER.name)
+
         self.run()
 
     def pre_processing(self):
@@ -60,21 +69,32 @@ class SpLegend(SpModelABC):
         """
         Performs data cleaning and validation on the legend data.
         """
-        df = self.data_loader_model.df_data
-        if df.empty:
-            return
-
         errors = []
+        dataframe = self.data_loader_model.df_data
+        if dataframe.empty:
+            return errors
 
-        # Validate code sequence
-        errors.extend(legend_validator.validate_code_sequence(df, self.RequiredColumn.COLUMN_CODE.name, self.filename))
+        legend_validator = LegendProcessing(self.context, self.filename)
 
-        # Group by legend code and perform group-wise validations
-        for code, group in df.groupby(self.RequiredColumn.COLUMN_CODE.name):
-            errors.extend(legend_validator.validate_legend_labels(group, code, self.filename, self.RequiredColumn.COLUMN_LABEL.name))
-            errors.extend(legend_validator.validate_color_format(group, code, self.filename, self.RequiredColumn.COLUMN_COLOR.name))
-            errors.extend(legend_validator.validate_min_max_values(group, code, self.filename, self.RequiredColumn.COLUMN_MINIMUM.name, self.RequiredColumn.COLUMN_MAXIMUM.name, self.RequiredColumn.COLUMN_LABEL.name))
-            errors.extend(legend_validator.validate_order_sequence(group, code, self.filename, self.RequiredColumn.COLUMN_ORDER.name))
+        # Group by legend code_value and perform group-wise validations
+        exists_errors_dtypes = False
+        for code_value, group in dataframe.groupby(self.column_name_code):
+
+            errors_dtypes = []
+            errors_dtypes.extend(legend_validator.validate_legend_columns_dtypes_numeric(group, code_value, self.column_name_code, self.column_name_label, self.column_name_minimum, self.column_name_maximum, self.column_name_order))
+            errors.extend(errors_dtypes)
+
+            if errors_dtypes:
+                exists_errors_dtypes = True
+
+            if not errors_dtypes:
+                errors.extend(legend_validator.validate_legend_labels(group, code_value, self.column_name_label))
+                errors.extend(legend_validator.validate_color_format(group, code_value, self.column_name_color))
+                errors.extend(legend_validator.validate_min_max_values(group, code_value, self.column_name_minimum, self.column_name_maximum, self.column_name_label))
+                errors.extend(legend_validator.validate_order_sequence(group, code_value, self.column_name_order))
+
+        if not exists_errors_dtypes:
+            errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code))
 
         self.DATA_CLEAN_ERRORS.extend(errors)
 
@@ -83,18 +103,3 @@ class SpLegend(SpModelABC):
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()
-
-
-if __name__ == '__main__':
-    # Test the SpLegends class
-    input_dir = '/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01'
-    importer = DataLoaderFacade(input_dir)
-    data = importer.load_all
-
-    # Assuming 'legendas' is a valid key in the data loaded by the importer
-    # You might need to adjust this part if the SpTemporalReference was a placeholder name
-    if SpLegend.INFO["SP_NAME"] in data:
-        sp_legends_instance = SpLegend(data_model=data[SpLegend.INFO["SP_NAME"]])
-        print(sp_legends_instance)
-    else:
-        print(f"Data for '{SpLegend.INFO['SP_NAME']}' not found. Please check your input data.")

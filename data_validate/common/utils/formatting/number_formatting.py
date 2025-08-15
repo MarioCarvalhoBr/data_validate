@@ -30,7 +30,7 @@ def validate_integer(value: float, min_value: int = 0) -> Tuple[bool, str]:
     return True, ""
 
 
-def check_cell(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
+def check_cell_integer(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
     """Full validation: NaN, numeric parsing, integer and range check."""
     if is_nan(cell):
         return False, f"O valor '{cell}' não é um número."
@@ -42,5 +42,16 @@ def check_cell(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
     valid, msg = validate_integer(num, min_value)
     if not valid:
         return False, msg
+
+    return True, ""
+
+def check_cell_float(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
+    """Check if a cell is a valid float."""
+    if is_nan(cell):
+        return False, f"O valor '{cell}' não é um número."
+
+    ok, num = parse_numeric(cell)
+    if not ok:
+        return False, f"O valor '{cell}' não é um número."
 
     return True, ""

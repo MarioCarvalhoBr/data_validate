@@ -1,7 +1,7 @@
 import re
 from typing import List, Set
 
-from common.utils.formatting.number_formatting import check_cell
+from common.utils.formatting.number_formatting import check_cell_integer
 
 
 def categorize_strings_by_id_pattern_from_list(items_to_categorize, allowed_scenario_suffixes=None):
@@ -75,7 +75,7 @@ def extract_numeric_integer_ids_from_list(id_values_list):
     invalid_ids = set()
 
     for value in id_values_list:
-        is_valid, _ = check_cell(value, 1)
+        is_valid, _ = check_cell_integer(value, 1)
 
         if is_valid:
             valid_ids.add(int(value))

@@ -8,7 +8,7 @@ from .sp_model_abc import SpModelABC
 from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
-from data_validate.common.utils.processing.data_cleaning import clean_dataframe
+from data_validate.common.utils.processing.data_cleaning import clean_dataframe_integers
 
 
 class SpTemporalReference(SpModelABC):
@@ -62,7 +62,7 @@ class SpTemporalReference(SpModelABC):
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
-            df, errors_symbol = clean_dataframe(self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0)
+            df, errors_symbol = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0)
             self.DATA_CLEAN_ERRORS.extend(errors_symbol)
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:

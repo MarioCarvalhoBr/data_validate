@@ -9,7 +9,7 @@ from controller.report import ReportList
 from data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf
-from data_validate.common.utils.formatting.number_formatting import check_cell
+from data_validate.common.utils.formatting.number_formatting import check_cell_integer
 from controller.context.data_context import DataModelsContext
 from services.spreadsheets.validator_model_abc import ValidatorModelABC
 
@@ -132,7 +132,7 @@ class SpDescriptionValidator(ValidatorModelABC):
 
         for index, row in self._dataframe.iterrows():
             level = row[column]
-            is_valid, __ = check_cell(level, min_value=1)
+            is_valid, __ = check_cell_integer(level, min_value=1)
             if not is_valid:
                 line_updated = int(index) + 2
                 errors.append(f"{self._filename}, linha {line_updated}: O nível do indicador na coluna '{column}' deve ser um número inteiro maior que 0.")

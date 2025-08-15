@@ -6,7 +6,7 @@ import pandas as pd
 from common.utils.generation.combinations import generate_combinations, find_extra_combinations
 from common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
     extract_numeric_integer_ids_from_list, find_differences_in_two_set, categorize_strings_by_id_pattern_from_list
-from common.utils.processing.data_cleaning import clean_dataframe
+from common.utils.processing.data_cleaning import clean_dataframe_integers
 from common.utils.validation.value_data_validation import (
     validate_data_values_in_columns
 )
@@ -103,7 +103,7 @@ class SpValueValidator(ValidatorModelABC):
         # No-need to clean the values dataframe
         df_values = self.model_dataframes[self.sp_name_value].copy()
         # Need to clean the description and temporal reference dataframes
-        df_description, _ = clean_dataframe(
+        df_description, _ = clean_dataframe_integers(
             self.model_dataframes[self.sp_name_description],
             self.sp_name_description,
             [code_column_name]
@@ -185,12 +185,12 @@ class SpValueValidator(ValidatorModelABC):
         df_values = self.model_dataframes[self.sp_name_value].copy()
 
         # Need to clean the description and temporal reference dataframes
-        df_description, _ = clean_dataframe(
+        df_description, _ = clean_dataframe_integers(
             self.model_dataframes[self.sp_name_description],
             self.sp_name_description,
             local_required_columns[self.sp_name_description]
         )
-        df_temporal_reference, _ = clean_dataframe(
+        df_temporal_reference, _ = clean_dataframe_integers(
             self.model_dataframes[self.sp_name_temporal_reference],
             self.sp_name_temporal_reference,
             local_required_columns[self.sp_name_temporal_reference]
