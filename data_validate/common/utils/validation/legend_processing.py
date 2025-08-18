@@ -211,6 +211,10 @@ class LegendProcessing:
 
         expected_sequence = list(range(1, len(actual_sequence) + 1))
 
+        # Reportar se o primeiro valor da sequencia nao comecar em 1
+        if actual_sequence and actual_sequence[0] != 1:
+            errors.append(f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}")
+
         if not actual_sequence == expected_sequence:
              errors.append(f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}")
         return errors
