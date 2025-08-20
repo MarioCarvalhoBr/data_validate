@@ -62,10 +62,10 @@ class SpLegend(SpModelABC):
         missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
-        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
-        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+        self.structural_errors.extend(col_errors)
+        self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """
         Performs data cleaning and validation on the legend data.
         """
@@ -90,7 +90,7 @@ class SpLegend(SpModelABC):
                 errors.extend(legend_validator.validate_min_max_values(group, code_value, self.column_name_minimum, self.column_name_maximum, self.column_name_label))
                 errors.extend(legend_validator.validate_order_sequence(group, code_value, self.column_name_order))
 
-        self.DATA_CLEAN_ERRORS.extend(errors)
+        self.data_cleaning_errors.extend(errors)
 
     def run(self):
         if self.data_loader_model.exists_file:

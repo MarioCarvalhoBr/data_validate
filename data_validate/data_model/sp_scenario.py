@@ -46,14 +46,14 @@ class SpScenario(SpModelABC):
         list_scenarios = self.list_scenarios
 
         if exists_scenario and not list_scenarios:
-            self.STRUCTURE_LIST_ERRORS.extend([f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."])
+            self.structural_errors.extend([f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."])
 
         # Reporta se tiver valroes reptidos na coluna 'simbolo'
         if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
             duplicated_symbols = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(keep=False)
             if duplicated_symbols.any():
                 duplicated_values = self.data_loader_model.df_data[duplicated_symbols][self.RequiredColumn.COLUMN_SYMBOL.name].unique()
-                self.STRUCTURE_LIST_ERRORS.append(f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]")
+                self.structural_errors.append(f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]")
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         # Check missing columns expected columns and extra columns
@@ -61,8 +61,8 @@ class SpScenario(SpModelABC):
                                                             list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
-        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
-        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+        self.structural_errors.extend(col_errors)
+        self.structural_warnings.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass

@@ -57,8 +57,8 @@ class SpDictionary(SpModelABC):
         missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
-        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
-        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+        self.structural_errors.extend(col_errors)
+        self.structural_warnings.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass

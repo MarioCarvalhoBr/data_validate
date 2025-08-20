@@ -48,13 +48,13 @@ class SpTemporalReference(SpModelABC):
         missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
-        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
-        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+        self.structural_errors.extend(col_errors)
+        self.structural_warnings.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Verify if the scenario file exists: Verifica se self.LIST_SCENARIOS: está vazio
         if (not self.list_scenarios) and (len(self.data_loader_model.df_data) != 1):
-            self.DATA_CLEAN_ERRORS.append(f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
+            self.data_cleaning_errors.append(f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
                 self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
@@ -63,7 +63,7 @@ class SpTemporalReference(SpModelABC):
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
             df, errors_symbol = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0)
-            self.DATA_CLEAN_ERRORS.extend(errors_symbol)
+            self.data_cleaning_errors.extend(errors_symbol)
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:
                 self.RequiredColumn.COLUMN_SYMBOL = df[self.RequiredColumn.COLUMN_SYMBOL.name]

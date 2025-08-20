@@ -76,7 +76,7 @@ class SpDescription(SpModelABC):
         if not self.list_scenarios:
             ## 1.1: Se não houver cenários, remove a coluna de cenário se existir no dataframe
             if self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns:
-                self.STRUCTURE_LIST_ERRORS.append(
+                self.structural_errors.append(
                     f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.VAR_CONSTS.SP_NAMAE_SCENARIO}' não estiver configurado ou não existir.")
                 self.data_loader_model.df_data = self.data_loader_model.df_data.drop(
                     columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
@@ -87,7 +87,7 @@ class SpDescription(SpModelABC):
         # 1. Tratamento de colunas dinâmicas: legenda
         if not self.exists_legend:
             if self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns:
-                self.STRUCTURE_LIST_ERRORS.append(
+                self.structural_errors.append(
                     f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir.")
                 self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
         else:
@@ -109,8 +109,8 @@ class SpDescription(SpModelABC):
         missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, self.EXPECTED_COLUMNS)
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
-        self.STRUCTURE_LIST_ERRORS.extend(col_errors)
-        self.STRUCTURE_LIST_WARNINGS.extend(col_warnings)
+        self.structural_errors.extend(col_errors)
+        self.structural_warnings.extend(col_warnings)
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # 1. Create mapping of column names to their corresponding class attributes codigo (mínimo 1) e nivel (mínimo 1)
@@ -122,7 +122,7 @@ class SpDescription(SpModelABC):
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
             df, errors = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [column_name], min_value=1)
-            self.DATA_CLEAN_ERRORS.extend(errors)
+            self.data_cleaning_errors.extend(errors)
 
             if column_name in df.columns:
                 # Use setattr to dynamically set the attribute
@@ -135,7 +135,7 @@ class SpDescription(SpModelABC):
             df, errors_cenario = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_cenario], min_value=-1)
             if col_cenario in df.columns:
                 self.DynamicColumn.COLUMN_SCENARIO = df[col_cenario]
-            self.DATA_CLEAN_ERRORS.extend(errors_cenario)
+            self.data_cleaning_errors.extend(errors_cenario)
 
     def run(self):
         self.pre_processing()

@@ -98,10 +98,10 @@ class ProcessorSpreadsheet:
             setattr(self, attribute_name, model_instance)
             self.models_to_use.append(model_instance)
 
-            self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=model_instance.STRUCTURE_LIST_ERRORS,
-                                    warnings=model_instance.STRUCTURE_LIST_WARNINGS)
-            self.report_list.extend(self.TITLES_INFO[NamesEnum.FC.value], errors=model_instance.DATA_CLEAN_ERRORS,
-                                    warnings=model_instance.DATA_CLEAN_WARNINGS)
+            self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=model_instance.structural_errors,
+                                    warnings=model_instance.structural_warnings)
+            self.report_list.extend(self.TITLES_INFO[NamesEnum.FC.value], errors=model_instance.data_cleaning_errors,
+                                    warnings=model_instance.data_cleaning_warnings)
 
             if FLAG is not None:
                 self.context.logger.info(f"Initialized model: {attribute_name} = {model_instance}")

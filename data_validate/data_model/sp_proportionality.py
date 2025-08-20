@@ -49,7 +49,7 @@ class SpProportionality(SpModelABC):
             )
             for extra_column in extras_level_1:
                 if not extra_column.lower().startswith("unnamed"):
-                    self.STRUCTURE_LIST_ERRORS.append(f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada.")
+                    self.structural_errors.append(f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada.")
 
             # Check extra columns in level 2 (ignore 'id')
             _, extras_level_2 = extract_numeric_ids_and_unmatched_strings_from_list(
@@ -59,12 +59,12 @@ class SpProportionality(SpModelABC):
             )
             for extra_column in extras_level_2:
                 if not extra_column.lower().startswith("unnamed"):
-                    self.STRUCTURE_LIST_ERRORS.append(f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada.")
+                    self.structural_errors.append(f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada.")
 
             # Check for missing expected columns in level 2
             for col in self.EXPECTED_COLUMNS:
                 if col not in colunas_nivel_2:
-                    self.STRUCTURE_LIST_ERRORS.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
+                    self.structural_errors.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass
