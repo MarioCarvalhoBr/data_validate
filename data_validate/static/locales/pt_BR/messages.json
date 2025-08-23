@@ -200,6 +200,9 @@
   "verification_name_legend_value_overlap": {
     "message": "Sobreposição de valores na legenda"
   },
+  "verification_name_legend_relations": {
+    "message": "Relações de indicadores em legendas"
+  },
   "verification_name_sum_properties_in_influencing_factors": {
     "message": "Propriedades de soma nos fatores influenciadores"
   },

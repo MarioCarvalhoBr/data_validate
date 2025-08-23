@@ -4,7 +4,7 @@ from typing import List, Tuple, Dict, Any
 import pandas as pd
 
 from common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
-    categorize_strings_by_id_pattern_from_list
+    categorize_strings_by_id_pattern_from_list, find_differences_in_two_set
 from common.utils.processing.data_cleaning import clean_dataframe_integers
 from config.config import NamesEnum
 from controller.report import ReportList
@@ -70,8 +70,112 @@ class SpLegendValidator(ValidatorModelABC):
             self.sp_name_value: self.model_sp_value.data_loader_model.df_data.copy(),
         }
 
-    def validate_overlapping_multiple_legend(self) -> Tuple[List[str], List[str]]:
+    def validate_relation_indicators_in_legend(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
+
+        if self.model_sp_description.data_loader_model.df_data.empty or self.model_sp_legend.data_loader_model.df_data.empty:
+            return errors, warnings
+
+        if not self.model_sp_legend.legend_read_success:
+            return errors, warnings
+
+        if self.model_sp_legend.structural_errors or self.model_sp_legend.data_cleaning_errors:
+            return errors, warnings
+
+        required_columns = {self.sp_name_description: [SpDescription.RequiredColumn.COLUMN_CODE.name,
+                                                       SpDescription.RequiredColumn.COLUMN_LEVEL.name,
+                                                       SpDescription.DynamicColumn.COLUMN_LEGEND.name]}
+
+        for column in required_columns[self.sp_name_description]:
+            exists_column, msg_error = self.column_exists(self.model_dataframes[self.sp_name_description],
+                                                          self.sp_name_description, column)
+            if not exists_column:
+                errors.append(msg_error)
+                break
+
+        if errors:
+            return errors, warnings
+
+        df_legend = self.model_dataframes[self.sp_name_legend].copy()
+        df_description = self.model_dataframes[self.sp_name_description].copy()
+
+        df_description_clean, __ = clean_dataframe_integers(df_description, self.sp_name_description,
+                                                            [SpDescription.RequiredColumn.COLUMN_CODE.name],
+                                                            min_value=1)
+
+
+        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = pd.to_numeric(df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name], errors='coerce')
+        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].astype('Int64')
+
+        # Remove all NaN values in column COLUMN_LEGEND
+        df_description_clean = df_description_clean.dropna(subset=[SpDescription.RequiredColumn.COLUMN_CODE.name])
+        df_legend = df_legend.dropna(subset=[SpLegend.RequiredColumn.COLUMN_CODE.name])
+
+        legends_id_in_description = df_description_clean[
+            (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != '1') &
+            (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna()) &
+            (pd.to_numeric(df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name],
+                           errors='coerce').notna())
+            ][SpDescription.DynamicColumn.COLUMN_LEGEND.name].astype(str).tolist()        # DROP NA VALUES
+
+        legends_id_in_legend = df_legend[SpLegend.RequiredColumn.COLUMN_CODE.name].astype(str).unique().tolist()
+
+        set_one = set(legends_id_in_description)
+        set_two = set(legends_id_in_legend)
+
+        missing_in_b, missing_in_a = find_differences_in_two_set(
+            first_set=set_one,
+            second_set=set_two,
+        )
+
+        missing_in_b = {int(x) for x in missing_in_b if str(x).isdigit()}
+        missing_in_a = {int(x) for x in missing_in_a if str(x).isdigit()}
+
+        if missing_in_b:
+            errors.append(
+                f"{self.sp_name_description}: Códigos de legenda ausentes em {self.sp_name_legend}: {sorted(list(missing_in_b))}."
+            )
+
+        if missing_in_a:
+            warnings.append(
+                f"{self.sp_name_legend}: Códigos de legenda não referenciados em {self.sp_name_description}: {sorted(list(missing_in_a))}."
+            )
+
+        # 1. All codes that are level 1 - Cannot have legends: if they do, error
+
+        codes_indicators_level_one = df_description_clean[df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == '1'][SpDescription.RequiredColumn.COLUMN_CODE.name].astype(str).tolist()
+
+        legends_id_in_description_level_one = df_description_clean[
+            (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == '1') &
+            (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
+        ][SpDescription.DynamicColumn.COLUMN_LEGEND.name].unique().astype(str).tolist()
+
+        if legends_id_in_description_level_one:
+            errors.append(
+                f"{self.sp_name_description}: Indicadores de nível 1 não podem ter referência de legenda. Códigos com referência em {self.sp_name_legend}: {sorted(list(codes_indicators_level_one))}."
+            )
+
+        # 3. All codes that are not level 1 and not level 2 - Must have a legend reference: if not, error
+        codes_indicators_other_levels = df_description_clean[
+            (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != '1') &
+            (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != '2')
+            ][SpDescription.RequiredColumn.COLUMN_CODE.name].astype(str).tolist()
+
+        codes_with_legend_other_levels = df_description_clean[
+            (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != '1') &
+            (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != '2') &
+            (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
+            ][SpDescription.RequiredColumn.COLUMN_CODE.name].astype(str).tolist()
+
+        set_codes_other_levels = set(codes_indicators_other_levels)
+        set_codes_with_legend = set(codes_with_legend_other_levels)
+        missing_legends_other_levels = set_codes_other_levels - set_codes_with_legend
+
+        if missing_legends_other_levels:
+            errors.append(
+                f"{self.sp_name_description}: Indicadores de níveis diferentes de 1 e 2 devem ter referência de legenda. Indicadores sem referência em {self.sp_name_legend}: {sorted(list(missing_legends_other_levels))}."
+            )
+
         return errors, warnings
 
     def validate_range_multiple_legend(self) -> Tuple[List[str], List[str]]:
@@ -97,9 +201,9 @@ class SpLegendValidator(ValidatorModelABC):
         if errors:
             return errors, warnings
 
-        df_values = self.model_dataframes[self.sp_name_value]
-        df_legend = self.model_dataframes[self.sp_name_legend]
-        df_description = self.model_dataframes[self.sp_name_description]
+        df_values = self.model_dataframes[self.sp_name_value].copy()
+        df_legend = self.model_dataframes[self.sp_name_legend].copy()
+        df_description = self.model_dataframes[self.sp_name_description].copy()
 
         if SpValue.RequiredColumn.COLUMN_ID.name in df_values.columns:
             df_values.drop(columns=[SpValue.RequiredColumn.COLUMN_ID.name], inplace=True)
@@ -181,7 +285,10 @@ class SpLegendValidator(ValidatorModelABC):
     def run(self) -> Tuple[List[str], List[str]]:
         """Runs all content validations for SpLegend."""
         validations = []
-        validations.append((self.validate_overlapping_multiple_legend, NamesEnum.LEG_OVER.value))
+        # Se existir legenda para validar
+        if not self.model_sp_legend.legend_read_success and not self.model_sp_legend.data_loader_model.df_data.empty:
+            validations.append((self.validate_relation_indicators_in_legend, NamesEnum.LEG_REL.value))
+
         validations.append((self.validate_range_multiple_legend, NamesEnum.LEG_RANGE.value))
 
         # BUILD REPORTS

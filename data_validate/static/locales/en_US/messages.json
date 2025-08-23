@@ -185,6 +185,9 @@
   "verification_name_legend_value_overlap": {
     "message": "Value overlap in legend"
   },
+  "verification_name_legend_relations": {
+    "message": "Indicator relations in legends"
+  },
   "verification_name_sum_properties_in_influencing_factors": {
     "message": "Sum properties in influencing factors"
   },

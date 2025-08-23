@@ -131,6 +131,14 @@ class SpDescription(SpModelABC):
                 self.DynamicColumn.COLUMN_SCENARIO = df[col_cenario]
             self.data_cleaning_errors.extend(errors_cenario)
 
+        # 3. Se houver coluna 'legenda', garantir que todos os valores são numeros inteiros (mínimo 1) ou vazios: erro se não
+        if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
+            col_legenda = self.DynamicColumn.COLUMN_LEGEND.name
+            df, errors_legenda = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_legenda], min_value=1, allow_empty=True)
+            if col_legenda in df.columns:
+                self.DynamicColumn.COLUMN_LEGEND = df[col_legenda]
+            self.data_cleaning_errors.extend(errors_legenda)
+
     def run(self):
         self.pre_processing()
         self.expected_structure_columns()

@@ -31,6 +31,7 @@ class NamesEnum(Enum):
     YEARS_TEMP = "verification_name_years_in_temporal_reference"
     LEG_RANGE = "verification_name_legend_data_range"
     LEG_OVER = "verification_name_legend_value_overlap"
+    LEG_REL = "verification_name_legend_relations"
     SUM_PROP = "verification_name_sum_properties_in_influencing_factors"
     REP_IND_PROP = "verification_name_repeated_indicators_in_proportionalities"
     IR_PROP = "verification_name_indicator_relations_in_proportionalities"

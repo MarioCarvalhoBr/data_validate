@@ -133,7 +133,8 @@ def extract_numeric_ids_and_unmatched_strings_from_list(source_list=None, string
 
     return extracted_numeric_ids, final_unmatched_strings
 
-def find_differences_in_two_set(first_set: Set, label_1: str, second_set: Set, label_2: str) -> List[str]:
+
+def find_differences_in_two_set(first_set: Set, second_set: Set) -> List[str]:
     """
     Compares two sets and identifies missing elements in each set.
 
@@ -155,16 +156,43 @@ def find_differences_in_two_set(first_set: Set, label_1: str, second_set: Set, l
 
     # Elements in set_a but not in set_b
     missing_in_b = first_set - second_set
+
+    # Elements in set_b but not in set_a
+    missing_in_a = second_set - first_set
+
+    return missing_in_b, missing_in_a
+
+def find_differences_in_two_set_with_message(first_set: Set, label_1: str, second_set: Set, label_2: str) -> List[str]:
+    """
+    Compares two sets and identifies missing elements in each set.
+
+    Args:
+        first_set (set): First set to compare
+        second_set (set): Second set to compare
+        label_1 (str): Label for the first set (used in error messages)
+        label_2 (str): Label for the second set (used in error messages)
+
+    Returns:
+        list: List of error messages describing missing elements in each set
+    """
+    errors = []
+
+    if first_set is None:
+        first_set = []
+    if second_set is None:
+        second_set = []
+
+    # Elements in set_a but not in set_b
+    missing_in_b, missing_in_a = find_differences_in_two_set(first_set, second_set)
     if missing_in_b:
         errors.append(
             f"{label_1}: Códigos dos indicadores ausentes em {label_2}: {sorted(list(missing_in_b))}."
         )
 
     # Elements in set_b but not in set_a
-    missing_in_a = second_set - first_set
     if missing_in_a:
         errors.append(
-            f"{label_2}: Códigos dos indicadores ausentes emn {label_1}: {sorted(list(missing_in_a))}."
+            f"{label_2}: Códigos dos indicadores ausentes em {label_1}: {sorted(list(missing_in_a))}."
         )
 
     return errors

@@ -6,7 +6,8 @@ def clean_column_integer(
         df: pd.DataFrame,
         column: str,
         file_name: str,
-        min_value: int = 0
+        min_value: int = 0,
+        allow_empty: bool = False
 ) -> Tuple[pd.DataFrame, List[str]]:
     """
     Validate and clean a single column, dropping invalid rows.
@@ -20,6 +21,9 @@ def clean_column_integer(
 
     mask_valid: List[bool] = []
     for idx, raw in df[column].items():
+        if allow_empty and (pd.isna(raw) or str(raw).strip() == ''):
+            mask_valid.append(True)
+            continue
         is_valid, message = check_cell_integer(raw, min_value)
         if not is_valid:
             errors.append(
@@ -30,7 +34,10 @@ def clean_column_integer(
             mask_valid.append(True)
 
     df_clean = df.loc[mask_valid].copy()
-    df_clean[column] = df_clean[column].apply(lambda x: int(float(str(x).replace(',', '.'))))
+    if not allow_empty:
+        df_clean[column] = df_clean[column].apply(lambda x: int(float(str(x).replace(',', '.'))))
+    else:
+        df_clean[column] = df_clean[column].apply(lambda x: int(float(str(x).replace(',', '.'))) if pd.notna(x) and str(x).strip() != '' else x)
     return df_clean, errors
 
 
@@ -38,7 +45,8 @@ def clean_dataframe_integers(
         df: pd.DataFrame,
         file_name: str,
         columns_to_clean: List[str],
-        min_value: int = 0
+        min_value: int = 0,
+        allow_empty: bool = False
 ) -> Tuple[pd.DataFrame, List[str]]:
     """
     Clean multiple columns in the DataFrame, validating integer values.
@@ -49,7 +57,7 @@ def clean_dataframe_integers(
     all_errors: List[str] = []
 
     for col in columns_to_clean:
-        df_work, errors = clean_column_integer(df_work, col, file_name, min_value)
+        df_work, errors = clean_column_integer(df_work, col, file_name, min_value, allow_empty)
         all_errors.extend(errors)
 
     return df_work, all_errors
