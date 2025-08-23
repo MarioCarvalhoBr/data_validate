@@ -13,9 +13,14 @@ class SpModelABC(ABC):
             self.CSV = ".csv"
             self.XLSX = ".xlsx"
             self.EXTENSIONS = [self.CSV, self.XLSX]
-            self.EXISTING_LEGEND = "exists_legend"
-            self.EXISTING_SCENARIO = "exists_scenario"
-            self.LIST_SCENARIOS = "list_scenarios"
+
+            self.LEGEND_EXISTS_FILE = "legend_exists_file"
+            self.LEGEND_READ_SUCCESS = "legend_read_success"
+
+            self.SCENARIO_EXISTS_FILE = "scenario_exists_file"
+            self.SCENARIO_READ_SUCCESS = "scenario_read_success"
+            self.SCENARIOS_LIST = "scenarios_list"
+
             self.SP_NAMAE_SCENARIO = "cenarios"
 
             self._finalize_initialization()
@@ -33,9 +38,12 @@ class SpModelABC(ABC):
         # UNPACKING DATA ARGS
         self.filename: str =  self.data_loader_model.filename
 
-        self.exists_legend: bool = self._kwargs.get(self.VAR_CONSTS.EXISTING_LEGEND, False)
-        self.exists_scenario: bool = self._kwargs.get(self.VAR_CONSTS.EXISTING_SCENARIO, False)
-        self.list_scenarios: List[str] = self._kwargs.get(self.VAR_CONSTS.LIST_SCENARIOS, [])
+        self.legend_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_EXISTS_FILE, False)
+        self.legend_read_success: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_READ_SUCCESS, False)
+
+        self.scenario_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False)
+        self.scenario_read_success: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False)
+        self.scenarios_list: List[str] = self._kwargs.get(self.VAR_CONSTS.SCENARIOS_LIST, [])
 
         # CONFIGURE VARIABLES AND LISTS
         self.structural_errors: List[str] = []
@@ -52,7 +60,7 @@ class SpModelABC(ABC):
 
 
     def init(self):
-        self.list_scenarios = list(set(self.list_scenarios))
+        self.scenarios_list = list(set(self.scenarios_list))
 
         # CHECK 0: Add COLUMNS
         if not self.data_loader_model.df_data.empty:

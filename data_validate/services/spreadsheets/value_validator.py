@@ -1,4 +1,5 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+from calendar import mdays
 from typing import List, Tuple, Dict, Any
 
 import pandas as pd
@@ -32,8 +33,8 @@ class SpValueValidator(ValidatorModelABC):
         self.model_sp_scenario = self._data_models_context.get_instance_of(SpScenario)
 
         # Get model properties once
-        self.exists_scenario = self.model_sp_value.exists_scenario
-        self.list_scenarios = self.model_sp_value.list_scenarios
+        self.exists_scenario = self.model_sp_value.scenario_exists_file
+        self.list_scenarios = self.model_sp_value.scenarios_list
 
         self.sp_name_description = ""
         self.sp_name_temporal_reference = ""
@@ -50,10 +51,10 @@ class SpValueValidator(ValidatorModelABC):
 
     def _prepare_statement(self):
         # Get model properties once
-        self.sp_name_description = self.model_sp_description.CONSTANTS.SP_NAME
-        self.sp_name_temporal_reference = self.model_sp_temporal_reference.CONSTANTS.SP_NAME
-        self.sp_name_scenario = self.model_sp_scenario.CONSTANTS.SP_NAME
-        self.sp_name_value = self.model_sp_value.CONSTANTS.SP_NAME
+        self.sp_name_description = self.model_sp_description.filename
+        self.sp_name_temporal_reference = self.model_sp_temporal_reference.filename
+        self.sp_name_scenario = self.model_sp_scenario.filename
+        self.sp_name_value = self.model_sp_value.filename
 
         # Define required columns efficiently
         self.global_required_columns = {
@@ -93,7 +94,7 @@ class SpValueValidator(ValidatorModelABC):
             dataframe = self.model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
-                    exists_column, error_msg = self._column_exists_dataframe(dataframe, column)
+                    exists_column, error_msg = self.column_exists(dataframe, model_name, column)
                     if not exists_column:
                         errors.append(error_msg)
         if errors:
@@ -173,7 +174,7 @@ class SpValueValidator(ValidatorModelABC):
             dataframe = self.model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
-                    exists_column, error_msg = self._column_exists_dataframe(dataframe, column)
+                    exists_column, error_msg = self.column_exists(dataframe, model_name, column)
                     if not exists_column:
                         errors.append(error_msg)
 

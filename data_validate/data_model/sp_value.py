@@ -40,7 +40,7 @@ class SpValue(SpModelABC):
         __, extras_columns = extract_numeric_ids_and_unmatched_strings_from_list(
             source_list=self.DF_COLUMNS,
             strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
-            suffixes_for_matching=self.list_scenarios
+            suffixes_for_matching=self.scenarios_list
         )
 
         for extra_column in extras_columns:

@@ -72,25 +72,18 @@ class SpDescription(SpModelABC):
     def pre_processing(self):
         local_expected_columns = list(self.RequiredColumn.ALL)
 
-        # 1. Tratamento de colunas dinâmicas: cenarios
-        if not self.list_scenarios:
-            ## 1.1: Se não houver cenários, remove a coluna de cenário se existir no dataframe
-            if self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns:
-                self.structural_errors.append(
-                    f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.VAR_CONSTS.SP_NAMAE_SCENARIO}' não estiver configurado ou não existir.")
-                self.data_loader_model.df_data = self.data_loader_model.df_data.drop(
-                    columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
-        else:
-            # 1.2: Se houver cenários, adiciona a coluna de cenário
+        # 1.0. Tratamento de colunas dinâmicas: cenarios
+        if (not self.scenario_read_success) and (self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns):
+                self.structural_errors.append(f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.VAR_CONSTS.SP_NAMAE_SCENARIO}' não estiver configurado ou não existir.")
+                self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
+        elif self.scenario_exists_file:
             local_expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
 
-        # 1. Tratamento de colunas dinâmicas: legenda
-        if not self.exists_legend:
-            if self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns:
-                self.structural_errors.append(
-                    f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir.")
+        # 1.1 Tratamento de colunas dinâmicas: legenda
+        if (not self.legend_read_success) and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
+                self.structural_errors.append(f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir.")
                 self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
-        else:
+        elif self.legend_exists_file:
             local_expected_columns.append(self.DynamicColumn.COLUMN_LEGEND.name)
 
         # 2. Tratamento de colunas opcionais
@@ -103,6 +96,7 @@ class SpDescription(SpModelABC):
             if (opt_column_name in self.data_loader_model.df_data.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
         self.EXPECTED_COLUMNS = local_expected_columns
+
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
@@ -130,7 +124,7 @@ class SpDescription(SpModelABC):
                 setattr(self.RequiredColumn, attribute_name, df[column_name])
 
         # 2. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
-        if self.list_scenarios:
+        if self.scenarios_list:
             col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
             df, errors_cenario = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_cenario], min_value=-1)
             if col_cenario in df.columns:

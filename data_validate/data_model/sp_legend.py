@@ -18,6 +18,9 @@ class SpLegend(SpModelABC):
             super().__init__()
             self.SP_NAME = "legenda"
             self.SP_DESCRIPTION = "Planilha de legendas"
+            # Others constants
+            self.MIN_LOWER_LEGEND_DEFAULT = 0
+            self.MAX_UPPER_LEGEND_DEFAULT = 1
             self._finalize_initialization()
 
     CONSTANTS = INFO()
@@ -72,6 +75,10 @@ class SpLegend(SpModelABC):
         errors = []
         dataframe = self.data_loader_model.df_data
         if dataframe.empty:
+            return errors
+
+        # Se tiver errors de estrutura, não prosseguir com a limpeza de dados
+        if self.structural_errors:
             return errors
 
         legend_validator = LegendProcessing(self.context, self.filename)

@@ -30,7 +30,7 @@ def validate_numeric_value(
     numeric_value = pd.to_numeric(str(value).replace(',', '.'), errors='coerce')
     if pd.isna(value) or pd.isna(numeric_value):
         error_msg = (f"{filename}, linha {row_index + 2}: "
-                    f"O valor não é um número válido e nem DI (Dado Indisponível) "
+                    f"O valor {value} não é um número válido e nem DI (Dado Indisponível) "
                     f"para a coluna '{column}'.")
         return False, error_msg, False
 

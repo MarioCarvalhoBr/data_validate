@@ -104,7 +104,7 @@ class SpellCheckerValidator(ValidatorModelABC):
             validations.append((lambda: self.validate_spellchecker(SpTemporalReference), NamesEnum.SPELL.value))
 
             # Add validation for Scenario if scenarios exist
-            if self._data_model.list_scenarios:
+            if self._data_model.scenarios_list:
                 validations.append((lambda: self.validate_spellchecker(SpScenario), NamesEnum.SPELL.value))
 
         # BUILD REPORTS

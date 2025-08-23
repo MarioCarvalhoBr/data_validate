@@ -42,13 +42,10 @@ class SpScenario(SpModelABC):
         self.run()
 
     def pre_processing(self):
-        exists_scenario = self.exists_scenario
-        list_scenarios = self.list_scenarios
-
-        if exists_scenario and not list_scenarios:
+        if self.scenario_exists_file and not self.scenarios_list:
             self.structural_errors.extend([f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."])
 
-        # Reporta se tiver valroes reptidos na coluna 'simbolo'
+        # Valores repetidos na coluna 'simbolo'
         if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
             duplicated_symbols = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(keep=False)
             if duplicated_symbols.any():

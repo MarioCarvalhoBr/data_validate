@@ -41,9 +41,7 @@ class ProcessorSpreadsheet:
         self.output_folder = self.context.data_args.data_file.output_folder
 
         # Setup kwargs for model initialization
-        self.exists_scenario = False
-        self.list_scenarios = []
-        self.exists_legend = False
+        self.scenarios_list = []
 
         # OBJECTS AND ARRAYS
         self.data_models_context: DataModelsContext = None
@@ -71,19 +69,16 @@ class ProcessorSpreadsheet:
         self.report_list.extend(self.TITLES_INFO[NamesEnum.FS.value], errors=errors_structure_general)
 
         # Verify scenarios and legend existence
-        if data[SpScenario.CONSTANTS.SP_NAME].exists_file and data[SpScenario.CONSTANTS.SP_NAME].read_success:
-            self.exists_scenario = True
-            if SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns:
-                self.list_scenarios = data[SpScenario.CONSTANTS.SP_NAME].df_data[SpScenario.RequiredColumn.COLUMN_SYMBOL.name].unique().tolist()
-
-        if data[SpLegend.CONSTANTS.SP_NAME].exists_file and data[SpLegend.CONSTANTS.SP_NAME].read_success:
-            self.exists_legend = True
-
+        if data[SpScenario.CONSTANTS.SP_NAME].read_success and (SpScenario.RequiredColumn.COLUMN_SYMBOL.name in data[SpScenario.CONSTANTS.SP_NAME].df_data.columns):
+                self.scenarios_list = data[SpScenario.CONSTANTS.SP_NAME].df_data[SpScenario.RequiredColumn.COLUMN_SYMBOL.name].unique().tolist()
         # Setup kwargs for model initialization
         kwargs = {
-            SpModelABC.VAR_CONSTS.EXISTING_SCENARIO: self.exists_scenario,
-            SpModelABC.VAR_CONSTS.LIST_SCENARIOS: self.list_scenarios,
-            SpModelABC.VAR_CONSTS.EXISTING_LEGEND: self.exists_legend
+            SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: data[SpScenario.CONSTANTS.SP_NAME].exists_file,
+            SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: data[SpScenario.CONSTANTS.SP_NAME].read_success,
+            SpModelABC.VAR_CONSTS.SCENARIOS_LIST: self.scenarios_list,
+
+            SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: data[SpLegend.CONSTANTS.SP_NAME].exists_file,
+            SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: data[SpLegend.CONSTANTS.SP_NAME].read_success,
         }
 
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation

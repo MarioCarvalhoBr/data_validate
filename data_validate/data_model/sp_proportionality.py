@@ -45,7 +45,7 @@ class SpProportionality(SpModelABC):
             _, extras_level_1 = extract_numeric_ids_and_unmatched_strings_from_list(
                 source_list=colunas_nivel_1,
                 strings_to_ignore=[],  # Do not ignore 'id' here
-                suffixes_for_matching=self.list_scenarios
+                suffixes_for_matching=self.scenarios_list
             )
             for extra_column in extras_level_1:
                 if not extra_column.lower().startswith("unnamed"):
@@ -55,7 +55,7 @@ class SpProportionality(SpModelABC):
             _, extras_level_2 = extract_numeric_ids_and_unmatched_strings_from_list(
                 source_list=colunas_nivel_2,
                 strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
-                suffixes_for_matching=self.list_scenarios
+                suffixes_for_matching=self.scenarios_list
             )
             for extra_column in extras_level_2:
                 if not extra_column.lower().startswith("unnamed"):

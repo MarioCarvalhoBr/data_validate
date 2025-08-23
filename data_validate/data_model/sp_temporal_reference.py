@@ -53,7 +53,7 @@ class SpTemporalReference(SpModelABC):
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         # Verify if the scenario file exists: Verifica se self.LIST_SCENARIOS: está vazio
-        if (not self.list_scenarios) and (len(self.data_loader_model.df_data) != 1):
+        if (not self.scenarios_list) and (len(self.data_loader_model.df_data) != 1):
             self.data_cleaning_errors.append(f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio.")
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:

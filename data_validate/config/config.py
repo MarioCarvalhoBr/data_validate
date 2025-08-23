@@ -42,8 +42,11 @@ class Config:
     TITLE_OVER_N_CHARS = 40
     SIMPLE_DESCRIPTIONS_OVER_N_CHARS = 150
     LIMIT_MESSAGES = 20
+
     VALUE_DATA_UNAVAILABLE = "Dado indisponível"
     VALUE_DI = "DI"
+
+    # LEGEND
     OUTPUT_DEFAULT_HTML = "default.html"
     OUTPUT_REPORT_HTML = "_report.html"
     CURRENT_YEAR = datetime.now().year
@@ -65,6 +68,16 @@ class Config:
 
     def __init__(self, lm: LanguageManager):
         self.lm = lm
+
+
+    def debug_messages(self, errors, warnings):
+        # self._data_models_context.config.debug_messages(errors, warnings)
+        print("DEBUG ERRORS:")
+        for error in errors:
+            print(error)
+        print("DEBUG WARNINGS:")
+        for warning in warnings:
+            print(warning)
 
     def get_verify_names(self):
         keys = [element for element in NamesEnum]
