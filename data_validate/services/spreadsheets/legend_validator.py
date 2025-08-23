@@ -38,7 +38,6 @@ class SpLegendValidator(ValidatorModelABC):
         self.model_sp_legend = self._data_model
         self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
         self.model_sp_value = self._data_models_context.get_instance_of(SpValue)
-        self.model_sp_scenario = self._data_models_context.get_instance_of(SpScenario)
 
         # Get model properties once
         self.scenario_exists_file = self.model_sp_value.scenario_exists_file
