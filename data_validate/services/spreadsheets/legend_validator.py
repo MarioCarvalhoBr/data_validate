@@ -184,8 +184,8 @@ class SpLegendValidator(ValidatorModelABC):
         if self.model_sp_value.data_loader_model.df_data.empty or self.model_sp_description.data_loader_model.df_data.empty:
             return errors, warnings
 
-        MIN_LOWER_LEGEND_DEFAULT = self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
-        MAX_UPPER_LEGEND_DEFAULT = self.model_sp_legend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT
+        min_lower_legend_default = self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
+        max_upper_legend_default = self.model_sp_legend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT
         exists_errors_legend = self.model_sp_legend.structural_errors or self.model_sp_legend.data_cleaning_errors
         required_columns = {self.sp_name_description: [SpDescription.RequiredColumn.COLUMN_CODE.name, SpDescription.RequiredColumn.COLUMN_LEVEL.name]}
 
@@ -229,7 +229,7 @@ class SpLegendValidator(ValidatorModelABC):
         mapping_legends = {}
         for data_column_sp_value in valid_columns_from_values:
             aux_indicator_id = data_column_sp_value.split('-')[0]
-            aux_data_mapping_legend = ModelMappingLegend(column_sp_value=data_column_sp_value, default_min_value=MIN_LOWER_LEGEND_DEFAULT, default_max_value=MAX_UPPER_LEGEND_DEFAULT)
+            aux_data_mapping_legend = ModelMappingLegend(column_sp_value=data_column_sp_value, default_min_value=min_lower_legend_default, default_max_value=max_upper_legend_default)
 
             if aux_indicator_id in codes_indicators_level_one:
                 continue
@@ -268,17 +268,17 @@ class SpLegendValidator(ValidatorModelABC):
             if code_column in codes_indicators_level_one:
                 continue
 
-            MIN_VALUE = mapping_legends[data_column_sp_value].min_value
-            MAX_VALUE = mapping_legends[data_column_sp_value].max_value
+            min_value = mapping_legends[data_column_sp_value].min_value
+            max_value = mapping_legends[data_column_sp_value].max_value
 
             for index, value_numeric in df_values_numeric[data_column_sp_value].items():
                 value_original = df_values[data_column_sp_value][index]
                 if value_original == self._data_models_context.config.VALUE_DI or pd.isna(value_numeric):
                     continue
 
-                if value_numeric < MIN_VALUE or value_numeric > MAX_VALUE:
+                if value_numeric < min_value or value_numeric > max_value:
                     errors.append(
-                        f"{self.sp_name_value}, linha {index + 2}: O valor {value_original} está fora do intervalo da legenda ({MIN_VALUE} a {MAX_VALUE}) para a coluna '{data_column_sp_value}'.")
+                        f"{self.sp_name_value}, linha {index + 2}: O valor {value_original} está fora do intervalo da legenda ({min_value} a {max_value}) para a coluna '{data_column_sp_value}'.")
 
         return errors, warnings
 
