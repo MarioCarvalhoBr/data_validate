@@ -1,11 +1,14 @@
-from common.locale.language_manager import LanguageManager
 from common.utils.data_args import DataArgs
+from middleware.bootstrap import Bootstrap
+
+from common.locale.language_manager import LanguageManager
+
+from config.config import Config
 from common.utils.file_system_utils import FileSystemUtils
 from common.utils.logger_manager import LoggerManager
-from config.config import Config
+
 from controller.context.general_context import GeneralContext
 from controller.processor import ProcessorSpreadsheet
-from middleware.bootstrap import Bootstrap
 
 if __name__ == "__main__":
 
@@ -36,4 +39,4 @@ if __name__ == "__main__":
         raise Exception(f"An unexpected error occurred: {e}. Please contact support.")
 
 # Example usage:
-# python3 data_validate/main.py --locale pt_BR --input_folder data/input/data_errors/ --output_folder data/output --debug
+# python3 data_validate/main.py --l pt_BR --i data/input/data_ground_truth_01/ --o data/output --d

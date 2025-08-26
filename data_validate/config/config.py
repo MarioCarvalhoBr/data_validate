@@ -51,6 +51,7 @@ class Config:
     OUTPUT_DEFAULT_HTML = "default.html"
     OUTPUT_REPORT_HTML = "_report.html"
     CURRENT_YEAR = datetime.now().year
+    DATE_NOW = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
     # Expected and optional files with their respective extensions
     # Improve this logic in the future to allow more flexibility
