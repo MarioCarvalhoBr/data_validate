@@ -5,7 +5,7 @@ from typing import List, Tuple, Dict, Any
 import pandas as pd
 
 from data_validate.config.config import NamesEnum
-from data_validate.controller.report.model_report import ModelReportList
+from data_validate.controller.report.model_report import ModelListReport
 from data_validate.data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf
@@ -19,7 +19,7 @@ class SpDescriptionValidator(ValidatorModelABC):
     Validates the content of the SpDescription spreadsheet.
     """
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ModelReportList, **kwargs: Dict[str, Any]):
+    def __init__(self, data_models_context: DataModelsContext, report_list: ModelListReport, **kwargs: Dict[str, Any]):
         super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpDescription, **kwargs)
 
         # Run pipeline

@@ -98,6 +98,12 @@
   "lorem_ipsum": {
     "message": "Não há quem goste de dor, que a procure e a queira ter, simplesmente porque é dor!"
   },
+  "model_report_msg_errors_omitted": {
+    "message": "Existem mais {count} erros similares aos anteriores que foram omitidos."
+  },
+  "model_report_msg_warnings_omitted": {
+    "message": "Existem mais {count} avisos similares aos anteriores que foram omitidos."
+  },
   "fs_utils_error_dir_empty": {
     "message": "O diretório '{dir_path}' está vazio."
   },

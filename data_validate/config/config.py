@@ -40,20 +40,23 @@ class NamesEnum(Enum):
     CHILD_LVL = "verification_name_child_indicator_levels"
 
 class Config:
+    # DESCRIPTION LIMITS
     TITLE_OVER_N_CHARS = 40
     SIMPLE_DESCRIPTIONS_OVER_N_CHARS = 150
-    LIMIT_MESSAGES = 20
 
-    VALUE_DATA_UNAVAILABLE = "Dado indisponível"
-    VALUE_DI = "DI"
-
-    # LEGEND
-    OUTPUT_DEFAULT_HTML = "default.html"
-    OUTPUT_REPORT_HTML = "_report.html"
+    # DATE AND TIME
     CURRENT_YEAR = datetime.now().year
     DATE_NOW = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
-    TEMPLATE_DEFAULT_BASIC_NO_CSS = """
+    # VALUE AND LEGEND
+    VALUE_DATA_UNAVAILABLE = "Dado indisponível"
+    VALUE_DI = "DI"
+
+    # REPORT
+    REPORT_LIMIT_N_MESSAGES = 20
+    REPORT_OUTPUT_DEFAULT_HTML = "default.html"
+    REPORT_OUTPUT_REPORT_HTML = "_report.html"
+    REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS = """
                                 <!DOCTYPE html>
                                 <html lang="pt-br">
                                 <head>

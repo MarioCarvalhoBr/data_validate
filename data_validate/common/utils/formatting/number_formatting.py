@@ -4,9 +4,9 @@ from typing import Tuple, Any
 from babel.numbers import format_decimal
 
 
-def format_number_brazilian(n):
+def format_number_brazilian(n,locale="pt_BR") -> str:
     """Formata um número no padrão brasileiro."""
-    return format_decimal(n, locale='pt_BR')
+    return format_decimal(number=n, locale=locale)
 
 def is_nan(value: Any) -> bool:
     """Check if a value is NaN (including pandas NaN)."""

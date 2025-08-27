@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from data_validate.config.config import NamesEnum
-from data_validate.controller.report.model_report import ModelReportList
+from data_validate.controller.report.model_report import ModelListReport
 from data_validate.controller.report.report_generator_pdf import ReportGeneratorPDF
 from data_validate.services.spreadsheets.legend_validator import SpLegendValidator
 from data_validate.tools import DataLoaderFacade
@@ -47,7 +47,7 @@ class ProcessorSpreadsheet:
             SpDescription, SpComposition, SpValue, SpTemporalReference,
             SpProportionality, SpScenario, SpLegend, SpDictionary
         ]
-        self.report_list = ModelReportList()
+        self.report_list = ModelListReport(context=self.context)
 
         # Running the main processing function
         self.run()

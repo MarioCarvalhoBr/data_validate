@@ -2,7 +2,7 @@
 from typing import List, Tuple, Dict, Any, Type, Union
 
 from data_validate.config.config import NamesEnum
-from data_validate.controller.report.model_report import ModelReportList
+from data_validate.controller.report.model_report import ModelListReport
 from data_validate.data_model import SpDictionary, SpDescription, SpTemporalReference, SpScenario
 from data_validate.tools.spellchecker.spellchecker import SpellChecker
 from data_validate.controller.context.data_context import DataModelsContext
@@ -13,7 +13,7 @@ class SpellCheckerValidator(ValidatorModelABC):
     Validates the content of the SpScenario spreadsheet.
     """
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ModelReportList, **kwargs: Dict[str, Any]):
+    def __init__(self, data_models_context: DataModelsContext, report_list: ModelListReport, **kwargs: Dict[str, Any]):
         super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpDictionary, **kwargs)
 
         # Configure

@@ -24,3 +24,6 @@ class GeneralContext:
         self.logger = logger
         self.locale_manager = fs_utils.locale_manager if fs_utils else None
         self.kwargs = kwargs
+
+        # ALIASES FOR EASIER ACCESS
+        self.lm = self.locale_manager  # Alias for easier access

@@ -98,6 +98,15 @@
   "lorem_ipsum": {
         "message": "There is no one who likes pain, who seeks it out and wants to have it, simply because it is pain!"
   },
+  "model_report_msg_errors_omitted": {
+    "message": "There are {count} more errors similar to the previous ones that were omitted."
+  },
+  "model_report_msg_warnings_omitted": {
+    "message": "There are {count} more warnings similar to the previous ones that were omitted."
+  },
+  "validator_structure_error_unexpected_file": {
+    "message": "The file '{file_name}' is not expected."
+  },
   "fs_utils_error_dir_empty": {
     "message": "The directory '{dir_path}' is empty."
   },

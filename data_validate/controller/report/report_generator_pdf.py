@@ -12,7 +12,7 @@ from config.config import NamesEnum
 from data_validate.common.base.metadata_info import METADATA
 from data_validate.common.utils.formatting.number_formatting import format_number_brazilian
 from data_validate.controller.context.general_context import GeneralContext
-from data_validate.controller.report.model_report import ModelReportList
+from data_validate.controller.report.model_report import ModelListReport
 
 class ReportGeneratorPDF:
     """PDF and HTML report generator for data validation results.
@@ -42,6 +42,8 @@ class ReportGeneratorPDF:
             context: General context containing validation configuration
         """
         self.context = context
+        self.locale = self.context.locale_manager.current_language
+
 
         # Initialize counters
         self.num_errors = 0
@@ -51,7 +53,7 @@ class ReportGeneratorPDF:
         # Setup file paths and template environment.
         self.input_folder = self.context.data_args.data_file.input_folder
         self.output_folder = self.context.data_args.data_file.output_folder
-        self.template_name = self.context.config.OUTPUT_DEFAULT_HTML
+        self.template_name = self.context.config.REPORT_OUTPUT_DEFAULT_HTML
         self.template_data_text = ""
         self.required_variables = []
         self.env = Environment(loader=FileSystemLoader(self.output_folder))
@@ -64,7 +66,7 @@ class ReportGeneratorPDF:
         variable_pattern = r"\{\{\s*.*?\s*\}\}"
         self.required_variables = re.findall(
             variable_pattern,
-            self.context.config.TEMPLATE_DEFAULT_BASIC_NO_CSS
+            self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
         )
 
         # Load template from file or use default
@@ -80,21 +82,22 @@ class ReportGeneratorPDF:
 
         # Validate required variables and fallback to default if needed
         if any(var not in self.template_data_text for var in self.required_variables):
-            self.template_data_text = self.context.config.TEMPLATE_DEFAULT_BASIC_NO_CSS
+            self.template_data_text = self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
 
-    def build_report(self, report_list: ModelReportList) -> None:
+    def build_report(self, report_list: ModelListReport) -> None:
         """Generate and save HTML and PDF reports from validation results.
 
         Args:
             report_list: List of validation test reports
         """
         file_name = self.context.fs_utils.get_last_directory_name(path=self.input_folder)
-        html_output_file = self.context.config.OUTPUT_REPORT_HTML
+        html_output_file = self.context.config.REPORT_OUTPUT_REPORT_HTML
 
-        # Update counters based on report data
-        self.num_errors = sum(len(report.errors) for report in report_list)
-        self.num_warnings = sum(len(report.warnings) for report in report_list)
+        self.num_errors = report_list.global_num_errors()
+        self.num_warnings = report_list.global_num_warnings()
         self.number_tests = len(report_list)
+
+        report_list_flattened = report_list.flatten(n_messages=self.context.config.REPORT_LIMIT_N_MESSAGES, locale=self.locale)
 
         tests_not_executed = []
         if self.context.data_args.data_action.no_spellchecker:
@@ -103,7 +106,7 @@ class ReportGeneratorPDF:
             tests_not_executed.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
 
         try:
-            html_content = self._generate_html_content(report_list, tests_not_executed)
+            html_content = self._generate_html_content(report_list_flattened, tests_not_executed)
             output_html_path = os.path.join(self.output_folder, file_name + html_output_file)
 
             self._save_html_file(html_content, output_html_path)
@@ -113,7 +116,7 @@ class ReportGeneratorPDF:
         except Exception as error:
             print(f'\nError creating HTML report: {error}', file=sys.stderr)
 
-    def _generate_html_content(self, report_list: ModelReportList, tests_not_executed: List[str]) -> str:
+    def _generate_html_content(self, report_list: ModelListReport, tests_not_executed: List[str]) -> str:
         """Generate HTML content from template and report data.
 
         Args:
@@ -127,7 +130,7 @@ class ReportGeneratorPDF:
         template_vars = self._build_template_variables(report_list, tests_not_executed)
         return template.render(template_vars)
 
-    def _build_template_variables(self, report_list: ModelReportList, tests_not_executed: List[str]) -> Dict[str, Any]:
+    def _build_template_variables(self, report_list: ModelListReport, tests_not_executed: List[str]) -> Dict[str, Any]:
         """Build template variables dictionary for HTML generation.
 
         Args:
@@ -200,7 +203,7 @@ class ReportGeneratorPDF:
         print(f'<{json_output}>\n')
 
     @staticmethod
-    def _format_messages_as_html(report_list: ModelReportList, message_type: str, css_class: str) -> str:
+    def _format_messages_as_html(report_list: ModelListReport, message_type: str, css_class: str) -> str:
         """Format error or warning messages as HTML.
 
         Args:
