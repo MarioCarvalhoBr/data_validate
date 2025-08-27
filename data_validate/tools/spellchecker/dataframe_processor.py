@@ -3,7 +3,7 @@
 import pandas as pd
 from typing import List, Tuple
 
-from tools.spellchecker.spellchecker_controller import SpellCheckerController
+from data_validate.tools.spellchecker.spellchecker_controller import SpellCheckerController
 
 
 class DataFrameProcessor:

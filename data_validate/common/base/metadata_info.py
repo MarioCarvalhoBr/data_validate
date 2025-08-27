@@ -7,7 +7,7 @@ Package metadata
 from __future__ import annotations
 from datetime import datetime
 
-from common.base.constant_base import ConstantBase
+from data_validate.common.base.constant_base import ConstantBase
 
 
 class MetadataInfo(ConstantBase):
@@ -19,7 +19,8 @@ class MetadataInfo(ConstantBase):
         _dev = 0
 
         # Project metadata
-        self.__name__ = "Canoa"
+        self.__name__ = "data_validate"
+        self.__project_name__ = "Canoa"
         self.__version__ = MetadataInfo._make_version(*version_info, _dev)
         self.__url__ = MetadataInfo._make_url(*version_info, _dev)
         self.__description__ = "A simple parser for Canoa project"
@@ -74,4 +75,3 @@ class MetadataInfo(ConstantBase):
         )
 
 METADATA = MetadataInfo()
-

@@ -1,14 +1,14 @@
-from common.utils.data_args import DataArgs
-from middleware.bootstrap import Bootstrap
+from data_validate.common.utils.data_args import DataArgs
+from data_validate.middleware.bootstrap import Bootstrap
 
-from common.locale.language_manager import LanguageManager
+from data_validate.common.locale.language_manager import LanguageManager
 
-from config.config import Config
-from common.utils.file_system_utils import FileSystemUtils
-from common.utils.logger_manager import LoggerManager
+from data_validate.config.config import Config
+from data_validate.common.utils.file_system_utils import FileSystemUtils
+from data_validate.common.utils.logger_manager import LoggerManager
 
-from controller.context.general_context import GeneralContext
-from controller.processor import ProcessorSpreadsheet
+from data_validate.controller.context.general_context import GeneralContext
+from data_validate.controller.processor import ProcessorSpreadsheet
 
 if __name__ == "__main__":
 

@@ -1,12 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Tuple, Dict, Any, Type, Union
 
-from config.config import NamesEnum
-from controller.report.model_report import ModelReportList
-from data_model import SpDictionary, SpDescription, SpTemporalReference, SpScenario
-from tools.spellchecker.spellchecker import SpellChecker
-from controller.context.data_context import DataModelsContext
-from services.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.config.config import NamesEnum
+from data_validate.controller.report.model_report import ModelReportList
+from data_validate.data_model import SpDictionary, SpDescription, SpTemporalReference, SpScenario
+from data_validate.tools.spellchecker.spellchecker import SpellChecker
+from data_validate.controller.context.data_context import DataModelsContext
+from data_validate.services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 class SpellCheckerValidator(ValidatorModelABC):
     """

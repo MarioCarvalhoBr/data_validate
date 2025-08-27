@@ -4,8 +4,8 @@ from typing import List, Dict, Any, Tuple
 import pandas as pd
 from decimal import Decimal, InvalidOperation
 
-from common.utils.formatting.number_formatting import check_cell_integer
-from controller.context.general_context import GeneralContext
+from data_validate.common.utils.formatting.number_formatting import check_cell_integer
+from data_validate.controller.context.general_context import GeneralContext
 
 class LegendProcessing:
     """Class for processing legend data validation."""

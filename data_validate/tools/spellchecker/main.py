@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import pandas as pd
 
-from tools.spellchecker.spellchecker import SpellChecker
+from data_validate.tools.spellchecker.spellchecker import SpellChecker
 
 
 def main():

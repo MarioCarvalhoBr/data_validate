@@ -1,10 +1,10 @@
 from typing import List, Dict, Any
 import pandas as pd
 
-from controller.context.general_context import GeneralContext
+from data_validate.controller.context.general_context import GeneralContext
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
-from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
+from data_validate.tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list  # Added
 
 

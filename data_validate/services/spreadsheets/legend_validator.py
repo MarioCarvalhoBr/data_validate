@@ -3,14 +3,14 @@ from typing import List, Tuple, Dict, Any
 
 import pandas as pd
 
-from common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
+from data_validate.common.utils.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
     categorize_strings_by_id_pattern_from_list, find_differences_in_two_set
-from common.utils.processing.data_cleaning import clean_dataframe_integers
-from config.config import NamesEnum
-from controller.report.model_report import ModelReportList
-from data_model import SpDescription, SpScenario, SpLegend, SpValue
-from controller.context.data_context import DataModelsContext
-from services.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.common.utils.processing.data_cleaning import clean_dataframe_integers
+from data_validate.config.config import NamesEnum
+from data_validate.controller.report.model_report import ModelReportList
+from data_validate.data_model import SpDescription, SpScenario, SpLegend, SpValue
+from data_validate.controller.context.data_context import DataModelsContext
+from data_validate.services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 
 class ModelMappingLegend:

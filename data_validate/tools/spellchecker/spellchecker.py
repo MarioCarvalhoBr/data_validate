@@ -4,9 +4,9 @@
 import pandas as pd
 from typing import List, Tuple
 
-from tools.spellchecker.spellchecker_controller import SpellCheckerController
-from tools.spellchecker.dataframe_processor import DataFrameProcessor
-from tools.spellchecker.dictionary_manager import DictionaryManager
+from data_validate.tools.spellchecker.spellchecker_controller import SpellCheckerController
+from data_validate.tools.spellchecker.dataframe_processor import DataFrameProcessor
+from data_validate.tools.spellchecker.dictionary_manager import DictionaryManager
 
 class SpellChecker:
     """Serviço principal para verificação ortográfica"""

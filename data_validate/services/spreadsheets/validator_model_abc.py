@@ -1,10 +1,10 @@
 from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Type, Tuple
 
-from common.utils.validation.data_validation import check_text_length, column_exists
-from controller.report.model_report import ModelReportList
-from data_model.sp_model_abc import SpModelABC
-from controller.context.data_context import DataModelsContext
+from data_validate.common.utils.validation.data_validation import check_text_length, column_exists
+from data_validate.controller.report.model_report import ModelReportList
+from data_validate.data_model.sp_model_abc import SpModelABC
+from data_validate.controller.context.data_context import DataModelsContext
 
 
 class ValidatorModelABC(ABC):

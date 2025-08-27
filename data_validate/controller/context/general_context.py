@@ -2,9 +2,9 @@
 from logging import Logger
 from typing import List, Any, Dict
 
-from common.utils.data_args import DataArgs
-from common.utils.file_system_utils import FileSystemUtils
-from config.config import Config
+from data_validate.common.utils.data_args import DataArgs
+from data_validate.common.utils.file_system_utils import FileSystemUtils
+from data_validate.config.config import Config
 
 
 class GeneralContext:

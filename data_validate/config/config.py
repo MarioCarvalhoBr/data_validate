@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime
 from types import MappingProxyType
-from common.locale.language_manager import LanguageManager
+from data_validate.common.locale.language_manager import LanguageManager
 
 class NamesEnum(Enum):
     FS = "verification_name_file_structure"
@@ -52,6 +52,42 @@ class Config:
     OUTPUT_REPORT_HTML = "_report.html"
     CURRENT_YEAR = datetime.now().year
     DATE_NOW = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+
+    TEMPLATE_DEFAULT_BASIC_NO_CSS = """
+                                <!DOCTYPE html>
+                                <html lang="pt-br">
+                                <head>
+                                    <meta charset="UTF-8">
+                                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+                                    <title>Canoa Report</title>
+                                </head>
+                                <body>
+                                    <h1 style="color:#FF0000;">Relat&oacute;rio gerando com o template padr&atilde;o de erro</h1>
+                                    <p>Esse relat&oacute;rio foi gerado com o template padr&atilde;o de erro, pois o template personalizado n&atilde;o foi encontrado ou est&aacute; faltando vari&aacute;veis obrigat&oacute;rias.</p>
+                                    <p>Entre em contato com o administrador do sistema para corrigir o problema.</p>
+                                    <p>RELAT&Oacute;RIO</p>
+                                    {{ name }}
+                                    Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados
+                                    Informa&ccedil;&otilde;es: 
+                                    {{ text_display_user }}
+                                    {{ text_display_sector }}
+                                    {{ text_display_protocol }}
+                                    {{ text_display_date }}
+                                    {{ text_display_version }}
+                                    {{ text_display_file }}
+                                    Resumo da validação
+                                    N&uacute;mero de Erros: {{ num_errors }}
+                                    N&uacute;mero de Avisos: {{ num_warnings }}
+                                    N&uacute;mero de testes executados: {{ number_tests }}
+                                    Testes n&atilde;o executados: {{ tests_not_executed }}
+                                    Mostrar erros n&atilde;o executados: {{ display_tests_not_executed }}
+                                    Erros
+                                    {{ errors }}
+                                    Avisos
+                                    {{ warnings }}
+                                </body>
+                                </html>
+                                """
 
     # Expected and optional files with their respective extensions
     # Improve this logic in the future to allow more flexibility

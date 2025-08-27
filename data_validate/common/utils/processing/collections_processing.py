@@ -1,7 +1,7 @@
 import re
 from typing import List, Set
 
-from common.utils.formatting.number_formatting import check_cell_integer
+from data_validate.common.utils.formatting.number_formatting import check_cell_integer
 
 
 def categorize_strings_by_id_pattern_from_list(items_to_categorize, allowed_scenario_suffixes=None):

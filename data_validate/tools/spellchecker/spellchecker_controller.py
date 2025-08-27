@@ -2,8 +2,8 @@
 
 from typing import List
 
-from tools.spellchecker.text_processor import TextProcessor
-from tools.spellchecker.dictionary_manager import DictionaryManager
+from data_validate.tools.spellchecker.text_processor import TextProcessor
+from data_validate.tools.spellchecker.dictionary_manager import DictionaryManager
 
 
 class SpellCheckerController:

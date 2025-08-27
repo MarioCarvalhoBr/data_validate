@@ -2,12 +2,12 @@ import re
 from typing import List, Dict, Any
 import pandas as pd
 
-from common.utils.processing.data_cleaning import clean_dataframe_integers, clean_dataframe_floats
-from common.utils.validation.legend_processing import LegendProcessing
-from controller.context.general_context import GeneralContext
+from data_validate.common.utils.processing.data_cleaning import clean_dataframe_integers, clean_dataframe_floats
+from data_validate.common.utils.validation.legend_processing import LegendProcessing
+from data_validate.controller.context.general_context import GeneralContext
 from data_validate.common.base.constant_base import ConstantBase
 from .sp_model_abc import SpModelABC
-from tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
+from data_validate.tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
 from data_validate.common.utils.validation.column_validation import check_column_names
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 

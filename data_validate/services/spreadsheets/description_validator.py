@@ -4,14 +4,14 @@ from collections import OrderedDict
 from typing import List, Tuple, Dict, Any
 import pandas as pd
 
-from config.config import NamesEnum
-from controller.report.model_report import ModelReportList
-from data_model import SpDescription
+from data_validate.config.config import NamesEnum
+from data_validate.controller.report.model_report import ModelReportList
+from data_validate.data_model import SpDescription
 from data_validate.common.utils.formatting.text_formatting import capitalize_text_keep_acronyms
 from data_validate.common.utils.validation.data_validation import check_punctuation, check_special_characters_cr_lf
 from data_validate.common.utils.formatting.number_formatting import check_cell_integer
-from controller.context.data_context import DataModelsContext
-from services.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.controller.context.data_context import DataModelsContext
+from data_validate.services.spreadsheets.validator_model_abc import ValidatorModelABC
 
 
 class SpDescriptionValidator(ValidatorModelABC):

@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
-from common.base.constant_base import ConstantBase
-from controller.context.general_context import GeneralContext
+from data_validate.common.base.constant_base import ConstantBase
+from data_validate.controller.context.general_context import GeneralContext
 from data_validate.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.common.utils.validation.data_validation import check_vertical_bar, check_unnamed_columns
 

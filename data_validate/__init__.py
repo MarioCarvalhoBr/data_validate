@@ -12,10 +12,11 @@ Aqui você pode adicionar informações como:
 Você pode até usar formatação Markdown básica aqui,
 embora o suporte possa variar dependendo da versão do pdoc.
 """
-from common.base.metadata_info import METADATA
+from data_validate.common.base.metadata_info import METADATA
 
 # Package metadata
 __name__ = METADATA.__name__
+__project_name__ = METADATA.__project_name__
 __version__ = METADATA.__version__
 __url__ = METADATA.__url__
 __description__ = METADATA.__description__
