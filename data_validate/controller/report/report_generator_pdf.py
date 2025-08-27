@@ -102,7 +102,7 @@ class ReportGeneratorPDF:
             output_html_path = os.path.join(self.output_folder, file_name + html_output_file)
 
             self._save_html_file(html_content, output_html_path)
-            self._save_pdf_report(output_html_path)
+            self._save_pdf_file(pdf_options=self._get_pdf_options(), html_file_path=output_html_path)
             self._print_json_summary()
 
         except Exception as error:
@@ -132,31 +132,32 @@ class ReportGeneratorPDF:
         Returns:
             Dictionary containing all template variables
         """
-        errors_html = self._format_messages_as_html(report_list, 'errors', 'text-danger-errors')
-        warnings_html = self._format_messages_as_html(report_list, 'warnings', 'text-orange-warning')
+        text_html_errors = self._format_messages_as_html(report_list, 'errors', 'text-danger-errors')
+        text_html_warnings = self._format_messages_as_html(report_list, 'warnings', 'text-orange-warning')
 
-        text_date_display = "" if self.context.data_args.data_action.no_time else f"<strong>Data e hora do processo: <strong class='text-gray'>{METADATA.__date_now__}</strong></strong><br>"
-        text_display_os_info = "" if self.context.data_args.data_action.no_version else f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{METADATA.__version__} &ndash; {platform.system()}</strong></strong><br>"
+        text_html_date_display = "" if self.context.data_args.data_action.no_time else f"<strong>Data e hora do processo: <strong class='text-gray'>{METADATA.__date_now__}</strong></strong><br>"
+        text_html_version_and_os_info = "" if self.context.data_args.data_action.no_version else f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{METADATA.__version__} &ndash; {platform.system()}</strong></strong><br>"
+        text_html_tests_not_executed = f"<ul>{"\n".join([f"<li>{test_name}</li>" for test_name in tests_not_executed])}</ul>"
 
         return {
             "name": METADATA.__project_name__,
 
-            "errors": errors_html,
-            "warnings": warnings_html,
+            "errors": text_html_errors,
+            "warnings": text_html_warnings,
 
             "num_errors": format_number_brazilian(self.num_errors),
             "num_warnings": format_number_brazilian(self.num_warnings),
             "number_tests": self.number_tests,
 
-            "text_display_version": text_display_os_info,
-            "text_display_date": text_date_display,
+            "text_display_version_and_os_info": text_html_version_and_os_info,
+            "text_display_date": text_html_date_display,
 
             "text_display_sector": self._get_optional_field_text("sector", "Setor estrat&eacute;gico"),
             "text_display_protocol": self._get_optional_field_text("protocol", "Protocolo"),
             "text_display_user": self._get_optional_field_text("user", "Usu&aacute;rio"),
             "text_display_file": self._get_optional_field_text("file", "Arquivo submetido"),
 
-            "tests_not_executed": self._format_tests_not_executed(tests_not_executed),
+            "tests_not_executed": text_html_tests_not_executed,
             "display_tests_not_executed": "block" if tests_not_executed else "none"
         }
 
@@ -177,22 +178,6 @@ class ReportGeneratorPDF:
         return (f"<strong>{display_label}: "
                 f"<strong class='text-gray'>{field_value}</strong></strong><br>")
 
-    def _save_pdf_report(self, html_file_path: str) -> None:
-        """Generate and save PDF report from HTML file.
-
-        Args:
-            html_file_path: Path to the HTML file to convert to PDF
-        """
-        try:
-            pdf_file_path = html_file_path.replace(".html", ".pdf")
-            pdf_options = self._get_pdf_options()
-
-            pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
-            print(f'PDF report created at: {pdf_file_path}')
-
-        except Exception as error:
-            print(f'Error creating PDF report: {error}', file=sys.stderr)
-
     def _print_json_summary(self) -> None:
         """Print JSON summary of validation results."""
         summary = {
@@ -208,31 +193,6 @@ class ReportGeneratorPDF:
 
         json_output = str(summary).replace("'", '"')
         print(f'<{json_output}>\n')
-
-    @staticmethod
-    def _format_tests_not_executed(tests_not_executed: List[str]) -> str:
-        """Format list of tests not executed as HTML.
-
-        Args:
-            tests_not_executed: List of test names that were not executed
-
-        Returns:
-            Formatted HTML list of tests not executed
-        """
-        test_items = "\n".join([f"<li>{test_name}</li>" for test_name in tests_not_executed])
-        return f"<ul>{test_items}</ul>"
-
-    @staticmethod
-    def _save_html_file(html_content: str, output_path: str) -> None:
-        """Save HTML content to file.
-
-        Args:
-            html_content: HTML content to save
-            output_path: Path where to save the HTML file
-        """
-        with open(output_path, 'w', encoding="utf-8") as file:
-            file.write(html_content)
-        print(f'\nHTML report created at: {output_path}')
 
     @staticmethod
     def _format_messages_as_html(report_list: ModelReportList, message_type: str, css_class: str) -> str:
@@ -276,4 +236,32 @@ class ReportGeneratorPDF:
             'cookie': [],
             'no-outline': None
         }
+
+    @staticmethod
+    def _save_html_file(html_content: str, output_path: str) -> None:
+        """Save HTML content to file.
+
+        Args:
+            html_content: HTML content to save
+            output_path: Path where to save the HTML file
+        """
+        with open(output_path, 'w', encoding="utf-8") as file:
+            file.write(html_content)
+        print(f'\nHTML report created at: {output_path}')
+
+    @staticmethod
+    def _save_pdf_file(pdf_options: Dict[str, Any], html_file_path: str) -> None:
+        """Generate and save PDF report from HTML file.
+
+        Args:
+            html_file_path: Path to the HTML file to convert to PDF
+        """
+        try:
+            pdf_file_path = html_file_path.replace(".html", ".pdf")
+
+            pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
+            print(f'PDF report created at: {pdf_file_path}')
+
+        except Exception as error:
+            print(f'Error creating PDF report: {error}', file=sys.stderr)
 

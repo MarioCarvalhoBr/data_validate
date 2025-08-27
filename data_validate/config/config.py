@@ -73,7 +73,7 @@ class Config:
                                     {{ text_display_sector }}
                                     {{ text_display_protocol }}
                                     {{ text_display_date }}
-                                    {{ text_display_version }}
+                                    {{ text_display_version_and_os_info }}
                                     {{ text_display_file }}
                                     Resumo da validação
                                     N&uacute;mero de Erros: {{ num_errors }}
