@@ -28,6 +28,8 @@ dependencies = [
     "openpyxl (>=3.1.5,<4.0.0)",
     "pandas-stubs (>=2.2.3.250527,<3.0.0)",
     "pyenchant (>=3.2.2,<4.0.0)",
+    "pdfkit (>=1.0.0,<2.0.0)",
+    "babel (>=2.17.0,<3.0.0)",
 ]
 
 [project.urls]

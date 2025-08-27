@@ -5,6 +5,7 @@ Package metadata
 """
 
 from __future__ import annotations
+from datetime import datetime
 
 from common.base.constant_base import ConstantBase
 
@@ -34,6 +35,7 @@ class MetadataInfo(ConstantBase):
         self.__python__ = "3.12"
         self.__python_version__ = self.__python__
         self.__status__ = "Development"
+        self.__date_now__ = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
 
         self._finalize_initialization()
 

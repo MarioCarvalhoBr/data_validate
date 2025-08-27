@@ -7,7 +7,7 @@ from common.utils.processing.collections_processing import extract_numeric_ids_a
     categorize_strings_by_id_pattern_from_list, find_differences_in_two_set
 from common.utils.processing.data_cleaning import clean_dataframe_integers
 from config.config import NamesEnum
-from controller.report import ReportList
+from controller.report.model_report import ModelReportList
 from data_model import SpDescription, SpScenario, SpLegend, SpValue
 from controller.context.data_context import DataModelsContext
 from services.spreadsheets.validator_model_abc import ValidatorModelABC
@@ -31,7 +31,7 @@ class SpLegendValidator(ValidatorModelABC):
     Validates the content of the SpLegend spreadsheet.
     """
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+    def __init__(self, data_models_context: DataModelsContext, report_list: ModelReportList, **kwargs: Dict[str, Any]):
         super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpLegend, **kwargs)
 
         # Configure

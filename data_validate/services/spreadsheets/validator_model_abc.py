@@ -2,14 +2,14 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Type, Tuple
 
 from common.utils.validation.data_validation import check_text_length, column_exists
-from controller.report import ReportList
+from controller.report.model_report import ModelReportList
 from data_model.sp_model_abc import SpModelABC
 from controller.context.data_context import DataModelsContext
 
 
 class ValidatorModelABC(ABC):
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, type_class: Type[SpModelABC], **kwargs: Dict[str, Any]):
+    def __init__(self, data_models_context: DataModelsContext, report_list: ModelReportList, type_class: Type[SpModelABC], **kwargs: Dict[str, Any]):
         # SETUP
         self._data_models_context = data_models_context
         self._report_list = report_list

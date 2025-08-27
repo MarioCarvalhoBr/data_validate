@@ -4,6 +4,8 @@ from logging import Logger
 from common.utils.data_args import DataArgs
 from common.utils.file_system_utils import FileSystemUtils
 from config.config import Config, NamesEnum
+from controller.report.model_report import ModelReportList
+from controller.report.report_generator_pdf import ReportGeneratorPDF
 from services.spreadsheets.legend_validator import SpLegendValidator
 from tools import DataLoaderFacade
 from data_model import (
@@ -18,7 +20,6 @@ from services.structure.validator_structure import ValidatorStructureFiles
 from controller.context.data_context import DataModelsContext
 from services.spreadsheets.value_validator import SpValueValidator
 from controller.context.general_context import GeneralContext
-from .report import ReportList
 
 FLAG = None
 
@@ -50,7 +51,7 @@ class ProcessorSpreadsheet:
             SpDescription, SpComposition, SpValue, SpTemporalReference,
             SpProportionality, SpScenario, SpLegend, SpDictionary
         ]
-        self.report_list = ReportList()
+        self.report_list = ModelReportList()
 
         # Running the main processing function
         self.run()
@@ -123,6 +124,17 @@ class ProcessorSpreadsheet:
         total_warnings = sum(len(report.warnings) for report in self.report_list)
         self.context.logger.error(f"Total errors: {total_errors}")
         self.context.logger.warning(f"Total warnings: {total_warnings}")
+
+        # Criar a pasta de saída para salvar os relatórios HMTL e PDF
+        # util.create_directory(output_folder)
+        self.context.fs_utils.create_directory(self.output_folder)
+        report_generator = ReportGeneratorPDF(context=self.context)
+
+        results_tests_not_executed = []
+
+        report_generator.save_html_pdf_report(report_list=self.report_list,
+                                              results_tests_not_executed=results_tests_not_executed)
+
     def _build_pipeline(self) -> None:
         """
         Build the validation pipeline by initializing the data context and running the validations.

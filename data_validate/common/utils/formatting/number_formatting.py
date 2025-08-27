@@ -1,7 +1,12 @@
 import pandas as pd
 import math
 from typing import Tuple, Any
+from babel.numbers import format_decimal
 
+
+def format_number_brazilian(n):
+    """Formata um número no padrão brasileiro."""
+    return format_decimal(n, locale='pt_BR')
 
 def is_nan(value: Any) -> bool:
     """Check if a value is NaN (including pandas NaN)."""

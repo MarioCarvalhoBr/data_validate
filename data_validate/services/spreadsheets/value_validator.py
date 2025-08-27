@@ -12,7 +12,7 @@ from common.utils.validation.value_data_validation import (
     validate_data_values_in_columns
 )
 from config.config import NamesEnum
-from controller.report import ReportList
+from controller.report.model_report import ModelReportList
 from data_model import SpDescription, SpTemporalReference, SpScenario, SpValue
 from controller.context.data_context import DataModelsContext
 from services.spreadsheets.validator_model_abc import ValidatorModelABC
@@ -23,7 +23,7 @@ class SpValueValidator(ValidatorModelABC):
     Validates the content of the SpValue spreadsheet.
     """
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ReportList, **kwargs: Dict[str, Any]):
+    def __init__(self, data_models_context: DataModelsContext, report_list: ModelReportList, **kwargs: Dict[str, Any]):
         super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpValue, **kwargs)
 
         # Configure

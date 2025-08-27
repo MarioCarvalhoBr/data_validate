@@ -1,6 +1,7 @@
 import os
 import chardet
 from typing import Tuple, List
+from pathlib import Path
 
 from ..locale.language_manager import LanguageManager
 
@@ -49,6 +50,9 @@ class FileSystemUtils:
             return False, self.locale_manager.text('fs_utils_error_encoding_os', error=str(e))
         except Exception as e:
             return False, self.locale_manager.text('fs_utils_error_unexpected', error=str(e))
+
+    def get_last_directory_name(self, path: str) -> str:
+        return Path(path).name
 
     def create_directory(self, dir_name: str) -> Tuple[bool, str]:
         """
