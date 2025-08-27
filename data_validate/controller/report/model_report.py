@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-class ModelReport:
+class ModelItemReport:
     """
     Data model for validation reports.
 
@@ -32,7 +32,7 @@ class ModelReportList:
     Data model for a list of Report objects, accessible by name.
 
     Attributes:
-        reports (dict[str, ModelReport]): Dictionary of Report instances by name_test.
+        reports (dict[str, ModelItemReport]): Dictionary of Report instances by name_test.
     """
     def __init__(self, reports: list = None):
         self.reports = {}
@@ -44,7 +44,7 @@ class ModelReportList:
         self.reports[report.name_test] = report
 
     def add_by_name(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
-        self.reports[name_test] = ModelReport(name_test, errors, warnings)
+        self.reports[name_test] = ModelItemReport(name_test, errors, warnings)
 
     def extend(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
         if name_test in self.reports:
@@ -63,26 +63,3 @@ class ModelReportList:
 
     def __len__(self):
         return len(self.reports)
-
-def main():
-    # Create 4 reports, each with 5 different errors
-    report_names = ["Structure", "Cleaning", "Relations", "Legend"]
-    report_list = ModelReportList()
-    for idx, name in enumerate(report_names):
-        errors = [f"Error {i+1} in {name}" for i in range(5)]
-        report = ModelReport(name_test=name, errors=errors)
-        report_list.add_report(report)
-
-    # Print all reports and their errors
-    for report in report_list:
-        print(f"Report: {report.name_test}")
-        print("  Errors:")
-        for error in report.errors:
-            print(f"    - {error}")
-        print("  Warnings:")
-        for warning in report.warnings:
-            print(f"    - {warning}")
-        print()
-
-if __name__ == "__main__":
-    main()

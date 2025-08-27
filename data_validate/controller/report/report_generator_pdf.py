@@ -8,11 +8,11 @@ from typing import List, Dict, Any
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
+from config.config import NamesEnum
 from data_validate.common.base.metadata_info import METADATA
 from data_validate.common.utils.formatting.number_formatting import format_number_brazilian
 from data_validate.controller.context.general_context import GeneralContext
 from data_validate.controller.report.model_report import ModelReportList
-
 
 class ReportGeneratorPDF:
     """PDF and HTML report generator for data validation results.
@@ -82,12 +82,11 @@ class ReportGeneratorPDF:
         if any(var not in self.template_data_text for var in self.required_variables):
             self.template_data_text = self.context.config.TEMPLATE_DEFAULT_BASIC_NO_CSS
 
-    def build_report(self, report_list: ModelReportList, tests_not_executed: List[str]) -> None:
+    def build_report(self, report_list: ModelReportList) -> None:
         """Generate and save HTML and PDF reports from validation results.
 
         Args:
             report_list: List of validation test reports
-            tests_not_executed: List of test names that were not executed
         """
         file_name = self.context.fs_utils.get_last_directory_name(path=self.input_folder)
         html_output_file = self.context.config.OUTPUT_REPORT_HTML
@@ -96,6 +95,12 @@ class ReportGeneratorPDF:
         self.num_errors = sum(len(report.errors) for report in report_list)
         self.num_warnings = sum(len(report.warnings) for report in report_list)
         self.number_tests = len(report_list)
+
+        tests_not_executed = []
+        if self.context.data_args.data_action.no_spellchecker:
+            tests_not_executed.append(self.context.config.get_verify_names()[NamesEnum.SPELL.value])
+        if self.context.data_args.data_action.no_warning_titles_length:
+            tests_not_executed.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
 
         try:
             html_content = self._generate_html_content(report_list, tests_not_executed)
@@ -245,9 +250,12 @@ class ReportGeneratorPDF:
             html_content: HTML content to save
             output_path: Path where to save the HTML file
         """
-        with open(output_path, 'w', encoding="utf-8") as file:
-            file.write(html_content)
-        print(f'\nHTML report created at: {output_path}')
+        try:
+            with open(output_path, 'w', encoding="utf-8") as file:
+                file.write(html_content)
+            print(f'\nHTML report created at: {output_path}')
+        except Exception as error:
+            print(f'Error saving HTML report: {error}', file=sys.stderr)
 
     @staticmethod
     def _save_pdf_file(pdf_options: Dict[str, Any], html_file_path: str) -> None:

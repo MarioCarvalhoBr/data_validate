@@ -103,6 +103,25 @@ class ProcessorSpreadsheet:
         for name in NamesEnum:
             self.report_list.add_by_name(self.TITLES_INFO[name.value])
 
+    def _build_pipeline(self) -> None:
+        """
+        Build the validation pipeline by initializing the data context and running the validations.
+        """
+        self.context.logger.info("Building validation pipeline...")
+
+        # Create the DataContext with the initialized models
+        self.data_models_context = DataModelsContext(context=self.context, models_to_use=self.models_to_use)
+
+        # RUN ALL VALIDATIONS PIPELINE
+        SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
+        SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
+        SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
     def _report(self) -> None:
         # Print all reports and their errors
         for report in self.report_list:
@@ -126,29 +145,7 @@ class ProcessorSpreadsheet:
         self.context.fs_utils.create_directory(self.output_folder)
         report_generator = ReportGeneratorPDF(context=self.context)
 
-        results_tests_not_executed = []
-
-        report_generator.build_report(report_list=self.report_list,
-                                      tests_not_executed=results_tests_not_executed)
-
-    def _build_pipeline(self) -> None:
-        """
-        Build the validation pipeline by initializing the data context and running the validations.
-        """
-        self.context.logger.info("Building validation pipeline...")
-
-        # Create the DataContext with the initialized models
-        self.data_models_context = DataModelsContext(context=self.context, models_to_use=self.models_to_use)
-
-        # RUN ALL VALIDATIONS PIPELINE
-        SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-        SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-        SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-
-        SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-
-        SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-        SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        report_generator.build_report(report_list=self.report_list)
 
     def run(self):
         self.context.logger.info("Iniciando processamento...")
