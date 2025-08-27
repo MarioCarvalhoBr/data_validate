@@ -128,8 +128,8 @@ class ProcessorSpreadsheet:
 
         results_tests_not_executed = []
 
-        report_generator.save_html_pdf_report(report_list=self.report_list,
-                                              tests_not_executed=results_tests_not_executed)
+        report_generator.build_report(report_list=self.report_list,
+                                      tests_not_executed=results_tests_not_executed)
 
     def _build_pipeline(self) -> None:
         """
