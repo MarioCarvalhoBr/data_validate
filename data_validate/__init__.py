@@ -28,4 +28,4 @@ __python__ = METADATA.__python__
 __python_version__ = METADATA.__python_version__
 __status__ = METADATA.__status__
 
-print(f'{__name__} version {__version__} initialized.')
+print(f'The {__project_name__} {__name__} version {__version__} initialized.')

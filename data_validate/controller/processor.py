@@ -53,6 +53,7 @@ class ProcessorSpreadsheet:
         self.run()
 
     def _read_data(self) -> None:
+        self.context.logger.info("Data reading and preprocessing...")
         # 0 ETL: Extract, Transform, Load
         importer = DataLoaderFacade(self.input_folder)
         data, errors_data_importer = importer.load_all
@@ -99,6 +100,7 @@ class ProcessorSpreadsheet:
                 self.context.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
 
     def _configure(self) -> None:
+        self.context.logger.info("Configuring the processor...")
         # Crie toda a lista dos 33 reportes vazia para ser preenchida posteriormente
         for name in NamesEnum:
             self.report_list.add_by_name(self.TITLES_INFO[name.value])
@@ -123,16 +125,21 @@ class ProcessorSpreadsheet:
         SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
 
     def _report(self) -> None:
+        self.context.logger.info("Generating reports...")
         # Print all reports and their errors
-        for report in self.report_list:
-            print(f"Report: {report.name_test}")
-            print(f"  Errors: {len(report.errors)}")
-            for error in report.errors:
-                print(f"    - {error}")
-            print(f"  Warnings: {len(report.warnings)}")
-            for warning in report.warnings:
-                print(f"    - {warning}")
-            print("---------------------------------------------------------------")
+        if self.context.data_args.data_action.debug:
+            self.context.logger.info("\nModo DEBUG ativado.")
+            self.context.logger.info(f'------ Resultados da verificação dos testes ------')
+
+            for report in self.report_list:
+                print(f"Report: {report.name_test}")
+                print(f"  Errors: {len(report.errors)}")
+                for error in report.errors:
+                    print(f"    - {error}")
+                print(f"  Warnings: {len(report.warnings)}")
+                for warning in report.warnings:
+                    print(f"    - {warning}")
+                print("---------------------------------------------------------------")
 
         # Imprime o número total de erros e avisos
         total_errors = sum(len(report.errors) for report in self.report_list)
@@ -148,7 +155,7 @@ class ProcessorSpreadsheet:
         report_generator.build_report(report_list=self.report_list)
 
     def run(self):
-        self.context.logger.info("Iniciando processamento...")
+        self.context.logger.info("Starting processing...")
         self._configure()
         self._read_data()
         self._build_pipeline()

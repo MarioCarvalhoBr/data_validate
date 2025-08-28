@@ -83,8 +83,8 @@ class DataFile(DataModelABC):
         if not os.path.isdir(self.input_folder):
             raise ValueError(f"Input folder does not exist: {self.input_folder}")
 
-        if not os.path.basename(self.output_folder):
-            raise ValueError(f"Invalid output folder name: {self.output_folder}")
+        if os.path.splitext(os.path.basename(self.output_folder))[1] != "" or '.' in os.path.basename(self.output_folder):
+            raise ValueError(f"Output folder name is invalid: {self.output_folder}")
 
     def run(self):
         """
