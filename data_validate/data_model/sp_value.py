@@ -54,6 +54,8 @@ class SpValue(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass
 
+    def post_processing(self):
+        pass
     def run(self):
         self.pre_processing()
         self.expected_structure_columns()

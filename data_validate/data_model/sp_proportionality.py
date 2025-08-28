@@ -69,6 +69,9 @@ class SpProportionality(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass
 
+    def post_processing(self):
+        pass
+
     def run(self):
         # Verificar se precisa do read_success também
         if self.data_loader_model.exists_file:

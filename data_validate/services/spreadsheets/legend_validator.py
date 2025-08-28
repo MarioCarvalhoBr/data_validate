@@ -186,7 +186,6 @@ class SpLegendValidator(ValidatorModelABC):
 
         min_lower_legend_default = self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
         max_upper_legend_default = self.model_sp_legend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT
-        exists_errors_legend = self.model_sp_legend.structural_errors or self.model_sp_legend.data_cleaning_errors
         required_columns = {self.sp_name_description: [SpDescription.RequiredColumn.COLUMN_CODE.name, SpDescription.RequiredColumn.COLUMN_LEVEL.name]}
 
         if self.model_sp_legend.legend_read_success:
@@ -223,7 +222,7 @@ class SpLegendValidator(ValidatorModelABC):
         )
 
         groups_legends = pd.DataFrame({str(SpLegend.RequiredColumn.COLUMN_CODE.name): []}).groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
-        if not exists_errors_legend:
+        if self.model_sp_legend.all_ok:
             groups_legends = df_legend.groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
 
         mapping_legends = {}

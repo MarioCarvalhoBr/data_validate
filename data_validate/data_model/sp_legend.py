@@ -12,6 +12,7 @@ from data_validate.common.utils.validation.column_validation import check_column
 from data_validate.common.utils.formatting.error_formatting import format_errors_and_warnings
 
 class SpLegend(SpModelABC):
+
     # CONSTANTS
     class INFO(ConstantBase):
         def __init__(self):
@@ -56,6 +57,10 @@ class SpLegend(SpModelABC):
 
         self.run()
 
+        # Avaliar o custo desse if
+        if self.structural_errors or self.data_cleaning_errors or not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty or not self.data_loader_model.read_success:
+            self.all_ok = False
+
     def pre_processing(self):
         if not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty:
             return
@@ -98,6 +103,9 @@ class SpLegend(SpModelABC):
                 errors.extend(legend_validator.validate_order_sequence(group, code_value, self.column_name_order))
 
         self.data_cleaning_errors.extend(errors)
+
+    def post_processing(self):
+        pass
 
     def run(self):
         if self.data_loader_model.exists_file:

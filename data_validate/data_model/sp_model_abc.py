@@ -56,6 +56,9 @@ class SpModelABC(ABC):
         self.EXPECTED_COLUMNS: List[str] = []
         self.DF_COLUMNS: List[str] = []
 
+        # Additional variables
+        self.all_ok: bool = True
+
         self.init()
 
 
@@ -84,6 +87,27 @@ class SpModelABC(ABC):
         by subclasses to perform necessary operations prior to executing the primary logic or task.
 
         This serves as a placeholder for subclass-specific preprocessing logic, and forces derived
+        classes to provide their own implementation.
+
+        :raises NotImplementedError: If the method is not overridden in a subclass.
+        """
+        pass
+
+    """@property
+    def is_sanity_check_passed(self) ->
+        exists_errors_legend = self.structural_errors or self.data_cleaning_errors
+        exists_file_errors_legend = not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty or not self.data_loader_model.read_success
+        if exists_errors_legend or exists_file_errors_legend:
+            return False
+        return True"""
+
+    @abstractmethod
+    def post_processing(self):
+        """
+        Defines an abstract method for post-processing. This method is intended to be implemented
+        by subclasses to perform necessary operations after executing the primary logic or task.
+
+        This serves as a placeholder for subclass-specific postprocessing logic, and forces derived
         classes to provide their own implementation.
 
         :raises NotImplementedError: If the method is not overridden in a subclass.

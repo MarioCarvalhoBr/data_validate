@@ -67,6 +67,8 @@ class SpTemporalReference(SpModelABC):
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:
                 self.RequiredColumn.COLUMN_SYMBOL = df[self.RequiredColumn.COLUMN_SYMBOL.name]
+    def post_processing(self):
+        pass
 
     def run(self):
         self.pre_processing()

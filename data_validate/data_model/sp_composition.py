@@ -63,6 +63,9 @@ class SpComposition(SpModelABC):
                 attribute_name = column_attribute_mapping[column_name]
                 setattr(self.RequiredColumn, attribute_name, df[column_name])
 
+    def post_processing(self):
+        pass
+
     def run(self):
         self.pre_processing()
         self.expected_structure_columns()

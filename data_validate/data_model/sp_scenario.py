@@ -64,6 +64,9 @@ class SpScenario(SpModelABC):
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass
 
+    def post_processing(self):
+        pass
+
     def run(self):
 
         if self.data_loader_model.exists_file:

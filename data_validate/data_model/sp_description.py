@@ -139,6 +139,9 @@ class SpDescription(SpModelABC):
                 self.DynamicColumn.COLUMN_LEGEND = df[col_legenda]
             self.data_cleaning_errors.extend(errors_legenda)
 
+    def post_processing(self):
+        pass
+
     def run(self):
         self.pre_processing()
         self.expected_structure_columns()
