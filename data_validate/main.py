@@ -47,4 +47,4 @@ if __name__ == "__main__":
         raise Exception(f"An unexpected error occurred: {e}. Please contact support.")
 
 # Example usage:
-# python3 data_validate/main.py --l pt_BR --i data/input/data_ground_truth_01/ --o data/output --d
+# python3 data_validate/main.py --l pt_BR --o data/output/temp/ --d --i data/input/data_ground_truth_01/

@@ -1,5 +1,4 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-import time
 
 from data_validate.config.config import NamesEnum
 from data_validate.controller.report.model_report import ModelListReport
@@ -43,7 +42,7 @@ class ProcessorSpreadsheet:
         self.scenarios_list = []
 
         # OBJECTS AND ARRAYS
-        self.data_models_context: DataModelsContext = None
+        self.data_models_context: DataModelsContext | None = None
         self.models_to_use = []
         self.classes_to_initialize = [
             SpDescription, SpComposition, SpValue, SpTemporalReference,
@@ -162,28 +161,7 @@ class ProcessorSpreadsheet:
 
     def run(self):
         self.context.logger.info("Starting processing...")
-
-        start_time = time.perf_counter()
         self._configure()
-        end_time = time.perf_counter()
-        elapsed_time = end_time - start_time
-        print(f"_configure: Function execution time: {elapsed_time:.6f} seconds")
-
-
-        start_time = time.perf_counter()
         self._read_data()
-        end_time = time.perf_counter()
-        elapsed_time = end_time - start_time
-        print(f"_read_data: Function execution time: {elapsed_time:.6f} seconds")
-
-        start_time = time.perf_counter()
         self._build_pipeline()
-        end_time = time.perf_counter()
-        elapsed_time = end_time - start_time
-        print(f"_build_pipeline: Function execution time: {elapsed_time:.6f} seconds")
-
-        start_time = time.perf_counter()
         self._report()
-        end_time = time.perf_counter()
-        elapsed_time = end_time - start_time
-        print(f"_report: Function execution time: {elapsed_time:.6f} seconds")
