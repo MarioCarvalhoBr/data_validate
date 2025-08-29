@@ -6,8 +6,7 @@ from typing import List, Dict, Any, Tuple
 from config.config import NamesEnum
 from controllers.context.data_context import DataModelsContext
 from controllers.report.model_report import ModelListReport
-from models import SpModelABC, SpDescription
-from data_validate.controllers.context.data_context import GeneralContext
+from models import SpDescription
 from validators.spreadsheets.validator_model_abc import ValidatorModelABC
 
 

@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from logging import Logger
-from typing import List, Any, Dict
+from typing import Any, Dict
 
 from helpers.base.data_args import DataArgs
 from helpers.base.file_system_utils import FileSystemUtils

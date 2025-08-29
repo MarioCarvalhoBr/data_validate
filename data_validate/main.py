@@ -16,7 +16,7 @@ def main():
         data_args = DataArgs()
 
         # Configure the Bootstrap
-        bootstrap = Bootstrap(data_args)
+        Bootstrap(data_args)
 
         # Configure the Toolkit
         config: Config = Config(lm=LanguageManager())
@@ -32,7 +32,7 @@ def main():
         start_time = time.time()
 
         # Bussiness Logic
-        processor = ProcessorSpreadsheet(context=general_context)
+        ProcessorSpreadsheet(context=general_context)
 
         if not data_args.data_action.no_time:
             print("Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos")

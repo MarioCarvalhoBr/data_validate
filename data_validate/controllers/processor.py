@@ -123,7 +123,7 @@ class ProcessorSpreadsheet:
         # RUN ALL VALIDATIONS PIPELINE
 
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
-        self.structure_validator = ValidatorStructureFiles(data_models_context=self.data_models_context, report_list=self.report_list)
+        ValidatorStructureFiles(data_models_context=self.data_models_context, report_list=self.report_list)
 
         SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
@@ -139,7 +139,7 @@ class ProcessorSpreadsheet:
         # Debug all reports and their errors
         if self.context.data_args.data_action.debug:
             self.context.logger.info("\nModo DEBUG ativado.")
-            self.context.logger.info(f'------ Resultados da verificação dos testes ------')
+            self.context.logger.info('------ Resultados da verificação dos testes ------')
 
             for report in self.report_list:
                 self.context.logger.info(f"Report: {report.name_test}")
@@ -166,7 +166,6 @@ class ProcessorSpreadsheet:
         self.context.logger.info("Starting processing...")
 
         self._prepare_statement()
-        all_names_testes = [report.name_test for report in self.report_list.reports.values()]
         self._read_data()
         self._configure()
         self._build_pipeline()

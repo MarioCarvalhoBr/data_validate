@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import re
-from typing import List, Dict, Any, Tuple
+from typing import List, Any
 import pandas as pd
 from decimal import Decimal, InvalidOperation
 

@@ -147,7 +147,6 @@ def find_differences_in_two_set(first_set: Set, second_set: Set) -> List[str]:
     Returns:
         list: List of error messages describing missing elements in each set
     """
-    errors = []
 
     if first_set is None:
         first_set = []

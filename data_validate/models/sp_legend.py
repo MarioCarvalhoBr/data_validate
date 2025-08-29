@@ -5,7 +5,7 @@ from data_validate.helpers.common.validation.legend_processing import LegendProc
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.models.sp_model_abc import SpModelABC
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
+from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.helpers.common.validation.column_validation import check_column_names
 from data_validate.helpers.common.formatting.error_formatting import format_errors_and_warnings
 
