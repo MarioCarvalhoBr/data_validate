@@ -1,7 +1,7 @@
 from enum import Enum
 from datetime import datetime
 from types import MappingProxyType
-from data_validate.common.locale.language_manager import LanguageManager
+from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
 class NamesEnum(Enum):
     FS = "verification_name_file_structure"

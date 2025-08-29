@@ -1,7 +1,7 @@
 import os
 from concurrent.futures import ThreadPoolExecutor
-from data_validate.common.locale.language_enum import LanguageEnum
-from data_validate.common.utils.data_args import DataArgs
+from data_validate.helpers.tools.locale.language_enum import LanguageEnum
+from helpers.base.data_args import DataArgs
 
 
 class Bootstrap:
