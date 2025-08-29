@@ -114,4 +114,7 @@ class SpellCheckerValidator(ValidatorModelABC):
         # BUILD REPORTS
         self.build_reports(validations)
 
+        # Cleanup temporary files
+        self.spellchecker.clean_files_generated()
+
         return self._errors, self._warnings

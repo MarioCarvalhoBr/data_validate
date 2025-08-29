@@ -31,6 +31,9 @@ class SpellChecker:
         if validation_errors:
             self.errors_dictionary.extend(validation_errors)
 
+    def clean_files_generated(self) -> None:
+        self.dictionary_manager.clean_temporary_files()
+
     def check_spelling_text(self, df: pd.DataFrame, file_name: str, columns_sheets: List[str]) -> Tuple[List[str], List[str]]:
         """Verifica ortografia em texto com tratamento melhorado de erros"""
 
