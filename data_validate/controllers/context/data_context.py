@@ -5,8 +5,14 @@ from typing import Type, Optional
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.models.sp_model_abc import SpModelABC
 
+
 class DataModelsContext(GeneralContext):
-    def __init__(self, context: GeneralContext, models_to_use: List[Any]=None, **kwargs: Dict[str, Any]):
+    def __init__(
+        self,
+        context: GeneralContext,
+        models_to_use: List[Any] = None,
+        **kwargs: Dict[str, Any],
+    ):
         """
         Initialize the DataContext with a list of models to initialize.
 
@@ -16,7 +22,12 @@ class DataModelsContext(GeneralContext):
             fs_utils (FileSystemUtils): File system utilities for file operations.
             data_args (DataArgs): Data arguments containing input and output folder paths.
         """
-        super().__init__(config=context.config, fs_utils=context.fs_utils, data_args=context.data_args, **kwargs)
+        super().__init__(
+            config=context.config,
+            fs_utils=context.fs_utils,
+            data_args=context.data_args,
+            **kwargs,
+        )
 
         self.context = context
         self.models_to_use = models_to_use or []
@@ -25,7 +36,6 @@ class DataModelsContext(GeneralContext):
         self.errors = []
         self.warnings = []
         self.report_list = []
-
 
     def _load_data(self):
         pass
@@ -46,7 +56,6 @@ class DataModelsContext(GeneralContext):
                 return model
 
         return None
-
 
     def run(self):
         pass

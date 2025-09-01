@@ -1,4 +1,4 @@
-.PHONY: help test test-cov test-fast clean coverage html-report install-dev
+.PHONY: help test test-cov test-fast clean coverage html-report install-dev genbadge-coverage genbadge-tests make-badge
 
 # Variáveis
 PYTHON = poetry run python
@@ -18,7 +18,7 @@ test: ## Executa todos os testes
 	$(PYTEST) -v
 
 test-cov: ## Executa testes com cobertura completa
-	$(PYTEST) --cov=data_validate --cov-report=term-missing --cov-report=html:dev-reports/htmlcov --cov-report=xml:dev-reports/coverage.xml --cov-fail-under=4 -v
+	$(PYTEST) --cov=data_validate --cov-report=term-missing --cov-report=html:dev-reports/htmlcov --cov-report=xml:dev-reports/coverage.xml --cov-fail-under=4 --junitxml=dev-reports/junit/junit.xml -v
 
 test-fast: ## Executa testes rapidamente (sem cobertura)
 	$(PYTEST) -x -v
@@ -41,6 +41,16 @@ clean: ## Remove arquivos temporários e relatórios
 	rm -rf __pycache__/
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
+
+genbadge-coverage: ## Gera badge de cobertura
+	@mkdir -p assets/coverage
+	poetry run genbadge coverage -i dev-reports/coverage.xml -o assets/coverage/coverage_badge.svg
+
+genbadge-tests: ## Gera badge de testes
+	@mkdir -p assets/coverage
+	poetry run genbadge tests --input-file dev-reports/junit/junit.xml -o assets/coverage/tests_badge.svg
+
+make-badge: genbadge-coverage genbadge-tests ## Gera todos os badges
 
 # Comando padrão
 all: test-cov ## Executa testes com cobertura (padrão)

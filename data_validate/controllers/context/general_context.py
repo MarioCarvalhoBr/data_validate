@@ -8,7 +8,14 @@ from data_validate.config.config import Config
 
 
 class GeneralContext:
-    def __init__(self, config: Config=None, fs_utils: FileSystemUtils=None, data_args: DataArgs=None, logger: Logger=None, **kwargs: Dict[str, Any]):
+    def __init__(
+        self,
+        config: Config = None,
+        fs_utils: FileSystemUtils = None,
+        data_args: DataArgs = None,
+        logger: Logger = None,
+        **kwargs: Dict[str, Any],
+    ):
         """
         Initialize the DataContext with a list of models to initialize.
 

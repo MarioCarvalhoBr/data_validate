@@ -1,5 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
+
 def is_acronym(text: str) -> bool:
     """
     Checks if the given text is an acronym (all uppercase and length > 1).
@@ -33,4 +34,4 @@ def capitalize_text_keep_acronyms(text: str) -> str:
         else:
             capitalized_words.append(word.lower())
 
-    return ' '.join(capitalized_words)
+    return " ".join(capitalized_words)

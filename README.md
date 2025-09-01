@@ -1,5 +1,7 @@
 
 # Adapta Parser
+![Coverage Status](assets/coverage/coverage_badge.svg)
+![Tests Status](assets/coverage/tests_badge.svg)
 
 Adapta Parser is a Python-based project designed to provide a multilingual calculator and other utilities. This project includes features such as language selection, basic arithmetic operations, and JSON-based localization.
 

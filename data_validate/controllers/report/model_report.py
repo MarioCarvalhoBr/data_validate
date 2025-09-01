@@ -12,7 +12,10 @@ class ModelItemReport:
         errors (list[str]): List of error messages.
         warnings (list[str]): List of warning messages.
     """
-    def __init__(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
+
+    def __init__(
+        self, name_test: str, errors: list[str] = None, warnings: list[str] = None
+    ):
         self.name_test = name_test
         self.errors = errors if errors is not None else []
         self.warnings = warnings if warnings is not None else []
@@ -38,6 +41,7 @@ class ModelListReport:
     Attributes:
         reports (dict[str, ModelItemReport]): Dictionary of Report instances by name_test.
     """
+
     def __init__(self, context: GeneralContext = None, reports: list = None):
         self.context = context
         self.reports = {}
@@ -55,11 +59,17 @@ class ModelListReport:
     def add_report(self, report):
         self.reports[report.name_test] = report
 
-    def add_by_name(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
+    def add_by_name(
+        self, name_test: str, errors: list[str] = None, warnings: list[str] = None
+    ):
         self.reports[name_test] = ModelItemReport(name_test, errors, warnings)
+
     def list_all_names(self):
         return list(self.reports.keys())
-    def extend(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
+
+    def extend(
+        self, name_test: str, errors: list[str] = None, warnings: list[str] = None
+    ):
         if name_test in self.reports:
             if errors:
                 self.reports[name_test].errors.extend(errors)
@@ -67,7 +77,6 @@ class ModelListReport:
                 self.reports[name_test].warnings.extend(warnings)
         else:
             self.add_by_name(name_test, errors, warnings)
-
 
     def global_num_errors(self):
         return sum(len(report.errors) for report in self.reports.values())
@@ -81,19 +90,31 @@ class ModelListReport:
             flattened_report = ModelItemReport(
                 name_test=report.name_test,
                 errors=report.errors[:n_messages],
-                warnings=report.warnings[:n_messages]
+                warnings=report.warnings[:n_messages],
             )
             if len(report.errors) > n_messages:
-                count_omitted_errors = format_number_brazilian(len(report.errors) - n_messages, locale)
-                flattened_report.add_error(self.context.lm.text("model_report_msg_errors_omitted", count=count_omitted_errors))
+                count_omitted_errors = format_number_brazilian(
+                    len(report.errors) - n_messages, locale
+                )
+                flattened_report.add_error(
+                    self.context.lm.text(
+                        "model_report_msg_errors_omitted", count=count_omitted_errors
+                    )
+                )
 
             if len(report.warnings) > n_messages:
-                count_omitted_warnings = format_number_brazilian(len(report.warnings) - n_messages, locale)
-                flattened_report.add_warning(self.context.lm.text("model_report_msg_warnings_omitted", count=count_omitted_warnings))
+                count_omitted_warnings = format_number_brazilian(
+                    len(report.warnings) - n_messages, locale
+                )
+                flattened_report.add_warning(
+                    self.context.lm.text(
+                        "model_report_msg_warnings_omitted",
+                        count=count_omitted_warnings,
+                    )
+                )
 
             flattened_reports.append(flattened_report)
         return ModelListReport(context=self.context, reports=flattened_reports)
-
 
     def __getitem__(self, name):
         return self.reports[name]

@@ -1,7 +1,10 @@
 import pandas as pd
 from typing import List, Tuple
 
-def check_column_names(df: pd.DataFrame, expected_columns: List[str]) -> Tuple[List[str], List[str]]:
+
+def check_column_names(
+    df: pd.DataFrame, expected_columns: List[str]
+) -> Tuple[List[str], List[str]]:
     """
     Checks for missing and extra columns in a DataFrame compared to the expected columns.
 
@@ -15,5 +18,7 @@ def check_column_names(df: pd.DataFrame, expected_columns: List[str]) -> Tuple[L
     missing_columns = [col for col in expected_columns if col not in df.columns]
     extra_columns = [col for col in df.columns if col not in expected_columns]
     # Remove unnamed extra columns
-    extra_columns = [col for col in extra_columns if not col.lower().startswith('unnamed')]
+    extra_columns = [
+        col for col in extra_columns if not col.lower().startswith("unnamed")
+    ]
     return missing_columns, extra_columns

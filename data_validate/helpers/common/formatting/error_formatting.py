@@ -1,6 +1,9 @@
 from typing import List, Tuple
 
-def format_errors_and_warnings(file_name: str, missing_columns: List[str], extra_columns: List[str]) -> Tuple[List[str], List[str]]:
+
+def format_errors_and_warnings(
+    file_name: str, missing_columns: List[str], extra_columns: List[str]
+) -> Tuple[List[str], List[str]]:
     """
     Formats error and warning messages for missing and extra columns in a file.
 
@@ -14,8 +17,16 @@ def format_errors_and_warnings(file_name: str, missing_columns: List[str], extra
     errors = []
     warnings = []
     try:
-        errors = [f"{file_name}: Coluna '{col}' esperada mas não foi encontrada." for col in missing_columns]
-        warnings = [f"{file_name}: Coluna '{col}' será ignorada pois não está na especificação." for col in extra_columns]
+        errors = [
+            f"{file_name}: Coluna '{col}' esperada mas não foi encontrada."
+            for col in missing_columns
+        ]
+        warnings = [
+            f"{file_name}: Coluna '{col}' será ignorada pois não está na especificação."
+            for col in extra_columns
+        ]
     except Exception as exc:
-        errors.append(f"{file_name}: Erro ao processar a formatação de erros e avisos: {str(exc)}")
+        errors.append(
+            f"{file_name}: Erro ao processar a formatação de erros e avisos: {str(exc)}"
+        )
     return errors, warnings

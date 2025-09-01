@@ -4,11 +4,9 @@ from typing import List, Tuple, Any, Set
 
 import pandas as pd
 
+
 def validate_numeric_value(
-    value: Any,
-    row_index: int,
-    column: str,
-    filename: str
+    value: Any, row_index: int, column: str, filename: str
 ) -> Tuple[bool, str, bool]:
     """
     Validate a single numeric value.
@@ -27,28 +25,30 @@ def validate_numeric_value(
         return True, "", False
 
     # Check if value is NaN or can't be converted to numeric
-    numeric_value = pd.to_numeric(str(value).replace(',', '.'), errors='coerce')
+    numeric_value = pd.to_numeric(str(value).replace(",", "."), errors="coerce")
     if pd.isna(value) or pd.isna(numeric_value):
-        error_msg = (f"{filename}, linha {row_index + 2}: "
-                    f"O valor {value} não é um número válido e nem DI (Dado Indisponível) "
-                    f"para a coluna '{column}'.")
+        error_msg = (
+            f"{filename}, linha {row_index + 2}: "
+            f"O valor {value} não é um número válido e nem DI (Dado Indisponível) "
+            f"para a coluna '{column}'."
+        )
         return False, error_msg, False
 
     # Check decimal places using Decimal for precision
     try:
-        decimal_value = Decimal(str(value).replace(',', '.'))
+        decimal_value = Decimal(str(value).replace(",", "."))
         has_excessive_decimals = decimal_value.as_tuple().exponent < -2
         return True, "", has_excessive_decimals
     except (ValueError, TypeError):
-        error_msg = (f"{filename}, linha {row_index + 2}: "
-                    f"Erro ao processar valor decimal para a coluna '{column}'.")
+        error_msg = (
+            f"{filename}, linha {row_index + 2}: "
+            f"Erro ao processar valor decimal para a coluna '{column}'."
+        )
         return False, error_msg, False
 
 
 def process_column_validation(
-    df_values: pd.DataFrame,
-    column: str,
-    filename: str
+    df_values: pd.DataFrame, column: str, filename: str
 ) -> Tuple[List[str], Set[int]]:
     """
     Process validation for a single column.
@@ -87,9 +87,11 @@ def process_column_validation(
     if len(invalid_values) == 1:
         errors.append(invalid_values[0][1])
     elif len(invalid_values) > 1:
-        error_msg = (f"{filename}: {len(invalid_values)} valores que não são "
-                    f"número válido nem DI (Dado Indisponível) para a coluna '{column}', "
-                    f"entre as linhas {first_invalid_row} e {last_invalid_row}.")
+        error_msg = (
+            f"{filename}: {len(invalid_values)} valores que não são "
+            f"número válido nem DI (Dado Indisponível) para a coluna '{column}', "
+            f"entre as linhas {first_invalid_row} e {last_invalid_row}."
+        )
         errors.append(error_msg)
 
     return errors, excessive_decimal_rows
@@ -98,7 +100,7 @@ def process_column_validation(
 def generate_decimal_warning(
     all_excessive_decimal_rows: Set[int],
     count_excessive_decimal_rows: int,
-    filename: str
+    filename: str,
 ) -> str:
     """
     Generate warning message for values with excessive decimal places.
@@ -122,15 +124,15 @@ def generate_decimal_warning(
     first_row = sorted_rows[0]
     last_row = sorted_rows[-1]
 
-    return (f"{filename}: {text_existem} {count_excessive_decimal_rows} {text_valores} com mais de 2 "
-           f"casas decimais, serão consideradas apenas as 2 primeiras casas decimais. "
-           f"Entre as linhas {first_row} e {last_row}.")
+    return (
+        f"{filename}: {text_existem} {count_excessive_decimal_rows} {text_valores} com mais de 2 "
+        f"casas decimais, serão consideradas apenas as 2 primeiras casas decimais. "
+        f"Entre as linhas {first_row} e {last_row}."
+    )
 
 
 def validate_data_values_in_columns(
-    dataframe: pd.DataFrame,
-    valid_columns: List[str],
-    filename: str
+    dataframe: pd.DataFrame, valid_columns: List[str], filename: str
 ) -> Tuple[List[str], List[str]]:
     """
     Validate data values in specified columns for numeric validity and decimal places.

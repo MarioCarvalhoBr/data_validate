@@ -1,15 +1,11 @@
-
+# Development local files
 local_data/
-data/output/*
-test.py
-issues/
-TODO.md
-
-assets/
-.idea/
+data/output/logs/
 docs/
-data/
+
+# Logs
 *.log
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

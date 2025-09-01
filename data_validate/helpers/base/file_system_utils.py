@@ -20,7 +20,9 @@ class FileSystemUtils:
         """
         self.locale_manager = lm
 
-    def detect_encoding(self, file_path: str, num_bytes: int = 1024) -> Tuple[bool, str]:
+    def detect_encoding(
+        self, file_path: str, num_bytes: int = 1024
+    ) -> Tuple[bool, str]:
         """
         Detects the encoding of a file by reading a specified number of bytes.
 
@@ -34,23 +36,34 @@ class FileSystemUtils:
         """
         try:
             if not file_path:
-                return False, self.locale_manager.text('fs_utils_error_file_path_empty')
+                return False, self.locale_manager.text("fs_utils_error_file_path_empty")
             if not os.path.exists(file_path):
-                return False, self.locale_manager.text('fs_utils_error_file_not_found', filename=os.path.basename(file_path))
+                return False, self.locale_manager.text(
+                    "fs_utils_error_file_not_found",
+                    filename=os.path.basename(file_path),
+                )
             if not os.path.isfile(file_path):
-                return False, self.locale_manager.text('fs_utils_error_path_not_file', path=file_path)
+                return False, self.locale_manager.text(
+                    "fs_utils_error_path_not_file", path=file_path
+                )
 
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 raw_data = f.read(num_bytes)
                 result = chardet.detect(raw_data)
-                encoding = result.get('encoding')
+                encoding = result.get("encoding")
                 if not encoding:
-                    return False, self.locale_manager.text('fs_utils_error_encoding_failed')
+                    return False, self.locale_manager.text(
+                        "fs_utils_error_encoding_failed"
+                    )
                 return True, encoding
         except OSError as e:
-            return False, self.locale_manager.text('fs_utils_error_encoding_os', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_encoding_os", error=str(e)
+            )
         except Exception as e:
-            return False, self.locale_manager.text('fs_utils_error_unexpected', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_unexpected", error=str(e)
+            )
 
     def get_last_directory_name(self, path: str) -> str:
         return Path(path).name
@@ -68,17 +81,27 @@ class FileSystemUtils:
         """
         try:
             if not file_path:
-                return False, self.locale_manager.text('fs_utils_error_file_path_empty')
+                return False, self.locale_manager.text("fs_utils_error_file_path_empty")
             if not os.path.exists(file_path):
-                return True, self.locale_manager.text('fs_utils_info_file_not_found', filename=os.path.basename(file_path))
+                return True, self.locale_manager.text(
+                    "fs_utils_info_file_not_found", filename=os.path.basename(file_path)
+                )
             if not os.path.isfile(file_path):
-                return False, self.locale_manager.text('fs_utils_error_path_not_file', path=file_path)
+                return False, self.locale_manager.text(
+                    "fs_utils_error_path_not_file", path=file_path
+                )
             os.remove(file_path)
-            return True, self.locale_manager.text('fs_utils_success_file_removed', filename=os.path.basename(file_path))
+            return True, self.locale_manager.text(
+                "fs_utils_success_file_removed", filename=os.path.basename(file_path)
+            )
         except OSError as e:
-            return False, self.locale_manager.text('fs_utils_error_remove_file_os', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_remove_file_os", error=str(e)
+            )
         except Exception as e:
-            return False, self.locale_manager.text('fs_utils_error_unexpected', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_unexpected", error=str(e)
+            )
 
     def create_directory(self, dir_name: str) -> Tuple[bool, str]:
         """
@@ -93,18 +116,28 @@ class FileSystemUtils:
         """
         try:
             if not dir_name:
-                return False, self.locale_manager.text('fs_utils_error_dir_path_empty')
+                return False, self.locale_manager.text("fs_utils_error_dir_path_empty")
             if os.path.exists(dir_name):
                 if os.path.isdir(dir_name):
-                    return True, self.locale_manager.text('fs_utils_info_dir_exists', dir_name=dir_name)
+                    return True, self.locale_manager.text(
+                        "fs_utils_info_dir_exists", dir_name=dir_name
+                    )
                 else:
-                    return False, self.locale_manager.text('fs_utils_error_path_not_dir', path=dir_name)
+                    return False, self.locale_manager.text(
+                        "fs_utils_error_path_not_dir", path=dir_name
+                    )
             os.makedirs(dir_name)
-            return True, self.locale_manager.text('fs_utils_success_dir_created', dir_name=dir_name)
+            return True, self.locale_manager.text(
+                "fs_utils_success_dir_created", dir_name=dir_name
+            )
         except OSError as e:
-            return False, self.locale_manager.text('fs_utils_error_create_dir_os', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_create_dir_os", error=str(e)
+            )
         except Exception as e:
-            return False, self.locale_manager.text('fs_utils_error_unexpected', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_unexpected", error=str(e)
+            )
 
     def check_file_exists(self, file_path: str) -> Tuple[bool, List[str]]:
         """
@@ -119,14 +152,27 @@ class FileSystemUtils:
         """
         try:
             if not file_path:
-                return False, [self.locale_manager.text('fs_utils_error_file_path_empty')]
+                return False, [
+                    self.locale_manager.text("fs_utils_error_file_path_empty")
+                ]
             if not os.path.exists(file_path):
-                return False, [self.locale_manager.text('fs_utils_error_file_not_found', filename=os.path.basename(file_path))]
+                return False, [
+                    self.locale_manager.text(
+                        "fs_utils_error_file_not_found",
+                        filename=os.path.basename(file_path),
+                    )
+                ]
             if not os.path.isfile(file_path):
-                return False, [self.locale_manager.text('fs_utils_error_path_not_file', path=file_path)]
+                return False, [
+                    self.locale_manager.text(
+                        "fs_utils_error_path_not_file", path=file_path
+                    )
+                ]
             return True, []
         except Exception as e:
-            return False, [self.locale_manager.text('fs_utils_error_file_check_fail', error=str(e))]
+            return False, [
+                self.locale_manager.text("fs_utils_error_file_check_fail", error=str(e))
+            ]
 
     def check_directory_exists(self, dir_path: str) -> Tuple[bool, str]:
         """
@@ -141,14 +187,20 @@ class FileSystemUtils:
         """
         try:
             if not dir_path:
-                return False, self.locale_manager.text('fs_utils_error_dir_path_empty')
+                return False, self.locale_manager.text("fs_utils_error_dir_path_empty")
             if not os.path.exists(dir_path):
-                return False, self.locale_manager.text('fs_utils_error_dir_not_found', dir_path=dir_path)
+                return False, self.locale_manager.text(
+                    "fs_utils_error_dir_not_found", dir_path=dir_path
+                )
             if not os.path.isdir(dir_path):
-                return False, self.locale_manager.text('fs_utils_error_path_not_dir', path=dir_path)
+                return False, self.locale_manager.text(
+                    "fs_utils_error_path_not_dir", path=dir_path
+                )
             return True, ""
         except Exception as e:
-            return False, self.locale_manager.text('fs_utils_error_dir_check_fail', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_dir_check_fail", error=str(e)
+            )
 
     def check_directory_is_empty(self, dir_path: str) -> Tuple[bool, str]:
         """
@@ -163,14 +215,26 @@ class FileSystemUtils:
         """
         try:
             if not os.path.exists(dir_path):
-                return False, self.locale_manager.text('fs_utils_error_dir_not_found', dir_path=dir_path)
+                return False, self.locale_manager.text(
+                    "fs_utils_error_dir_not_found", dir_path=dir_path
+                )
             if not os.path.isdir(dir_path):
-                return False, self.locale_manager.text('fs_utils_error_path_not_dir', path=dir_path)
+                return False, self.locale_manager.text(
+                    "fs_utils_error_path_not_dir", path=dir_path
+                )
             if not os.listdir(dir_path):
-                return True, self.locale_manager.text('fs_utils_error_dir_empty', dir_path=dir_path)
-            return False, self.locale_manager.text('fs_utils_info_dir_not_empty', dir_path=dir_path)
+                return True, self.locale_manager.text(
+                    "fs_utils_error_dir_empty", dir_path=dir_path
+                )
+            return False, self.locale_manager.text(
+                "fs_utils_info_dir_not_empty", dir_path=dir_path
+            )
         except Exception as e:
-            return False, self.locale_manager.text('fs_utils_error_dir_check_fail', error=str(e))
+            return False, self.locale_manager.text(
+                "fs_utils_error_dir_check_fail", error=str(e)
+            )
+
+
 if __name__ == "__main__":
     locale_manager = LanguageManager()
     fs_utils = FileSystemUtils(locale_manager)

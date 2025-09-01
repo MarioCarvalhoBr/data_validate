@@ -42,7 +42,7 @@ def parse_numeric(cell: Any) -> Tuple[bool, float]:
         Tuple[bool, float]: (True, float value) if successful, (False, 0.0) otherwise.
     """
     if isinstance(cell, str):
-        cell = cell.replace(',', '.')
+        cell = cell.replace(",", ".")
     try:
         return True, float(cell)
     except (ValueError, TypeError):
@@ -109,6 +109,9 @@ def check_cell_float(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
 
     # Check minimum value constraint
     if num < min_value:
-        return False, f"O valor '{num}' é menor que o valor mínimo permitido ({min_value})."
+        return (
+            False,
+            f"O valor '{num}' é menor que o valor mínimo permitido ({min_value}).",
+        )
 
     return True, ""

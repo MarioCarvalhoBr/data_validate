@@ -3,12 +3,21 @@ from typing import List, Tuple, Dict, Any
 
 import pandas as pd
 
-from data_validate.helpers.common.generation.combinations import generate_combinations, find_extra_combinations
-from data_validate.helpers.common.processing.collections_processing import extract_numeric_ids_and_unmatched_strings_from_list, \
-    extract_numeric_integer_ids_from_list, find_differences_in_two_set_with_message, categorize_strings_by_id_pattern_from_list
-from data_validate.helpers.common.processing.data_cleaning import clean_dataframe_integers
+from data_validate.helpers.common.generation.combinations import (
+    generate_combinations,
+    find_extra_combinations,
+)
+from data_validate.helpers.common.processing.collections_processing import (
+    extract_numeric_ids_and_unmatched_strings_from_list,
+    extract_numeric_integer_ids_from_list,
+    find_differences_in_two_set_with_message,
+    categorize_strings_by_id_pattern_from_list,
+)
+from data_validate.helpers.common.processing.data_cleaning import (
+    clean_dataframe_integers,
+)
 from data_validate.helpers.common.validation.value_data_validation import (
-    validate_data_values_in_columns
+    validate_data_values_in_columns,
 )
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.report.model_report import ModelListReport
@@ -22,13 +31,27 @@ class SpValueValidator(ValidatorModelABC):
     Validates the content of the SpValue spreadsheet.
     """
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ModelListReport, **kwargs: Dict[str, Any]):
-        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpValue, **kwargs)
+    def __init__(
+        self,
+        data_models_context: DataModelsContext,
+        report_list: ModelListReport,
+        **kwargs: Dict[str, Any],
+    ):
+        super().__init__(
+            data_models_context=data_models_context,
+            report_list=report_list,
+            type_class=SpValue,
+            **kwargs,
+        )
 
         # Configure
         self.model_sp_value = self._data_model
-        self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
-        self.model_sp_temporal_reference = self._data_models_context.get_instance_of(SpTemporalReference)
+        self.model_sp_description = self._data_models_context.get_instance_of(
+            SpDescription
+        )
+        self.model_sp_temporal_reference = self._data_models_context.get_instance_of(
+            SpTemporalReference
+        )
         self.model_sp_scenario = self._data_models_context.get_instance_of(SpScenario)
 
         # Get model properties once
@@ -58,9 +81,18 @@ class SpValueValidator(ValidatorModelABC):
         # Define required columns efficiently
         self.global_required_columns = {
             self.sp_name_value: [SpValue.RequiredColumn.COLUMN_ID.name],
-            self.sp_name_description: [SpDescription.RequiredColumn.COLUMN_CODE.name,SpDescription.RequiredColumn.COLUMN_LEVEL.name],
-            self.sp_name_temporal_reference: [SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name],
-            self.sp_name_scenario: [SpScenario.RequiredColumn.COLUMN_SYMBOL.name] if self.exists_scenario else []
+            self.sp_name_description: [
+                SpDescription.RequiredColumn.COLUMN_CODE.name,
+                SpDescription.RequiredColumn.COLUMN_LEVEL.name,
+            ],
+            self.sp_name_temporal_reference: [
+                SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name
+            ],
+            self.sp_name_scenario: (
+                [SpScenario.RequiredColumn.COLUMN_SYMBOL.name]
+                if self.exists_scenario
+                else []
+            ),
         }
 
         # Validate all required columns exist
@@ -68,7 +100,11 @@ class SpValueValidator(ValidatorModelABC):
             self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
             self.sp_name_description: self.model_sp_description.data_loader_model.df_data,
             self.sp_name_temporal_reference: self.model_sp_temporal_reference.data_loader_model.df_data,
-            self.sp_name_scenario: self.model_sp_scenario.data_loader_model.df_data if self.exists_scenario else pd.DataFrame()
+            self.sp_name_scenario: (
+                self.model_sp_scenario.data_loader_model.df_data
+                if self.exists_scenario
+                else pd.DataFrame()
+            ),
         }
 
     def validate_relation_indicators_in_values(self) -> Tuple[List[str], List[str]]:
@@ -84,8 +120,10 @@ class SpValueValidator(ValidatorModelABC):
             return errors, warnings
 
         local_required_columns = {
-            self.sp_name_description: self.global_required_columns[self.sp_name_description],
-            self.sp_name_scenario: self.global_required_columns[self.sp_name_scenario]
+            self.sp_name_description: self.global_required_columns[
+                self.sp_name_description
+            ],
+            self.sp_name_scenario: self.global_required_columns[self.sp_name_scenario],
         }
 
         code_column_name = SpDescription.RequiredColumn.COLUMN_CODE.name
@@ -96,7 +134,9 @@ class SpValueValidator(ValidatorModelABC):
             dataframe = self.model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
-                    exists_column, error_msg = self.column_exists(dataframe, model_name, column)
+                    exists_column, error_msg = self.column_exists(
+                        dataframe, model_name, column
+                    )
                     if not exists_column:
                         errors.append(error_msg)
         if errors:
@@ -109,45 +149,66 @@ class SpValueValidator(ValidatorModelABC):
         df_description, _ = clean_dataframe_integers(
             self.model_dataframes[self.sp_name_description],
             self.sp_name_description,
-            [code_column_name]
+            [code_column_name],
         )
 
-        level_one_codes = df_description[df_description[level_column_name] == '1'][code_column_name].astype(str).tolist()
+        level_one_codes = (
+            df_description[df_description[level_column_name] == "1"][code_column_name]
+            .astype(str)
+            .tolist()
+        )
 
         # Process value columns
         value_columns = df_values.columns.tolist()
-        columns_to_ignore = self.global_required_columns[self.sp_name_value] + level_one_codes
+        columns_to_ignore = (
+            self.global_required_columns[self.sp_name_value] + level_one_codes
+        )
 
-        valid_value_codes, invalid_columns = extract_numeric_ids_and_unmatched_strings_from_list(
-            value_columns, columns_to_ignore, self.list_scenarios
+        valid_value_codes, invalid_columns = (
+            extract_numeric_ids_and_unmatched_strings_from_list(
+                value_columns, columns_to_ignore, self.list_scenarios
+            )
         )
 
         # Filter out columns containing ':'
-        processed_invalid_columns = sorted({col for col in invalid_columns if ':' not in col})
+        processed_invalid_columns = sorted(
+            {col for col in invalid_columns if ":" not in col}
+        )
 
         if processed_invalid_columns:
-            errors.append(f"{self.model_sp_value.filename}: Colunas inválidas: {processed_invalid_columns}.")
+            errors.append(
+                f"{self.model_sp_value.filename}: Colunas inválidas: {processed_invalid_columns}."
+            )
 
         # Get filtered description codes using generic function
         # Remove level 1 indicators
-        filtered_description_df = df_description[df_description[level_column_name] != '1'].copy()
+        filtered_description_df = df_description[
+            df_description[level_column_name] != "1"
+        ].copy()
 
         # Remove level 2 indicators with scenario 0 if scenario column exists
-        if self.exists_scenario and scenario_column_name in filtered_description_df.columns:
+        if (
+            self.exists_scenario
+            and scenario_column_name in filtered_description_df.columns
+        ):
             filtered_description_df = filtered_description_df[
-                ~((filtered_description_df[level_column_name] == '2') &
-                  (filtered_description_df[scenario_column_name] == '0'))
+                ~(
+                    (filtered_description_df[level_column_name] == "2")
+                    & (filtered_description_df[scenario_column_name] == "0")
+                )
             ]
 
         # Extract valid description codes
-        valid_description_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=set(filtered_description_df[code_column_name].astype(str)))
+        valid_description_codes, _ = extract_numeric_integer_ids_from_list(
+            id_values_list=set(filtered_description_df[code_column_name].astype(str))
+        )
 
         # Compare codes between description and values
         comparison_errors = find_differences_in_two_set_with_message(
             first_set=valid_description_codes,
             label_1=self.model_sp_description.filename,
             second_set=valid_value_codes,
-            label_2=self.model_sp_value.filename
+            label_2=self.model_sp_value.filename,
         )
         errors.extend(comparison_errors)
 
@@ -162,7 +223,10 @@ class SpValueValidator(ValidatorModelABC):
         """
         errors, warnings = [], []
 
-        if self.model_dataframes[self.sp_name_description].empty or self.model_dataframes[self.sp_name_temporal_reference].empty:
+        if (
+            self.model_dataframes[self.sp_name_description].empty
+            or self.model_dataframes[self.sp_name_temporal_reference].empty
+        ):
             return errors, warnings
 
         local_required_columns = self.global_required_columns.copy()
@@ -173,13 +237,17 @@ class SpValueValidator(ValidatorModelABC):
         symbol_column_name = SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name
 
         if self.exists_scenario:
-            local_required_columns[self.sp_name_description].append(scenario_column_name)
+            local_required_columns[self.sp_name_description].append(
+                scenario_column_name
+            )
 
         for model_name, columns in local_required_columns.items():
             dataframe = self.model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
-                    exists_column, error_msg = self.column_exists(dataframe, model_name, column)
+                    exists_column, error_msg = self.column_exists(
+                        dataframe, model_name, column
+                    )
                     if not exists_column:
                         errors.append(error_msg)
 
@@ -194,12 +262,12 @@ class SpValueValidator(ValidatorModelABC):
         df_description, _ = clean_dataframe_integers(
             self.model_dataframes[self.sp_name_description],
             self.sp_name_description,
-            local_required_columns[self.sp_name_description]
+            local_required_columns[self.sp_name_description],
         )
         df_temporal_reference, _ = clean_dataframe_integers(
             self.model_dataframes[self.sp_name_temporal_reference],
             self.sp_name_temporal_reference,
-            local_required_columns[self.sp_name_temporal_reference]
+            local_required_columns[self.sp_name_temporal_reference],
         )
 
         # Get temporal symbols once (sorted for consistency)
@@ -219,7 +287,9 @@ class SpValueValidator(ValidatorModelABC):
                 if scenario == 0:
                     expected_combinations = [f"{code}-{first_year}"]
                 elif scenario == 1:
-                    expected_combinations = generate_combinations(code, first_year, temporal_symbols, self.list_scenarios)
+                    expected_combinations = generate_combinations(
+                        code, first_year, temporal_symbols, self.list_scenarios
+                    )
 
             # Validate required combinations exist
             for combination in expected_combinations:
@@ -227,19 +297,29 @@ class SpValueValidator(ValidatorModelABC):
                     # Skip validation for level 2 with scenario 0 (special case)
                     if level == 2 and scenario == 0:
                         continue
-                    errors.append(f"{self.model_sp_value.filename}: A coluna '{combination}' é obrigatória.")
+                    errors.append(
+                        f"{self.model_sp_value.filename}: A coluna '{combination}' é obrigatória."
+                    )
 
             # Find actual combinations for this code
-            actual_combinations = [col for col in sp_value_columns if col.startswith(f"{code}-")]
+            actual_combinations = [
+                col for col in sp_value_columns if col.startswith(f"{code}-")
+            ]
 
             # Check for extra combinations
-            has_extra_error, extra_columns = find_extra_combinations(expected_combinations, actual_combinations)
+            has_extra_error, extra_columns = find_extra_combinations(
+                expected_combinations, actual_combinations
+            )
             if has_extra_error:
                 for extra_column in extra_columns:
                     if level == 1:
-                        errors.append(f"{self.model_sp_value.filename}: A coluna '{extra_column}' é desnecessária para o indicador de nível 1.")
+                        errors.append(
+                            f"{self.model_sp_value.filename}: A coluna '{extra_column}' é desnecessária para o indicador de nível 1."
+                        )
                     else:
-                        errors.append(f"{self.model_sp_value.filename}: A coluna '{extra_column}' é desnecessária.")
+                        errors.append(
+                            f"{self.model_sp_value.filename}: A coluna '{extra_column}' é desnecessária."
+                        )
 
         return errors, warnings
 
@@ -258,7 +338,11 @@ class SpValueValidator(ValidatorModelABC):
 
         # Get model properties
         local_required_columns = {
-            self.sp_name_scenario: self.global_required_columns[self.sp_name_scenario] if self.exists_scenario else []
+            self.sp_name_scenario: (
+                self.global_required_columns[self.sp_name_scenario]
+                if self.exists_scenario
+                else []
+            )
         }
         id_column_name = SpValue.RequiredColumn.COLUMN_ID.name
 
@@ -266,7 +350,9 @@ class SpValueValidator(ValidatorModelABC):
             dataframe = self.model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
-                    exists_column, error_msg = self._column_exists_dataframe(dataframe, column)
+                    exists_column, error_msg = self._column_exists_dataframe(
+                        dataframe, column
+                    )
                     if not exists_column:
                         errors.append(error_msg)
 
@@ -309,4 +395,3 @@ class SpValueValidator(ValidatorModelABC):
         self.build_reports(validations)
 
         return self._errors, self._warnings
-

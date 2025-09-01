@@ -2,7 +2,9 @@
 
 from typing import List
 
-from data_validate.helpers.tools.spellchecker.dictionary_manager import DictionaryManager
+from data_validate.helpers.tools.spellchecker.dictionary_manager import (
+    DictionaryManager,
+)
 from data_validate.helpers.tools.spellchecker.text_processor import TextProcessor
 
 
@@ -33,7 +35,9 @@ class SpellCheckerController:
 
         return errors
 
-    def check_text_quality(self, text: str, column: str, row_index: int, sheet_name: str) -> List[str]:
+    def check_text_quality(
+        self, text: str, column: str, row_index: int, sheet_name: str
+    ) -> List[str]:
         """Verifica a qualidade do texto (espaços e ortografia)"""
         warnings = []
 

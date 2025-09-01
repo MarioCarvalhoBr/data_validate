@@ -1,10 +1,8 @@
 from typing import List, Tuple, Any
 
+
 def generate_combinations(
-    code: str,
-    start_year: int,
-    temporal_symbols: List[Any],
-    scenario_symbols: List[Any]
+    code: str, start_year: int, temporal_symbols: List[Any], scenario_symbols: List[Any]
 ) -> List[str]:
     """
     Generate combinations using the base code, start year, temporal symbols, and scenario symbols.
@@ -24,9 +22,9 @@ def generate_combinations(
             combinations.append(f"{code}-{year}-{symbol}")
     return combinations
 
+
 def find_extra_combinations(
-    expected_combinations: List[str],
-    actual_combinations: List[str]
+    expected_combinations: List[str], actual_combinations: List[str]
 ) -> Tuple[bool, List[str]]:
     """
     Find extra combinations present in actual_combinations but not in expected_combinations.

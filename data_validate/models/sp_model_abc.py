@@ -4,7 +4,11 @@ from typing import List, Dict, Any
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
-from data_validate.helpers.common.validation.data_validation import check_vertical_bar, check_unnamed_columns
+from data_validate.helpers.common.validation.data_validation import (
+    check_vertical_bar,
+    check_unnamed_columns,
+)
+
 
 class SpModelABC(ABC):
     class DEFINITIONS(ConstantBase):
@@ -24,11 +28,17 @@ class SpModelABC(ABC):
             self.SP_NAMAE_SCENARIO = "cenarios"
 
             self._finalize_initialization()
+
     VAR_CONSTS = DEFINITIONS()
 
     CONSTANTS = None
 
-    def __init__(self, context: GeneralContext, data_model: DataLoaderModel, **kwargs: Dict[str, Any]):
+    def __init__(
+        self,
+        context: GeneralContext,
+        data_model: DataLoaderModel,
+        **kwargs: Dict[str, Any],
+    ):
 
         # SETUP
         self.context: GeneralContext = context
@@ -36,14 +46,24 @@ class SpModelABC(ABC):
         self._kwargs: Dict[str, Any] = kwargs
 
         # UNPACKING DATA ARGS
-        self.filename: str =  self.data_loader_model.filename
+        self.filename: str = self.data_loader_model.filename
 
-        self.legend_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_EXISTS_FILE, False)
-        self.legend_read_success: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_READ_SUCCESS, False)
+        self.legend_exists_file: bool = self._kwargs.get(
+            self.VAR_CONSTS.LEGEND_EXISTS_FILE, False
+        )
+        self.legend_read_success: bool = self._kwargs.get(
+            self.VAR_CONSTS.LEGEND_READ_SUCCESS, False
+        )
 
-        self.scenario_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False)
-        self.scenario_read_success: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False)
-        self.scenarios_list: List[str] = self._kwargs.get(self.VAR_CONSTS.SCENARIOS_LIST, [])
+        self.scenario_exists_file: bool = self._kwargs.get(
+            self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False
+        )
+        self.scenario_read_success: bool = self._kwargs.get(
+            self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False
+        )
+        self.scenarios_list: List[str] = self._kwargs.get(
+            self.VAR_CONSTS.SCENARIOS_LIST, []
+        )
 
         # CONFIGURE VARIABLES AND LISTS
         self.structural_errors: List[str] = []
@@ -61,7 +81,6 @@ class SpModelABC(ABC):
 
         self.init()
 
-
     def init(self):
         self.scenarios_list = list(set(self.scenarios_list))
 
@@ -70,14 +89,20 @@ class SpModelABC(ABC):
             self.DF_COLUMNS = list(self.data_loader_model.df_data.columns)
 
         if self.data_loader_model.df_data.empty and self.data_loader_model.read_success:
-            self.structural_errors.append(f"{self.filename}: O arquivo enviado está vazio.")
+            self.structural_errors.append(
+                f"{self.filename}: O arquivo enviado está vazio."
+            )
 
         # CHECK 1: Vertical Bar Check
-        _, errors_vertical_bar = check_vertical_bar(self.data_loader_model.df_data, self.filename)
+        _, errors_vertical_bar = check_vertical_bar(
+            self.data_loader_model.df_data, self.filename
+        )
         self.structural_errors.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        _, errors_unnamed_columns = check_unnamed_columns(self.data_loader_model.df_data, self.filename)
+        _, errors_unnamed_columns = check_unnamed_columns(
+            self.data_loader_model.df_data, self.filename
+        )
         self.structural_errors.extend(errors_unnamed_columns)
 
     @abstractmethod
@@ -96,7 +121,11 @@ class SpModelABC(ABC):
     @property
     def is_sanity_check_passed(self) -> bool:
         exists_errors_legend = self.structural_errors or self.data_cleaning_errors
-        exists_file_errors_legend = not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty or not self.data_loader_model.read_success
+        exists_file_errors_legend = (
+            not self.data_loader_model.exists_file
+            or self.data_loader_model.df_data.empty
+            or not self.data_loader_model.read_success
+        )
         value = True
         if exists_errors_legend or exists_file_errors_legend:
             value = False
@@ -120,7 +149,6 @@ class SpModelABC(ABC):
         # Check if there is a vertical bar in the column name
         pass
 
-
     @abstractmethod
     def data_cleaning(self, *args, **kwargs):
         """
@@ -133,8 +161,6 @@ class SpModelABC(ABC):
         :raises NotImplementedError: If the method is not overridden in a subclass.
         """
         pass
-
-
 
     @abstractmethod
     def run(self):
@@ -150,5 +176,7 @@ class SpModelABC(ABC):
         Returns:
             str: Representação em string do objeto.
         """
-        return f"SpModelABC(FILENAME: {self.filename}):\n" + \
-               f"  DATA_MODEL: {self.data_loader_model}\n"
+        return (
+            f"SpModelABC(FILENAME: {self.filename}):\n"
+            + f"  DATA_MODEL: {self.data_loader_model}\n"
+        )

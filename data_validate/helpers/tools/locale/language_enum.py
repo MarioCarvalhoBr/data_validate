@@ -20,6 +20,7 @@ Usage Example:
 """
 import enum
 
+
 class LanguageEnum(enum.Enum):
     """
     An enumeration of supported languages.
@@ -29,9 +30,9 @@ class LanguageEnum(enum.Enum):
         EN_US (str): Represents the American English language code ('en_US').
     """
 
-    PT_BR = 'pt_BR'
-    EN_US = 'en_US'
-    DEFAULT_LANGUAGE = 'pt_BR'
+    PT_BR = "pt_BR"
+    EN_US = "en_US"
+    DEFAULT_LANGUAGE = "pt_BR"
 
     @classmethod
     def list_supported_languages(cls):
@@ -52,6 +53,7 @@ class LanguageEnum(enum.Enum):
             str: The default language code ('pt_BR').
         """
         return cls.PT_BR.value
+
 
 if __name__ == "__main__":
     # Example usage

@@ -3,21 +3,39 @@ from typing import List, Tuple, Dict, Any, Type, Union
 
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.models import SpDictionary, SpDescription, SpTemporalReference, SpScenario
+from data_validate.models import (
+    SpDictionary,
+    SpDescription,
+    SpTemporalReference,
+    SpScenario,
+)
 from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+
 
 class SpellCheckerValidator(ValidatorModelABC):
     """
     Validates the content of the SpScenario spreadsheet.
     """
 
-    def __init__(self, data_models_context: DataModelsContext, report_list: ModelListReport, **kwargs: Dict[str, Any]):
-        super().__init__(data_models_context=data_models_context, report_list=report_list, type_class=SpDictionary, **kwargs)
+    def __init__(
+        self,
+        data_models_context: DataModelsContext,
+        report_list: ModelListReport,
+        **kwargs: Dict[str, Any],
+    ):
+        super().__init__(
+            data_models_context=data_models_context,
+            report_list=report_list,
+            type_class=SpDictionary,
+            **kwargs,
+        )
 
         # Configure
-        self.dictionary: SpDictionary | None = self._data_models_context.get_instance_of(SpDictionary)
+        self.dictionary: SpDictionary | None = (
+            self._data_models_context.get_instance_of(SpDictionary)
+        )
         self.lang_dict_spell = self._data_models_context.data_args.data_file.locale
 
         # From SpDictionary extract words to ignore
@@ -27,7 +45,9 @@ class SpellCheckerValidator(ValidatorModelABC):
         self.spellchecker = SpellChecker(self.lang_dict_spell, self.list_words_user)
 
         # Define column mappings for each model type
-        self.model_columns_map: Dict[Type[Union[SpDescription, SpTemporalReference, SpScenario]], List[str]] = {
+        self.model_columns_map: Dict[
+            Type[Union[SpDescription, SpTemporalReference, SpScenario]], List[str]
+        ] = {
             SpDescription: [
                 SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
                 SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name,
@@ -40,13 +60,15 @@ class SpellCheckerValidator(ValidatorModelABC):
             SpScenario: [
                 SpScenario.RequiredColumn.COLUMN_NAME.name,
                 SpScenario.RequiredColumn.COLUMN_DESCRIPTION.name,
-            ]
+            ],
         }
 
         # Run pipeline
         self.run()
 
-    def validate_spellchecker(self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]) -> Tuple[List[str], List[str]]:
+    def validate_spellchecker(
+        self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]
+    ) -> Tuple[List[str], List[str]]:
         """
         Generic spellchecker validation method that works with any model class.
 
@@ -81,10 +103,12 @@ class SpellCheckerValidator(ValidatorModelABC):
                 continue
 
         # Perform spellcheck
-        errors_spellchecker, warnings_spellchecker = self.spellchecker.check_spelling_text(
-            df=self._dataframe,
-            file_name=self._filename,
-            columns_sheets=columns_to_check
+        errors_spellchecker, warnings_spellchecker = (
+            self.spellchecker.check_spelling_text(
+                df=self._dataframe,
+                file_name=self._filename,
+                columns_sheets=columns_to_check,
+            )
         )
 
         errors.extend(errors_spellchecker)
@@ -102,14 +126,29 @@ class SpellCheckerValidator(ValidatorModelABC):
         validations = []
         if not self._data_models_context.data_args.data_action.no_spellchecker:
             # Add validation for Description
-            validations.append((lambda: self.validate_spellchecker(SpDescription), NamesEnum.SPELL.value))
+            validations.append(
+                (
+                    lambda: self.validate_spellchecker(SpDescription),
+                    NamesEnum.SPELL.value,
+                )
+            )
 
             # Add validation for Temporal Reference
-            validations.append((lambda: self.validate_spellchecker(SpTemporalReference), NamesEnum.SPELL.value))
+            validations.append(
+                (
+                    lambda: self.validate_spellchecker(SpTemporalReference),
+                    NamesEnum.SPELL.value,
+                )
+            )
 
             # Add validation for Scenario if scenarios exist
             if self._data_model.scenarios_list:
-                validations.append((lambda: self.validate_spellchecker(SpScenario), NamesEnum.SPELL.value))
+                validations.append(
+                    (
+                        lambda: self.validate_spellchecker(SpScenario),
+                        NamesEnum.SPELL.value,
+                    )
+                )
 
         # BUILD REPORTS
         self.build_reports(validations)

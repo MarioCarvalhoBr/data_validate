@@ -27,7 +27,9 @@ def categorize_strings_by_id_pattern_from_list(
 
     if allowed_scenario_suffixes:
         escaped_suffixes = [re.escape(str(s)) for s in allowed_scenario_suffixes]
-        scenario_pattern_id_year_suffix = re.compile(r'^\d{1,}-\d{4}-(?:' + '|'.join(escaped_suffixes) + ')$')
+        scenario_pattern_id_year_suffix = re.compile(
+            r"^\d{1,}-\d{4}-(?:" + "|".join(escaped_suffixes) + ")$"
+        )
     else:
         scenario_pattern_id_year_suffix = re.compile(r"(?!)")
 
@@ -38,7 +40,9 @@ def categorize_strings_by_id_pattern_from_list(
     for current_item_str in string_items_to_categorize:
         if base_pattern_id_year.match(current_item_str):
             matched_by_pattern.append(current_item_str)
-        elif allowed_scenario_suffixes and scenario_pattern_id_year_suffix.match(current_item_str):
+        elif allowed_scenario_suffixes and scenario_pattern_id_year_suffix.match(
+            current_item_str
+        ):
             matched_by_pattern.append(current_item_str)
         else:
             not_matched_by_pattern.append(current_item_str)
@@ -46,7 +50,9 @@ def categorize_strings_by_id_pattern_from_list(
     return matched_by_pattern, not_matched_by_pattern
 
 
-def extract_numeric_integer_ids_from_list(id_values_list: List[Any]) -> Tuple[Set[int], Set[Any]]:
+def extract_numeric_integer_ids_from_list(
+    id_values_list: List[Any],
+) -> Tuple[Set[int], Set[Any]]:
     """
     Extracts and categorizes valid and invalid IDs from a list of values.
 
@@ -71,7 +77,7 @@ def extract_numeric_integer_ids_from_list(id_values_list: List[Any]) -> Tuple[Se
 def extract_numeric_ids_and_unmatched_strings_from_list(
     source_list: List[Any] = None,
     strings_to_ignore: List[Any] = None,
-    suffixes_for_matching: List[Any] = None
+    suffixes_for_matching: List[Any] = None,
 ) -> Tuple[Set[int], List[str]]:
     """
     Extracts numeric IDs from a list of strings that match specific patterns and returns a list of strings
@@ -93,14 +99,17 @@ def extract_numeric_ids_and_unmatched_strings_from_list(
         suffixes_for_matching = []
 
     set_of_strings_to_ignore = {str(item) for item in strings_to_ignore}
-    pattern_matched_strings, initially_unmatched_strings = categorize_strings_by_id_pattern_from_list(
-        source_list, suffixes_for_matching
+    pattern_matched_strings, initially_unmatched_strings = (
+        categorize_strings_by_id_pattern_from_list(source_list, suffixes_for_matching)
     )
     final_unmatched_strings = [
-        unmatched_str for unmatched_str in initially_unmatched_strings if unmatched_str not in set_of_strings_to_ignore
+        unmatched_str
+        for unmatched_str in initially_unmatched_strings
+        if unmatched_str not in set_of_strings_to_ignore
     ]
     extracted_numeric_ids = {
-        int(matched_string.split('-', 1)[0]) for matched_string in pattern_matched_strings
+        int(matched_string.split("-", 1)[0])
+        for matched_string in pattern_matched_strings
     }
     return extracted_numeric_ids, final_unmatched_strings
 

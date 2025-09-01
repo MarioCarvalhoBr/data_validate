@@ -3,6 +3,7 @@ from typing import Optional
 import os
 from datetime import datetime
 
+
 class CustomFormatter(logging.Formatter):
 
     grey = "\x1b[38;20m"
@@ -10,7 +11,9 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    format = (
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    )
     # logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     FORMATS = {
@@ -18,13 +21,14 @@ class CustomFormatter(logging.Formatter):
         logging.INFO: grey + format + reset,
         logging.WARNING: yellow + format + reset,
         logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
+        logging.CRITICAL: bold_red + format + reset,
     }
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
+
 
 class LoggerManager:
     """
@@ -35,11 +39,14 @@ class LoggerManager:
         default_level (int): The default logging level.
     """
 
-    def __init__(self, log_folder: str = "logs",
-                 default_level: int = logging.DEBUG,
-                 console_logger="console_logger",
-                 prefix="data_validate",
-                 logger_name="data_validate_file_logger"):
+    def __init__(
+        self,
+        log_folder: str = "logs",
+        default_level: int = logging.DEBUG,
+        console_logger="console_logger",
+        prefix="data_validate",
+        logger_name="data_validate_file_logger",
+    ):
         """
         Initializes the LoggerManager.
 
@@ -54,9 +61,16 @@ class LoggerManager:
 
         self.console_logger = self.configure_logger(console_logger)
         self.log_file = self.generate_log_file_name(prefix=prefix)
-        self.file_logger = self.configure_logger(logger_name=logger_name, log_file=self.log_file)
+        self.file_logger = self.configure_logger(
+            logger_name=logger_name, log_file=self.log_file
+        )
 
-    def configure_logger(self, logger_name: str, level: Optional[int] = None, log_file: Optional[str] = None) -> logging.Logger:
+    def configure_logger(
+        self,
+        logger_name: str,
+        level: Optional[int] = None,
+        log_file: Optional[str] = None,
+    ) -> logging.Logger:
         """
         Configures a logger with the specified name, level, and optional log file.
 
@@ -70,8 +84,6 @@ class LoggerManager:
         """
         logger = logging.getLogger(logger_name)
         logger.setLevel(level or self.default_level)
-
-
 
         # Console handler
         console_handler = logging.StreamHandler()

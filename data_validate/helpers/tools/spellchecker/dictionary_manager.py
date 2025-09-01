@@ -28,7 +28,9 @@ class DictionaryManager:
         self.dictionary = None
         self.broker = None
         self._errors = []
-        self.path_dictionary: Path = Path(__file__).resolve().parents[3] / 'static' / 'dictionaries'
+        self.path_dictionary: Path = (
+            Path(__file__).resolve().parents[3] / "static" / "dictionaries"
+        )
 
         self._setup_paths()
 
@@ -76,12 +78,14 @@ class DictionaryManager:
 
             # Adiciona palavras do usuário
             for word in list_words_user:
-                if word and not word.startswith('#'):
+                if word and not word.startswith("#"):
                     self.dictionary.add(word)
 
             return self.dictionary
         except Exception as e:
-            self._errors.append(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
+            self._errors.append(
+                f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}"
+            )
 
     def _load_extra_words(self) -> None:
         """Load additional words from extra-words.dic file.
@@ -90,20 +94,26 @@ class DictionaryManager:
         to the dictionary. Ignores lines starting with '#'.
         """
         try:
-            extra_words_path = self.path_dictionary / 'extra-words.dic'
+            extra_words_path = self.path_dictionary / "extra-words.dic"
 
             if extra_words_path.exists():
-                with open(extra_words_path, 'r', encoding='utf-8') as file:
+                with open(extra_words_path, "r", encoding="utf-8") as file:
                     for line in file:
                         word = line.strip()
-                        if word and not word.startswith('#'):  # Ignora linhas vazias e comentários
+                        if word and not word.startswith(
+                            "#"
+                        ):  # Ignora linhas vazias e comentários
                             self.dictionary.add(word)
             else:
-                self._errors.append("Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema.")
+                self._errors.append(
+                    "Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema."
+                )
 
         except Exception as e:
             # Log do erro mas não interrompe a execução
-            self._errors.append(f"Aviso: Não foi possível carregar palavras extras: {e}")
+            self._errors.append(
+                f"Aviso: Não foi possível carregar palavras extras: {e}"
+            )
 
     def __del__(self):
         """Cleanup temporary files when object is destroyed."""
@@ -137,7 +147,7 @@ class DictionaryManager:
         # Remove temporary dictionary files
         temp_files_to_remove = [
             self.path_dictionary / f"{self.lang_dict_spell}.dic",
-            self.path_dictionary / f"{self.lang_dict_spell}.exc"
+            self.path_dictionary / f"{self.lang_dict_spell}.exc",
         ]
 
         for temp_file in temp_files_to_remove:
@@ -145,4 +155,6 @@ class DictionaryManager:
                 if temp_file.exists():
                     temp_file.unlink()
             except Exception as e:
-                self._errors.append(f"Warning: Could not remove temporary file {temp_file}: {e}")
+                self._errors.append(
+                    f"Warning: Could not remove temporary file {temp_file}: {e}"
+                )

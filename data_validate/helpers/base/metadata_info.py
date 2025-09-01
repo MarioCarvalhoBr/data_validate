@@ -36,18 +36,18 @@ class MetadataInfo(ConstantBase):
         self.__python__ = "3.12"
         self.__python_version__ = self.__python__
         self.__status__ = "Development"
-        self.__date_now__ = datetime.now().strftime('%d/%m/%Y %H:%M:%S')
+        self.__date_now__ = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
         self._finalize_initialization()
 
     @staticmethod
     def _make_version(
-            major: int,
-            minor: int,
-            micro: int,
-            releaselevel: str = "final",
-            serial: int = 0,
-            dev: int = 0,
+        major: int,
+        minor: int,
+        micro: int,
+        releaselevel: str = "final",
+        serial: int = 0,
+        dev: int = 0,
     ) -> str:
         """Create a readable version string from version_info tuple components."""
         assert releaselevel in ["alpha", "beta", "candidate", "final"]
@@ -61,17 +61,17 @@ class MetadataInfo(ConstantBase):
 
     @staticmethod
     def _make_url(
-            major: int,
-            minor: int,
-            micro: int,
-            releaselevel: str,
-            serial: int = 0,
-            dev: int = 0,
+        major: int,
+        minor: int,
+        micro: int,
+        releaselevel: str,
+        serial: int = 0,
+        dev: int = 0,
     ) -> str:
         """Make the URL people should start at for this version of data_validate.__init__.py."""
-        return (
-                "https://data_validate.readthedocs.io/en/"
-                + MetadataInfo._make_version(major, minor, micro, releaselevel, serial, dev)
+        return "https://data_validate.readthedocs.io/en/" + MetadataInfo._make_version(
+            major, minor, micro, releaselevel, serial, dev
         )
+
 
 METADATA = MetadataInfo()

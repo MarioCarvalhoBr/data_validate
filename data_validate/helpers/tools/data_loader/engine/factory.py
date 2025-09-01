@@ -1,4 +1,3 @@
-
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
 # File: data_loader/factory.py
@@ -13,11 +12,12 @@ from ..readers.csv_reader import CSVReader
 from ..readers.excel_reader import ExcelReader
 from ..readers.qml_reader import QMLReader
 
+
 class ReaderFactory:
     _registry = {
-        '.csv':  CSVReader,
-        '.xlsx': ExcelReader,
-        '.qml':  QMLReader,
+        ".csv": CSVReader,
+        ".xlsx": ExcelReader,
+        ".qml": QMLReader,
     }
 
     @classmethod
@@ -27,4 +27,3 @@ class ReaderFactory:
         if not reader_cls:
             raise ReaderNotFoundError(f"Nenhum leitor para extensão '{ext}'")
         return reader_cls(file_path, header_strategy)
-

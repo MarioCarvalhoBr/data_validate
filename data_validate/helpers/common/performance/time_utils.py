@@ -3,6 +3,7 @@ import time
 from typing import Callable, Any, Optional
 from functools import wraps
 
+
 def estimate_time(func: Optional[Callable]) -> Callable:
     """
     Decorator to measure execution time of any function.
@@ -17,7 +18,9 @@ def estimate_time(func: Optional[Callable]) -> Callable:
         TypeError: If func is not callable or is None.
     """
     if func is None:
-        raise TypeError("Cannot decorate None object. Please provide a callable function.")
+        raise TypeError(
+            "Cannot decorate None object. Please provide a callable function."
+        )
 
     if not callable(func):
         raise TypeError(f"Object of type '{type(func).__name__}' is not callable.")
@@ -39,6 +42,7 @@ def estimate_time(func: Optional[Callable]) -> Callable:
 
     return wrapper
 
+
 def fibonacci(n: int) -> int:
     if n <= 0:
         return 0
@@ -46,6 +50,7 @@ def fibonacci(n: int) -> int:
         return 1
     else:
         return fibonacci(n - 1) + fibonacci(n - 2)
+
 
 def main():
     n = 30  # Example input
@@ -58,6 +63,7 @@ def main():
 
     # timed_read_data = estimate_time(self._read_data)
     # timed_read_data()
+
 
 if __name__ == "__main__":
     main()

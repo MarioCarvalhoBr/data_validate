@@ -83,7 +83,9 @@ class DataFile(DataModelABC):
         if not os.path.isdir(self.input_folder):
             raise ValueError(f"Input folder does not exist: {self.input_folder}")
 
-        if os.path.splitext(os.path.basename(self.output_folder))[1] != "" or '.' in os.path.basename(self.output_folder):
+        if os.path.splitext(os.path.basename(self.output_folder))[
+            1
+        ] != "" or "." in os.path.basename(self.output_folder):
             raise ValueError(f"Output folder name is invalid: {self.output_folder}")
 
     def run(self):
@@ -112,7 +114,15 @@ class DataAction(DataModelABC):
         run():
             Parses and validates the command-line arguments.
     """
-    def __init__(self, no_spellchecker=None, no_warning_titles_length=None, no_time=None, no_version=None, debug=None):
+
+    def __init__(
+        self,
+        no_spellchecker=None,
+        no_warning_titles_length=None,
+        no_time=None,
+        no_version=None,
+        debug=None,
+    ):
         """
         Initializes the DataAction class with default attributes.
 
@@ -253,28 +263,62 @@ class DataArgs:
         """
         parser = argparse.ArgumentParser(
             description="Adapta Parser - Processes the program arguments.",
-            allow_abbrev=self.allow_abbrev
+            allow_abbrev=self.allow_abbrev,
         )
 
         # Arguments for DataFile
-        parser.add_argument("--input_folder", type=str, required=True, help="Path to the input folder.")
-        parser.add_argument("--output_folder", default="output_data/", type=str, help="Path to the output folder.")
-        parser.add_argument("--locale", "-l", type=str, choices=["pt_BR", "en_US"], default="pt_BR",
-                            help="Sets the locale (pt_BR or en_US).")
+        parser.add_argument(
+            "--input_folder", type=str, required=True, help="Path to the input folder."
+        )
+        parser.add_argument(
+            "--output_folder",
+            default="output_data/",
+            type=str,
+            help="Path to the output folder.",
+        )
+        parser.add_argument(
+            "--locale",
+            "-l",
+            type=str,
+            choices=["pt_BR", "en_US"],
+            default="pt_BR",
+            help="Sets the locale (pt_BR or en_US).",
+        )
 
         # Arguments for DataAction
-        parser.add_argument("--no-spellchecker", action="store_true", help="Disables the spell checker.")
-        parser.add_argument("--no-warning-titles-length", action="store_true",
-                            help="Disables warnings for title length.")
-        parser.add_argument("--no-time", action="store_true", help="Hides execution time and date information.")
-        parser.add_argument("--no-version", action="store_true", help="Hides the script version in the final report.")
-        parser.add_argument("--debug", action="store_true", help="Runs the program in debug mode.")
+        parser.add_argument(
+            "--no-spellchecker", action="store_true", help="Disables the spell checker."
+        )
+        parser.add_argument(
+            "--no-warning-titles-length",
+            action="store_true",
+            help="Disables warnings for title length.",
+        )
+        parser.add_argument(
+            "--no-time",
+            action="store_true",
+            help="Hides execution time and date information.",
+        )
+        parser.add_argument(
+            "--no-version",
+            action="store_true",
+            help="Hides the script version in the final report.",
+        )
+        parser.add_argument(
+            "--debug", action="store_true", help="Runs the program in debug mode."
+        )
 
         # Arguments for DataReport
-        parser.add_argument("--sector", type=str, default=None, help="Name of the strategic sector.")
-        parser.add_argument("--protocol", type=str, default=None, help="Name of the protocol.")
+        parser.add_argument(
+            "--sector", type=str, default=None, help="Name of the strategic sector."
+        )
+        parser.add_argument(
+            "--protocol", type=str, default=None, help="Name of the protocol."
+        )
         parser.add_argument("--user", type=str, default=None, help="Name of the user.")
-        parser.add_argument("--file", type=str, default=None, help="Name of the file to be analyzed.")
+        parser.add_argument(
+            "--file", type=str, default=None, help="Name of the file to be analyzed."
+        )
 
         return parser
 
@@ -297,7 +341,7 @@ class DataArgs:
             "sector": self.data_report.sector,
             "protocol": self.data_report.protocol,
             "user": self.data_report.user,
-            "file": self.data_report.file
+            "file": self.data_report.file,
         }
 
     def __str__(self):
@@ -307,14 +351,16 @@ class DataArgs:
         Returns:
             str: String representation of the parsed arguments.
         """
-        return f"DataArgs(input_folder={self.data_file.input_folder}, " \
-               f"output_folder={self.data_file.output_folder}, locale={self.data_file.locale}, " \
-               f"no_spellchecker={self.data_action.no_spellchecker}, " \
-               f"no_warning_titles_length={self.data_action.no_warning_titles_length}, " \
-               f"no_time={self.data_action.no_time}, no_version={self.data_action.no_version}, " \
-               f"debug={self.data_action.debug}, sector={self.data_report.sector}, " \
-               f"protocol={self.data_report.protocol}, user={self.data_report.user}, " \
-               f"file={self.data_report.file})"
+        return (
+            f"DataArgs(input_folder={self.data_file.input_folder}, "
+            f"output_folder={self.data_file.output_folder}, locale={self.data_file.locale}, "
+            f"no_spellchecker={self.data_action.no_spellchecker}, "
+            f"no_warning_titles_length={self.data_action.no_warning_titles_length}, "
+            f"no_time={self.data_action.no_time}, no_version={self.data_action.no_version}, "
+            f"debug={self.data_action.debug}, sector={self.data_report.sector}, "
+            f"protocol={self.data_report.protocol}, user={self.data_report.user}, "
+            f"file={self.data_report.file})"
+        )
 
     def run(self):
         """
@@ -328,7 +374,11 @@ class DataArgs:
 
         # Set attributes: DataFile, DataAction, DataReport
         self.data_file = DataFile(args.input_folder, args.output_folder, args.locale)
-        self.data_action = DataAction(args.no_spellchecker, args.no_warning_titles_length, args.no_time,
-                                      args.no_version, args.debug)
+        self.data_action = DataAction(
+            args.no_spellchecker,
+            args.no_warning_titles_length,
+            args.no_time,
+            args.no_version,
+            args.debug,
+        )
         self.data_report = DataReport(args.sector, args.protocol, args.user, args.file)
-

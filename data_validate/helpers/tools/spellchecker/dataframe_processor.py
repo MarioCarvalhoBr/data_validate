@@ -3,7 +3,9 @@
 import pandas as pd
 from typing import List, Tuple
 
-from data_validate.helpers.tools.spellchecker.spellchecker_controller import SpellCheckerController
+from data_validate.helpers.tools.spellchecker.spellchecker_controller import (
+    SpellCheckerController,
+)
 
 
 class DataFrameProcessor:
@@ -12,7 +14,9 @@ class DataFrameProcessor:
     def __init__(self, spell_checker: SpellCheckerController):
         self.spell_checker = spell_checker
 
-    def validate_columns(self, df: pd.DataFrame, columns: List[str], file_name: str) -> Tuple[List[str], List[str]]:
+    def validate_columns(
+        self, df: pd.DataFrame, columns: List[str], file_name: str
+    ) -> Tuple[List[str], List[str]]:
         """Valida se as colunas existem no DataFrame"""
         existing_columns = set(df.columns)
         target_columns = set(columns)
@@ -28,7 +32,9 @@ class DataFrameProcessor:
         valid_columns = list(target_columns & existing_columns)
         return valid_columns, warnings
 
-    def process_dataframe(self, df: pd.DataFrame, columns: List[str], sheet_name: str) -> List[str]:
+    def process_dataframe(
+        self, df: pd.DataFrame, columns: List[str], sheet_name: str
+    ) -> List[str]:
         """Processa o DataFrame usando operações vetorizadas"""
         warnings = []
 

@@ -1,4 +1,3 @@
-
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
 # File: data_loader/readers/__init__.py
@@ -12,4 +11,3 @@ from .excel_reader import ExcelReader
 from .qml_reader import QMLReader
 
 __all__ = ["BaseReader", "CSVReader", "ExcelReader", "QMLReader"]
-
