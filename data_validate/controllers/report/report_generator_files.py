@@ -8,7 +8,7 @@ from typing import List, Dict, Any
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
-from config.config import NamesEnum
+from data_validate.config.config import NamesEnum
 from data_validate.helpers.base.metadata_info import METADATA
 from data_validate.helpers.common.formatting.number_formatting import (
     format_number_brazilian,

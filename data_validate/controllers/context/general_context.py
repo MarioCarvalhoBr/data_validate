@@ -2,8 +2,8 @@
 from logging import Logger
 from typing import Any, Dict
 
-from helpers.base.data_args import DataArgs
-from helpers.base.file_system_utils import FileSystemUtils
+from data_validate.helpers.base.data_args import DataArgs
+from data_validate.helpers.base.file_system_utils import FileSystemUtils
 from data_validate.config.config import Config
 
 

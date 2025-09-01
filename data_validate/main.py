@@ -1,12 +1,12 @@
 import time
 
-from helpers.base.data_args import DataArgs
+from data_validate.helpers.base.data_args import DataArgs
 from data_validate.middleware.bootstrap import Bootstrap
 
 from data_validate.helpers.tools.locale.language_manager import LanguageManager
 from data_validate.config.config import Config
-from helpers.base.file_system_utils import FileSystemUtils
-from helpers.base.logger_manager import LoggerManager
+from data_validate.helpers.base.file_system_utils import FileSystemUtils
+from data_validate.helpers.base.logger_manager import LoggerManager
 
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.controllers.processor import ProcessorSpreadsheet
