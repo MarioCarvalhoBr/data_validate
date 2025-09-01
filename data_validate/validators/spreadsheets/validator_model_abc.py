@@ -53,7 +53,7 @@ class ValidatorModelABC(ABC):
     def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:
         """Helper function to validate text length in a column."""
         warnings = []
-        __, warnings_text_length = check_text_length(dataframe=self._dataframe, file_name=self._filename, column=column, max_len=max_len)
+        __, warnings_text_length = check_text_length(dataframe=self._dataframe, file_name=self._filename, column=column, max_length=max_len)
         warnings.extend(warnings_text_length)
         return [], warnings
 

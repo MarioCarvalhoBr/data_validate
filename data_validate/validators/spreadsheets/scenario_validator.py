@@ -50,7 +50,7 @@ class SpScenarioValidator(ValidatorModelABC):
                 errors.append(msg_error_column)
 
         __, unique_errors = check_unique_values(
-            df=self._dataframe,
+            dataframe=self._dataframe,
             file_name=self._filename,
             columns_uniques=columns_to_check
         )
