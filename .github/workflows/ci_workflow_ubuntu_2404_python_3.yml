@@ -33,7 +33,7 @@ jobs:
         run: poetry install
 
       - name: Lint with Ruff
-        run: poetry run ruff check . --target-version=py312
+        run: poetry run ruff check .
         continue-on-error: true
 
       - name: Test with pytest and Generate Coverage Report
