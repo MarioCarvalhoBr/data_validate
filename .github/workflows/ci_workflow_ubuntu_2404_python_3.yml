@@ -1,0 +1,48 @@
+name: CI Ubuntu 24.04.1 LTS with Python 3.12 versions
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python and PIP version
+        run: |
+          python -c "import sys; print(sys.version)"
+          python -m pip --version
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install project dependencies with Poetry
+        run: poetry install
+
+      - name: Lint with Ruff
+        run: poetry run ruff check . --target-version=py312
+        continue-on-error: true
+
+      - name: Test with pytest and Generate Coverage Report
+        run: |
+          make test > coverage.txt
+
+      - name: Upload Test Coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: |
+            coverage.txt
+          if-no-files-found: warn
