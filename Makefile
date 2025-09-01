@@ -1,9 +1,9 @@
 .PHONY: help test test-cov test-fast clean coverage html-report install-dev
 
 # Variáveis
-PYTHON = python
-PYTEST = $(PYTHON) -m pytest
-COVERAGE = $(PYTHON) -m coverage
+PYTHON = poetry run python
+PYTEST = poetry run pytest
+COVERAGE = poetry run coverage
 
 # Comandos padrão
 help: ## Mostra esta ajuda
@@ -12,7 +12,7 @@ help: ## Mostra esta ajuda
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  \033[36m%-15s\033[0m %s\n", $$1, $$2}'
 
 install-dev: ## Instala dependências de desenvolvimento
-	pip install pytest pytest-cov coverage
+	poetry install
 
 test: ## Executa todos os testes
 	$(PYTEST) -v
@@ -43,4 +43,4 @@ clean: ## Remove arquivos temporários e relatórios
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
 # Comando padrão
-all: test-cov ## Executa testes com cobertura (padrão) 
+all: test-cov ## Executa testes com cobertura (padrão)
