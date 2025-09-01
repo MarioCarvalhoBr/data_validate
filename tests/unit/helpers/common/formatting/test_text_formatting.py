@@ -1,6 +1,6 @@
 from data_validate.helpers.common.formatting.text_formatting import (
     is_acronym,
-    capitalize_text_keep_acronyms
+    capitalize_text_keep_acronyms,
 )
 
 
@@ -19,8 +19,8 @@ class TestTextFormatting:
         # Test non-acronyms
         assert is_acronym("usa") is False  # lowercase
         assert is_acronym("Usa") is False  # mixed case
-        assert is_acronym("A") is False    # single character
-        assert is_acronym("") is False     # empty string
+        assert is_acronym("A") is False  # single character
+        assert is_acronym("") is False  # empty string
         assert is_acronym("Hello") is False  # regular word
         assert is_acronym("hello") is False  # lowercase word
 
@@ -69,4 +69,4 @@ class TestTextFormatting:
 
         # Test multiple spaces
         result = capitalize_text_keep_acronyms("  hello  world  ")
-        assert result == "Hello world"  # split() removes extra spaces 
+        assert result == "Hello world"  # split() removes extra spaces

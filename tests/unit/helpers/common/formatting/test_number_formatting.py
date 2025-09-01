@@ -6,7 +6,7 @@ from data_validate.helpers.common.formatting.number_formatting import (
     parse_numeric,
     validate_integer,
     check_cell_integer,
-    check_cell_float
+    check_cell_float,
 )
 
 
@@ -36,18 +36,18 @@ class TestNumberFormatting:
         # Test pandas NaN
         assert is_nan(pd.NA) is True
         assert is_nan(pd.NaT) is True
-        
+
         # Test math NaN
-        assert is_nan(float('nan')) is True
+        assert is_nan(float("nan")) is True
         assert is_nan(math.nan) is True
-        
+
         # Test non-NaN values
         assert is_nan(0) is False
         assert is_nan(1.5) is False
         assert is_nan("string") is False
         assert is_nan("") is False
         assert is_nan(None) is True  # pd.isna(None) returns True
-        
+
         # Test exception handling (invalid float conversion)
         assert is_nan("not_a_number") is False
 

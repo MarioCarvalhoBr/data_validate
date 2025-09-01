@@ -42,6 +42,8 @@ clean: ## Remove arquivos temporários e relatórios
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
+black: ## Formata o código com Black
+	poetry run black data_validate tests
 genbadge-coverage: ## Gera badge de cobertura
 	@mkdir -p assets/coverage
 	poetry run genbadge coverage -i dev-reports/coverage.xml -o assets/coverage/coverage_badge.svg

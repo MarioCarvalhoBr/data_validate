@@ -1,6 +1,6 @@
 from data_validate.helpers.common.generation.combinations import (
     generate_combinations,
-    find_extra_combinations
+    find_extra_combinations,
 )
 
 
@@ -14,14 +14,16 @@ class TestCombinations:
         temporal_symbols = [2020, 2021, 2022]
         scenario_symbols = ["A", "B"]
 
-        result = generate_combinations(code, start_year, temporal_symbols, scenario_symbols)
+        result = generate_combinations(
+            code, start_year, temporal_symbols, scenario_symbols
+        )
 
         expected = [
             "TEST-2020",
             "TEST-2021-A",
             "TEST-2021-B",
             "TEST-2022-A",
-            "TEST-2022-B"
+            "TEST-2022-B",
         ]
         assert result == expected
 
@@ -32,7 +34,9 @@ class TestCombinations:
         temporal_symbols = [2023]
         scenario_symbols = ["X", "Y", "Z"]
 
-        result = generate_combinations(code, start_year, temporal_symbols, scenario_symbols)
+        result = generate_combinations(
+            code, start_year, temporal_symbols, scenario_symbols
+        )
 
         expected = ["SINGLE-2023"]
         assert result == expected
@@ -44,7 +48,9 @@ class TestCombinations:
         temporal_symbols = [2024, 2025]
         scenario_symbols = []
 
-        result = generate_combinations(code, start_year, temporal_symbols, scenario_symbols)
+        result = generate_combinations(
+            code, start_year, temporal_symbols, scenario_symbols
+        )
 
         expected = ["NOSCEN-2024"]
         assert result == expected
@@ -56,7 +62,9 @@ class TestCombinations:
         temporal_symbols = []
         scenario_symbols = ["A", "B"]
 
-        result = generate_combinations(code, start_year, temporal_symbols, scenario_symbols)
+        result = generate_combinations(
+            code, start_year, temporal_symbols, scenario_symbols
+        )
 
         expected = ["EMPTY-2025"]
         assert result == expected
@@ -68,14 +76,16 @@ class TestCombinations:
         temporal_symbols = [2026, "2027", "2028"]
         scenario_symbols = ["SCEN1", "SCEN2"]
 
-        result = generate_combinations(code, start_year, temporal_symbols, scenario_symbols)
+        result = generate_combinations(
+            code, start_year, temporal_symbols, scenario_symbols
+        )
 
         expected = [
             "STR-2026",
             "STR-2027-SCEN1",
             "STR-2027-SCEN2",
             "STR-2028-SCEN1",
-            "STR-2028-SCEN2"
+            "STR-2028-SCEN2",
         ]
         assert result == expected
 
@@ -137,4 +147,4 @@ class TestCombinations:
         has_extras, extras = find_extra_combinations(expected, actual)
 
         assert has_extras is True
-        assert extras == ["TEST-2022-B"] 
+        assert extras == ["TEST-2022-B"]
