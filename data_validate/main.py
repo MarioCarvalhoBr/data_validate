@@ -48,4 +48,3 @@ if __name__ == "__main__":
 
 # Example usage:
 # python3 data_validate/main.py --l pt_BR --o data/output/temp/ --d --i data/input/data_ground_truth_01/
-# python3 data_validate/main.py --l en_US --o data/output/temp/ --d --i data/input/data_ground_truth_01/
