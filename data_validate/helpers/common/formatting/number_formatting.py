@@ -4,12 +4,28 @@ from typing import Tuple, Any
 from babel.numbers import format_decimal
 
 
-def format_number_brazilian(n,locale="pt_BR") -> str:
-    """Formata um número no padrão brasileiro."""
+def format_number_brazilian(n: float, locale: str = "pt_BR") -> str:
+    """
+    Format a number using Brazilian locale.
+
+    Args:
+        n (float): Number to format.
+        locale (str): Locale string. Default is "pt_BR".
+    Returns:
+        str: Formatted number string.
+    """
     return format_decimal(number=n, locale=locale)
 
+
 def is_nan(value: Any) -> bool:
-    """Check if a value is NaN (including pandas NaN)."""
+    """
+    Check if a value is NaN (including pandas NaN).
+
+    Args:
+        value (Any): Value to check.
+    Returns:
+        bool: True if value is NaN, False otherwise.
+    """
     try:
         return pd.isna(value) or math.isnan(float(value))
     except Exception:
@@ -17,7 +33,14 @@ def is_nan(value: Any) -> bool:
 
 
 def parse_numeric(cell: Any) -> Tuple[bool, float]:
-    """Try to parse a cell to float, handling comma as decimal separator."""
+    """
+    Try to parse a cell to float, handling comma as decimal separator.
+
+    Args:
+        cell (Any): Value to parse.
+    Returns:
+        Tuple[bool, float]: (True, float value) if successful, (False, 0.0) otherwise.
+    """
     if isinstance(cell, str):
         cell = cell.replace(',', '.')
     try:
@@ -27,7 +50,15 @@ def parse_numeric(cell: Any) -> Tuple[bool, float]:
 
 
 def validate_integer(value: float, min_value: int = 0) -> Tuple[bool, str]:
-    """Validate that a float is an integer >= min_value."""
+    """
+    Validate that a float is an integer greater than or equal to min_value.
+
+    Args:
+        value (float): Value to validate.
+        min_value (int): Minimum allowed value. Default is 0.
+    Returns:
+        Tuple[bool, str]: (True, "") if valid, (False, error message) otherwise.
+    """
     if not value.is_integer():
         return False, f"O valor '{value}' não é um número inteiro."
     if int(value) < min_value:
@@ -36,7 +67,15 @@ def validate_integer(value: float, min_value: int = 0) -> Tuple[bool, str]:
 
 
 def check_cell_integer(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
-    """Full validation: NaN, numeric parsing, integer and range check."""
+    """
+    Validate if a cell contains a valid integer greater than or equal to min_value.
+
+    Args:
+        cell (Any): Value to check.
+        min_value (int): Minimum allowed value. Default is 0.
+    Returns:
+        Tuple[bool, str]: (True, "") if valid, (False, error message) otherwise.
+    """
     if is_nan(cell):
         return False, f"O valor '{cell}' não é um número."
 
@@ -50,8 +89,17 @@ def check_cell_integer(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
 
     return True, ""
 
+
 def check_cell_float(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
-    """Check if a cell is a valid float."""
+    """
+    Validate if a cell contains a valid float greater than or equal to min_value.
+
+    Args:
+        cell (Any): Value to check.
+        min_value (int): Minimum allowed value. Default is 0.
+    Returns:
+        Tuple[bool, str]: (True, "") if valid, (False, error message) otherwise.
+    """
     if is_nan(cell):
         return False, f"O valor '{cell}' não é um número."
 

@@ -1,34 +1,42 @@
-def generate_combinations(code, start_year, temporal_symbols, scenario_symbols):
+from typing import List, Tuple, Any
+
+def generate_combinations(
+    code: str,
+    start_year: int,
+    temporal_symbols: List[Any],
+    scenario_symbols: List[Any]
+) -> List[str]:
     """
-    Generates a list of combinations based on the provided code, start year, temporal symbols, and scenario symbols.
+    Generate combinations using the base code, start year, temporal symbols, and scenario symbols.
 
     Args:
-        code (str): The base code to be used in the combinations.
-        start_year (int): The starting year for the combinations.
-        temporal_symbols (list): A list of temporal symbols (e.g., years).
-        scenario_symbols (list): A list of scenario symbols.
+        code: Base code for combinations.
+        start_year: Initial year for combinations.
+        temporal_symbols: List of temporal symbols.
+        scenario_symbols: List of scenario symbols.
 
     Returns:
-        list: A list of generated combinations in the format `code-year-scenario`.
-
-    Example:
-        >>> generate_combinations("ABC", 2023, [2023, 2024], ["X", "Y"])
-        ['ABC-2023', 'ABC-2024-X', 'ABC-2024-Y']
+        List of generated combinations in the format 'code-year-scenario'.
     """
     combinations = [f"{code}-{start_year}"]
-
-    # Skip the first temporal symbol
     for year in temporal_symbols[1:]:
         for symbol in scenario_symbols:
             combinations.append(f"{code}-{year}-{symbol}")
-
     return combinations
 
-def find_extra_combinations(expected_combinations, actual_combinations):
-    for i in expected_combinations:
-        if i in actual_combinations:
-            actual_combinations.pop(actual_combinations.index(i))
+def find_extra_combinations(
+    expected_combinations: List[str],
+    actual_combinations: List[str]
+) -> Tuple[bool, List[str]]:
+    """
+    Find extra combinations present in actual_combinations but not in expected_combinations.
 
-    if actual_combinations:
-        return True, actual_combinations
-    return False, []
+    Args:
+        expected_combinations: List of expected combinations.
+        actual_combinations: List of actual combinations.
+
+    Returns:
+        Tuple with a boolean indicating if extras exist and a list of extra combinations.
+    """
+    extras = list(set(actual_combinations) - set(expected_combinations))
+    return bool(extras), extras

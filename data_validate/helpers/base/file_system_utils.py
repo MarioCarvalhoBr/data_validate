@@ -54,6 +54,7 @@ class FileSystemUtils:
 
     def get_last_directory_name(self, path: str) -> str:
         return Path(path).name
+
     def remove_file(self, file_path: str) -> Tuple[bool, str]:
         """
         Removes a file at the given path if it exists.
@@ -78,6 +79,7 @@ class FileSystemUtils:
             return False, self.locale_manager.text('fs_utils_error_remove_file_os', error=str(e))
         except Exception as e:
             return False, self.locale_manager.text('fs_utils_error_unexpected', error=str(e))
+
     def create_directory(self, dir_name: str) -> Tuple[bool, str]:
         """
         Creates a directory with the given name if it does not already exist.

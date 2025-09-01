@@ -1,5 +1,4 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-# Function to estimate execution time of any callable function
 import time
 from typing import Callable, Any, Optional
 from functools import wraps
