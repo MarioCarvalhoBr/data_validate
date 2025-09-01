@@ -22,6 +22,7 @@ jobs:
 
       - name: Display Python and PIP version
         run: |
+          # Display Python and PIP version
           python -c "import sys; print(sys.version)"
           python -m pip --version
 
