@@ -107,4 +107,8 @@ def check_cell_float(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
     if not ok:
         return False, f"O valor '{cell}' não é um número."
 
+    # Check minimum value constraint
+    if num < min_value:
+        return False, f"O valor '{num}' é menor que o valor mínimo permitido ({min_value})."
+
     return True, ""

@@ -126,8 +126,8 @@ def clean_dataframe_floats(
 
         print(f'Cleaning column {col} in {file_name} with {sum(mask_valid)} valid entries out of {len(df_work)} total entries.')
 
-        # converter valores pra float coerce
-        df_work[col] = df_work[col].apply(lambda x: float(str(x).replace(',', '.')) if pd.notna(x) else x)
+        # First filter out invalid rows, then convert valid values to float
         df_work = df_work.loc[mask_valid].copy()
+        df_work[col] = df_work[col].apply(lambda x: float(str(x).replace(',', '.')) if pd.notna(x) else x)
 
     return df_work, all_errors
