@@ -68,7 +68,7 @@ class LegendProcessing:
         # NEW INSTANCE
         local_dataframe = original_dataframe.copy()
 
-        # 2.2 - Se o label for 'Dado indisponível', os valores min, max devem ser vazios (não pode ter valores nenhum)
+        # 2.2 - If the label is 'Dado indisponível', the min, max values must be empty (cannot have any values)
         if min_col in local_dataframe.columns and max_col in local_dataframe.columns and label_col in local_dataframe.columns:
             unavailable_mask = original_dataframe[label_col] == self.context.config.VALUE_DATA_UNAVAILABLE
             invalid_min = local_dataframe.loc[unavailable_mask & local_dataframe[min_col].notnull()]
@@ -87,7 +87,7 @@ class LegendProcessing:
                     f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_max))}]: A coluna '{max_col}' deve estar vazia quando o label é '{self.context.config.VALUE_DATA_UNAVAILABLE}'."
                 )
 
-        # 2.3 - Deve existir 1 único label 'Dado indisponível'. Se existir mais de 1, erro. Se não existir nenhum, erro. Se existir apenas 1, ok.
+        # 2.3 - There must be exactly one label 'Dado indisponível'. If there is more than one, error. If there is none, error. If there is exactly one, ok.
         if label_col in local_dataframe.columns:
             unavailable_labels = original_dataframe[original_dataframe[label_col] == self.context.config.VALUE_DATA_UNAVAILABLE]
             if len(unavailable_labels) == 0:
@@ -193,7 +193,6 @@ class LegendProcessing:
         local_dataframe = dataframe.copy()
         local_dataframe[code_col] = pd.to_numeric(local_dataframe[code_col], errors='coerce')
 
-        # Verifica se há valores NaN após a conversão
         if local_dataframe[code_col].isnull().any():
             errors.append(f"{self.filename}: A coluna '{code_col}' contém valores não numéricos e não pode ser validada para sequencialidade.")
 
@@ -211,7 +210,7 @@ class LegendProcessing:
 
         expected_sequence = list(range(1, len(actual_sequence) + 1))
 
-        # Reportar se o primeiro valor da sequencia nao comecar em 1
+        # Report if the first value of the sequence does not start at 1
         if actual_sequence and actual_sequence[0] != 1:
             errors.append(f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}")
 

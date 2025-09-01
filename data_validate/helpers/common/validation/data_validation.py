@@ -147,7 +147,7 @@ def check_punctuation(
     return not bool(warnings), warnings
 
 
-def _check_special_characters_cr_lf_columns_start_end(
+def check_special_characters_cr_lf_columns_start_end(
     dataframe: pd.DataFrame,
     file_name: str,
     columns_start_end: Optional[List[str]] = None
@@ -191,7 +191,7 @@ def _check_special_characters_cr_lf_columns_start_end(
     return not bool(warnings), warnings
 
 
-def _check_special_characters_cr_lf_columns_anywhere(
+def check_special_characters_cr_lf_columns_anywhere(
     dataframe: pd.DataFrame,
     file_name: str,
     columns_anywhere: Optional[List[str]] = None
@@ -253,12 +253,12 @@ def check_special_characters_cr_lf(
     dataframe = dataframe.copy()
     all_warnings: List[str] = []
 
-    _, warnings_start_end = _check_special_characters_cr_lf_columns_start_end(
+    _, warnings_start_end = check_special_characters_cr_lf_columns_start_end(
         dataframe, file_name, columns_start_end
     )
     all_warnings.extend(warnings_start_end)
 
-    _, warnings_anywhere = _check_special_characters_cr_lf_columns_anywhere(
+    _, warnings_anywhere = check_special_characters_cr_lf_columns_anywhere(
         dataframe, file_name, columns_anywhere
     )
     all_warnings.extend(warnings_anywhere)

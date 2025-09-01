@@ -30,6 +30,7 @@ dependencies = [
     "pyenchant (>=3.2.2,<4.0.0)",
     "pdfkit (>=1.0.0,<2.0.0)",
     "babel (>=2.17.0,<3.0.0)",
+    "pytest-cov (>=6.2.1,<7.0.0)",
 ]
 
 [project.urls]
@@ -46,3 +47,38 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 packages = [{include = "data_validate"}]
+
+[tool.coverage.run]
+source = ["data_validate"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/.venv/*",
+    "*/.env/*",
+    "setup.py",
+    "conftest.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@\\(abc\\\\.\\)?abstractmethod",
+    "def __init_subclass__"
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "dev-reports/htmlcov"
+title = "Data Validate Coverage Report"

@@ -69,6 +69,7 @@ def process_column_validation(
     last_invalid_row = None
 
     for index, value in df_values[column].items():
+        index = int(index)  # Ensure index is an integer
         is_valid, error_msg, has_excessive_decimals = validate_numeric_value(
             value, index, column, filename
         )
