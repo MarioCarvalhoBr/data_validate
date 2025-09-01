@@ -49,7 +49,7 @@ Ensure you have Python 3.12 or higher installed. Follow these steps to set up th
 
 4. Activate the virtual environment managed by `poetry`:
    ```bash
-   poetry shell
+   eval $(poetry env activate)
    ```
 
 ---

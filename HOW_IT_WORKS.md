@@ -1,68 +1,100 @@
-# HOW_IT_WORKS
+# Como Funciona
 
-## Visão Geral
+Este documento detalha a arquitetura e o fluxo de execução do projeto `data-validate`, fornecendo uma visão geral de como os componentes interagem para validar os dados das planilhas.
 
-O Adapta Parser é um validador e processador de planilhas, desenvolvido em Python, que automatiza a checagem de integridade e estrutura de arquivos de dados. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores.
+## Estrutura de Diretórios
 
-## Estrutura do Projeto
+A estrutura do projeto foi organizada para separar responsabilidades, facilitando a manutenção e a escalabilidade.
 
-- **data_validate/main.py**: Ponto de entrada do sistema. Inicializa argumentos, configura o ambiente, gerencia logs e executa o processamento principal.
-- **data_validate/core/**: Contém o processador principal (`processor.py`) e a lógica de geração de relatórios (`report.py`).
-- **data_validate/data_model/**: Define os modelos de dados (ex: valores, proporções, cenários, legendas) e suas validações específicas.
-- **data_validate/common/**: Utilitários para manipulação de arquivos, argumentos, internacionalização, logs e validações genéricas.
-- **data_validate/controller/**: Gerencia a importação de dados e integrações com diferentes fontes/formats.
-- **data_validate/validation/**: Estruturas e funções para validação de dados.
-- **data_validate/static/**: Arquivos estáticos, como templates de relatórios e mensagens de localização.
-
-## Fluxo de Funcionamento
-
-1. **Inicialização**  
-   O usuário executa o script principal (`main.py`), informando os diretórios de entrada e saída, além do idioma desejado.
-
-2. **Leitura e Importação**  
-   O sistema importa os arquivos de dados do diretório de entrada, utilizando classes especializadas para cada tipo de planilha.
-
-3. **Validação**  
-   Cada arquivo é validado conforme seu modelo de dados:
-   - Verificação de colunas obrigatórias e opcionais.
-   - Checagem de nomes, cenários, legendas, proporções, etc.
-   - Mensagens de erro e advertência são geradas em português ou inglês, conforme configuração.
-
-4. **Processamento**  
-   Após a validação, os dados podem ser processados para análises, transformações ou cálculos adicionais, dependendo do modelo.
-
-5. **Geração de Relatórios**  
-   Um relatório detalhado é gerado, indicando erros, advertências e o status de cada arquivo processado.
-
-6. **Saída**  
-   Os resultados (relatórios, logs e arquivos processados) são salvos no diretório de saída especificado pelo usuário.
-
-## Como Executar
-
-```bash
-python3 -m data_validate.main --locale pt_BR --input_folder data/input --output_folder data/output --debug
+```
+data-validate/
+├── assets/               # Badges de cobertura e testes
+├── data/                 # Dados de entrada e saída
+│   ├── input/            # Planilhas a serem validadas
+│   └── output/           # Relatórios e logs gerados
+├── data_validate/        # Código-fonte da aplicação
+│   ├── config/           # Configurações globais
+│   ├── controllers/      # Orquestração do fluxo de validação
+│   ├── helpers/          # Funções utilitárias
+│   ├── middleware/       # Camada de inicialização e configuração
+│   ├── models/           # Modelos de dados que representam as planilhas
+│   ├── static/           # Arquivos estáticos (dicionários, templates)
+│   └── validators/       # Lógica de validação (estrutura, ortografia, etc.)
+├── dev-reports/          # Relatórios de desenvolvimento (cobertura, etc.)
+├── docs/                 # Documentação gerada
+├── scripts/              # Scripts de automação
+├── tests/                # Testes unitários e de integração
+├── Makefile              # Comandos de automação (test, clean, badge)
+├── pyproject.toml        # Definição do projeto e dependências (Poetry)
+└── README.md             # Documentação principal
 ```
 
-## Personalização
+### Componentes Principais
 
-- **Modelos de Dados**: Para adicionar novos tipos de validação, basta criar uma nova classe em `data_model/` seguindo o padrão das existentes.
-- **Mensagens**: As mensagens de erro e interface podem ser personalizadas nos arquivos de localização em `static/locales/`.
-- **Relatórios**: O template do relatório pode ser ajustado em `static/report/report_template.html`.
+-   **`data_validate/main.py`**: Ponto de entrada da aplicação. Ele inicializa o processo de validação.
+-   **`data_validate/middleware/bootstrap.py`**: Responsável por configurar o ambiente, como a criação de diretórios e a configuração de logs, antes da execução principal.
+-   **`data_validate/controllers/processor.py`**: O coração da aplicação. Ele orquestra a leitura dos dados, a execução das validações em sequência e a geração dos relatórios de saída.
+-   **`data_validate/models/`**: Contém classes que modelam a estrutura esperada de cada planilha (e.g., `sp_legend.py`, `sp_value.py`). Eles definem as colunas, tipos de dados e regras de negócio.
+-   **`data_validate/validators/`**: Contém a lógica específica para cada tipo de validação. Por exemplo:
+    -   `structure/`: Valida a estrutura das planilhas (nomes de colunas, ordem, etc.).
+    -   `spell/`: Realiza a verificação ortográfica.
+    -   `spreadsheets/`: Contém validações de regras de negócio específicas para cada planilha.
+-   **`data_validate/helpers/`**: Funções genéricas e reutilizáveis que auxiliam os outros componentes, como manipulação de DataFrames, leitura de arquivos e formatação de logs.
+-   **`data/`**: Diretório crucial para a operação. Os dados a serem validados são colocados em `data/input/`, e os resultados, incluindo logs de erros e relatórios, são salvos em `data/output/`.
 
-## Testes
+## Fluxo de Execução
 
-Execute todos os testes com:
-```bash
-pytest .
+O processo de validação segue as seguintes etapas:
+
+1.  **Inicialização**: O `main.py` é executado, acionando o `Bootstrap` para preparar o ambiente.
+2.  **Carga de Dados**: O `Processor` lê as planilhas do diretório `data/input/`.
+3.  **Execução das Validações**: O `Processor` invoca uma série de validadores em uma ordem predefinida:
+    -   **Validação de Estrutura**: Verifica se as planilhas e colunas existem e estão nomeadas corretamente.
+    -   **Validação de Conteúdo**: Aplica as regras definidas nos `models` e `validators` para cada planilha, como:
+        -   Verificação de tipos de dados.
+        -   Checagem de valores obrigatórios.
+        -   Validação de relações entre diferentes planilhas.
+        -   Verificação ortográfica em campos de texto.
+4.  **Coleta de Erros**: Cada validador retorna uma lista de erros e avisos encontrados. O `Processor` agrega todos esses resultados.
+5.  **Geração de Relatórios**: Ao final, o `Processor` utiliza os erros e avisos coletados para gerar relatórios detalhados em `data/output/`, geralmente em formatos como `.txt`, `.csv` ou `.html`.
+
+## Como Usar
+
+O projeto utiliza `Poetry` para gerenciamento de dependências e `Make` para automação de tarefas comuns.
+
+### Instalação
+
+Para instalar as dependências, execute:
+
+```sh
+poetry install
 ```
 
-## Documentação
+### Execução da Validação
 
-Gere a documentação automática com:
-```bash
-pdoc ./data_validate/ -o ./docs
+Para rodar o pipeline completo de validação:
+
+```sh
+bash scripts/run_main_pipeline.sh
 ```
 
----
+### Execução dos Testes
 
-**Dúvidas ou sugestões? Consulte o README.md ou abra uma issue no repositório.**
+O `Makefile` fornece comandos para executar os testes:
+
+```sh
+# Rodar todos os testes
+make test
+
+# Rodar testes com relatório de cobertura
+make test-cov
+```
+
+### Geração de Badges
+
+Para gerar os badges de cobertura e testes (salvos em `assets/coverage/`):
+
+```sh
+make make-badge
+```
+
