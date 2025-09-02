@@ -127,21 +127,16 @@ class ReportGeneratorFiles:
             html_content = self._generate_html_content(
                 report_list_flattened, tests_not_executed
             )
-            # Gere o caminho como antes
-            output_html_path_relative = os.path.join(
+            output_html_path = os.path.join(
                 self.output_folder, file_name + html_output_file
             )
-
-            # Converta para um caminho absoluto
-            output_html_path = os.path.abspath(output_html_path_relative)
 
             self._save_html_file(
                 html_content, output_html_path, logger=self.context.logger
             )
             self._save_pdf_file(
-                html_content = html_content,
                 pdf_options=self._get_pdf_options(),
-                html_file_path=output_html_path,  # <-- Passando o caminho absoluto
+                html_file_path=output_html_path,
                 logger=self.context.logger,
             )
             self._print_json_summary()
@@ -191,7 +186,6 @@ class ReportGeneratorFiles:
             if self.context.data_args.data_action.no_time
             else f"<strong>Data e hora do processo: <strong class='text-gray'>{METADATA.__date_now__}</strong></strong><br>"
         )
-
         text_html_version_and_os_info = (
             ""
             if self.context.data_args.data_action.no_version
@@ -308,7 +302,6 @@ class ReportGeneratorFiles:
             "custom-header": [("Accept-Encoding", "gzip")],
             "cookie": [],
             "no-outline": None,
-            "enable-local-file-access": None,  # Adicione esta linha
         }
 
     @staticmethod
@@ -334,7 +327,8 @@ class ReportGeneratorFiles:
             print(msg_error, file=sys.stderr)
 
     @staticmethod
-    def _save_pdf_file(html_content: str, pdf_options: Dict[str, Any], html_file_path: str, logger
+    def _save_pdf_file(
+        pdf_options: Dict[str, Any], html_file_path: str, logger
     ) -> None:
         """Generate and save PDF report from HTML file.
 
@@ -344,8 +338,7 @@ class ReportGeneratorFiles:
         try:
             pdf_file_path = html_file_path.replace(".html", ".pdf")
 
-            # pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
-            pdfkit.from_string(html_content, pdf_file_path, options=pdf_options)
+            pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
             msg_info = f"PDF report created at: {pdf_file_path}"
 
             logger.info(msg_info)
