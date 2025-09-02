@@ -186,6 +186,7 @@ class ReportGeneratorFiles:
             if self.context.data_args.data_action.no_time
             else f"<strong>Data e hora do processo: <strong class='text-gray'>{METADATA.__date_now__}</strong></strong><br>"
         )
+
         text_html_version_and_os_info = (
             ""
             if self.context.data_args.data_action.no_version
@@ -302,8 +303,6 @@ class ReportGeneratorFiles:
             "custom-header": [("Accept-Encoding", "gzip")],
             "cookie": [],
             "no-outline": None,
-            'user-style-sheet': 'style.css',
-            'enable-local-file-access': None
         }
 
     @staticmethod
