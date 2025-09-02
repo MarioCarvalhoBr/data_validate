@@ -11,6 +11,7 @@ jobs:
   build:
     runs-on: ubuntu-24.04 # Usa uma máquina virtual com Ubuntu 24.04
     strategy:
+      fail-fast: false # Garante que todos os jobs rodem, mesmo que um falhe
       matrix:
         python-version: ["3.11", "3.12"] # Roda os testes em múltiplas versões do Python
 

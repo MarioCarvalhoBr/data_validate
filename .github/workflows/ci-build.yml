@@ -38,19 +38,15 @@ jobs:
       - name: Install project dependencies with Poetry
         run: poetry install
 
-      - name: Lint with Ruff
-        run: poetry run ruff check .
-        continue-on-error: true
+      - name: Run code with Python
+        run:
+         bash scripts/run_main_pipeline.sh
 
-      - name: Test with pytest and Generate Coverage Report
-        run: |
-          make test > coverage.txt
-          cat coverage.txt
-
-      - name: Upload Test Coverage report
+      - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-report
+          name: pdf-files
           path: |
-            coverage.txt
+            data/outputs/*/*.pdf
+            data/outputs/*/*/*.pdf
           if-no-files-found: warn
