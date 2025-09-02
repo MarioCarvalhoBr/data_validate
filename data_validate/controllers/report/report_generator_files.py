@@ -302,6 +302,8 @@ class ReportGeneratorFiles:
             "custom-header": [("Accept-Encoding", "gzip")],
             "cookie": [],
             "no-outline": None,
+            'user-style-sheet': 'style.css',
+            'enable-local-file-access': None
         }
 
     @staticmethod
