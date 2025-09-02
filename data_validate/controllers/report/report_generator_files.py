@@ -139,6 +139,7 @@ class ReportGeneratorFiles:
                 html_content, output_html_path, logger=self.context.logger
             )
             self._save_pdf_file(
+                html_content = html_content,
                 pdf_options=self._get_pdf_options(),
                 html_file_path=output_html_path,  # <-- Passando o caminho absoluto
                 logger=self.context.logger,
@@ -333,8 +334,7 @@ class ReportGeneratorFiles:
             print(msg_error, file=sys.stderr)
 
     @staticmethod
-    def _save_pdf_file(
-        pdf_options: Dict[str, Any], html_file_path: str, logger
+    def _save_pdf_file(html_content: str, pdf_options: Dict[str, Any], html_file_path: str, logger
     ) -> None:
         """Generate and save PDF report from HTML file.
 
@@ -344,7 +344,8 @@ class ReportGeneratorFiles:
         try:
             pdf_file_path = html_file_path.replace(".html", ".pdf")
 
-            pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
+            # pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
+            pdfkit.from_string(html_content, pdf_file_path, options=pdf_options)
             msg_info = f"PDF report created at: {pdf_file_path}"
 
             logger.info(msg_info)
