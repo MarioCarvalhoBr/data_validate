@@ -1,6 +1,7 @@
 # Development local files
 local_data/
-data/output/logs/
+data/output/
+data/output/*
 docs/
 
 # Logs
