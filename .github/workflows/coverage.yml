@@ -1,0 +1,67 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+# Permissões para que a Action possa fazer commit no seu repositório (para atualizar o README)
+permissions:
+  contents: write
+
+jobs:
+  build-and-update-badges:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12' # Usaremos uma única versão para gerar os badges
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest pytest-cov # Ferramentas de teste e cobertura
+          sudo apt-get update && sudo apt-get install -y jq # Instala o processador de JSON
+
+      - name: Run tests and generate coverage report
+        run: |
+          # Gera o coverage.json e salva a saída do pytest em um arquivo
+          pytest --cov=./ --cov-report=json:coverage.json | tee pytest_summary.txt
+
+      - name: Extract test and coverage results
+        id: extract_data # Damos um ID a este passo para usar suas saídas depois
+        run: |
+          # Extrai a porcentagem de cobertura do JSON e remove as aspas
+          COVERAGE=$(jq -r '.totals.percent_covered_display' coverage.json)
+          echo "Coverage is ${COVERAGE}%"
+          # Define a variável de saída para a cobertura
+          echo "coverage_percentage=${COVERAGE}" >> $GITHUB_OUTPUT
+
+          # Extrai a linha de resumo do pytest, pega o número de testes que passaram
+          TESTS_PASSED=$(grep -o '[0-9]* passed' pytest_summary.txt | cut -d' ' -f1)
+          echo "Tests passed: ${TESTS_PASSED}"
+          # Define a variável de saída para os testes
+          echo "tests_passed=${TESTS_PASSED}" >> $GITHUB_OUTPUT
+
+      - name: Create Dynamic Badges
+        uses: schneegans/dynamic-badges-action@v1.7.0
+        with:
+          # Token de acesso do GitHub (gerado automaticamente)
+          auth: ${{ secrets.GITHUB_TOKEN }}
+
+          # Badge de Testes
+          - label: "Tests"
+            message: "${{ steps.extract_data.outputs.tests_passed }} passed"
+            color: "green"
+            filename: "tests_badge.svg" # Nome do arquivo a ser salvo
+
+          # Badge de Cobertura
+          - label: "Coverage"
+            message: "${{ steps.extract_data.outputs.coverage_percentage }}%"
+            color: "brightgreen"
+            filename: "coverage_badge.svg" # Nome do arquivo a ser salvo
