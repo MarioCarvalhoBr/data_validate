@@ -44,6 +44,7 @@ clean: ## Remove arquivos temporários e relatórios
 
 black: ## Formata o código com Black
 	poetry run black data_validate tests
+
 genbadge-coverage: ## Gera badge de cobertura
 	@mkdir -p assets/coverage
 	poetry run genbadge coverage -i dev-reports/coverage.xml -o assets/coverage/coverage_badge.svg
@@ -53,6 +54,9 @@ genbadge-tests: ## Gera badge de testes
 	poetry run genbadge tests --input-file dev-reports/junit/junit.xml -o assets/coverage/tests_badge.svg
 
 make-badge: genbadge-coverage genbadge-tests ## Gera todos os badges
+
+make-run: ## Executa o script principal
+	bash scripts/run_main_pipeline.sh
 
 # Comando padrão
 all: test-cov ## Executa testes com cobertura (padrão)

@@ -35,12 +35,17 @@ jobs:
          sudo apt-get upgrade -y
          sudo apt-get install -y wkhtmltopdf
 
+      - name: Install tree command and run ls and tree
+        run: |
+          sudo apt-get install -y tree
+          ls -la
+          tree -L 2
+
       - name: Install project dependencies with Poetry
-        run: poetry install
+        run: make install-dev
 
       - name: Run code with Python
-        run:
-         bash scripts/run_main_pipeline.sh
+        run: poetry run python -m data_validate.main --l pt_BR --i data/input/data_ground_truth_01/
 
       - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)
         uses: actions/upload-artifact@v4
@@ -48,5 +53,5 @@ jobs:
           name: pdf-files
           path: |
             data/outputs/*/*.pdf
-            data/outputs/*/*/*.pdf
+            # data/outputs/*/*/*.pdf
           if-no-files-found: warn
