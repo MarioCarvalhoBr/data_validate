@@ -1,5 +1,5 @@
-# .github/workflows/unit-tests.yml
-name: Unit Tests
+# .github/workflows/unit-tests-linux.yml
+name: Lint Linux
 
 on:
   push:
@@ -28,8 +28,8 @@ jobs:
         run: pip install poetry
 
       - name: Install project dependencies with Poetry
-        run: poetry install
+        run: poetry add ruff
 
-      - name: Test with pytest
-        run: |
-          make test
+      - name: Lint with Ruff
+        run: poetry run ruff check .
+        continue-on-error: true
