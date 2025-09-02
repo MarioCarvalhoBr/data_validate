@@ -1,4 +1,4 @@
-name: CI Ubuntu 24.04.1 LTS with Python 3.12 versions
+name: CI Build
 
 on:
   push:
@@ -28,6 +28,12 @@ jobs:
 
       - name: Install Poetry
         run: pip install poetry
+
+      - name: Install WKHtmlToPdf on Ubuntu
+        run: |
+         sudo apt-get update --fix-missing -y
+         sudo apt-get upgrade -y
+         sudo apt-get install -y wkhtmltopdf
 
       - name: Install project dependencies with Poetry
         run: poetry install

@@ -1,8 +1,5 @@
 
 # Data Validate - Sistema de Validação de Planilhas
-<div align="center" class="text-center">
-
-<p><em>Ensuring Data Quality, Accelerating Insights</em></p>
 
 ![Coverage Status](assets/coverage/coverage_badge.svg)
 ![Tests Status](assets/coverage/tests_badge.svg)
