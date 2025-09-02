@@ -45,13 +45,13 @@ jobs:
         run: make install-dev
 
       - name: Run code with Python
-        run: poetry run python -m data_validate.main --l pt_BR --i data/input/data_ground_truth_01/
+        run: make make-run
 
       - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)
         uses: actions/upload-artifact@v4
         with:
           name: pdf-files
           path: |
-            data/outputs/*/*.pdf
-            # data/outputs/*/*/*.pdf
+            data/*/*/*.pdf
+            data/*/*/*/*.pdf
           if-no-files-found: warn
