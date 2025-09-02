@@ -127,16 +127,20 @@ class ReportGeneratorFiles:
             html_content = self._generate_html_content(
                 report_list_flattened, tests_not_executed
             )
-            output_html_path = os.path.join(
+            # Gere o caminho como antes
+            output_html_path_relative = os.path.join(
                 self.output_folder, file_name + html_output_file
             )
+
+            # Converta para um caminho absoluto
+            output_html_path = os.path.abspath(output_html_path_relative)
 
             self._save_html_file(
                 html_content, output_html_path, logger=self.context.logger
             )
             self._save_pdf_file(
                 pdf_options=self._get_pdf_options(),
-                html_file_path=output_html_path,
+                html_file_path=output_html_path,  # <-- Passando o caminho absoluto
                 logger=self.context.logger,
             )
             self._print_json_summary()
@@ -303,6 +307,7 @@ class ReportGeneratorFiles:
             "custom-header": [("Accept-Encoding", "gzip")],
             "cookie": [],
             "no-outline": None,
+            "enable-local-file-access": None,  # Adicione esta linha
         }
 
     @staticmethod
