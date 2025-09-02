@@ -47,12 +47,14 @@ jobs:
         run:
           scripts\run_main_pipeline.bat  # Executa um script no Windows
 
-      - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)
+      - name: Upload to all .html and .pdf files generated
         uses: actions/upload-artifact@v4
         with:
           name: pdf-files
           path: |
             data/*/*/*.pdf
             data/*/*/*/*.pdf
+            data/*/*/*.html
+            data/*/*/*/*.html
           if-no-files-found: warn
 
