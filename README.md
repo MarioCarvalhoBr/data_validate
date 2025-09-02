@@ -3,6 +3,7 @@
 
 ![Coverage Status](assets/coverage/coverage_badge.svg)
 ![Tests Status](assets/coverage/tests_badge.svg)
+[![Lint](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/lint.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/lint.yml)
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Version](https://img.shields.io/badge/version-0.6.0-orange.svg)
