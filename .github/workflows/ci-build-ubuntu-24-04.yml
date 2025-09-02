@@ -1,4 +1,4 @@
-name: CI Build
+name: Build Linux
 
 on:
   push:
@@ -26,25 +26,19 @@ jobs:
           python -c "import sys; print(sys.version)"
           python -m pip --version
 
-      - name: Install Poetry
-        run: pip install poetry
-
       - name: Install WKHtmlToPdf on Ubuntu
         run: |
          sudo apt-get update --fix-missing -y
          # sudo apt-get upgrade -y
          sudo apt-get install -y wkhtmltopdf
 
-      - name: Install tree command and run ls and tree
-        run: |
-          sudo apt-get install -y tree
-          ls -la
-          tree -L 2
+      - name: Install Poetry
+        run: pip install poetry
 
-      - name: Install project dependencies with Poetry
+      - name: Install project dependencies with Makefile
         run: make install-dev
 
-      - name: Run code with Python
+      - name: Run code with Makefile
         run: make make-run
 
       - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)

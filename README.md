@@ -3,11 +3,11 @@
 
 <div align="center">
 
-
+[![CI Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/ci-build-ubuntu-24-04.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/ci-build-ubuntu-24-04.yml)
 [![Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/unit-tests.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/unit-tests.yml)
+[![Lint](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/lint.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/lint.yml)
 ![Coverage Status](assets/coverage/coverage_badge.svg)
 ![Tests Status](assets/coverage/tests_badge.svg)
-[![Lint](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/lint.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/lint.yml)
 ![Python](https://img.shields.io/badge/python-3.12+-blue.svg)
 ![License](https://img.shields.io/badge/license-MIT-green.svg)
 ![Version](https://img.shields.io/badge/version-0.6.0-orange.svg)
@@ -99,6 +99,7 @@ O projeto segue uma arquitetura modular baseada em padrões de design limpos:
 
 - Python 3.12 ou superior
 - Poetry para gerenciamento de dependências
+- Wkhtmltopdf (para geração de PDFs)
 
 ### Instalação Rápida
 
@@ -118,11 +119,15 @@ eval $(poetry env activate)
 ```
 
 ### Instalação de Dependências de Desenvolvimento
+##### GNU/LINUX
+Certifique-se de que `python-dev` e `wkhtmltopdf` estejam instalados,
 
-```bash
-# Para desenvolvedores
-make install-dev
+```shell
+    # Instalando as dependências
+    sudo apt install python3-dev wkhtmltopdf
 ```
+##### Windows
+Para instalar o `wkhtmltopdf`, baixe o instalador do site oficial: https://wkhtmltopdf.org/downloads.html
 
 ## 🎯 Uso
 
