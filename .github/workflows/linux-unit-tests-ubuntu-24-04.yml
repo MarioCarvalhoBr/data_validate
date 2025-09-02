@@ -1,5 +1,5 @@
 # .github/workflows/unit-tests-linux.yml
-name: Unit Tests Linux
+name: Linux Unit Tests
 
 on:
   push:

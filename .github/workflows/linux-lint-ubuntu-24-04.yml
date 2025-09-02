@@ -1,5 +1,5 @@
 # .github/workflows/unit-tests-linux.yml
-name: Lint Linux
+name: Linux Lint
 
 on:
   push:
