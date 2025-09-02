@@ -44,6 +44,6 @@ jobs:
       ## TEST YOUR CODE HERE
       - name: Test with pytest and Generate Coverage Report
         run: |
-          coverage run -m pytest  -v -s
-          coverage report -m
+          poetry run coverage run -m pytest  -v -s
+          poetry run coverage report -m
 
