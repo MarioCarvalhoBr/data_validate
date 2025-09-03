@@ -97,7 +97,22 @@ O projeto segue uma arquitetura modular baseada em padrões de design limpos:
 - Poetry para gerenciamento de dependências
 - Wkhtmltopdf (para geração de PDFs)
 
-### Instalação Rápida
+### Instalação de Dependências de Sistema
+##### GNU/LINUX
+Certifique-se de que `python-dev` e `wkhtmltopdf` estejam instalados,
+
+```shell
+    # Instalando as dependências
+    sudo apt install python3-dev wkhtmltopdf
+```
+##### Windows
+Para instalar o `wkhtmltopdf`, baixe o instalador do site oficial: https://wkhtmltopdf.org/downloads.html
+Ou usando o `chocolatey`:
+```shell
+    choco install -y wkhtmltopdf
+```
+
+### Instalação De Dependências do Projeto
 
 ```bash
 # 1. Clone o repositório
@@ -113,17 +128,6 @@ poetry install
 # 4. Ative o ambiente virtual
 eval $(poetry env activate)
 ```
-
-### Instalação de Dependências de Desenvolvimento
-##### GNU/LINUX
-Certifique-se de que `python-dev` e `wkhtmltopdf` estejam instalados,
-
-```shell
-    # Instalando as dependências
-    sudo apt install python3-dev wkhtmltopdf
-```
-##### Windows
-Para instalar o `wkhtmltopdf`, baixe o instalador do site oficial: https://wkhtmltopdf.org/downloads.html
 
 ## 🎯 Uso
 
