@@ -1,9 +1,10 @@
-
+# Development local files
 local_data/
-output_data/*/*.pdf
-test.py
-issues/
-TODO.md
+data/output/logs/
+
+# Logs
+*.log
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -60,6 +61,7 @@ nosetests.xml
 .hypothesis/
 .pytest_cache/
 cover/
+dev-reports/
 
 # Translations
 *.mo

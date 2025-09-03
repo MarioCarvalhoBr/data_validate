@@ -2,8 +2,7 @@
 
 
 echo "1. Ativando o ambiente..."
-. ~/anaconda3/etc/profile.d/conda.sh
-conda activate adapta_data
+source .venv/bin/activate
 
 # Importa o arquivo de constantes usando o caminho do diretório do script
 SCRIPT_DIR=$(dirname "$0")
@@ -13,15 +12,12 @@ source "$SCRIPT_DIR/constants.sh"
 rm -rf $OUTPUT_DATA/*
 
 echo "2. Gerando o relatório de cobertura..."
-coverage run -m pytest --junitxml=reports/junit/junit.xml
-coverage report
-coverage xml -o reports/coverage/coverage.xml
+make all
 
 if [ $? -eq 0 ]; then
 
     echo "3. Gerando o badge de cobertura e adicionando arquivos ao staging area..."
-    genbadge coverage -o - > reports/coverage/coverage_badge.svg
-    genbadge tests -o reports/coverage/tests_badge.svg
+    make make-badge
     
     # Adicionando arquivos ao staging area
     git add .
@@ -31,7 +27,7 @@ if [ $? -eq 0 ]; then
         if [ -d "$INPUT_DATA/$name" ]; then
             echo ""
             echo "Processando a pasta '$INPUT_DATA/$name'..."
-            python3 main.py --input_folder=$INPUT_DATA/$name/ --output_folder=$OUTPUT_DATA/$name/ --debug --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
+            poetry run python -m data_validate.main --l=pt_BR --i=$INPUT_DATA/$name/ --o=$OUTPUT_DATA/$name/ --debug --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
             
             # Adicionando arquivos ao staging area
             git add .

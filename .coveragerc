@@ -1,9 +1,34 @@
 [run]
-source = src/
+source = data_validate
+omit = 
+    */tests/*
+    */__pycache__/*
+    */migrations/*
+    */venv/*
+    */env/*
+    */.venv/*
+    */.env/*
+    *__init__.py
+    setup.py
+    conftest.py
 
 [report]
-# Ignore files/directories
-omit =
-    *orchestrator.py*
-    */python3.5/*
-    */python3.12/*
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    if self.debug:
+    if settings.DEBUG
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    class .*\bProtocol\):
+    @(abc\.)?abstractmethod
+    def __init_subclass__
+
+show_missing = True
+precision = 2
+
+[html]
+directory = dev-reports/htmlcov
+title = Data Validate Coverage Report 

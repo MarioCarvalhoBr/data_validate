@@ -1,0 +1,218 @@
+{
+  "choose_language": {
+    "message": "Choose your language ({languages}): "
+  },
+  "invalid_language": {
+    "message": "Invalid language selected. Using {default_lang} as default."
+  },
+  "lang_load_error": {
+    "message": "Error loading language '{lang}'. Using default '{default_lang}'."
+  },
+  "welcome": {
+    "message": "--- Simple Calculator ---"
+  },
+  "menu_title": {
+    "message": "\nChoose an operation:"
+  },
+  "add_option": {
+    "message": "1. Add (+)"
+  },
+  "subtract_option": {
+    "message": "2. Subtract (-)"
+  },
+  "multiply_option": {
+    "message": "3. Multiply (*)"
+  },
+  "divide_option": {
+    "message": "4. Divide (/)"
+  },
+  "exit_option": {
+    "message": "5. Exit"
+  },
+  "enter_choice": {
+    "message": "Enter your choice (1/2/3/4/5): "
+  },
+  "enter_num1": {
+    "message": "Enter the first number: "
+  },
+  "enter_num2": {
+    "message": "Enter the second number: "
+  },
+  "result": {
+    "message": "Result: {result}"
+  },
+  "invalid_option": {
+    "message": "Invalid option. Please try again."
+  },
+  "invalid_input": {
+    "message": "Invalid input. Please enter numbers only."
+  },
+  "zero_division": {
+    "message": "Error: Cannot divide by zero."
+  },
+  "goodbye": {
+    "message": "Exiting calculator. Goodbye!"
+  },
+  "error_unexpected": {
+    "message": "An unexpected error occurred: {error}"
+  },
+  "fs_utils_error_file_path_empty": {
+    "message": "The file path is empty."
+  },
+  "fs_utils_error_file_not_found": {
+    "message": "The file '{filename}' does not exist."
+  },
+  "fs_utils_error_path_not_file": {
+    "message": "The path '{path}' is not a file."
+  },
+  "fs_utils_error_encoding_failed": {
+    "message": "Failed to detect encoding."
+  },
+  "fs_utils_error_encoding_os": {
+    "message": "OS error occurred while detecting encoding: {error}"
+  },
+  "fs_utils_error_dir_path_empty": {
+    "message": "The directory path is empty."
+  },
+  "fs_utils_info_dir_exists": {
+    "message": "The directory '{dir_name}' already exists."
+  },
+  "fs_utils_error_path_not_dir": {
+    "message": "The path '{path}' exists but is not a directory."
+  },
+  "fs_utils_success_dir_created": {
+    "message": "The directory '{dir_name}' was successfully created."
+  },
+  "fs_utils_error_create_dir_os": {
+    "message": "OS error occurred while creating directory: {error}"
+  },
+  "fs_utils_error_file_check_fail": {
+    "message": "Error checking file existence: {error}"
+  },
+  "fs_utils_error_dir_not_found": {
+    "message": "The directory '{dir_path}' was not found."
+  },
+  "fs_utils_error_dir_check_fail": {
+    "message": "Error checking directory existence: {error}"
+  },
+  "lorem_ipsum": {
+        "message": "There is no one who likes pain, who seeks it out and wants to have it, simply because it is pain!"
+  },
+  "model_report_msg_errors_omitted": {
+    "message": "There are {count} more errors similar to the previous ones that were omitted."
+  },
+  "model_report_msg_warnings_omitted": {
+    "message": "There are {count} more warnings similar to the previous ones that were omitted."
+  },
+  "validator_structure_error_unexpected_file": {
+    "message": "The file '{file_name}' is not expected."
+  },
+  "fs_utils_error_dir_empty": {
+    "message": "The directory '{dir_path}' is empty."
+  },
+  "validator_structure_error_empty_directory": {
+    "message": "The directory '{dir_path}' is empty. Please add the required files."
+  },
+  "verification_name_file_structure": {
+    "message": "Structure of the input folder files"
+  },
+  "verification_name_file_cleaning": {
+    "message": "File cleaning"
+  },
+  "verification_name_indicator_relations": {
+    "message": "Relations between indicators"
+  },
+  "verification_name_tree_hierarchy": {
+    "message": "Hierarchy as a tree"
+  },
+  "verification_name_indicator_levels": {
+    "message": "Indicator levels"
+  },
+  "verification_name_code_uniqueness": {
+    "message": "Code uniqueness"
+  },
+  "verification_name_html_codes_in_descriptions": {
+    "message": "HTML codes in simple descriptions"
+  },
+  "verification_name_spelling": {
+    "message": "Spelling"
+  },
+  "verification_name_unique_titles": {
+    "message": "Unique titles"
+  },
+  "verification_name_sequential_codes": {
+    "message": "Sequential codes"
+  },
+  "verification_name_empty_fields": {
+    "message": "Empty fields"
+  },
+  "verification_name_indicator_name_pattern": {
+    "message": "Pattern for indicator names"
+  },
+  "verification_name_titles_over_n_chars": {
+    "message": "Titles with more than {value} characters"
+  },
+  "verification_name_simple_descriptions_over_n_chars": {
+    "message": "Simple descriptions with more than {value} characters"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_descriptions": {
+    "message": "Mandatory and prohibited punctuation in descriptions"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_scenarios": {
+    "message": "Mandatory and prohibited punctuation in scenarios"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_temporal_reference": {
+    "message": "Mandatory and prohibited punctuation in temporal reference"
+  },
+  "verification_name_unique_value_relations_in_scenarios": {
+    "message": "Unique value relations in scenarios"
+  },
+  "verification_name_unique_value_relations_in_temporal_reference": {
+    "message": "Unique value relations in temporal reference"
+  },
+  "verification_name_value_combination_relations": {
+    "message": "Value combination relations"
+  },
+  "verification_name_unavailable_and_invalid_values": {
+    "message": "Unavailable and invalid values"
+  },
+  "verification_name_line_break_in_description": {
+    "message": "Line break in description"
+  },
+  "verification_name_line_break_in_scenarios": {
+    "message": "Line break in scenarios"
+  },
+  "verification_name_line_break_in_temporal_reference": {
+    "message": "Line break in temporal reference"
+  },
+  "verification_name_years_in_temporal_reference": {
+    "message": "Years in temporal reference"
+  },
+  "verification_name_legend_data_range": {
+    "message": "Legend data range"
+  },
+  "verification_name_legend_value_overlap": {
+    "message": "Value overlap in legend"
+  },
+  "verification_name_legend_relations": {
+    "message": "Indicator relations in legends"
+  },
+  "verification_name_sum_properties_in_influencing_factors": {
+    "message": "Sum properties in influencing factors"
+  },
+  "verification_name_repeated_indicators_in_proportionalities": {
+    "message": "Repeated indicators in proportionalities"
+  },
+  "verification_name_indicator_relations_in_proportionalities": {
+    "message": "Indicator relations in proportionalities"
+  },
+  "verification_name_indicators_in_values_and_proportionalities": {
+    "message": "Indicators in values and proportionalities"
+  },
+  "verification_name_leaf_indicators_without_associated_data": {
+    "message": "Leaf indicators without associated data"
+  },
+  "verification_name_child_indicator_levels": {
+    "message": "Child indicator levels"
+  }
+}

@@ -1,0 +1,51 @@
+name: Linux Build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Display Python and PIP version
+        run: |
+          # Display Python and PIP version
+          python -c "import sys; print(sys.version)"
+          python -m pip --version
+
+      - name: Install WKHtmlToPdf on Ubuntu
+        run: |
+         sudo apt-get update --fix-missing -y
+         # sudo apt-get upgrade -y
+         sudo apt-get install -y wkhtmltopdf
+
+      - name: Install Poetry
+        run: pip install poetry
+
+      - name: Install project dependencies with Makefile
+        run: make install-dev
+
+      - name: Run code with Makefile
+        run: make make-run
+
+      - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pdf-files
+          path: |
+            data/*/*/*.pdf
+            data/*/*/*/*.pdf
+          if-no-files-found: warn

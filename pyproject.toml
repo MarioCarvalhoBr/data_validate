@@ -1,0 +1,93 @@
+[project]
+name = "data_validate"
+version = "0.7.0"
+description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
+authors = [
+    {name = "Mário de Araújo Carvalho", email = "mariodearaujocarvalho@gmail.com"},
+    {name = "Mauro Assis", email = "assismauro@hotmail.com"},
+    {name = "Miguel Gastelumendi", email = "miguelgastelumendi@gmail.com"},
+    {name = "Pedro Andrade", email = "pedro.andrade@inpe.br"}
+]
+
+readme = "README.md"
+license = "MIT"
+license-files = ["LICEN[CS]E.*"]
+keywords = ["data validation", "data processing", "spreadsheet validation", "data integrity", "tabular data", "scientific research", "environmental data", "indicator systems"]
+classifiers = [
+  "Development Status :: 0.7.0 - Beta",
+  "Programming Language :: Python"
+]
+
+requires-python = ">=3.12"
+dependencies = [
+    "pandas (>=2.2.3,<3.0.0)",
+    "chardet (>=5.2.0,<6.0.0)",
+    "openpyxl (>=3.1.5,<4.0.0)",
+    "pandas-stubs (>=2.2.3.250527,<3.0.0)",
+    "pyenchant (>=3.2.2,<4.0.0)",
+    "pdfkit (>=1.0.0,<2.0.0)",
+    "babel (>=2.17.0,<3.0.0)",
+    "jinja2 (>=3.1.6,<4.0.0)",
+]
+
+[project.urls]
+Homepage = "https://github.com/AdaptaBrasil/"
+Documentation = "https://github.com/AdaptaBrasil/data_validate/docs"
+Repository = "https://github.com/AdaptaBrasil/data_validate.git"
+"Bug Tracker" = "https://github.com/AdaptaBrasil/data_validate/issues"
+Changelog = "https://github.com/AdaptaBrasil/data_validate/blob/dev/CHANGELOG.md"
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+packages = [{include = "data_validate"}]
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.4.1"
+coverage = "^7.10.6"
+pytest-cov = "^6.2.1"
+ruff = "^0.12.11"
+flake8 = "^7.3.0"
+black = "^25.1.0"
+pre-commit = "^4.3.0"
+pdoc = "^15.0.4"
+flake8-html = "^0.4.3"
+genbadge = {extras = ["all"], version = "^1.1.2"}
+
+[tool.coverage.run]
+source = ["data_validate"]
+omit = [
+    "*/tests/*",
+    "*/__pycache__/*",
+    "*/migrations/*",
+    "*/venv/*",
+    "*/env/*",
+    "*/.venv/*",
+    "*/.env/*",
+    "setup.py",
+    "conftest.py"
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@\\(abc\\\\.\\)?abstractmethod",
+    "def __init_subclass__"
+]
+show_missing = true
+precision = 2
+
+[tool.coverage.html]
+directory = "dev-reports/htmlcov"
+title = "Data Validate Coverage Report"

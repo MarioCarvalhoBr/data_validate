@@ -1,0 +1,230 @@
+{
+  "choose_language": {
+    "message": "Escolha seu idioma ({languages}): "
+  },
+  "invalid_language": {
+    "message": "Idioma inválido selecionado. Usando {default_lang} como padrão."
+  },
+  "lang_load_error": {
+    "message": "Erro ao carregar idioma '{lang}'. Usando padrão '{default_lang}'."
+  },
+  "welcome": {
+    "message": "--- Calculadora Simples ---"
+  },
+  "menu_title": {
+    "message": "\nEscolha uma operação:"
+  },
+  "add_option": {
+    "message": "1. Somar (+)"
+  },
+  "subtract_option": {
+    "message": "2. Subtrair (-)"
+  },
+  "multiply_option": {
+    "message": "3. Multiplicar (*)"
+  },
+  "divide_option": {
+    "message": "4. Dividir (/)"
+  },
+  "exit_option": {
+    "message": "5. Sair"
+  },
+  "enter_choice": {
+    "message": "Digite sua escolha (1/2/3/4/5): "
+  },
+  "enter_num1": {
+    "message": "Digite o primeiro número: "
+  },
+  "enter_num2": {
+    "message": "Digite o segundo número: "
+  },
+  "result": {
+    "message": "Resultado: {result}"
+  },
+  "invalid_option": {
+    "message": "Opção inválida. Por favor, tente novamente."
+  },
+  "invalid_input": {
+    "message": "Entrada inválida. Por favor, digite apenas números."
+  },
+  "zero_division": {
+    "message": "Erro: Não é possível dividir por zero."
+  },
+  "goodbye": {
+    "message": "Saindo da calculadora. Adeus!"
+  },
+  "error_unexpected": {
+    "message": "Ocorreu um erro inesperado: {error}"
+  },
+  "fs_utils_error_file_path_empty": {
+    "message": "O caminho do arquivo está vazio."
+  },
+  "fs_utils_error_file_not_found": {
+    "message": "O arquivo '{filename}' não foi encontrado."
+  },
+  "fs_utils_error_path_not_file": {
+    "message": "O caminho '{path}' não é um arquivo."
+  },
+  "fs_utils_error_encoding_failed": {
+    "message": "Falha ao detectar a codificação."
+  },
+  "fs_utils_error_encoding_os": {
+    "message": "Erro de SO ocorrido ao detectar a codificação: {error}"
+  },
+  "fs_utils_error_dir_path_empty": {
+    "message": "O caminho do diretório está vazio."
+  },
+  "fs_utils_info_dir_exists": {
+    "message": "O diretório '{dir_name}' já existe."
+  },
+  "fs_utils_error_path_not_dir": {
+    "message": "O caminho '{path}' existe mas não é um diretório."
+  },
+  "fs_utils_success_dir_created": {
+    "message": "O diretório '{dir_name}' foi criado com sucesso."
+  },
+  "fs_utils_error_create_dir_os": {
+    "message": "Erro de SO ocorrido ao criar o diretório: {error}"
+  },
+  "fs_utils_error_file_check_fail": {
+    "message": "Erro ao verificar a existência do arquivo: {error}"
+  },
+  "fs_utils_error_dir_not_found": {
+    "message": "O diretório '{dir_path}' não foi encontrado."
+  },
+  "fs_utils_error_dir_check_fail": {
+    "message": "Erro ao verificar a existência do diretório: {error}"
+  },
+  "lorem_ipsum": {
+    "message": "Não há quem goste de dor, que a procure e a queira ter, simplesmente porque é dor!"
+  },
+  "model_report_msg_errors_omitted": {
+    "message": "Existem mais {count} erros similares aos anteriores que foram omitidos."
+  },
+  "model_report_msg_warnings_omitted": {
+    "message": "Existem mais {count} avisos similares aos anteriores que foram omitidos."
+  },
+  "fs_utils_error_dir_empty": {
+    "message": "O diretório '{dir_path}' está vazio."
+  },
+  "validator_structure_error_files_not_in_folder": {
+    "message": "Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente."
+  },
+  "validator_structure_error_unexpected_folder": {
+    "message": "A pasta '{file_name}' não é esperada."
+  },
+  "validator_structure_error_unexpected_file": {
+    "message": "O arquivo '{file_name}' não é esperado."
+  },
+  "validator_structure_error_missing_file": {
+    "message": "{file_base}: O arquivo esperado não foi encontrado. Use .csv ou .xlsx como extensões."
+  },
+  "validator_structure_error_conflicting_files": {
+    "message": "{file_base}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv."
+  },
+  "validator_structure_error_empty_directory": {
+    "message": "O diretório '{dir_path}' está vazio. Por favor, adicione os arquivos necessários."
+  },
+   "verification_name_file_structure": {
+    "message": "Estrutura dos arquivos da pasta de entrada"
+  },
+  "verification_name_file_cleaning": {
+    "message": "Limpeza dos arquivos"
+  },
+  "verification_name_indicator_relations": {
+    "message": "Relações entre indicadores"
+  },
+  "verification_name_tree_hierarchy": {
+    "message": "Hierarquia como árvore"
+  },
+  "verification_name_indicator_levels": {
+    "message": "Níveis de indicadores"
+  },
+  "verification_name_code_uniqueness": {
+    "message": "Unicidade dos códigos"
+  },
+  "verification_name_html_codes_in_descriptions": {
+    "message": "Códigos HTML nas descrições simples"
+  },
+  "verification_name_spelling": {
+    "message": "Ortografia"
+  },
+  "verification_name_unique_titles": {
+    "message": "Títulos únicos"
+  },
+  "verification_name_sequential_codes": {
+    "message": "Códigos sequenciais"
+  },
+  "verification_name_empty_fields": {
+    "message": "Campos vazios"
+  },
+  "verification_name_indicator_name_pattern": {
+    "message": "Padrão para nomes dos indicadores"
+  },
+  "verification_name_titles_over_n_chars": {
+    "message": "Títulos com mais de {value} caracteres"
+  },
+  "verification_name_simple_descriptions_over_n_chars": {
+    "message": "Descrições simples com mais de {value} caracteres"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_descriptions": {
+    "message": "Pontuações obrigatórias e proibidas em descrições"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_scenarios": {
+    "message": "Pontuações obrigatórias e proibidas em cenários"
+  },
+  "verification_name_mandatory_and_prohibited_punctuation_in_temporal_reference": {
+    "message": "Pontuações obrigatórias e proibidas em referência temporal"
+  },
+  "verification_name_unique_value_relations_in_scenarios": {
+    "message": "Relações de valores únicos em cenários"
+  },
+  "verification_name_unique_value_relations_in_temporal_reference": {
+    "message": "Relações de valores únicos em referência temporal"
+  },
+  "verification_name_value_combination_relations": {
+    "message": "Relações de combinações de valores"
+  },
+  "verification_name_unavailable_and_invalid_values": {
+    "message": "Valores indisponíveis e inválidos"
+  },
+  "verification_name_line_break_in_description": {
+    "message": "Quebra de linha para descrição"
+  },
+  "verification_name_line_break_in_scenarios": {
+    "message": "Quebra de linha para cenários"
+  },
+  "verification_name_line_break_in_temporal_reference": {
+    "message": "Quebra de linha para referência temporal"
+  },
+  "verification_name_years_in_temporal_reference": {
+    "message": "Anos em referência temporal"
+  },
+  "verification_name_legend_data_range": {
+    "message": "Intervalo dos dados da legenda"
+  },
+  "verification_name_legend_value_overlap": {
+    "message": "Sobreposição de valores na legenda"
+  },
+  "verification_name_legend_relations": {
+    "message": "Relações de indicadores em legendas"
+  },
+  "verification_name_sum_properties_in_influencing_factors": {
+    "message": "Propriedades de soma nos fatores influenciadores"
+  },
+  "verification_name_repeated_indicators_in_proportionalities": {
+    "message": "Indicadores repetidos em proporcionalidades"
+  },
+  "verification_name_indicator_relations_in_proportionalities": {
+    "message": "Relações de indicadores em proporcionalidades"
+  },
+  "verification_name_indicators_in_values_and_proportionalities": {
+    "message": "Indicadores em valores e proporcionalidades"
+  },
+  "verification_name_leaf_indicators_without_associated_data": {
+    "message": "Indicadores folhas sem dados associados"
+  },
+  "verification_name_child_indicator_levels": {
+    "message": "Níveis dos indicadores filhos"
+  }
+}

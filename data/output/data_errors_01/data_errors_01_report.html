@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Canoa Report</title>
+
+    <style>
+        /* Microstrap 0.0.1 - A minimal CSS framework based on Bootstrap */
+        /* Estilo CSS minimalista baseado no design do Bootstrap: By Mário Carvalho */
+
+        /* START MY CUSTOM STYLES */
+        /* ---------------------------------------------------------- */
+
+        /* BODY */
+        body {
+            background-color: #EEEDEA; /* Cor de fundo do corpo */
+            color: #000000; /* Cor padrão do texto */
+        }
+
+        /* DIVS */
+        .container {
+            max-width: 100%;
+            margin-left: 0.10in;
+            margin-right: 0.10in;
+        }
+
+        /* CARDS */
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            box-shadow: 0 4px 6px #0000001A;
+
+            overflow: hidden;
+            margin: 5px auto;
+        }
+
+        .card-header {
+            padding: 0.75rem 1rem;
+            background-color: #007bff; /* Cor padrão da faixa */
+            color: white; /* Cor padrão do texto na faixa */
+        }
+
+        .card-body {
+            padding: 1rem;
+            background-color: #f8f9fa; /* Cor de fundo do corpo */
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .card-text {
+            margin-top: 0px;
+            font-size: 1rem;
+            color: #000000;
+        }
+
+        /* HEADER CENTER */
+        .info-header-center {
+            text-align: center; /* Centraliza os itens horizontalmente */
+            padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+        }
+
+        .info-header-center h1 {
+            margin: 0; /* Remove margem padrão do h1 */
+            font-size: 2rem; /* Tamanho da fonte */
+        }
+
+        .info-header-center h2 {
+            margin: 0; /* Remove margem padrão do h2 */
+            font-size: 1.5rem; /* Tamanho da fonte */
+            color: #343a40; /* Cor do texto */
+        }
+
+        .info-header-center strong {
+            font-weight: bold; /* Deixa o texto em negrito */
+        }
+
+        /* HEADER LEFT */
+        .info-header-left {
+            text-align: left; /* Centraliza os itens a esquerda */
+            padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+        }
+
+        .info-header-left strong {
+            font-weight: bold; /* Deixa o texto em negrito */
+            margin: 0; /* Remove margem padrão do strong */
+            padding: 0; /* Remove padding padrão do strong */
+        }
+
+        .info-header-left li {
+            font-weight: bold; /* Deixa o texto em negrito */
+            margin: 0; /* Remove margem padrão do strong */
+            padding: 0; /* Remove padding padrão do strong */
+        }
+
+        /* TEXT COLORS */
+        .text-primary {
+            color: #0000FF;
+            font-weight: bold;
+        }
+
+        .text-secondary {
+            color: #007bff;
+        }
+
+        .text-danger {
+            color: #FF0000;
+        }
+
+        .text-danger-errors {
+            color: #FF0000;
+            font-weight: normal;
+        }
+
+        .text-warning {
+            color: #FFA500;
+        }
+
+        .text-orange-warning {
+            color: #FFA500;
+            font-weight: normal;
+        }
+
+        .text-green {
+            color: #008000;
+        }
+
+        .text-info {
+            color: #17a2b8;
+        }
+
+        .text-white {
+            color: #ffffff;
+        }
+
+        .text-black {
+            color: #000000;
+        }
+
+        .text-gray {
+            color: #343a40;
+        }
+
+        /* BACKGROUND COLORS */
+        .bg-primary {
+            background-color: #0000FF;
+        }
+
+        .bg-secondary {
+            background-color: #007bff;
+        }
+
+        .bg-danger {
+            background-color: #FF0000;
+        }
+
+        .bg-warning {
+            background-color: #FFA500;
+        }
+
+        .bg-success {
+            background-color: #008000;
+        }
+
+        .bg-info {
+            background-color: #17a2b8;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa;
+        }
+
+        .bg-white {
+            background-color: #ffffff;
+        }
+
+        .bg-black {
+            background-color: #000000;
+        }
+
+        .bg-gray {
+            background-color: #343a40;
+        }
+
+        /* END MY CUSTOM STYLES */
+        /* ---------------------------------------------------------- */
+
+    </style>
+
+</head>
+<body>
+<!-- DIV PRINCIPAL -->
+<div class="container">
+
+    <!-- DIV HEADER -->
+    <div class="info-header-center">
+        <h1><strong>Canoa</strong></h1>
+        <h2 class="text-subtitle">Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
+    </div>
+
+    <!-- CARD DE INFORMAÇÕES -->
+    <div class="card">
+        <div class="card-header bg-secondary">
+            <h5 class="card-title text-white">Informa&ccedil;&otilde;es</h5>
+        </div>
+        <div class="card-body">
+            <strong>Usu&aacute;rio: <strong class='text-gray'>Usuário C</strong></strong><br>
+            <strong>Setor estrat&eacute;gico: <strong class='text-gray'>Setor A</strong></strong><br>
+            <strong>Protocolo: <strong class='text-gray'>Protocolo B</strong></strong><br>
+            
+            
+            
+        </div>
+    </div>
+
+    <!-- CARD DE RESUMO -->
+    <div class="card">
+        <div class="card-header bg-primary">
+            <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
+        </div>
+        <div class="card-body">
+            <strong class="text-danger">N&uacute;mero de Erros: 35</strong><br>
+            <strong class="text-warning">N&uacute;mero de Avisos: 34</strong><br>
+            <strong class="text-green">N&uacute;mero de testes executados: 34</strong><br>
+            <div class="info-header-left" id="tests_not_executed" style="display: none">
+                <strong>Testes n&atilde;o executados: </strong>
+                <ul></ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CARD DE ERROS -->
+    <div class="card">
+        <!-- Faixa do título -->
+        <div class="card-header bg-danger">
+            <h5 class="card-title text-white">Erros</h5>
+        </div>
+        <div class="card-body">
+            <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Erro nos valores da planilha. Verifique se os tipos de dados estão corretos. Detalhes: Excel file format cannot be determined, you must specify an engine manually. (<class 'ValueError'>)</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Coluna 'legenda' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: O arquivo enviado está vazio.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Coluna 'codigo_pai' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Coluna 'codigo_filho' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>valores.xlsx: A coluna '5000-2080-M' não é esperada.</span>
+<br><span class='text-danger-errors'>cenarios.xlsx: Valores duplicados encontrados na coluna 'simbolo': [O]</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Coluna 'codigo' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Coluna 'label' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Coluna 'cor' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Coluna 'minimo' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Coluna 'maximo' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>legenda.xlsx: Coluna 'ordem' esperada mas não foi encontrada.</span>
+<br><span class='text-danger-errors'>O arquivo '_composicao.xlsx' não é esperado.</span>
+<br><span class='text-primary'>Limpeza dos arquivos</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor '3.1' não é um número inteiro.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 12: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: A coluna 'codigo_pai' não foi encontrada.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: A coluna 'codigo_filho' não foi encontrada.</span>
+<br><span class='text-danger-errors'>referencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor inválido: O valor '2050B' não é um número.</span>
+<br><span class='text-primary'>Relações entre indicadores</span>
+<br><span class='text-danger-errors'>valores.xlsx: Colunas inválidas: ['5000-2080-M'].</span>
+<br><span class='text-danger-errors'>valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].</span>
+<br><span class='text-primary'>Hierarquia como árvore</span>
+<br><span class='text-primary'>Níveis de indicadores</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 4: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 5: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 12: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.</span>
+<br><span class='text-primary'>Unicidade dos códigos</span>
+<br><span class='text-danger-errors'>descricao.xlsx: A coluna 'codigo' contém códigos duplicados: [5007].</span>
+<br><span class='text-primary'>Códigos HTML nas descrições simples</span>
+<br><span class='text-primary'>Ortografia</span>
+<br><span class='text-primary'>Títulos únicos</span>
+<br><span class='text-primary'>Códigos sequenciais</span>
+<br><span class='text-danger-errors'>descricao.xlsx: A verificação foi abortada porque a coluna 'codigo' contém valores não numéricos.</span>
+<br><span class='text-primary'>Campos vazios</span>
+<br><span class='text-danger-errors'>descricao.xlsx, linha 13: Nenhum item da coluna 'nome_simples' pode ser vazio.</span>
+<br><span class='text-primary'>Padrão para nomes dos indicadores</span>
+<br><span class='text-primary'>Títulos com mais de 40 caracteres</span>
+<br><span class='text-primary'>Descrições simples com mais de 150 caracteres</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em descrições</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em cenários</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em referência temporal</span>
+<br><span class='text-primary'>Relações de valores únicos em cenários</span>
+<br><span class='text-danger-errors'>cenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.</span>
+<br><span class='text-danger-errors'>cenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos.</span>
+<br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
+<br><span class='text-danger-errors'>referencia_temporal.xlsx: A coluna 'nome' não deve conter valores repetidos.</span>
+<br><span class='text-primary'>Relações de combinações de valores</span>
+<br><span class='text-danger-errors'>valores.xlsx: A coluna '5000-2030-O' é obrigatória.</span>
+<br><span class='text-danger-errors'>valores.xlsx: A coluna '5000-2080-M' é desnecessária.</span>
+<br><span class='text-primary'>Valores indisponíveis e inválidos</span>
+<br><span class='text-primary'>Quebra de linha para descrição</span>
+<br><span class='text-primary'>Quebra de linha para cenários</span>
+<br><span class='text-primary'>Quebra de linha para referência temporal</span>
+<br><span class='text-primary'>Anos em referência temporal</span>
+<br><span class='text-primary'>Intervalo dos dados da legenda</span>
+<br><span class='text-primary'>Sobreposição de valores na legenda</span>
+<br><span class='text-primary'>Relações de indicadores em legendas</span>
+<br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
+<br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
+<br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
+<br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
+<br><span class='text-primary'>Indicadores folhas sem dados associados</span>
+<br><span class='text-primary'>Níveis dos indicadores filhos</span>
+        </div>
+    </div>
+
+    <!-- CARD DE AVISOS -->
+    <div class="card">
+        <!-- Faixa do título -->
+        <div class="card-header bg-warning">
+            <h5 class="card-title text-white">Avisos</h5>
+        </div>
+        <div class="card-body">
+            <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
+<br><span class='text-orange-warning'>composicao.xlsx: Coluna 'ababa' será ignorada pois não está na especificação.</span>
+<br><span class='text-primary'>Limpeza dos arquivos</span>
+<br><span class='text-primary'>Relações entre indicadores</span>
+<br><span class='text-primary'>Hierarquia como árvore</span>
+<br><span class='text-primary'>Níveis de indicadores</span>
+<br><span class='text-primary'>Unicidade dos códigos</span>
+<br><span class='text-primary'>Códigos HTML nas descrições simples</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: Coluna 'desc_simples' não pode conter código HTML.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 3: Coluna 'desc_simples' não pode conter código HTML.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 4: Coluna 'desc_simples' não pode conter código HTML.</span>
+<br><span class='text-primary'>Ortografia</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].</span>
+<br><span class='text-orange-warning'>referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].</span>
+<br><span class='text-primary'>Títulos únicos</span>
+<br><span class='text-primary'>Códigos sequenciais</span>
+<br><span class='text-primary'>Campos vazios</span>
+<br><span class='text-primary'>Padrão para nomes dos indicadores</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: Valor da coluna 'nome_simples' fora do padrão. Esperado: 'Segurança alimentar.'. Encontrado: 'Segurança Alimentar.'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 6: Valor da coluna 'nome_simples' fora do padrão. Esperado: 'Ameaça climática'. Encontrado: 'Ameaça Climática'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Impactos para segurança alimentar'. Encontrado: 'Impactos para Segurança Alimentar'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 3: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de risco de impacto para seca'. Encontrado: 'Índice de Risco de Impacto para Seca'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 4: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de risco de impacto para seca'. Encontrado: 'Índice de Risco de Impacto para Seca'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 5: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de exposição.'. Encontrado: 'Índice de Exposição.'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 6: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de ameaça climática'. Encontrado: 'Índice de Ameaça Climática'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 7: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de sensibilidade'. Encontrado: 'Índice de Sensibilidade'.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 8: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de capacidade adaptativa'. Encontrado: 'Índice de Capacidade Adaptativa'.</span>
+<br><span class='text-primary'>Títulos com mais de 40 caracteres</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 10: O texto da coluna "nome_simples" excede o limite de 40 caracteres (encontrado: 43).</span>
+<br><span class='text-primary'>Descrições simples com mais de 150 caracteres</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 9: O texto da coluna "desc_simples" excede o limite de 150 caracteres (encontrado: 184).</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em descrições</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: O valor da coluna 'nome_simples' não deve terminar com pontuação.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 5: O valor da coluna 'nome_completo' não deve terminar com pontuação.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 3: O valor da coluna 'desc_simples' deve terminar com ponto.</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 2: O valor da coluna 'desc_completa' deve terminar com ponto.</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em cenários</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 3: O valor da coluna 'nome' não deve terminar com pontuação.</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.</span>
+<br><span class='text-primary'>Pontuações obrigatórias e proibidas em referência temporal</span>
+<br><span class='text-orange-warning'>referencia_temporal.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.</span>
+<br><span class='text-primary'>Relações de valores únicos em cenários</span>
+<br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
+<br><span class='text-primary'>Relações de combinações de valores</span>
+<br><span class='text-primary'>Valores indisponíveis e inválidos</span>
+<br><span class='text-orange-warning'>valores.xlsx: Existem 383 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas 2 e 20.</span>
+<br><span class='text-primary'>Quebra de linha para descrição</span>
+<br><span class='text-orange-warning'>descricao.xlsx: A verificação foi abortada para a coluna obrigatória 'legenda' que está ausente.</span>
+<br><span class='text-primary'>Quebra de linha para cenários</span>
+<br><span class='text-primary'>Quebra de linha para referência temporal</span>
+<br><span class='text-primary'>Anos em referência temporal</span>
+<br><span class='text-primary'>Intervalo dos dados da legenda</span>
+<br><span class='text-primary'>Sobreposição de valores na legenda</span>
+<br><span class='text-primary'>Relações de indicadores em legendas</span>
+<br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
+<br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
+<br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
+<br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
+<br><span class='text-primary'>Indicadores folhas sem dados associados</span>
+<br><span class='text-primary'>Níveis dos indicadores filhos</span>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
