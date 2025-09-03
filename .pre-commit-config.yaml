@@ -16,3 +16,11 @@ repos:
           language: system
           always_run: true
           pass_filenames: false
+
+        - id: generate-readme-md
+          name: generate readme.md
+          entry: make readme
+          language: python
+          always_run: true
+          pass_filenames: false
+          stages: ["pre-push"]

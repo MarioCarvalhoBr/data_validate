@@ -42,9 +42,6 @@ clean: ## Remove arquivos temporários e relatórios
 	find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name "*.pyc" -delete 2>/dev/null || true
 
-black: ## Formata o código com Black
-	poetry run black data_validate tests
-
 genbadge-coverage: ## Gera badge de cobertura
 	@mkdir -p assets/coverage
 	poetry run genbadge coverage -i dev-reports/coverage.xml -o assets/coverage/coverage_badge.svg
@@ -61,5 +58,14 @@ make-run: ## Executa o script principal
 docs: ## Gera documentação com Sphinx
 	pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 
+readme: ## Gera documentação com Sphinx
+	$(PYTHON)  data_validate/helpers/tools/readme/gerador_readme.py
+
+black: ## Formata o código com Black
+	poetry run black data_validate tests
+
+ruff:
+## Verifica o código com Ruff
+	poetry run ruff check . --fix
 # Comando padrão
 all: test-cov ## Executa testes com cobertura (padrão)
