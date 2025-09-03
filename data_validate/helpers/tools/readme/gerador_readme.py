@@ -20,9 +20,12 @@ TEMPLATE_FILE: Path = (
 if not TEMPLATE_FILE.exists():
     raise FileNotFoundError(f"Template file not found: {TEMPLATE_FILE}")
 
-print(f'Build README for "{USER_REPO}" - Status: {METADATA.__status__} | Version: {REPO_VERSION}')
+print(
+    f'Build README for "{USER_REPO}" - Status: {METADATA.__status__} | Version: {REPO_VERSION}'
+)
 # OUTPUT_FILE = "README.md"
 OUTPUT_FILE = Path(__file__).resolve().parents[4] / "README.md"
+
 
 def generate_readme():
     """
@@ -40,7 +43,9 @@ def generate_readme():
             content = f.read()
 
         # Substitui o placeholder pelo valor da variável
-        new_content = content.replace("{{USER_REPO}}", USER_REPO).replace("{{REPO_VERSION}}", REPO_VERSION)
+        new_content = content.replace("{{USER_REPO}}", USER_REPO).replace(
+            "{{REPO_VERSION}}", REPO_VERSION
+        )
 
         # Escreve o novo conteúdo no arquivo de saída
         with open(output_path, "w", encoding="utf-8") as f:
@@ -54,6 +59,7 @@ def generate_readme():
         print(f"❌ Erro: O arquivo de template '{TEMPLATE_FILE}' não foi encontrado.")
     except Exception as e:
         print(f"❌ Ocorreu um erro inesperado: {e}")
+
 
 if __name__ == "__main__":
     generate_readme()
