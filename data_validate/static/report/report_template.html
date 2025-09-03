@@ -6,53 +6,16 @@
     <title>Canoa Report</title>
 
     <style>
+        /* Microstrap 0.0.1 - A minimal CSS framework based on Bootstrap */
         /* Estilo CSS minimalista baseado no design do Bootstrap: By Mário Carvalho */
-
-        /* COLORS */
-        /* ---------------------------------------------------------- */
-        :root {
-            /* TEXT COLORS */
-            --color-primary: #0000FF; /* Cor azul */
-            --color-secondary: #007bff; /* Cor cinza */
-            --color-danger: #FF0000; /* Cor vermelha */
-            --color-warning: #FFA500; /* Cor laranja */
-            --color-green: #008000; /* Cor verde */
-            --color-info: #17a2b8; /* Cor azul clara */
-            --color-white: #ffffff; /* Cor branca */
-            --color-black: #000000; /* Cor preta */
-            --color-gray: #343a40; /* Cor cinza */
-
-            /* BACKGROUND COLORS */
-            --bg-primary: #0000FF; /* Cor azul */
-            --bg-secondary: #007bff; /* Cor cinza */
-            --bg-danger: #FF0000; /* Cor vermelha */
-            --bg-warning: #FFA500; /* Cor laranja */
-            --bg-success: #008000; /* Cor verde */
-            --bg-info: #17a2b8; /* Cor azul clara */
-            --bg-light: #f8f9fa; /* Cor cinza claro */
-            --bg-white: #ffffff; /* Cor branca */
-            --bg-black: #000000; /* Cor preta */
-            --bg-gray: #343a40; /* Cor cinza */
-
-            /* CARD COLORS */
-            --color-card-border: #dee2e6; /* Cor da borda do card */
-            --color-card-body: #f8f9fa; /* Cor de fundo do corpo do card */
-            --color-card-gray-light: #0000001A; /* Cor cinza suave */
-
-            /* OTHER COLORS */
-            --color-sepia-light: #EEEDEA; /* Cor sepia suave */
-        }
-
-        /* END COLORS */
-        /* ---------------------------------------------------------- */
 
         /* START MY CUSTOM STYLES */
         /* ---------------------------------------------------------- */
 
         /* BODY */
         body {
-            background-color: var(--color-sepia-light); /* Cor de fundo do corpo */
-            color: var(--color-black); /* Cor padrão do texto */
+            background-color: #EEEDEA; /* Cor de fundo do corpo */
+            color: #000000; /* Cor padrão do texto */
         }
 
         /* DIVS */
@@ -64,9 +27,9 @@
 
         /* CARDS */
         .card {
-            border: 1px solid var(--color-card-border);
+            border: 1px solid #dee2e6;
             border-radius: 0.25rem;
-            box-shadow: 0 4px 6px var(--color-card-gray-light);
+            box-shadow: 0 4px 6px #0000001A;
 
             overflow: hidden;
             margin: 5px auto;
@@ -74,13 +37,13 @@
 
         .card-header {
             padding: 0.75rem 1rem;
-            background-color: var(--bg-secondary); /* Cor padrão da faixa */
+            background-color: #007bff; /* Cor padrão da faixa */
             color: white; /* Cor padrão do texto na faixa */
         }
 
         .card-body {
             padding: 1rem;
-            background-color: var(--color-card-body); /* Cor de fundo do corpo */
+            background-color: #f8f9fa; /* Cor de fundo do corpo */
             font-family: Arial, sans-serif;
             font-weight: bold;
         }
@@ -94,7 +57,7 @@
         .card-text {
             margin-top: 0px;
             font-size: 1rem;
-            color: var(--color-black);
+            color: #000000;
         }
 
         /* HEADER CENTER */
@@ -111,7 +74,7 @@
         .info-header-center h2 {
             margin: 0; /* Remove margem padrão do h2 */
             font-size: 1.5rem; /* Tamanho da fonte */
-            color: var(--color-gray); /* Cor do texto */
+            color: #343a40; /* Cor do texto */
         }
 
         .info-header-center strong {
@@ -138,91 +101,91 @@
 
         /* TEXT COLORS */
         .text-primary {
-            color: var(--color-primary);
+            color: #0000FF;
             font-weight: bold;
         }
 
         .text-secondary {
-            color: var(--color-secondary);
+            color: #007bff;
         }
 
         .text-danger {
-            color: var(--color-danger);
+            color: #FF0000;
         }
 
         .text-danger-errors {
-            color: var(--color-danger);
+            color: #FF0000;
             font-weight: normal;
         }
 
         .text-warning {
-            color: var(--color-warning);
+            color: #FFA500;
         }
 
         .text-orange-warning {
-            color: var(--color-warning);
+            color: #FFA500;
             font-weight: normal;
         }
 
         .text-green {
-            color: var(--color-green);
+            color: #008000;
         }
 
         .text-info {
-            color: var(--color-info);
+            color: #17a2b8;
         }
 
         .text-white {
-            color: var(--color-white);
+            color: #ffffff;
         }
 
         .text-black {
-            color: var(--color-black);
+            color: #000000;
         }
 
         .text-gray {
-            color: var(--color-gray);
+            color: #343a40;
         }
 
         /* BACKGROUND COLORS */
         .bg-primary {
-            background-color: var(--bg-primary);
+            background-color: #0000FF;
         }
 
         .bg-secondary {
-            background-color: var(--bg-secondary);
+            background-color: #007bff;
         }
 
         .bg-danger {
-            background-color: var(--bg-danger);
+            background-color: #FF0000;
         }
 
         .bg-warning {
-            background-color: var(--bg-warning);
+            background-color: #FFA500;
         }
 
         .bg-success {
-            background-color: var(--bg-success);
+            background-color: #008000;
         }
 
         .bg-info {
-            background-color: var(--bg-info);
+            background-color: #17a2b8;
         }
 
         .bg-light {
-            background-color: var(--bg-light);
+            background-color: #f8f9fa;
         }
 
         .bg-white {
-            background-color: var(--bg-white);
+            background-color: #ffffff;
         }
 
         .bg-black {
-            background-color: var(--bg-black);
+            background-color: #000000;
         }
 
         .bg-gray {
-            background-color: var(--bg-gray);
+            background-color: #343a40;
         }
 
         /* END MY CUSTOM STYLES */
