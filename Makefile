@@ -59,7 +59,7 @@ docs: ## Gera documentação com Sphinx
 	pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 
 readme: ## Gera documentação com Sphinx
-	$(PYTHON)  data_validate/helpers/tools/readme/gerador_readme.py
+	$(PYTHON) data_validate/helpers/tools/readme/gerador_readme.py
 
 black: ## Formata o código com Black
 	poetry run black data_validate tests
