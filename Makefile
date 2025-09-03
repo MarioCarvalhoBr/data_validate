@@ -60,6 +60,7 @@ docs: ## Gera documentação com Sphinx
 
 readme: ## Gera documentação com Sphinx
 	$(PYTHON) data_validate/helpers/tools/readme/gerador_readme.py
+	git add .
 
 black: ## Formata o código com Black
 	poetry run black data_validate tests
