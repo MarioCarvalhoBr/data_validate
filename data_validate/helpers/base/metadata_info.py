@@ -15,7 +15,7 @@ class MetadataInfo(ConstantBase):
         super().__init__()
 
         # Config
-        version_info = (0, 6, 0, "beta", 0)
+        version_info = (0, 7, 0, "beta", 0)
         _dev = 0
 
         # Project metadata

@@ -58,5 +58,8 @@ make-badge: genbadge-coverage genbadge-tests ## Gera todos os badges
 make-run: ## Executa o script principal
 	bash scripts/run_main_pipeline.sh
 
+docs: ## Gera documentação com Sphinx
+	pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
+
 # Comando padrão
 all: test-cov ## Executa testes com cobertura (padrão)

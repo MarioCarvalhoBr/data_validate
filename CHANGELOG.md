@@ -4,8 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+## [0.7.0] - 2025-09-03
 
-## [0.6.0] - YYYY-MM-DD
+### Added
+- New version refactoring and improvements.
+- Updated the `pyproject.toml` file to include the `pandas` dependency, ensuring that it is explicitly listed for proper package management.
+- Added a new check to validate that all columns in the DataFrame have unique names, preventing potential data processing issues related to duplicate column names.
+- Improved the error handling in the `DataImporterFacade.load_all` method to provide more specific and informative error messages for various exceptions, including `FileNotFoundError`, `UnicodeDecodeError`, `ValueError`, `pd.errors.ParserError`, and `IOError`. The order of exception catching was also refined to ensure that more specific exceptions are caught before more general ones.
+- Enhanced the `check_vertical_bar` function to provide clearer and more detailed error messages when forbidden characters (specifically the vertical bar `|`) are found in column names. The messages now specify whether the issue is in level 0 or level 1 of a `MultiIndex` column name, or if it is found within data under a column whose level 0 header is "unnamed".
+- Corrected the initialization process in the `SpModelABC` class (and functions called within it, specifically `check_unnamed_columns`) to ensure that DataFrames with `MultiIndex` headers are not inadvertently converted to `SingleIndex` headers. The validation functions now inspect column names without altering the DataFrame's structure.
+- Ensured that the `check_unnamed_columns` function correctly identifies and processes columns based on their names (e.g., "unnamed") across both `SingleIndex` and `MultiIndex` DataFrames without modifying the original DataFrame's column structure.
+- Updated and corrected author information in the `pyproject.toml` file to ensure accurate attribution.
+- General improvements to user messages for better clarity and understanding.
 
 ### Fixed
 - Corrected an issue in the `SpModelABC` initialization (or functions called within it, specifically `check_unnamed_columns`) where DataFrames with `MultiIndex` headers were being converted to `SingleIndex` headers. The validation functions now inspect column names without altering the DataFrame's structure.
