@@ -13,7 +13,7 @@ if METADATA.__status__ == METADATA.STATUS_DEVELOPMENT:
 
 # --------------------
 TEMPLATE_FILE: Path = (
-    Path(__file__).resolve().parents[3] / "static" / "templates" / "READZME.TEMPLATE.md"
+    Path(__file__).resolve().parents[3] / "static" / "templates" / "README.TEMPLATE.md"
 )
 # Se o arquivo não existir, lança um erro
 if not TEMPLATE_FILE.exists():
