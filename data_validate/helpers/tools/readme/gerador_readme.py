@@ -5,10 +5,11 @@ from pathlib import Path
 from data_validate import METADATA
 
 # --- CONFIGURAÇÃO ---
+REPO_VERSION = METADATA.__version__
+
 # Exemplos: "MarioCarvalhoBr/data_validate" ou "AdaptaBrasil/data_validate"
 USER_REPO = "AdaptaBrasil/data_validate"
-
-if METADATA.__status__ == METADATA.STATUS_DEVELOPMENT:
+if METADATA.__status__ == METADATA.__text_dev__:
     USER_REPO = "MarioCarvalhoBr/data_validate"
 
 # --------------------
@@ -19,8 +20,7 @@ TEMPLATE_FILE: Path = (
 if not TEMPLATE_FILE.exists():
     raise FileNotFoundError(f"Template file not found: {TEMPLATE_FILE}")
 
-print(f'__status__: {METADATA.__status__}')
-
+print(f'Build README for "{USER_REPO}" - Status: {METADATA.__status__} | Version: {REPO_VERSION}')
 # OUTPUT_FILE = "README.md"
 OUTPUT_FILE = Path(__file__).resolve().parents[4] / "README.md"
 
@@ -40,7 +40,7 @@ def generate_readme():
             content = f.read()
 
         # Substitui o placeholder pelo valor da variável
-        new_content = content.replace("{{USER_REPO}}", USER_REPO)
+        new_content = content.replace("{{USER_REPO}}", USER_REPO).replace("{{REPO_VERSION}}", REPO_VERSION)
 
         # Escreve o novo conteúdo no arquivo de saída
         with open(output_path, "w", encoding="utf-8") as f:

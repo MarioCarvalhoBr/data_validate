@@ -25,7 +25,6 @@ __author__ = METADATA.__author__
 __author_email__ = METADATA.__author_email__
 __maintainer_email__ = METADATA.__maintainer_email__
 __license__ = METADATA.__license__
-__python__ = METADATA.__python__
 __python_version__ = METADATA.__python_version__
 __status__ = METADATA.__status__
 

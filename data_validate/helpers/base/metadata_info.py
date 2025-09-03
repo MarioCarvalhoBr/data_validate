@@ -6,6 +6,9 @@ Package metadata
 
 from __future__ import annotations
 from datetime import datetime
+from pathlib import Path
+
+import toml
 
 from data_validate.helpers.base.constant_base import ConstantBase
 
@@ -14,41 +17,51 @@ class MetadataInfo(ConstantBase):
     def __init__(self):
         super().__init__()
 
-        # CONFIGURE METADATA
-        _major: int = 0
-        _minor: int = 7
-        _micro: int = 2
-        _release_level: str = "beta"
-        _serial: int = 0
-        _dev: int = 2  # 0 for production, >0 for development builds
+        # Base metadata
+        self.__text_dev__ = "Development"
+        self.__text_prod__ = "Production/Stable"
+        self.__date_now__ = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+        # Locate the pyproject.toml file (3 levels up from this file)
+        pyproject_toml_file: Path = (
+            Path(__file__).resolve().parents[3] / "pyproject.toml"
+        )
+
+        if not pyproject_toml_file.exists() or not pyproject_toml_file.is_file():
+            raise FileNotFoundError(f"pyproject.toml file not found: {pyproject_toml_file}")
+
+        # Load and parse the pyproject.toml file
+        data = toml.load(pyproject_toml_file)
+
+        if "project" not in data:
+            raise RuntimeError(f"pyproject.toml file does not contain a 'project' section")
+
+        # PROJECT INFO METADATA
+        self.__name__ = data["project"].get("name", "data_validate")
+        self.__project_name__ = data["project"].get("project_name", "Canoa")
+        self.__description__ = data["project"].get("description", "Parser and validate data easily for Canoa.")
+        self.__url__ = data["project"].get("urls", {}).get("Repository", "https://github.com/AdaptaBrasil/data_validate.git")
+        self.__author__ = data["project"].get("authors", [{}])[0].get("name", "Mário de Araújo Carvalho")
+        self.__author_email__ = data["project"].get("authors", [{}])[0].get("email", "mariodearaujocarvalho@gmail.com")
+        self.__maintainer_email__ = self.__author_email__
+
+        # PROJECT MAINTAINER INFO
+        self.__license__ = data["project"].get("license", "unknown")
+        self.__python_version__ = data["project"].get("requires-python", "unknown")
+
+        # PROJECT MAINTAINER VERSION
+        self.__version_base__ = data["project"].get("version", "0.0.0")
+        self.__release_level__ = data["project"].get("release_level", "beta")
+        self.__serial__ = data["project"].get("serial", 0)
+        self.__status_dev__ = data["project"].get("status_dev", 0)
+
+        # CONFIGURE VAR FOR VERSION
+        self._major, self._minor, self._micro = map(int, self.__version_base__.split(".")[:3])
 
         # Create config data
-        version_info = (_major, _minor, _micro, _release_level, _serial)
-
-        # Other constants
-        self.STATUS_DEVELOPMENT = "Development"
-        self.STATUS_PRODUCTION = "Production/Stable"
-
-        # Project metadata
-        self.__name__ = "data_validate"
-        self.__project_name__ = "Canoa"
-        self.__version__ = MetadataInfo._make_version(*version_info, _dev)
-        self.__url__ = MetadataInfo._make_url(*version_info, _dev)
-        self.__description__ = "A simple parser for Canoa project"
-
-        # Author and maintainer metadata
-        self.__author__ = "Mário de Araújo Carvalho"
-        self.__author_email__ = "mariodearaujocarvalho@gmail.com"
-        self.__maintainer_email__ = "mariodearaujocarvalho@gmail.com"
-
-        # Other metadata
-        self.__license__ = "MIT"
-        self.__url__ = "https://github.com/AdaptaBrasil/data_validate"
-        self.__python__ = "3.12"
-        self.__python_version__ = self.__python__
-
-        self.__status__ = self.STATUS_PRODUCTION if _dev == 0 else self.STATUS_DEVELOPMENT
-        self.__date_now__ = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        version_info = (self._major, self._minor, self._micro, self.__release_level__, self.__serial__, self.__status_dev__)
+        self.__version__ = MetadataInfo._make_version(*version_info)
+        self.__status__ = self.__text_prod__ if self.__status_dev__ == 0 else self.__text_dev__
 
         self._finalize_initialization()
 
