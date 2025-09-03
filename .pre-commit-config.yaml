@@ -10,6 +10,13 @@ repos:
           pass_filenames: false
           stages: ["pre-push"]
 
+        - id: generate-readme
+          name: generate README
+          entry: bash scripts/generate_readme.sh
+          language: system
+          always_run: true
+          pass_filenames: false
+
         - id: generate-logs-coverage-badge
           name: generate logs coverage badge
           entry: bash scripts/generate_logs_coverage_badge.sh
@@ -17,10 +24,3 @@ repos:
           always_run: true
           pass_filenames: false
 
-        - id: generate-readme-md
-          name: generate readme.md
-          entry: make readme
-          language: python
-          always_run: true
-          pass_filenames: false
-          stages: ["pre-push"]
