@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import data_validate
-from config.config import NamesEnum
+from data_validate.config.config import NamesEnum
 from data_validate.helpers.tools import DataLoaderFacade
 
 from data_validate.controllers import (
