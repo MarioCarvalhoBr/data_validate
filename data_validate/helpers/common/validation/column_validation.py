@@ -19,7 +19,6 @@ def check_column_names(
     extra_columns = [col for col in df.columns if col not in expected_columns]
     # Remove unnamed extra columns - handle both string and numeric column names
     extra_columns = [
-        col for col in extra_columns
-        if not str(col).lower().startswith("unnamed")
+        col for col in extra_columns if not str(col).lower().startswith("unnamed")
     ]
     return missing_columns, extra_columns
