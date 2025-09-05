@@ -36,39 +36,45 @@ def legend_processor(mock_context) -> LegendProcessing:
 @pytest.fixture
 def sample_dataframe() -> pd.DataFrame:
     """Create sample DataFrame for testing."""
-    return pd.DataFrame({
-        "codigo": [1, 2, 3],
-        "label": ["Baixo", "Médio", "Alto"],
-        "minimo": [0.0, 10.0, 20.0],
-        "maximo": [9.99, 19.99, 30.0],
-        "ordem": [1, 2, 3],
-        "cor": ["#FF0000", "#00FF00", "#0000FF"]
-    })
+    return pd.DataFrame(
+        {
+            "codigo": [1, 2, 3],
+            "label": ["Baixo", "Médio", "Alto"],
+            "minimo": [0.0, 10.0, 20.0],
+            "maximo": [9.99, 19.99, 30.0],
+            "ordem": [1, 2, 3],
+            "cor": ["#FF0000", "#00FF00", "#0000FF"],
+        }
+    )
 
 
 @pytest.fixture
 def invalid_dataframe() -> pd.DataFrame:
     """Create DataFrame with invalid data for testing."""
-    return pd.DataFrame({
-        "codigo": ["invalid", 2, 3],
-        "label": ["", "Médio", None],
-        "minimo": ["not_number", 10.0, 20.0],
-        "maximo": [9.99, "invalid", 30.0],
-        "ordem": [1.5, 2, "three"],
-        "cor": ["invalid_color", "#00FF00", "#0000FF"]
-    })
+    return pd.DataFrame(
+        {
+            "codigo": ["invalid", 2, 3],
+            "label": ["", "Médio", None],
+            "minimo": ["not_number", 10.0, 20.0],
+            "maximo": [9.99, "invalid", 30.0],
+            "ordem": [1.5, 2, "three"],
+            "cor": ["invalid_color", "#00FF00", "#0000FF"],
+        }
+    )
 
 
 @pytest.fixture
 def unavailable_data_dataframe() -> pd.DataFrame:
     """Create DataFrame with 'Dado indisponível' entries."""
-    return pd.DataFrame({
-        "codigo": [1, 2],
-        "label": ["Baixo", "Dado indisponível"],
-        "minimo": [0.0, None],
-        "maximo": [9.99, None],
-        "ordem": [1, 2]
-    })
+    return pd.DataFrame(
+        {
+            "codigo": [1, 2],
+            "label": ["Baixo", "Dado indisponível"],
+            "minimo": [0.0, None],
+            "maximo": [9.99, None],
+            "ordem": [1, 2],
+        }
+    )
 
 
 class TestLegendProcessing:
@@ -84,28 +90,20 @@ class TestLegendProcessing:
 
     def test_get_min_max_values_basic(self) -> None:
         """Test get_min_max_values with valid data."""
-        df = pd.DataFrame({
-            "min_col": [1.0, 2.0, 3.0],
-            "max_col": [10.0, 20.0, 30.0]
-        })
+        df = pd.DataFrame({"min_col": [1.0, 2.0, 3.0], "max_col": [10.0, 20.0, 30.0]})
 
-        min_val, max_val = LegendProcessing.get_min_max_values(
-            df, "min_col", "max_col"
-        )
+        min_val, max_val = LegendProcessing.get_min_max_values(df, "min_col", "max_col")
 
         assert min_val == 1.0
         assert max_val == 30.0
 
     def test_get_min_max_values_with_nan(self) -> None:
         """Test get_min_max_values with NaN values."""
-        df = pd.DataFrame({
-            "min_col": [1.0, float('nan'), 3.0],
-            "max_col": [10.0, 20.0, float('nan')]
-        })
-
-        min_val, max_val = LegendProcessing.get_min_max_values(
-            df, "min_col", "max_col"
+        df = pd.DataFrame(
+            {"min_col": [1.0, float("nan"), 3.0], "max_col": [10.0, 20.0, float("nan")]}
         )
+
+        min_val, max_val = LegendProcessing.get_min_max_values(df, "min_col", "max_col")
 
         assert min_val == 1.0
         assert max_val == 20.0
@@ -114,9 +112,7 @@ class TestLegendProcessing:
         """Test get_min_max_values with empty DataFrame."""
         df = pd.DataFrame({"min_col": [], "max_col": []})
 
-        min_val, max_val = LegendProcessing.get_min_max_values(
-            df, "min_col", "max_col"
-        )
+        min_val, max_val = LegendProcessing.get_min_max_values(df, "min_col", "max_col")
 
         assert pd.isna(min_val)
         assert pd.isna(max_val)
@@ -129,9 +125,7 @@ class TestValidateLegendLabels:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with no duplicate labels."""
-        df = pd.DataFrame({
-            "label": ["Baixo", "Médio", "Alto"]
-        })
+        df = pd.DataFrame({"label": ["Baixo", "Médio", "Alto"]})
 
         errors = legend_processor.validate_legend_labels(df, 1, "label")
 
@@ -141,9 +135,7 @@ class TestValidateLegendLabels:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with duplicate labels."""
-        df = pd.DataFrame({
-            "label": ["Baixo", "Médio", "Baixo", "Alto", "Médio"]
-        })
+        df = pd.DataFrame({"label": ["Baixo", "Médio", "Baixo", "Alto", "Médio"]})
 
         errors = legend_processor.validate_legend_labels(df, 1, "label")
 
@@ -180,13 +172,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with valid data types."""
-        df = pd.DataFrame({
-            "codigo": [1, 2, 3, 4],
-            "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
-            "minimo": [0.0, 10.0, 20.0, None],
-            "maximo": [9.99, 19.99, 30.0, None],
-            "ordem": [1, 2, 3, 4]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2, 3, 4],
+                "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
+                "minimo": [0.0, 10.0, 20.0, None],
+                "maximo": [9.99, 19.99, 30.0, None],
+                "ordem": [1, 2, 3, 4],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -198,13 +192,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with empty or null labels."""
-        df = pd.DataFrame({
-            "codigo": [1, 2, 3, 4],
-            "label": ["Baixo", "", None, "Dado indisponível"],
-            "minimo": [0.0, 10.0, 20.0, None],
-            "maximo": [9.99, 19.99, 30.0, None],
-            "ordem": [1, 2, 3, 4]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2, 3, 4],
+                "label": ["Baixo", "", None, "Dado indisponível"],
+                "minimo": [0.0, 10.0, 20.0, None],
+                "maximo": [9.99, 19.99, 30.0, None],
+                "ordem": [1, 2, 3, 4],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -218,13 +214,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with non-numeric values in numeric columns."""
-        df = pd.DataFrame({
-            "codigo": ["not_number", 2, 3],
-            "label": ["Baixo", "Médio", "Alto"],
-            "minimo": ["invalid", 10.0, 20.0],
-            "maximo": [9.99, "text", 30.0],
-            "ordem": [1, 2, "three"]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": ["not_number", 2, 3],
+                "label": ["Baixo", "Médio", "Alto"],
+                "minimo": ["invalid", 10.0, 20.0],
+                "maximo": [9.99, "text", 30.0],
+                "ordem": [1, 2, "three"],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -236,13 +234,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation when 'Dado indisponível' has min/max values."""
-        df = pd.DataFrame({
-            "codigo": [1, 2],
-            "label": ["Baixo", "Dado indisponível"],
-            "minimo": [0.0, 10.0],  # Should be None for 'Dado indisponível'
-            "maximo": [9.99, 20.0],  # Should be None for 'Dado indisponível'
-            "ordem": [1, 2]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2],
+                "label": ["Baixo", "Dado indisponível"],
+                "minimo": [0.0, 10.0],  # Should be None for 'Dado indisponível'
+                "maximo": [9.99, 20.0],  # Should be None for 'Dado indisponível'
+                "ordem": [1, 2],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -256,13 +256,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation when no 'Dado indisponível' label exists."""
-        df = pd.DataFrame({
-            "codigo": [1, 2, 3],
-            "label": ["Baixo", "Médio", "Alto"],
-            "minimo": [0.0, 10.0, 20.0],
-            "maximo": [9.99, 19.99, 30.0],
-            "ordem": [1, 2, 3]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2, 3],
+                "label": ["Baixo", "Médio", "Alto"],
+                "minimo": [0.0, 10.0, 20.0],
+                "maximo": [9.99, 19.99, 30.0],
+                "ordem": [1, 2, 3],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -275,13 +277,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation when multiple 'Dado indisponível' labels exist."""
-        df = pd.DataFrame({
-            "codigo": [1, 2, 3],
-            "label": ["Dado indisponível", "Médio", "Dado indisponível"],
-            "minimo": [None, 10.0, None],
-            "maximo": [None, 19.99, None],
-            "ordem": [1, 2, 3]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2, 3],
+                "label": ["Dado indisponível", "Médio", "Dado indisponível"],
+                "minimo": [None, 10.0, None],
+                "maximo": [None, 19.99, None],
+                "ordem": [1, 2, 3],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -295,13 +299,15 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with non-integer values in code and order columns."""
-        df = pd.DataFrame({
-            "codigo": [1.5, 2, 3],
-            "label": ["Baixo", "Médio", "Dado indisponível"],
-            "minimo": [0.0, 10.0, None],
-            "maximo": [9.99, 19.99, None],
-            "ordem": [1, 2.5, 3]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1.5, 2, 3],
+                "label": ["Baixo", "Médio", "Dado indisponível"],
+                "minimo": [0.0, 10.0, None],
+                "maximo": [9.99, 19.99, None],
+                "ordem": [1, 2.5, 3],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -315,11 +321,13 @@ class TestValidateLegendColumnsDtypesNumeric:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation when some columns don't exist."""
-        df = pd.DataFrame({
-            "codigo": [1, 2],
-            "label": ["Baixo", "Dado indisponível"]
-            # Missing minimo, maximo, ordem columns
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2],
+                "label": ["Baixo", "Dado indisponível"],
+                # Missing minimo, maximo, ordem columns
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -348,7 +356,10 @@ class TestValidateColorFormat:
         ],
     )
     def test_validate_color_format_various_inputs(
-        self, legend_processor: LegendProcessing, colors: List[str], expected_error_count: int
+        self,
+        legend_processor: LegendProcessing,
+        colors: List[str],
+        expected_error_count: int,
     ) -> None:
         """Test color format validation with various inputs."""
         df = pd.DataFrame({"cor": colors})
@@ -389,11 +400,13 @@ class TestValidateMinMaxValues:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with valid min/max sequence."""
-        df = pd.DataFrame({
-            "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
-            "minimo": [0.0, 10.01, 20.01, None],
-            "maximo": [10.0, 20.0, 30.0, None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
+                "minimo": [0.0, 10.01, 20.01, None],
+                "maximo": [10.0, 20.0, 30.0, None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
@@ -405,30 +418,38 @@ class TestValidateMinMaxValues:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation when min >= max."""
-        df = pd.DataFrame({
-            "label": ["Baixo", "Médio", "Dado indisponível"],
-            "minimo": [10.0, 20.0, None],  # min >= max for first row
-            "maximo": [5.0, 19.99, None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["Baixo", "Médio", "Dado indisponível"],
+                "minimo": [10.0, 20.0, None],  # min >= max for first row
+                "maximo": [5.0, 19.99, None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
         )
 
         assert len(errors) == 3
-        assert "valor mínimo (10.0) deve ser menor que o valor máximo (5.0)" in errors[0]
-        assert "valor mínimo (20.0) deve ser menor que o valor máximo (19.99)" in errors[1]
+        assert (
+            "valor mínimo (10.0) deve ser menor que o valor máximo (5.0)" in errors[0]
+        )
+        assert (
+            "valor mínimo (20.0) deve ser menor que o valor máximo (19.99)" in errors[1]
+        )
         assert "intervalo não é contínuo" in errors[2]
 
     def test_validate_min_max_values_non_continuous_intervals(
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with non-continuous intervals."""
-        df = pd.DataFrame({
-            "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
-            "minimo": [0.0, 10.02, 20.01, None],  # Gap between intervals
-            "maximo": [10.0, 20.0, 30.0, None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
+                "minimo": [0.0, 10.02, 20.01, None],  # Gap between intervals
+                "maximo": [10.0, 20.0, 30.0, None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
@@ -442,11 +463,13 @@ class TestValidateMinMaxValues:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation with NaN values."""
-        df = pd.DataFrame({
-            "label": ["Baixo", "Médio", "Dado indisponível"],
-            "minimo": [0.0, float('nan'), None],
-            "maximo": [10.0, 20.0, None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["Baixo", "Médio", "Dado indisponível"],
+                "minimo": [0.0, float("nan"), None],
+                "maximo": [10.0, 20.0, None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
@@ -459,11 +482,9 @@ class TestValidateMinMaxValues:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test validation when DataFrame is empty after filtering."""
-        df = pd.DataFrame({
-            "label": ["Dado indisponível"],
-            "minimo": [None],
-            "maximo": [None]
-        })
+        df = pd.DataFrame(
+            {"label": ["Dado indisponível"], "minimo": [None], "maximo": [None]}
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
@@ -485,14 +506,17 @@ class TestValidateMinMaxValues:
 
         # Patch Decimal temporarily
         import data_validate.helpers.common.validation.legend_processing as legend_module
+
         legend_module.Decimal = mock_decimal_constructor
 
         try:
-            df = pd.DataFrame({
-                "label": ["Baixo", "Médio", "Dado indisponível"],
-                "minimo": [0.0, 10.0, None],
-                "maximo": [5.0, 20.0, None]
-            })
+            df = pd.DataFrame(
+                {
+                    "label": ["Baixo", "Médio", "Dado indisponível"],
+                    "minimo": [0.0, 10.0, None],
+                    "maximo": [5.0, 20.0, None],
+                }
+            )
 
             errors = legend_processor.validate_min_max_values(
                 df, 1, "minimo", "maximo", "label"
@@ -508,11 +532,13 @@ class TestValidateMinMaxValues:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test that validation sorts by minimum value correctly."""
-        df = pd.DataFrame({
-            "label": ["Alto", "Baixo", "Médio", "Dado indisponível"],
-            "minimo": [20.01, 0.0, 10.01, None],
-            "maximo": [30.0, 10.0, 20.0, None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["Alto", "Baixo", "Médio", "Dado indisponível"],
+                "minimo": [20.01, 0.0, 10.01, None],
+                "maximo": [30.0, 10.0, 20.0, None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
@@ -622,7 +648,7 @@ class TestValidateCodeSequence:
         errors = legend_processor.validate_code_sequence(df, "codigo")
 
         assert len(errors) == 0
-        
+
     def test_validate_code_sequence_unordered_fails(
         self, legend_processor: LegendProcessing
     ) -> None:
@@ -713,14 +739,16 @@ class TestIntegrationScenarios:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test with completely valid legend data."""
-        df = pd.DataFrame({
-            "codigo": [1, 1, 1, 1],
-            "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
-            "minimo": [0.0, 10.01, 20.01, None],
-            "maximo": [10.0, 20.0, 30.0, None],
-            "ordem": [1, 2, 3, 4],
-            "cor": ["#FF0000", "#FFFF00", "#00FF00", "#000000"]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 1, 1, 1],
+                "label": ["Baixo", "Médio", "Alto", "Dado indisponível"],
+                "minimo": [0.0, 10.01, 20.01, None],
+                "maximo": [10.0, 20.0, 30.0, None],
+                "ordem": [1, 2, 3, 4],
+                "cor": ["#FF0000", "#FFFF00", "#00FF00", "#000000"],
+            }
+        )
 
         # Test all validation methods
         label_errors = legend_processor.validate_legend_labels(df, 1, "label")
@@ -739,14 +767,16 @@ class TestIntegrationScenarios:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test with data containing multiple types of errors."""
-        df = pd.DataFrame({
-            "codigo": [1, 1, 1],
-            "label": ["Baixo", "Baixo", ""],  # Duplicate and empty
-            "minimo": [20.0, 10.0, 0.0],  # Wrong order and min > max
-            "maximo": [10.0, 25.0, 5.0],
-            "ordem": [1, 3, 5],  # Non-sequential
-            "cor": ["invalid", "#00FF00", "#GGGGGG"]  # Invalid colors
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 1, 1],
+                "label": ["Baixo", "Baixo", ""],  # Duplicate and empty
+                "minimo": [20.0, 10.0, 0.0],  # Wrong order and min > max
+                "maximo": [10.0, 25.0, 5.0],
+                "ordem": [1, 3, 5],  # Non-sequential
+                "cor": ["invalid", "#00FF00", "#GGGGGG"],  # Invalid colors
+            }
+        )
 
         label_errors = legend_processor.validate_legend_labels(df, 1, "label")
         color_errors = legend_processor.validate_color_format(df, 1, "cor")
@@ -764,18 +794,19 @@ class TestIntegrationScenarios:
 class TestEdgeCasesAndBoundaryConditions:
     """Test edge cases and boundary conditions."""
 
-
     def test_very_large_dataset(self, legend_processor: LegendProcessing) -> None:
         """Test with large dataset to check performance."""
         size = 1000
-        df = pd.DataFrame({
-            "codigo": list(range(1, size + 1)),
-            "label": [f"Label_{i}" for i in range(size)],
-            "minimo": [float(i) for i in range(size)],
-            "maximo": [float(i + 0.99) for i in range(size)],
-            "ordem": list(range(1, size + 1)),
-            "cor": ["#FF0000"] * size
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": list(range(1, size + 1)),
+                "label": [f"Label_{i}" for i in range(size)],
+                "minimo": [float(i) for i in range(size)],
+                "maximo": [float(i + 0.99) for i in range(size)],
+                "ordem": list(range(1, size + 1)),
+                "cor": ["#FF0000"] * size,
+            }
+        )
 
         # Should handle large dataset without issues
         errors = legend_processor.validate_legend_labels(df, 1, "label")
@@ -785,22 +816,20 @@ class TestEdgeCasesAndBoundaryConditions:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test with special characters in labels."""
-        df = pd.DataFrame({
-            "label": ["Açúcar", "Café", "Água", "Pão", "Maçã"]
-        })
+        df = pd.DataFrame({"label": ["Açúcar", "Café", "Água", "Pão", "Maçã"]})
 
         errors = legend_processor.validate_legend_labels(df, 1, "label")
         assert len(errors) == 0
 
-    def test_extreme_numeric_values(
-        self, legend_processor: LegendProcessing
-    ) -> None:
+    def test_extreme_numeric_values(self, legend_processor: LegendProcessing) -> None:
         """Test with extreme numeric values."""
-        df = pd.DataFrame({
-            "label": ["Min", "Max", "Dado indisponível"],
-            "minimo": [float('-inf'), 1e10, None],
-            "maximo": [1e-10, float('inf'), None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["Min", "Max", "Dado indisponível"],
+                "minimo": [float("-inf"), 1e10, None],
+                "maximo": [1e-10, float("inf"), None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"
@@ -813,13 +842,15 @@ class TestEdgeCasesAndBoundaryConditions:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test with mixed data types that pandas might handle differently."""
-        df = pd.DataFrame({
-            "codigo": [1, 2.0, 3],  # Mixed int and float
-            "label": ["A", "B", "Dado indisponível"],
-            "minimo": [0, 10.0, None],  # Mixed int and float
-            "maximo": [9.99, 20, None],
-            "ordem": [1, 2, 3]
-        })
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2.0, 3],  # Mixed int and float
+                "label": ["A", "B", "Dado indisponível"],
+                "minimo": [0, 10.0, None],  # Mixed int and float
+                "maximo": [9.99, 20, None],
+                "ordem": [1, 2, 3],
+            }
+        )
 
         errors = legend_processor.validate_legend_columns_dtypes_numeric(
             df, 1, "codigo", "label", "minimo", "maximo", "ordem"
@@ -832,10 +863,12 @@ class TestEdgeCasesAndBoundaryConditions:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test with Unicode characters and potential encoding issues."""
-        df = pd.DataFrame({
-            "label": ["测试", "テスト", "тест", "🌟", "Dado indisponível"],
-            "codigo": [1, 2, 3, 4, 5]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["测试", "テスト", "тест", "🌟", "Dado indisponível"],
+                "codigo": [1, 2, 3, 4, 5],
+            }
+        )
 
         errors = legend_processor.validate_legend_labels(df, 1, "label")
         assert len(errors) == 0
@@ -844,11 +877,13 @@ class TestEdgeCasesAndBoundaryConditions:
         self, legend_processor: LegendProcessing
     ) -> None:
         """Test precision edge cases in decimal validation."""
-        df = pd.DataFrame({
-            "label": ["A", "B", "C", "Dado indisponível"],
-            "minimo": [0.0, 10.00, 20.00, None],
-            "maximo": [9.99, 19.99, 29.99, None]
-        })
+        df = pd.DataFrame(
+            {
+                "label": ["A", "B", "C", "Dado indisponível"],
+                "minimo": [0.0, 10.00, 20.00, None],
+                "maximo": [9.99, 19.99, 29.99, None],
+            }
+        )
 
         errors = legend_processor.validate_min_max_values(
             df, 1, "minimo", "maximo", "label"

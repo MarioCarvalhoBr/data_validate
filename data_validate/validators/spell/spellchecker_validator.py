@@ -11,7 +11,9 @@ from data_validate.models import (
 )
 from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
 
 
 class SpellCheckerValidator(ValidatorModelABC):

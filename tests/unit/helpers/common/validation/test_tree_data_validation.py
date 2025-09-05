@@ -137,7 +137,7 @@ class TestValidateLevelHierarchy:
     def test_validate_level_hierarchy_valid(
         self, sample_composition_df: pd.DataFrame, sample_description_df: pd.DataFrame
     ) -> None:
-        """Test validate_level_hierarchy with valid hierarchy."""
+        """Test validate_level_hierarchy with valid composition."""
         errors = validate_level_hierarchy(
             sample_composition_df,
             sample_description_df,
@@ -150,7 +150,7 @@ class TestValidateLevelHierarchy:
         assert len(errors) == 0
 
     def test_validate_level_hierarchy_invalid_levels(self) -> None:
-        """Test validate_level_hierarchy with invalid level hierarchy."""
+        """Test validate_level_hierarchy with invalid level composition."""
         composition_df = pd.DataFrame(
             {
                 "codigo_pai": [1, 2],
@@ -313,6 +313,8 @@ class TestValidateLevelHierarchy:
         assert len(missing_parent_errors) >= 1  # Missing parents 99, 88
         # Note: child 100 and 77 are missing but we only check for their existence, not specific tuple format
         assert (1, 2) in parent_child_errors  # Parent 1 (level 3) >= Child 2 (level 1)
+
+
 class TestValidateMissingCodesInDescription:
     """Test suite for validate_missing_codes_in_description function."""
 
@@ -716,7 +718,7 @@ class TestIntegrationScenarios:
         tree = create_tree_structure(composition_df, "codigo_pai", "codigo_filho")
         assert tree == {"1": ["2", "3"], "2": ["4"]}
 
-        # Test level hierarchy
+        # Test level composition
         level_errors = validate_level_hierarchy(
             composition_df,
             description_df,
@@ -752,14 +754,14 @@ class TestIntegrationScenarios:
                     2,
                     1,
                     3,
-                ],  # Invalid hierarchy: parent 1 (level 2) -> child 2 (level 1)
+                ],  # Invalid composition: parent 1 (level 2) -> child 2 (level 1)
             }
         )
 
         # Test tree creation
         tree = create_tree_structure(composition_df, "codigo_pai", "codigo_filho")
 
-        # Test level hierarchy
+        # Test level composition
         level_errors = validate_level_hierarchy(
             composition_df,
             description_df,
@@ -830,7 +832,7 @@ class TestEdgeCasesAndBoundaryConditions:
         assert "1" in tree
         assert "A" in tree
 
-        # Should validate hierarchy correctly with proper level progression
+        # Should validate composition correctly with proper level progression
         errors = validate_level_hierarchy(
             composition_df, description_df, "codigo", "nivel", "parent", "child"
         )

@@ -16,7 +16,9 @@ from data_validate.helpers.common.validation.data_validation import (
 )
 from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
 
 
 class SpDescriptionValidator(ValidatorModelABC):

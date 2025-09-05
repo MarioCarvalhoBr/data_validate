@@ -1,5 +1,5 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-"""Tree hierarchy validation for spreadsheet composition structures."""
+"""Tree composition validation for spreadsheet composition structures."""
 
 from typing import List, Tuple, Dict, Any
 
@@ -9,7 +9,10 @@ from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.models import SpComposition, SpDescription
-from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
+
 from data_validate.helpers.common.processing.data_cleaning import (
     clean_dataframe_integers,
 )
@@ -113,7 +116,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
 
     def validate_hierarchy_with_tree(self) -> Tuple[List[str], List[str]]:
         """
-        Validate tree hierarchy structure and detect cycles.
+        Validate tree composition structure and detect cycles.
 
         Returns:
             Tuple containing (errors, warnings) lists
@@ -173,7 +176,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
                 f"{self.sp_name_composition}: Ciclo encontrado: [{' -> '.join(cycle)}]."
             )
 
-        # Validate level hierarchy
+        # Validate level composition
         level_errors = validate_level_hierarchy(
             df_composition,
             df_description,
@@ -257,7 +260,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         df_description: pd.DataFrame,
     ) -> List[str]:
         """
-        Format level hierarchy errors with proper line numbers and descriptions.
+        Format level composition errors with proper line numbers and descriptions.
 
         Args:
             level_errors: List of (parent, child) error tuples

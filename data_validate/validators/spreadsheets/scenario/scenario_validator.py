@@ -3,18 +3,20 @@ from typing import List, Tuple, Dict, Any
 
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.models import SpTemporalReference
+from data_validate.models import SpScenario
 from data_validate.helpers.common.validation.data_validation import (
     check_punctuation,
     check_unique_values,
 )
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
 
 
-class SpTemporalReferenceValidator(ValidatorModelABC):
+class SpScenarioValidator(ValidatorModelABC):
     """
-    Validates the content of the SpTemporalReference spreadsheet.
+    Validates the content of the SpScenario spreadsheet.
     """
 
     def __init__(
@@ -26,7 +28,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
         super().__init__(
             data_models_context=data_models_context,
             report_list=report_list,
-            type_class=SpTemporalReference,
+            type_class=SpScenario,
             **kwargs,
         )
 
@@ -36,10 +38,8 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
     def validate_punctuation(self) -> Tuple[List[str], List[str]]:
         warnings = []
 
-        columns_dont_punctuation = []
-        columns_must_end_with_dot = [
-            SpTemporalReference.RequiredColumn.COLUMN_DESCRIPTION.name
-        ]
+        columns_dont_punctuation = [SpScenario.RequiredColumn.COLUMN_NAME.name]
+        columns_must_end_with_dot = [SpScenario.RequiredColumn.COLUMN_DESCRIPTION.name]
 
         list_columns = list(columns_dont_punctuation + columns_must_end_with_dot)
         for column in list_columns:
@@ -56,37 +56,12 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
         warnings.extend(punctuation_warnings)
         return [], warnings
 
-    def validate_reference_years(self) -> Tuple[List[str], List[str]]:
-        errors = []
-
-        columns_to_check = [
-            SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name,
-        ]
-        for column in columns_to_check:
-            exists_column, msg_error_column = self._column_exists(column)
-            if not exists_column:
-                errors.append(msg_error_column)
-                return errors, []
-
-        # Remove first row: This is actual year
-        column_series_symbol = SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.iloc[1:]
-        years = column_series_symbol.unique()
-
-        # Check if all years are greater than the current year
-        for year in years:
-            if year <= self._data_models_context.config.CURRENT_YEAR:
-                errors.append(
-                    f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro."
-                )
-
-        return errors, []
-
     def validate_unique_values(self) -> Tuple[List[str], List[str]]:
         errors = []
 
         columns_to_check = [
-            SpTemporalReference.RequiredColumn.COLUMN_NAME.name,
-            SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name,
+            SpScenario.RequiredColumn.COLUMN_NAME.name,
+            SpScenario.RequiredColumn.COLUMN_SYMBOL.name,
         ]
 
         # Check if columns exist
@@ -108,12 +83,11 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
         pass
 
     def run(self) -> Tuple[List[str], List[str]]:
-        """Runs all content validations for SpTemporalReference."""
+        """Runs all content validations for SpScenario."""
 
         validations = [
-            (self.validate_punctuation, NamesEnum.MAND_PUNC_TEMP.value),
-            (self.validate_reference_years, NamesEnum.YEARS_TEMP.value),
-            (self.validate_unique_values, NamesEnum.UVR_TEMP.value),
+            (self.validate_punctuation, NamesEnum.MAND_PUNC_SCEN.value),
+            (self.validate_unique_values, NamesEnum.UVR_SCEN.value),
         ]
         if self._dataframe.empty:
             self.set_not_executed(validations)

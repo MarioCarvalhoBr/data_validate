@@ -27,5 +27,6 @@ __maintainer_email__ = METADATA.__maintainer_email__
 __license__ = METADATA.__license__
 __python_version__ = METADATA.__python_version__
 __status__ = METADATA.__status__
+__text_init__ = METADATA.__text_init__
 
-print(f"The {__project_name__} {__name__} version {__version__} initialized.\n")
+print(__text_init__)

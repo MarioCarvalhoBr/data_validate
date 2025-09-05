@@ -93,6 +93,8 @@ class MetadataInfo(ConstantBase):
             self.__text_prod__ if self.__status_dev__ == 0 else self.__text_dev__
         )
 
+        self.__text_init__ = f"The {self.__project_name__} {self.__name__} version {self.__version__} initialized.\n"
+
         self._finalize_initialization()
 
     @staticmethod
