@@ -38,7 +38,7 @@ class MetadataInfo(ConstantBase):
 
         if "project" not in data_toml:
             raise RuntimeError(
-                f"pyproject.toml file does not contain a 'project' section"
+                "pyproject.toml file does not contain a 'project' section"
             )
 
         # PROJECT INFO METADATA

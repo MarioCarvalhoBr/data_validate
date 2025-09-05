@@ -30,6 +30,7 @@ from data_validate.validators.structure.validator_structure import (
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.validators.spreadsheets.value_validator import SpValueValidator
 from data_validate.controllers.context.general_context import GeneralContext
+from validators.hierarchy.tree_validator import SpCompositionTreeValidator
 
 FLAG = None
 
@@ -176,6 +177,9 @@ class ProcessorSpreadsheet:
         )
 
         SpDescriptionValidator(
+            data_models_context=self.data_models_context, report_list=self.report_list
+        )
+        SpCompositionTreeValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
         SpTemporalReferenceValidator(

@@ -119,28 +119,23 @@ class SpValueValidator(ValidatorModelABC):
         if self.model_dataframes[self.sp_name_description].empty:
             return errors, warnings
 
-        local_required_columns = {
-            self.sp_name_description: self.global_required_columns[
-                self.sp_name_description
-            ],
-            self.sp_name_scenario: self.global_required_columns[self.sp_name_scenario],
-        }
+        errors = self.check_columns_in_models_dataframes(
+            required_columns={
+                self.sp_name_description: self.global_required_columns[
+                    self.sp_name_description
+                ],
+                self.sp_name_scenario: self.global_required_columns[
+                    self.sp_name_scenario
+                ],
+            },
+            model_dataframes=self.model_dataframes,
+        )
+        if errors:
+            return errors, warnings
 
         code_column_name = SpDescription.RequiredColumn.COLUMN_CODE.name
         level_column_name = SpDescription.RequiredColumn.COLUMN_LEVEL.name
         scenario_column_name = SpDescription.DynamicColumn.COLUMN_SCENARIO.name
-
-        for model_name, columns in local_required_columns.items():
-            dataframe = self.model_dataframes[model_name]
-            if dataframe is not None:
-                for column in columns:
-                    exists_column, error_msg = self.column_exists(
-                        dataframe, model_name, column
-                    )
-                    if not exists_column:
-                        errors.append(error_msg)
-        if errors:
-            return errors, warnings
 
         # Prepare cleaned dataframes
         # No-need to clean the values dataframe
@@ -229,28 +224,21 @@ class SpValueValidator(ValidatorModelABC):
         ):
             return errors, warnings
 
-        local_required_columns = self.global_required_columns.copy()
-
         code_column_name = SpDescription.RequiredColumn.COLUMN_CODE.name
         level_column_name = SpDescription.RequiredColumn.COLUMN_LEVEL.name
         scenario_column_name = SpDescription.DynamicColumn.COLUMN_SCENARIO.name
         symbol_column_name = SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name
 
+        local_required_columns = self.global_required_columns.copy()
         if self.exists_scenario:
             local_required_columns[self.sp_name_description].append(
                 scenario_column_name
             )
 
-        for model_name, columns in local_required_columns.items():
-            dataframe = self.model_dataframes[model_name]
-            if dataframe is not None:
-                for column in columns:
-                    exists_column, error_msg = self.column_exists(
-                        dataframe, model_name, column
-                    )
-                    if not exists_column:
-                        errors.append(error_msg)
-
+        errors = self.check_columns_in_models_dataframes(
+            required_columns=local_required_columns,
+            model_dataframes=self.model_dataframes,
+        )
         if errors:
             return errors, warnings
 
@@ -336,28 +324,21 @@ class SpValueValidator(ValidatorModelABC):
         """
         errors, warnings = [], []
 
-        # Get model properties
-        local_required_columns = {
-            self.sp_name_scenario: (
-                self.global_required_columns[self.sp_name_scenario]
-                if self.exists_scenario
-                else []
-            )
-        }
-        id_column_name = SpValue.RequiredColumn.COLUMN_ID.name
-
-        for model_name, columns in local_required_columns.items():
-            dataframe = self.model_dataframes[model_name]
-            if dataframe is not None:
-                for column in columns:
-                    exists_column, error_msg = self._column_exists_dataframe(
-                        dataframe, column
-                    )
-                    if not exists_column:
-                        errors.append(error_msg)
+        errors = self.check_columns_in_models_dataframes(
+            required_columns={
+                self.sp_name_scenario: (
+                    self.global_required_columns[self.sp_name_scenario]
+                    if self.exists_scenario
+                    else []
+                )
+            },
+            model_dataframes=self.model_dataframes,
+        )
 
         if errors:
             return errors, warnings
+
+        id_column_name = SpValue.RequiredColumn.COLUMN_ID.name
 
         # Prepare dataframe for validation using generic function
         df_values = self.model_dataframes[self.sp_name_value].copy()

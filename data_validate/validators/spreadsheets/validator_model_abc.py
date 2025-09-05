@@ -45,6 +45,32 @@ class ValidatorModelABC(ABC):
     def init(self):
         pass
 
+    def check_columns_in_models_dataframes(
+        self,
+        required_columns: Dict[str, List[str]],
+        model_dataframes: Dict[str, pd.DataFrame],
+    ) -> List[str]:
+        """
+        Check if required columns exist in the provided dataframes for different models.
+        :param required_columns: A dictionary where keys are model names and values are lists of required column names.
+        :param model_dataframes: A dictionary where keys are model names and values are their corresponding dataframes.
+        :return: A list of error messages for missing columns.
+        """
+        errors = []
+
+        # Check if columns exist
+        for model_name, columns in required_columns.items():
+            dataframe = model_dataframes[model_name]
+            if dataframe is not None:
+                for column in columns:
+                    exists_column, error_msg = self.column_exists(
+                        dataframe, model_name, column
+                    )
+                    if not exists_column:
+                        errors.append(error_msg)
+
+        return errors
+
     # Create static method to check if column exists
     def column_exists(self, dataframe, filename, column) -> Tuple[bool, str]:
 
