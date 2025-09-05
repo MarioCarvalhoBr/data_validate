@@ -1,37 +1,10 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import data_validate
-from data_validate.config.config import NamesEnum
-from data_validate.helpers.tools import DataLoaderFacade
-
-from data_validate.controllers import (
-    DataModelsContext,
-    GeneralContext,
-    ModelListReport,
-    ReportGeneratorFiles,
-)
-
-from data_validate.models import (
-    SpModelABC,
-    SpDescription,
-    SpComposition,
-    SpValue,
-    SpTemporalReference,
-    SpProportionality,
-    SpScenario,
-    SpLegend,
-    SpDictionary,
-)
-
-from data_validate.validators import (
-    SpellCheckerValidator,
-    ValidatorStructureFiles,
-    SpDescriptionValidator,
-    SpValueValidator,
-    SpCompositionTreeValidator,
-    SpTemporalReferenceValidator,
-    SpScenarioValidator,
-    SpLegendValidator,
-)
+import data_validate.config as config
+import data_validate.helpers.tools as tools
+import data_validate.models as models
+import data_validate.controllers as controllers
+import data_validate.validators as validators
 
 FLAG = None
 
@@ -41,7 +14,7 @@ class ProcessorSpreadsheet:
     Classe principal para processar as planilhas, validar dados e gerar relatórios.
     """
 
-    def __init__(self, context: GeneralContext):
+    def __init__(self, context: controllers.GeneralContext):
         # SETUP GENERAL CONTEXT
         self.context = context
 
@@ -61,19 +34,19 @@ class ProcessorSpreadsheet:
         self.data_loader_facade = None
         self.kwargs = None
 
-        self.data_models_context: DataModelsContext | None = None
+        self.data_models_context: controllers.DataModelsContext | None = None
         self.models_to_use = []
         self.classes_to_initialize = [
-            SpDescription,
-            SpComposition,
-            SpValue,
-            SpTemporalReference,
-            SpProportionality,
-            SpScenario,
-            SpLegend,
-            SpDictionary,
+            models.SpDescription,
+            models.SpComposition,
+            models.SpValue,
+            models.SpTemporalReference,
+            models.SpProportionality,
+            models.SpScenario,
+            models.SpLegend,
+            models.SpDictionary,
         ]
-        self.report_list = ModelListReport(context=self.context)
+        self.report_list = controllers.ModelListReport(context=self.context)
 
         # Running the main processing function
         self.context.logger.info(data_validate.__text_init__)
@@ -82,44 +55,44 @@ class ProcessorSpreadsheet:
 
     def _prepare_statement(self) -> None:
         self.context.logger.info("Preparing statements and environment...")
-        for name in NamesEnum:
+        for name in config.NamesEnum:
             self.report_list.add_by_name(self.TITLES_INFO[name.value])
 
     def _read_data(self) -> None:
         self.context.logger.info("Data reading and preprocessing...")
 
         # 0 ETL: Extract, Transform, Load
-        self.data_loader_facade = DataLoaderFacade(self.input_folder)
+        self.data_loader_facade = tools.DataLoaderFacade(self.input_folder)
         self.all_load_data, errors_data_importer = self.data_loader_facade.load_all
         self.report_list.extend(
-            self.TITLES_INFO[NamesEnum.FS.value], errors=errors_data_importer
+            self.TITLES_INFO[config.NamesEnum.FS.value], errors=errors_data_importer
         )
 
         # Verify scenarios and legend existence
-        if self.all_load_data[SpScenario.CONSTANTS.SP_NAME].read_success and (
-            SpScenario.RequiredColumn.COLUMN_SYMBOL.name
-            in self.all_load_data[SpScenario.CONSTANTS.SP_NAME].df_data.columns
+        if self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].read_success and (
+            models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name
+            in self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].df_data.columns
         ):
             self.scenarios_list = (
-                self.all_load_data[SpScenario.CONSTANTS.SP_NAME]
-                .df_data[SpScenario.RequiredColumn.COLUMN_SYMBOL.name]
+                self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME]
+                .df_data[models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name]
                 .unique()
                 .tolist()
             )
         # Setup kwargs for model initialization
         self.kwargs = {
-            SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.all_load_data[
-                SpScenario.CONSTANTS.SP_NAME
+            models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.all_load_data[
+                models.SpScenario.CONSTANTS.SP_NAME
             ].exists_file,
-            SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.all_load_data[
-                SpScenario.CONSTANTS.SP_NAME
+            models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.all_load_data[
+                models.SpScenario.CONSTANTS.SP_NAME
             ].read_success,
-            SpModelABC.VAR_CONSTS.SCENARIOS_LIST: self.scenarios_list,
-            SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.all_load_data[
-                SpLegend.CONSTANTS.SP_NAME
+            models.SpModelABC.VAR_CONSTS.SCENARIOS_LIST: self.scenarios_list,
+            models.SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.all_load_data[
+                models.SpLegend.CONSTANTS.SP_NAME
             ].exists_file,
-            SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.all_load_data[
-                SpLegend.CONSTANTS.SP_NAME
+            models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.all_load_data[
+                models.SpLegend.CONSTANTS.SP_NAME
             ].read_success,
         }
 
@@ -142,12 +115,12 @@ class ProcessorSpreadsheet:
             self.models_to_use.append(model_instance)
 
             self.report_list.extend(
-                self.TITLES_INFO[NamesEnum.FS.value],
+                self.TITLES_INFO[config.NamesEnum.FS.value],
                 errors=model_instance.structural_errors,
                 warnings=model_instance.structural_warnings,
             )
             self.report_list.extend(
-                self.TITLES_INFO[NamesEnum.FC.value],
+                self.TITLES_INFO[config.NamesEnum.FC.value],
                 errors=model_instance.data_cleaning_errors,
                 warnings=model_instance.data_cleaning_warnings,
             )
@@ -164,38 +137,38 @@ class ProcessorSpreadsheet:
         self.context.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_models_context = DataModelsContext(
+        self.data_models_context = controllers.DataModelsContext(
             context=self.context, models_to_use=self.models_to_use
         )
 
         # RUN ALL VALIDATIONS PIPELINE
 
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
-        ValidatorStructureFiles(
+        validators.ValidatorStructureFiles(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
 
-        SpDescriptionValidator(
+        validators.SpDescriptionValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
-        SpCompositionTreeValidator(
+        validators.SpCompositionTreeValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
-        SpTemporalReferenceValidator(
+        validators.SpTemporalReferenceValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
-        SpValueValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
-
-        SpellCheckerValidator(
+        validators.SpValueValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
 
-        SpScenarioValidator(
+        validators.SpellCheckerValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
-        SpLegendValidator(
+
+        validators.SpScenarioValidator(
+            data_models_context=self.data_models_context, report_list=self.report_list
+        )
+        validators.SpLegendValidator(
             data_models_context=self.data_models_context, report_list=self.report_list
         )
 
@@ -229,7 +202,7 @@ class ProcessorSpreadsheet:
             self.context.logger.warning(f"Total warnings: {total_warnings}")
 
         # Generate report in HTML and PDF formats
-        ReportGeneratorFiles(context=self.context).build_report(
+        controllers.ReportGeneratorFiles(context=self.context).build_report(
             report_list=self.report_list
         )
 

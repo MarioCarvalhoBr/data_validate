@@ -1,15 +1,10 @@
 import time
 
-from data_validate.helpers.base.data_args import DataArgs
-from data_validate.middleware.bootstrap import Bootstrap
-
-from data_validate.helpers.tools.locale.language_manager import LanguageManager
-from data_validate.config.config import Config
-from data_validate.helpers.base.file_system_utils import FileSystemUtils
-from data_validate.helpers.base.logger_manager import LoggerManager
-
-from data_validate.controllers.context.general_context import GeneralContext
-from data_validate.controllers.processor import ProcessorSpreadsheet
+from data_validate.middleware import Bootstrap
+from data_validate.helpers.tools import LanguageManager
+from data_validate.config import Config
+from data_validate.helpers.base import DataArgs, FileSystemUtils, LoggerManager
+from data_validate.controllers import GeneralContext, ProcessorSpreadsheet
 
 
 def main():
@@ -60,4 +55,4 @@ if __name__ == "__main__":
     main()
 
 # Example usage:
-# python3 data_validate/main.py --l pt_BR --o data/output/temp/ --d --i data/input/data_ground_truth_01/
+# python3 data_validate/main.py --l pt_BR --o data/output/temp/ --i data/input/data_ground_truth_01/
