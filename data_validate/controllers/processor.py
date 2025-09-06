@@ -1,4 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+import time
+
 import data_validate
 import data_validate.config as config
 import data_validate.helpers.tools as tools
@@ -19,7 +21,7 @@ class ProcessorSpreadsheet:
         self.context = context
 
         # CONFIGURE VARIABLES
-        self.language_manager = self.context.locale_manager
+        self.lm = self.context.lm
         self.TITLES_INFO = self.context.config.get_verify_names()
 
         # SETUP CONFIGURE VARIABLES
@@ -51,7 +53,19 @@ class ProcessorSpreadsheet:
         # Running the main processing function
         self.context.logger.info(data_validate.__text_init__)
 
+        # Start time measurement
+        start_time = time.time()
+
+        # RUN ALL PROCESS: ETL, VALIDATIONS, REPORTS
         self.run()
+
+        # End time measurement if --no-time is not set
+        if not self.context.data_args.data_action.no_time:
+            print(
+                "Tempo total de execução: "
+                + str(round(time.time() - start_time, 1))
+                + " segundos"
+            )
 
     def _prepare_statement(self) -> None:
         self.context.logger.info("Preparing statements and environment...")

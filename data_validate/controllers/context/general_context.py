@@ -1,38 +1,55 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from logging import Logger
 from typing import Any, Dict
 
-from data_validate.helpers.base.data_args import DataArgs
-from data_validate.helpers.base.file_system_utils import FileSystemUtils
-from data_validate.config.config import Config
+from data_validate.helpers.tools import LanguageManager
+from data_validate.config import Config
+from data_validate.helpers.base import DataArgs, FileSystemUtils, LoggerManager
 
 
 class GeneralContext:
     def __init__(
         self,
-        config: Config = None,
-        fs_utils: FileSystemUtils = None,
         data_args: DataArgs = None,
-        logger: Logger = None,
         **kwargs: Dict[str, Any],
     ):
         """
-        Initialize the DataContext with a list of models to initialize.
+        Initialize the GeneralContext with a toolkit, configuration, file system utilities, and logger.
 
         Args:
-            models_to_use (List[Any]): List of models to initialize.
-            config (Config): Configuration object containing settings.
-            fs_utils (FileSystemUtils): File system utilities for file operations.
             data_args (DataArgs): Data arguments containing input and output folder paths.
+
+        Atributes:
+            lm (LanguageManager): Language manager for handling multilingual support.
+            config (Config): Configuration manager for application settings.
+            fs_utils (FileSystemUtils): File system utilities for file operations.
+            logger (Logger): Logger for logging messages and errors.
+            validations_not_run (list): List to track validations that were not executed.
         """
-        self.config = config
-        self.fs_utils = fs_utils
+        # Unpack the arguments
         self.data_args = data_args
-        self.logger = logger
-        self.locale_manager = fs_utils.locale_manager if fs_utils else None
         self.kwargs = kwargs
 
-        # ALIASES FOR EASIER ACCESS
-        self.lm = self.locale_manager  # Alias for easier access
+        # Configure the Toolkit
+        self.lm: LanguageManager = LanguageManager()
+        self.config: Config = Config()
+        self.fs_utils: FileSystemUtils = FileSystemUtils()
+        self.logger_manager = LoggerManager(
+            log_folder="data/output/logs",
+            console_logger="console_logger",
+            prefix="data_validate",
+            logger_name="data_validate_file_logger",
+        )
+        self.logger = self.logger_manager.file_logger
+
+        # Configure the file logger
+        if not self.data_args.data_action.debug:
+            self.logger.disabled = True
 
         self.validations_not_run = []
+
+    def finalize(self):
+        # Remove log file if not in debug mode
+        if not self.data_args.data_action.debug:
+            self.fs_utils.remove_file(self.logger_manager.log_file)
+        else:
+            print("\nLog file created at:", self.logger_manager.log_file)

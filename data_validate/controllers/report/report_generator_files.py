@@ -9,12 +9,12 @@ import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
 from data_validate.config.config import NamesEnum
+from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.base.metadata_info import METADATA
 from data_validate.helpers.common.formatting.number_formatting import (
     format_number_brazilian,
 )
-from data_validate.controllers.context.general_context import GeneralContext
-from data_validate.controllers.report.model_report import ModelListReport
 
 
 class ReportGeneratorFiles:
@@ -45,7 +45,7 @@ class ReportGeneratorFiles:
             context: General context containing validation configuration
         """
         self.context = context
-        self.locale = self.context.locale_manager.current_language
+        self.locale = self.context.lm.current_language
 
         # Initialize counters
         self.num_errors = 0

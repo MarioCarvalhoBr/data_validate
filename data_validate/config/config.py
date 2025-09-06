@@ -115,8 +115,8 @@ class Config:
         "dicionario": [".csv", ".xlsx"],
     }
 
-    def __init__(self, lm: LanguageManager):
-        self.lm = lm
+    def __init__(self):
+        self.lm: LanguageManager = LanguageManager()
 
     def debug_messages(self, errors, warnings):
         # self._data_models_context.config.debug_messages(errors, warnings)

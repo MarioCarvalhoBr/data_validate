@@ -2,7 +2,7 @@
 from data_validate.helpers.common.formatting.number_formatting import (
     format_number_brazilian,
 )
-from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.controllers import GeneralContext
 
 
 class ModelItemReport:

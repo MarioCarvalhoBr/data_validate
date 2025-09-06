@@ -14,11 +14,11 @@ pip install pytest pytest-cov coverage
 
 ### Comandos Make
 
-#### `make all` (padrão)
+#### `make all-cov` (padrão)
 Executa todos os testes com cobertura completa e gera relatórios.
 
 ```bash
-make all
+make all-cov
 ```
 
 #### `make test-cov`

@@ -16,6 +16,8 @@ import argparse
 import os
 from abc import ABC, abstractmethod
 
+from data_validate.helpers.tools import LanguageManager
+
 
 class DataModelABC(ABC):
     """
@@ -246,6 +248,9 @@ class DataArgs:
         Args:
             allow_abbrev (bool, optional): Allows argument abbreviations. Defaults to True.
         """
+
+        self.lm: LanguageManager = LanguageManager()
+
         self.data_file = None
         self.data_action = None
         self.data_report = None

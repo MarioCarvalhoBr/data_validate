@@ -567,7 +567,7 @@ class SpExample(SpModelABC):
 ```python
 def setup_validation_context(self) -> None:
     """Setup validation context with required dependencies."""
-    self.language_manager = self.context.locale_manager
+    self.lm = self.context.lm
     self.config = self.context.config
     self.logger = self.context.logger
     self.input_folder = self.context.data_args.data_file.input_folder

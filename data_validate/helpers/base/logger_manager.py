@@ -113,24 +113,3 @@ class LoggerManager:
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"{prefix}_{timestamp}.log"
         return os.path.join(self.log_folder, file_name)
-
-
-# Example usage
-if __name__ == "__main__":
-    logger_manager = LoggerManager(log_folder="logs/")
-
-    # Configure a logger for console output only
-    console_logger = logger_manager.configure_logger("console_logger")
-    console_logger.info("This is an info message for the console logger.")
-
-    # Configure a logger for both console and file output
-    log_file = logger_manager.generate_log_file_name(prefix="my_app")
-    file_logger = logger_manager.configure_logger("file_logger", log_file=log_file)
-    file_logger.debug("This is a debug message for the file logger.")
-    file_logger.error("This is an error message for the file logger.")
-
-    file_logger.debug("debug message")
-    file_logger.info("info message")
-    file_logger.warning("warning message")
-    file_logger.error("error message")
-    file_logger.critical("critical message")

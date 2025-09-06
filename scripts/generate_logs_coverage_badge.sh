@@ -12,7 +12,7 @@ source "$SCRIPT_DIR/constants.sh"
 rm -rf $OUTPUT_DATA/*
 
 echo "2. Gerando o relatório de cobertura..."
-make all
+make all-cov
 
 if [ $? -eq 0 ]; then
 

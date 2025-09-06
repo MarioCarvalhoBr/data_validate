@@ -311,7 +311,7 @@ O projeto utiliza pytest para testes unitários com cobertura completa.
 
 ```bash
 # Execultar tudo
-make all
+make all-cov
 
 # Executar todos os testes
 make test
@@ -365,7 +365,7 @@ ruff check . --fix
 
 | Comando | Descrição |
 |---------|-----------|
-| `make all` | Executa testes com cobertura completa |
+| `make all-cov` | Executa testes com cobertura completa |
 | `make test` | Executa todos os testes |
 | `make test-cov` | Testes com relatório de cobertura |
 | `make test-fast` | Testes rápidos (para no primeiro erro) |

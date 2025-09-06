@@ -1,6 +1,7 @@
 # Development local files
 local_data/
 data/output/logs/
+code_test.py
 
 # Logs
 *.log
