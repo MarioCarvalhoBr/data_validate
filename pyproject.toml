@@ -73,6 +73,8 @@ omit = [
     "*/env/*",
     "*/.venv/*",
     "*/.env/*",
+    "__init__.py",
+    "*/__init__.py",
     "setup.py",
     "conftest.py"
 ]
@@ -97,3 +99,15 @@ precision = 2
 [tool.coverage.html]
 directory = "dev-reports/htmlcov"
 title = "Data Validate Coverage Report"
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = "--cov=data_validate --cov-report=term-missing --cov-report=html:dev-reports/htmlcov --cov-report=xml:dev-reports/coverage.xml --cov-fail-under=4 -v --tb=short"
+testpaths = ["tests"]
+python_files = "test_*.py"
+python_classes = "Test*"
+python_functions = "test_*"
+filterwarnings = [
+    "ignore::DeprecationWarning",
+    "ignore::PendingDeprecationWarning"
+]
