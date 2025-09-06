@@ -23,10 +23,11 @@ if [ -f "$PYPROJECT_FILE" ]; then
         # Substitui o número de serial antigo pelo novo no arquivo
         # O comando sed -i altera o arquivo diretamente
         sed -i "s/serial = $current_serial/serial = $new_serial/" "$PYPROJECT_FILE"
-
+        git add .
         # Verifica se o comando sed foi executado com sucesso
         if [ $? -eq 0 ]; then
             # Imprime a mensagem de sucesso
+            git add .
             echo "Arquivo pyproject.toml foi localizado. Incrementando o serial de $current_serial pra $new_serial."
         else
             # Mensagem de erro se a substituição falhar
