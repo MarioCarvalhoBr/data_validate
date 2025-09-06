@@ -2,7 +2,7 @@ repos:
 
     - repo: local
       hooks:
-        - id: poetry install
+        - id: poetry-install
           name: poetry install
           entry: poetry install
           language: python
@@ -10,7 +10,7 @@ repos:
           pass_filenames: false
           stages: ["pre-push"]
 
-        - id: prepare pyproject.toml
+        - id: prepare-pyproject-toml
           name: prepare pyproject.toml
           entry: bash scripts/prepare_pyproject.sh
           language: system
