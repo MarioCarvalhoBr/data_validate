@@ -184,7 +184,7 @@ class ReportGeneratorFiles:
         text_html_date_display = (
             ""
             if self.context.data_args.data_action.no_time
-            else f"<strong>Data e hora do processo: <strong class='text-gray'>{METADATA.__date_now__}</strong></strong><br>"
+            else f"<strong>Data e hora do processo: <strong class='text-gray'>{self.context.config.DATE_NOW}</strong></strong><br>"
         )
         text_html_version_and_os_info = (
             ""

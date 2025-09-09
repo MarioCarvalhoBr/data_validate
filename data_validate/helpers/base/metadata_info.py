@@ -20,7 +20,6 @@ class MetadataInfo(ConstantBase):
         # Base metadata
         self.__text_dev__ = "Development"
         self.__text_prod__ = "Production/Stable"
-        self.__date_now__ = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
         # Locate the pyproject.toml file (3 levels up from this file)
         pyproject_toml_file: Path = (
@@ -93,7 +92,7 @@ class MetadataInfo(ConstantBase):
             self.__text_prod__ if self.__status_dev__ == 0 else self.__text_dev__
         )
 
-        self.__text_init__ = f"The {self.__project_name__} {self.__name__} version {self.__version__} initialized.\n"
+        self.__welcome__ = f"The {self.__project_name__} {self.__name__} version {self.__version__} initialized.\n"
 
         self._finalize_initialization()
 

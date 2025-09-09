@@ -51,7 +51,7 @@ class ProcessorSpreadsheet:
         self.report_list = controllers.ModelListReport(context=self.context)
 
         # Running the main processing function
-        self.context.logger.info(data_validate.__text_init__)
+        self.context.logger.info(data_validate.__welcome__)
 
         # Start time measurement
         start_time = time.time()

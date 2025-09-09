@@ -2,7 +2,7 @@
 import os
 from pathlib import Path
 
-from data_validate import METADATA
+from data_validate.helpers.base.metadata_info import METADATA
 
 # --- CONFIGURAÇÃO ---
 REPO_VERSION = METADATA.__version__
