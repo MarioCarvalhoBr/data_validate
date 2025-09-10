@@ -5,9 +5,7 @@ from typing import List, Tuple, Any, Set
 import pandas as pd
 
 
-def validate_numeric_value(
-    value: Any, row_index: int, column: str, filename: str
-) -> Tuple[bool, str, bool]:
+def validate_numeric_value(value: Any, row_index: int, column: str, filename: str) -> Tuple[bool, str, bool]:
     """
     Validate a single numeric value.
 
@@ -40,16 +38,11 @@ def validate_numeric_value(
         has_excessive_decimals = decimal_value.as_tuple().exponent < -2
         return True, "", has_excessive_decimals
     except (ValueError, TypeError):
-        error_msg = (
-            f"{filename}, linha {row_index + 2}: "
-            f"Erro ao processar valor decimal para a coluna '{column}'."
-        )
+        error_msg = f"{filename}, linha {row_index + 2}: " f"Erro ao processar valor decimal para a coluna '{column}'."
         return False, error_msg, False
 
 
-def process_column_validation(
-    df_values: pd.DataFrame, column: str, filename: str
-) -> Tuple[List[str], Set[int]]:
+def process_column_validation(df_values: pd.DataFrame, column: str, filename: str) -> Tuple[List[str], Set[int]]:
     """
     Process validation for a single column.
 
@@ -70,9 +63,7 @@ def process_column_validation(
 
     for index, value in df_values[column].items():
         index = int(index)  # Ensure index is an integer
-        is_valid, error_msg, has_excessive_decimals = validate_numeric_value(
-            value, index, column, filename
-        )
+        is_valid, error_msg, has_excessive_decimals = validate_numeric_value(value, index, column, filename)
 
         if not is_valid:
             invalid_values.append((index + 2, error_msg))
@@ -131,9 +122,7 @@ def generate_decimal_warning(
     )
 
 
-def validate_data_values_in_columns(
-    dataframe: pd.DataFrame, valid_columns: List[str], filename: str
-) -> Tuple[List[str], List[str]]:
+def validate_data_values_in_columns(dataframe: pd.DataFrame, valid_columns: List[str], filename: str) -> Tuple[List[str], List[str]]:
     """
     Validate data values in specified columns for numeric validity and decimal places.
 
@@ -152,17 +141,13 @@ def validate_data_values_in_columns(
     count_excessive_decimal_rows = 0
 
     for column in valid_columns:
-        column_errors, excessive_decimal_rows = process_column_validation(
-            dataframe, column, filename
-        )
+        column_errors, excessive_decimal_rows = process_column_validation(dataframe, column, filename)
         errors.extend(column_errors)
         count_excessive_decimal_rows += len(excessive_decimal_rows)
         all_excessive_decimal_rows.update(excessive_decimal_rows)
 
     # Generate warning for excessive decimal places
-    decimal_warning = generate_decimal_warning(
-        all_excessive_decimal_rows, count_excessive_decimal_rows, filename
-    )
+    decimal_warning = generate_decimal_warning(all_excessive_decimal_rows, count_excessive_decimal_rows, filename)
     if decimal_warning:
         warnings.append(decimal_warning)
 

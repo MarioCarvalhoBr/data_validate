@@ -31,9 +31,7 @@ class Bootstrap:
                     f.write(locale)
                 return
             else:
-                raise ValueError(
-                    f"Invalid locale: {locale}. Use '{LanguageEnum.DEFAULT_LANGUAGE.value}' or 'en_US'."
-                )
+                raise ValueError(f"Invalid locale: {locale}. Use '{LanguageEnum.DEFAULT_LANGUAGE.value}' or 'en_US'.")
 
         if os.path.exists(self.locale_file):
             with open(self.locale_file, "r", encoding="utf-8") as f:
@@ -42,13 +40,9 @@ class Bootstrap:
                     print(f"Locale configured: {current_locale}")
                     return
                 else:
-                    print(
-                        f"Invalid locale found: {current_locale}. Using default '{self.default_locale}'."
-                    )
+                    print(f"Invalid locale found: {current_locale}. Using default '{self.default_locale}'.")
         else:
-            print(
-                f"File 'store.locale' not found. Creating with default locale '{self.default_locale}'."
-            )
+            print(f"File 'store.locale' not found. Creating with default locale '{self.default_locale}'.")
 
         with open(self.locale_file, "w", encoding="utf-8") as f:
             f.write(self.default_locale)
@@ -65,9 +59,7 @@ class Bootstrap:
             ValueError: If the provided argument is None.
         """
         if not isinstance(args, DataArgs):
-            raise TypeError(
-                "The 'args' parameter must be an instance of the DataArgs class."
-            )
+            raise TypeError("The 'args' parameter must be an instance of the DataArgs class.")
         if args is None:
             raise ValueError("The 'args' parameter cannot be None.")
 

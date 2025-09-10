@@ -26,13 +26,9 @@ class TestCreateTreeStructure:
             }
         )
 
-    def test_create_tree_structure_basic(
-        self, sample_composition_df: pd.DataFrame
-    ) -> None:
+    def test_create_tree_structure_basic(self, sample_composition_df: pd.DataFrame) -> None:
         """Test create_tree_structure with basic parent-child relationships."""
-        tree = create_tree_structure(
-            sample_composition_df, "codigo_pai", "codigo_filho"
-        )
+        tree = create_tree_structure(sample_composition_df, "codigo_pai", "codigo_filho")
 
         expected_tree = {
             "A": ["B", "C"],
@@ -134,9 +130,7 @@ class TestValidateLevelHierarchy:
             }
         )
 
-    def test_validate_level_hierarchy_valid(
-        self, sample_composition_df: pd.DataFrame, sample_description_df: pd.DataFrame
-    ) -> None:
+    def test_validate_level_hierarchy_valid(self, sample_composition_df: pd.DataFrame, sample_description_df: pd.DataFrame) -> None:
         """Test validate_level_hierarchy with valid composition."""
         errors = validate_level_hierarchy(
             sample_composition_df,
@@ -300,11 +294,7 @@ class TestValidateLevelHierarchy:
         # Should have multiple errors
         assert len(errors) >= 2
         # Check for specific errors we know should exist
-        parent_child_errors = [
-            (error[0], error[1])
-            for error in errors
-            if error[0] is not None and error[1] is not None
-        ]
+        parent_child_errors = [(error[0], error[1]) for error in errors if error[0] is not None and error[1] is not None]
         missing_parent_errors = [error for error in errors if error[1] is None]
         missing_child_errors = [error for error in errors if error[0] is None]
 
@@ -338,9 +328,7 @@ class TestValidateMissingCodesInDescription:
             }
         )
 
-    def test_validate_missing_codes_all_present(
-        self, sample_composition_df: pd.DataFrame, complete_description_df: pd.DataFrame
-    ) -> None:
+    def test_validate_missing_codes_all_present(self, sample_composition_df: pd.DataFrame, complete_description_df: pd.DataFrame) -> None:
         """Test validate_missing_codes_in_description with all codes present."""
         errors = validate_missing_codes_in_description(
             sample_composition_df,
@@ -352,9 +340,7 @@ class TestValidateMissingCodesInDescription:
 
         assert len(errors) == 0
 
-    def test_validate_missing_codes_missing_parent(
-        self, sample_composition_df: pd.DataFrame
-    ) -> None:
+    def test_validate_missing_codes_missing_parent(self, sample_composition_df: pd.DataFrame) -> None:
         """Test validate_missing_codes_in_description with missing parent codes."""
         description_df = pd.DataFrame(
             {
@@ -375,9 +361,7 @@ class TestValidateMissingCodesInDescription:
         assert len(errors) >= 1
         assert any(error == ("parent", 1) for error in errors)
 
-    def test_validate_missing_codes_missing_child(
-        self, sample_composition_df: pd.DataFrame
-    ) -> None:
+    def test_validate_missing_codes_missing_child(self, sample_composition_df: pd.DataFrame) -> None:
         """Test validate_missing_codes_in_description with missing child codes."""
         description_df = pd.DataFrame(
             {
@@ -397,9 +381,7 @@ class TestValidateMissingCodesInDescription:
         assert len(errors) == 1
         assert ("child", 5) in errors
 
-    def test_validate_missing_codes_missing_both(
-        self, sample_composition_df: pd.DataFrame
-    ) -> None:
+    def test_validate_missing_codes_missing_both(self, sample_composition_df: pd.DataFrame) -> None:
         """Test validate_missing_codes_in_description with missing parent and child codes."""
         description_df = pd.DataFrame(
             {
@@ -437,9 +419,7 @@ class TestValidateMissingCodesInDescription:
 
         assert len(errors) == 0
 
-    def test_validate_missing_codes_empty_description(
-        self, sample_composition_df: pd.DataFrame
-    ) -> None:
+    def test_validate_missing_codes_empty_description(self, sample_composition_df: pd.DataFrame) -> None:
         """Test validate_missing_codes_in_description with empty description DataFrame."""
         description_df = pd.DataFrame({"codigo": [], "nome": []})
 
@@ -730,9 +710,7 @@ class TestIntegrationScenarios:
         assert len(level_errors) == 0
 
         # Test missing codes
-        missing_errors = validate_missing_codes_in_description(
-            composition_df, description_df, "codigo", "codigo_pai", "codigo_filho"
-        )
+        missing_errors = validate_missing_codes_in_description(composition_df, description_df, "codigo", "codigo_pai", "codigo_filho")
         assert len(missing_errors) == 0
 
         # Test cycles
@@ -773,9 +751,7 @@ class TestIntegrationScenarios:
         assert len(level_errors) > 0
 
         # Test missing codes
-        missing_errors = validate_missing_codes_in_description(
-            composition_df, description_df, "codigo", "codigo_pai", "codigo_filho"
-        )
+        missing_errors = validate_missing_codes_in_description(composition_df, description_df, "codigo", "codigo_pai", "codigo_filho")
         assert len(missing_errors) > 0
 
         # Test cycles
@@ -833,9 +809,7 @@ class TestEdgeCasesAndBoundaryConditions:
         assert "A" in tree
 
         # Should validate composition correctly with proper level progression
-        errors = validate_level_hierarchy(
-            composition_df, description_df, "codigo", "nivel", "parent", "child"
-        )
+        errors = validate_level_hierarchy(composition_df, description_df, "codigo", "nivel", "parent", "child")
         assert len(errors) == 0
 
     def test_duplicate_codes_in_description(self) -> None:
@@ -854,8 +828,6 @@ class TestEdgeCasesAndBoundaryConditions:
         )
 
         # Should still work (uses first occurrence)
-        errors = validate_level_hierarchy(
-            composition_df, description_df, "codigo", "nivel", "parent", "child"
-        )
+        errors = validate_level_hierarchy(composition_df, description_df, "codigo", "nivel", "parent", "child")
         # Should be valid since first occurrence is used
         assert len(errors) == 0

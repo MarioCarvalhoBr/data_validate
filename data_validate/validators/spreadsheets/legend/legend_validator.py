@@ -58,9 +58,7 @@ class SpLegendValidator(ValidatorModelABC):
 
         # Configure
         self.model_sp_legend = self._data_model
-        self.model_sp_description = self._data_models_context.get_instance_of(
-            SpDescription
-        )
+        self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
         self.model_sp_value = self._data_models_context.get_instance_of(SpValue)
 
         # Get model properties once
@@ -131,40 +129,25 @@ class SpLegendValidator(ValidatorModelABC):
             min_value=1,
         )
 
-        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = (
-            pd.to_numeric(
-                df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name],
-                errors="coerce",
-            )
+        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = pd.to_numeric(
+            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name],
+            errors="coerce",
         )
-        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = (
-            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].astype(
-                "Int64"
-            )
-        )
+        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = df_description_clean[
+            SpDescription.DynamicColumn.COLUMN_LEGEND.name
+        ].astype("Int64")
 
         # Remove all NaN values in column COLUMN_LEGEND
-        df_description_clean = df_description_clean.dropna(
-            subset=[SpDescription.RequiredColumn.COLUMN_CODE.name]
-        )
+        df_description_clean = df_description_clean.dropna(subset=[SpDescription.RequiredColumn.COLUMN_CODE.name])
         df_legend = df_legend.dropna(subset=[SpLegend.RequiredColumn.COLUMN_CODE.name])
 
         legends_id_in_description = (
             df_description_clean[
-                (
-                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                    != "1"
-                )
-                & (
-                    df_description_clean[
-                        SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                    ].notna()
-                )
+                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "1")
+                & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
                 & (
                     pd.to_numeric(
-                        df_description_clean[
-                            SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                        ],
+                        df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name],
                         errors="coerce",
                     ).notna()
                 )
@@ -173,12 +156,7 @@ class SpLegendValidator(ValidatorModelABC):
             .tolist()
         )  # DROP NA VALUES
 
-        legends_id_in_legend = (
-            df_legend[SpLegend.RequiredColumn.COLUMN_CODE.name]
-            .astype(str)
-            .unique()
-            .tolist()
-        )
+        legends_id_in_legend = df_legend[SpLegend.RequiredColumn.COLUMN_CODE.name].astype(str).unique().tolist()
 
         set_one = set(legends_id_in_description)
         set_two = set(legends_id_in_legend)
@@ -192,9 +170,7 @@ class SpLegendValidator(ValidatorModelABC):
         missing_in_a = {int(x) for x in missing_in_a if str(x).isdigit()}
 
         if missing_in_b:
-            errors.append(
-                f"{self.sp_name_description}: Códigos de legenda ausentes em {self.sp_name_legend}: {sorted(list(missing_in_b))}."
-            )
+            errors.append(f"{self.sp_name_description}: Códigos de legenda ausentes em {self.sp_name_legend}: {sorted(list(missing_in_b))}.")
 
         if missing_in_a:
             warnings.append(
@@ -204,25 +180,17 @@ class SpLegendValidator(ValidatorModelABC):
         # 1. All codes that are level 1 - Cannot have legends: if they do, error
 
         codes_indicators_level_one = (
-            df_description_clean[
-                df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                == "1"
-            ][SpDescription.RequiredColumn.COLUMN_CODE.name]
+            df_description_clean[df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == "1"][
+                SpDescription.RequiredColumn.COLUMN_CODE.name
+            ]
             .astype(str)
             .tolist()
         )
 
         legends_id_in_description_level_one = (
             df_description_clean[
-                (
-                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                    == "1"
-                )
-                & (
-                    df_description_clean[
-                        SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                    ].notna()
-                )
+                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == "1")
+                & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
             ][SpDescription.DynamicColumn.COLUMN_LEGEND.name]
             .unique()
             .astype(str)
@@ -237,14 +205,8 @@ class SpLegendValidator(ValidatorModelABC):
         # 3. All codes that are not level 1 and not level 2 - Must have a legend reference: if not, error
         codes_indicators_other_levels = (
             df_description_clean[
-                (
-                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                    != "1"
-                )
-                & (
-                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                    != "2"
-                )
+                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "1")
+                & (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "2")
             ][SpDescription.RequiredColumn.COLUMN_CODE.name]
             .astype(str)
             .tolist()
@@ -252,19 +214,9 @@ class SpLegendValidator(ValidatorModelABC):
 
         codes_with_legend_other_levels = (
             df_description_clean[
-                (
-                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                    != "1"
-                )
-                & (
-                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                    != "2"
-                )
-                & (
-                    df_description_clean[
-                        SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                    ].notna()
-                )
+                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "1")
+                & (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "2")
+                & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
             ][SpDescription.RequiredColumn.COLUMN_CODE.name]
             .astype(str)
             .tolist()
@@ -287,12 +239,8 @@ class SpLegendValidator(ValidatorModelABC):
         if self.model_sp_value.data_loader_model.df_data.empty:
             return errors, warnings
 
-        min_lower_legend_default = (
-            self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
-        )
-        max_upper_legend_default = (
-            self.model_sp_legend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT
-        )
+        min_lower_legend_default = self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
+        max_upper_legend_default = self.model_sp_legend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT
         required_columns = {
             self.sp_name_description: [
                 SpDescription.RequiredColumn.COLUMN_CODE.name,
@@ -301,9 +249,7 @@ class SpLegendValidator(ValidatorModelABC):
         }
 
         if self.model_sp_legend.legend_read_success:
-            required_columns[self.sp_name_description].append(
-                SpDescription.DynamicColumn.COLUMN_LEGEND.name
-            )
+            required_columns[self.sp_name_description].append(SpDescription.DynamicColumn.COLUMN_LEGEND.name)
 
         for column in required_columns[self.sp_name_description]:
             exists_column, msg_error = self.column_exists(
@@ -323,9 +269,7 @@ class SpLegendValidator(ValidatorModelABC):
         df_description = self.model_dataframes[self.sp_name_description].copy()
 
         if SpValue.RequiredColumn.COLUMN_ID.name in df_values.columns:
-            df_values.drop(
-                columns=[SpValue.RequiredColumn.COLUMN_ID.name], inplace=True
-            )
+            df_values.drop(columns=[SpValue.RequiredColumn.COLUMN_ID.name], inplace=True)
 
         df_description_clean, __ = clean_dataframe_integers(
             df_description,
@@ -334,33 +278,21 @@ class SpLegendValidator(ValidatorModelABC):
             min_value=1,
         )
 
-        if (
-            SpDescription.DynamicColumn.COLUMN_LEGEND.name
-            not in df_description_clean.columns
-        ):
-            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = (
-                pd.Series(dtype="Int64")
-            )
+        if SpDescription.DynamicColumn.COLUMN_LEGEND.name not in df_description_clean.columns:
+            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = pd.Series(dtype="Int64")
         else:
-            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = (
-                pd.to_numeric(
-                    df_description_clean[
-                        SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                    ],
-                    errors="coerce",
-                )
+            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = pd.to_numeric(
+                df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name],
+                errors="coerce",
             )
-            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = (
-                df_description_clean[
-                    SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                ].astype("Int64")
-            )
+            df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name] = df_description_clean[
+                SpDescription.DynamicColumn.COLUMN_LEGEND.name
+            ].astype("Int64")
 
         codes_indicators_level_one = (
-            df_description_clean[
-                df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
-                == "1"
-            ][SpDescription.RequiredColumn.COLUMN_CODE.name]
+            df_description_clean[df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == "1"][
+                SpDescription.RequiredColumn.COLUMN_CODE.name
+            ]
             .astype(str)
             .tolist()
         )
@@ -369,13 +301,9 @@ class SpLegendValidator(ValidatorModelABC):
             allowed_scenario_suffixes=self.scenarios_list,
         )
 
-        groups_legends = pd.DataFrame(
-            {str(SpLegend.RequiredColumn.COLUMN_CODE.name): []}
-        ).groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
+        groups_legends = pd.DataFrame({str(SpLegend.RequiredColumn.COLUMN_CODE.name): []}).groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
         if self.model_sp_legend.is_sanity_check_passed:
-            groups_legends = df_legend.groupby(
-                str(SpLegend.RequiredColumn.COLUMN_CODE.name)
-            )
+            groups_legends = df_legend.groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
 
         mapping_legends = {}
         for data_column_sp_value in valid_columns_from_values:
@@ -390,54 +318,32 @@ class SpLegendValidator(ValidatorModelABC):
                 continue
 
             row_description = df_description_clean[
-                df_description_clean[
-                    SpDescription.RequiredColumn.COLUMN_CODE.name
-                ].astype(str)
-                == aux_indicator_id
+                df_description_clean[SpDescription.RequiredColumn.COLUMN_CODE.name].astype(str) == aux_indicator_id
             ]
             if not row_description.empty:
                 aux_data_mapping_legend.indicator_id = aux_indicator_id
 
-                key_legend = row_description.iloc[0][
-                    SpDescription.DynamicColumn.COLUMN_LEGEND.name
-                ]
-                group_legend = (
-                    groups_legends.get_group(str(key_legend))
-                    if str(key_legend) in groups_legends.groups
-                    else None
-                )
+                key_legend = row_description.iloc[0][SpDescription.DynamicColumn.COLUMN_LEGEND.name]
+                group_legend = groups_legends.get_group(str(key_legend)) if str(key_legend) in groups_legends.groups else None
 
                 if group_legend is not None:
                     aux_data_mapping_legend.legend_id = key_legend
 
                     group_legend = group_legend[
-                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name]
-                        != self._data_models_context.config.VALUE_DATA_UNAVAILABLE
+                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name] != self._data_models_context.config.VALUE_DATA_UNAVAILABLE
                     ]
                     if not group_legend.empty:
-                        group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name] = (
-                            pd.to_numeric(
-                                group_legend[
-                                    SpLegend.RequiredColumn.COLUMN_MINIMUM.name
-                                ],
-                                errors="coerce",
-                            )
+                        group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name] = pd.to_numeric(
+                            group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name],
+                            errors="coerce",
                         )
-                        group_legend[SpLegend.RequiredColumn.COLUMN_MAXIMUM.name] = (
-                            pd.to_numeric(
-                                group_legend[
-                                    SpLegend.RequiredColumn.COLUMN_MAXIMUM.name
-                                ],
-                                errors="coerce",
-                            )
+                        group_legend[SpLegend.RequiredColumn.COLUMN_MAXIMUM.name] = pd.to_numeric(
+                            group_legend[SpLegend.RequiredColumn.COLUMN_MAXIMUM.name],
+                            errors="coerce",
                         )
 
-                        aux_min_value = group_legend[
-                            SpLegend.RequiredColumn.COLUMN_MINIMUM.name
-                        ].min()
-                        aux_max_value = group_legend[
-                            SpLegend.RequiredColumn.COLUMN_MAXIMUM.name
-                        ].max()
+                        aux_min_value = group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name].min()
+                        aux_max_value = group_legend[SpLegend.RequiredColumn.COLUMN_MAXIMUM.name].max()
 
                         if not pd.isna(aux_min_value) and not pd.isna(aux_max_value):
                             aux_data_mapping_legend.min_value = aux_min_value
@@ -447,9 +353,7 @@ class SpLegendValidator(ValidatorModelABC):
 
         df_values_numeric = df_values.copy()
         for col in valid_columns_from_values:
-            df_values_numeric[col] = pd.to_numeric(
-                df_values[col].astype(str).str.replace(",", "."), errors="coerce"
-            )
+            df_values_numeric[col] = pd.to_numeric(df_values[col].astype(str).str.replace(",", "."), errors="coerce")
 
         for data_column_sp_value in valid_columns_from_values:
             code_column = data_column_sp_value.split("-")[0]
@@ -462,10 +366,7 @@ class SpLegendValidator(ValidatorModelABC):
 
             for index, value_numeric in df_values_numeric[data_column_sp_value].items():
                 value_original = df_values[data_column_sp_value][index]
-                if (
-                    value_original == self._data_models_context.config.VALUE_DI
-                    or pd.isna(value_numeric)
-                ):
+                if value_original == self._data_models_context.config.VALUE_DI or pd.isna(value_numeric):
                     continue
 
                 if value_numeric < min_value or value_numeric > max_value:
@@ -480,12 +381,8 @@ class SpLegendValidator(ValidatorModelABC):
         validations = []
 
         if self.model_sp_legend.is_sanity_check_passed:
-            validations.append(
-                (self.validate_relation_indicators_in_legend, NamesEnum.LEG_REL.value)
-            )
-        validations.append(
-            (self.validate_range_multiple_legend, NamesEnum.LEG_RANGE.value)
-        )
+            validations.append((self.validate_relation_indicators_in_legend, NamesEnum.LEG_REL.value))
+        validations.append((self.validate_range_multiple_legend, NamesEnum.LEG_RANGE.value))
 
         if self.model_sp_description.data_loader_model.df_data.empty:
             self.set_not_executed(validations)

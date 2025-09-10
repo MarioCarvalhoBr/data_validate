@@ -12,9 +12,7 @@ class TestErrorFormatting:
         missing_columns = ["col1", "col2"]
         extra_columns = ["extra1", "extra2"]
 
-        errors, warnings = format_errors_and_warnings(
-            file_name, missing_columns, extra_columns
-        )
+        errors, warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
         expected_errors = [
             "test_file.csv: Coluna 'col1' esperada mas não foi encontrada.",
@@ -34,9 +32,7 @@ class TestErrorFormatting:
         missing_columns = []
         extra_columns = []
 
-        errors, warnings = format_errors_and_warnings(
-            file_name, missing_columns, extra_columns
-        )
+        errors, warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
         assert errors == []
         assert warnings == []
@@ -47,13 +43,9 @@ class TestErrorFormatting:
         missing_columns = ["required_col"]
         extra_columns = []
 
-        errors, warnings = format_errors_and_warnings(
-            file_name, missing_columns, extra_columns
-        )
+        errors, warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
-        expected_errors = [
-            "data.xlsx: Coluna 'required_col' esperada mas não foi encontrada."
-        ]
+        expected_errors = ["data.xlsx: Coluna 'required_col' esperada mas não foi encontrada."]
         expected_warnings = []
 
         assert errors == expected_errors
@@ -65,16 +57,10 @@ class TestErrorFormatting:
         missing_columns = ["coluna_com_ção"]
         extra_columns = ["coluna_extra_é"]
 
-        errors, warnings = format_errors_and_warnings(
-            file_name, missing_columns, extra_columns
-        )
+        errors, warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
-        expected_errors = [
-            "arquivo_com_acentos_é_ção.csv: Coluna 'coluna_com_ção' esperada mas não foi encontrada."
-        ]
-        expected_warnings = [
-            "arquivo_com_acentos_é_ção.csv: Coluna 'coluna_extra_é' será ignorada pois não está na especificação."
-        ]
+        expected_errors = ["arquivo_com_acentos_é_ção.csv: Coluna 'coluna_com_ção' esperada mas não foi encontrada."]
+        expected_warnings = ["arquivo_com_acentos_é_ção.csv: Coluna 'coluna_extra_é' será ignorada pois não está na especificação."]
 
         assert errors == expected_errors
         assert warnings == expected_warnings
@@ -95,9 +81,7 @@ class TestErrorFormatting:
         missing_columns = ExceptionList(["col1"])
         extra_columns = ["extra1"]
 
-        errors, warnings = format_errors_and_warnings(
-            file_name, missing_columns, extra_columns
-        )
+        errors, warnings = format_errors_and_warnings(file_name, missing_columns, extra_columns)
 
         # When an exception occurs, only the exception error is added
         # The normal processing of missing/extra columns is skipped

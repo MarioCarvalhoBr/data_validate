@@ -39,9 +39,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
         warnings = []
 
         columns_dont_punctuation = []
-        columns_must_end_with_dot = [
-            SpTemporalReference.RequiredColumn.COLUMN_DESCRIPTION.name
-        ]
+        columns_must_end_with_dot = [SpTemporalReference.RequiredColumn.COLUMN_DESCRIPTION.name]
 
         list_columns = list(columns_dont_punctuation + columns_must_end_with_dot)
         for column in list_columns:
@@ -77,9 +75,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
         # Check if all years are greater than the current year
         for year in years:
             if year <= self._data_models_context.config.CURRENT_YEAR:
-                errors.append(
-                    f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro."
-                )
+                errors.append(f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.")
 
         return errors, []
 

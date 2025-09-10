@@ -29,11 +29,7 @@ class ValidatorModelABC(ABC):
         # UNPACK DATA
         self._data_model = self._data_models_context.get_instance_of(self._type_class)
         self._filename = self._data_model.filename if self._data_model else "Unknown"
-        self._dataframe = (
-            self._data_model.data_loader_model.df_data.copy()
-            if self._data_model
-            else pd.DataFrame({})
-        )
+        self._dataframe = self._data_model.data_loader_model.df_data.copy() if self._data_model else pd.DataFrame({})
         self.TITLES_INFO = self._data_models_context.config.get_verify_names()
 
         # LIST OF ERRORS AND WARNINGS
@@ -63,9 +59,7 @@ class ValidatorModelABC(ABC):
             dataframe = model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
-                    exists_column, error_msg = self.column_exists(
-                        dataframe, model_name, column
-                    )
+                    exists_column, error_msg = self.column_exists(dataframe, model_name, column)
                     if not exists_column:
                         errors.append(error_msg)
 
@@ -81,18 +75,14 @@ class ValidatorModelABC(ABC):
         return exists, msg_error_column
 
     def _column_exists(self, column: str) -> Tuple[bool, str]:
-        exists, msg_error_column = column_exists(
-            self._dataframe, self._filename, column
-        )
+        exists, msg_error_column = column_exists(self._dataframe, self._filename, column)
         return exists, msg_error_column
 
     def _column_exists_dataframe(self, dataframe, column: str) -> Tuple[bool, str]:
         exists, msg_error_column = column_exists(dataframe, self._filename, column)
         return exists, msg_error_column
 
-    def _check_text_length(
-        self, column: str, max_len: int
-    ) -> Tuple[List[str], List[str]]:
+    def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:
         """Helper function to validate text length in a column."""
         warnings = []
         __, warnings_text_length = check_text_length(
@@ -117,17 +107,13 @@ class ValidatorModelABC(ABC):
             try:
                 errors, warnings = func()
                 if errors or warnings:
-                    self._report_list.extend(
-                        self.TITLES_INFO[report_key], errors=errors, warnings=warnings
-                    )
+                    self._report_list.extend(self.TITLES_INFO[report_key], errors=errors, warnings=warnings)
                 self._errors.extend(errors)
                 self._warnings.extend(warnings)
             except Exception as e:
                 self._report_list.extend(
                     self.TITLES_INFO[report_key],
-                    errors=[
-                        f"Exception validation in file during {func.__name__}: {str(e)}"
-                    ],
+                    errors=[f"Exception validation in file during {func.__name__}: {str(e)}"],
                     warnings=[],
                 )
 

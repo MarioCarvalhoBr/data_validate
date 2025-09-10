@@ -13,11 +13,14 @@ Você pode até usar formatação Markdown básica aqui,
 embora o suporte possa variar dependendo da versão do pdoc.
 """
 
+
 # Lazy loading - só importa quando necessário
 def get_metadata():
     """Get package metadata lazily."""
     from data_validate.helpers.base.metadata_info import METADATA
+
     return METADATA
+
 
 # Package metadata - usando lazy loading
 def __getattr__(name: str):
@@ -26,18 +29,18 @@ def __getattr__(name: str):
     metadata = get_metadata()
 
     attr_map = {
-        '__name__': '__name__',
-        '__project_name__': '__project_name__',
-        '__version__': '__version__',
-        '__url__': '__url__',
-        '__description__': '__description__',
-        '__author__': '__author__',
-        '__author_email__': '__author_email__',
-        '__maintainer_email__': '__maintainer_email__',
-        '__license__': '__license__',
-        '__python_version__': '__python_version__',
-        '__status__': '__status__',
-        '__welcome__': '__welcome__',
+        "__name__": "__name__",
+        "__project_name__": "__project_name__",
+        "__version__": "__version__",
+        "__url__": "__url__",
+        "__description__": "__description__",
+        "__author__": "__author__",
+        "__author_email__": "__author_email__",
+        "__maintainer_email__": "__maintainer_email__",
+        "__license__": "__license__",
+        "__python_version__": "__python_version__",
+        "__status__": "__status__",
+        "__welcome__": "__welcome__",
     }
 
     if name in attr_map:

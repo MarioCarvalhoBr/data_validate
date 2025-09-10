@@ -3,7 +3,7 @@ name = "data_validate"
 project_name = "Canoa"
 version = "0.7.8"
 release_level = "beta"
-serial = 1012
+serial = 1013
 status_dev = 10
 
 description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados da plataforma AdaptaBrasil. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
@@ -111,3 +111,25 @@ filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning"
 ]
+
+[tool.black]
+# Define o comprimento máximo da linha. O padrão é 88.
+# Um valor comum e mais permissivo é 99 ou 119.
+# Vamos usar 99 como um bom ponto de partida.
+line-length = 150
+
+# Opcional, mas recomendado: exclui diretórios que não devem ser formatados.
+# Usa o mesmo formato do .gitignore.
+exclude = '''
+/(
+    \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''

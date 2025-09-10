@@ -66,9 +66,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         )
 
         self.model_sp_composition = self._data_model
-        self.model_sp_description = self._data_models_context.get_instance_of(
-            SpDescription
-        )
+        self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
 
         # Initialize attributes
         self.sp_name_description: str = ""
@@ -125,9 +123,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         warnings: List[str] = []
 
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(
-            self.global_required_columns, self.model_dataframes
-        )
+        column_errors = self.check_columns_in_models_dataframes(self.global_required_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
 
@@ -166,15 +162,11 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             df_description = pd.concat([df_description, root_row], ignore_index=True)
 
         # Build tree and check for cycles
-        tree = create_tree_structure(
-            df_composition, self.column_name_parent, self.column_name_child
-        )
+        tree = create_tree_structure(df_composition, self.column_name_parent, self.column_name_child)
 
         cycle_found, cycle = detect_tree_cycles(tree)
         if cycle_found:
-            errors.append(
-                f"{self.sp_name_composition}: Ciclo encontrado: [{' -> '.join(cycle)}]."
-            )
+            errors.append(f"{self.sp_name_composition}: Ciclo encontrado: [{' -> '.join(cycle)}].")
 
         # Validate level composition
         level_errors = validate_level_hierarchy(
@@ -186,9 +178,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             self.column_name_child,
         )
 
-        errors.extend(
-            self._format_level_errors(level_errors, df_composition, df_description)
-        )
+        errors.extend(self._format_level_errors(level_errors, df_composition, df_description))
 
         return errors, warnings
 
@@ -203,9 +193,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         warnings: List[str] = []
 
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(
-            self.global_required_columns, self.model_dataframes
-        )
+        column_errors = self.check_columns_in_models_dataframes(self.global_required_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
 
@@ -213,18 +201,13 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         df_description = self.model_dataframes[self.sp_name_description].copy()
 
         # Create level mapping
-        levels = {
-            row[self.column_name_code]: row[self.column_name_level]
-            for _, row in df_description.iterrows()
-        }
+        levels = {row[self.column_name_code]: row[self.column_name_level] for _, row in df_description.iterrows()}
 
         # Group by parent and validate children levels
         parent_groups = df_composition.groupby(self.column_name_parent)
         for parent, group in parent_groups:
             if parent not in levels:
-                errors.append(
-                    f"{self.sp_name_composition}: Código pai {parent} não encontrado na descrição."
-                )
+                errors.append(f"{self.sp_name_composition}: Código pai {parent} não encontrado na descrição.")
                 continue
 
             children_info: List[Tuple[Any, Any]] = []
@@ -232,24 +215,14 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             for _, row in group.iterrows():
                 child = row[self.column_name_child]
                 if child not in levels:
-                    errors.append(
-                        f"{self.sp_name_composition}: Código filho {child} não encontrado na descrição."
-                    )
+                    errors.append(f"{self.sp_name_composition}: Código filho {child} não encontrado na descrição.")
                     continue
                 child_level = levels[child]
                 children_info.append((child, child_level))
 
             if children_info and len({level for _, level in children_info}) > 1:
-                error_children = ", ".join(
-                    [
-                        f"indicador {child} possui nível '{level}'"
-                        for child, level in children_info
-                    ]
-                )
-                errors.append(
-                    f"{self.sp_name_description}: Indicadores filhos do pai {parent} "
-                    f"não estão no mesmo nível: [{error_children}]."
-                )
+                error_children = ", ".join([f"indicador {child} possui nível '{level}'" for child, level in children_info])
+                errors.append(f"{self.sp_name_description}: Indicadores filhos do pai {parent} " f"não estão no mesmo nível: [{error_children}].")
 
         return errors, warnings
 
@@ -276,21 +249,16 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             if parent is not None and child is not None:
                 # Find the row with this relationship
                 matching_rows = df_composition[
-                    (df_composition[self.column_name_parent] == int(parent))
-                    & (df_composition[self.column_name_child] == int(child))
+                    (df_composition[self.column_name_parent] == int(parent)) & (df_composition[self.column_name_child] == int(child))
                 ]
 
                 if not matching_rows.empty:
                     row_index = matching_rows.index[0]
                     line_number = row_index + 2
 
-                    parent_level = df_description[
-                        df_description[self.column_name_code] == int(parent)
-                    ][self.column_name_level].values[0]
+                    parent_level = df_description[df_description[self.column_name_code] == int(parent)][self.column_name_level].values[0]
 
-                    child_level = df_description[
-                        df_description[self.column_name_code] == int(child)
-                    ][self.column_name_level].values[0]
+                    child_level = df_description[df_description[self.column_name_code] == int(child)][self.column_name_level].values[0]
 
                     formatted_errors.append(
                         f"{self.sp_name_composition}, linha {line_number}: "
@@ -313,10 +281,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             (self.validate_tree_levels_children, NamesEnum.CHILD_LVL.value),
         ]
 
-        if (
-            self.model_sp_composition.data_loader_model.df_data.empty
-            or self.model_sp_description.data_loader_model.df_data.empty
-        ):
+        if self.model_sp_composition.data_loader_model.df_data.empty or self.model_sp_description.data_loader_model.df_data.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 

@@ -58,9 +58,7 @@ class TestDataCleaning:
 
     def test_clean_column_integer_allow_empty_true(self):
         """Test integer column cleaning allowing empty values."""
-        df, errors = clean_column_integer(
-            self.df, "value", "test.csv", allow_empty=True
-        )
+        df, errors = clean_column_integer(self.df, "value", "test.csv", allow_empty=True)
 
         assert len(errors) == 1  # Only 'invalid' is invalid
         assert len(df) == 4  # One row removed
@@ -68,9 +66,7 @@ class TestDataCleaning:
 
     def test_clean_column_integer_allow_empty_false(self):
         """Test integer column cleaning not allowing empty values."""
-        df, errors = clean_column_integer(
-            self.df, "value", "test.csv", allow_empty=False
-        )
+        df, errors = clean_column_integer(self.df, "value", "test.csv", allow_empty=False)
 
         assert len(errors) == 2  # 'invalid' and empty string are invalid
         assert len(df) == 3  # Two rows removed
@@ -132,9 +128,7 @@ class TestDataCleaning:
             }
         )
 
-        df, errors = clean_dataframe_floats(
-            df_clean, "test.csv", ["float_val", "mixed"]
-        )
+        df, errors = clean_dataframe_floats(df_clean, "test.csv", ["float_val", "mixed"])
 
         assert len(errors) == 0  # No errors with clean data
         assert len(df) == 5  # All rows kept
@@ -142,13 +136,9 @@ class TestDataCleaning:
     def test_clean_dataframe_floats_column_not_found(self):
         """Test cleaning float columns when some don't exist."""
         # Create a DataFrame without invalid values to avoid conversion errors
-        df_clean = pd.DataFrame(
-            {"id": [1, 2, 3, 4, 5], "float_val": ["1.5", "2.5", "3.5", "4.5", "5.5"]}
-        )
+        df_clean = pd.DataFrame({"id": [1, 2, 3, 4, 5], "float_val": ["1.5", "2.5", "3.5", "4.5", "5.5"]})
 
-        df, errors = clean_dataframe_floats(
-            df_clean, "test.csv", ["float_val", "nonexistent"]
-        )
+        df, errors = clean_dataframe_floats(df_clean, "test.csv", ["float_val", "nonexistent"])
 
         assert len(errors) >= 1  # At least one error for missing column
         assert "não foi encontrada" in errors[0]
@@ -167,9 +157,7 @@ class TestDataCleaning:
         """Test integer column cleaning with NaN values not allowed."""
         df_nan = pd.DataFrame({"value": [1, 2, np.nan, 4, 5]})
 
-        df, errors = clean_column_integer(
-            df_nan, "value", "test.csv", allow_empty=False
-        )
+        df, errors = clean_column_integer(df_nan, "value", "test.csv", allow_empty=False)
 
         assert len(errors) == 1  # NaN is invalid
         assert len(df) == 4  # One row removed
@@ -191,9 +179,7 @@ class TestDataCleaning:
 
         # Test with a list that has missing column first, then valid column
         # This should trigger the continue statement and mask_valid initialization
-        df, errors = clean_dataframe_floats(
-            df_test, "test.csv", ["nonexistent", "value"]
-        )
+        df, errors = clean_dataframe_floats(df_test, "test.csv", ["nonexistent", "value"])
 
         assert len(errors) == 1  # One error for missing column
         assert "não foi encontrada" in errors[0]
@@ -205,9 +191,7 @@ class TestDataCleaning:
         df_test = pd.DataFrame({"id": [1, 2, 3], "value": ["1.5", "2.5", "3.5"]})
 
         # Test with multiple missing columns to ensure continue statements work
-        df, errors = clean_dataframe_floats(
-            df_test, "test.csv", ["nonexistent1", "nonexistent2", "value"]
-        )
+        df, errors = clean_dataframe_floats(df_test, "test.csv", ["nonexistent1", "nonexistent2", "value"])
 
         assert len(errors) == 2  # Two errors for missing columns
         assert all("não foi encontrada" in error for error in errors[:2])
@@ -219,9 +203,7 @@ class TestDataCleaning:
         df_test = pd.DataFrame({"id": [1, 2, 3], "value": ["1.5", "2.5", "3.5"]})
 
         # Test with missing column at the end to ensure continue works correctly
-        df, errors = clean_dataframe_floats(
-            df_test, "test.csv", ["value", "nonexistent"]
-        )
+        df, errors = clean_dataframe_floats(df_test, "test.csv", ["value", "nonexistent"])
 
         assert len(errors) == 1  # One error for missing column
         assert "não foi encontrada" in errors[0]
@@ -234,15 +216,11 @@ class TestDataCleaning:
 
         # Test with only missing columns to ensure the continue statements are executed
         # This should trigger lines 120-123 for each missing column
-        df, errors = clean_dataframe_floats(
-            df_test, "test.csv", ["nonexistent1", "nonexistent2"]
-        )
+        df, errors = clean_dataframe_floats(df_test, "test.csv", ["nonexistent1", "nonexistent2"])
 
         assert len(errors) == 2  # Two errors for missing columns
         assert all("não foi encontrada" in error for error in errors)
-        assert df.equals(
-            df_test
-        )  # DataFrame unchanged since no valid columns to process
+        assert df.equals(df_test)  # DataFrame unchanged since no valid columns to process
 
     def test_clean_dataframe_floats_with_missing_and_valid_columns_mixed(self):
         """Test clean_dataframe_floats with mixed missing and valid columns to force line coverage."""
@@ -260,9 +238,7 @@ class TestDataCleaning:
         # Test with missing column first, then valid column
         # This should execute lines 112-115 for the missing column
         # and then continue processing the valid column
-        df, errors = clean_dataframe_floats(
-            df_test, "test.csv", ["nonexistent", "value"]
-        )
+        df, errors = clean_dataframe_floats(df_test, "test.csv", ["nonexistent", "value"])
 
         assert len(errors) == 1  # One error for missing column
         assert "não foi encontrada" in errors[0]  # Error for missing column
@@ -331,9 +307,7 @@ class TestDataCleaning:
         )
 
         # Set min_value to 1.0 to trigger errors for values below this threshold
-        df, errors = clean_dataframe_floats(
-            df_test, "scores.csv", ["score"], min_value=1
-        )
+        df, errors = clean_dataframe_floats(df_test, "scores.csv", ["score"], min_value=1)
 
         # Should have errors for values below min_value (0.5, -2.5, 0.1)
         assert len(errors) >= 3

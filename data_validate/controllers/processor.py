@@ -61,11 +61,7 @@ class ProcessorSpreadsheet:
 
         # End time measurement if --no-time is not set
         if not self.context.data_args.data_action.no_time:
-            print(
-                "Tempo total de execução: "
-                + str(round(time.time() - start_time, 1))
-                + " segundos"
-            )
+            print("Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos")
 
     def _prepare_statement(self) -> None:
         self.context.logger.info("Preparing statements and environment...")
@@ -78,36 +74,22 @@ class ProcessorSpreadsheet:
         # 0 ETL: Extract, Transform, Load
         self.data_loader_facade = tools.DataLoaderFacade(self.input_folder)
         self.all_load_data, errors_data_importer = self.data_loader_facade.load_all
-        self.report_list.extend(
-            self.TITLES_INFO[config.NamesEnum.FS.value], errors=errors_data_importer
-        )
+        self.report_list.extend(self.TITLES_INFO[config.NamesEnum.FS.value], errors=errors_data_importer)
 
         # Verify scenarios and legend existence
         if self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].read_success and (
-            models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name
-            in self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].df_data.columns
+            models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name in self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].df_data.columns
         ):
             self.scenarios_list = (
-                self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME]
-                .df_data[models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name]
-                .unique()
-                .tolist()
+                self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].df_data[models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name].unique().tolist()
             )
         # Setup kwargs for model initialization
         self.kwargs = {
-            models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.all_load_data[
-                models.SpScenario.CONSTANTS.SP_NAME
-            ].exists_file,
-            models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.all_load_data[
-                models.SpScenario.CONSTANTS.SP_NAME
-            ].read_success,
+            models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].exists_file,
+            models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.all_load_data[models.SpScenario.CONSTANTS.SP_NAME].read_success,
             models.SpModelABC.VAR_CONSTS.SCENARIOS_LIST: self.scenarios_list,
-            models.SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.all_load_data[
-                models.SpLegend.CONSTANTS.SP_NAME
-            ].exists_file,
-            models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.all_load_data[
-                models.SpLegend.CONSTANTS.SP_NAME
-            ].read_success,
+            models.SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.all_load_data[models.SpLegend.CONSTANTS.SP_NAME].exists_file,
+            models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.all_load_data[models.SpLegend.CONSTANTS.SP_NAME].read_success,
         }
 
     def _configure(self) -> None:
@@ -140,9 +122,7 @@ class ProcessorSpreadsheet:
             )
 
             if FLAG is not None:
-                self.context.logger.info(
-                    f"Initialized model: {attribute_name} = {model_instance}"
-                )
+                self.context.logger.info(f"Initialized model: {attribute_name} = {model_instance}")
 
     def _build_pipeline(self) -> None:
         """
@@ -151,49 +131,30 @@ class ProcessorSpreadsheet:
         self.context.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_models_context = controllers.DataModelsContext(
-            context=self.context, models_to_use=self.models_to_use
-        )
+        self.data_models_context = controllers.DataModelsContext(context=self.context, models_to_use=self.models_to_use)
 
         # RUN ALL VALIDATIONS PIPELINE
 
         # 1 STRUCTURE_VALIDATION: Validate the structure of the data
-        validators.ValidatorStructureFiles(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
+        validators.ValidatorStructureFiles(data_models_context=self.data_models_context, report_list=self.report_list)
 
-        validators.SpDescriptionValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
-        validators.SpCompositionTreeValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
-        validators.SpTemporalReferenceValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
-        validators.SpValueValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
+        validators.SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        validators.SpCompositionGraphValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        validators.SpCompositionTreeValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        validators.SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        validators.SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
 
-        validators.SpellCheckerValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
+        validators.SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
 
-        validators.SpScenarioValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
-        validators.SpLegendValidator(
-            data_models_context=self.data_models_context, report_list=self.report_list
-        )
+        validators.SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+        validators.SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
 
     def _report(self) -> None:
         self.context.logger.info("Generating reports...")
         # Debug all reports and their errors
         if self.context.data_args.data_action.debug:
             self.context.logger.info("\nModo DEBUG ativado.")
-            self.context.logger.info(
-                "------ Resultados da verificação dos testes ------"
-            )
+            self.context.logger.info("------ Resultados da verificação dos testes ------")
 
             for report in self.report_list:
                 self.context.logger.info(f"Report: {report.name_test}")
@@ -203,9 +164,7 @@ class ProcessorSpreadsheet:
                 self.context.logger.warning(f"  Warnings: {len(report.warnings)}")
                 for warning in report.warnings:
                     self.context.logger.warning(f"    - {warning}")
-                self.context.logger.info(
-                    "---------------------------------------------------------------"
-                )
+                self.context.logger.info("---------------------------------------------------------------")
 
         # Set summary of total errors and warnings
         total_errors = sum(len(report.errors) for report in self.report_list)
@@ -216,9 +175,7 @@ class ProcessorSpreadsheet:
             self.context.logger.warning(f"Total warnings: {total_warnings}")
 
         # Generate report in HTML and PDF formats
-        controllers.ReportGeneratorFiles(context=self.context).build_report(
-            report_list=self.report_list
-        )
+        controllers.ReportGeneratorFiles(context=self.context).build_report(report_list=self.report_list)
 
     def run(self):
         self.context.logger.info("Starting processing...")

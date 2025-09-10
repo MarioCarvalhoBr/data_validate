@@ -20,9 +20,7 @@ class TestCheckColumnNames:
     @pytest.fixture
     def simple_dataframe(self) -> pd.DataFrame:
         """Create a simple DataFrame with basic columns."""
-        return pd.DataFrame(
-            {"id": [1, 2, 3], "nome": ["A", "B", "C"], "valor": [10, 20, 30]}
-        )
+        return pd.DataFrame({"id": [1, 2, 3], "nome": ["A", "B", "C"], "valor": [10, 20, 30]})
 
     @pytest.fixture
     def dataframe_with_unnamed_columns(self) -> pd.DataFrame:
@@ -88,17 +86,11 @@ class TestCheckColumnNames:
     ) -> None:
         """Test check_column_names with various column combinations using simple DataFrame."""
         # Act
-        missing_columns, extra_columns = check_column_names(
-            simple_dataframe, expected_columns
-        )
+        missing_columns, extra_columns = check_column_names(simple_dataframe, expected_columns)
 
         # Assert
-        assert (
-            missing_columns == expected_missing
-        ), f"Expected missing: {expected_missing}, got: {missing_columns}"
-        assert (
-            extra_columns == expected_extra
-        ), f"Expected extra: {expected_extra}, got: {extra_columns}"
+        assert missing_columns == expected_missing, f"Expected missing: {expected_missing}, got: {missing_columns}"
+        assert extra_columns == expected_extra, f"Expected extra: {expected_extra}, got: {extra_columns}"
         assert isinstance(missing_columns, list), "Missing columns should be a list"
         assert isinstance(extra_columns, list), "Extra columns should be a list"
 
@@ -122,26 +114,20 @@ class TestCheckColumnNames:
     ) -> None:
         """Test check_column_names with empty DataFrame scenarios."""
         # Act
-        missing_columns, extra_columns = check_column_names(
-            empty_dataframe, expected_columns
-        )
+        missing_columns, extra_columns = check_column_names(empty_dataframe, expected_columns)
 
         # Assert
         assert missing_columns == expected_missing
         assert extra_columns == expected_extra
         assert len(extra_columns) == 0, "Empty DataFrame should have no extra columns"
 
-    def test_check_column_names_filters_unnamed_columns(
-        self, dataframe_with_unnamed_columns: pd.DataFrame
-    ) -> None:
+    def test_check_column_names_filters_unnamed_columns(self, dataframe_with_unnamed_columns: pd.DataFrame) -> None:
         """Test that unnamed columns are properly filtered out from extra columns."""
         # Arrange
         expected_columns = ["id", "nome"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(
-            dataframe_with_unnamed_columns, expected_columns
-        )
+        missing_columns, extra_columns = check_column_names(dataframe_with_unnamed_columns, expected_columns)
 
         # Assert
         assert missing_columns == []
@@ -149,9 +135,7 @@ class TestCheckColumnNames:
 
         # Verify that unnamed columns are not in the result
         for col in extra_columns:
-            assert not col.lower().startswith(
-                "unnamed"
-            ), f"Column {col} should be filtered out"
+            assert not col.lower().startswith("unnamed"), f"Column {col} should be filtered out"
 
     @pytest.mark.parametrize(
         "unnamed_column_name",
@@ -164,9 +148,7 @@ class TestCheckColumnNames:
             "Unnamed:5",
         ],
     )
-    def test_check_column_names_filters_various_unnamed_formats(
-        self, unnamed_column_name: str
-    ) -> None:
+    def test_check_column_names_filters_various_unnamed_formats(self, unnamed_column_name: str) -> None:
         """Test that various formats of unnamed columns are filtered out."""
         # Arrange
         df = pd.DataFrame({"id": [1, 2, 3], unnamed_column_name: [10, 20, 30]})
@@ -177,21 +159,15 @@ class TestCheckColumnNames:
 
         # Assert
         assert missing_columns == []
-        assert (
-            extra_columns == []
-        ), f"Column '{unnamed_column_name}' should be filtered out"
+        assert extra_columns == [], f"Column '{unnamed_column_name}' should be filtered out"
 
-    def test_check_column_names_case_sensitivity(
-        self, dataframe_with_mixed_case_columns: pd.DataFrame
-    ) -> None:
+    def test_check_column_names_case_sensitivity(self, dataframe_with_mixed_case_columns: pd.DataFrame) -> None:
         """Test that column name matching is case-sensitive."""
         # Arrange
         expected_columns = ["id", "nome", "valor"]  # lowercase
 
         # Act
-        missing_columns, extra_columns = check_column_names(
-            dataframe_with_mixed_case_columns, expected_columns
-        )
+        missing_columns, extra_columns = check_column_names(dataframe_with_mixed_case_columns, expected_columns)
 
         # Assert
         assert missing_columns == ["id", "nome", "valor"]
@@ -220,9 +196,7 @@ class TestCheckColumnNames:
         missing_columns, extra_columns = check_column_names(df, expected_columns)
 
         # Assert
-        assert missing_columns == [
-            "valor"
-        ], "Should only report 'valor' as missing once"
+        assert missing_columns == ["valor"], "Should only report 'valor' as missing once"
         assert extra_columns == []
 
     def test_check_column_names_with_special_characters(self) -> None:
@@ -285,12 +259,8 @@ class TestCheckColumnNames:
         df_columns = [f"col_{i}" for i in range(num_cols)]
         df = pd.DataFrame({col: range(10) for col in df_columns})
 
-        expected_columns = [
-            f"col_{i}" for i in range(0, num_cols, 2)
-        ]  # Even numbered columns
-        expected_missing = [
-            f"col_{i}" for i in range(1, num_cols, 2)
-        ]  # Odd numbered columns
+        expected_columns = [f"col_{i}" for i in range(0, num_cols, 2)]  # Even numbered columns
+        expected_missing = [f"col_{i}" for i in range(1, num_cols, 2)]  # Odd numbered columns
 
         # Act
         missing_columns, extra_columns = check_column_names(df, expected_columns)
@@ -357,9 +327,7 @@ class TestCheckColumnNames:
     def test_check_column_names_edge_case_whitespace_columns(self) -> None:
         """Test with columns containing whitespace."""
         # Arrange
-        df = pd.DataFrame(
-            {" id ": [1, 2, 3], "nome": ["A", "B", "C"], "  valor  ": [10, 20, 30]}
-        )
+        df = pd.DataFrame({" id ": [1, 2, 3], "nome": ["A", "B", "C"], "  valor  ": [10, 20, 30]})
         expected_columns = ["id", "nome", "valor"]
 
         # Act
@@ -443,14 +411,8 @@ class TestCheckColumnNamesEdgeCases:
         check_column_names(df, ["id", "nome", "extra"])
 
         # Assert
-        assert (
-            df.columns.tolist() == original_columns
-        ), "Original DataFrame should not be modified"
+        assert df.columns.tolist() == original_columns, "Original DataFrame should not be modified"
         assert df.shape == original_shape, "DataFrame shape should not change"
         # Compare data more appropriately
-        assert (
-            list(df["id"]) == original_data["id"]
-        ), "ID column data should not be modified"
-        assert (
-            list(df["nome"]) == original_data["nome"]
-        ), "Nome column data should not be modified"
+        assert list(df["id"]) == original_data["id"], "ID column data should not be modified"
+        assert list(df["nome"]) == original_data["nome"], "Nome column data should not be modified"

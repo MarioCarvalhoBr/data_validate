@@ -48,22 +48,12 @@ class SpModelABC(ABC):
         # UNPACKING DATA ARGS
         self.filename: str = self.data_loader_model.filename
 
-        self.legend_exists_file: bool = self._kwargs.get(
-            self.VAR_CONSTS.LEGEND_EXISTS_FILE, False
-        )
-        self.legend_read_success: bool = self._kwargs.get(
-            self.VAR_CONSTS.LEGEND_READ_SUCCESS, False
-        )
+        self.legend_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_EXISTS_FILE, False)
+        self.legend_read_success: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_READ_SUCCESS, False)
 
-        self.scenario_exists_file: bool = self._kwargs.get(
-            self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False
-        )
-        self.scenario_read_success: bool = self._kwargs.get(
-            self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False
-        )
-        self.scenarios_list: List[str] = self._kwargs.get(
-            self.VAR_CONSTS.SCENARIOS_LIST, []
-        )
+        self.scenario_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False)
+        self.scenario_read_success: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False)
+        self.scenarios_list: List[str] = self._kwargs.get(self.VAR_CONSTS.SCENARIOS_LIST, [])
 
         # CONFIGURE VARIABLES AND LISTS
         self.structural_errors: List[str] = []
@@ -89,20 +79,14 @@ class SpModelABC(ABC):
             self.DF_COLUMNS = list(self.data_loader_model.df_data.columns)
 
         if self.data_loader_model.df_data.empty and self.data_loader_model.read_success:
-            self.structural_errors.append(
-                f"{self.filename}: O arquivo enviado está vazio."
-            )
+            self.structural_errors.append(f"{self.filename}: O arquivo enviado está vazio.")
 
         # CHECK 1: Vertical Bar Check
-        _, errors_vertical_bar = check_vertical_bar(
-            self.data_loader_model.df_data, self.filename
-        )
+        _, errors_vertical_bar = check_vertical_bar(self.data_loader_model.df_data, self.filename)
         self.structural_errors.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        _, errors_unnamed_columns = check_unnamed_columns(
-            self.data_loader_model.df_data, self.filename
-        )
+        _, errors_unnamed_columns = check_unnamed_columns(self.data_loader_model.df_data, self.filename)
         self.structural_errors.extend(errors_unnamed_columns)
 
     @abstractmethod
@@ -122,9 +106,7 @@ class SpModelABC(ABC):
     def is_sanity_check_passed(self) -> bool:
         exists_errors_legend = self.structural_errors or self.data_cleaning_errors
         exists_file_errors_legend = (
-            not self.data_loader_model.exists_file
-            or self.data_loader_model.df_data.empty
-            or not self.data_loader_model.read_success
+            not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty or not self.data_loader_model.read_success
         )
         value = True
         if exists_errors_legend or exists_file_errors_legend:
@@ -176,7 +158,4 @@ class SpModelABC(ABC):
         Returns:
             str: Representação em string do objeto.
         """
-        return (
-            f"SpModelABC(FILENAME: {self.filename}):\n"
-            + f"  DATA_MODEL: {self.data_loader_model}\n"
-        )
+        return f"SpModelABC(FILENAME: {self.filename}):\n" + f"  DATA_MODEL: {self.data_loader_model}\n"

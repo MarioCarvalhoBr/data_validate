@@ -5,9 +5,7 @@ from typing import List, Tuple, Dict, Any, Set
 import pandas as pd
 
 
-def create_tree_structure(
-    dataframe: pd.DataFrame, parent_column: str, child_column: str
-) -> Dict[str, List[str]]:
+def create_tree_structure(dataframe: pd.DataFrame, parent_column: str, child_column: str) -> Dict[str, List[str]]:
     """
     Create a tree structure from parent-child relationships.
 
@@ -57,9 +55,7 @@ def validate_level_hierarchy(
     errors: List[Tuple[Any, Any]] = []
 
     # Create level mapping
-    levels = {
-        row[code_column]: row[level_column] for _, row in description_df.iterrows()
-    }
+    levels = {row[code_column]: row[level_column] for _, row in description_df.iterrows()}
 
     for _, row in composition_df.iterrows():
         parent = row[parent_column]
@@ -115,9 +111,7 @@ def validate_missing_codes_in_description(
     return errors
 
 
-def detect_cycles_dfs(
-    tree: Dict[str, List[str]], node: str, visited: Set[str], current_path: List[str]
-) -> Tuple[bool, List[str]]:
+def detect_cycles_dfs(tree: Dict[str, List[str]], node: str, visited: Set[str], current_path: List[str]) -> Tuple[bool, List[str]]:
     """
     Detect cycles in tree using depth-first search.
 

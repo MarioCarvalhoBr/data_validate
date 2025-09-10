@@ -3,7 +3,8 @@ from data_validate.middleware import Bootstrap
 from data_validate.helpers.base import DataArgs
 from data_validate.controllers import GeneralContext, ProcessorSpreadsheet
 
-print(f'{data_validate.__welcome__}\n')
+print(f"{data_validate.__welcome__}\n")
+
 
 def main_init():
     # Initialize and Configure the Data Arguments

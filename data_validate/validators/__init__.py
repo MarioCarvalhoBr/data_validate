@@ -9,8 +9,9 @@ from data_validate.validators.spreadsheets.description.description_validator imp
     SpDescriptionValidator,
 )
 from data_validate.validators.spreadsheets.value.value_validator import SpValueValidator
-from data_validate.validators.spreadsheets.composition.composition_tree_validator import (
+from data_validate.validators.spreadsheets.composition import (
     SpCompositionTreeValidator,
+    SpCompositionGraphValidator,
 )
 
 from data_validate.validators.spreadsheets.temporal_reference.temporal_reference_validator import (
@@ -38,6 +39,7 @@ __all__ = [
     "SpDescriptionValidator",
     "SpValueValidator",
     "SpCompositionTreeValidator",
+    "SpCompositionGraphValidator",
     "SpTemporalReferenceValidator",
     "SpScenarioValidator",
     "SpLegendValidator",

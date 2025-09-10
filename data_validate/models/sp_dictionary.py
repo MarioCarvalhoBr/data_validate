@@ -65,12 +65,8 @@ class SpDictionary(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
-        )
-        col_errors, col_warnings = format_errors_and_warnings(
-            self.filename, missing_columns, extra_columns
-        )
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
@@ -103,12 +99,8 @@ if __name__ == "__main__":
     data = importer.load_all
 
     if SpDictionary.INFO["SP_NAME"] in data:
-        sp_dictionary_instance = SpDictionary(
-            data_model=data[SpDictionary.INFO["SP_NAME"]]
-        )
+        sp_dictionary_instance = SpDictionary(data_model=data[SpDictionary.INFO["SP_NAME"]])
         # A impressão das palavras já ocorre dentro do run() quando __name__ == '__main__',
         # mas podemos adicionar outra aqui se necessário, ou acessar sp_dictionary_instance.words_to_ignore
     else:
-        print(
-            f"Data for '{SpDictionary.INFO['SP_NAME']}' not found. Please check your input data and ensure a 'dicionario' file exists."
-        )
+        print(f"Data for '{SpDictionary.INFO['SP_NAME']}' not found. Please check your input data and ensure a 'dicionario' file exists.")

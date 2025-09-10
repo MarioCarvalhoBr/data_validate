@@ -11,9 +11,7 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = (
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
-    )
+    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
     # logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     FORMATS = {
@@ -61,9 +59,7 @@ class LoggerManager:
 
         self.console_logger = self.configure_logger(console_logger)
         self.log_file = self.generate_log_file_name(prefix=prefix)
-        self.file_logger = self.configure_logger(
-            logger_name=logger_name, log_file=self.log_file
-        )
+        self.file_logger = self.configure_logger(logger_name=logger_name, log_file=self.log_file)
 
     def configure_logger(
         self,
