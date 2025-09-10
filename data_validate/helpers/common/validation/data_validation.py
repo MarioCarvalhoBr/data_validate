@@ -353,3 +353,34 @@ def check_text_length(dataframe: pd.DataFrame, file_name: str, column: str, max_
             )
 
     return not bool(errors), errors
+
+
+def check_dataframe_titles_uniques(
+    dataframe: pd.DataFrame, column_one: str, column_two: str, plural_column_one: str, plural_column_two: str
+) -> List[str]:
+    dataframe = dataframe.copy()
+    warnings = []
+
+    # Se tiver vazio
+    if dataframe.empty:
+        return warnings
+
+    columns_to_check = [column_one, column_two]
+    columns_to_check = [col for col in columns_to_check if col in dataframe.columns]
+
+    for column in columns_to_check:
+        # Convert to string
+        dataframe[column] = dataframe[column].astype(str).str.strip()
+        duplicated = dataframe[column].duplicated().any()
+
+        if duplicated:
+            titles_duplicated = dataframe[dataframe[column].duplicated()][column].tolist()
+            # Rename columns to plural
+            if column == column_one:
+                column = plural_column_one
+            elif column == column_two:
+                column = plural_column_two
+
+            warnings.append(f"Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
+
+    return warnings

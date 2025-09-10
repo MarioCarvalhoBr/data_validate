@@ -70,6 +70,11 @@ class SpDescription(SpModelABC):
             COLUMN_ORDER.name,
         ]
 
+    class PluralColumn:
+        COLUMN_PLURAL_SIMPLE_NAME = pd.Series(dtype="str", name="nomes_simples")
+        COLUMN_PLURAL_COMPLETE_NAME = pd.Series(dtype="str", name="nomes_completos")
+        ALL = [COLUMN_PLURAL_SIMPLE_NAME.name, COLUMN_PLURAL_COMPLETE_NAME.name]
+
     def __init__(
         self,
         context: GeneralContext,

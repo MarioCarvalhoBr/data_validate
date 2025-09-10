@@ -3,7 +3,7 @@ name = "data_validate"
 project_name = "Canoa"
 version = "0.7.8"
 release_level = "beta"
-serial = 1013
+serial = 1014
 status_dev = 10
 
 description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados da plataforma AdaptaBrasil. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
@@ -33,6 +33,7 @@ dependencies = [
     "pdfkit (>=1.0.0,<2.0.0)",
     "babel (>=2.17.0,<3.0.0)",
     "jinja2 (>=3.1.6,<4.0.0)",
+    "networkx (>=3.5,<4.0)",
 ]
 
 [project.urls]

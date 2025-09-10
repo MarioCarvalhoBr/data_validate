@@ -4,6 +4,7 @@
 from typing import List, Tuple, Dict, Any
 
 import pandas as pd
+from pandas import DataFrame
 
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
@@ -26,29 +27,18 @@ from data_validate.helpers.common.processing.collections_processing import (
     find_differences_in_two_set_with_message,
     extract_numeric_integer_ids_from_list,
 )
+from data_validate.helpers.common.validation.graph_data_validation import (
+    create_graph_structure,
+    detect_cycles_in_graph,
+    detect_graphs_disconnected,
+    get_graph_report,
+    convert_graph_to_tree,
+    bsf_from_node,
+)
+from data_validate.helpers.common.validation.data_validation import check_dataframe_titles_uniques
 
 
 class SpCompositionGraphValidator(ValidatorModelABC):
-    """
-    Validates hierarchical tree structures in SpComposition spreadsheets.
-
-    This validator ensures that composition data forms a valid tree structure
-    without cycles and maintains proper level hierarchies between parent and
-    child indicator relationships.
-
-    Attributes:
-        model_sp_composition: SpComposition model instance
-        model_sp_description: SpDescription model instance
-        sp_name_description: Description spreadsheet filename
-        sp_name_composition: Composition spreadsheet filename
-        column_name_code: Code column name from description
-        column_name_level: Level column name from description
-        column_name_parent: Parent code column name from composition
-        column_name_child: Child code column name from composition
-        global_required_columns: Required columns mapping
-        model_dataframes: DataFrames mapping
-    """
-
     def __init__(
         self,
         data_models_context: DataModelsContext,
@@ -85,7 +75,8 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         self.column_name_child: str = ""
 
         self.column_name_code: str = ""
-        self.column_name_level: str = ""
+        self.column_name_simple_name: str = ""
+        self.column_name_complete_name: str = ""
 
         self.column_name_id: str = ""
 
@@ -108,7 +99,8 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         self.column_name_child = SpComposition.RequiredColumn.COLUMN_CHILD_CODE.name
 
         self.column_name_code = SpDescription.RequiredColumn.COLUMN_CODE.name
-        self.column_name_level = SpDescription.RequiredColumn.COLUMN_LEVEL.name
+        self.column_name_simple_name = SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name
+        self.column_name_complete_name = SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name
 
         self.column_name_id = SpValue.RequiredColumn.COLUMN_ID.name
 
@@ -120,7 +112,6 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             ],
             self.sp_name_description: [
                 SpDescription.RequiredColumn.COLUMN_CODE.name,
-                SpDescription.RequiredColumn.COLUMN_LEVEL.name,
             ],
             self.sp_name_value: [SpValue.RequiredColumn.COLUMN_ID.name],
             self.sp_name_proportionality: [SpProportionality.RequiredColumn.COLUMN_ID.name],
@@ -160,14 +151,13 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             return column_errors, warnings
 
         # Extract valid description codes
-        valid_description_codes, _ = extract_numeric_integer_ids_from_list(
-            id_values_list=list(set(self.model_sp_description.RequiredColumn.COLUMN_CODE.to_list().astype(str)))
-        )
+        list_codes = self.model_sp_description.RequiredColumn.COLUMN_CODE.astype(str).to_list()
+        valid_description_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_codes)))
 
-        list_parents = self.model_sp_composition.RequiredColumn.COLUMN_PARENT_CODE.to_list()
-        valid_compositions_parent_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_parents.astype(str))))
-        list_childs = self.model_sp_composition.RequiredColumn.COLUMN_CHILD_CODE.to_list()
-        valid_compositions_childs_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_childs.astype(str))))
+        list_parents = self.model_sp_composition.RequiredColumn.COLUMN_PARENT_CODE.astype(str).to_list()
+        valid_compositions_parent_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_parents)))
+        list_childs = self.model_sp_composition.RequiredColumn.COLUMN_CHILD_CODE.astype(str).to_list()
+        valid_compositions_childs_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_childs)))
 
         # Compare codes between description and values
         comparison_errors = find_differences_in_two_set_with_message(
@@ -190,15 +180,18 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         errors: List[str] = []
         warnings: List[str] = []
 
+        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        local_requeired_columns = {
+            self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
+        }
+
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(self.global_required_columns, self.model_dataframes)
+        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
 
         # Create working copies and clean data
-        df_composition = self.model_dataframes[self.sp_name_composition].copy()
-        df_description = self.model_dataframes[self.sp_name_description].copy()
-        df_value = self.model_dataframes[self.sp_name_value].copy()
+        df_composition: DataFrame = self.model_dataframes[self.sp_name_composition].copy()
 
         # Clean integer columns: df_composition
         df_composition, _ = clean_dataframe_integers(
@@ -214,40 +207,123 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             min_value=1,
         )
 
-        # Clean integer columns: df_description
-        df_description, _ = clean_dataframe_integers(
-            df=df_description,
-            file_name=self.sp_name_description,
-            columns_to_clean=[self.column_name_code, self.column_name_level],
-            min_value=1,
-        )
+        directed_graph = create_graph_structure(df_composition, self.column_name_parent, self.column_name_child)
+        exists_cycle, cycle = detect_cycles_in_graph(directed_graph)
+        if exists_cycle:
+            text_cycles = ""
+            for source, target in cycle:
+                text_cycles += f"{source} -> {target}, "
+            errors.append(f"{self.sp_name_composition}: Ciclo encontrado: [{text_cycles[:-2]}].")
+
+        graphs_disconnected = detect_graphs_disconnected(directed_graph)
+        if graphs_disconnected:
+            list_graphs_disconnected = []
+            for i, grafo in enumerate(graphs_disconnected):
+                text_disconnected = "[" + get_graph_report(grafo) + "]"
+                list_graphs_disconnected.append(text_disconnected)
+            errors.append(f"{self.sp_name_composition}: Indicadores desconectados encontrados: " + ", ".join(list_graphs_disconnected) + ".")
 
         return errors, warnings
 
     def validate_unique_titles_with_graph(self) -> Tuple[List[str], List[str]]:
-        """
-        Validate that all children of the same parent have the same level.
-
-        Returns:
-            Tuple containing (errors, warnings) lists
-        """
         errors: List[str] = []
         warnings: List[str] = []
 
+        local_requeired_columns = {
+            self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
+            self.sp_name_description: [
+                SpDescription.RequiredColumn.COLUMN_CODE.name,
+                SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
+                SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name,
+            ],
+        }
+
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(self.global_required_columns, self.model_dataframes)
+        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
+
+        # Create working copies and clean data
+        df_composition: DataFrame = self.model_dataframes[self.sp_name_composition].copy()
+        df_description: DataFrame = self.model_dataframes[self.sp_name_description].copy()
+        root_node = "1"
+        column_plural_simple_name = SpDescription.PluralColumn.COLUMN_PLURAL_SIMPLE_NAME.name
+        column_plural_complete_name = SpDescription.PluralColumn.COLUMN_PLURAL_COMPLETE_NAME.name
+
+        # Clean integer columns: df_composition
+        df_composition, _ = clean_dataframe_integers(
+            df=df_composition,
+            file_name=self.sp_name_composition,
+            columns_to_clean=[self.column_name_parent],
+            min_value=0,
+        )
+        df_composition, _ = clean_dataframe_integers(
+            df=df_composition,
+            file_name=self.sp_name_composition,
+            columns_to_clean=[self.column_name_child],
+            min_value=1,
+        )
+        # Clean integer columns: df_description
+        df_description, _ = clean_dataframe_integers(
+            df=df_description,
+            file_name=self.sp_name_description,
+            columns_to_clean=[self.column_name_code],
+            min_value=1,
+        )
+        comparison_errors, __ = self.validate_relation_indicators_in_composition()
+        if comparison_errors:
+            return errors, warnings
+
+        # Montar o grafo
+        directed_graph = create_graph_structure(df_composition, self.column_name_parent, self.column_name_child)
+
+        existe_ciclo, __ = detect_cycles_in_graph(directed_graph)
+        if existe_ciclo:
+            return errors, warnings
+
+        grafos_desconectados = detect_graphs_disconnected(directed_graph)
+        if grafos_desconectados:
+            return errors, warnings
+
+        # Verifica se existe pelo menos 1 nó pai == 1, senão, mostrar erro e solicitar correção
+        if not directed_graph.has_node("1"):
+            errors.append(f"{self.sp_name_composition}: Nó raiz '{root_node}' não encontrado.")
+            return errors, warnings
+
+        # Convert the graph to a tree
+        tree = convert_graph_to_tree(directed_graph, root_node)
+
+        # All children of root node (1)
+        childs_root_node = list(tree.neighbors(root_node))
+
+        # Para cada filho de 1, pegar toda a sub-arvore abaixo
+        for child in childs_root_node:
+            # Rodar um BFS a partir do filho
+            sub_tree = bsf_from_node(directed_graph, child)
+
+            # Monta uma lista somente com os código dos nós
+            nodes = list(sub_tree.nodes())
+
+            # Busca todos um sub-dataframe de descrição com os códigos (SP_DESCRIPTION_COLUMNS.CODIGO) que estão na lista_nos
+            df_slice_description = df_description[df_description[self.column_name_code].astype(str).isin(nodes)]
+
+            # Check if the titles are unique
+            warnings_i = check_dataframe_titles_uniques(
+                dataframe=df_slice_description,
+                column_one=self.column_name_simple_name,
+                column_two=self.column_name_complete_name,
+                plural_column_one=column_plural_simple_name,
+                plural_column_two=column_plural_complete_name,
+            )
+            # Add prefix to warnings
+            warnings_i = [f"{self.sp_name_description}: {warning}" for warning in warnings_i]
+
+            # Add to main warnings list
+            warnings += warnings_i
 
         return errors, warnings
 
     def validate_associated_indicators_leafs(self) -> Tuple[List[str], List[str]]:
-        """
-        Validate that all children of the same parent have the same level.
-
-        Returns:
-            Tuple containing (errors, warnings) lists
-        """
         errors: List[str] = []
         warnings: List[str] = []
 
@@ -278,8 +354,8 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         """
         validations = [
             (self.validate_relation_indicators_in_composition, NamesEnum.IR.value),
-            # (self.validate_relations_hierarchy_with_graph, NamesEnum.IR.value),
-            # (self.validate_unique_titles_with_graph, NamesEnum.UT.value),
+            (self.validate_relations_hierarchy_with_graph, NamesEnum.IR.value),
+            (self.validate_unique_titles_with_graph, NamesEnum.UT.value),
             # (self.validate_associated_indicators_leafs, NamesEnum.LEAF_NO_DATA.value)
         ]
 
