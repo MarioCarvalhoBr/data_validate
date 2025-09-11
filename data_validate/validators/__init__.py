@@ -8,7 +8,11 @@ from data_validate.validators.spreadsheets.base.validator_model_abc import (
 from data_validate.validators.spreadsheets.description.description_validator import (
     SpDescriptionValidator,
 )
-from data_validate.validators.spreadsheets.value.value_validator import SpValueValidator
+
+from data_validate.validators.spreadsheets.value.value_validator import (
+    SpValueValidator,
+)
+
 from data_validate.validators.spreadsheets.composition import (
     SpCompositionTreeValidator,
     SpCompositionGraphValidator,
@@ -17,6 +21,11 @@ from data_validate.validators.spreadsheets.composition import (
 from data_validate.validators.spreadsheets.temporal_reference.temporal_reference_validator import (
     SpTemporalReferenceValidator,
 )
+
+from data_validate.validators.spreadsheets.proportionality.proportionality_validator import (
+    SpProportionalityValidator,
+)
+
 from data_validate.validators.spreadsheets.scenario.scenario_validator import (
     SpScenarioValidator,
 )
@@ -41,6 +50,7 @@ __all__ = [
     "SpCompositionTreeValidator",
     "SpCompositionGraphValidator",
     "SpTemporalReferenceValidator",
+    "SpProportionalityValidator",
     "SpScenarioValidator",
     "SpLegendValidator",
     # Package spell

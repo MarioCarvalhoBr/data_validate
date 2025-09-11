@@ -135,17 +135,21 @@ class ProcessorSpreadsheet:
 
         # RUN ALL VALIDATIONS PIPELINE
 
-        # 1 STRUCTURE_VALIDATION: Validate the structure of the data
+        # 1. Validate the structure of the data
         validators.ValidatorStructureFiles(data_models_context=self.data_models_context, report_list=self.report_list)
 
+        # 2. Validate the spelling of the data
+        validators.SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
+        # 3. Validate spreadsheet data mandatory
         validators.SpDescriptionValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         validators.SpCompositionGraphValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         validators.SpCompositionTreeValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         validators.SpTemporalReferenceValidator(data_models_context=self.data_models_context, report_list=self.report_list)
+
+        # 4. Validate spreadsheet data optional
+        validators.SpProportionalityValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         validators.SpValueValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-
-        validators.SpellCheckerValidator(data_models_context=self.data_models_context, report_list=self.report_list)
-
         validators.SpScenarioValidator(data_models_context=self.data_models_context, report_list=self.report_list)
         validators.SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
 
