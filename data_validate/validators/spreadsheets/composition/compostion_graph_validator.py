@@ -2,7 +2,6 @@
 """Tree composition validation for spreadsheet composition structures."""
 from typing import List, Tuple, Dict, Any
 
-import pandas as pd
 from pandas import DataFrame
 
 from data_validate.config.config import NamesEnum
@@ -73,7 +72,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         self.column_name_id: str = ""
 
         self.global_required_columns: Dict[str, List[str]] = {}
-        self.model_dataframes: Dict[str, pd.DataFrame] = {}
+        self.model_dataframes: Dict[str, DataFrame] = {}
         self.graph_processing: GraphProcessing | None = None
 
         self._prepare_statement()

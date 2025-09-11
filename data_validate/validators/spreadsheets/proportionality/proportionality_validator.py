@@ -1,5 +1,9 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Set
+
+
+import pandas as pd
+from pandas import DataFrame
 
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
@@ -8,6 +12,36 @@ from data_validate.models import SpProportionality, SpDescription, SpValue, SpCo
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
 )
+
+
+from data_validate.helpers.common.processing.data_cleaning import (
+    clean_dataframe_integers,
+)
+from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
+from data_validate.helpers.common.processing.collections_processing import (
+    categorize_strings_by_id_pattern_from_list,
+    find_differences_in_two_set_with_message,
+)
+
+
+def get_valids_codes_from_description(
+    df_description: pd.DataFrame, column_name_level: str, column_name_code: str, column_name_scenario: str
+) -> Set[str]:
+    df_description = df_description[df_description[column_name_level] != "1"]
+
+    if column_name_scenario in df_description.columns:
+        df_description = df_description[~((df_description[column_name_level] == "2") & (df_description[column_name_scenario] == "0"))]
+
+    codes_cleanned = set(df_description[column_name_code].astype(str))
+    valid_codes = set()
+
+    for code in codes_cleanned:
+        is_correct, __ = check_cell_integer(code, 1)
+        if is_correct:
+            valid_codes.add(code)
+
+    set_valid_codes = set(str(code) for code in valid_codes)
+    return set_valid_codes
 
 
 class SpProportionalityValidator(ValidatorModelABC):
@@ -38,19 +72,27 @@ class SpProportionalityValidator(ValidatorModelABC):
         self.exists_scenario = self.model_sp_value.scenario_exists_file
         self.list_scenarios = self.model_sp_value.scenarios_list
 
+        # Initialize variables
+
+        # Spreadsheet names
         self.sp_name_proportionality = ""
         self.sp_name_description = ""
         self.sp_name_value = ""
         self.sp_name_composition = ""
 
+        # Column names used in validations
+
+        # Columns in SpProportionality and SpValue
         self.column_name_id: str = ""
 
-        self.column_name_parent: str = ""
-        self.column_name_child: str = ""
-
+        # Columns in SpDescription
         self.column_name_code: str = ""
         self.column_name_level: str = ""
         self.column_name_scenario: str = ""
+
+        # Columns in SpComposition
+        self.column_name_parent: str = ""
+        self.column_name_child: str = ""
 
         self.global_required_columns = {}
         self.model_dataframes = {}
@@ -69,14 +111,14 @@ class SpProportionalityValidator(ValidatorModelABC):
         self.sp_name_composition = self.model_sp_composition.filename
 
         # Set column names
-        self.column_name_parent = SpComposition.RequiredColumn.COLUMN_PARENT_CODE.name
-        self.column_name_child = SpComposition.RequiredColumn.COLUMN_CHILD_CODE.name
+        self.column_name_id = SpProportionality.RequiredColumn.COLUMN_ID.name
 
         self.column_name_code = SpDescription.RequiredColumn.COLUMN_CODE.name
         self.column_name_level = SpDescription.RequiredColumn.COLUMN_LEVEL.name
         self.column_name_scenario = SpDescription.DynamicColumn.COLUMN_SCENARIO.name
 
-        self.column_name_id = SpProportionality.RequiredColumn.COLUMN_ID.name
+        self.column_name_parent = SpComposition.RequiredColumn.COLUMN_PARENT_CODE.name
+        self.column_name_child = SpComposition.RequiredColumn.COLUMN_CHILD_CODE.name
 
         # Define required columns efficiently
         self.global_required_columns = {
@@ -100,9 +142,84 @@ class SpProportionalityValidator(ValidatorModelABC):
             self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
         }
 
-    def validate_aaa(self) -> Tuple[List[str], List[str]]:
+    def validate_relation_indicators_in_proportionality(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
-        print(f"Validating {self.sp_name_proportionality} - AAA")
+
+        if self.model_dataframes[self.sp_name_description].empty:
+            self.set_not_executed(
+                [
+                    (
+                        self.validate_relation_indicators_in_proportionality,
+                        NamesEnum.IR.value,
+                    )
+                ]
+            )
+            return errors, warnings
+
+        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        local_required_columns = {
+            self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
+            self.sp_name_description: self.global_required_columns[self.sp_name_description],
+        }
+
+        # Check required columns exist
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
+        if column_errors:
+            return column_errors, warnings
+
+        # Create working copies and clean data
+        df_description: DataFrame = self.model_dataframes[self.sp_name_description].copy()
+        df_proportionality: DataFrame = self.model_dataframes[self.sp_name_proportionality].copy()
+
+        # Clean integer columns: df_description
+        df_description, _ = clean_dataframe_integers(
+            df=df_description,
+            file_name=self.sp_name_description,
+            columns_to_clean=[self.column_name_code],
+        )
+
+        # List of codes at level 1 to remove
+        codes_level_to_remove = df_description[df_description[self.column_name_level] == "1"][self.column_name_code].astype(str).tolist()
+        set_valid_codes_description = get_valids_codes_from_description(
+            df_description, self.column_name_level, self.column_name_code, self.column_name_scenario
+        )
+
+        # List all codes in proportionality (both levels of MultiIndex)
+        level_one_columns = df_proportionality.columns.get_level_values(0).unique().tolist()
+        level_two_columns = df_proportionality.columns.get_level_values(1).unique().tolist()
+
+        # Remove ID column from both levels if present
+        if self.column_name_id in level_two_columns:
+            level_two_columns.remove(self.column_name_id)
+
+        # Remove unnamed columns
+        level_one_columns = [col for col in level_one_columns if not col.startswith("Unnamed")]
+        level_two_columns = [col for col in level_two_columns if not col.startswith("Unnamed")]
+
+        # Extract codes from both levels from pattern
+        set_valid_codes_prop = set()
+        level_columns = [level_one_columns, level_two_columns]
+        for level_column in level_columns:
+            codes_matched_by_pattern, __ = categorize_strings_by_id_pattern_from_list(level_column, self.list_scenarios)
+            codes_matched_by_pattern = [str(code) for code in codes_matched_by_pattern]
+            codes_cleaned = set([code.split("-")[0] for code in codes_matched_by_pattern]) - set(codes_level_to_remove)
+
+            # Add to all_codes_proportionalities
+            set_valid_codes_prop = set_valid_codes_prop.union(codes_cleaned)
+
+        # Convert to integers for comparison
+        set_valid_codes_description = set([int(code) for code in set_valid_codes_description])
+        set_valid_codes_prop = set([int(code) for code in set(set_valid_codes_prop)])
+
+        # Compare codes between description and proportionality
+        comparison_errors = find_differences_in_two_set_with_message(
+            first_set=set_valid_codes_description,
+            label_1=self.sp_name_description,
+            second_set=set_valid_codes_prop,
+            label_2=self.sp_name_proportionality,
+        )
+        errors.extend(comparison_errors)
+
         return errors, warnings
 
     def validate_bbb(self) -> Tuple[List[str], List[str]]:
@@ -133,7 +250,7 @@ class SpProportionalityValidator(ValidatorModelABC):
         """Runs all content validations for SpProportionality."""
 
         validations = [
-            (self.validate_aaa, NamesEnum.IR.value),
+            (self.validate_relation_indicators_in_proportionality, NamesEnum.IR.value),
             (self.validate_bbb, NamesEnum.IR.value),
             (self.validate_ccc, NamesEnum.IR.value),
             (self.validate_xxx, NamesEnum.IR.value),
