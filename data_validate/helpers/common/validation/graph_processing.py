@@ -30,7 +30,14 @@ class GraphProcessing:
         self.graph: Optional[nx.DiGraph] = None
 
         # Se as colunas estiverem no dataframe, cria o grafo
-        if not dataframe.empty and parent_column in dataframe.columns and child_column in dataframe.columns:
+        if (
+            dataframe is not None
+            and not dataframe.empty
+            and parent_column is not None
+            and child_column is not None
+            and parent_column in dataframe.columns
+            and child_column in dataframe.columns
+        ):
             self.graph = self.create_graph_structure(dataframe, parent_column, child_column)
 
     def create_graph_structure(self, dataframe: pd.DataFrame, parent_column: str, child_column: str) -> nx.DiGraph:
