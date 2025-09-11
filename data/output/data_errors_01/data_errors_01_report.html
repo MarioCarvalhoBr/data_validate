@@ -225,8 +225,8 @@
             <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
         </div>
         <div class="card-body">
-            <strong class="text-danger">N&uacute;mero de Erros: 35</strong><br>
-            <strong class="text-warning">N&uacute;mero de Avisos: 34</strong><br>
+            <strong class="text-danger">N&uacute;mero de Erros: 52</strong><br>
+            <strong class="text-warning">N&uacute;mero de Avisos: 33</strong><br>
             <strong class="text-green">N&uacute;mero de testes executados: 34</strong><br>
             <div class="info-header-left" id="tests_not_executed" style="display: none">
                 <strong>Testes n&atilde;o executados: </strong>
@@ -246,9 +246,6 @@
             <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
 <br><span class='text-danger-errors'>legenda.xlsx: Erro nos valores da planilha. Verifique se os tipos de dados estão corretos. Detalhes: Excel file format cannot be determined, you must specify an engine manually. (<class 'ValueError'>)</span>
 <br><span class='text-danger-errors'>descricao.xlsx: Coluna 'legenda' esperada mas não foi encontrada.</span>
-<br><span class='text-danger-errors'>composicao.xlsx: O arquivo enviado está vazio.</span>
-<br><span class='text-danger-errors'>composicao.xlsx: Coluna 'codigo_pai' esperada mas não foi encontrada.</span>
-<br><span class='text-danger-errors'>composicao.xlsx: Coluna 'codigo_filho' esperada mas não foi encontrada.</span>
 <br><span class='text-danger-errors'>valores.xlsx: A coluna '5000-2080-M' não é esperada.</span>
 <br><span class='text-danger-errors'>cenarios.xlsx: Valores duplicados encontrados na coluna 'simbolo': [O]</span>
 <br><span class='text-danger-errors'>legenda.xlsx: Coluna 'codigo' esperada mas não foi encontrada.</span>
@@ -257,20 +254,27 @@
 <br><span class='text-danger-errors'>legenda.xlsx: Coluna 'minimo' esperada mas não foi encontrada.</span>
 <br><span class='text-danger-errors'>legenda.xlsx: Coluna 'maximo' esperada mas não foi encontrada.</span>
 <br><span class='text-danger-errors'>legenda.xlsx: Coluna 'ordem' esperada mas não foi encontrada.</span>
-<br><span class='text-danger-errors'>O arquivo '_composicao.xlsx' não é esperado.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor '3.1' não é um número inteiro.</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 12: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.</span>
-<br><span class='text-danger-errors'>composicao.xlsx: A coluna 'codigo_pai' não foi encontrada.</span>
-<br><span class='text-danger-errors'>composicao.xlsx: A coluna 'codigo_filho' não foi encontrada.</span>
+<br><span class='text-danger-errors'>composicao.xlsx, linha 14: A coluna 'codigo_pai' contém um valor inválido: O valor '-88' é menor que 1.</span>
+<br><span class='text-danger-errors'>composicao.xlsx, linha 16: A coluna 'codigo_pai' contém um valor inválido: O valor 'MSDOS' não é um número.</span>
+<br><span class='text-danger-errors'>composicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor inválido: O valor '0' é menor que 1.</span>
+<br><span class='text-danger-errors'>composicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor inválido: O valor '-89' é menor que 1.</span>
+<br><span class='text-danger-errors'>composicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor inválido: O valor 'GNU' não é um número.</span>
 <br><span class='text-danger-errors'>referencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor inválido: O valor '2050B' não é um número.</span>
 <br><span class='text-primary'>Relações entre indicadores</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Códigos dos indicadores ausentes em composicao.xlsx: [5005].</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [55, 77, 5010, 5022, 5033].</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].</span>
 <br><span class='text-danger-errors'>valores.xlsx: Colunas inválidas: ['5000-2080-M'].</span>
 <br><span class='text-danger-errors'>valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018].</span>
 <br><span class='text-primary'>Hierarquia como árvore</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000].</span>
 <br><span class='text-primary'>Níveis de indicadores</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 4: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.</span>
 <br><span class='text-danger-errors'>descricao.xlsx, linha 5: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.</span>
@@ -311,7 +315,20 @@
 <br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
 <br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5002' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5003' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5006' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5007' não possui dados associados.</span>
+<br><span class='text-danger-errors'>proporcionalidades.xlsx: Indicador folha '5010' não possui dados associados.</span>
 <br><span class='text-primary'>Níveis dos indicadores filhos</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Código filho -89 não encontrado na descrição.</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Indicadores filhos do pai 5000 não estão no mesmo nível: [indicador 5001 possui nível '3.1', indicador 5002 possui nível '-1', indicador 5003 possui nível '3'].</span>
+<br><span class='text-danger-errors'>descricao.xlsx: Indicadores filhos do pai 5001 não estão no mesmo nível: [indicador 5004 possui nível '4', indicador 5000 possui nível '2'].</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Código pai 5022 não encontrado na descrição.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Código pai 5033 não encontrado na descrição.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Código pai 55 não encontrado na descrição.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Código pai 77 não encontrado na descrição.</span>
+<br><span class='text-danger-errors'>composicao.xlsx: Código pai MSDOS não encontrado na descrição.</span>
         </div>
     </div>
 
@@ -323,7 +340,6 @@
         </div>
         <div class="card-body">
             <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-<br><span class='text-orange-warning'>composicao.xlsx: Coluna 'ababa' será ignorada pois não está na especificação.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 <br><span class='text-primary'>Relações entre indicadores</span>
 <br><span class='text-primary'>Hierarquia como árvore</span>
@@ -334,16 +350,16 @@
 <br><span class='text-orange-warning'>descricao.xlsx, linha 3: Coluna 'desc_simples' não pode conter código HTML.</span>
 <br><span class='text-orange-warning'>descricao.xlsx, linha 4: Coluna 'desc_simples' não pode conter código HTML.</span>
 <br><span class='text-primary'>Ortografia</span>
-<br><span class='text-orange-warning'>descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].</span>
-<br><span class='text-orange-warning'>descricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].</span>
 <br><span class='text-orange-warning'>descricao.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna desc_completa: ['meioz', 'çociedades'].</span>
 <br><span class='text-orange-warning'>descricao.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna desc_completa: ['crimáticas'].</span>
 <br><span class='text-orange-warning'>descricao.xlsx, linha 5: Palavras com possíveis erros ortográficos na coluna desc_completa: ['siztema'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 11: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].</span>
+<br><span class='text-orange-warning'>descricao.xlsx, linha 12: Palavras com possíveis erros ortográficos na coluna nome_completo: ['ruarais'].</span>
 <br><span class='text-orange-warning'>referencia_temporal.xlsx, linha 3: Palavras com possíveis erros ortográficos na coluna descricao: ['Déccadda'].</span>
-<br><span class='text-orange-warning'>cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].</span>
-<br><span class='text-orange-warning'>cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].</span>
 <br><span class='text-orange-warning'>cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].</span>
 <br><span class='text-orange-warning'>cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna nome: ['Otiimmiztta'].</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 2: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].</span>
+<br><span class='text-orange-warning'>cenarios.xlsx, linha 4: Palavras com possíveis erros ortográficos na coluna descricao: ['otiimmiztta'].</span>
 <br><span class='text-primary'>Títulos únicos</span>
 <br><span class='text-primary'>Códigos sequenciais</span>
 <br><span class='text-primary'>Campos vazios</span>

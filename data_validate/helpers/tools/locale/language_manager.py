@@ -17,10 +17,7 @@ class LanguageManager:
         Args:
             path_locale_dir (str): Path to the directory containing locale files.
         """
-        self.path_locale_dir = (
-            path_locale_dir
-            or Path(__file__).resolve().parents[3] / "static" / "locales"
-        )
+        self.path_locale_dir = path_locale_dir or Path(__file__).resolve().parents[3] / "static" / "locales"
 
         self.default_language = LanguageEnum.DEFAULT_LANGUAGE.value
         self.current_language = None
@@ -32,16 +29,12 @@ class LanguageManager:
         self._load_translations(self.current_language)
 
     def _congifure_language(self):
-        store_locale_path = (
-            Path(__file__).resolve().parents[4] / ".config" / "store.locale"
-        )
+        store_locale_path = Path(__file__).resolve().parents[4] / ".config" / "store.locale"
 
         with store_locale_path.open("r", encoding="utf-8") as f:
             self.current_language = f.read().strip()
             if self.current_language not in LanguageEnum.list_supported_languages():
-                print(
-                    f"Invalid current language '{self.current_language}' in store.locale. Falling back to '{LanguageEnum.DEFAULT_LANGUAGE.value}'."
-                )
+                print(f"Invalid current language '{self.current_language}' in store.locale. Falling back to '{LanguageEnum.DEFAULT_LANGUAGE.value}'.")
                 self.current_language = self.default_language
 
     def _load_translations(self, lang_code):
@@ -52,13 +45,9 @@ class LanguageManager:
                 self.translations = json.load(f)
             return True
         except FileNotFoundError:
-            print(
-                f"WARNING: Translation file not found for language '{lang_code}': {filepath}"
-            )
+            print(f"WARNING: Translation file not found for language '{lang_code}': {filepath}")
         except json.JSONDecodeError:
-            print(
-                f"ERROR: Could not decode JSON for language '{lang_code}': {filepath}"
-            )
+            print(f"ERROR: Could not decode JSON for language '{lang_code}': {filepath}")
         except Exception as e:
             print(f"ERROR: Unexpected error loading language '{lang_code}': {e}")
         return False
@@ -109,20 +98,14 @@ class LanguageManager:
         """
         translation_object = self.translations.get(key)
         if isinstance(translation_object, dict):
-            text = translation_object.get(
-                "message", f"<Message for '{key}' missing in '{self.current_language}'>"
-            )
+            text = translation_object.get("message", f"<Message for '{key}' missing in '{self.current_language}'>")
         else:
-            text = (
-                f"<'{key}' missing or invalid structure in '{self.current_language}'>"
-            )
+            text = f"<'{key}' missing or invalid structure in '{self.current_language}'>"
 
         try:
             return text.format(**kwargs) if kwargs else text
         except KeyError as e:
-            print(
-                f"Warning: Formatting error for key '{key}'. Missing placeholder: {e}"
-            )
+            print(f"Warning: Formatting error for key '{key}'. Missing placeholder: {e}")
             return text
         except Exception as format_exc:
             print(f"Warning: Generic formatting error for key '{key}': {format_exc}")

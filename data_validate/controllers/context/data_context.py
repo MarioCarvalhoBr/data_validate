@@ -18,13 +18,9 @@ class DataModelsContext(GeneralContext):
 
         Args:
             models_to_use (List[Any]): List of models to initialize.
-            config (Config): Configuration object containing settings.
-            fs_utils (FileSystemUtils): File system utilities for file operations.
             data_args (DataArgs): Data arguments containing input and output folder paths.
         """
         super().__init__(
-            config=context.config,
-            fs_utils=context.fs_utils,
             data_args=context.data_args,
             **kwargs,
         )
@@ -36,13 +32,6 @@ class DataModelsContext(GeneralContext):
         self.errors = []
         self.warnings = []
         self.report_list = []
-
-    def _load_data(self):
-        pass
-
-    # file: data_validate/validation/data_context.py
-
-    # file: data_validate/validation/data_context.py
 
     def get_instance_of(self, model_class: Type[SpModelABC]) -> Optional[SpModelABC]:
         """
@@ -56,6 +45,3 @@ class DataModelsContext(GeneralContext):
                 return model
 
         return None
-
-    def run(self):
-        pass

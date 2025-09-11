@@ -28,9 +28,7 @@ class DictionaryManager:
         self.dictionary = None
         self.broker = None
         self._errors = []
-        self.path_dictionary: Path = (
-            Path(__file__).resolve().parents[3] / "static" / "dictionaries"
-        )
+        self.path_dictionary: Path = Path(__file__).resolve().parents[3] / "static" / "dictionaries"
 
         self._setup_paths()
 
@@ -83,9 +81,7 @@ class DictionaryManager:
 
             return self.dictionary
         except Exception as e:
-            self._errors.append(
-                f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}"
-            )
+            self._errors.append(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
 
     def _load_extra_words(self) -> None:
         """Load additional words from extra-words.dic file.
@@ -100,20 +96,14 @@ class DictionaryManager:
                 with open(extra_words_path, "r", encoding="utf-8") as file:
                     for line in file:
                         word = line.strip()
-                        if word and not word.startswith(
-                            "#"
-                        ):  # Ignora linhas vazias e comentários
+                        if word and not word.startswith("#"):  # Ignora linhas vazias e comentários
                             self.dictionary.add(word)
             else:
-                self._errors.append(
-                    "Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema."
-                )
+                self._errors.append("Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema.")
 
         except Exception as e:
             # Log do erro mas não interrompe a execução
-            self._errors.append(
-                f"Aviso: Não foi possível carregar palavras extras: {e}"
-            )
+            self._errors.append(f"Aviso: Não foi possível carregar palavras extras: {e}")
 
     def __del__(self):
         """Cleanup temporary files when object is destroyed."""
@@ -155,6 +145,4 @@ class DictionaryManager:
                 if temp_file.exists():
                     temp_file.unlink()
             except Exception as e:
-                self._errors.append(
-                    f"Warning: Could not remove temporary file {temp_file}: {e}"
-                )
+                self._errors.append(f"Warning: Could not remove temporary file {temp_file}: {e}")

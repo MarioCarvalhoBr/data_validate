@@ -35,25 +35,19 @@ class SpellCheckerController:
 
         return errors
 
-    def check_text_quality(
-        self, text: str, column: str, row_index: int, sheet_name: str
-    ) -> List[str]:
+    def check_text_quality(self, text: str, column: str, row_index: int, sheet_name: str) -> List[str]:
         """Verifica a qualidade do texto (espaços e ortografia)"""
         warnings = []
 
         # Verifica espaços múltiplos
         if self.text_processor.has_multiple_spaces(text):
-            warnings.append(
-                f"{sheet_name}, linha {row_index + 2}: "
-                f"Há dois ou mais espaços seguidos na coluna {column}."
-            )
+            warnings.append(f"{sheet_name}, linha {row_index + 2}: " f"Há dois ou mais espaços seguidos na coluna {column}.")
 
         # Verifica ortografia
         spelling_errors = self.find_spelling_errors(text)
         if spelling_errors:
             warnings.append(
-                f"{sheet_name}, linha {row_index + 2}: "
-                f"Palavras com possíveis erros ortográficos na coluna {column}: {spelling_errors}."
+                f"{sheet_name}, linha {row_index + 2}: " f"Palavras com possíveis erros ortográficos na coluna {column}: {spelling_errors}."
             )
 
         return warnings

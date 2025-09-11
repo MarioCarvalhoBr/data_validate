@@ -19,9 +19,7 @@ class CSVReader(BaseReader):
         _, _, sep = Config().file_specs.get(base, (None, None, None))
 
         sep = sep or ","
-        df = pd.read_csv(
-            self.file_path, header=header, sep=sep, low_memory=False, dtype=str
-        )
+        df = pd.read_csv(self.file_path, header=header, sep=sep, low_memory=False, dtype=str)
         if isinstance(self.header_strategy, DoubleHeaderStrategy):
             lvl0 = df.columns.get_level_values(0)
             lvl1 = df.columns.get_level_values(1)

@@ -22,15 +22,11 @@ class LegendProcessing:
 
         return min_value, max_value
 
-    def validate_legend_labels(
-        self, dataframe: pd.DataFrame, code: Any, label_col: str
-    ) -> List[str]:
+    def validate_legend_labels(self, dataframe: pd.DataFrame, code: Any, label_col: str) -> List[str]:
         """Validates that labels are unique within a legend group."""
         errors = []
         if dataframe[label_col].duplicated().any():
-            duplicate_labels = dataframe[dataframe[label_col].duplicated()][
-                label_col
-            ].unique()
+            duplicate_labels = dataframe[dataframe[label_col].duplicated()][label_col].unique()
             for label in duplicate_labels:
                 errors.append(
                     f"{self.filename} [código: {code}]: O label '{label}' está duplicado. Labels devem ser únicos para cada código de legenda."
@@ -50,23 +46,14 @@ class LegendProcessing:
         """Validates that required columns have the correct data types."""
         errors = []
         # Check if columns exist
-        columns_to_check = [
-            col
-            for col in [code_col, min_col, max_col, order_col]
-            if col in original_dataframe.columns
-        ]
+        columns_to_check = [col for col in [code_col, min_col, max_col, order_col] if col in original_dataframe.columns]
 
         # 1 - Check column label: Null or empty values
         if label_col in original_dataframe.columns:
-            empty_labels = original_dataframe[
-                original_dataframe[label_col].isnull()
-                | (original_dataframe[label_col] == "")
-            ]
+            empty_labels = original_dataframe[original_dataframe[label_col].isnull() | (original_dataframe[label_col] == "")]
             if not empty_labels.empty:
                 indices_empty_labels = empty_labels.index.tolist()
-                indices_empty_labels = [
-                    idx + 2 for idx in indices_empty_labels
-                ]  # Adjust for header row
+                indices_empty_labels = [idx + 2 for idx in indices_empty_labels]  # Adjust for header row
                 errors.append(
                     f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_empty_labels))}]: A coluna '{label_col}' contém valores vazios ou nulos."
                 )
@@ -78,19 +65,11 @@ class LegendProcessing:
         for col in columns_to_check:
             local_dataframe[col] = pd.to_numeric(local_dataframe[col], errors="coerce")
         for col in columns_to_check:
-            filtered_df = local_dataframe[
-                local_dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE
-            ]
+            filtered_df = local_dataframe[local_dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE]
             if filtered_df[col].isnull().any():
-                indices_non_numeric_values = filtered_df[
-                    filtered_df[col].isnull()
-                ].index.tolist()
-                non_numeric_values_original = original_dataframe.loc[
-                    indices_non_numeric_values, col
-                ].to_list()
-                indices_non_numeric_values = [
-                    idx + 2 for idx in indices_non_numeric_values
-                ]  # Adjust for header row
+                indices_non_numeric_values = filtered_df[filtered_df[col].isnull()].index.tolist()
+                non_numeric_values_original = original_dataframe.loc[indices_non_numeric_values, col].to_list()
+                indices_non_numeric_values = [idx + 2 for idx in indices_non_numeric_values]  # Adjust for header row
                 errors.append(
                     f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_non_numeric_values))}]: A coluna '{col}' contém valores não numéricos: {non_numeric_values_original}"
                 )
@@ -100,21 +79,10 @@ class LegendProcessing:
         local_dataframe = original_dataframe.copy()
 
         # 2.2 - If the label is 'Dado indisponível', the min, max values must be empty (cannot have any values)
-        if (
-            min_col in local_dataframe.columns
-            and max_col in local_dataframe.columns
-            and label_col in local_dataframe.columns
-        ):
-            unavailable_mask = (
-                original_dataframe[label_col]
-                == self.context.config.VALUE_DATA_UNAVAILABLE
-            )
-            invalid_min = local_dataframe.loc[
-                unavailable_mask & local_dataframe[min_col].notnull()
-            ]
-            invalid_max = local_dataframe.loc[
-                unavailable_mask & local_dataframe[max_col].notnull()
-            ]
+        if min_col in local_dataframe.columns and max_col in local_dataframe.columns and label_col in local_dataframe.columns:
+            unavailable_mask = original_dataframe[label_col] == self.context.config.VALUE_DATA_UNAVAILABLE
+            invalid_min = local_dataframe.loc[unavailable_mask & local_dataframe[min_col].notnull()]
+            invalid_max = local_dataframe.loc[unavailable_mask & local_dataframe[max_col].notnull()]
 
             if not invalid_min.empty:
                 indices_invalid_min = invalid_min.index.tolist()
@@ -131,19 +99,14 @@ class LegendProcessing:
 
         # 2.3 - There must be exactly one label 'Dado indisponível'. If there is more than one, error. If there is none, error. If there is exactly one, ok.
         if label_col in local_dataframe.columns:
-            unavailable_labels = original_dataframe[
-                original_dataframe[label_col]
-                == self.context.config.VALUE_DATA_UNAVAILABLE
-            ]
+            unavailable_labels = original_dataframe[original_dataframe[label_col] == self.context.config.VALUE_DATA_UNAVAILABLE]
             if len(unavailable_labels) == 0:
                 errors.append(
                     f"{self.filename} [código: {code_value}]: Deve existir um label '{self.context.config.VALUE_DATA_UNAVAILABLE}' por código, mas nenhum foi encontrado."
                 )
             elif len(unavailable_labels) > 1:
                 indices_unavailable_labels = unavailable_labels.index.tolist()
-                indices_unavailable_labels = [
-                    idx + 2 for idx in indices_unavailable_labels
-                ]
+                indices_unavailable_labels = [idx + 2 for idx in indices_unavailable_labels]
                 errors.append(
                     f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_unavailable_labels))}]: Deve existir exatamente um label '{self.context.config.VALUE_DATA_UNAVAILABLE}' por código, mas foram encontrados {len(unavailable_labels)}."
                 )
@@ -160,9 +123,7 @@ class LegendProcessing:
                         )
         return errors
 
-    def validate_color_format(
-        self, dataframe: pd.DataFrame, code: Any, color_col: str
-    ) -> List[str]:
+    def validate_color_format(self, dataframe: pd.DataFrame, code: Any, color_col: str) -> List[str]:
         """Validates that color format is a valid hexadecimal string."""
         errors = []
         hex_color_pattern = re.compile(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
@@ -185,9 +146,7 @@ class LegendProcessing:
         """Validates min/max values for legends, ensuring they are logical and sequential."""
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
-        sorted_group = dataframe[
-            dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE
-        ].copy()
+        sorted_group = dataframe[dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE].copy()
 
         # Convert to numeric, coercing errors
         sorted_group[min_col] = pd.to_numeric(sorted_group[min_col], errors="coerce")
@@ -214,32 +173,24 @@ class LegendProcessing:
             if prev_max_val is not None:
                 try:
                     # Using Decimal for precision
-                    if Decimal(str(min_val)) - Decimal(str(prev_max_val)) != Decimal(
-                        "0.01"
-                    ):
+                    if Decimal(str(min_val)) - Decimal(str(prev_max_val)) != Decimal("0.01"):
                         errors.append(
                             f"{self.filename} [código: {code}, linha: {index + 2}]: O intervalo não é contínuo. O valor mínimo {min_val} deveria ser {prev_max_val + 0.01} para seguir o valor máximo anterior."
                         )
                 except InvalidOperation:
-                    errors.append(
-                        f"{self.filename} [código: {code}, linha: {index + 2}]: Valor inválido para operação de mínimo/máximo."
-                    )
+                    errors.append(f"{self.filename} [código: {code}, linha: {index + 2}]: Valor inválido para operação de mínimo/máximo.")
 
             prev_max_val = max_val
 
         return errors
 
-    def validate_order_sequence(
-        self, dataframe: pd.DataFrame, code: Any, order_col: str
-    ) -> List[str]:
+    def validate_order_sequence(self, dataframe: pd.DataFrame, code: Any, order_col: str) -> List[str]:
         """Validates that order is sequential starting from 1."""
         errors = []
         dataframe = dataframe.copy()
         dataframe[order_col] = pd.to_numeric(dataframe[order_col], errors="coerce")
         if dataframe[order_col].isnull().any():
-            errors.append(
-                f"{self.filename}: A coluna '{order_col}' da legenda '{code}' contém valores não numéricos."
-            )
+            errors.append(f"{self.filename}: A coluna '{order_col}' da legenda '{code}' contém valores não numéricos.")
             return errors
 
         sorted_order = dataframe[order_col].sort_values()
@@ -250,31 +201,19 @@ class LegendProcessing:
             )
         return errors
 
-    def validate_code_sequence(
-        self, dataframe: pd.DataFrame, code_col: str
-    ) -> List[str]:
+    def validate_code_sequence(self, dataframe: pd.DataFrame, code_col: str) -> List[str]:
         """Validates that legend codes are sequential."""
         errors = []
         local_dataframe = dataframe.copy()
-        local_dataframe[code_col] = pd.to_numeric(
-            local_dataframe[code_col], errors="coerce"
-        )
+        local_dataframe[code_col] = pd.to_numeric(local_dataframe[code_col], errors="coerce")
 
         if local_dataframe[code_col].isnull().any():
-            errors.append(
-                f"{self.filename}: A coluna '{code_col}' contém valores não numéricos e não pode ser validada para sequencialidade."
-            )
+            errors.append(f"{self.filename}: A coluna '{code_col}' contém valores não numéricos e não pode ser validada para sequencialidade.")
 
-            indices_non_numeric_values_local = local_dataframe[
-                local_dataframe[code_col].isnull()
-            ].index.tolist()
-            non_numeric_values_original = dataframe.loc[
-                indices_non_numeric_values_local, code_col
-            ].tolist()
+            indices_non_numeric_values_local = local_dataframe[local_dataframe[code_col].isnull()].index.tolist()
+            non_numeric_values_original = dataframe.loc[indices_non_numeric_values_local, code_col].tolist()
 
-            errors.append(
-                f"{self.filename}: Valores não numéricos encontrados na coluna '{code_col}': {non_numeric_values_original}"
-            )
+            errors.append(f"{self.filename}: Valores não numéricos encontrados na coluna '{code_col}': {non_numeric_values_original}")
 
             return errors
 
@@ -287,12 +226,8 @@ class LegendProcessing:
 
         # Report if the first value of the sequence does not start at 1
         if actual_sequence and actual_sequence[0] != 1:
-            errors.append(
-                f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}"
-            )
+            errors.append(f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}")
 
         if not actual_sequence == expected_sequence:
-            errors.append(
-                f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}"
-            )
+            errors.append(f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}")
         return errors

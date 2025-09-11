@@ -19,15 +19,9 @@ class NamesEnum(Enum):
     INP = "verification_name_indicator_name_pattern"
     TITLES_N = "verification_name_titles_over_n_chars"
     SIMP_DESC_N = "verification_name_simple_descriptions_over_n_chars"
-    MAND_PUNC_DESC = (
-        "verification_name_mandatory_and_prohibited_punctuation_in_descriptions"
-    )
-    MAND_PUNC_SCEN = (
-        "verification_name_mandatory_and_prohibited_punctuation_in_scenarios"
-    )
-    MAND_PUNC_TEMP = (
-        "verification_name_mandatory_and_prohibited_punctuation_in_temporal_reference"
-    )
+    MAND_PUNC_DESC = "verification_name_mandatory_and_prohibited_punctuation_in_descriptions"
+    MAND_PUNC_SCEN = "verification_name_mandatory_and_prohibited_punctuation_in_scenarios"
+    MAND_PUNC_TEMP = "verification_name_mandatory_and_prohibited_punctuation_in_temporal_reference"
     UVR_SCEN = "verification_name_unique_value_relations_in_scenarios"
     UVR_TEMP = "verification_name_unique_value_relations_in_temporal_reference"
     VAL_COMB = "verification_name_value_combination_relations"
@@ -115,8 +109,8 @@ class Config:
         "dicionario": [".csv", ".xlsx"],
     }
 
-    def __init__(self, lm: LanguageManager):
-        self.lm = lm
+    def __init__(self):
+        self.lm: LanguageManager = LanguageManager()
 
     def debug_messages(self, errors, warnings):
         # self._data_models_context.config.debug_messages(errors, warnings)
@@ -136,11 +130,7 @@ class Config:
                     value=(
                         self.TITLE_OVER_N_CHARS
                         if element == NamesEnum.TITLES_N
-                        else (
-                            self.SIMPLE_DESCRIPTIONS_OVER_N_CHARS
-                            if element == NamesEnum.SIMP_DESC_N
-                            else None
-                        )
+                        else (self.SIMPLE_DESCRIPTIONS_OVER_N_CHARS if element == NamesEnum.SIMP_DESC_N else None)
                     ),
                 )
                 if element in (NamesEnum.TITLES_N, NamesEnum.SIMP_DESC_N)

@@ -11,13 +11,13 @@ source "$SCRIPT_DIR/constants.sh"
 # Removendo todos os arquivos e subpastas do diretório de OUTPUT_DATA
 rm -rf $OUTPUT_DATA/*
 
-echo "2. Gerando o relatório de cobertura..."
-make all
+echo "2. Gerando o relatório de cobertura completo..."
+make test
 
 if [ $? -eq 0 ]; then
 
     echo "3. Gerando o badge de cobertura e adicionando arquivos ao staging area..."
-    make make-badge
+    make badges
     
     # Adicionando arquivos ao staging area
     git add .

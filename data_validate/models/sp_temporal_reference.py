@@ -52,12 +52,8 @@ class SpTemporalReference(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
-        )
-        col_errors, col_warnings = format_errors_and_warnings(
-            self.filename, missing_columns, extra_columns
-        )
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
@@ -69,26 +65,17 @@ class SpTemporalReference(SpModelABC):
                 f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio."
             )
 
-            if (
-                self.RequiredColumn.COLUMN_SYMBOL.name
-                in self.data_loader_model.df_data.columns
-            ):
-                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.df_data[
-                    self.RequiredColumn.COLUMN_SYMBOL.name
-                ].iloc[0:1]
+            if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
+                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
         else:
             # 1. Limpar e validar a coluna 'codigo' (mínimo 1)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
-            df, errors_symbol = clean_dataframe_integers(
-                self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0
-            )
+            df, errors_symbol = clean_dataframe_integers(self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0)
             self.data_cleaning_errors.extend(errors_symbol)
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = df[
-                    self.RequiredColumn.COLUMN_SYMBOL.name
-                ]
+                self.RequiredColumn.COLUMN_SYMBOL = df[self.RequiredColumn.COLUMN_SYMBOL.name]
 
     def post_processing(self):
         pass

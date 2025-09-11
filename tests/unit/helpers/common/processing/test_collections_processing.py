@@ -15,9 +15,7 @@ class TestCollectionsProcessing:
         items = ["1-2020", "2-2021", "invalid", "3-2022"]
         allowed_suffixes = ["A", "B"]
 
-        matched, not_matched = categorize_strings_by_id_pattern_from_list(
-            items, allowed_suffixes
-        )
+        matched, not_matched = categorize_strings_by_id_pattern_from_list(items, allowed_suffixes)
 
         assert set(matched) == {"1-2020", "2-2021", "3-2022"}
         assert set(not_matched) == {"invalid"}
@@ -27,9 +25,7 @@ class TestCollectionsProcessing:
         items = ["1-2020", "2-2021-A", "3-2022-B", "4-2023-C", "invalid"]
         allowed_suffixes = ["A", "B"]
 
-        matched, not_matched = categorize_strings_by_id_pattern_from_list(
-            items, allowed_suffixes
-        )
+        matched, not_matched = categorize_strings_by_id_pattern_from_list(items, allowed_suffixes)
 
         assert set(matched) == {"1-2020", "2-2021-A", "3-2022-B"}
         assert set(not_matched) == {"4-2023-C", "invalid"}
@@ -39,9 +35,7 @@ class TestCollectionsProcessing:
         items = ["1-2020", "2-2021-A", "3-2022-B", "invalid"]
         allowed_suffixes = None
 
-        matched, not_matched = categorize_strings_by_id_pattern_from_list(
-            items, allowed_suffixes
-        )
+        matched, not_matched = categorize_strings_by_id_pattern_from_list(items, allowed_suffixes)
 
         assert set(matched) == {"1-2020"}
         assert set(not_matched) == {"2-2021-A", "3-2022-B", "invalid"}
@@ -51,9 +45,7 @@ class TestCollectionsProcessing:
         items = ["1-2020", "2-2021-A", "3-2022-B", "invalid"]
         allowed_suffixes = []
 
-        matched, not_matched = categorize_strings_by_id_pattern_from_list(
-            items, allowed_suffixes
-        )
+        matched, not_matched = categorize_strings_by_id_pattern_from_list(items, allowed_suffixes)
 
         assert set(matched) == {"1-2020"}
         assert set(not_matched) == {"2-2021-A", "3-2022-B", "invalid"}
@@ -63,9 +55,7 @@ class TestCollectionsProcessing:
         items = [1, "2-2021", 3, "4-2022-A", "invalid"]
         allowed_suffixes = ["A"]
 
-        matched, not_matched = categorize_strings_by_id_pattern_from_list(
-            items, allowed_suffixes
-        )
+        matched, not_matched = categorize_strings_by_id_pattern_from_list(items, allowed_suffixes)
 
         assert set(matched) == {"2-2021", "4-2022-A"}
         assert set(not_matched) == {"1", "3", "invalid"}
@@ -112,9 +102,7 @@ class TestCollectionsProcessing:
         strings_to_ignore = ["ignore_this"]
         suffixes_for_matching = ["A", "B"]
 
-        numeric_ids, unmatched = extract_numeric_ids_and_unmatched_strings_from_list(
-            source_list, strings_to_ignore, suffixes_for_matching
-        )
+        numeric_ids, unmatched = extract_numeric_ids_and_unmatched_strings_from_list(source_list, strings_to_ignore, suffixes_for_matching)
 
         assert numeric_ids == {1, 2, 3}
         assert set(unmatched) == {"invalid"}
@@ -125,9 +113,7 @@ class TestCollectionsProcessing:
         strings_to_ignore = ["ignore_this"]
         suffixes_for_matching = ["A", "B"]
 
-        numeric_ids, unmatched = extract_numeric_ids_and_unmatched_strings_from_list(
-            source_list, strings_to_ignore, suffixes_for_matching
-        )
+        numeric_ids, unmatched = extract_numeric_ids_and_unmatched_strings_from_list(source_list, strings_to_ignore, suffixes_for_matching)
 
         assert numeric_ids == {1, 2, 3}
         assert set(unmatched) == set()  # All unmatched are ignored
@@ -145,9 +131,7 @@ class TestCollectionsProcessing:
         strings_to_ignore = []
         suffixes_for_matching = ["A", "B"]
 
-        numeric_ids, unmatched = extract_numeric_ids_and_unmatched_strings_from_list(
-            source_list, strings_to_ignore, suffixes_for_matching
-        )
+        numeric_ids, unmatched = extract_numeric_ids_and_unmatched_strings_from_list(source_list, strings_to_ignore, suffixes_for_matching)
 
         assert numeric_ids == {1, 2, 3, 4}
         assert set(unmatched) == {"invalid"}
@@ -206,9 +190,7 @@ class TestCollectionsProcessing:
         label_1 = "File A"
         label_2 = "File B"
 
-        errors = find_differences_in_two_set_with_message(
-            set_a, label_1, set_b, label_2
-        )
+        errors = find_differences_in_two_set_with_message(set_a, label_1, set_b, label_2)
 
         assert len(errors) == 2
         assert "File A: Códigos dos indicadores ausentes em File B" in errors[0]
@@ -221,9 +203,7 @@ class TestCollectionsProcessing:
         label_1 = "File A"
         label_2 = "File B"
 
-        errors = find_differences_in_two_set_with_message(
-            set_a, label_1, set_b, label_2
-        )
+        errors = find_differences_in_two_set_with_message(set_a, label_1, set_b, label_2)
 
         assert len(errors) == 0
 
@@ -234,9 +214,7 @@ class TestCollectionsProcessing:
         label_1 = "File A"
         label_2 = "File B"
 
-        errors = find_differences_in_two_set_with_message(
-            set_a, label_1, set_b, label_2
-        )
+        errors = find_differences_in_two_set_with_message(set_a, label_1, set_b, label_2)
 
         assert len(errors) == 1
         assert "File B: Códigos dos indicadores ausentes em File A" in errors[0]
@@ -257,8 +235,6 @@ class TestCollectionsProcessing:
         label_1 = "File A"
         label_2 = "File B"
 
-        errors = find_differences_in_two_set_with_message(
-            set_a, label_1, set_b, label_2
-        )
+        errors = find_differences_in_two_set_with_message(set_a, label_1, set_b, label_2)
 
         assert len(errors) == 0

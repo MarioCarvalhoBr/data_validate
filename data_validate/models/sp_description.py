@@ -70,6 +70,11 @@ class SpDescription(SpModelABC):
             COLUMN_ORDER.name,
         ]
 
+    class PluralColumn:
+        COLUMN_PLURAL_SIMPLE_NAME = pd.Series(dtype="str", name="nomes_simples")
+        COLUMN_PLURAL_COMPLETE_NAME = pd.Series(dtype="str", name="nomes_completos")
+        ALL = [COLUMN_PLURAL_SIMPLE_NAME.name, COLUMN_PLURAL_COMPLETE_NAME.name]
+
     def __init__(
         self,
         context: GeneralContext,
@@ -83,60 +88,38 @@ class SpDescription(SpModelABC):
         local_expected_columns = list(self.RequiredColumn.ALL)
 
         # 1.0. Tratamento de colunas dinâmicas: cenarios
-        if (not self.scenario_read_success) and (
-            self.DynamicColumn.COLUMN_SCENARIO.name
-            in self.data_loader_model.df_data.columns
-        ):
+        if (not self.scenario_read_success) and (self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns):
             self.structural_errors.append(
                 f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.VAR_CONSTS.SP_NAMAE_SCENARIO}' não estiver configurado ou não existir."
             )
-            self.data_loader_model.df_data = self.data_loader_model.df_data.drop(
-                columns=[self.DynamicColumn.COLUMN_SCENARIO.name]
-            )
+            self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         elif self.scenario_exists_file:
             local_expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
 
         # 1.1 Tratamento de colunas dinâmicas: legenda
-        if (not self.legend_read_success) and (
-            self.DynamicColumn.COLUMN_LEGEND.name
-            in self.data_loader_model.df_data.columns
-        ):
+        if (not self.legend_read_success) and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
             self.structural_errors.append(
                 f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir."
             )
-            self.data_loader_model.df_data = self.data_loader_model.df_data.drop(
-                columns=[self.DynamicColumn.COLUMN_LEGEND.name]
-            )
+            self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
         elif self.legend_exists_file:
             local_expected_columns.append(self.DynamicColumn.COLUMN_LEGEND.name)
 
         # 2. Tratamento de colunas opcionais
-        if (
-            self.OptionalColumn.COLUMN_RELATION.name
-            not in self.data_loader_model.df_data.columns
-        ):
+        if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.df_data.columns:
             self.data_loader_model.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
-        if (
-            self.OptionalColumn.COLUMN_UNIT.name
-            not in self.data_loader_model.df_data.columns
-        ):
+        if self.OptionalColumn.COLUMN_UNIT.name not in self.data_loader_model.df_data.columns:
             self.data_loader_model.df_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
 
         for opt_column_name in self.OptionalColumn.ALL:
-            if (opt_column_name in self.data_loader_model.df_data.columns) and (
-                opt_column_name not in local_expected_columns
-            ):
+            if (opt_column_name in self.data_loader_model.df_data.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
         self.EXPECTED_COLUMNS = local_expected_columns
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(
-            self.data_loader_model.df_data, self.EXPECTED_COLUMNS
-        )
-        col_errors, col_warnings = format_errors_and_warnings(
-            self.filename, missing_columns, extra_columns
-        )
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, self.EXPECTED_COLUMNS)
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
@@ -177,10 +160,7 @@ class SpDescription(SpModelABC):
             self.data_cleaning_errors.extend(errors_cenario)
 
         # 3. Se houver coluna 'legenda', garantir que todos os valores são numeros inteiros (mínimo 1) ou vazios: erro se não
-        if self.legend_exists_file and (
-            self.DynamicColumn.COLUMN_LEGEND.name
-            in self.data_loader_model.df_data.columns
-        ):
+        if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
             col_legenda = self.DynamicColumn.COLUMN_LEGEND.name
             df, errors_legenda = clean_dataframe_integers(
                 self.data_loader_model.df_data,

@@ -30,10 +30,6 @@ class FileScanner:
                         found[base] = f
                     elif base not in found:
                         found[base] = f
-        missing = [
-            name
-            for name, (req, _, _) in self.config.file_specs.items()
-            if req and name not in found
-        ]
+        missing = [name for name, (req, _, _) in self.config.file_specs.items() if req and name not in found]
 
         return found, qmls, missing

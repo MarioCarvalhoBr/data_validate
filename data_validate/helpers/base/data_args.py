@@ -16,6 +16,8 @@ import argparse
 import os
 from abc import ABC, abstractmethod
 
+from data_validate.helpers.tools import LanguageManager
+
 
 class DataModelABC(ABC):
     """
@@ -83,9 +85,7 @@ class DataFile(DataModelABC):
         if not os.path.isdir(self.input_folder):
             raise ValueError(f"Input folder does not exist: {self.input_folder}")
 
-        if os.path.splitext(os.path.basename(self.output_folder))[
-            1
-        ] != "" or "." in os.path.basename(self.output_folder):
+        if os.path.splitext(os.path.basename(self.output_folder))[1] != "" or "." in os.path.basename(self.output_folder):
             raise ValueError(f"Output folder name is invalid: {self.output_folder}")
 
     def run(self):
@@ -246,6 +246,9 @@ class DataArgs:
         Args:
             allow_abbrev (bool, optional): Allows argument abbreviations. Defaults to True.
         """
+
+        self.lm: LanguageManager = LanguageManager()
+
         self.data_file = None
         self.data_action = None
         self.data_report = None
@@ -267,9 +270,7 @@ class DataArgs:
         )
 
         # Arguments for DataFile
-        parser.add_argument(
-            "--input_folder", type=str, required=True, help="Path to the input folder."
-        )
+        parser.add_argument("--input_folder", type=str, required=True, help="Path to the input folder.")
         parser.add_argument(
             "--output_folder",
             default="output_data/",
@@ -286,9 +287,7 @@ class DataArgs:
         )
 
         # Arguments for DataAction
-        parser.add_argument(
-            "--no-spellchecker", action="store_true", help="Disables the spell checker."
-        )
+        parser.add_argument("--no-spellchecker", action="store_true", help="Disables the spell checker.")
         parser.add_argument(
             "--no-warning-titles-length",
             action="store_true",
@@ -304,21 +303,13 @@ class DataArgs:
             action="store_true",
             help="Hides the script version in the final report.",
         )
-        parser.add_argument(
-            "--debug", action="store_true", help="Runs the program in debug mode."
-        )
+        parser.add_argument("--debug", action="store_true", help="Runs the program in debug mode.")
 
         # Arguments for DataReport
-        parser.add_argument(
-            "--sector", type=str, default=None, help="Name of the strategic sector."
-        )
-        parser.add_argument(
-            "--protocol", type=str, default=None, help="Name of the protocol."
-        )
+        parser.add_argument("--sector", type=str, default=None, help="Name of the strategic sector.")
+        parser.add_argument("--protocol", type=str, default=None, help="Name of the protocol.")
         parser.add_argument("--user", type=str, default=None, help="Name of the user.")
-        parser.add_argument(
-            "--file", type=str, default=None, help="Name of the file to be analyzed."
-        )
+        parser.add_argument("--file", type=str, default=None, help="Name of the file to be analyzed.")
 
         return parser
 

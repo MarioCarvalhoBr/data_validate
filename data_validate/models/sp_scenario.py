@@ -49,35 +49,22 @@ class SpScenario(SpModelABC):
     def pre_processing(self):
         if self.scenario_exists_file and not self.scenarios_list:
             self.structural_errors.extend(
-                [
-                    f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."
-                ]
+                [f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."]
             )
 
         # Valores repetidos na coluna 'simbolo'
-        if (
-            self.RequiredColumn.COLUMN_SYMBOL.name
-            in self.data_loader_model.df_data.columns
-        ):
-            duplicated_symbols = self.data_loader_model.df_data[
-                self.RequiredColumn.COLUMN_SYMBOL.name
-            ].duplicated(keep=False)
+        if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
+            duplicated_symbols = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(keep=False)
             if duplicated_symbols.any():
-                duplicated_values = self.data_loader_model.df_data[duplicated_symbols][
-                    self.RequiredColumn.COLUMN_SYMBOL.name
-                ].unique()
+                duplicated_values = self.data_loader_model.df_data[duplicated_symbols][self.RequiredColumn.COLUMN_SYMBOL.name].unique()
                 self.structural_errors.append(
                     f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]"
                 )
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
-        )
-        col_errors, col_warnings = format_errors_and_warnings(
-            self.filename, missing_columns, extra_columns
-        )
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)

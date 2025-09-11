@@ -53,14 +53,10 @@ class SpValue(SpModelABC):
         for extra_column in extras_columns:
             if extra_column.lower().startswith("unnamed"):
                 continue
-            self.structural_errors.append(
-                f"{self.filename}: A coluna '{extra_column}' não é esperada."
-            )
+            self.structural_errors.append(f"{self.filename}: A coluna '{extra_column}' não é esperada.")
         for col in self.EXPECTED_COLUMNS:
             if col not in self.DF_COLUMNS:
-                self.structural_errors.append(
-                    f"{self.filename}: Coluna '{col}' esperada mas não foi encontrada."
-                )
+                self.structural_errors.append(f"{self.filename}: Coluna '{col}' esperada mas não foi encontrada.")
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass

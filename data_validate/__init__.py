@@ -13,19 +13,37 @@ Você pode até usar formatação Markdown básica aqui,
 embora o suporte possa variar dependendo da versão do pdoc.
 """
 
-from data_validate.helpers.base.metadata_info import METADATA
 
-# Package metadata
-__name__ = METADATA.__name__
-__project_name__ = METADATA.__project_name__
-__version__ = METADATA.__version__
-__url__ = METADATA.__url__
-__description__ = METADATA.__description__
-__author__ = METADATA.__author__
-__author_email__ = METADATA.__author_email__
-__maintainer_email__ = METADATA.__maintainer_email__
-__license__ = METADATA.__license__
-__python_version__ = METADATA.__python_version__
-__status__ = METADATA.__status__
+# Lazy loading - só importa quando necessário
+def get_metadata():
+    """Get package metadata lazily."""
+    from data_validate.helpers.base.metadata_info import METADATA
 
-print(f"The {__project_name__} {__name__} version {__version__} initialized.\n")
+    return METADATA
+
+
+# Package metadata - usando lazy loading
+def __getattr__(name: str):
+    """Lazy attribute access for metadata."""
+    """Get package metadata lazily."""
+    metadata = get_metadata()
+
+    attr_map = {
+        "__name__": "__name__",
+        "__project_name__": "__project_name__",
+        "__version__": "__version__",
+        "__url__": "__url__",
+        "__description__": "__description__",
+        "__author__": "__author__",
+        "__author_email__": "__author_email__",
+        "__maintainer_email__": "__maintainer_email__",
+        "__license__": "__license__",
+        "__python_version__": "__python_version__",
+        "__status__": "__status__",
+        "__welcome__": "__welcome__",
+    }
+
+    if name in attr_map:
+        return getattr(metadata, attr_map[name])
+
+    raise AttributeError(f"module '{__name__}' has no attribute '{name}'")

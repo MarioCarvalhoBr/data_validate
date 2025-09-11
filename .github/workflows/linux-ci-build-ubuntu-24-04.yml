@@ -36,10 +36,10 @@ jobs:
         run: pip install poetry
 
       - name: Install project dependencies with Makefile
-        run: make install-dev
+        run: make install
 
       - name: Run code with Makefile
-        run: make make-run
+        run: make run
 
       - name: Upload to all .pdf files generated (data/outputs/*/*.pdf)
         uses: actions/upload-artifact@v4

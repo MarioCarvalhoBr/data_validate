@@ -27,9 +27,7 @@ def categorize_strings_by_id_pattern_from_list(
 
     if allowed_scenario_suffixes:
         escaped_suffixes = [re.escape(str(s)) for s in allowed_scenario_suffixes]
-        scenario_pattern_id_year_suffix = re.compile(
-            r"^\d{1,}-\d{4}-(?:" + "|".join(escaped_suffixes) + ")$"
-        )
+        scenario_pattern_id_year_suffix = re.compile(r"^\d{1,}-\d{4}-(?:" + "|".join(escaped_suffixes) + ")$")
     else:
         scenario_pattern_id_year_suffix = re.compile(r"(?!)")
 
@@ -40,9 +38,7 @@ def categorize_strings_by_id_pattern_from_list(
     for current_item_str in string_items_to_categorize:
         if base_pattern_id_year.match(current_item_str):
             matched_by_pattern.append(current_item_str)
-        elif allowed_scenario_suffixes and scenario_pattern_id_year_suffix.match(
-            current_item_str
-        ):
+        elif allowed_scenario_suffixes and scenario_pattern_id_year_suffix.match(current_item_str):
             matched_by_pattern.append(current_item_str)
         else:
             not_matched_by_pattern.append(current_item_str)
@@ -99,24 +95,13 @@ def extract_numeric_ids_and_unmatched_strings_from_list(
         suffixes_for_matching = []
 
     set_of_strings_to_ignore = {str(item) for item in strings_to_ignore}
-    pattern_matched_strings, initially_unmatched_strings = (
-        categorize_strings_by_id_pattern_from_list(source_list, suffixes_for_matching)
-    )
-    final_unmatched_strings = [
-        unmatched_str
-        for unmatched_str in initially_unmatched_strings
-        if unmatched_str not in set_of_strings_to_ignore
-    ]
-    extracted_numeric_ids = {
-        int(matched_string.split("-", 1)[0])
-        for matched_string in pattern_matched_strings
-    }
+    pattern_matched_strings, initially_unmatched_strings = categorize_strings_by_id_pattern_from_list(source_list, suffixes_for_matching)
+    final_unmatched_strings = [unmatched_str for unmatched_str in initially_unmatched_strings if unmatched_str not in set_of_strings_to_ignore]
+    extracted_numeric_ids = {int(matched_string.split("-", 1)[0]) for matched_string in pattern_matched_strings}
     return extracted_numeric_ids, final_unmatched_strings
 
 
-def find_differences_in_two_set(
-    first_set: Set[Any], second_set: Set[Any]
-) -> Tuple[Set[Any], Set[Any]]:
+def find_differences_in_two_set(first_set: Set[Any], second_set: Set[Any]) -> Tuple[Set[Any], Set[Any]]:
     """
     Compares two sets and identifies missing elements in each set.
 
@@ -136,9 +121,7 @@ def find_differences_in_two_set(
     return missing_in_b, missing_in_a
 
 
-def find_differences_in_two_set_with_message(
-    first_set: Set[Any], label_1: str, second_set: Set[Any], label_2: str
-) -> List[str]:
+def find_differences_in_two_set_with_message(first_set: Set[Any], label_1: str, second_set: Set[Any], label_2: str) -> List[str]:
     """
     Compares two sets and returns error messages for missing elements in each set.
 
@@ -158,12 +141,8 @@ def find_differences_in_two_set_with_message(
         second_set = set()
     missing_in_b, missing_in_a = find_differences_in_two_set(first_set, second_set)
     if missing_in_b:
-        errors.append(
-            f"{label_1}: Códigos dos indicadores ausentes em {label_2}: {sorted(list(missing_in_b))}."
-        )
+        errors.append(f"{label_1}: Códigos dos indicadores ausentes em {label_2}: {sorted(list(missing_in_b))}.")
     if missing_in_a:
-        errors.append(
-            f"{label_2}: Códigos dos indicadores ausentes em {label_1}: {sorted(list(missing_in_a))}."
-        )
+        errors.append(f"{label_2}: Códigos dos indicadores ausentes em {label_1}: {sorted(list(missing_in_a))}.")
 
     return errors

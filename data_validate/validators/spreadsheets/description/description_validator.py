@@ -16,7 +16,9 @@ from data_validate.helpers.common.validation.data_validation import (
 )
 from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
 
 
 class SpDescriptionValidator(ValidatorModelABC):
@@ -49,9 +51,7 @@ class SpDescriptionValidator(ValidatorModelABC):
         for index, row in self._dataframe.iterrows():
             if re.search("<.*?>", str(row[column])):
                 index = int(str(index))
-                warnings.append(
-                    f"{self._filename}, linha {index + 2}: Coluna '{column}' não pode conter código HTML."
-                )
+                warnings.append(f"{self._filename}, linha {index + 2}: Coluna '{column}' não pode conter código HTML.")
         return [], warnings
 
     def validate_sequential_codes(self) -> Tuple[List[str], List[str]]:
@@ -69,9 +69,7 @@ class SpDescriptionValidator(ValidatorModelABC):
 
         # 1. Check if the column has only integers
         if original_codes.size != codes_cleaned.size:
-            errors.append(
-                f"{self._filename}: A verificação foi abortada porque a coluna '{column}' contém valores não numéricos."
-            )
+            errors.append(f"{self._filename}: A verificação foi abortada porque a coluna '{column}' contém valores não numéricos.")
             return errors, []
 
         # 2. Check if the first code is 1
@@ -80,9 +78,7 @@ class SpDescriptionValidator(ValidatorModelABC):
 
         # 3. Check if the codes are sequential and starting from 1
         if not codes_cleaned.equals(pd.Series(range(1, len(codes_cleaned) + 1))):
-            errors.append(
-                f"{self._filename}: A coluna '{column}' deve conter valores inteiros e sequenciais (1, 2, 3, ...)."
-            )
+            errors.append(f"{self._filename}: A coluna '{column}' deve conter valores inteiros e sequenciais (1, 2, 3, ...).")
 
         return errors, []
 
@@ -97,9 +93,7 @@ class SpDescriptionValidator(ValidatorModelABC):
         duplicated_codes = codes_cleaned[codes_cleaned.duplicated()].tolist()
 
         if duplicated_codes:
-            errors.append(
-                f"{self._filename}: A coluna '{column}' contém códigos duplicados: {duplicated_codes}."
-            )
+            errors.append(f"{self._filename}: A coluna '{column}' contém códigos duplicados: {duplicated_codes}.")
 
         return errors, []
 
@@ -210,14 +204,10 @@ class SpDescriptionValidator(ValidatorModelABC):
             if not exists_column:
                 errors.append(msg_error_column)
                 continue
-            empty_rows = self._dataframe[
-                self._dataframe[column].isna() | (self._dataframe[column] == "")
-            ].index
+            empty_rows = self._dataframe[self._dataframe[column].isna() | (self._dataframe[column] == "")].index
             if not empty_rows.empty:
                 for index in empty_rows:
-                    errors.append(
-                        f"{self._filename}, linha {index + 2}: Nenhum item da coluna '{column}' pode ser vazio."
-                    )
+                    errors.append(f"{self._filename}, linha {index + 2}: Nenhum item da coluna '{column}' pode ser vazio.")
         return errors, []
 
     def validate_cr_lf_characters(self) -> Tuple[List[str], List[str]]:
@@ -230,9 +220,7 @@ class SpDescriptionValidator(ValidatorModelABC):
         ]
 
         # Create an ordered dictionary with the columns
-        columns_to_check = list(
-            OrderedDict.fromkeys(columns_anywhere + columns_start_end).keys()
-        )
+        columns_to_check = list(OrderedDict.fromkeys(columns_anywhere + columns_start_end).keys())
 
         # Check if the columns exist
         for column in columns_to_check:
@@ -242,9 +230,7 @@ class SpDescriptionValidator(ValidatorModelABC):
                 continue
 
         # Run the checks for CR/LF characters
-        __, all_warnings_cr_lf = check_special_characters_cr_lf(
-            self._dataframe, self._filename, columns_start_end, columns_anywhere
-        )
+        __, all_warnings_cr_lf = check_special_characters_cr_lf(self._dataframe, self._filename, columns_start_end, columns_anywhere)
 
         warnings.extend(all_warnings_cr_lf)
         return [], warnings

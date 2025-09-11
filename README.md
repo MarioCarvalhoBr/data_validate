@@ -11,7 +11,7 @@
 | Testing Windows | [![Windows Build](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](assets/coverage/coverage_badge.svg) ![Tests Status](assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/AdaptaBrasil/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/AdaptaBrasil/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/AdaptaBrasil/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.6b0-orange.svg) [![License - MIT](https://img.shields.io/github/license/AdaptaBrasil/data_validate)](https://img.shields.io/github/license/AdaptaBrasil/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.11b1020-orange.svg) [![License - MIT](https://img.shields.io/github/license/AdaptaBrasil/data_validate)](https://img.shields.io/github/license/AdaptaBrasil/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -311,7 +311,7 @@ O projeto utiliza pytest para testes unitários com cobertura completa.
 
 ```bash
 # Execultar tudo
-make all
+make all-cov
 
 # Executar todos os testes
 make test
@@ -365,7 +365,7 @@ ruff check . --fix
 
 | Comando | Descrição |
 |---------|-----------|
-| `make all` | Executa testes com cobertura completa |
+| `make all-cov` | Executa testes com cobertura completa |
 | `make test` | Executa todos os testes |
 | `make test-cov` | Testes com relatório de cobertura |
 | `make test-fast` | Testes rápidos (para no primeiro erro) |

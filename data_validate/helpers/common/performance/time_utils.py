@@ -18,9 +18,7 @@ def estimate_time(func: Optional[Callable]) -> Callable:
         TypeError: If func is not callable or is None.
     """
     if func is None:
-        raise TypeError(
-            "Cannot decorate None object. Please provide a callable function."
-        )
+        raise TypeError("Cannot decorate None object. Please provide a callable function.")
 
     if not callable(func):
         raise TypeError(f"Object of type '{type(func).__name__}' is not callable.")

@@ -2,7 +2,7 @@
 from data_validate.helpers.common.formatting.number_formatting import (
     format_number_brazilian,
 )
-from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.controllers import GeneralContext
 
 
 class ModelItemReport:
@@ -15,9 +15,7 @@ class ModelItemReport:
         warnings (list[str]): List of warning messages.
     """
 
-    def __init__(
-        self, name_test: str, errors: list[str] = None, warnings: list[str] = None
-    ):
+    def __init__(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
         self.name_test = name_test
         self.errors = errors if errors is not None else []
         self.warnings = warnings if warnings is not None else []
@@ -61,17 +59,13 @@ class ModelListReport:
     def add_report(self, report):
         self.reports[report.name_test] = report
 
-    def add_by_name(
-        self, name_test: str, errors: list[str] = None, warnings: list[str] = None
-    ):
+    def add_by_name(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
         self.reports[name_test] = ModelItemReport(name_test, errors, warnings)
 
     def list_all_names(self):
         return list(self.reports.keys())
 
-    def extend(
-        self, name_test: str, errors: list[str] = None, warnings: list[str] = None
-    ):
+    def extend(self, name_test: str, errors: list[str] = None, warnings: list[str] = None):
         if name_test in self.reports:
             if errors:
                 self.reports[name_test].errors.extend(errors)
@@ -95,19 +89,11 @@ class ModelListReport:
                 warnings=report.warnings[:n_messages],
             )
             if len(report.errors) > n_messages:
-                count_omitted_errors = format_number_brazilian(
-                    len(report.errors) - n_messages, locale
-                )
-                flattened_report.add_error(
-                    self.context.lm.text(
-                        "model_report_msg_errors_omitted", count=count_omitted_errors
-                    )
-                )
+                count_omitted_errors = format_number_brazilian(len(report.errors) - n_messages, locale)
+                flattened_report.add_error(self.context.lm.text("model_report_msg_errors_omitted", count=count_omitted_errors))
 
             if len(report.warnings) > n_messages:
-                count_omitted_warnings = format_number_brazilian(
-                    len(report.warnings) - n_messages, locale
-                )
+                count_omitted_warnings = format_number_brazilian(len(report.warnings) - n_messages, locale)
                 flattened_report.add_warning(
                     self.context.lm.text(
                         "model_report_msg_warnings_omitted",

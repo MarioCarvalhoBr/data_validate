@@ -50,12 +50,8 @@ class SpComposition(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
-        )
-        col_errors, col_warnings = format_errors_and_warnings(
-            self.filename, missing_columns, extra_columns
-        )
+        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)

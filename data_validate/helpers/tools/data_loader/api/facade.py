@@ -109,29 +109,21 @@ class DataLoaderFacade:
             try:
                 df_local = reader.read()
             except FileNotFoundError as e:
-                errors.append(
-                    f"{path.name}: Arquivo não encontrado no diretório. Detalhes: {e} ({type(e)})"
-                )
+                errors.append(f"{path.name}: Arquivo não encontrado no diretório. Detalhes: {e} ({type(e)})")
             except UnicodeDecodeError as e:
-                errors.append(
-                    f"{path.name}: Erro de codificação do arquivo. Verifique se está em UTF-8. Detalhes: {e} ({type(e)})"
-                )
+                errors.append(f"{path.name}: Erro de codificação do arquivo. Verifique se está em UTF-8. Detalhes: {e} ({type(e)})")
             except pd.errors.ParserError as e:
                 errors.append(
                     f"{path.name}: Erro na estrutura da planilha. Verifique se há células mescladas ou formato inválido. Detalhes: {e} ({type(e)})"
                 )
             except ValueError as e:
-                errors.append(
-                    f"{path.name}: Erro nos valores da planilha. Verifique se os tipos de dados estão corretos. Detalhes: {e} ({type(e)})"
-                )
+                errors.append(f"{path.name}: Erro nos valores da planilha. Verifique se os tipos de dados estão corretos. Detalhes: {e} ({type(e)})")
             except IOError as e:
                 errors.append(
                     f"{path.name}: Erro de entrada/saída ao ler o arquivo. Verifique se ele não está aberto em outro programa. Detalhes: {e} ({type(e)})"
                 )
             except Exception as e:
-                errors.append(
-                    f"{path.name}: Erro inesperado ao processar o arquivo. Detalhes: {e} ({type(e)})"
-                )
+                errors.append(f"{path.name}: Erro inesperado ao processar o arquivo. Detalhes: {e} ({type(e)})")
 
             data_model = DataLoaderModel(
                 input_folder=str(self.input_dir),
@@ -143,10 +135,7 @@ class DataLoaderFacade:
             data[name] = data_model
 
         # adiciona QMLs brutas
-        data["qmls"] = [
-            ReaderFactory.get_reader(q, SingleHeaderStrategy()).read()
-            for q in qml_files
-        ]
+        data["qmls"] = [ReaderFactory.get_reader(q, SingleHeaderStrategy()).read() for q in qml_files]
 
         # Adiciona arquivos faltando ou não obrigatórios como vazios
         for name, (req, _, _) in self.config.file_specs.items():

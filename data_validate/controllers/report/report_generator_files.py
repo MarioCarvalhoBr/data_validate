@@ -9,12 +9,12 @@ import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
 from data_validate.config.config import NamesEnum
+from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.base.metadata_info import METADATA
 from data_validate.helpers.common.formatting.number_formatting import (
     format_number_brazilian,
 )
-from data_validate.controllers.context.general_context import GeneralContext
-from data_validate.controllers.report.model_report import ModelListReport
 
 
 class ReportGeneratorFiles:
@@ -45,7 +45,7 @@ class ReportGeneratorFiles:
             context: General context containing validation configuration
         """
         self.context = context
-        self.locale = self.context.locale_manager.current_language
+        self.locale = self.context.lm.current_language
 
         # Initialize counters
         self.num_errors = 0
@@ -70,25 +70,17 @@ class ReportGeneratorFiles:
         """Validate HTML template existence and required variables."""
         # Extract template variables using regex
         variable_pattern = r"\{\{\s*.*?\s*\}\}"
-        self.required_variables = re.findall(
-            variable_pattern, self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
-        )
+        self.required_variables = re.findall(variable_pattern, self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS)
 
         # Load template from file or use default
-        template_path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__), "../../static/report/report_template.html"
-            )
-        )
+        template_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../static/report/report_template.html"))
         if os.path.exists(template_path):
             with open(template_path, "r", encoding="utf-8") as file:
                 self.template_data_text = file.read()
 
         # Validate required variables and fallback to default if needed
         if any(var not in self.template_data_text for var in self.required_variables):
-            self.template_data_text = (
-                self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
-            )
+            self.template_data_text = self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
 
     def build_report(self, report_list: ModelListReport) -> None:
         """Generate and save HTML and PDF reports from validation results.
@@ -96,44 +88,30 @@ class ReportGeneratorFiles:
         Args:
             report_list: List of validation test reports
         """
-        file_name = self.context.fs_utils.get_last_directory_name(
-            path=self.input_folder
-        )
+        file_name = self.context.fs_utils.get_last_directory_name(path=self.input_folder)
         html_output_file = self.context.config.REPORT_OUTPUT_REPORT_HTML
 
         self.num_errors = report_list.global_num_errors()
         self.num_warnings = report_list.global_num_warnings()
         self.number_tests = len(report_list)
 
-        report_list_flattened = report_list.flatten(
-            n_messages=self.context.config.REPORT_LIMIT_N_MESSAGES, locale=self.locale
-        )
+        report_list_flattened = report_list.flatten(n_messages=self.context.config.REPORT_LIMIT_N_MESSAGES, locale=self.locale)
 
         tests_not_executed = []
         if self.context.data_args.data_action.no_spellchecker:
-            tests_not_executed.append(
-                self.context.config.get_verify_names()[NamesEnum.SPELL.value]
-            )
+            tests_not_executed.append(self.context.config.get_verify_names()[NamesEnum.SPELL.value])
         if self.context.data_args.data_action.no_warning_titles_length:
-            tests_not_executed.append(
-                self.context.config.get_verify_names()[NamesEnum.TITLES_N.value]
-            )
+            tests_not_executed.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
 
         for report in report_list.reports.values():
             if not report.was_executed:
                 tests_not_executed.append(report.name_test)
 
         try:
-            html_content = self._generate_html_content(
-                report_list_flattened, tests_not_executed
-            )
-            output_html_path = os.path.join(
-                self.output_folder, file_name + html_output_file
-            )
+            html_content = self._generate_html_content(report_list_flattened, tests_not_executed)
+            output_html_path = os.path.join(self.output_folder, file_name + html_output_file)
 
-            self._save_html_file(
-                html_content, output_html_path, logger=self.context.logger
-            )
+            self._save_html_file(html_content, output_html_path, logger=self.context.logger)
             self._save_pdf_file(
                 pdf_options=self._get_pdf_options(),
                 html_file_path=output_html_path,
@@ -146,9 +124,7 @@ class ReportGeneratorFiles:
             self.context.logger.info(msg_error)
             print(msg_error, file=sys.stderr)
 
-    def _generate_html_content(
-        self, report_list: ModelListReport, tests_not_executed: List[str]
-    ) -> str:
+    def _generate_html_content(self, report_list: ModelListReport, tests_not_executed: List[str]) -> str:
         """Generate HTML content from template and report data.
 
         Args:
@@ -162,9 +138,7 @@ class ReportGeneratorFiles:
         template_vars = self._build_template_variables(report_list, tests_not_executed)
         return template.render(template_vars)
 
-    def _build_template_variables(
-        self, report_list: ModelListReport, tests_not_executed: List[str]
-    ) -> Dict[str, Any]:
+    def _build_template_variables(self, report_list: ModelListReport, tests_not_executed: List[str]) -> Dict[str, Any]:
         """Build template variables dictionary for HTML generation.
 
         Args:
@@ -174,17 +148,13 @@ class ReportGeneratorFiles:
         Returns:
             Dictionary containing all template variables
         """
-        text_html_errors = self._format_messages_as_html(
-            report_list, "errors", "text-danger-errors"
-        )
-        text_html_warnings = self._format_messages_as_html(
-            report_list, "warnings", "text-orange-warning"
-        )
+        text_html_errors = self._format_messages_as_html(report_list, "errors", "text-danger-errors")
+        text_html_warnings = self._format_messages_as_html(report_list, "warnings", "text-orange-warning")
 
         text_html_date_display = (
             ""
             if self.context.data_args.data_action.no_time
-            else f"<strong>Data e hora do processo: <strong class='text-gray'>{METADATA.__date_now__}</strong></strong><br>"
+            else f"<strong>Data e hora do processo: <strong class='text-gray'>{self.context.config.DATE_NOW}</strong></strong><br>"
         )
         text_html_version_and_os_info = (
             ""
@@ -202,18 +172,10 @@ class ReportGeneratorFiles:
             "number_tests": self.number_tests,
             "text_display_version_and_os_info": text_html_version_and_os_info,
             "text_display_date": text_html_date_display,
-            "text_display_sector": self._get_optional_field_text(
-                "sector", "Setor estrat&eacute;gico"
-            ),
-            "text_display_protocol": self._get_optional_field_text(
-                "protocol", "Protocolo"
-            ),
-            "text_display_user": self._get_optional_field_text(
-                "user", "Usu&aacute;rio"
-            ),
-            "text_display_file": self._get_optional_field_text(
-                "file", "Arquivo submetido"
-            ),
+            "text_display_sector": self._get_optional_field_text("sector", "Setor estrat&eacute;gico"),
+            "text_display_protocol": self._get_optional_field_text("protocol", "Protocolo"),
+            "text_display_user": self._get_optional_field_text("user", "Usu&aacute;rio"),
+            "text_display_file": self._get_optional_field_text("file", "Arquivo submetido"),
             "tests_not_executed": text_html_tests_not_executed,
             "display_tests_not_executed": "block" if tests_not_executed else "none",
         }
@@ -232,10 +194,7 @@ class ReportGeneratorFiles:
         if field_value is None:
             return ""
 
-        return (
-            f"<strong>{display_label}: "
-            f"<strong class='text-gray'>{field_value}</strong></strong><br>"
-        )
+        return f"<strong>{display_label}: " f"<strong class='text-gray'>{field_value}</strong></strong><br>"
 
     def _print_json_summary(self) -> None:
         """Print JSON summary of validation results."""
@@ -258,9 +217,7 @@ class ReportGeneratorFiles:
         print(msg_info, file=sys.stdout)
 
     @staticmethod
-    def _format_messages_as_html(
-        report_list: ModelListReport, message_type: str, css_class: str
-    ) -> str:
+    def _format_messages_as_html(report_list: ModelListReport, message_type: str, css_class: str) -> str:
         """Format error or warning messages as HTML.
 
         Args:
@@ -274,9 +231,7 @@ class ReportGeneratorFiles:
         html_parts = []
 
         for report in report_list:
-            html_parts.append(
-                f"<br><span class='text-primary'>{report.name_test}</span>"
-            )
+            html_parts.append(f"<br><span class='text-primary'>{report.name_test}</span>")
 
             messages = getattr(report, message_type, [])
             for message in messages:
@@ -327,9 +282,7 @@ class ReportGeneratorFiles:
             print(msg_error, file=sys.stderr)
 
     @staticmethod
-    def _save_pdf_file(
-        pdf_options: Dict[str, Any], html_file_path: str, logger
-    ) -> None:
+    def _save_pdf_file(pdf_options: Dict[str, Any], html_file_path: str, logger) -> None:
         """Generate and save PDF report from HTML file.
 
         Args:

@@ -11,7 +11,9 @@ from data_validate.models import (
 )
 from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.validators.spreadsheets.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
 
 
 class SpellCheckerValidator(ValidatorModelABC):
@@ -33,9 +35,7 @@ class SpellCheckerValidator(ValidatorModelABC):
         )
 
         # Configure
-        self.dictionary: SpDictionary | None = (
-            self._data_models_context.get_instance_of(SpDictionary)
-        )
+        self.dictionary: SpDictionary | None = self._data_models_context.get_instance_of(SpDictionary)
         self.lang_dict_spell = self._data_models_context.data_args.data_file.locale
 
         # From SpDictionary extract words to ignore
@@ -45,9 +45,7 @@ class SpellCheckerValidator(ValidatorModelABC):
         self.spellchecker = SpellChecker(self.lang_dict_spell, self.list_words_user)
 
         # Define column mappings for each model type
-        self.model_columns_map: Dict[
-            Type[Union[SpDescription, SpTemporalReference, SpScenario]], List[str]
-        ] = {
+        self.model_columns_map: Dict[Type[Union[SpDescription, SpTemporalReference, SpScenario]], List[str]] = {
             SpDescription: [
                 SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
                 SpDescription.RequiredColumn.COLUMN_COMPLETE_NAME.name,
@@ -66,9 +64,7 @@ class SpellCheckerValidator(ValidatorModelABC):
         # Run pipeline
         self.run()
 
-    def validate_spellchecker(
-        self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]
-    ) -> Tuple[List[str], List[str]]:
+    def validate_spellchecker(self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]) -> Tuple[List[str], List[str]]:
         """
         Generic spellchecker validation method that works with any model class.
 
@@ -103,12 +99,10 @@ class SpellCheckerValidator(ValidatorModelABC):
                 continue
 
         # Perform spellcheck
-        errors_spellchecker, warnings_spellchecker = (
-            self.spellchecker.check_spelling_text(
-                df=self._dataframe,
-                file_name=self._filename,
-                columns_sheets=columns_to_check,
-            )
+        errors_spellchecker, warnings_spellchecker = self.spellchecker.check_spelling_text(
+            df=self._dataframe,
+            file_name=self._filename,
+            columns_sheets=columns_to_check,
         )
 
         errors.extend(errors_spellchecker)

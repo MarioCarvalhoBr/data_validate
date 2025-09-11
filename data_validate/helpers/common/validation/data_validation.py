@@ -10,9 +10,7 @@ from typing import List, Tuple, Optional
 import pandas as pd
 
 
-def check_vertical_bar(
-    dataframe: pd.DataFrame, file_name: str
-) -> Tuple[bool, List[str]]:
+def check_vertical_bar(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool, List[str]]:
     """Check for vertical bar characters in DataFrame columns.
 
     Args:
@@ -30,9 +28,7 @@ def check_vertical_bar(
         if isinstance(dataframe.columns, pd.MultiIndex):
             for col_tuple in dataframe.columns:
                 if "|" in str(col_tuple[0]):
-                    errors.append(
-                        f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'."
-                    )
+                    errors.append(f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'.")
 
                 if len(col_tuple) > 1 and "|" in str(col_tuple[1]):
                     errors.append(
@@ -41,9 +37,7 @@ def check_vertical_bar(
         else:
             for column_name in dataframe.columns:
                 if "|" in str(column_name):
-                    errors.append(
-                        f"{file_name}: A coluna '{column_name}' não pode conter o caractere '|'."
-                    )
+                    errors.append(f"{file_name}: A coluna '{column_name}' não pode conter o caractere '|'.")
 
         # Check data values for vertical bars using vectorized operations
         string_data = dataframe.astype(str)
@@ -52,28 +46,18 @@ def check_vertical_bar(
         for column in mask.columns:
             if mask[column].any():
                 error_indices = mask.index[mask[column]].tolist()
-                col_display_name = (
-                    str(column)
-                    if not isinstance(column, tuple)
-                    else ".".join(map(str, column))
-                )
+                col_display_name = str(column) if not isinstance(column, tuple) else ".".join(map(str, column))
 
                 for row_idx in error_indices:
-                    errors.append(
-                        f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'."
-                    )
+                    errors.append(f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'.")
 
     except Exception as e:
-        errors.append(
-            f"{file_name}: Erro ao processar a checagem de barra vertical: {str(e)}"
-        )
+        errors.append(f"{file_name}: Erro ao processar a checagem de barra vertical: {str(e)}")
 
     return not bool(errors), errors
 
 
-def check_unnamed_columns(
-    dataframe: pd.DataFrame, file_name: str
-) -> Tuple[bool, List[str]]:
+def check_unnamed_columns(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool, List[str]]:
     """Check for unnamed columns and validate row data consistency.
 
     Args:
@@ -92,11 +76,7 @@ def check_unnamed_columns(
 
         unnamed_indices = []
         for i, col_identifier in enumerate(columns):
-            col_str = (
-                str(col_identifier[1] if is_multi_level_2 else col_identifier)
-                .strip()
-                .lower()
-            )
+            col_str = str(col_identifier[1] if is_multi_level_2 else col_identifier).strip().lower()
 
             if col_str.startswith("unnamed"):
                 unnamed_indices.append(i)
@@ -110,17 +90,13 @@ def check_unnamed_columns(
         if invalid_rows.any():
             invalid_indices = invalid_rows[invalid_rows].index
             for idx in invalid_indices:
-                text_column = (
-                    "coluna válida" if valid_columns_count == 1 else "colunas válidas"
-                )
+                text_column = "coluna válida" if valid_columns_count == 1 else "colunas válidas"
                 errors.append(
                     f"{file_name}, linha {idx + 2}: A linha possui {non_null_counts[idx]} valores, mas a tabela possui apenas {valid_columns_count} {text_column}."
                 )
 
     except Exception as e:
-        errors.append(
-            f"{file_name}: Erro ao processar a checagem de colunas sem nome: {str(e)}"
-        )
+        errors.append(f"{file_name}: Erro ao processar a checagem de colunas sem nome: {str(e)}")
 
     return not bool(errors), errors
 
@@ -149,12 +125,8 @@ def check_punctuation(
     columns_must_end_with_dot = columns_must_end_with_dot or []
 
     # Filter existing columns
-    existing_no_punct = [
-        col for col in columns_dont_punctuation if col in dataframe.columns
-    ]
-    existing_with_dot = [
-        col for col in columns_must_end_with_dot if col in dataframe.columns
-    ]
+    existing_no_punct = [col for col in columns_dont_punctuation if col in dataframe.columns]
+    existing_with_dot = [col for col in columns_must_end_with_dot if col in dataframe.columns]
 
     punctuation_chars = {",", ".", ";", ":", "!", "?"}
 
@@ -165,9 +137,7 @@ def check_punctuation(
             ends_with_punct = text_series.str[-1].isin(punctuation_chars)
 
             for idx in text_series[ends_with_punct].index:
-                warnings.append(
-                    f"{file_name}, linha {idx + 2}: O valor da coluna '{column}' não deve terminar com pontuação."
-                )
+                warnings.append(f"{file_name}, linha {idx + 2}: O valor da coluna '{column}' não deve terminar com pontuação.")
 
     for column in existing_with_dot:
         non_empty_mask = dataframe[column].notna() & (dataframe[column] != "")
@@ -176,9 +146,7 @@ def check_punctuation(
             not_ends_with_dot = ~text_series.str.endswith(".")
 
             for idx in text_series[not_ends_with_dot].index:
-                warnings.append(
-                    f"{file_name}, linha {idx + 2}: O valor da coluna '{column}' deve terminar com ponto."
-                )
+                warnings.append(f"{file_name}, linha {idx + 2}: O valor da coluna '{column}' deve terminar com ponto.")
 
     return not bool(warnings), warnings
 
@@ -233,10 +201,7 @@ def check_special_characters_cr_lf_columns_start_end(
 
         for pattern_name, (mask, message_template) in patterns.items():
             for idx in text_series[mask].index:
-                warnings.append(
-                    f"{file_name}, linha {idx + 2}: "
-                    + message_template.format(column=column)
-                )
+                warnings.append(f"{file_name}, linha {idx + 2}: " + message_template.format(column=column))
 
     return not bool(warnings), warnings
 
@@ -271,10 +236,7 @@ def check_special_characters_cr_lf_columns_anywhere(
 
         def find_cr_lf_positions(text: str) -> List[Tuple[int, str]]:
             """Find positions of CR/LF characters in text."""
-            return [
-                (match.start() + 1, "CR" if match.group() == "\x0d" else "LF")
-                for match in re.finditer(r"[\x0D\x0A]", text)
-            ]
+            return [(match.start() + 1, "CR" if match.group() == "\x0d" else "LF") for match in re.finditer(r"[\x0D\x0A]", text)]
 
         cr_lf_positions = text_series.apply(find_cr_lf_positions)
 
@@ -307,22 +269,16 @@ def check_special_characters_cr_lf(
     dataframe = dataframe.copy()
     all_warnings: List[str] = []
 
-    _, warnings_start_end = check_special_characters_cr_lf_columns_start_end(
-        dataframe, file_name, columns_start_end
-    )
+    _, warnings_start_end = check_special_characters_cr_lf_columns_start_end(dataframe, file_name, columns_start_end)
     all_warnings.extend(warnings_start_end)
 
-    _, warnings_anywhere = check_special_characters_cr_lf_columns_anywhere(
-        dataframe, file_name, columns_anywhere
-    )
+    _, warnings_anywhere = check_special_characters_cr_lf_columns_anywhere(dataframe, file_name, columns_anywhere)
     all_warnings.extend(warnings_anywhere)
 
     return not bool(all_warnings), all_warnings
 
 
-def check_unique_values(
-    dataframe: pd.DataFrame, file_name: str, columns_uniques: List[str]
-) -> Tuple[bool, List[str]]:
+def check_unique_values(dataframe: pd.DataFrame, file_name: str, columns_uniques: List[str]) -> Tuple[bool, List[str]]:
     """Check for unique values in specified columns.
 
     Args:
@@ -339,17 +295,13 @@ def check_unique_values(
 
     for column in existing_columns:
         if not dataframe[column].is_unique:
-            warnings.append(
-                f"{file_name}: A coluna '{column}' não deve conter valores repetidos."
-            )
+            warnings.append(f"{file_name}: A coluna '{column}' não deve conter valores repetidos.")
 
     return not bool(warnings), warnings
 
 
-def column_exists(
-    dataframe: pd.DataFrame, file_name: str, column: str
-) -> Tuple[bool, str]:
-    """Check if a column exists in the DataFrame.
+def column_exists(dataframe: pd.DataFrame, file_name: str, column: str) -> Tuple[bool, str]:
+    """Check if a column exists in the DataFrame (supports MultiIndex).
 
     Args:
         dataframe: The pandas DataFrame to check
@@ -359,17 +311,27 @@ def column_exists(
     Returns:
         Tuple of (exists, error_message) where exists is True if column found
     """
-    if column not in dataframe.columns:
-        return (
-            False,
-            f"{file_name}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente.",
-        )
+
+    # Check index type
+    if isinstance(dataframe.columns, pd.MultiIndex):
+        # Dataframe is <class 'pandas.core.indexes.multi.MultiIndex'>
+        if column not in dataframe.columns.get_level_values(1):
+            return (
+                False,
+                f"{file_name}: A verificação foi abortada para a coluna nível 2 obrigatória '{column}' que está ausente.",
+            )
+
+    else:
+        # Dataframe is <class 'pandas.core.indexes.base.Index'>
+        if column not in dataframe.columns:
+            return (
+                False,
+                f"{file_name}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente.",
+            )
     return True, ""
 
 
-def check_text_length(
-    dataframe: pd.DataFrame, file_name: str, column: str, max_length: int
-) -> Tuple[bool, List[str]]:
+def check_text_length(dataframe: pd.DataFrame, file_name: str, column: str, max_length: int) -> Tuple[bool, List[str]]:
     """Validate text length in a specific column.
 
     Args:
@@ -403,3 +365,34 @@ def check_text_length(
             )
 
     return not bool(errors), errors
+
+
+def check_dataframe_titles_uniques(
+    dataframe: pd.DataFrame, column_one: str, column_two: str, plural_column_one: str, plural_column_two: str
+) -> List[str]:
+    dataframe = dataframe.copy()
+    warnings = []
+
+    # Se tiver vazio
+    if dataframe.empty:
+        return warnings
+
+    columns_to_check = [column_one, column_two]
+    columns_to_check = [col for col in columns_to_check if col in dataframe.columns]
+
+    for column in columns_to_check:
+        # Convert to string
+        dataframe[column] = dataframe[column].astype(str).str.strip()
+        duplicated = dataframe[column].duplicated().any()
+
+        if duplicated:
+            titles_duplicated = dataframe[dataframe[column].duplicated()][column].tolist()
+            # Rename columns to plural
+            if column == column_one:
+                column = plural_column_one
+            elif column == column_two:
+                column = plural_column_two
+
+            warnings.append(f"Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
+
+    return warnings
