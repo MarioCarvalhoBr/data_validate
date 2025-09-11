@@ -150,8 +150,19 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         errors: List[str] = []
         warnings: List[str] = []
 
+        if self.model_dataframes[self.sp_name_description].empty:
+            self.set_not_executed(
+                [
+                    (
+                        self.validate_relation_indicators_in_composition,
+                        NamesEnum.IR.value,
+                    )
+                ]
+            )
+            return errors, warnings
+
         # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
-        local_requeired_columns = {
+        local_required_columns = {
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
             self.sp_name_description: [
                 SpDescription.RequiredColumn.COLUMN_CODE.name,
@@ -159,7 +170,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         }
 
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
 
@@ -167,8 +178,11 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         list_codes = self.model_sp_description.RequiredColumn.COLUMN_CODE.astype(str).to_list()
         valid_description_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_codes)))
 
+        # Extract valid composition parent
         list_parents = self.model_sp_composition.RequiredColumn.COLUMN_PARENT_CODE.astype(str).to_list()
         valid_compositions_parent_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_parents)))
+
+        # Extract valid composition child codes
         list_childs = self.model_sp_composition.RequiredColumn.COLUMN_CHILD_CODE.astype(str).to_list()
         valid_compositions_childs_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_childs)))
 
@@ -194,12 +208,12 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         warnings: List[str] = []
 
         # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
-        local_requeired_columns = {
+        local_required_columns = {
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
         }
 
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
 
@@ -224,7 +238,18 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         errors: List[str] = []
         warnings: List[str] = []
 
-        local_requeired_columns = {
+        if self.model_dataframes[self.sp_name_description].empty:
+            self.set_not_executed(
+                [
+                    (
+                        self.validate_unique_titles_with_graph,
+                        NamesEnum.UT.value,
+                    )
+                ]
+            )
+            return errors, warnings
+
+        local_required_columns = {
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
             self.sp_name_description: [
                 SpDescription.RequiredColumn.COLUMN_CODE.name,
@@ -234,7 +259,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         }
 
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
         if column_errors:
             return column_errors, warnings
 
@@ -317,15 +342,15 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             return errors, warnings
 
         # Check required columns exist
-        local_requeired_columns = {
+        local_required_columns = {
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
             self.sp_name_value: self.global_required_columns[self.sp_name_value],
         }
 
         if self.model_sp_proportionality.data_loader_model.read_success:
-            local_requeired_columns[self.sp_name_proportionality] = [SpProportionality.RequiredColumn.COLUMN_ID.name]
+            local_required_columns[self.sp_name_proportionality] = [SpProportionality.RequiredColumn.COLUMN_ID.name]
 
-        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
 
         if column_errors:
             return column_errors, warnings
@@ -376,7 +401,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             (self.validate_associated_indicators_leafs, NamesEnum.LEAF_NO_DATA.value),
         ]
 
-        if self.model_sp_composition.data_loader_model.df_data.empty or self.model_sp_description.data_loader_model.df_data.empty:
+        if self.model_sp_composition.data_loader_model.df_data.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 
