@@ -69,8 +69,6 @@ class ValidatorModelABC(ABC):
     def column_exists(self, dataframe, filename, column) -> Tuple[bool, str]:
 
         # How use: To use this method, you can call it directly with the dataframe and column name.
-        # For example:
-        # exists, msg_error_column = ValidatorModelABC.column_exists(dataframe, filename, column
         exists, msg_error_column = column_exists(dataframe, filename, column)
         return exists, msg_error_column
 

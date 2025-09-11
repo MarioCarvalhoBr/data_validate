@@ -107,7 +107,6 @@ class SpCompositionGraphValidator(ValidatorModelABC):
                 SpDescription.RequiredColumn.COLUMN_CODE.name,
             ],
             self.sp_name_value: [SpValue.RequiredColumn.COLUMN_ID.name],
-            self.sp_name_proportionality: [SpProportionality.RequiredColumn.COLUMN_ID.name],
         }
 
         # Set dataframes
@@ -119,15 +118,29 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         }
 
         # Setup graph processing if composition data is available
+        # Create working copies and clean data
+        df_composition: DataFrame = self.model_dataframes[self.sp_name_composition].copy()
+
+        # Clean integer columns: df_composition
+        df_composition, _ = clean_dataframe_integers(
+            df=df_composition,
+            file_name=self.sp_name_composition,
+            columns_to_clean=[self.column_name_parent],
+            min_value=0,
+        )
+        df_composition, _ = clean_dataframe_integers(
+            df=df_composition,
+            file_name=self.sp_name_composition,
+            columns_to_clean=[self.column_name_child],
+            min_value=1,
+        )
         self.graph_processing = GraphProcessing(
-            dataframe=self.model_dataframes[self.sp_name_composition],
+            dataframe=df_composition,
             parent_column=self.column_name_parent,
             child_column=self.column_name_child,
         )
 
-    def validate_relation_indicators_in_composition(
-        self,
-    ) -> Tuple[List[str], List[str]]:
+    def validate_relation_indicators_in_composition(self) -> Tuple[List[str], List[str]]:
         """
         Validate that all indicators in composition exist in description.
 
@@ -190,23 +203,6 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         if column_errors:
             return column_errors, warnings
 
-        # Create working copies and clean data
-        df_composition: DataFrame = self.model_dataframes[self.sp_name_composition].copy()
-
-        # Clean integer columns: df_composition
-        df_composition, _ = clean_dataframe_integers(
-            df=df_composition,
-            file_name=self.sp_name_composition,
-            columns_to_clean=[self.column_name_parent],
-            min_value=0,
-        )
-        df_composition, _ = clean_dataframe_integers(
-            df=df_composition,
-            file_name=self.sp_name_composition,
-            columns_to_clean=[self.column_name_child],
-            min_value=1,
-        )
-
         exists_cycle, cycle = self.graph_processing.detect_cycles()
         if exists_cycle:
             text_cycles = ""
@@ -243,25 +239,11 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             return column_errors, warnings
 
         # Create working copies and clean data
-        df_composition: DataFrame = self.model_dataframes[self.sp_name_composition].copy()
         df_description: DataFrame = self.model_dataframes[self.sp_name_description].copy()
         root_node = "1"
         column_plural_simple_name = SpDescription.PluralColumn.COLUMN_PLURAL_SIMPLE_NAME.name
         column_plural_complete_name = SpDescription.PluralColumn.COLUMN_PLURAL_COMPLETE_NAME.name
 
-        # Clean integer columns: df_composition
-        df_composition, _ = clean_dataframe_integers(
-            df=df_composition,
-            file_name=self.sp_name_composition,
-            columns_to_clean=[self.column_name_parent],
-            min_value=0,
-        )
-        df_composition, _ = clean_dataframe_integers(
-            df=df_composition,
-            file_name=self.sp_name_composition,
-            columns_to_clean=[self.column_name_child],
-            min_value=1,
-        )
         # Clean integer columns: df_description
         df_description, _ = clean_dataframe_integers(
             df=df_description,
@@ -335,10 +317,49 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             return errors, warnings
 
         # Check required columns exist
-        column_errors = self.check_columns_in_models_dataframes(self.global_required_columns, self.model_dataframes)
+        local_requeired_columns = {
+            self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
+            self.sp_name_value: self.global_required_columns[self.sp_name_value],
+        }
+
+        if self.model_sp_proportionality.data_loader_model.read_success:
+            local_requeired_columns[self.sp_name_proportionality] = [SpProportionality.RequiredColumn.COLUMN_ID.name]
+
+        column_errors = self.check_columns_in_models_dataframes(local_requeired_columns, self.model_dataframes)
+
         if column_errors:
             return column_errors, warnings
 
+        # Create working copies and clean data
+        df_value: DataFrame = self.model_dataframes[self.sp_name_value].copy()
+        df_proportionality: DataFrame = self.model_dataframes[self.sp_name_proportionality].copy()
+
+        leafs = self.graph_processing.get_leaf_nodes()
+
+        # Validation for values
+        codes_values = df_value.columns.tolist()
+        codes_values = [code.split("-")[0] for code in codes_values]
+        for leaf in leafs:
+            if leaf not in codes_values:
+                errors.append(f"{self.sp_name_value}: Indicador folha '{leaf}' não possui dados associados.")
+
+        # Validation for proportionality (if available)
+        if not df_proportionality.empty:
+            level_two_columns = df_proportionality.columns.get_level_values(1).unique().tolist()
+
+            if self.column_name_id in level_two_columns:
+                level_two_columns.remove(self.column_name_id)
+
+            level_two_columns = [col for col in level_two_columns if not col.startswith("Unnamed")]
+            level_two_columns = [col for col in level_two_columns if not col.startswith("unnamed")]
+
+            level_two_columns = [col.split("-")[0] for col in level_two_columns]
+            all_columns = list(set(level_two_columns))
+
+            # Check if all leaf codes are present in level_one_columns
+            for leaf in leafs:
+                if leaf not in all_columns:
+                    errors.append(f"{self.sp_name_proportionality}: Indicador folha '{leaf}' não possui dados associados.")
         return errors, warnings
 
     def run(self) -> Tuple[List[str], List[str]]:
@@ -352,7 +373,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             (self.validate_relation_indicators_in_composition, NamesEnum.IR.value),
             (self.validate_relations_hierarchy_with_graph, NamesEnum.IR.value),
             (self.validate_unique_titles_with_graph, NamesEnum.UT.value),
-            # (self.validate_associated_indicators_leafs, NamesEnum.LEAF_NO_DATA.value)
+            (self.validate_associated_indicators_leafs, NamesEnum.LEAF_NO_DATA.value),
         ]
 
         if self.model_sp_composition.data_loader_model.df_data.empty or self.model_sp_description.data_loader_model.df_data.empty:

@@ -1,9 +1,9 @@
 [project]
 name = "data_validate"
 project_name = "Canoa"
-version = "0.7.8"
+version = "0.7.9"
 release_level = "beta"
-serial = 1015
+serial = 1016
 status_dev = 10
 
 description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados da plataforma AdaptaBrasil. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
@@ -55,7 +55,6 @@ packages = [{include = "data_validate"}]
 pytest = "^8.4.1"
 coverage = "^7.10.6"
 pytest-cov = "^6.2.1"
-ruff = "^0.12.11"
 flake8 = "^7.3.0"
 black = "^25.1.0"
 pre-commit = "^4.3.0"
@@ -63,6 +62,7 @@ pdoc = "^15.0.4"
 flake8-html = "^0.4.3"
 genbadge = {extras = ["all"], version = "^1.1.2"}
 pytest-mock = "^3.15.0"
+ruff = "^0.13.0"
 
 [tool.coverage.run]
 source = ["data_validate"]

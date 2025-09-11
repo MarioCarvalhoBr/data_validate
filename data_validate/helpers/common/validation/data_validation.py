@@ -301,7 +301,7 @@ def check_unique_values(dataframe: pd.DataFrame, file_name: str, columns_uniques
 
 
 def column_exists(dataframe: pd.DataFrame, file_name: str, column: str) -> Tuple[bool, str]:
-    """Check if a column exists in the DataFrame.
+    """Check if a column exists in the DataFrame (supports MultiIndex).
 
     Args:
         dataframe: The pandas DataFrame to check
@@ -311,11 +311,23 @@ def column_exists(dataframe: pd.DataFrame, file_name: str, column: str) -> Tuple
     Returns:
         Tuple of (exists, error_message) where exists is True if column found
     """
-    if column not in dataframe.columns:
-        return (
-            False,
-            f"{file_name}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente.",
-        )
+
+    # Check index type
+    if isinstance(dataframe.columns, pd.MultiIndex):
+        # Dataframe is <class 'pandas.core.indexes.multi.MultiIndex'>
+        if column not in dataframe.columns.get_level_values(1):
+            return (
+                False,
+                f"{file_name}: A verificação foi abortada para a coluna nível 2 obrigatória '{column}' que está ausente.",
+            )
+
+    else:
+        # Dataframe is <class 'pandas.core.indexes.base.Index'>
+        if column not in dataframe.columns:
+            return (
+                False,
+                f"{file_name}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente.",
+            )
     return True, ""
 
 

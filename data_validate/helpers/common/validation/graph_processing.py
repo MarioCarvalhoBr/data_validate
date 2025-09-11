@@ -29,7 +29,8 @@ class GraphProcessing:
         """
         self.graph: Optional[nx.DiGraph] = None
 
-        if dataframe is not None and parent_column is not None and child_column is not None:
+        # Se as colunas estiverem no dataframe, cria o grafo
+        if not dataframe.empty and parent_column in dataframe.columns and child_column in dataframe.columns:
             self.graph = self.create_graph_structure(dataframe, parent_column, child_column)
 
     def create_graph_structure(self, dataframe: pd.DataFrame, parent_column: str, child_column: str) -> nx.DiGraph:
@@ -129,6 +130,7 @@ class GraphProcessing:
             raise ValueError("No graph available for leaf node detection")
 
         leaf_nodes = []
+
         for node in target_graph.nodes():
             if target_graph.out_degree(node) == 0:
                 leaf_nodes.append(node)
@@ -200,46 +202,3 @@ class GraphProcessing:
     def is_empty(self) -> bool:
         """Check if the graph is empty."""
         return self.graph is None or self.graph.number_of_nodes() == 0
-
-
-# Backward compatibility functions for existing code
-def create_graph_structure(dataframe: pd.DataFrame, parent_column: str, child_column: str) -> nx.DiGraph:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.create_graph_structure(dataframe, parent_column, child_column)
-
-
-def detect_cycles_in_graph(directed_graph: nx.DiGraph) -> Tuple[bool, Optional[List[Tuple[str, str]]]]:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.detect_cycles(directed_graph)
-
-
-def detect_graphs_disconnected(directed_graph: nx.DiGraph) -> List[nx.DiGraph]:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.detect_disconnected_components(directed_graph)
-
-
-def get_graph_report(directed_graph: nx.DiGraph) -> str:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.generate_graph_report(directed_graph)
-
-
-def get_nodes_leafs(directed_graph: nx.DiGraph) -> List[str]:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.get_leaf_nodes(directed_graph)
-
-
-def convert_graph_to_tree(directed_graph: nx.DiGraph, root_node: str) -> nx.DiGraph:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.convert_to_tree(root_node, directed_graph)
-
-
-def bsf_from_node(directed_graph: nx.DiGraph, start_node: str) -> nx.DiGraph:
-    """Legacy function for backward compatibility."""
-    processor = GraphProcessing()
-    return processor.breadth_first_search_from_node(start_node, directed_graph)
