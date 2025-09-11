@@ -1,6 +1,5 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 """Tree composition validation for spreadsheet composition structures."""
-
 from typing import List, Tuple, Dict, Any
 
 import pandas as pd
@@ -27,15 +26,8 @@ from data_validate.helpers.common.processing.collections_processing import (
     find_differences_in_two_set_with_message,
     extract_numeric_integer_ids_from_list,
 )
-from data_validate.helpers.common.validation.graph_data_validation import (
-    create_graph_structure,
-    detect_cycles_in_graph,
-    detect_graphs_disconnected,
-    get_graph_report,
-    convert_graph_to_tree,
-    bsf_from_node,
-)
 from data_validate.helpers.common.validation.data_validation import check_dataframe_titles_uniques
+from data_validate.helpers.common.validation.graph_processing import GraphProcessing
 
 
 class SpCompositionGraphValidator(ValidatorModelABC):
@@ -82,6 +74,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
 
         self.global_required_columns: Dict[str, List[str]] = {}
         self.model_dataframes: Dict[str, pd.DataFrame] = {}
+        self.graph_processing: GraphProcessing | None = None
 
         self._prepare_statement()
         self.run()
@@ -124,6 +117,13 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
             self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.df_data,
         }
+
+        # Setup graph processing if composition data is available
+        self.graph_processing = GraphProcessing(
+            dataframe=self.model_dataframes[self.sp_name_composition],
+            parent_column=self.column_name_parent,
+            child_column=self.column_name_child,
+        )
 
     def validate_relation_indicators_in_composition(
         self,
@@ -207,19 +207,18 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             min_value=1,
         )
 
-        directed_graph = create_graph_structure(df_composition, self.column_name_parent, self.column_name_child)
-        exists_cycle, cycle = detect_cycles_in_graph(directed_graph)
+        exists_cycle, cycle = self.graph_processing.detect_cycles()
         if exists_cycle:
             text_cycles = ""
             for source, target in cycle:
                 text_cycles += f"{source} -> {target}, "
             errors.append(f"{self.sp_name_composition}: Ciclo encontrado: [{text_cycles[:-2]}].")
 
-        graphs_disconnected = detect_graphs_disconnected(directed_graph)
+        graphs_disconnected = self.graph_processing.detect_disconnected_components()
         if graphs_disconnected:
             list_graphs_disconnected = []
             for i, grafo in enumerate(graphs_disconnected):
-                text_disconnected = "[" + get_graph_report(grafo) + "]"
+                text_disconnected = "[" + self.graph_processing.generate_graph_report(grafo) + "]"
                 list_graphs_disconnected.append(text_disconnected)
             errors.append(f"{self.sp_name_composition}: Indicadores desconectados encontrados: " + ", ".join(list_graphs_disconnected) + ".")
 
@@ -274,24 +273,21 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         if comparison_errors:
             return errors, warnings
 
-        # Montar o grafo
-        directed_graph = create_graph_structure(df_composition, self.column_name_parent, self.column_name_child)
-
-        existe_ciclo, __ = detect_cycles_in_graph(directed_graph)
+        existe_ciclo, __ = self.graph_processing.detect_cycles()
         if existe_ciclo:
             return errors, warnings
 
-        grafos_desconectados = detect_graphs_disconnected(directed_graph)
+        grafos_desconectados = self.graph_processing.detect_disconnected_components()
         if grafos_desconectados:
             return errors, warnings
 
         # Verifica se existe pelo menos 1 nó pai == 1, senão, mostrar erro e solicitar correção
-        if not directed_graph.has_node("1"):
+        if not self.graph_processing.graph.has_node("1"):
             errors.append(f"{self.sp_name_composition}: Nó raiz '{root_node}' não encontrado.")
             return errors, warnings
 
         # Convert the graph to a tree
-        tree = convert_graph_to_tree(directed_graph, root_node)
+        tree = self.graph_processing.convert_to_tree(root_node)
 
         # All children of root node (1)
         childs_root_node = list(tree.neighbors(root_node))
@@ -299,7 +295,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         # Para cada filho de 1, pegar toda a sub-arvore abaixo
         for child in childs_root_node:
             # Rodar um BFS a partir do filho
-            sub_tree = bsf_from_node(directed_graph, child)
+            sub_tree = self.graph_processing.breadth_first_search_from_node(child)
 
             # Monta uma lista somente com os código dos nós
             nodes = list(sub_tree.nodes())
