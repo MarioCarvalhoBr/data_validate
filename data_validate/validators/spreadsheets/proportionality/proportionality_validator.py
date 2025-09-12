@@ -416,6 +416,8 @@ class SpProportionalityValidator(ValidatorModelABC):
                         f"{self.sp_name_proportionality}: Deve existir pelo menos uma relação do indicador filho '{child}' com o indicador pai '{code_pai_local}' (em '{parent_id}') conforme especificado em {self.sp_name_composition}."
                     )
 
+        errors = sorted(set(errors))
+
         return errors, warnings
 
     def validate_yyy(self) -> Tuple[List[str], List[str]]:
