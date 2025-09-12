@@ -4,6 +4,36 @@ from typing import List, Set, Any, Tuple
 from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
 
 
+def generate_group_from_list(items: List) -> List[List]:
+    """
+    Group consecutive identical elements in a list.
+
+    Args:
+        items: List of elements to group.
+
+    Returns:
+        List of lists, where each sublist contains consecutive identical elements.
+
+    Raises:
+        ValueError: If the input list is empty.
+    """
+    if not items:
+        raise ValueError("Input list must not be empty.")
+
+    grouped: List[List] = []
+    current_group: List = [items[0]]
+
+    for element in items[1:]:
+        if element == current_group[0]:
+            current_group.append(element)
+        else:
+            grouped.append(current_group)
+            current_group = [element]
+
+    grouped.append(current_group)
+    return grouped
+
+
 def categorize_strings_by_id_pattern_from_list(
     items_to_categorize: List[Any], allowed_scenario_suffixes: List[Any] = None
 ) -> Tuple[List[str], List[str]]:
