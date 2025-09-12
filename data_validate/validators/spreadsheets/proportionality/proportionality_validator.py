@@ -45,6 +45,38 @@ def get_valids_codes_from_description(
     return set_valid_codes
 
 
+def build_subdatasets(df_proportionalities: DataFrame, column_name_id: str):
+    df_proportionalities = df_proportionalities.copy()
+
+    # Create columns information
+    columns_multi_index_prop = df_proportionalities.columns
+    columns_level_one_prop = df_proportionalities.columns.get_level_values(0).unique().tolist()
+    columns_level_one_prop_cleaned = [col for col in columns_level_one_prop if not col.lower().startswith("unnamed")]
+
+    # Create subdatasets and others variables
+    subdatasets = {}
+    has_found_col_id = False
+    found_col_level_0 = None
+
+    # Find the column with the ID
+    for column in columns_multi_index_prop:
+        col_level_0, col_level_1 = column
+        if col_level_1 == column_name_id:
+            has_found_col_id = True
+            found_col_level_0 = col_level_0
+            break
+
+    if not has_found_col_id:
+        return subdatasets
+
+    sub_dataset_id = df_proportionalities[found_col_level_0]
+
+    for parent_id in columns_level_one_prop_cleaned:
+        subdatasets[parent_id] = pd.concat([sub_dataset_id, df_proportionalities[parent_id]], axis=1)
+
+    return subdatasets
+
+
 class SpProportionalityValidator(ValidatorModelABC):
     """
     Validates the content of the SpProportionality spreadsheet.
@@ -309,9 +341,80 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         return errors, warnings
 
-    def validate_xxx(self) -> Tuple[List[str], List[str]]:
+    def validate_parent_child_relationships(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
-        print(f"Validating {self.sp_name_proportionality} - XXX")
+        if self.model_dataframes[self.sp_name_composition].empty:
+            self.set_not_executed(
+                [
+                    (
+                        self.validate_parent_child_relationships,
+                        NamesEnum.IND_VAL_PROP.value,
+                    )
+                ]
+            )
+            return errors, warnings
+
+        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        local_required_columns = {
+            self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
+            self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
+        }
+
+        # Check required columns exist
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
+        if column_errors:
+            return column_errors, warnings
+
+        # Setup dataframes
+        df_proportionalities = self.model_dataframes[self.sp_name_proportionality].copy()
+        df_composition = self.model_dataframes[self.sp_name_composition].copy()
+
+        # Build subdatasets
+        subdatasets = build_subdatasets(df_proportionalities, self.column_name_id)
+
+        # Filter composition to remove level 1 parents
+        df_composition = df_composition[df_composition[self.column_name_parent] != "1"]
+
+        dict_grouped_composition = {}
+        for __, row in df_composition.iterrows():
+            parent = row[self.column_name_parent]
+            child = row[self.column_name_child]
+
+            if parent not in dict_grouped_composition:
+                dict_grouped_composition[parent] = []
+
+            dict_grouped_composition[parent].append(child)
+
+        for parent_id, subdataset in subdatasets.items():
+
+            cleaned_parent_id = parent_id.split("-")[0]
+
+            if cleaned_parent_id not in dict_grouped_composition.keys():
+                if ":" not in parent_id:
+                    errors.append(
+                        f"{self.sp_name_proportionality}: O indicador pai '{cleaned_parent_id}' (em '{parent_id}') não está presente na coluna '{self.column_name_parent}' da planilha {self.sp_name_composition}."
+                    )
+                continue
+
+            children_codes = [col for col in subdataset.columns.tolist() if not col.lower().startswith(self.column_name_id)]
+            children_codes_cleaned = [filho.split("-")[0] for filho in children_codes]
+
+            dict_children_codes_cleaned = dict()
+            dict_children_codes_cleaned.setdefault(cleaned_parent_id, []).extend(children_codes_cleaned)
+
+            set_errors = {
+                f"{self.sp_name_proportionality}: O indicador '{filho}' (em '{filho_orig}') não é filho do indicador '{cleaned_parent_id}' (em '{parent_id}') conforme especificado em {self.sp_name_composition}."
+                for filho, filho_orig in zip(children_codes_cleaned, children_codes)
+                if filho not in dict_grouped_composition[cleaned_parent_id]
+            }
+            errors.extend(set_errors)
+
+            for child in dict_grouped_composition[cleaned_parent_id]:
+                if child not in dict_children_codes_cleaned[cleaned_parent_id]:
+                    code_pai_local = parent_id.split("-")[0]
+                    errors.append(
+                        f"{self.sp_name_proportionality}: Deve existir pelo menos uma relação do indicador filho '{child}' com o indicador pai '{code_pai_local}' (em '{parent_id}') conforme especificado em {self.sp_name_composition}."
+                    )
 
         return errors, warnings
 
@@ -328,7 +431,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             (self.validate_relation_indicators_in_proportionality, NamesEnum.IR.value),
             (self.validate_columns_repeated_indicators, NamesEnum.REP_IND_PROP.value),
             (self.validate_relation_indicators_in_value_and_proportionality, NamesEnum.IND_VAL_PROP.value),
-            (self.validate_xxx, NamesEnum.IR.value),
+            (self.validate_parent_child_relationships, NamesEnum.IR_PROP.value),
             (self.validate_yyy, NamesEnum.IR.value),
         ]
         if self._dataframe.empty:
