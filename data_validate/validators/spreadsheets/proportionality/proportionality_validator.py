@@ -1,6 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from typing import List, Tuple, Dict, Any, Set
-
+from decimal import Decimal
+from typing import List, Tuple, Dict, Any
 
 import pandas as pd
 from pandas import DataFrame
@@ -8,73 +8,25 @@ from pandas import DataFrame
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.models import SpProportionality, SpDescription, SpValue, SpComposition
-from data_validate.validators.spreadsheets.base.validator_model_abc import (
-    ValidatorModelABC,
-)
-
-
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
-from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
+from data_validate.helpers.common.formatting.number_formatting import truncate_number
 from data_validate.helpers.common.processing.collections_processing import (
     categorize_strings_by_id_pattern_from_list,
     find_differences_in_two_set_with_message,
 )
 from data_validate.helpers.common.processing.collections_processing import generate_group_from_list
+from data_validate.helpers.common.processing.data_cleaning import (
+    clean_dataframe_integers,
+)
 
-
-def get_valids_codes_from_description(
-    df_description: pd.DataFrame, column_name_level: str, column_name_code: str, column_name_scenario: str
-) -> Set[str]:
-    df_description = df_description[df_description[column_name_level] != "1"]
-
-    if column_name_scenario in df_description.columns:
-        df_description = df_description[~((df_description[column_name_level] == "2") & (df_description[column_name_scenario] == "0"))]
-
-    codes_cleaned = set(df_description[column_name_code].astype(str))
-    valid_codes = set()
-
-    for code in codes_cleaned:
-        is_correct, __ = check_cell_integer(code, 1)
-        if is_correct:
-            valid_codes.add(code)
-
-    set_valid_codes = set(str(code) for code in valid_codes)
-    return set_valid_codes
-
-
-def build_subdatasets(df_proportionalities: DataFrame, column_name_id: str):
-    df_proportionalities = df_proportionalities.copy()
-
-    # Create columns information
-    columns_multi_index_prop = df_proportionalities.columns
-    columns_level_one_prop = df_proportionalities.columns.get_level_values(0).unique().tolist()
-    columns_level_one_prop_cleaned = [col for col in columns_level_one_prop if not col.lower().startswith("unnamed")]
-
-    # Create subdatasets and others variables
-    subdatasets = {}
-    has_found_col_id = False
-    found_col_level_0 = None
-
-    # Find the column with the ID
-    for column in columns_multi_index_prop:
-        col_level_0, col_level_1 = column
-        if col_level_1 == column_name_id:
-            has_found_col_id = True
-            found_col_level_0 = col_level_0
-            break
-
-    if not has_found_col_id:
-        return subdatasets
-
-    sub_dataset_id = df_proportionalities[found_col_level_0]
-
-    for parent_id in columns_level_one_prop_cleaned:
-        subdatasets[parent_id] = pd.concat([sub_dataset_id, df_proportionalities[parent_id]], axis=1)
-
-    return subdatasets
+from data_validate.helpers.common.validation.proportionality_data_validation import (
+    get_valids_codes_from_description,
+    build_subdatasets,
+)
+from data_validate.models import SpProportionality, SpDescription, SpValue, SpComposition
+from data_validate.validators.spreadsheets.base.validator_model_abc import (
+    ValidatorModelABC,
+)
+from data_validate.helpers.common.formatting.number_formatting import format_number_brazilian
 
 
 class SpProportionalityValidator(ValidatorModelABC):
@@ -174,6 +126,113 @@ class SpProportionalityValidator(ValidatorModelABC):
             self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
             self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
         }
+
+    def _check_sum_equals_one(self, subdatasets, sp_df_values):
+        errors = []
+        warnings = []
+
+        has_more_than_3_decimal_places = False
+        count_values_has_more_than_3_decimal_places = 0
+        line_init_values = 0
+
+        for parent_id, subdataset in subdatasets.items():
+
+            line_init = None
+            line_end = None
+            count_errors = 0
+            errors_column = []
+
+            for index, row in subdataset.iterrows():
+                all_cells = []
+
+                # Iterrows retorna uma tupla nome da coluna, dados da linha
+                lista_id_coluna_valor = []
+                id_linha = 0
+                # sub_col = ""
+                for i, cell in enumerate(row):
+                    # Nome da coluna
+                    nome_coluna = row.index[i]
+
+                    if i == 0:
+                        id_linha = cell
+                        continue
+
+                    lista_id_coluna_valor.append([id_linha, nome_coluna, cell])
+
+                    # Se a célula for 'self._data_models_context.config.VALUE_DI', pula para a próxima
+                    if cell == self._data_models_context.config.VALUE_DI:
+                        continue
+
+                    if pd.isna(cell) or pd.isna(pd.to_numeric(cell, errors="coerce")):
+                        if line_init is None:
+                            line_init = index + 3
+                            errors_column.append(
+                                f"{self.sp_name_proportionality}, linha {index + 3}: O valor não é um número válido e nem {self._data_models_context.config.VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}'."
+                            )
+                        count_errors += 1
+
+                        line_end = index + 3
+                        continue
+
+                    cell_aux = cell.replace(",", ".")
+                    cell_aux = pd.to_numeric(cell_aux, errors="coerce")
+
+                    # Trunca o valor para 3 casas decimais
+                    new_value = truncate_number(cell_aux, 3)
+                    a = Decimal(str(cell))
+
+                    # Verifica se o valor tem mais de 3 casas decimais
+                    if a.as_tuple().exponent < -3:
+                        if not has_more_than_3_decimal_places:
+                            line_init_values = index + 3
+                        has_more_than_3_decimal_places = True
+                        count_values_has_more_than_3_decimal_places += 1
+
+                    all_cells.append(str(new_value))
+
+                # Soma os valores válidos da linha
+                row_sum = sum([Decimal(cell) for cell in all_cells])
+
+                if row_sum == 0:
+                    for data in lista_id_coluna_valor:
+                        id_linha, id_coluna, valor = data
+
+                        try:
+                            valor = sp_df_values.loc[sp_df_values[self.column_name_id] == id_linha][id_coluna].values[0]
+                            if valor != self._data_models_context.config.VALUE_DI and float(valor) != 0:
+                                errors.append(
+                                    f"{self.sp_name_proportionality}: A soma de fatores influenciadores para o ID '{id_linha}' no pai '{id_coluna}' é 0 (zero). Na planilha {self.sp_name_value}, existe(m) valor(es) para os filhos do indicador '{id_coluna}', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+                                )
+
+                        except Exception:
+                            continue
+                elif row_sum < Decimal("0.99") or row_sum > Decimal("1.01"):
+
+                    errors.append(
+                        f"{self.sp_name_proportionality}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {format_number_brazilian(row_sum, self._data_models_context.lm.current_language)}, e não 1."
+                    )
+                elif row_sum != 1 and Decimal("0.99") <= row_sum <= Decimal(
+                    "1.01"
+                ):  # elif row_sum != 1 and row_sum >= Decimal('0.99') and row_sum <= Decimal('1.01'):
+                    warnings.append(
+                        f"{self.sp_name_proportionality}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {format_number_brazilian(row_sum, self._data_models_context.lm.current_language)}, e não 1."
+                    )
+            if count_errors > 1:
+                errors_column.clear()
+                errors_column.append(
+                    f"{self.sp_name_proportionality}: {count_errors} valores que não são número válido nem {self._data_models_context.config.VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}."
+                )
+
+            errors.extend(errors_column)
+
+        if has_more_than_3_decimal_places:
+            text_existem = "Existem" if count_values_has_more_than_3_decimal_places > 1 else "Existe"
+            text_valores = "valores" if count_values_has_more_than_3_decimal_places > 1 else "valor"
+            warnings.append(
+                f"{self.sp_name_proportionality}, linha {line_init_values}: {text_existem} {count_values_has_more_than_3_decimal_places} {text_valores} com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais."
+            )
+
+        return errors, warnings
 
     def validate_relation_indicators_in_proportionality(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
@@ -420,9 +479,36 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         return errors, warnings
 
-    def validate_yyy(self) -> Tuple[List[str], List[str]]:
+    def validate_sum_properties_in_influencing_factors(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
-        print(f"Validating {self.sp_name_proportionality} - YYY")
+        if self.model_dataframes[self.sp_name_value].empty:
+            self.set_not_executed(
+                [
+                    (
+                        self.validate_sum_properties_in_influencing_factors,
+                        NamesEnum.SUM_PROP.value,
+                    )
+                ]
+            )
+            return errors, warnings
+
+        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        local_required_columns = {
+            self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
+            self.sp_name_value: self.global_required_columns[self.sp_name_value],
+        }
+
+        # Check required columns exist
+        column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
+        if column_errors:
+            return column_errors, warnings
+
+        df_proportionalities = self.model_dataframes[self.sp_name_proportionality].copy()
+        df_values = self.model_dataframes[self.sp_name_value].copy()
+
+        subdatasets = build_subdatasets(df_proportionalities, self.column_name_id)
+
+        errors, warnings = self._check_sum_equals_one(subdatasets, df_values)
 
         return errors, warnings
 
@@ -434,7 +520,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             (self.validate_columns_repeated_indicators, NamesEnum.REP_IND_PROP.value),
             (self.validate_relation_indicators_in_value_and_proportionality, NamesEnum.IND_VAL_PROP.value),
             (self.validate_parent_child_relationships, NamesEnum.IR_PROP.value),
-            (self.validate_yyy, NamesEnum.IR.value),
+            (self.validate_sum_properties_in_influencing_factors, NamesEnum.SUM_PROP.value),
         ]
         if self._dataframe.empty:
             self.set_not_executed(validations)
