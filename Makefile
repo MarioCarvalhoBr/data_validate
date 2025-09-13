@@ -1,4 +1,4 @@
-.PHONY: help install run clean test test-fast test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
+.PHONY: help install update run clean test test-fast test-short test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
 
 # Variables
 APP_NAME = data_validate
@@ -16,6 +16,9 @@ help: ## Shows available commands
 install: ## Install development dependencies
 	poetry install
 
+update: ## Update dependencies to latest versions
+	poetry update
+
 # 3. Run main script
 run: ## Execute main pipeline script
 	bash scripts/run_main_pipeline.sh
@@ -29,6 +32,9 @@ test: ## Run all tests with coverage (uses pyproject.toml config)
 
 test-fast: ## Run tests quickly (no coverage, fail fast)
 	$(PYTEST) -x --no-cov
+
+test-short: ## Run tests showing only the name of the tested file
+	$(PYTEST) -q --tb=short
 
 test-clean: ## Remove temporary files and reports
 	rm -rf .coverage
