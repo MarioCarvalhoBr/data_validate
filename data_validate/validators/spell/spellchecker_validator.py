@@ -105,8 +105,8 @@ class SpellCheckerValidator(ValidatorModelABC):
             columns_sheets=columns_to_check,
         )
 
-        errors.extend(errors_spellchecker)
-        warnings.extend(warnings_spellchecker)
+        errors.extend(sorted(errors_spellchecker))
+        warnings.extend(sorted(warnings_spellchecker))
 
         return errors, warnings
 
