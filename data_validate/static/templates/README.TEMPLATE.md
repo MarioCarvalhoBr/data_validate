@@ -119,9 +119,16 @@ Ou usando o `chocolatey`:
 ### Instalação De Dependências do Projeto
 
 ```bash
-# 1. Clone o repositório
+# 1.1 Clone o repositório
 git clone https://github.com/{{USER_REPO}}.git
 cd data_validate
+
+#  1.2 Crie e ative um ambiente virtual (opcional, mas recomendado)
+python -m venv .venv
+
+# 1.3 Ative o ambiente virtual
+source .venv/bin/activate # No Linux/MacOS
+.venv\Scripts\activate # No Windows
 
 # 2. Instale o Poetry (se necessário)
 pip install poetry
