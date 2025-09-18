@@ -3,6 +3,7 @@ import os
 from pathlib import Path
 
 from data_validate.helpers.base.metadata_info import METADATA
+
 print(f"{METADATA.__welcome__}\n")
 
 # --- CONFIGURAÇÃO ---
