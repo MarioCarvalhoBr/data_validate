@@ -16,6 +16,9 @@ help: ## Shows available commands
 install: ## Install development dependencies
 	poetry install
 
+build: ## Build the package
+	rm -rf dist/
+	poetry build
 update: ## Update dependencies to latest versions
 	poetry update
 

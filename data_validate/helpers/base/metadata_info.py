@@ -1,13 +1,7 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-
-"""
-Package metadata
-"""
-
 from __future__ import annotations
-from pathlib import Path
-import tomllib
-
+import importlib.metadata
+from typing import Final
 
 from data_validate.helpers.base.constant_base import ConstantBase
 
@@ -16,57 +10,53 @@ class MetadataInfo(ConstantBase):
     def __init__(self):
         super().__init__()
 
-        # Base metadata
-        self.__text_dev__ = "Development"
-        self.__text_prod__ = "Production/Stable"
+        project_name: Final = "Canoa"
+        dist_name: Final = "canoa_data_validate"
+        release_level: Final = "beta"
+        serial: Final = 1077
+        status_dev: Final = 10
 
-        # Locate the pyproject.toml file (3 levels up from this file)
-        pyproject_toml_file: Path = Path(__file__).resolve().parents[3] / "pyproject.toml"
+        self.__version__ = "0.0.0"
+        self.__name__ = dist_name
+        self.__project_name__ = project_name
+        self.__description__ = "DEFAULT DESCRIPTION: This is the default description."
+        self.__license__ = "DEFAULT LICENSE: MIT"
+        self.__python_version__ = "DEFAULT PYTHON VERSION: >=3.12"
+        self.__author__ = "DEFAULT AUTHOR: Mário Carvalho"
+        self.__author_email__ = "DEFAULT EMAIL: mariodearaujocarvalho@gmail.com"
+        self.__url__ = "DEFAULT URL: https://github.com/AdaptaBrasil/data_validate.git"
+        self.__status_dev__ = "Development"
+        self.__status_prod__ = "Production/Stable"
 
-        if not pyproject_toml_file.exists() or not pyproject_toml_file.is_file():
-            raise FileNotFoundError(f"pyproject.toml file not found: {pyproject_toml_file}")
+        try:
+            meta = importlib.metadata.metadata(dist_name)
 
-        data_toml = {}
-        with open(pyproject_toml_file, "rb") as f:
-            data_toml = tomllib.load(f)
+            self.__version__ = importlib.metadata.version(dist_name)
+            self.__name__ = meta.get("Name", dist_name)
+            self.__description__ = meta.get("Summary", "Descrição padrão.")
+            self.__license__ = meta.get("License", "MIT")
+            self.__python_version__ = meta.get("Requires-Python", ">=3.12")
+            self.__author__ = meta.get("Author", "Autor desconhecido")
+            self.__author_email__ = meta.get("Author-Email", "email@desconhecido.com")
 
-        if "project" not in data_toml:
-            raise RuntimeError("pyproject.toml file does not contain a 'project' section")
+            project_urls = {entry.split(", ")[0]: entry.split(", ")[1] for entry in meta.get_all("Project-URL", [])}
+            self.__url__ = project_urls.get("Repository", "URL não encontrada")
 
-        # PROJECT INFO METADATA
-        self.__name__ = data_toml["project"].get("name", "data_validate")
-        self.__project_name__ = data_toml["project"].get("project_name", "Canoa")
-        self.__description__ = data_toml["project"].get("description", "Parser and validate data easily for Canoa.")
-        self.__url__ = data_toml["project"].get("urls", {}).get("Repository", "https://github.com/AdaptaBrasil/data_validate.git")
-        self.__author__ = data_toml["project"].get("authors", [{}])[0].get("name", "Mário de Araújo Carvalho")
-        self.__author_email__ = data_toml["project"].get("authors", [{}])[0].get("email", "mariodearaujocarvalho@gmail.com")
+        except importlib.metadata.PackageNotFoundError:
+            print(f'Warning: Package "{dist_name}" not found. Using default metadata values.')
+
+        # CONFIGURE VAR FOR VERSION: MAJOR, MINOR, MICRO
+        map_versions = list(map(int, self.__version__.split(".")))
+        major_version: Final = map_versions[0] if len(map_versions) > 0 else 0
+        minor_version: Final = map_versions[1] if len(map_versions) > 1 else 0
+        micro_version: Final = map_versions[2] if len(map_versions) > 2 else 0
+
+        # Finally, create the full version string
+        self.__version__ = MetadataInfo._make_version(major_version, minor_version, micro_version, release_level, serial, status_dev)
+
+        # CONFIGURE URL, STATUS AND WELCOME MESSAGE
         self.__maintainer_email__ = self.__author_email__
-
-        # PROJECT MAINTAINER INFO
-        self.__license__ = data_toml["project"].get("license", "unknown")
-        self.__python_version__ = data_toml["project"].get("requires-python", "unknown")
-
-        # PROJECT MAINTAINER VERSION
-        self.__version_base__ = data_toml["project"].get("version", "0.0.0")
-        self.__release_level__ = data_toml["project"].get("release_level", "beta")
-        self.__serial__ = data_toml["project"].get("serial", 0)
-        self.__status_dev__ = data_toml["project"].get("status_dev", 0)
-
-        # CONFIGURE VAR FOR VERSION
-        self._major, self._minor, self._micro = map(int, self.__version_base__.split(".")[:3])
-
-        # Create config data
-        version_info = (
-            self._major,
-            self._minor,
-            self._micro,
-            self.__release_level__,
-            self.__serial__,
-            self.__status_dev__,
-        )
-        self.__version__ = MetadataInfo._make_version(*version_info)
-        self.__status__ = self.__text_prod__ if self.__status_dev__ == 0 else self.__text_dev__
-
+        self.__status__ = self.__status_prod__ if status_dev == 0 else self.__status_dev__
         self.__welcome__ = f"The {self.__project_name__} {self.__name__} version {self.__version__} initialized.\n"
 
         self._finalize_initialization()
