@@ -1,9 +1,9 @@
 [project]
-name = "data_validate"
+name = "canoa_data_validate"
 project_name = "Canoa"
-version = "0.7.15"
+version = "0.7.18"
 release_level = "beta"
-serial = 1034
+serial = 1036
 status_dev = 10
 
 description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados da plataforma AdaptaBrasil. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
@@ -19,7 +19,6 @@ license = "MIT"
 license-files = ["LICEN[CS]E*"]
 keywords = ["data validation", "data processing", "spreadsheet validation", "data integrity", "tabular data", "scientific research", "environmental data", "indicator systems"]
 classifiers = [
-  "Development Status :: 0.7.0 - Beta",
   "Programming Language :: Python"
 ]
 
@@ -50,6 +49,9 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 packages = [{include = "data_validate"}]
+
+[tool.poetry.scripts]
+conoa-data-validate = "data_validate.main:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"
