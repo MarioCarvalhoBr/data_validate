@@ -1,6 +1,6 @@
 [project]
 name = "canoa_data_validate"
-version = "0.7.41"
+version = "0.7.42"
 
 description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados da plataforma AdaptaBrasil. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
 authors = [

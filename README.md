@@ -11,7 +11,7 @@
 | Testing Windows | [![Windows Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/MarioCarvalhoBr/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/MarioCarvalhoBr/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/MarioCarvalhoBr/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.41b635.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.42b636.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -121,7 +121,7 @@ Ou usando o `chocolatey`:
 ```bash
 # 1.1 Clone o repositório
 git clone https://github.com/MarioCarvalhoBr/data_validate.git
-cd src
+cd data_validate
 
 #  1.2 Crie e ative um ambiente virtual (opcional, mas recomendado)
 python -m venv .venv
@@ -139,7 +139,7 @@ poetry install
 # 4. Ative o ambiente virtual
 eval $(poetry env activate)
 ```
-]
+
 # Comando completo
 python -m src.main
     --input_folder data/input

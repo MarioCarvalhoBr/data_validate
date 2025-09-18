@@ -121,7 +121,7 @@ Ou usando o `chocolatey`:
 ```bash
 # 1.1 Clone o repositório
 git clone https://github.com/{{USER_REPO}}.git
-cd src
+cd data_validate
 
 #  1.2 Crie e ative um ambiente virtual (opcional, mas recomendado)
 python -m venv .venv
@@ -139,7 +139,7 @@ poetry install
 # 4. Ative o ambiente virtual
 eval $(poetry env activate)
 ```
-]
+
 # Comando completo
 python -m src.main
     --input_folder data/input
