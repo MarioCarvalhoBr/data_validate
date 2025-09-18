@@ -9,38 +9,48 @@ PYPROJECT_FILE="pyproject.toml"
 
 # Verifica se o arquivo pyproject.toml existe no diretório atual
 if [ -f "$PYPROJECT_FILE" ]; then
-    # Tenta extrair o número de serial atual do arquivo
-    # grep 'serial' -> encontra a linha que contém a palavra "serial"
-    # cut -d '=' -f2 -> divide a linha pelo caractere '=' e pega a segunda parte
-    # tr -d ' ' -> remove quaisquer espaços em branco
-    current_serial=$(grep 'serial' "$PYPROJECT_FILE" | cut -d '=' -f2 | tr -d ' ')
+    # Extrai a versão atual do arquivo usando grep e sed
+    # Busca pela linha 'version = "x.y.z"' e extrai apenas o valor entre aspas
+    current_version=$(grep '^version = ' "$PYPROJECT_FILE" | sed 's/version = "\([^"]*\)"/\1/')
 
-    # Verifica se a extração do serial foi bem-sucedida e se é um número
-    if [[ "$current_serial" =~ ^[0-9]+$ ]]; then
-        # Incrementa o número do serial em 1
-        new_serial=$((current_serial + 1))
+    # Verifica se a extração da versão foi bem-sucedida
+    if [ -n "$current_version" ]; then
+        # Verifica se a versão está no formato correto (major.minor.micro)
+        if [[ "$current_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+            # Separa os componentes da versão
+            IFS='.' read -r major minor micro <<< "$current_version"
 
-        # Substitui o número de serial antigo pelo novo no arquivo
-        # O comando sed -i altera o arquivo diretamente
-        sed -i "s/serial = $current_serial/serial = $new_serial/" "$PYPROJECT_FILE"
-        git add .
-        # Verifica se o comando sed foi executado com sucesso
-        if [ $? -eq 0 ]; then
-            # Imprime a mensagem de sucesso
-            git add .
-            echo "Arquivo pyproject.toml foi localizado. Incrementando o serial de $current_serial pra $new_serial."
+            # Incrementa o micro (patch) em 1
+            new_micro=$((micro + 1))
+
+            # Monta a nova versão
+            new_version="${major}.${minor}.${new_micro}"
+
+            echo "Versão atual encontrada: $current_version. Incrementando micro para $new_version."
+
+            # Substitui a versão antiga pela nova no arquivo
+            sed -i "s/version = \"$current_version\"/version = \"$new_version\"/" "$PYPROJECT_FILE"
+
+            # Verifica se o comando sed foi executado com sucesso
+            if [ $? -eq 0 ]; then
+                # Adiciona as mudanças ao git e imprime mensagem de sucesso
+                git add .
+                echo "Arquivo $PYPROJECT_FILE foi atualizado com sucesso!"
+                poetry install
+                echo "Dependências atualizadas com sucesso!"
+            else
+                echo "Erro: Falha ao tentar atualizar o arquivo $PYPROJECT_FILE." >&2
+                exit 1
+            fi
         else
-            # Mensagem de erro se a substituição falhar
-            echo "Erro: Falha ao tentar atualizar o arquivo $PYPROJECT_FILE." >&2
+            echo "Erro: A versão '$current_version' não está no formato esperado (major.minor.micro)." >&2
             exit 1
         fi
     else
-        # Mensagem de erro se o serial não for encontrado ou não for um número
-        echo "Erro: Não foi possível encontrar ou ler um valor de serial válido em $PYPROJECT_FILE." >&2
+        echo "Erro: Não foi possível encontrar a linha de versão em $PYPROJECT_FILE." >&2
         exit 1
     fi
 else
-    # Mensagem de erro se o arquivo pyproject.toml não for encontrado
     echo "Erro: Arquivo $PYPROJECT_FILE não localizado." >&2
     exit 1
 fi
