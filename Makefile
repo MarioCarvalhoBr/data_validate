@@ -1,4 +1,4 @@
-.PHONY: help install update run clean test test-fast test-short test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
+.PHONY: help install update publish run clean test test-fast test-short test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
 
 # Variables
 APP_NAME = data_validate
@@ -18,6 +18,12 @@ install: ## Install development dependencies
 
 update: ## Update dependencies to latest versions
 	poetry update
+
+publish: readme ## Build and Publish the package to PyPI
+	rm -rf dist/
+	poetry build
+	poetry run twine upload --repository testpypi dist/*
+	poetry run twine upload dist/*
 
 # 3. Run main script
 run: ## Execute main pipeline script
