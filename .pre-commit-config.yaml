@@ -8,7 +8,6 @@ repos:
           language: python
           always_run: true
           pass_filenames: false
-          stages: ["pre-push"]
 
         - id: prepare-pyproject
           name: prepare pyproject
