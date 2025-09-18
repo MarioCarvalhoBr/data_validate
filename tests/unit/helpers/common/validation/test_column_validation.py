@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 from typing import List
 
-from data_validate.helpers.common.validation.column_validation import check_column_names
+from src.helpers.common.validation.column_validation import check_column_names
 
 
 class TestCheckColumnNames:

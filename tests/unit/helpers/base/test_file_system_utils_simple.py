@@ -1,5 +1,5 @@
 from unittest.mock import patch
-from data_validate.helpers.base.file_system_utils import FileSystemUtils
+from src.helpers.base.file_system_utils import FileSystemUtils
 
 
 def test_simple():
@@ -12,6 +12,6 @@ class TestFileSystemUtils:
 
     def test_init(self):
         """Test initialization."""
-        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
+        with patch("src.helpers.base.file_system_utils.LanguageManager"):
             fs_utils = FileSystemUtils()
             assert fs_utils is not None

@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from data_validate.helpers.common.processing.data_cleaning import (
+from src.helpers.common.processing.data_cleaning import (
     clean_column_integer,
     clean_dataframe_integers,
     clean_column_floats,

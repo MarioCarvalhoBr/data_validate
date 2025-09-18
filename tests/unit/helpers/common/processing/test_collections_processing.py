@@ -1,4 +1,4 @@
-from data_validate.helpers.common.processing.collections_processing import (
+from src.helpers.common.processing.collections_processing import (
     categorize_strings_by_id_pattern_from_list,
     extract_numeric_integer_ids_from_list,
     extract_numeric_ids_and_unmatched_strings_from_list,

@@ -9,7 +9,7 @@ testing initialization, attribute setting protection, and string representation.
 from typing import Any, Dict, List
 import pytest
 
-from data_validate.helpers.base.constant_base import ConstantBase
+from src.helpers.base.constant_base import ConstantBase
 
 
 class TestConstantBase:

@@ -11,7 +11,7 @@
 | Testing Windows | [![Windows Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/MarioCarvalhoBr/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/MarioCarvalhoBr/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/MarioCarvalhoBr/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.39b634.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.41b635.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -75,7 +75,7 @@ O Data Validate implementa a especificação detalhada no protocolo de validaç�
 O projeto segue uma arquitetura modular baseada em padrões de design limpos:
 
 ```
-📁 data_validate/
+📁 src/
 ├── 🎛️ controllers/     # Orquestração e controle de fluxo
 ├── 📊 models/          # Modelos de dados para planilhas
 ├── ✅ validators/      # Lógica de validação
@@ -121,7 +121,7 @@ Ou usando o `chocolatey`:
 ```bash
 # 1.1 Clone o repositório
 git clone https://github.com/MarioCarvalhoBr/data_validate.git
-cd data_validate
+cd src
 
 #  1.2 Crie e ative um ambiente virtual (opcional, mas recomendado)
 python -m venv .venv
@@ -139,21 +139,16 @@ poetry install
 # 4. Ative o ambiente virtual
 eval $(poetry env activate)
 ```
-
-## 🎯 Uso
-
-### Execução Básica
-
-```bash
+]
 # Comando completo
-python -m data_validate.main
+python -m src.main
     --input_folder data/input
     --output_folder data/output
     --locale pt_BR
     --debug
 
 # Comando abreviado
-python -m data_validate.main --i data/input --o data/output --l pt_BR --d
+python -m src.main --i data/input --o data/output --l pt_BR --d
 ```
 
 ### Script de Pipeline
@@ -168,13 +163,13 @@ bash scripts/run_main_pipeline.sh
 #### Modo Desenvolvimento (Recomendado)
 ```bash
 # Com debug ativo e logs detalhados
-python -m data_validate.main --input_folder data/input --debug
+python -m src.main --input_folder data/input --debug
 ```
 
 #### Modo Produção
 ```bash
 # Sem logs, sem tempo, sem versão no relatório
-python -m data_validate.main
+python -m src.main
     --input_folder data/input
     --output_folder data/output
     --no-time
@@ -184,7 +179,7 @@ python -m data_validate.main
 #### Modo Rápido (sem verificação ortográfica e tamanhos de títulos)
 ```bash
 # Para execuções rápidas, pulando spell check e avisos de comprimento de títulos
-python -m data_validate.main
+python -m src.main
     --input_folder data/input
     --no-spellchecker
     --no-warning-titles-length
@@ -275,12 +270,12 @@ O sistema gera:
 ## 📁 Estrutura do Projeto
 
 ```
-data_validate/
+src/
 ├── 📊 assets/                    # Badges e recursos visuais
 ├── 📁 data/                      # Dados de entrada e saída
 │   ├── input/                    # Planilhas para validação
 │   └── output/                   # Relatórios e logs gerados
-├── 🐍 data_validate/             # Código-fonte principal
+├── 🐍 src/             # Código-fonte principal
 │   ├── config/                   # Configurações globais
 │   ├── controllers/              # Orquestração e controle
 │   │   ├── context/              # Contextos de dados
@@ -402,7 +397,7 @@ tests/
 
 ```bash
 # Gerar documentação com pdoc
-pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
+pdoc ./src/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 ```
 
 ### Documentos Disponíveis
@@ -435,10 +430,10 @@ pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/
 
 ```bash
 # Validação mínima (apenas pasta de entrada é obrigatória)
-python -m data_validate.main --input_folder data/input
+python -m src.main --input_folder data/input
 
 # Validação com pasta específica e debug
-python -m data_validate.main \
+python -m src.main \
     --input_folder /caminho/para/planilhas \
     --output_folder /caminho/para/relatorios \
     --debug
@@ -448,17 +443,17 @@ python -m data_validate.main \
 
 ```bash
 # Interface em português (padrão)
-python -m data_validate.main --input_folder data/input --locale pt_BR
+python -m src.main --input_folder data/input --locale pt_BR
 
 # Interface em inglês
-python -m data_validate.main --input_folder data/input --locale en_US
+python -m src.main --input_folder data/input --locale en_US
 ```
 
 ### Validação com Argumentos Avançados
 
 ```bash
 # Execução completa com todos os argumentos
-python -m data_validate.main \
+python -m src.main \
     --input_folder data/input \
     --output_folder data/output \
     --locale pt_BR \
@@ -472,7 +467,7 @@ python -m data_validate.main \
 
 ```bash
 # Execução rápida sem verificação ortográfica e avisos de comprimento
-python -m data_validate.main \
+python -m src.main \
     --input_folder data/input \
     --no-spellchecker \
     --no-warning-titles-length \
@@ -484,7 +479,7 @@ python -m data_validate.main \
 
 ```bash
 # Comando mais conciso usando abreviações
-python -m data_validate.main --i data/input --o data/output --l pt_BR --d
+python -m src.main --i data/input --o data/output --l pt_BR --d
 ```
 
 ### Pipeline Completo
@@ -585,13 +580,13 @@ Este projeto está licenciado sob a **MIT License** - veja o arquivo [LICENSE](.
 ```bash
 # Erro: "argument --input_folder is required"
 # Solução: Sempre especifique a pasta de entrada
-python -m data_validate.main --input_folder data/input
+python -m src.main --input_folder data/input
 ```
 
 ### Performance Lenta
 ```bash
 # Para execução mais rápida, desative verificações demoradas
-python -m data_validate.main \
+python -m src.main \
     --input_folder data/input \
     --no-spellchecker \
     --no-warning-titles-length
@@ -600,7 +595,7 @@ python -m data_validate.main \
 ### Logs Excessivos
 ```bash
 # Para reduzir saída no console
-python -m data_validate.main \
+python -m src.main \
     --input_folder data/input \
     --no-time \
     --no-version

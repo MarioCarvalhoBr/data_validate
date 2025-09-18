@@ -1,4 +1,4 @@
-from data_validate.helpers.common.formatting.text_formatting import (
+from src.helpers.common.formatting.text_formatting import (
     is_acronym,
     capitalize_text_keep_acronyms,
 )

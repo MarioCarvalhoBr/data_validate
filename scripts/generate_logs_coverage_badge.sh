@@ -27,7 +27,7 @@ if [ $? -eq 0 ]; then
         if [ -d "$INPUT_DATA/$name" ]; then
             echo ""
             echo "Processando a pasta '$INPUT_DATA/$name'..."
-            poetry run python -m data_validate.main --l=pt_BR --i=$INPUT_DATA/$name/ --o=$OUTPUT_DATA/$name/ --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
+            poetry run python -m src.main --l=pt_BR --i=$INPUT_DATA/$name/ --o=$OUTPUT_DATA/$name/ --no-time --no-version --sector="Setor A" --protocol="Protocolo B" --user="Usuário C"
             
             # Adicionando arquivos ao staging area
             git add .

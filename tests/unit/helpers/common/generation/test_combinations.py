@@ -1,4 +1,4 @@
-from data_validate.helpers.common.generation.combinations import (
+from src.helpers.common.generation.combinations import (
     generate_combinations,
     find_extra_combinations,
 )

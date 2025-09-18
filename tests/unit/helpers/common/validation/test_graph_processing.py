@@ -6,7 +6,7 @@ import pytest
 import pandas as pd
 import networkx as nx
 
-from data_validate.helpers.common.validation.graph_processing import GraphProcessing
+from src.helpers.common.validation.graph_processing import GraphProcessing
 
 
 class TestGraphProcessing:

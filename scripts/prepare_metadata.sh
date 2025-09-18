@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define o caminho para o arquivo de metadados
-METADATA_FILE="data_validate/helpers/base/metadata_info.py"
+METADATA_FILE="src/helpers/base/metadata_info.py"
 
 # Verifica se o arquivo existe
 if [ -f "$METADATA_FILE" ]; then

@@ -17,7 +17,7 @@ from typing import Any, Dict, Generator
 from unittest.mock import Mock, patch
 import pytest
 
-from data_validate.helpers.base.data_args import (
+from src.helpers.base.data_args import (
     DataModelABC,
     DataFile,
     DataAction,
@@ -251,7 +251,7 @@ class TestDataArgs:
         """Mock LanguageManager for testing."""
         return Mock()
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_init_with_mocked_args(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
         """Test DataArgs initialization with mocked command line arguments."""
@@ -279,7 +279,7 @@ class TestDataArgs:
         assert data_args.data_action is not None
         assert data_args.data_report is not None
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_create_parser_method(self, mock_parse_args: Mock, mock_lm_class: Mock) -> None:
         """Test _create_parser method creates ArgumentParser correctly."""
@@ -307,7 +307,7 @@ class TestDataArgs:
         assert isinstance(parser, argparse.ArgumentParser)
         assert parser.allow_abbrev is False
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_get_dict_args_method(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
         """Test get_dict_args method returns correct dictionary."""
@@ -348,7 +348,7 @@ class TestDataArgs:
 
         assert result_dict == expected_dict
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_str_method(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
         """Test __str__ method returns correct string representation."""
@@ -390,7 +390,7 @@ class TestDataArgs:
         for part in expected_parts:
             assert part in str_result
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     def test_run_method_calls_parser(self, mock_lm_class: Mock) -> None:
         """Test that run method creates parser and parses arguments."""
         mock_lm_class.return_value = Mock()
@@ -442,7 +442,7 @@ class TestDataArgsDataDrivenTests:
             (False, False),
         ],
     )
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_allow_abbrev_parameter(
         self, mock_parse_args: Mock, mock_lm_class: Mock, allow_abbrev: bool, expected_abbrev: bool, temp_input_dir: str
@@ -476,7 +476,7 @@ class TestDataArgsDataDrivenTests:
             ("en_US", "en_US"),
         ],
     )
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_locale_parameter_variations(
         self, mock_parse_args: Mock, mock_lm_class: Mock, locale_value: str, expected_locale: str, temp_input_dir: str
@@ -520,7 +520,7 @@ class TestDataArgsDataDrivenTests:
             ),
         ],
     )
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_boolean_flags_combinations(
         self, mock_parse_args: Mock, mock_lm_class: Mock, boolean_flags: Dict[str, bool], expected_values: Dict[str, bool], temp_input_dir: str
@@ -561,7 +561,7 @@ class TestDataArgsEdgeCases:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_create_parser_with_all_arguments(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
         """Test that _create_parser creates parser with all required arguments."""
@@ -595,7 +595,7 @@ class TestDataArgsEdgeCases:
         for arg in expected_args:
             assert arg in action_names
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_parser_description_and_settings(self, mock_parse_args: Mock, mock_lm_class: Mock) -> None:
         """Test parser description and allow_abbrev setting."""
@@ -651,7 +651,7 @@ class TestDataArgsIntegration:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_complete_workflow_with_all_parameters(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
         """Test complete workflow with all parameters set."""
@@ -709,7 +709,7 @@ class TestDataArgsIntegration:
         assert "Agricultura" in str_repr
         assert "crops.xlsx" in str_repr
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
+    @patch("src.helpers.base.data_args.LanguageManager")
     @patch("argparse.ArgumentParser.parse_args")
     def test_workflow_with_minimal_parameters(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
         """Test workflow with minimal required parameters."""
@@ -746,7 +746,7 @@ class TestDataArgsIntegration:
 
     def test_multiple_dataargs_instances_independence(self) -> None:
         """Test that multiple DataArgs instances are independent."""
-        with patch("data_validate.helpers.base.data_args.LanguageManager"):
+        with patch("src.helpers.base.data_args.LanguageManager"):
             with patch("argparse.ArgumentParser.parse_args") as mock_parse_args:
                 with tempfile.TemporaryDirectory() as temp_dir1:
                     with tempfile.TemporaryDirectory() as temp_dir2:

@@ -12,7 +12,7 @@ data-validate/
 ├── data/                 # Dados de entrada e saída
 │   ├── input/            # Planilhas a serem validadas
 │   └── output/           # Relatórios e logs gerados
-├── data_validate/        # Código-fonte da aplicação
+├── src/        # Código-fonte da aplicação
 │   ├── config/           # Configurações globais
 │   ├── controllers/      # Orquestração do fluxo de validação
 │   ├── helpers/          # Funções utilitárias
@@ -31,15 +31,15 @@ data-validate/
 
 ### Componentes Principais
 
--   **`data_validate/main.py`**: Ponto de entrada da aplicação. Ele inicializa o processo de validação.
--   **`data_validate/middleware/bootstrap.py`**: Responsável por configurar o ambiente, como a criação de diretórios e a configuração de logs, antes da execução principal.
--   **`data_validate/controllers/processor.py`**: O coração da aplicação. Ele orquestra a leitura dos dados, a execução das validações em sequência e a geração dos relatórios de saída.
--   **`data_validate/models/`**: Contém classes que modelam a estrutura esperada de cada planilha (e.g., `sp_legend.py`, `sp_value.py`). Eles definem as colunas, tipos de dados e regras de negócio.
--   **`data_validate/validators/`**: Contém a lógica específica para cada tipo de validação. Por exemplo:
+-   **`src/main.py`**: Ponto de entrada da aplicação. Ele inicializa o processo de validação.
+-   **`src/middleware/bootstrap.py`**: Responsável por configurar o ambiente, como a criação de diretórios e a configuração de logs, antes da execução principal.
+-   **`src/controllers/processor.py`**: O coração da aplicação. Ele orquestra a leitura dos dados, a execução das validações em sequência e a geração dos relatórios de saída.
+-   **`src/models/`**: Contém classes que modelam a estrutura esperada de cada planilha (e.g., `sp_legend.py`, `sp_value.py`). Eles definem as colunas, tipos de dados e regras de negócio.
+-   **`src/validators/`**: Contém a lógica específica para cada tipo de validação. Por exemplo:
     -   `structure/`: Valida a estrutura das planilhas (nomes de colunas, ordem, etc.).
     -   `spell/`: Realiza a verificação ortográfica.
     -   `spreadsheets/`: Contém validações de regras de negócio específicas para cada planilha.
--   **`data_validate/helpers/`**: Funções genéricas e reutilizáveis que auxiliam os outros componentes, como manipulação de DataFrames, leitura de arquivos e formatação de logs.
+-   **`src/helpers/`**: Funções genéricas e reutilizáveis que auxiliam os outros componentes, como manipulação de DataFrames, leitura de arquivos e formatação de logs.
 -   **`data/`**: Diretório crucial para a operação. Os dados a serem validados são colocados em `data/input/`, e os resultados, incluindo logs de erros e relatórios, são salvos em `data/output/`.
 
 ## Fluxo de Execução
