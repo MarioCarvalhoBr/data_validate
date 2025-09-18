@@ -2,6 +2,7 @@
 local_data/
 data/output/logs/
 code_test.py
+my_codes.py
 
 # Logs
 *.log
