@@ -135,7 +135,7 @@ pip install canoa-data-validate
 
 #### Exemplo de uso após instalação via PyPI
 ```bash
-data-validate --input_folder data/input --output_folder data/output --locale pt_BR --debug
+canoa-data-validate --input_folder data/input --output_folder data/output --locale pt_BR --debug
 ```
 
 ### Instalação via repositório GitHub
