@@ -11,7 +11,7 @@
 | Testing Windows | [![Windows Build](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/AdaptaBrasil/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/AdaptaBrasil/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/AdaptaBrasil/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/AdaptaBrasil/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/AdaptaBrasil/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.44b638-orange.svg) [![License - MIT](https://img.shields.io/github/license/AdaptaBrasil/data_validate)](https://img.shields.io/github/license/AdaptaBrasil/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.45b639-orange.svg) [![License - MIT](https://img.shields.io/github/license/AdaptaBrasil/data_validate)](https://img.shields.io/github/license/AdaptaBrasil/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -116,7 +116,29 @@ Ou usando o `chocolatey`:
     choco install -y wkhtmltopdf
 ```
 
-### Instalação De Dependências do Projeto
+### Instalação via PyPI
+
+#### Crie um ambiente virtual (opcional, mas recomendado)
+```bash
+#  1.0 Crie e ative um ambiente virtual (opcional, mas recomendado)
+python -m venv .venv
+
+# 1.0 Ative o ambiente virtual
+source .venv/bin/activate # No Linux/MacOS
+.venv\Scripts\activate # No Windows
+```
+
+#### Instale o pacote via pip
+```bash
+pip install canoa-data-validate
+```
+
+#### Exemplo de uso após instalação via PyPI
+```bash
+data-validate --input_folder data/input --output_folder data/output --locale pt_BR --debug
+```
+
+### Instalação via repositório GitHub
 
 ```bash
 # 1.1 Clone o repositório
@@ -140,14 +162,14 @@ poetry install
 eval $(poetry env activate)
 ```
 
-# Comando completo
+#### Comando completo
 python -m src.main
     --input_folder data/input
     --output_folder data/output
     --locale pt_BR
     --debug
 
-# Comando abreviado
+#### Comando abreviado
 python -m src.main --i data/input --o data/output --l pt_BR --d
 ```
 
@@ -575,6 +597,12 @@ Este projeto está licenciado sob a **MIT License** - veja o arquivo [LICENSE](.
 - **Changelog**: [Histórico de Versões](../../../CHANGELOG.md)
 
 ## 🐛 Solução de Problemas
+
+### Desinstalando o canoa-data-validate instalado via PyPI
+
+```bash
+pip uninstall canoa-data-validate
+```
 
 ### Argumentos Obrigatórios
 ```bash
