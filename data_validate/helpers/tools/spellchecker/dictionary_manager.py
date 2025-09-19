@@ -1,8 +1,9 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import os
-from enchant import Broker, Dict
 from pathlib import Path
 from typing import List
+
+from enchant import Broker, Dict
 
 
 class DictionaryManager:

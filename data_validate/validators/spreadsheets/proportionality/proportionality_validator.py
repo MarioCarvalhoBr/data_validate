@@ -8,6 +8,7 @@ from pandas import DataFrame
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.helpers.common.formatting.number_formatting import format_number_brazilian
 from data_validate.helpers.common.formatting.number_formatting import truncate_number
 from data_validate.helpers.common.processing.collections_processing import (
     categorize_strings_by_id_pattern_from_list,
@@ -17,7 +18,6 @@ from data_validate.helpers.common.processing.collections_processing import gener
 from data_validate.helpers.common.processing.data_cleaning import (
     clean_dataframe_integers,
 )
-
 from data_validate.helpers.common.validation.proportionality_data_validation import (
     get_valids_codes_from_description,
     build_subdatasets,
@@ -26,7 +26,6 @@ from data_validate.models import SpProportionality, SpDescription, SpValue, SpCo
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
 )
-from data_validate.helpers.common.formatting.number_formatting import format_number_brazilian
 
 
 class SpProportionalityValidator(ValidatorModelABC):

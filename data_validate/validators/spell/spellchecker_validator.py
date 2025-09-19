@@ -2,15 +2,15 @@
 from typing import List, Tuple, Dict, Any, Type, Union
 
 from data_validate.config.config import NamesEnum
+from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 from data_validate.models import (
     SpDictionary,
     SpDescription,
     SpTemporalReference,
     SpScenario,
 )
-from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
-from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
 )
@@ -105,8 +105,8 @@ class SpellCheckerValidator(ValidatorModelABC):
             columns_sheets=columns_to_check,
         )
 
-        errors.extend(errors_spellchecker)
-        warnings.extend(warnings_spellchecker)
+        errors.extend(sorted(errors_spellchecker))
+        warnings.extend(sorted(warnings_spellchecker))
 
         return errors, warnings
 

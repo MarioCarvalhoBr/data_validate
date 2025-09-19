@@ -1,11 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import re
-from typing import List, Any
-import pandas as pd
 from decimal import Decimal, InvalidOperation
+from typing import List, Any
 
-from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
+import pandas as pd
+
 from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
 
 
 class LegendProcessing:

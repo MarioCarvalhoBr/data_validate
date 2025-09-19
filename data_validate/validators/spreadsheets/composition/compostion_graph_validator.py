@@ -7,6 +7,15 @@ from pandas import DataFrame
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.helpers.common.processing.collections_processing import (
+    find_differences_in_two_set_with_message,
+    extract_numeric_integer_ids_from_list,
+)
+from data_validate.helpers.common.processing.data_cleaning import (
+    clean_dataframe_integers,
+)
+from data_validate.helpers.common.validation.data_validation import check_dataframe_titles_uniques
+from data_validate.helpers.common.validation.graph_processing import GraphProcessing
 from data_validate.models import (
     SpModelABC,
     SpComposition,
@@ -17,16 +26,6 @@ from data_validate.models import (
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
 )
-
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
-from data_validate.helpers.common.processing.collections_processing import (
-    find_differences_in_two_set_with_message,
-    extract_numeric_integer_ids_from_list,
-)
-from data_validate.helpers.common.validation.data_validation import check_dataframe_titles_uniques
-from data_validate.helpers.common.validation.graph_processing import GraphProcessing
 
 
 class SpCompositionGraphValidator(ValidatorModelABC):

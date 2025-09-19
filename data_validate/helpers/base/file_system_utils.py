@@ -1,7 +1,8 @@
 import os
-import chardet
-from typing import Tuple, List
 from pathlib import Path
+from typing import Tuple, List
+
+import chardet
 
 from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
@@ -179,12 +180,3 @@ class FileSystemUtils:
             return False, self.lm.text("fs_utils_info_dir_not_empty", dir_path=dir_path)
         except Exception as e:
             return False, self.lm.text("fs_utils_error_dir_check_fail", error=str(e))
-
-
-if __name__ == "__main__":
-    locale_manager = LanguageManager()
-    fs_utils = FileSystemUtils(locale_manager)
-
-    # Exemplo de uso
-    success, message = fs_utils.create_directory("example_dir")
-    print(message)

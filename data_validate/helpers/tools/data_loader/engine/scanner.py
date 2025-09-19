@@ -6,6 +6,7 @@ Escaneia diretório de entrada e valida existência de arquivos.
 """
 
 from pathlib import Path
+
 from ..common.config import Config
 
 

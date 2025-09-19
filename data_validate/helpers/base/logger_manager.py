@@ -1,7 +1,7 @@
 import logging
-from typing import Optional
 import os
 from datetime import datetime
+from typing import Optional
 
 
 class CustomFormatter(logging.Formatter):

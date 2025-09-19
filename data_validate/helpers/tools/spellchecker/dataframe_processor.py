@@ -1,7 +1,8 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
-import pandas as pd
 from typing import List, Tuple
+
+import pandas as pd
 
 from data_validate.helpers.tools.spellchecker.spellchecker_controller import (
     SpellCheckerController,

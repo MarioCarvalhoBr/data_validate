@@ -1,9 +1,9 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import Any, Dict
 
-from data_validate.helpers.tools import LanguageManager
 from data_validate.config import Config
 from data_validate.helpers.base import DataArgs, FileSystemUtils, LoggerManager
+from data_validate.helpers.tools import LanguageManager
 
 
 class GeneralContext:

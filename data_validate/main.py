@@ -1,12 +1,12 @@
 import data_validate
-from data_validate.middleware import Bootstrap
-from data_validate.helpers.base import DataArgs
 from data_validate.controllers import GeneralContext, ProcessorSpreadsheet
+from data_validate.helpers.base import DataArgs
+from data_validate.middleware import Bootstrap
 
 print(f"{data_validate.__welcome__}\n")
 
 
-def main_init():
+def main():
     # Initialize and Configure the Data Arguments
     data_args = DataArgs()
 
@@ -23,7 +23,7 @@ def main_init():
 
 
 if __name__ == "__main__":
-    main_init()
+    main()
 
 # Example usage:
 # python3 data_validate/main.py --l pt_BR --o data/output/temp/ --i data/input/data_ground_truth_01/

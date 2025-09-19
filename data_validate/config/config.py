@@ -1,6 +1,7 @@
-from enum import Enum
 from datetime import datetime
+from enum import Enum
 from types import MappingProxyType
+
 from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
 

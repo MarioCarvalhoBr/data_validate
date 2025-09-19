@@ -2,6 +2,7 @@
 """Tree data validation utilities for hierarchical structure validation."""
 
 from typing import List, Tuple, Dict, Any, Set
+
 import pandas as pd
 
 

@@ -7,11 +7,12 @@ Facade para importar todos os arquivos esperados de forma simples.
 
 from pathlib import Path
 
-from ..engine.scanner import FileScanner
-from ..engine.factory import ReaderFactory
-from ..common.config import Config
-from ..strategies.header import SingleHeaderStrategy, DoubleHeaderStrategy
 import pandas as pd
+
+from ..common.config import Config
+from ..engine.factory import ReaderFactory
+from ..engine.scanner import FileScanner
+from ..strategies.header import SingleHeaderStrategy, DoubleHeaderStrategy
 
 
 class DataLoaderModel:

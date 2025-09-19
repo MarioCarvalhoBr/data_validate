@@ -1,7 +1,7 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 import time
-from typing import Callable, Any, Optional
 from functools import wraps
+from typing import Callable, Any, Optional
 
 
 def estimate_time(func: Optional[Callable]) -> Callable:
@@ -61,7 +61,3 @@ def main():
 
     # timed_read_data = estimate_time(self._read_data)
     # timed_read_data()
-
-
-if __name__ == "__main__":
-    main()

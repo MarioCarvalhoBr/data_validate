@@ -4,12 +4,14 @@ from pathlib import Path
 
 from data_validate.helpers.base.metadata_info import METADATA
 
+print(f"{METADATA.__welcome__}\n")
+
 # --- CONFIGURAÇÃO ---
 REPO_VERSION = METADATA.__version__
 
 # Exemplos: "MarioCarvalhoBr/data_validate" ou "AdaptaBrasil/data_validate"
 USER_REPO = "AdaptaBrasil/data_validate"
-if METADATA.__status__ == METADATA.__text_dev__:
+if METADATA.__status__ == METADATA.__status_dev__:
     USER_REPO = "MarioCarvalhoBr/data_validate"
 
 # --------------------

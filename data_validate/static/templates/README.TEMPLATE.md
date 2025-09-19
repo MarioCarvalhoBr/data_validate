@@ -9,7 +9,7 @@
 |-----------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | Testing Linux   | [![Linux Build](https://github.com/{{USER_REPO}}/actions/workflows/linux-ci-build-ubuntu-24-04.yml/badge.svg)](https://github.com/{{USER_REPO}}/actions/workflows/linux-ci-build-ubuntu-24-04.yml) [![Linux Lint](https://github.com/{{USER_REPO}}/actions/workflows/linux-lint-ubuntu-24-04.yml/badge.svg)](https://github.com/{{USER_REPO}}/actions/workflows/linux-lint-ubuntu-24-04.yml) [![Linux Unit Tests](https://github.com/{{USER_REPO}}/actions/workflows/linux-unit-tests-ubuntu-24-04.yml/badge.svg)](https://github.com/{{USER_REPO}}/actions/workflows/linux-unit-tests-ubuntu-24-04.yml) |
 | Testing Windows | [![Windows Build](https://github.com/{{USER_REPO}}/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/{{USER_REPO}}/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/{{USER_REPO}}/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/{{USER_REPO}}/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
-| Coverage        | ![Coverage Status](assets/coverage/coverage_badge.svg) ![Tests Status](assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Coverage        | ![Coverage Status](https://raw.githubusercontent.com/{{USER_REPO}}/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/{{USER_REPO}}/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/{{USER_REPO}}?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/{{USER_REPO}}?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/{{USER_REPO}}?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
 | Meta            | ![Version](https://img.shields.io/badge/version-{{REPO_VERSION}}-orange.svg) [![License - MIT](https://img.shields.io/github/license/{{USER_REPO}})](https://img.shields.io/github/license/{{USER_REPO}})                                                                                                                                                                                                                                                                                                                                                                                                |
 
@@ -116,12 +116,41 @@ Ou usando o `chocolatey`:
     choco install -y wkhtmltopdf
 ```
 
-### Instalação De Dependências do Projeto
+### Instalação via PyPI
+
+#### Crie um ambiente virtual (opcional, mas recomendado)
+```bash
+#  1.0 Crie e ative um ambiente virtual (opcional, mas recomendado)
+python -m venv .venv
+
+# 1.0 Ative o ambiente virtual
+source .venv/bin/activate # No Linux/MacOS
+.venv\Scripts\activate # No Windows
+```
+
+#### Instale o pacote via pip
+```bash
+pip install canoa-data-validate
+```
+
+#### Exemplo de uso após instalação via PyPI
+```bash
+canoa-data-validate --input_folder data/input --output_folder data/output --locale pt_BR --debug
+```
+
+### Instalação via repositório GitHub
 
 ```bash
-# 1. Clone o repositório
+# 1.1 Clone o repositório
 git clone https://github.com/{{USER_REPO}}.git
 cd data_validate
+
+#  1.2 Crie e ative um ambiente virtual (opcional, mas recomendado)
+python -m venv .venv
+
+# 1.3 Ative o ambiente virtual
+source .venv/bin/activate # No Linux/MacOS
+.venv\Scripts\activate # No Windows
 
 # 2. Instale o Poetry (se necessário)
 pip install poetry
@@ -133,19 +162,14 @@ poetry install
 eval $(poetry env activate)
 ```
 
-## 🎯 Uso
-
-### Execução Básica
-
-```bash
-# Comando completo
+#### Comando completo
 python -m data_validate.main
     --input_folder data/input
     --output_folder data/output
     --locale pt_BR
     --debug
 
-# Comando abreviado
+#### Comando abreviado
 python -m data_validate.main --i data/input --o data/output --l pt_BR --d
 ```
 
@@ -573,6 +597,12 @@ Este projeto está licenciado sob a **MIT License** - veja o arquivo [LICENSE](.
 - **Changelog**: [Histórico de Versões](../../../CHANGELOG.md)
 
 ## 🐛 Solução de Problemas
+
+### Desinstalando o canoa-data-validate instalado via PyPI
+
+```bash
+pip uninstall canoa-data-validate
+```
 
 ### Argumentos Obrigatórios
 ```bash

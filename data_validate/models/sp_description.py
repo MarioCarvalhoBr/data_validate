@@ -1,21 +1,21 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Dict, Any
+
 import pandas as pd
 
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
-from data_validate.models.sp_model_abc import SpModelABC
-from data_validate.helpers.tools.data_loader.api.facade import (
-    DataLoaderModel,
-    DataLoaderFacade,
-)
-from data_validate.helpers.common.validation.column_validation import check_column_names
 from data_validate.helpers.common.formatting.error_formatting import (
     format_errors_and_warnings,
 )
 from data_validate.helpers.common.processing.data_cleaning import (
     clean_dataframe_integers,
 )
+from data_validate.helpers.common.validation.column_validation import check_column_names
+from data_validate.helpers.tools.data_loader.api.facade import (
+    DataLoaderModel,
+)
+from data_validate.models.sp_model_abc import SpModelABC
 
 
 class SpDescription(SpModelABC):
@@ -182,13 +182,3 @@ class SpDescription(SpModelABC):
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()
-
-
-if __name__ == "__main__":
-    # Test the SpDescription class
-    input_dir = "/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01"
-    importer = DataLoaderFacade(input_dir)
-    data = importer.load_all
-
-    sp_description = SpDescription(data_model=data[SpDescription.INFO["SP_NAME"]])
-    print(sp_description)

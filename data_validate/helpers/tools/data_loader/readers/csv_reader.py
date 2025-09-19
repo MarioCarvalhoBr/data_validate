@@ -5,8 +5,9 @@
 Lê CSV com pandas, corrige cabeçalho duplo e separador custom.
 """
 
-import pandas as pd
 import numpy as np
+import pandas as pd
+
 from .base_reader import BaseReader
 from ..common.config import Config
 from ..strategies.header import DoubleHeaderStrategy

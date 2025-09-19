@@ -1,5 +1,7 @@
 from typing import Tuple, List
+
 import pandas as pd
+
 from data_validate.helpers.common.formatting.number_formatting import (
     check_cell_integer,
     check_cell_float,

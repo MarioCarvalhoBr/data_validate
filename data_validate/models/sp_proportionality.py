@@ -1,5 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from typing import List, Dict, Any
+
 import pandas as pd
 
 from data_validate.controllers.context.general_context import GeneralContext

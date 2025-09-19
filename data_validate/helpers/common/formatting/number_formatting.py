@@ -1,6 +1,7 @@
-import pandas as pd
 import math
 from typing import Tuple, Any
+
+import pandas as pd
 from babel.numbers import format_decimal
 
 

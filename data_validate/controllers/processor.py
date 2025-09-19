@@ -3,9 +3,9 @@ import time
 
 import data_validate
 import data_validate.config as config
+import data_validate.controllers as controllers
 import data_validate.helpers.tools as tools
 import data_validate.models as models
-import data_validate.controllers as controllers
 import data_validate.validators as validators
 
 FLAG = None

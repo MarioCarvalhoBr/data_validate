@@ -1,15 +1,16 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-import pandas as pd
 from typing import List, Tuple
 
+import pandas as pd
+
+from data_validate.helpers.tools.spellchecker.dataframe_processor import (
+    DataFrameProcessor,
+)
 from data_validate.helpers.tools.spellchecker.dictionary_manager import (
     DictionaryManager,
 )
 from data_validate.helpers.tools.spellchecker.spellchecker_controller import (
     SpellCheckerController,
-)
-from data_validate.helpers.tools.spellchecker.dataframe_processor import (
-    DataFrameProcessor,
 )
 
 

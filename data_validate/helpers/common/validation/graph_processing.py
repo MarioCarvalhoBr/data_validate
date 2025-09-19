@@ -2,8 +2,9 @@
 """Graph data validation utilities for hierarchical structure validation."""
 
 from typing import List, Tuple, Optional
-import pandas as pd
+
 import networkx as nx
+import pandas as pd
 
 
 class GraphProcessing:

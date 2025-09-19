@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import List, Tuple
+
+import pandas as pd
 
 
 def check_column_names(df: pd.DataFrame, expected_columns: List[str]) -> Tuple[List[str], List[str]]:

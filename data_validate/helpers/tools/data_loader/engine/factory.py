@@ -6,11 +6,12 @@ Factory Method para instanciar leitores adequados.
 """
 
 from pathlib import Path
+
 from ..common.exceptions import ReaderNotFoundError
-from ..strategies.header import HeaderStrategy
 from ..readers.csv_reader import CSVReader
 from ..readers.excel_reader import ExcelReader
 from ..readers.qml_reader import QMLReader
+from ..strategies.header import HeaderStrategy
 
 
 class ReaderFactory:

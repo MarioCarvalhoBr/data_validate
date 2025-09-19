@@ -1,7 +1,7 @@
-.PHONY: help install run clean test test-fast test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
+.PHONY: help install update build publish run clean test test-fast test-short test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
 
 # Variables
-APP_NAME = data_validate
+PATH_SRC = data_validate
 PYTHON = poetry run python
 PYTEST = poetry run pytest
 COVERAGE = poetry run coverage
@@ -16,12 +16,29 @@ help: ## Shows available commands
 install: ## Install development dependencies
 	poetry install
 
+update: ## Update dependencies to latest versions
+	poetry update
+
+build: ## Build the package
+	rm -rf dist/
+	poetry build
+
+publish: readme ## Build and Publish the package to PyPI
+	rm -rf dist/
+	poetry build
+	poetry run twine upload --repository testpypi dist/*
+	poetry run twine upload dist/*
+
 # 3. Run main script
 run: ## Execute main pipeline script
 	bash scripts/run_main_pipeline.sh
 
-clean: ## Remove output data in data/output/
+clean: test-clean ## Remove output data in data/output/
 	rm -rf data/output/
+	rm -rf data/temp/
+	rm -rf docs/
+	rm -rf assets/coverage/
+	rm -rf dist/
 
 # 4. Testing and coverage (using pyproject.toml configuration)
 test: ## Run all tests with coverage (uses pyproject.toml config)
@@ -29,6 +46,9 @@ test: ## Run all tests with coverage (uses pyproject.toml config)
 
 test-fast: ## Run tests quickly (no coverage, fail fast)
 	$(PYTEST) -x --no-cov
+
+test-short: ## Run tests showing only the name of the tested file
+	$(PYTEST) -q --tb=short
 
 test-clean: ## Remove temporary files and reports
 	rm -rf .coverage
@@ -51,14 +71,14 @@ badges: genbadge-coverage genbadge-tests ## Generate all badges
 
 # 6. Documentation
 docs: ## Generate documentation with pdoc
-	poetry run pdoc ./$(APP_NAME)/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
+	poetry run pdoc ./$(PATH_SRC)/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 
 readme: ## Generate README documentation
-	$(PYTHON) $(APP_NAME)/helpers/tools/readme/gerador_readme.py
+	$(PYTHON) $(PATH_SRC)/helpers/tools/readme/gerador_readme.py
 
 # 7. Code formatting and linting
 black: ## Format code with black
-	poetry run black $(APP_NAME) tests
+	poetry run black $(PATH_SRC) tests
 
 ruff: ## Lint and fix code with ruff
 	poetry run ruff check . --fix

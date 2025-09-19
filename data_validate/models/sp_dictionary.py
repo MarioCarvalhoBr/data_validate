@@ -1,17 +1,17 @@
 from typing import List, Dict, Any
+
 import pandas as pd
 
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
-from data_validate.models.sp_model_abc import SpModelABC
-from data_validate.helpers.tools.data_loader.api.facade import (
-    DataLoaderModel,
-    DataLoaderFacade,
-)
-from data_validate.helpers.common.validation.column_validation import check_column_names
 from data_validate.helpers.common.formatting.error_formatting import (
     format_errors_and_warnings,
 )
+from data_validate.helpers.common.validation.column_validation import check_column_names
+from data_validate.helpers.tools.data_loader.api.facade import (
+    DataLoaderModel,
+)
+from data_validate.models.sp_model_abc import SpModelABC
 
 
 class SpDictionary(SpModelABC):
@@ -82,25 +82,3 @@ class SpDictionary(SpModelABC):
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()
-
-
-if __name__ == "__main__":
-    # Para testar esta classe, você precisaria de um arquivo 'dicionario.csv' ou 'dicionario.xlsx'
-    # no diretório de entrada, com uma palavra por linha.
-    # Exemplo de dicionario.csv:
-    # PalavraIgnorada1
-    # Outr@Palavra
-    # termoEspecifico
-
-    input_dir = "/home/carvalho/Desktop/INPE/Trabalho/Codes-INPE/AdaptaBrasil/data_validate/data/input/data_ground_truth_01"
-    # Certifique-se de que o DataImporterFacade consegue lidar com arquivos sem cabeçalho
-    # e que o nome do arquivo 'dicionario' está correto.
-    importer = DataLoaderFacade(input_dir)
-    data = importer.load_all
-
-    if SpDictionary.INFO["SP_NAME"] in data:
-        sp_dictionary_instance = SpDictionary(data_model=data[SpDictionary.INFO["SP_NAME"]])
-        # A impressão das palavras já ocorre dentro do run() quando __name__ == '__main__',
-        # mas podemos adicionar outra aqui se necessário, ou acessar sp_dictionary_instance.words_to_ignore
-    else:
-        print(f"Data for '{SpDictionary.INFO['SP_NAME']}' not found. Please check your input data and ensure a 'dicionario' file exists.")
