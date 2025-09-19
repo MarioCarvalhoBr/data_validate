@@ -7,7 +7,7 @@ import pytest
 
 from unittest.mock import Mock, patch
 
-from src.helpers.base.logger_manager import LoggerManager, CustomFormatter
+from data_validate.helpers.base.logger_manager import LoggerManager, CustomFormatter
 
 
 class TestCustomFormatter:
@@ -130,7 +130,7 @@ class TestLoggerManager:
     @pytest.fixture
     def mock_datetime(self):
         """Mock datetime for consistent timestamp testing."""
-        with patch("src.helpers.base.logger_manager.datetime") as mock_dt:
+        with patch("data_validate.helpers.base.logger_manager.datetime") as mock_dt:
             mock_dt.now.return_value.strftime.return_value = "20230101_120000"
             yield mock_dt
 
@@ -274,7 +274,7 @@ class TestLoggerManager:
     def test_timestamp_format_in_filename(self, temp_log_dir):
         """Test that timestamp format is correct in filename."""
         with patch("os.path.exists", return_value=True):
-            with patch("src.helpers.base.logger_manager.datetime") as mock_dt:
+            with patch("data_validate.helpers.base.logger_manager.datetime") as mock_dt:
                 mock_dt.now.return_value.strftime.return_value = "20231201_143022"
 
                 logger_manager = LoggerManager(log_folder=temp_log_dir)
@@ -313,7 +313,7 @@ class TestLoggerManager:
 
         with patch("os.path.exists", return_value=False):
             with patch("os.makedirs") as mock_makedirs:
-                with patch("src.helpers.base.logger_manager.datetime") as mock_dt:
+                with patch("data_validate.helpers.base.logger_manager.datetime") as mock_dt:
                     mock_dt.now.return_value.strftime.return_value = "20230101_120000"
                     LoggerManager(log_folder=test_folder)
 

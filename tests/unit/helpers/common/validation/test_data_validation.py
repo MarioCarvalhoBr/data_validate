@@ -12,7 +12,7 @@ import pandas as pd
 from typing import List, Tuple, Optional
 from unittest.mock import patch, Mock
 
-from src.helpers.common.validation.data_validation import (
+from data_validate.helpers.common.validation.data_validation import (
     check_vertical_bar,
     check_unnamed_columns,
     check_punctuation,
@@ -176,7 +176,7 @@ class TestCheckVerticalBar:
         # Assert
         pd.testing.assert_frame_equal(simple_dataframe, original_data)
 
-    @patch("src.helpers.common.validation.data_validation.pd.DataFrame.astype")
+    @patch("data_validate.helpers.common.validation.data_validation.pd.DataFrame.astype")
     def test_check_vertical_bar_exception_handling(self, mock_astype: Mock, simple_dataframe: pd.DataFrame) -> None:
         """Test check_vertical_bar exception handling."""
         # Arrange

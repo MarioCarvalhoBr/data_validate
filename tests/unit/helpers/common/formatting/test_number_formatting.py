@@ -1,6 +1,6 @@
 import pandas as pd
 import math
-from src.helpers.common.formatting.number_formatting import (
+from data_validate.helpers.common.formatting.number_formatting import (
     format_number_brazilian,
     is_nan,
     parse_numeric,

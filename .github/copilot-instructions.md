@@ -17,7 +17,7 @@
 ### Module Structure
 
 ```
-src/
+data_validate/
 ├── models/              # Data models for spreadsheet structures (ABC pattern)
 ├── validators/          # Validation logic (Strategy + Template Method patterns)
 ├── controllers/         # Orchestration and control flow (Facade pattern)
@@ -281,9 +281,9 @@ from typing import List, Dict, Any, Tuple, Optional
 import pandas as pd
 
 # Local application imports
-from src.config.config import Config
-from src.models.sp_model_abc import SpModelABC
-from src.helpers.base.constant_base import ConstantBase
+from data_validate.config.config import Config
+from data_validate.models.sp_model_abc import SpModelABC
+from data_validate.helpers.base.constant_base import ConstantBase
 ```
 
 ## Validation Patterns
@@ -351,7 +351,7 @@ Follow pytest conventions with proper fixtures:
 ```python
 import pytest
 import pandas as pd
-from src.models.sp_example import SpExample
+from data_validate.models.sp_example import SpExample
 
 class TestSpExample:
     """Test suite for SpExample model."""
@@ -374,7 +374,7 @@ Use proper mocking for external dependencies:
 ```python
 from unittest.mock import Mock, patch
 
-@patch('src.helpers.tools.data_loader.api.facade.DataLoaderModel')
+@patch('data_validate.helpers.tools.data_loader.api.facade.DataLoaderModel')
 def test_model_initialization(mock_loader: Mock) -> None:
     """Test model initialization with mocked dependencies."""
     pass

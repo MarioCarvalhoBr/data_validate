@@ -11,7 +11,7 @@
 | Testing Windows | [![Windows Build](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/AdaptaBrasil/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/AdaptaBrasil/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/AdaptaBrasil/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/AdaptaBrasil/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/AdaptaBrasil/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/AdaptaBrasil/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.46b640-orange.svg) [![License - MIT](https://img.shields.io/github/license/AdaptaBrasil/data_validate)](https://img.shields.io/github/license/AdaptaBrasil/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.47b641-orange.svg) [![License - MIT](https://img.shields.io/github/license/AdaptaBrasil/data_validate)](https://img.shields.io/github/license/AdaptaBrasil/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -75,7 +75,7 @@ O Data Validate implementa a especificação detalhada no protocolo de validaç�
 O projeto segue uma arquitetura modular baseada em padrões de design limpos:
 
 ```
-📁 src/
+📁 data_validate/
 ├── 🎛️ controllers/     # Orquestração e controle de fluxo
 ├── 📊 models/          # Modelos de dados para planilhas
 ├── ✅ validators/      # Lógica de validação
@@ -163,14 +163,14 @@ eval $(poetry env activate)
 ```
 
 #### Comando completo
-python -m src.main
+python -m data_validate.main
     --input_folder data/input
     --output_folder data/output
     --locale pt_BR
     --debug
 
 #### Comando abreviado
-python -m src.main --i data/input --o data/output --l pt_BR --d
+python -m data_validate.main --i data/input --o data/output --l pt_BR --d
 ```
 
 ### Script de Pipeline
@@ -185,13 +185,13 @@ bash scripts/run_main_pipeline.sh
 #### Modo Desenvolvimento (Recomendado)
 ```bash
 # Com debug ativo e logs detalhados
-python -m src.main --input_folder data/input --debug
+python -m data_validate.main --input_folder data/input --debug
 ```
 
 #### Modo Produção
 ```bash
 # Sem logs, sem tempo, sem versão no relatório
-python -m src.main
+python -m data_validate.main
     --input_folder data/input
     --output_folder data/output
     --no-time
@@ -201,7 +201,7 @@ python -m src.main
 #### Modo Rápido (sem verificação ortográfica e tamanhos de títulos)
 ```bash
 # Para execuções rápidas, pulando spell check e avisos de comprimento de títulos
-python -m src.main
+python -m data_validate.main
     --input_folder data/input
     --no-spellchecker
     --no-warning-titles-length
@@ -292,12 +292,12 @@ O sistema gera:
 ## 📁 Estrutura do Projeto
 
 ```
-src/
+data_validate/
 ├── 📊 assets/                    # Badges e recursos visuais
 ├── 📁 data/                      # Dados de entrada e saída
 │   ├── input/                    # Planilhas para validação
 │   └── output/                   # Relatórios e logs gerados
-├── 🐍 src/             # Código-fonte principal
+├── 🐍 data_validate/             # Código-fonte principal
 │   ├── config/                   # Configurações globais
 │   ├── controllers/              # Orquestração e controle
 │   │   ├── context/              # Contextos de dados
@@ -419,7 +419,7 @@ tests/
 
 ```bash
 # Gerar documentação com pdoc
-pdoc ./src/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
+pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 ```
 
 ### Documentos Disponíveis
@@ -452,10 +452,10 @@ pdoc ./src/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?
 
 ```bash
 # Validação mínima (apenas pasta de entrada é obrigatória)
-python -m src.main --input_folder data/input
+python -m data_validate.main --input_folder data/input
 
 # Validação com pasta específica e debug
-python -m src.main \
+python -m data_validate.main \
     --input_folder /caminho/para/planilhas \
     --output_folder /caminho/para/relatorios \
     --debug
@@ -465,17 +465,17 @@ python -m src.main \
 
 ```bash
 # Interface em português (padrão)
-python -m src.main --input_folder data/input --locale pt_BR
+python -m data_validate.main --input_folder data/input --locale pt_BR
 
 # Interface em inglês
-python -m src.main --input_folder data/input --locale en_US
+python -m data_validate.main --input_folder data/input --locale en_US
 ```
 
 ### Validação com Argumentos Avançados
 
 ```bash
 # Execução completa com todos os argumentos
-python -m src.main \
+python -m data_validate.main \
     --input_folder data/input \
     --output_folder data/output \
     --locale pt_BR \
@@ -489,7 +489,7 @@ python -m src.main \
 
 ```bash
 # Execução rápida sem verificação ortográfica e avisos de comprimento
-python -m src.main \
+python -m data_validate.main \
     --input_folder data/input \
     --no-spellchecker \
     --no-warning-titles-length \
@@ -501,7 +501,7 @@ python -m src.main \
 
 ```bash
 # Comando mais conciso usando abreviações
-python -m src.main --i data/input --o data/output --l pt_BR --d
+python -m data_validate.main --i data/input --o data/output --l pt_BR --d
 ```
 
 ### Pipeline Completo
@@ -608,13 +608,13 @@ pip uninstall canoa-data-validate
 ```bash
 # Erro: "argument --input_folder is required"
 # Solução: Sempre especifique a pasta de entrada
-python -m src.main --input_folder data/input
+python -m data_validate.main --input_folder data/input
 ```
 
 ### Performance Lenta
 ```bash
 # Para execução mais rápida, desative verificações demoradas
-python -m src.main \
+python -m data_validate.main \
     --input_folder data/input \
     --no-spellchecker \
     --no-warning-titles-length
@@ -623,7 +623,7 @@ python -m src.main \
 ### Logs Excessivos
 ```bash
 # Para reduzir saída no console
-python -m src.main \
+python -m data_validate.main \
     --input_folder data/input \
     --no-time \
     --no-version

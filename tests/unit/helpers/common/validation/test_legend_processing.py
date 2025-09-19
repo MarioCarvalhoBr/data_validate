@@ -7,8 +7,8 @@ from typing import List
 import pandas as pd
 import pytest
 
-from src.controllers.context.general_context import GeneralContext
-from src.helpers.common.validation.legend_processing import LegendProcessing
+from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.helpers.common.validation.legend_processing import LegendProcessing
 
 
 @pytest.fixture
@@ -431,7 +431,7 @@ class TestValidateMinMaxValues:
             return original_decimal(value)
 
         # Patch Decimal temporarily
-        import src.helpers.common.validation.legend_processing as legend_module
+        import data_validate.helpers.common.validation.legend_processing as legend_module
 
         legend_module.Decimal = mock_decimal_constructor
 

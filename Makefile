@@ -1,7 +1,7 @@
 .PHONY: help install update build publish run clean test test-fast test-short test-clean genbadge-coverage genbadge-tests badges docs readme black ruff lint
 
 # Variables
-PATH_SRC = src
+PATH_SRC = data_validate
 PYTHON = poetry run python
 PYTEST = poetry run pytest
 COVERAGE = poetry run coverage

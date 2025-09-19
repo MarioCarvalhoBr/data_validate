@@ -1,4 +1,4 @@
-from src.helpers.common.formatting.error_formatting import (
+from data_validate.helpers.common.formatting.error_formatting import (
     format_errors_and_warnings,
 )
 

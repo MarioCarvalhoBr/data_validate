@@ -1,6 +1,6 @@
 [project]
 name = "canoa_data_validate"
-version = "0.7.46"
+version = "0.7.47"
 
 description = "O data_validate é um validador e processador de planilhas, que automatiza a checagem de integridade e estrutura de arquivos de dados da plataforma AdaptaBrasil. Ele é especialmente útil para projetos que exigem padronização e validação rigorosa de dados tabulares, como pesquisas científicas, bancos de dados ambientais e sistemas de indicadores."
 authors = [
@@ -44,10 +44,10 @@ requires = ["poetry-core>=2.0.0,<3.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
-packages = [{include = "src"}]
+packages = [{include = "data_validate"}]
 
 [tool.poetry.scripts]
-canoa-data-validate = "src.main:main"
+canoa-data-validate = "data_validate.main:main"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.4.1"
@@ -63,7 +63,7 @@ pytest-mock = "^3.15.0"
 ruff = "^0.13.0"
 
 [tool.coverage.run]
-source = ["src"]
+source = ["data_validate"]
 omit = [
     "*/tests/*",
     "*/__pycache__/*",
@@ -101,7 +101,7 @@ title = "Data Validate Coverage Report"
 
 [tool.pytest.ini_options]
 pythonpath = "."
-addopts = "--cov=src --cov-report=term-missing --cov-report=html:dev-reports/htmlcov --cov-report=xml:dev-reports/coverage.xml --cov-fail-under=4 --junitxml=dev-reports/junit/junit.xml -v --tb=short"
+addopts = "--cov=data_validate --cov-report=term-missing --cov-report=html:dev-reports/htmlcov --cov-report=xml:dev-reports/coverage.xml --cov-fail-under=4 --junitxml=dev-reports/junit/junit.xml -v --tb=short"
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"

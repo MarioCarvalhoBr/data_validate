@@ -7,7 +7,7 @@ from typing import Any, Dict, Generator
 from unittest.mock import Mock, patch, mock_open
 import pytest
 
-from src.helpers.base.file_system_utils import FileSystemUtils
+from data_validate.helpers.base.file_system_utils import FileSystemUtils
 
 
 class TestFileSystemUtils:
@@ -16,7 +16,7 @@ class TestFileSystemUtils:
     @pytest.fixture
     def fs_utils(self) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("src.helpers.base.file_system_utils.LanguageManager"):
+        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
             fs_utils = FileSystemUtils()
             fs_utils.lm = Mock()
             # Setup default mock returns for language manager
@@ -44,7 +44,7 @@ class TestFileSystemUtils:
 
     def test_init_creates_language_manager(self) -> None:
         """Test that __init__ creates LanguageManager instance."""
-        with patch("src.helpers.base.file_system_utils.LanguageManager") as mock_lm:
+        with patch("data_validate.helpers.base.file_system_utils.LanguageManager") as mock_lm:
             mock_instance = Mock()
             mock_lm.return_value = mock_instance
 
@@ -465,7 +465,7 @@ class TestFileSystemUtilsDataDrivenTests:
     @pytest.fixture
     def fs_utils(self) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("src.helpers.base.file_system_utils.LanguageManager"):
+        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
             fs_utils = FileSystemUtils()
             fs_utils.lm = Mock()
             fs_utils.lm.text.return_value = "mocked_message"
@@ -575,7 +575,7 @@ class TestFileSystemUtilsEdgeCases:
     @pytest.fixture
     def fs_utils(self) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("src.helpers.base.file_system_utils.LanguageManager"):
+        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
             fs_utils = FileSystemUtils()
             fs_utils.lm = Mock()
             fs_utils.lm.text.return_value = "mocked_message"
@@ -697,7 +697,7 @@ class TestFileSystemUtilsEdgeCases:
 
     def test_pathlib_integration(self, fs_utils: FileSystemUtils) -> None:
         """Test that get_last_directory_name properly uses pathlib.Path."""
-        with patch("src.helpers.base.file_system_utils.Path") as mock_path:
+        with patch("data_validate.helpers.base.file_system_utils.Path") as mock_path:
             mock_instance = Mock()
             mock_instance.name = "test_directory"
             mock_path.return_value = mock_instance
@@ -714,7 +714,7 @@ class TestFileSystemUtilsIntegration:
     @pytest.fixture
     def fs_utils(self) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("src.helpers.base.file_system_utils.LanguageManager"):
+        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
             fs_utils = FileSystemUtils()
             fs_utils.lm = Mock()
             fs_utils.lm.text.return_value = "mocked_message"
