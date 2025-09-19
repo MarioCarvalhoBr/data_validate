@@ -6,7 +6,7 @@ from src.controllers import GeneralContext, ProcessorSpreadsheet
 print(f"{src.__welcome__}\n")
 
 
-def main_init():
+def main():
     # Initialize and Configure the Data Arguments
     data_args = DataArgs()
 
@@ -23,7 +23,7 @@ def main_init():
 
 
 if __name__ == "__main__":
-    main_init()
+    main()
 
 # Example usage:
 # python3 src/main.py --l pt_BR --o data/output/temp/ --i data/input/data_ground_truth_01/

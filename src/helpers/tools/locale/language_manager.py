@@ -31,6 +31,17 @@ class LanguageManager:
     def _congifure_language(self):
         store_locale_path = Path(__file__).resolve().parents[4] / ".config" / "store.locale"
 
+        # Verifica se o arquivo store.locale existe
+        if not store_locale_path.exists():
+            print(f"store.locale not found. Falling back to default language '{self.default_language}'.")
+            self.current_language = self.default_language
+
+            # Cria o arquivo store.locale com a linguagem padrão
+            store_locale_path.parent.mkdir(parents=True, exist_ok=True)
+            with store_locale_path.open("w", encoding="utf-8") as f:
+                f.write(self.default_language)
+            return
+
         with store_locale_path.open("r", encoding="utf-8") as f:
             self.current_language = f.read().strip()
             if self.current_language not in LanguageEnum.list_supported_languages():

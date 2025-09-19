@@ -36,7 +36,7 @@ class GeneralContext:
         self.logger_manager = LoggerManager(
             log_folder="data/output/logs",
             console_logger="console_logger",
-            prefix="src",
+            prefix="data_validate",
             logger_name="data_validate_file_logger",
         )
         self.logger = self.logger_manager.file_logger
