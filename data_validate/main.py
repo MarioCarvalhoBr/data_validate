@@ -26,4 +26,4 @@ if __name__ == "__main__":
     main()
 
 # Example usage:
-# python3 data_validate/main.py --l pt_BR --o data/output/temp/ --i data/input/data_ground_truth_01/
+# python3 data_validate/main.py --o data/output/temp/ --i data/input/data_ground_truth_01/
