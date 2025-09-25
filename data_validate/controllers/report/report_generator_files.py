@@ -297,17 +297,6 @@ class ReportGeneratorFiles:
             logger.info(msg_info)
             print(msg_info, file=sys.stdout)
 
-            pdfkit.from_file(html_file_path, "/home/desenv/data_validate/arquivo.pdf", options=pdf_options)
-            logger.info("PDF report also saved to /home/desenv/data_validate/arquivo.pdf for testing purposes.")
-            print(msg_info, file=sys.stdout)
-
-            if os.path.exists(pdf_file_path):
-                logger.info(f"The path '{pdf_file_path}' exists.")
-                print(f'The path "{pdf_file_path}" exists.', file=sys.stdout)
-            else:
-                logger.info(f"The path '{pdf_file_path}' does not exist.")
-                print(f'The path "{pdf_file_path}" does not exist.', file=sys.stdout)
-
         except Exception as error:
             msg_error = f"Error creating PDF report: {error}"
 
