@@ -74,7 +74,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
 
         # Check if all years are greater than the current year
         for year in years:
-            if year <= self._data_models_context.config.CURRENT_YEAR:
+            if int(year) < self._data_models_context.config.CURRENT_YEAR:
                 errors.append(f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.")
 
         return errors, []
