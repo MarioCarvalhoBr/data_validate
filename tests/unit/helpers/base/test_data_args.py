@@ -14,7 +14,6 @@ import argparse
 import os
 import tempfile
 from typing import Any, Dict, Generator
-from unittest.mock import Mock, patch
 import pytest
 
 from data_validate.helpers.base.data_args import (
@@ -111,22 +110,22 @@ class TestDataFile:
         with pytest.raises(ValueError, match="Output folder name is invalid"):
             DataFile(input_folder=temp_input_dir, output_folder=invalid_output, locale="pt_BR")
 
-    def test_validate_arguments_called_during_init(self, temp_input_dir: str) -> None:
+    def test_validate_arguments_called_during_init(self, temp_input_dir: str, mocker) -> None:
         """Test that _validate_arguments is called during initialization."""
-        with patch.object(DataFile, "_validate_arguments") as mock_validate:
-            DataFile(input_folder=temp_input_dir, output_folder="/valid/output", locale="pt_BR")
-            mock_validate.assert_called_once()
+        mock_validate = mocker.patch.object(DataFile, "_validate_arguments")
+        DataFile(input_folder=temp_input_dir, output_folder="/valid/output", locale="pt_BR")
+        mock_validate.assert_called_once()
 
-    def test_run_method_calls_validate(self, temp_input_dir: str) -> None:
+    def test_run_method_calls_validate(self, temp_input_dir: str, mocker) -> None:
         """Test that run method calls _validate_arguments."""
         data_file = DataFile.__new__(DataFile)  # Create without calling __init__
         data_file.input_folder = temp_input_dir
         data_file.output_folder = "/valid/output"
         data_file.locale = "pt_BR"
 
-        with patch.object(data_file, "_validate_arguments") as mock_validate:
-            data_file.run()
-            mock_validate.assert_called_once()
+        mock_validate = mocker.patch.object(data_file, "_validate_arguments")
+        data_file.run()
+        mock_validate.assert_called_once()
 
 
 class TestDataAction:
@@ -172,7 +171,7 @@ class TestDataAction:
         with pytest.raises(ValueError, match="debug must be a boolean value"):
             DataAction(no_spellchecker=True, no_warning_titles_length=True, no_time=True, no_version=True, debug=1.5)
 
-    def test_run_method_calls_validate(self) -> None:
+    def test_run_method_calls_validate(self, mocker) -> None:
         """Test that run method calls _validate_arguments."""
         data_action = DataAction.__new__(DataAction)  # Create without calling __init__
         data_action.no_spellchecker = True
@@ -181,9 +180,9 @@ class TestDataAction:
         data_action.no_version = False
         data_action.debug = True
 
-        with patch.object(data_action, "_validate_arguments") as mock_validate:
-            data_action.run()
-            mock_validate.assert_called_once()
+        mock_validate = mocker.patch.object(data_action, "_validate_arguments")
+        data_action.run()
+        mock_validate.assert_called_once()
 
 
 class TestDataReport:
@@ -224,7 +223,7 @@ class TestDataReport:
         result = data_report._validate_arguments()
         assert result is None
 
-    def test_run_method_calls_validate(self) -> None:
+    def test_run_method_calls_validate(self, mocker) -> None:
         """Test that run method calls _validate_arguments."""
         data_report = DataReport.__new__(DataReport)  # Create without calling __init__
         data_report.sector = "Test"
@@ -232,9 +231,9 @@ class TestDataReport:
         data_report.user = "Test"
         data_report.file = "Test"
 
-        with patch.object(data_report, "_validate_arguments") as mock_validate:
-            data_report.run()
-            mock_validate.assert_called_once()
+        mock_validate = mocker.patch.object(data_report, "_validate_arguments")
+        data_report.run()
+        mock_validate.assert_called_once()
 
 
 class TestDataArgs:
@@ -247,17 +246,18 @@ class TestDataArgs:
             yield temp_dir
 
     @pytest.fixture
-    def mock_language_manager(self) -> Mock:
+    def mock_language_manager(self, mocker):
         """Mock LanguageManager for testing."""
-        return Mock()
+        return mocker.MagicMock()
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_init_with_mocked_args(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
+    def test_init_with_mocked_args(self, temp_input_dir: str, mocker) -> None:
         """Test DataArgs initialization with mocked command line arguments."""
         # Setup mock
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
         mock_args.locale = "pt_BR"
@@ -279,14 +279,15 @@ class TestDataArgs:
         assert data_args.data_action is not None
         assert data_args.data_report is not None
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_create_parser_method(self, mock_parse_args: Mock, mock_lm_class: Mock) -> None:
+    def test_create_parser_method(self, mocker) -> None:
         """Test _create_parser method creates ArgumentParser correctly."""
-        mock_lm_class.return_value = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
 
         # Mock parse_args to avoid actual parsing and validation
-        mock_args = Mock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = "/tmp"  # Use existing directory
         mock_args.output_folder = "/test/output"
         mock_args.locale = "pt_BR"
@@ -307,13 +308,14 @@ class TestDataArgs:
         assert isinstance(parser, argparse.ArgumentParser)
         assert parser.allow_abbrev is False
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_get_dict_args_method(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
+    def test_get_dict_args_method(self, temp_input_dir: str, mocker) -> None:
         """Test get_dict_args method returns correct dictionary."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
         mock_args.locale = "en_US"
@@ -348,13 +350,14 @@ class TestDataArgs:
 
         assert result_dict == expected_dict
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_str_method(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
+    def test_str_method(self, temp_input_dir: str, mocker) -> None:
         """Test __str__ method returns correct string representation."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
         mock_args.locale = "pt_BR"
@@ -390,40 +393,41 @@ class TestDataArgs:
         for part in expected_parts:
             assert part in str_result
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    def test_run_method_calls_parser(self, mock_lm_class: Mock) -> None:
+    def test_run_method_calls_parser(self, mocker) -> None:
         """Test that run method creates parser and parses arguments."""
-        mock_lm_class.return_value = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_lm_class.return_value = mocker.MagicMock()
 
-        with patch.object(DataArgs, "_create_parser") as mock_create_parser:
-            mock_parser = Mock()
-            mock_args = Mock()
-            mock_args.input_folder = "/test/input"
-            mock_args.output_folder = "/test/output"
-            mock_args.locale = "pt_BR"
-            mock_args.no_spellchecker = False
-            mock_args.no_warning_titles_length = False
-            mock_args.no_time = False
-            mock_args.no_version = False
-            mock_args.debug = False
-            mock_args.sector = None
-            mock_args.protocol = None
-            mock_args.user = None
-            mock_args.file = None
+        mock_create_parser = mocker.patch.object(DataArgs, "_create_parser")
+        mock_parser = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
+        mock_args.input_folder = "/test/input"
+        mock_args.output_folder = "/test/output"
+        mock_args.locale = "pt_BR"
+        mock_args.no_spellchecker = False
+        mock_args.no_warning_titles_length = False
+        mock_args.no_time = False
+        mock_args.no_version = False
+        mock_args.debug = False
+        mock_args.sector = None
+        mock_args.protocol = None
+        mock_args.user = None
+        mock_args.file = None
 
-            mock_parser.parse_args.return_value = mock_args
-            mock_create_parser.return_value = mock_parser
+        mock_parser.parse_args.return_value = mock_args
+        mock_create_parser.return_value = mock_parser
 
-            with patch.object(DataFile, "__init__", return_value=None):
-                with patch.object(DataAction, "__init__", return_value=None):
-                    with patch.object(DataReport, "__init__", return_value=None):
-                        data_args = DataArgs.__new__(DataArgs)
-                        data_args.lm = Mock()
-                        data_args.allow_abbrev = True
-                        data_args.run()
+        mocker.patch.object(DataFile, "__init__", return_value=None)
+        mocker.patch.object(DataAction, "__init__", return_value=None)
+        mocker.patch.object(DataReport, "__init__", return_value=None)
+        
+        data_args = DataArgs.__new__(DataArgs)
+        data_args.lm = mocker.MagicMock()
+        data_args.allow_abbrev = True
+        data_args.run()
 
-            mock_create_parser.assert_called_once()
-            mock_parser.parse_args.assert_called_once()
+        mock_create_parser.assert_called_once()
+        mock_parser.parse_args.assert_called_once()
 
 
 class TestDataArgsDataDrivenTests:
@@ -442,15 +446,16 @@ class TestDataArgsDataDrivenTests:
             (False, False),
         ],
     )
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
     def test_allow_abbrev_parameter(
-        self, mock_parse_args: Mock, mock_lm_class: Mock, allow_abbrev: bool, expected_abbrev: bool, temp_input_dir: str
+        self, allow_abbrev: bool, expected_abbrev: bool, temp_input_dir: str, mocker
     ) -> None:
         """Test DataArgs with different allow_abbrev settings."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
         mock_args.locale = "pt_BR"
@@ -476,15 +481,16 @@ class TestDataArgsDataDrivenTests:
             ("en_US", "en_US"),
         ],
     )
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
     def test_locale_parameter_variations(
-        self, mock_parse_args: Mock, mock_lm_class: Mock, locale_value: str, expected_locale: str, temp_input_dir: str
+        self, locale_value: str, expected_locale: str, temp_input_dir: str, mocker
     ) -> None:
         """Test DataArgs with different locale values."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
         mock_args.locale = locale_value
@@ -520,15 +526,16 @@ class TestDataArgsDataDrivenTests:
             ),
         ],
     )
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
     def test_boolean_flags_combinations(
-        self, mock_parse_args: Mock, mock_lm_class: Mock, boolean_flags: Dict[str, bool], expected_values: Dict[str, bool], temp_input_dir: str
+        self, boolean_flags: Dict[str, bool], expected_values: Dict[str, bool], temp_input_dir: str, mocker
     ) -> None:
         """Test DataArgs with different combinations of boolean flags."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
         mock_args.locale = "pt_BR"
@@ -561,15 +568,16 @@ class TestDataArgsEdgeCases:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_create_parser_with_all_arguments(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
+    def test_create_parser_with_all_arguments(self, temp_input_dir: str, mocker) -> None:
         """Test that _create_parser creates parser with all required arguments."""
-        mock_lm_class.return_value = Mock()
-        mock_parse_args.return_value = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_parse_args.return_value = mocker.MagicMock()
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.lm = Mock()
+        data_args.lm = mocker.MagicMock()
         data_args.allow_abbrev = True
 
         parser = data_args._create_parser()
@@ -595,15 +603,16 @@ class TestDataArgsEdgeCases:
         for arg in expected_args:
             assert arg in action_names
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_parser_description_and_settings(self, mock_parse_args: Mock, mock_lm_class: Mock) -> None:
+    def test_parser_description_and_settings(self, mocker) -> None:
         """Test parser description and allow_abbrev setting."""
-        mock_lm_class.return_value = Mock()
-        mock_parse_args.return_value = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_parse_args.return_value = mocker.MagicMock()
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.lm = Mock()
+        data_args.lm = mocker.MagicMock()
         data_args.allow_abbrev = False
 
         parser = data_args._create_parser()
@@ -651,13 +660,14 @@ class TestDataArgsIntegration:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_complete_workflow_with_all_parameters(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
+    def test_complete_workflow_with_all_parameters(self, temp_input_dir: str, mocker) -> None:
         """Test complete workflow with all parameters set."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/complete/output"
         mock_args.locale = "en_US"
@@ -677,7 +687,7 @@ class TestDataArgsIntegration:
 
         # Verify all components initialized correctly
         assert data_args.allow_abbrev is False
-        assert isinstance(data_args.lm, Mock)
+        assert isinstance(data_args.lm, mocker.MagicMock)
 
         # Verify DataFile
         assert data_args.data_file.input_folder == temp_input_dir
@@ -709,13 +719,14 @@ class TestDataArgsIntegration:
         assert "Agricultura" in str_repr
         assert "crops.xlsx" in str_repr
 
-    @patch("data_validate.helpers.base.data_args.LanguageManager")
-    @patch("argparse.ArgumentParser.parse_args")
-    def test_workflow_with_minimal_parameters(self, mock_parse_args: Mock, mock_lm_class: Mock, temp_input_dir: str) -> None:
+    def test_workflow_with_minimal_parameters(self, temp_input_dir: str, mocker) -> None:
         """Test workflow with minimal required parameters."""
         # Setup mocks
-        mock_lm_class.return_value = Mock()
-        mock_args = Mock()
+        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        mock_lm_class.return_value = mocker.MagicMock()
+        mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "output_data/"  # Default value
         mock_args.locale = "pt_BR"  # Default value
@@ -744,58 +755,59 @@ class TestDataArgsIntegration:
         assert result_dict["debug"] is False
         assert result_dict["sector"] is None
 
-    def test_multiple_dataargs_instances_independence(self) -> None:
+    def test_multiple_dataargs_instances_independence(self, mocker) -> None:
         """Test that multiple DataArgs instances are independent."""
-        with patch("data_validate.helpers.base.data_args.LanguageManager"):
-            with patch("argparse.ArgumentParser.parse_args") as mock_parse_args:
-                with tempfile.TemporaryDirectory() as temp_dir1:
-                    with tempfile.TemporaryDirectory() as temp_dir2:
-                        # Create two different mock args
-                        mock_args1 = Mock()
-                        mock_args1.input_folder = temp_dir1  # Use real temp directory
-                        mock_args1.output_folder = "/output1"
-                        mock_args1.locale = "pt_BR"
-                        mock_args1.no_spellchecker = True
-                        mock_args1.no_warning_titles_length = False
-                        mock_args1.no_time = True
-                        mock_args1.no_version = False
-                        mock_args1.debug = True
-                        mock_args1.sector = "Sector1"
-                        mock_args1.protocol = "v1.0"
-                        mock_args1.user = "user1"
-                        mock_args1.file = "file1.xlsx"
+        mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
+        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
+        
+        with tempfile.TemporaryDirectory() as temp_dir1:
+            with tempfile.TemporaryDirectory() as temp_dir2:
+                # Create two different mock args
+                mock_args1 = mocker.MagicMock()
+                mock_args1.input_folder = temp_dir1  # Use real temp directory
+                mock_args1.output_folder = "/output1"
+                mock_args1.locale = "pt_BR"
+                mock_args1.no_spellchecker = True
+                mock_args1.no_warning_titles_length = False
+                mock_args1.no_time = True
+                mock_args1.no_version = False
+                mock_args1.debug = True
+                mock_args1.sector = "Sector1"
+                mock_args1.protocol = "v1.0"
+                mock_args1.user = "user1"
+                mock_args1.file = "file1.xlsx"
 
-                        mock_args2 = Mock()
-                        mock_args2.input_folder = temp_dir2  # Use real temp directory
-                        mock_args2.output_folder = "/output2"
-                        mock_args2.locale = "en_US"
-                        mock_args2.no_spellchecker = False
-                        mock_args2.no_warning_titles_length = True
-                        mock_args2.no_time = False
-                        mock_args2.no_version = True
-                        mock_args2.debug = False
-                        mock_args2.sector = "Sector2"
-                        mock_args2.protocol = "v2.0"
-                        mock_args2.user = "user2"
-                        mock_args2.file = "file2.xlsx"
+                mock_args2 = mocker.MagicMock()
+                mock_args2.input_folder = temp_dir2  # Use real temp directory
+                mock_args2.output_folder = "/output2"
+                mock_args2.locale = "en_US"
+                mock_args2.no_spellchecker = False
+                mock_args2.no_warning_titles_length = True
+                mock_args2.no_time = False
+                mock_args2.no_version = True
+                mock_args2.debug = False
+                mock_args2.sector = "Sector2"
+                mock_args2.protocol = "v2.0"
+                mock_args2.user = "user2"
+                mock_args2.file = "file2.xlsx"
 
-                        # Test first instance
-                        mock_parse_args.return_value = mock_args1
-                        data_args1 = DataArgs(allow_abbrev=True)
+                # Test first instance
+                mock_parse_args.return_value = mock_args1
+                data_args1 = DataArgs(allow_abbrev=True)
 
-                        # Test second instance
-                        mock_parse_args.return_value = mock_args2
-                        data_args2 = DataArgs(allow_abbrev=False)
+                # Test second instance
+                mock_parse_args.return_value = mock_args2
+                data_args2 = DataArgs(allow_abbrev=False)
 
-                        # Verify independence
-                        assert data_args1.allow_abbrev is True
-                        assert data_args2.allow_abbrev is False
+                # Verify independence
+                assert data_args1.allow_abbrev is True
+                assert data_args2.allow_abbrev is False
 
-                        assert data_args1.data_file.locale == "pt_BR"
-                        assert data_args2.data_file.locale == "en_US"
+                assert data_args1.data_file.locale == "pt_BR"
+                assert data_args2.data_file.locale == "en_US"
 
-                        assert data_args1.data_action.debug is True
-                        assert data_args2.data_action.debug is False
+                assert data_args1.data_action.debug is True
+                assert data_args2.data_action.debug is False
 
-                        assert data_args1.data_report.sector == "Sector1"
-                        assert data_args2.data_report.sector == "Sector2"
+                assert data_args1.data_report.sector == "Sector1"
+                assert data_args2.data_report.sector == "Sector2"

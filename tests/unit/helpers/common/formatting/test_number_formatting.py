@@ -7,6 +7,7 @@ from data_validate.helpers.common.formatting.number_formatting import (
     validate_integer,
     check_cell_integer,
     check_cell_float,
+    truncate_number,
 )
 
 
@@ -176,3 +177,37 @@ class TestNumberFormatting:
         valid, msg = check_cell_float(3, min_value=5)
         assert valid is False  # Float validation doesn't check minimum
         assert msg == "O valor '3.0' é menor que o valor mínimo permitido (5)."
+
+    def test_truncate_number(self):
+        """Test number truncation function."""
+        # Test integer (should return as-is)
+        result = truncate_number(5, 2)
+        assert result == 5
+        
+        # Test float with truncation
+        result = truncate_number(3.14159, 2)
+        assert result == 3.14
+        
+        # Test float with more precision
+        result = truncate_number(3.14159, 3)
+        assert result == 3.141
+        
+        # Test negative numbers
+        result = truncate_number(-3.14159, 2)
+        assert result == -3.14
+        
+        # Test zero
+        result = truncate_number(0, 2)
+        assert result == 0
+        
+        # Test zero with decimals
+        result = truncate_number(0.0, 2)
+        assert result == 0.0
+        
+        # Test very small numbers
+        result = truncate_number(0.123456789, 4)
+        assert result == 0.1234
+        
+        # Test large numbers
+        result = truncate_number(123.456789, 1)
+        assert result == 123.4

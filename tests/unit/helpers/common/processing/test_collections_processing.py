@@ -1,14 +1,70 @@
+import pytest
+
 from data_validate.helpers.common.processing.collections_processing import (
     categorize_strings_by_id_pattern_from_list,
     extract_numeric_integer_ids_from_list,
     extract_numeric_ids_and_unmatched_strings_from_list,
     find_differences_in_two_set,
     find_differences_in_two_set_with_message,
+    generate_group_from_list,
 )
 
 
 class TestCollectionsProcessing:
     """Test cases for collections processing functions."""
+
+    def test_generate_group_from_list_basic(self):
+        """Test basic grouping of consecutive identical elements."""
+        items = [1, 1, 2, 2, 2, 3, 1, 1]
+        result = generate_group_from_list(items)
+        
+        expected = [[1, 1], [2, 2, 2], [3], [1, 1]]
+        assert result == expected
+
+    def test_generate_group_from_list_single_element(self):
+        """Test grouping with single element."""
+        items = [5]
+        result = generate_group_from_list(items)
+        
+        expected = [[5]]
+        assert result == expected
+
+    def test_generate_group_from_list_all_different(self):
+        """Test grouping with all different elements."""
+        items = [1, 2, 3, 4, 5]
+        result = generate_group_from_list(items)
+        
+        expected = [[1], [2], [3], [4], [5]]
+        assert result == expected
+
+    def test_generate_group_from_list_all_same(self):
+        """Test grouping with all identical elements."""
+        items = [1, 1, 1, 1, 1]
+        result = generate_group_from_list(items)
+        
+        expected = [[1, 1, 1, 1, 1]]
+        assert result == expected
+
+    def test_generate_group_from_list_strings(self):
+        """Test grouping with string elements."""
+        items = ["a", "a", "b", "c", "c", "c"]
+        result = generate_group_from_list(items)
+        
+        expected = [["a", "a"], ["b"], ["c", "c", "c"]]
+        assert result == expected
+
+    def test_generate_group_from_list_mixed_types(self):
+        """Test grouping with mixed data types."""
+        items = [1, 1, "a", "a", 2, 2]
+        result = generate_group_from_list(items)
+        
+        expected = [[1, 1], ["a", "a"], [2, 2]]
+        assert result == expected
+
+    def test_generate_group_from_list_empty_raises_error(self):
+        """Test that empty list raises ValueError."""
+        with pytest.raises(ValueError, match="Input list must not be empty"):
+            generate_group_from_list([])
 
     def test_categorize_strings_by_id_pattern_from_list_basic(self):
         """Test basic categorization of strings by ID pattern."""

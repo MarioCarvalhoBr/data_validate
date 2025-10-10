@@ -4,7 +4,6 @@ import os
 import tempfile
 from pathlib import Path
 from typing import Any, Dict, Generator
-from unittest.mock import Mock, patch, mock_open
 import pytest
 
 from data_validate.helpers.base.file_system_utils import FileSystemUtils
@@ -14,14 +13,14 @@ class TestFileSystemUtils:
     """Test suite for FileSystemUtils core functionality."""
 
     @pytest.fixture
-    def fs_utils(self) -> FileSystemUtils:
+    def fs_utils(self, mocker) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
-            fs_utils = FileSystemUtils()
-            fs_utils.lm = Mock()
-            # Setup default mock returns for language manager
-            fs_utils.lm.text.return_value = "mocked_message"
-            return fs_utils
+        mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
+        fs_utils = FileSystemUtils()
+        fs_utils.lm = mocker.MagicMock()
+        # Setup default mock returns for language manager
+        fs_utils.lm.text.return_value = "mocked_message"
+        return fs_utils
 
     @pytest.fixture
     def temp_file(self) -> Generator[str, None, None]:
@@ -42,26 +41,26 @@ class TestFileSystemUtils:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
 
-    def test_init_creates_language_manager(self) -> None:
+    def test_init_creates_language_manager(self, mocker) -> None:
         """Test that __init__ creates LanguageManager instance."""
-        with patch("data_validate.helpers.base.file_system_utils.LanguageManager") as mock_lm:
-            mock_instance = Mock()
-            mock_lm.return_value = mock_instance
+        mock_lm = mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
+        mock_instance = mocker.MagicMock()
+        mock_lm.return_value = mock_instance
 
-            fs_utils = FileSystemUtils()
+        fs_utils = FileSystemUtils()
 
-            mock_lm.assert_called_once()
-            assert fs_utils.lm == mock_instance
+        mock_lm.assert_called_once()
+        assert fs_utils.lm == mock_instance
 
-    def test_detect_encoding_success(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
+    def test_detect_encoding_success(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test successful encoding detection."""
-        with patch("chardet.detect") as mock_detect:
-            mock_detect.return_value = {"encoding": "utf-8"}
+        mock_detect = mocker.patch("chardet.detect")
+        mock_detect.return_value = {"encoding": "utf-8"}
 
-            success, result = fs_utils.detect_encoding(temp_file)
+        success, result = fs_utils.detect_encoding(temp_file)
 
-            assert success is True
-            assert result == "utf-8"
+        assert success is True
+        assert result == "utf-8"
 
     def test_detect_encoding_empty_file_path(self, fs_utils: FileSystemUtils) -> None:
         """Test detect_encoding with empty file path."""
@@ -94,62 +93,60 @@ class TestFileSystemUtils:
         assert result == "path_not_file_error"
         fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
-    def test_detect_encoding_chardet_returns_none(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
+    def test_detect_encoding_chardet_returns_none(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test detect_encoding when chardet returns None encoding."""
         fs_utils.lm.text.return_value = "encoding_failed_error"
 
-        with patch("chardet.detect") as mock_detect:
-            mock_detect.return_value = {"encoding": None}
+        mock_detect = mocker.patch("chardet.detect")
+        mock_detect.return_value = {"encoding": None}
 
-            success, result = fs_utils.detect_encoding(temp_file)
+        success, result = fs_utils.detect_encoding(temp_file)
 
-            assert success is False
-            assert result == "encoding_failed_error"
-            fs_utils.lm.text.assert_called_with("fs_utils_error_encoding_failed")
+        assert success is False
+        assert result == "encoding_failed_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_encoding_failed")
 
-    def test_detect_encoding_os_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_detect_encoding_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with OS error during file reading."""
         fs_utils.lm.text.return_value = "os_error_message"
 
         # Mock os.path.exists and os.path.isfile to return True, then raise OSError on open
-        with (
-            patch("os.path.exists", return_value=True),
-            patch("os.path.isfile", return_value=True),
-            patch("builtins.open", side_effect=OSError("Permission denied")),
-        ):
-            success, result = fs_utils.detect_encoding("file.txt")
+        mocker.patch("os.path.exists", return_value=True)
+        mocker.patch("os.path.isfile", return_value=True)
+        mocker.patch("builtins.open", side_effect=OSError("Permission denied"))
+        
+        success, result = fs_utils.detect_encoding("file.txt")
 
-            assert success is False
-            assert result == "os_error_message"
-            fs_utils.lm.text.assert_called_with("fs_utils_error_encoding_os", error="Permission denied")
+        assert success is False
+        assert result == "os_error_message"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_encoding_os", error="Permission denied")
 
-    def test_detect_encoding_unexpected_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_detect_encoding_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with unexpected exception."""
         fs_utils.lm.text.return_value = "unexpected_error_message"
 
         # Mock os.path.exists and os.path.isfile to return True, then raise ValueError on open
-        with (
-            patch("os.path.exists", return_value=True),
-            patch("os.path.isfile", return_value=True),
-            patch("builtins.open", side_effect=ValueError("Unexpected error")),
-        ):
-            success, result = fs_utils.detect_encoding("file.txt")
+        mocker.patch("os.path.exists", return_value=True)
+        mocker.patch("os.path.isfile", return_value=True)
+        mocker.patch("builtins.open", side_effect=ValueError("Unexpected error"))
+        
+        success, result = fs_utils.detect_encoding("file.txt")
 
-            assert success is False
-            assert result == "unexpected_error_message"
-            fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        assert success is False
+        assert result == "unexpected_error_message"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
 
-    def test_detect_encoding_custom_num_bytes(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
+    def test_detect_encoding_custom_num_bytes(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test detect_encoding with custom num_bytes parameter."""
-        with patch("chardet.detect") as mock_detect:
-            mock_detect.return_value = {"encoding": "utf-8"}
+        mock_detect = mocker.patch("chardet.detect")
+        mock_detect.return_value = {"encoding": "utf-8"}
 
-            with patch("builtins.open", mock_open(read_data=b"test data")) as mock_file:
-                success, result = fs_utils.detect_encoding(temp_file, num_bytes=512)
+        mock_file = mocker.patch("builtins.open", mocker.mock_open(read_data=b"test data"))
+        success, result = fs_utils.detect_encoding(temp_file, num_bytes=512)
 
-                assert success is True
-                # Verify that read was called with custom num_bytes
-                mock_file.return_value.read.assert_called_with(512)
+        assert success is True
+        # Verify that read was called with custom num_bytes
+        mock_file.return_value.read.assert_called_with(512)
 
     def test_get_last_directory_name_basic_path(self, fs_utils: FileSystemUtils) -> None:
         """Test get_last_directory_name with basic path."""
@@ -208,31 +205,33 @@ class TestFileSystemUtils:
         assert message == "path_not_file_error"
         fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
-    def test_remove_file_os_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_remove_file_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test remove_file with OSError."""
         fs_utils.lm.text.return_value = "remove_file_os_error"
 
-        with patch("os.remove", side_effect=OSError("Permission denied")):
-            with patch("os.path.exists", return_value=True):
-                with patch("os.path.isfile", return_value=True):
-                    success, message = fs_utils.remove_file("/some/file.txt")
+        mocker.patch("os.remove", side_effect=OSError("Permission denied"))
+        mocker.patch("os.path.exists", return_value=True)
+        mocker.patch("os.path.isfile", return_value=True)
+        
+        success, message = fs_utils.remove_file("/some/file.txt")
 
-                    assert success is False
-                    assert message == "remove_file_os_error"
-                    fs_utils.lm.text.assert_called_with("fs_utils_error_remove_file_os", error="Permission denied")
+        assert success is False
+        assert message == "remove_file_os_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_remove_file_os", error="Permission denied")
 
-    def test_remove_file_unexpected_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_remove_file_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test remove_file with unexpected exception."""
         fs_utils.lm.text.return_value = "unexpected_error"
 
-        with patch("os.remove", side_effect=ValueError("Unexpected error")):
-            with patch("os.path.exists", return_value=True):
-                with patch("os.path.isfile", return_value=True):
-                    success, message = fs_utils.remove_file("/some/file.txt")
+        mocker.patch("os.remove", side_effect=ValueError("Unexpected error"))
+        mocker.patch("os.path.exists", return_value=True)
+        mocker.patch("os.path.isfile", return_value=True)
+        
+        success, message = fs_utils.remove_file("/some/file.txt")
 
-                    assert success is False
-                    assert message == "unexpected_error"
-                    fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        assert success is False
+        assert message == "unexpected_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
 
     def test_create_directory_success(self, fs_utils: FileSystemUtils) -> None:
         """Test successful directory creation."""
@@ -278,29 +277,31 @@ class TestFileSystemUtils:
         assert message == "path_not_dir_error"
         fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
-    def test_create_directory_os_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_create_directory_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test create_directory with OSError."""
         fs_utils.lm.text.return_value = "create_dir_os_error"
 
-        with patch("os.makedirs", side_effect=OSError("Permission denied")):
-            with patch("os.path.exists", return_value=False):
-                success, message = fs_utils.create_directory("/some/directory")
+        mocker.patch("os.makedirs", side_effect=OSError("Permission denied"))
+        mocker.patch("os.path.exists", return_value=False)
+        
+        success, message = fs_utils.create_directory("/some/directory")
 
-                assert success is False
-                assert message == "create_dir_os_error"
-                fs_utils.lm.text.assert_called_with("fs_utils_error_create_dir_os", error="Permission denied")
+        assert success is False
+        assert message == "create_dir_os_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_create_dir_os", error="Permission denied")
 
-    def test_create_directory_unexpected_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_create_directory_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test create_directory with unexpected exception."""
         fs_utils.lm.text.return_value = "unexpected_error"
 
-        with patch("os.makedirs", side_effect=ValueError("Unexpected error")):
-            with patch("os.path.exists", return_value=False):
-                success, message = fs_utils.create_directory("/some/directory")
+        mocker.patch("os.makedirs", side_effect=ValueError("Unexpected error"))
+        mocker.patch("os.path.exists", return_value=False)
+        
+        success, message = fs_utils.create_directory("/some/directory")
 
-                assert success is False
-                assert message == "unexpected_error"
-                fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        assert success is False
+        assert message == "unexpected_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
 
     def test_check_file_exists_success(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test check_file_exists with existing file."""
@@ -340,16 +341,17 @@ class TestFileSystemUtils:
         assert messages == ["path_not_file_error"]
         fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
-    def test_check_file_exists_unexpected_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_check_file_exists_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test check_file_exists with unexpected exception."""
         fs_utils.lm.text.return_value = "file_check_fail_error"
 
-        with patch("os.path.exists", side_effect=ValueError("Unexpected error")):
-            exists, messages = fs_utils.check_file_exists("/some/file.txt")
+        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+        
+        exists, messages = fs_utils.check_file_exists("/some/file.txt")
 
-            assert exists is False
-            assert messages == ["file_check_fail_error"]
-            fs_utils.lm.text.assert_called_with("fs_utils_error_file_check_fail", error="Unexpected error")
+        assert exists is False
+        assert messages == ["file_check_fail_error"]
+        fs_utils.lm.text.assert_called_with("fs_utils_error_file_check_fail", error="Unexpected error")
 
     def test_check_directory_exists_success(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test check_directory_exists with existing directory."""
@@ -389,16 +391,17 @@ class TestFileSystemUtils:
         assert message == "path_not_dir_error"
         fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
-    def test_check_directory_exists_unexpected_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_check_directory_exists_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test check_directory_exists with unexpected exception."""
         fs_utils.lm.text.return_value = "dir_check_fail_error"
 
-        with patch("os.path.exists", side_effect=ValueError("Unexpected error")):
-            exists, message = fs_utils.check_directory_exists("/some/directory")
+        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+        
+        exists, message = fs_utils.check_directory_exists("/some/directory")
 
-            assert exists is False
-            assert message == "dir_check_fail_error"
-            fs_utils.lm.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
+        assert exists is False
+        assert message == "dir_check_fail_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
 
     def test_check_directory_is_empty_true(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_is_empty with empty directory."""
@@ -447,29 +450,30 @@ class TestFileSystemUtils:
         assert message == "path_not_dir_error"
         fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
-    def test_check_directory_is_empty_unexpected_error(self, fs_utils: FileSystemUtils) -> None:
+    def test_check_directory_is_empty_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test check_directory_is_empty with unexpected exception."""
         fs_utils.lm.text.return_value = "dir_check_fail_error"
 
-        with patch("os.path.exists", side_effect=ValueError("Unexpected error")):
-            is_empty, message = fs_utils.check_directory_is_empty("/some/directory")
+        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+        
+        is_empty, message = fs_utils.check_directory_is_empty("/some/directory")
 
-            assert is_empty is False
-            assert message == "dir_check_fail_error"
-            fs_utils.lm.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
+        assert is_empty is False
+        assert message == "dir_check_fail_error"
+        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
 
 
 class TestFileSystemUtilsDataDrivenTests:
     """Data-driven tests for FileSystemUtils using pytest parameterization."""
 
     @pytest.fixture
-    def fs_utils(self) -> FileSystemUtils:
+    def fs_utils(self, mocker) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
-            fs_utils = FileSystemUtils()
-            fs_utils.lm = Mock()
-            fs_utils.lm.text.return_value = "mocked_message"
-            return fs_utils
+        mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
+        fs_utils = FileSystemUtils()
+        fs_utils.lm = mocker.MagicMock()
+        fs_utils.lm.text.return_value = "mocked_message"
+        return fs_utils
 
     @pytest.mark.parametrize(
         "path,expected_name",
@@ -501,7 +505,7 @@ class TestFileSystemUtilsDataDrivenTests:
         ],
     )
     def test_detect_encoding_various_results(
-        self, fs_utils: FileSystemUtils, encoding_result: Dict[str, Any], expected_success: bool, expected_encoding: str
+        self, fs_utils: FileSystemUtils, encoding_result: Dict[str, Any], expected_success: bool, expected_encoding: str, mocker
     ) -> None:
         """Test detect_encoding with various chardet results."""
         with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
@@ -509,13 +513,13 @@ class TestFileSystemUtilsDataDrivenTests:
             temp_file_path = temp_file.name
 
         try:
-            with patch("chardet.detect") as mock_detect:
-                mock_detect.return_value = encoding_result
+            mock_detect = mocker.patch("chardet.detect")
+            mock_detect.return_value = encoding_result
 
-                success, result = fs_utils.detect_encoding(temp_file_path)
+            success, result = fs_utils.detect_encoding(temp_file_path)
 
-                assert success == expected_success
-                assert result == expected_encoding
+            assert success == expected_success
+            assert result == expected_encoding
         finally:
             if os.path.exists(temp_file_path):
                 os.unlink(temp_file_path)
@@ -530,40 +534,39 @@ class TestFileSystemUtilsDataDrivenTests:
         ],
     )
     def test_detect_encoding_exception_handling(
-        self, fs_utils: FileSystemUtils, exception_type: type, exception_message: str, expected_lm_call: str
+        self, fs_utils: FileSystemUtils, exception_type: type, exception_message: str, expected_lm_call: str, mocker
     ) -> None:
         """Test detect_encoding exception handling with various exception types."""
         # Mock os.path.exists and os.path.isfile to return True, then raise exception on open
-        with (
-            patch("os.path.exists", return_value=True),
-            patch("os.path.isfile", return_value=True),
-            patch("builtins.open", side_effect=exception_type(exception_message)),
-        ):
-            success, result = fs_utils.detect_encoding("file.txt")
+        mocker.patch("os.path.exists", return_value=True)
+        mocker.patch("os.path.isfile", return_value=True)
+        mocker.patch("builtins.open", side_effect=exception_type(exception_message))
+        
+        success, result = fs_utils.detect_encoding("file.txt")
 
-            assert success is False
-            assert result == "mocked_message"
-            fs_utils.lm.text.assert_called_with(expected_lm_call, error=exception_message)
+        assert success is False
+        assert result == "mocked_message"
+        fs_utils.lm.text.assert_called_with(expected_lm_call, error=exception_message)
 
     @pytest.mark.parametrize(
         "num_bytes_value",
         [512, 1024, 2048, 4096, 8192],
     )
-    def test_detect_encoding_various_num_bytes(self, fs_utils: FileSystemUtils, num_bytes_value: int) -> None:
+    def test_detect_encoding_various_num_bytes(self, fs_utils: FileSystemUtils, num_bytes_value: int, mocker) -> None:
         """Test detect_encoding with various num_bytes values."""
         with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
             temp_file.write("test content for encoding detection")
             temp_file_path = temp_file.name
 
         try:
-            with patch("chardet.detect") as mock_detect:
-                mock_detect.return_value = {"encoding": "utf-8"}
+            mock_detect = mocker.patch("chardet.detect")
+            mock_detect.return_value = {"encoding": "utf-8"}
 
-                with patch("builtins.open", mock_open(read_data=b"test data")) as mock_file:
-                    success, result = fs_utils.detect_encoding(temp_file_path, num_bytes=num_bytes_value)
+            mock_file = mocker.patch("builtins.open", mocker.mock_open(read_data=b"test data"))
+            success, result = fs_utils.detect_encoding(temp_file_path, num_bytes=num_bytes_value)
 
-                    assert success is True
-                    mock_file.return_value.read.assert_called_with(num_bytes_value)
+            assert success is True
+            mock_file.return_value.read.assert_called_with(num_bytes_value)
         finally:
             if os.path.exists(temp_file_path):
                 os.unlink(temp_file_path)
@@ -573,64 +576,64 @@ class TestFileSystemUtilsEdgeCases:
     """Edge cases and boundary condition tests for FileSystemUtils."""
 
     @pytest.fixture
-    def fs_utils(self) -> FileSystemUtils:
+    def fs_utils(self, mocker) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
-            fs_utils = FileSystemUtils()
-            fs_utils.lm = Mock()
-            fs_utils.lm.text.return_value = "mocked_message"
-            return fs_utils
+        mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
+        fs_utils = FileSystemUtils()
+        fs_utils.lm = mocker.MagicMock()
+        fs_utils.lm.text.return_value = "mocked_message"
+        return fs_utils
 
-    def test_detect_encoding_very_small_file(self, fs_utils: FileSystemUtils) -> None:
+    def test_detect_encoding_very_small_file(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with very small file."""
         with tempfile.NamedTemporaryFile(mode="w", delete=False, encoding="utf-8") as temp_file:
             temp_file.write("x")  # Single character
             temp_file_path = temp_file.name
 
         try:
-            with patch("chardet.detect") as mock_detect:
-                mock_detect.return_value = {"encoding": "utf-8"}
+            mock_detect = mocker.patch("chardet.detect")
+            mock_detect.return_value = {"encoding": "utf-8"}
 
-                success, result = fs_utils.detect_encoding(temp_file_path)
+            success, result = fs_utils.detect_encoding(temp_file_path)
 
-                assert success is True
-                assert result == "utf-8"
+            assert success is True
+            assert result == "utf-8"
         finally:
             if os.path.exists(temp_file_path):
                 os.unlink(temp_file_path)
 
-    def test_detect_encoding_empty_file(self, fs_utils: FileSystemUtils) -> None:
+    def test_detect_encoding_empty_file(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with empty file."""
         with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:
             # Create empty file
             temp_file_path = temp_file.name
 
         try:
-            with patch("chardet.detect") as mock_detect:
-                mock_detect.return_value = {"encoding": "ascii"}
+            mock_detect = mocker.patch("chardet.detect")
+            mock_detect.return_value = {"encoding": "ascii"}
 
-                success, result = fs_utils.detect_encoding(temp_file_path)
+            success, result = fs_utils.detect_encoding(temp_file_path)
 
-                assert success is True
-                assert result == "ascii"
+            assert success is True
+            assert result == "ascii"
         finally:
             if os.path.exists(temp_file_path):
                 os.unlink(temp_file_path)
 
-    def test_detect_encoding_binary_file(self, fs_utils: FileSystemUtils) -> None:
+    def test_detect_encoding_binary_file(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with binary file."""
         with tempfile.NamedTemporaryFile(mode="wb", delete=False) as temp_file:
             temp_file.write(b"\x89PNG\r\n\x1a\n")  # PNG file signature
             temp_file_path = temp_file.name
 
         try:
-            with patch("chardet.detect") as mock_detect:
-                mock_detect.return_value = {"encoding": "utf-8"}
+            mock_detect = mocker.patch("chardet.detect")
+            mock_detect.return_value = {"encoding": "utf-8"}
 
-                success, result = fs_utils.detect_encoding(temp_file_path)
+            success, result = fs_utils.detect_encoding(temp_file_path)
 
-                assert success is True
-                assert result == "utf-8"
+            assert success is True
+            assert result == "utf-8"
         finally:
             if os.path.exists(temp_file_path):
                 os.unlink(temp_file_path)
@@ -661,7 +664,7 @@ class TestFileSystemUtilsEdgeCases:
             assert message == "directory_created_success"
             assert os.path.isdir(special_dir)
 
-    def test_remove_file_readonly_file(self, fs_utils: FileSystemUtils) -> None:
+    def test_remove_file_readonly_file(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test remove_file with read-only file (simulated with OSError)."""
         fs_utils.lm.text.return_value = "remove_file_os_error"
 
@@ -670,11 +673,12 @@ class TestFileSystemUtilsEdgeCases:
 
         try:
             # Simulate read-only file by patching os.remove to raise OSError
-            with patch("os.remove", side_effect=OSError("Operation not permitted")):
-                success, message = fs_utils.remove_file(temp_file_path)
+            mocker.patch("os.remove", side_effect=OSError("Operation not permitted"))
+            
+            success, message = fs_utils.remove_file(temp_file_path)
 
-                assert success is False
-                assert message == "remove_file_os_error"
+            assert success is False
+            assert message == "remove_file_os_error"
         finally:
             # Cleanup - remove the file if it still exists
             if os.path.exists(temp_file_path):
@@ -695,32 +699,32 @@ class TestFileSystemUtilsEdgeCases:
             assert is_empty is False
             assert message == "dir_not_empty_message"
 
-    def test_pathlib_integration(self, fs_utils: FileSystemUtils) -> None:
+    def test_pathlib_integration(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test that get_last_directory_name properly uses pathlib.Path."""
-        with patch("data_validate.helpers.base.file_system_utils.Path") as mock_path:
-            mock_instance = Mock()
-            mock_instance.name = "test_directory"
-            mock_path.return_value = mock_instance
+        mock_path = mocker.patch("data_validate.helpers.base.file_system_utils.Path")
+        mock_instance = mocker.MagicMock()
+        mock_instance.name = "test_directory"
+        mock_path.return_value = mock_instance
 
-            result = fs_utils.get_last_directory_name("/some/path/test_directory")
+        result = fs_utils.get_last_directory_name("/some/path/test_directory")
 
-            mock_path.assert_called_once_with("/some/path/test_directory")
-            assert result == "test_directory"
+        mock_path.assert_called_once_with("/some/path/test_directory")
+        assert result == "test_directory"
 
 
 class TestFileSystemUtilsIntegration:
     """Integration tests for FileSystemUtils complete workflows."""
 
     @pytest.fixture
-    def fs_utils(self) -> FileSystemUtils:
+    def fs_utils(self, mocker) -> FileSystemUtils:
         """Create FileSystemUtils instance for testing."""
-        with patch("data_validate.helpers.base.file_system_utils.LanguageManager"):
-            fs_utils = FileSystemUtils()
-            fs_utils.lm = Mock()
-            fs_utils.lm.text.return_value = "mocked_message"
-            return fs_utils
+        mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
+        fs_utils = FileSystemUtils()
+        fs_utils.lm = mocker.MagicMock()
+        fs_utils.lm.text.return_value = "mocked_message"
+        return fs_utils
 
-    def test_complete_file_workflow(self, fs_utils: FileSystemUtils) -> None:
+    def test_complete_file_workflow(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test complete workflow: create file, check exists, detect encoding, remove file."""
         with tempfile.TemporaryDirectory() as temp_dir:
             test_file = os.path.join(temp_dir, "test_file.txt")
@@ -735,11 +739,11 @@ class TestFileSystemUtilsIntegration:
             assert messages == []
 
             # Detect encoding
-            with patch("chardet.detect") as mock_detect:
-                mock_detect.return_value = {"encoding": "utf-8"}
-                success, encoding = fs_utils.detect_encoding(test_file)
-                assert success is True
-                assert encoding == "utf-8"
+            mock_detect = mocker.patch("chardet.detect")
+            mock_detect.return_value = {"encoding": "utf-8"}
+            success, encoding = fs_utils.detect_encoding(test_file)
+            assert success is True
+            assert encoding == "utf-8"
 
             # Remove file
             fs_utils.lm.text.return_value = "file_removed_success"
