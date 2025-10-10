@@ -18,6 +18,7 @@ install: ## Install development dependencies
 
 update: ## Update dependencies to latest versions
 	poetry update
+	poetry update --only=dev
 
 build: ## Build the package
 	rm -rf dist/
