@@ -182,7 +182,7 @@ def check_special_characters_cr_lf_columns_start_end(
         non_empty_values = dataframe[column][non_empty_mask]
         if len(non_empty_values) == 0:
             continue
-            
+
         text_series = non_empty_values.astype(str)
 
         # Check for CR/LF at positions using vectorized operations
@@ -242,7 +242,7 @@ def check_special_characters_cr_lf_columns_anywhere(
         non_empty_values = dataframe[column][non_empty_mask]
         if len(non_empty_values) == 0:
             continue
-            
+
         text_series = non_empty_values.astype(str)
 
         def find_cr_lf_positions(text: str) -> List[Tuple[int, str]]:

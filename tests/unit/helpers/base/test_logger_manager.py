@@ -136,7 +136,7 @@ class TestLoggerManager:
         """Test LoggerManager initialization with default parameters."""
         mock_makedirs = mocker.patch("os.makedirs")
         mocker.patch("os.path.exists", return_value=False)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         assert logger_manager.log_folder == temp_log_dir
@@ -151,7 +151,7 @@ class TestLoggerManager:
         """Test initialization when log folder already exists."""
         mock_makedirs = mocker.patch("os.makedirs")
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         assert logger_manager.log_folder == temp_log_dir
@@ -161,7 +161,7 @@ class TestLoggerManager:
     def test_init_custom_log_levels(self, temp_log_dir, log_level, mocker):
         """Test initialization with different log levels."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir, default_level=log_level)
 
         assert logger_manager.default_level == log_level
@@ -173,7 +173,7 @@ class TestLoggerManager:
         custom_logger_name = "custom_logger"
 
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(
             log_folder=temp_log_dir,
             default_level=logging.WARNING,
@@ -188,7 +188,7 @@ class TestLoggerManager:
     def test_configure_logger_console_only(self, temp_log_dir, mocker):
         """Test configure_logger method with console handler only."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         test_logger = logger_manager.configure_logger("test_logger")
@@ -205,7 +205,7 @@ class TestLoggerManager:
         log_file_path = os.path.join(temp_log_dir, "test.log")
 
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         test_logger = logger_manager.configure_logger("test_logger_file", log_file=log_file_path)
@@ -219,7 +219,7 @@ class TestLoggerManager:
     def test_configure_logger_custom_level(self, temp_log_dir, mocker):
         """Test configure_logger with custom logging level."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         test_logger = logger_manager.configure_logger("test_logger", level=logging.ERROR)
@@ -229,7 +229,7 @@ class TestLoggerManager:
     def test_configure_logger_none_level_uses_default(self, temp_log_dir, mocker):
         """Test that None level parameter uses default level."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir, default_level=logging.WARNING)
 
         test_logger = logger_manager.configure_logger("test_logger", level=None)
@@ -239,7 +239,7 @@ class TestLoggerManager:
     def test_generate_log_file_name_default_prefix(self, temp_log_dir, mock_datetime, mocker):
         """Test log file name generation with default prefix."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         log_file = logger_manager.generate_log_file_name()
@@ -250,7 +250,7 @@ class TestLoggerManager:
     def test_generate_log_file_name_custom_prefix(self, temp_log_dir, mock_datetime, mocker):
         """Test log file name generation with custom prefix."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         log_file = logger_manager.generate_log_file_name(prefix="custom")
@@ -262,7 +262,7 @@ class TestLoggerManager:
     def test_generate_log_file_name_various_prefixes(self, temp_log_dir, mock_datetime, prefix, mocker):
         """Test log file name generation with various prefixes."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         log_file = logger_manager.generate_log_file_name(prefix=prefix)
@@ -273,7 +273,7 @@ class TestLoggerManager:
     def test_log_file_path_contains_folder(self, temp_log_dir, mocker):
         """Test that generated log file path is within log folder."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         log_file = logger_manager.generate_log_file_name()
@@ -296,7 +296,7 @@ class TestLoggerManager:
     def test_logger_integration_console_and_file(self, temp_log_dir, mocker):
         """Test complete integration of console and file loggers."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         # Test that both loggers are created
@@ -310,7 +310,7 @@ class TestLoggerManager:
     def test_custom_formatter_applied_to_handlers(self, temp_log_dir, mocker):
         """Test that CustomFormatter is applied to all handlers."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         test_logger = logger_manager.configure_logger("test_logger", log_file=os.path.join(temp_log_dir, "test.log"))
@@ -327,7 +327,7 @@ class TestLoggerManager:
         mock_makedirs = mocker.patch("os.makedirs")
         mock_dt = mocker.patch("data_validate.helpers.base.logger_manager.datetime")
         mock_dt.now.return_value.strftime.return_value = "20230101_120000"
-        
+
         LoggerManager(log_folder=test_folder)
 
         mock_makedirs.assert_called_once_with(test_folder)
@@ -335,7 +335,7 @@ class TestLoggerManager:
     def test_logging_levels_hierarchy(self, temp_log_dir, mocker):
         """Test that logging levels work correctly."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir, default_level=logging.WARNING)
 
         test_logger = logger_manager.configure_logger("hierarchy_test")
@@ -349,7 +349,7 @@ class TestLoggerManager:
     def test_multiple_loggers_creation(self, temp_log_dir, mocker):
         """Test creation of multiple loggers with different configurations."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         logger1 = logger_manager.configure_logger("logger1", level=logging.DEBUG)
@@ -367,7 +367,7 @@ class TestLoggerManager:
     def test_file_path_construction(self, temp_log_dir, mock_datetime, mocker):
         """Test that file paths are constructed correctly."""
         mocker.patch("os.path.exists", return_value=True)
-        
+
         logger_manager = LoggerManager(log_folder=temp_log_dir)
 
         mock_join = mocker.patch("os.path.join", return_value="mocked_path")

@@ -1034,43 +1034,31 @@ class TestCheckDataframeTitlesUniques:
 
     def test_check_dataframe_titles_uniques_no_duplicates(self):
         """Test with no duplicate titles."""
-        df = pd.DataFrame({
-            "title_one": ["Title 1", "Title 2", "Title 3"],
-            "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]
-        })
-        
+        df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]})
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert result == []
 
     def test_check_dataframe_titles_uniques_with_duplicates_first_column(self):
         """Test with duplicates in first column."""
-        df = pd.DataFrame({
-            "title_one": ["Title 1", "Title 1", "Title 3"],
-            "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]
-        })
-        
+        df = pd.DataFrame({"title_one": ["Title 1", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]})
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 1
         assert "titles one duplicados: ['Title 1']" in result[0]
 
     def test_check_dataframe_titles_uniques_with_duplicates_second_column(self):
         """Test with duplicates in second column."""
-        df = pd.DataFrame({
-            "title_one": ["Title 1", "Title 2", "Title 3"],
-            "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]
-        })
-        
+        df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]})
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 1
         assert "titles two duplicados: ['Subtitle 1']" in result[0]
 
     def test_check_dataframe_titles_uniques_with_duplicates_both_columns(self):
         """Test with duplicates in both columns."""
-        df = pd.DataFrame({
-            "title_one": ["Title 1", "Title 1", "Title 3"],
-            "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]
-        })
-        
+        df = pd.DataFrame({"title_one": ["Title 1", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]})
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 2
         assert any("titles one duplicados: ['Title 1']" in msg for msg in result)
@@ -1079,26 +1067,26 @@ class TestCheckDataframeTitlesUniques:
     def test_check_dataframe_titles_uniques_empty_dataframe(self):
         """Test with empty DataFrame."""
         df = pd.DataFrame(columns=["title_one", "title_two"])
-        
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert result == []
 
     def test_check_dataframe_titles_uniques_missing_columns(self):
         """Test with missing columns."""
-        df = pd.DataFrame({
-            "title_one": ["Title 1", "Title 2", "Title 3"]
-        })
-        
+        df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"]})
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 0  # Should not find duplicates in missing column
 
     def test_check_dataframe_titles_uniques_multiple_duplicates(self):
         """Test with multiple duplicate values."""
-        df = pd.DataFrame({
-            "title_one": ["Title 1", "Title 1", "Title 2", "Title 2", "Title 3"],
-            "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3", "Subtitle 3", "Subtitle 4"]
-        })
-        
+        df = pd.DataFrame(
+            {
+                "title_one": ["Title 1", "Title 1", "Title 2", "Title 2", "Title 3"],
+                "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3", "Subtitle 3", "Subtitle 4"],
+            }
+        )
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 2
         assert any("titles one duplicados: ['Title 1', 'Title 2']" in msg for msg in result)
@@ -1106,11 +1094,8 @@ class TestCheckDataframeTitlesUniques:
 
     def test_check_dataframe_titles_uniques_with_whitespace(self):
         """Test with titles that have leading/trailing whitespace."""
-        df = pd.DataFrame({
-            "title_one": [" Title 1 ", "Title 1", "Title 3"],
-            "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]
-        })
-        
+        df = pd.DataFrame({"title_one": [" Title 1 ", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]})
+
         result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 1
         assert "titles one duplicados: ['Title 1']" in result[0]
@@ -1121,19 +1106,15 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
 
     def test_check_special_characters_cr_lf_columns_start_end_no_issues(self):
         """Test with no CR/LF characters."""
-        df = pd.DataFrame({
-            "text_col": ["Normal text", "Another text", "Clean text"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Normal text", "Another text", "Clean text"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_start_end_with_cr_end(self):
         """Test with CR character at end."""
-        df = pd.DataFrame({
-            "text_col": ["Text with CR\r", "Normal text", "Another with CR\r"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Text with CR\r", "Normal text", "Another with CR\r"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
@@ -1141,10 +1122,8 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
 
     def test_check_special_characters_cr_lf_columns_start_end_with_lf_end(self):
         """Test with LF character at end."""
-        df = pd.DataFrame({
-            "text_col": ["Text with LF\n", "Normal text", "Another with LF\n"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Text with LF\n", "Normal text", "Another with LF\n"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
@@ -1152,10 +1131,8 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
 
     def test_check_special_characters_cr_lf_columns_start_end_with_cr_start(self):
         """Test with CR character at start."""
-        df = pd.DataFrame({
-            "text_col": ["\rText with CR", "Normal text", "\rAnother with CR"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["\rText with CR", "Normal text", "\rAnother with CR"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
@@ -1163,10 +1140,8 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
 
     def test_check_special_characters_cr_lf_columns_start_end_with_lf_start(self):
         """Test with LF character at start."""
-        df = pd.DataFrame({
-            "text_col": ["\nText with LF", "Normal text", "\nAnother with LF"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["\nText with LF", "Normal text", "\nAnother with LF"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
@@ -1174,29 +1149,24 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
 
     def test_check_special_characters_cr_lf_columns_start_end_empty_columns(self):
         """Test with empty or None columns."""
-        df = pd.DataFrame({
-            "text_col": ["", None, "Normal text"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["", None, "Normal text"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_start_end_missing_column(self):
         """Test with missing column."""
-        df = pd.DataFrame({
-            "other_col": ["Text", "More text"]
-        })
-        
+        df = pd.DataFrame({"other_col": ["Text", "More text"]})
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_start_end_all_empty_values(self):
         """Test with column containing only empty/NaN values (covers line 179)."""
-        df = pd.DataFrame({
-            "empty_col": [None, "", pd.NA, None],
-            "normal_col": ["Normal text", "\rText with CR at start", "Text with LF at end\n", "Another text"]
-        })
-        
+        df = pd.DataFrame(
+            {"empty_col": [None, "", pd.NA, None], "normal_col": ["Normal text", "\rText with CR at start", "Text with LF at end\n", "Another text"]}
+        )
+
         result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["empty_col", "normal_col"])
         # Should only check normal_col since empty_col has no non-empty values
         assert result[0] is False
@@ -1209,19 +1179,15 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
 
     def test_check_special_characters_cr_lf_columns_anywhere_no_issues(self):
         """Test with no CR/LF characters."""
-        df = pd.DataFrame({
-            "text_col": ["Normal text", "Another text", "Clean text"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Normal text", "Another text", "Clean text"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_anywhere_with_cr_middle(self):
         """Test with CR character in middle of text."""
-        df = pd.DataFrame({
-            "text_col": ["Text\rwith CR", "Normal text", "Another\rwith CR"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Text\rwith CR", "Normal text", "Another\rwith CR"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
@@ -1229,10 +1195,8 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
 
     def test_check_special_characters_cr_lf_columns_anywhere_with_lf_middle(self):
         """Test with LF character in middle of text."""
-        df = pd.DataFrame({
-            "text_col": ["Text\nwith LF", "Normal text", "Another\nwith LF"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Text\nwith LF", "Normal text", "Another\nwith LF"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
@@ -1240,39 +1204,30 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
 
     def test_check_special_characters_cr_lf_columns_anywhere_multiple_cr_lf(self):
         """Test with multiple CR/LF characters in same text."""
-        df = pd.DataFrame({
-            "text_col": ["Text\r\nwith both", "Normal text"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["Text\r\nwith both", "Normal text"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2  # One for CR, one for LF
 
     def test_check_special_characters_cr_lf_columns_anywhere_empty_columns(self):
         """Test with empty or None columns."""
-        df = pd.DataFrame({
-            "text_col": ["", None, "Normal text"]
-        })
-        
+        df = pd.DataFrame({"text_col": ["", None, "Normal text"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_anywhere_missing_column(self):
         """Test with missing column."""
-        df = pd.DataFrame({
-            "other_col": ["Text", "More text"]
-        })
-        
+        df = pd.DataFrame({"other_col": ["Text", "More text"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_anywhere_all_empty_values(self):
         """Test with column containing only empty/NaN values (covers line 234)."""
-        df = pd.DataFrame({
-            "empty_col": [None, "", pd.NA, None],
-            "normal_col": ["Normal text", "Text with\nLF", "Text with\rCR", "Another text"]
-        })
-        
+        df = pd.DataFrame({"empty_col": [None, "", pd.NA, None], "normal_col": ["Normal text", "Text with\nLF", "Text with\rCR", "Another text"]})
+
         result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["empty_col", "normal_col"])
         # Should only check normal_col since empty_col has no non-empty values
         assert result[0] is False
@@ -1285,21 +1240,15 @@ class TestColumnExistsMultiIndex:
 
     def test_column_exists_multiindex_column_found(self):
         """Test column_exists with MultiIndex when column is found."""
-        df = pd.DataFrame({
-            ("level1", "level2_col"): [1, 2, 3],
-            ("level1", "other_col"): ["a", "b", "c"]
-        })
-        
+        df = pd.DataFrame({("level1", "level2_col"): [1, 2, 3], ("level1", "other_col"): ["a", "b", "c"]})
+
         result = column_exists(df, "test.xlsx", "level2_col")
         assert result == (True, "")
 
     def test_column_exists_multiindex_column_not_found(self):
         """Test column_exists with MultiIndex when column is not found."""
-        df = pd.DataFrame({
-            ("level1", "level2_col"): [1, 2, 3],
-            ("level1", "other_col"): ["a", "b", "c"]
-        })
-        
+        df = pd.DataFrame({("level1", "level2_col"): [1, 2, 3], ("level1", "other_col"): ["a", "b", "c"]})
+
         result = column_exists(df, "test.xlsx", "missing_col")
         assert result == (False, "test.xlsx: A verificação foi abortada para a coluna nível 2 obrigatória 'missing_col' que está ausente.")
         assert isinstance(result[1], (list, str))  # column_exists returns str for second element

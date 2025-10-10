@@ -114,7 +114,7 @@ class TestFileSystemUtils:
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
         mocker.patch("builtins.open", side_effect=OSError("Permission denied"))
-        
+
         success, result = fs_utils.detect_encoding("file.txt")
 
         assert success is False
@@ -129,7 +129,7 @@ class TestFileSystemUtils:
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
         mocker.patch("builtins.open", side_effect=ValueError("Unexpected error"))
-        
+
         success, result = fs_utils.detect_encoding("file.txt")
 
         assert success is False
@@ -212,7 +212,7 @@ class TestFileSystemUtils:
         mocker.patch("os.remove", side_effect=OSError("Permission denied"))
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
-        
+
         success, message = fs_utils.remove_file("/some/file.txt")
 
         assert success is False
@@ -226,7 +226,7 @@ class TestFileSystemUtils:
         mocker.patch("os.remove", side_effect=ValueError("Unexpected error"))
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
-        
+
         success, message = fs_utils.remove_file("/some/file.txt")
 
         assert success is False
@@ -283,7 +283,7 @@ class TestFileSystemUtils:
 
         mocker.patch("os.makedirs", side_effect=OSError("Permission denied"))
         mocker.patch("os.path.exists", return_value=False)
-        
+
         success, message = fs_utils.create_directory("/some/directory")
 
         assert success is False
@@ -296,7 +296,7 @@ class TestFileSystemUtils:
 
         mocker.patch("os.makedirs", side_effect=ValueError("Unexpected error"))
         mocker.patch("os.path.exists", return_value=False)
-        
+
         success, message = fs_utils.create_directory("/some/directory")
 
         assert success is False
@@ -346,7 +346,7 @@ class TestFileSystemUtils:
         fs_utils.lm.text.return_value = "file_check_fail_error"
 
         mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
-        
+
         exists, messages = fs_utils.check_file_exists("/some/file.txt")
 
         assert exists is False
@@ -396,7 +396,7 @@ class TestFileSystemUtils:
         fs_utils.lm.text.return_value = "dir_check_fail_error"
 
         mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
-        
+
         exists, message = fs_utils.check_directory_exists("/some/directory")
 
         assert exists is False
@@ -455,7 +455,7 @@ class TestFileSystemUtils:
         fs_utils.lm.text.return_value = "dir_check_fail_error"
 
         mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
-        
+
         is_empty, message = fs_utils.check_directory_is_empty("/some/directory")
 
         assert is_empty is False
@@ -541,7 +541,7 @@ class TestFileSystemUtilsDataDrivenTests:
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
         mocker.patch("builtins.open", side_effect=exception_type(exception_message))
-        
+
         success, result = fs_utils.detect_encoding("file.txt")
 
         assert success is False
@@ -674,7 +674,7 @@ class TestFileSystemUtilsEdgeCases:
         try:
             # Simulate read-only file by patching os.remove to raise OSError
             mocker.patch("os.remove", side_effect=OSError("Operation not permitted"))
-            
+
             success, message = fs_utils.remove_file(temp_file_path)
 
             assert success is False

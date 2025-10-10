@@ -17,7 +17,7 @@ class TestCollectionsProcessing:
         """Test basic grouping of consecutive identical elements."""
         items = [1, 1, 2, 2, 2, 3, 1, 1]
         result = generate_group_from_list(items)
-        
+
         expected = [[1, 1], [2, 2, 2], [3], [1, 1]]
         assert result == expected
 
@@ -25,7 +25,7 @@ class TestCollectionsProcessing:
         """Test grouping with single element."""
         items = [5]
         result = generate_group_from_list(items)
-        
+
         expected = [[5]]
         assert result == expected
 
@@ -33,7 +33,7 @@ class TestCollectionsProcessing:
         """Test grouping with all different elements."""
         items = [1, 2, 3, 4, 5]
         result = generate_group_from_list(items)
-        
+
         expected = [[1], [2], [3], [4], [5]]
         assert result == expected
 
@@ -41,7 +41,7 @@ class TestCollectionsProcessing:
         """Test grouping with all identical elements."""
         items = [1, 1, 1, 1, 1]
         result = generate_group_from_list(items)
-        
+
         expected = [[1, 1, 1, 1, 1]]
         assert result == expected
 
@@ -49,7 +49,7 @@ class TestCollectionsProcessing:
         """Test grouping with string elements."""
         items = ["a", "a", "b", "c", "c", "c"]
         result = generate_group_from_list(items)
-        
+
         expected = [["a", "a"], ["b"], ["c", "c", "c"]]
         assert result == expected
 
@@ -57,7 +57,7 @@ class TestCollectionsProcessing:
         """Test grouping with mixed data types."""
         items = [1, 1, "a", "a", 2, 2]
         result = generate_group_from_list(items)
-        
+
         expected = [[1, 1], ["a", "a"], [2, 2]]
         assert result == expected
 

@@ -20,16 +20,16 @@ class TestMetadataInfo:
             "License": "MIT",
             "Requires-Python": ">=3.12",
             "Author": "Test Author",
-            "Author-Email": "test@example.com"
+            "Author-Email": "test@example.com",
         }.get(key, default)
-        
+
         mock_meta.get_all.return_value = ["Repository, https://github.com/test/repo.git"]
-        
+
         mocker.patch("importlib.metadata.metadata", return_value=mock_meta)
         mocker.patch("importlib.metadata.version", return_value="1.0.0")
-        
+
         metadata = MetadataInfo()
-        
+
         assert metadata.__name__ == "canoa_data_validate"
         assert metadata.__description__ == "Test description"
         assert metadata.__license__ == "MIT"
@@ -41,9 +41,9 @@ class TestMetadataInfo:
         """Test initialization when package is not found."""
         mocker.patch("importlib.metadata.metadata", side_effect=importlib.metadata.PackageNotFoundError("Package not found"))
         mocker.patch("importlib.metadata.version", side_effect=importlib.metadata.PackageNotFoundError("Package not found"))
-        
+
         metadata = MetadataInfo()
-        
+
         # Should use default values
         assert metadata.__name__ == "canoa_data_validate"
         assert metadata.__description__ == "DEFAULT DESCRIPTION: This is the default description."
@@ -105,7 +105,7 @@ class TestMetadataInfo:
         """Test version parsing with short version string."""
         mocker.patch("importlib.metadata.version", return_value="1.0")
         mocker.patch("importlib.metadata.metadata", return_value=mocker.MagicMock(get=lambda k, d: d, get_all=lambda k, d: []))
-        
+
         metadata = MetadataInfo()
         # Should handle short version gracefully
         assert metadata.__version__ is not None
@@ -114,7 +114,7 @@ class TestMetadataInfo:
         """Test version parsing with single digit version."""
         mocker.patch("importlib.metadata.version", return_value="1")
         mocker.patch("importlib.metadata.metadata", return_value=mocker.MagicMock(get=lambda k, d: d, get_all=lambda k, d: []))
-        
+
         metadata = MetadataInfo()
         # Should handle single digit version gracefully
         assert metadata.__version__ is not None
@@ -122,51 +122,53 @@ class TestMetadataInfo:
     def test_project_urls_parsing(self, mocker) -> None:
         """Test parsing of project URLs."""
         mock_meta = mocker.MagicMock()
-        mock_meta.get.side_effect = lambda key, default=None: {
-            "Name": "test_package"
-        }.get(key, default)
-        
+        mock_meta.get.side_effect = lambda key, default=None: {"Name": "test_package"}.get(key, default)
+
         mock_meta.get_all.return_value = [
             "Repository, https://github.com/test/repo.git",
             "Homepage, https://test.com",
-            "Documentation, https://docs.test.com"
+            "Documentation, https://docs.test.com",
         ]
-        
+
         mocker.patch("importlib.metadata.metadata", return_value=mock_meta)
         mocker.patch("importlib.metadata.version", return_value="1.0.0")
-        
+
         metadata = MetadataInfo()
         assert metadata.__url__ == "https://github.com/test/repo.git"
 
     def test_project_urls_parsing_no_repository(self, mocker) -> None:
         """Test parsing of project URLs when no repository URL is found."""
         mock_meta = mocker.MagicMock()
-        mock_meta.get.side_effect = lambda key, default=None: {
-            "Name": "test_package"
-        }.get(key, default)
-        
-        mock_meta.get_all.return_value = [
-            "Homepage, https://test.com",
-            "Documentation, https://docs.test.com"
-        ]
-        
+        mock_meta.get.side_effect = lambda key, default=None: {"Name": "test_package"}.get(key, default)
+
+        mock_meta.get_all.return_value = ["Homepage, https://test.com", "Documentation, https://docs.test.com"]
+
         mocker.patch("importlib.metadata.metadata", return_value=mock_meta)
         mocker.patch("importlib.metadata.version", return_value="1.0.0")
-        
+
         metadata = MetadataInfo()
         assert metadata.__url__ == "URL não encontrada"
 
     def test_metadata_attributes_initialization(self) -> None:
         """Test that all metadata attributes are properly initialized."""
         metadata = MetadataInfo()
-        
+
         # Check that all expected attributes exist
         expected_attributes = [
-            "__version__", "__name__", "__project_name__", "__description__",
-            "__license__", "__python_version__", "__author__", "__author_email__",
-            "__url__", "__maintainer_email__", "__status__", "__welcome__"
+            "__version__",
+            "__name__",
+            "__project_name__",
+            "__description__",
+            "__license__",
+            "__python_version__",
+            "__author__",
+            "__author_email__",
+            "__url__",
+            "__maintainer_email__",
+            "__status__",
+            "__welcome__",
         ]
-        
+
         for attr in expected_attributes:
             assert hasattr(metadata, attr)
             assert getattr(metadata, attr) is not None
@@ -177,7 +179,7 @@ class TestMetadataInfo:
         status_dev = 1  # Development mode
         status_prod = "Production/Stable"
         status_dev_str = "Development"
-        
+
         # Test the conditional logic
         status = status_prod if status_dev == 0 else status_dev_str
         assert status == "Development"
