@@ -18,7 +18,8 @@ class SpellCheckerController:
 
     def find_spelling_errors(self, text: str) -> List[str]:
         """Encontra erros ortográficos no texto"""
-        preprocessed_text = self.text_processor.preprocess_text(text)
+        # Input string
+        preprocessed_text = self.text_processor.sanitize_text(text)
         words = preprocessed_text.split()
         errors = []
 

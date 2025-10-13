@@ -127,6 +127,39 @@
                 </ul>
 
             </li>
+            <li>
+                    <a class="class" href="#SpellChecker">SpellChecker</a>
+                            <ul class="memberlist">
+                        <li>
+                                <a class="function" href="#SpellChecker.__init__">SpellChecker</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SpellChecker.list_words_user">list_words_user</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SpellChecker.lang_dict_spell">lang_dict_spell</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SpellChecker.dictionary_manager">dictionary_manager</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SpellChecker.spell_checker_controller">spell_checker_controller</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SpellChecker.df_processor">df_processor</a>
+                        </li>
+                        <li>
+                                <a class="variable" href="#SpellChecker.errors_dictionary">errors_dictionary</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SpellChecker.clean_files_generated">clean_files_generated</a>
+                        </li>
+                        <li>
+                                <a class="function" href="#SpellChecker.check_spelling_text">check_spelling_text</a>
+                        </li>
+                </ul>
+
+            </li>
     </ul>
 
 
@@ -154,13 +187,15 @@
 </span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>    <span class="n">DataLoaderModel</span><span class="p">,</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="p">)</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.helpers.tools.locale.language_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">LanguageManager</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.helpers.tools.spellchecker.spellchecker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpellChecker</span>
 </span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="s2">&quot;DataLoaderFacade&quot;</span><span class="p">,</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;DataLoaderModel&quot;</span><span class="p">,</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;LanguageManager&quot;</span><span class="p">,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="p">]</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>    <span class="s2">&quot;DataLoaderFacade&quot;</span><span class="p">,</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="s2">&quot;DataLoaderModel&quot;</span><span class="p">,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>    <span class="s2">&quot;LanguageManager&quot;</span><span class="p">,</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a>    <span class="s2">&quot;SpellChecker&quot;</span><span class="p">,</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="p">]</span>
 </span></pre></div>
 
 
@@ -1037,6 +1072,231 @@ and logging purposes.</p>
 
 
             <div class="docstring"><p>Returns the current language and supported languages.</p>
+</div>
+
+
+                            </div>
+                </section>
+                <section id="SpellChecker">
+                            <input id="SpellChecker-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr class">
+            
+    <span class="def">class</span>
+    <span class="name">SpellChecker</span>:
+
+                <label class="view-source-button" for="SpellChecker-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpellChecker"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpellChecker-18"><a href="#SpellChecker-18"><span class="linenos">18</span></a><span class="k">class</span><span class="w"> </span><span class="nc">SpellChecker</span><span class="p">:</span>
+</span><span id="SpellChecker-19"><a href="#SpellChecker-19"><span class="linenos">19</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Serviço principal para verificação ortográfica&quot;&quot;&quot;</span>
+</span><span id="SpellChecker-20"><a href="#SpellChecker-20"><span class="linenos">20</span></a>
+</span><span id="SpellChecker-21"><a href="#SpellChecker-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang_dict_spell</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pt_BR&quot;</span><span class="p">,</span> <span class="n">list_words_user</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="SpellChecker-22"><a href="#SpellChecker-22"><span class="linenos">22</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span> <span class="o">=</span> <span class="n">list_words_user</span>
+</span><span id="SpellChecker-23"><a href="#SpellChecker-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="SpellChecker-24"><a href="#SpellChecker-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SpellChecker-25"><a href="#SpellChecker-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lang_dict_spell</span> <span class="o">=</span> <span class="n">lang_dict_spell</span>
+</span><span id="SpellChecker-26"><a href="#SpellChecker-26"><span class="linenos">26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span> <span class="o">=</span> <span class="n">DictionaryManager</span><span class="p">(</span><span class="n">lang_dict_spell</span><span class="p">)</span>
+</span><span id="SpellChecker-27"><a href="#SpellChecker-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">spell_checker_controller</span> <span class="o">=</span> <span class="n">SpellCheckerController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span><span class="p">)</span>
+</span><span id="SpellChecker-28"><a href="#SpellChecker-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">df_processor</span> <span class="o">=</span> <span class="n">DataFrameProcessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spell_checker_controller</span><span class="p">)</span>
+</span><span id="SpellChecker-29"><a href="#SpellChecker-29"><span class="linenos">29</span></a>
+</span><span id="SpellChecker-30"><a href="#SpellChecker-30"><span class="linenos">30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">errors_dictionary</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SpellChecker-31"><a href="#SpellChecker-31"><span class="linenos">31</span></a>
+</span><span id="SpellChecker-32"><a href="#SpellChecker-32"><span class="linenos">32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_statement</span><span class="p">()</span>
+</span><span id="SpellChecker-33"><a href="#SpellChecker-33"><span class="linenos">33</span></a>
+</span><span id="SpellChecker-34"><a href="#SpellChecker-34"><span class="linenos">34</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_statement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="SpellChecker-35"><a href="#SpellChecker-35"><span class="linenos">35</span></a>        <span class="c1"># Inicializa dicionário</span>
+</span><span id="SpellChecker-36"><a href="#SpellChecker-36"><span class="linenos">36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">spell_checker_controller</span><span class="o">.</span><span class="n">dictionary</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span><span class="o">.</span><span class="n">initialize_dictionary</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span><span class="p">)</span>
+</span><span id="SpellChecker-37"><a href="#SpellChecker-37"><span class="linenos">37</span></a>
+</span><span id="SpellChecker-38"><a href="#SpellChecker-38"><span class="linenos">38</span></a>        <span class="c1"># Valida dicionário</span>
+</span><span id="SpellChecker-39"><a href="#SpellChecker-39"><span class="linenos">39</span></a>        <span class="n">validation_errors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span><span class="o">.</span><span class="n">validate_dictionary</span><span class="p">()</span>
+</span><span id="SpellChecker-40"><a href="#SpellChecker-40"><span class="linenos">40</span></a>        <span class="k">if</span> <span class="n">validation_errors</span><span class="p">:</span>
+</span><span id="SpellChecker-41"><a href="#SpellChecker-41"><span class="linenos">41</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">errors_dictionary</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">validation_errors</span><span class="p">)</span>
+</span><span id="SpellChecker-42"><a href="#SpellChecker-42"><span class="linenos">42</span></a>
+</span><span id="SpellChecker-43"><a href="#SpellChecker-43"><span class="linenos">43</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">clean_files_generated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="SpellChecker-44"><a href="#SpellChecker-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span><span class="o">.</span><span class="n">clean_temporary_files</span><span class="p">()</span>
+</span><span id="SpellChecker-45"><a href="#SpellChecker-45"><span class="linenos">45</span></a>
+</span><span id="SpellChecker-46"><a href="#SpellChecker-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_spelling_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns_sheets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="SpellChecker-47"><a href="#SpellChecker-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Verifica ortografia em texto com tratamento melhorado de erros&quot;&quot;&quot;</span>
+</span><span id="SpellChecker-48"><a href="#SpellChecker-48"><span class="linenos">48</span></a>
+</span><span id="SpellChecker-49"><a href="#SpellChecker-49"><span class="linenos">49</span></a>        <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+</span><span id="SpellChecker-50"><a href="#SpellChecker-50"><span class="linenos">50</span></a>
+</span><span id="SpellChecker-51"><a href="#SpellChecker-51"><span class="linenos">51</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="SpellChecker-52"><a href="#SpellChecker-52"><span class="linenos">52</span></a>            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="SpellChecker-53"><a href="#SpellChecker-53"><span class="linenos">53</span></a>            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+</span><span id="SpellChecker-54"><a href="#SpellChecker-54"><span class="linenos">54</span></a>                <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+</span><span id="SpellChecker-55"><a href="#SpellChecker-55"><span class="linenos">55</span></a>
+</span><span id="SpellChecker-56"><a href="#SpellChecker-56"><span class="linenos">56</span></a>            <span class="c1"># Valida colunas</span>
+</span><span id="SpellChecker-57"><a href="#SpellChecker-57"><span class="linenos">57</span></a>            <span class="n">valid_columns</span><span class="p">,</span> <span class="n">column_warnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_processor</span><span class="o">.</span><span class="n">validate_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns_sheets</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+</span><span id="SpellChecker-58"><a href="#SpellChecker-58"><span class="linenos">58</span></a>            <span class="c1"># warnings.extend(column_warnings)</span>
+</span><span id="SpellChecker-59"><a href="#SpellChecker-59"><span class="linenos">59</span></a>
+</span><span id="SpellChecker-60"><a href="#SpellChecker-60"><span class="linenos">60</span></a>            <span class="c1"># Processa DataFrame</span>
+</span><span id="SpellChecker-61"><a href="#SpellChecker-61"><span class="linenos">61</span></a>            <span class="k">if</span> <span class="n">valid_columns</span><span class="p">:</span>
+</span><span id="SpellChecker-62"><a href="#SpellChecker-62"><span class="linenos">62</span></a>                <span class="n">processing_warnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_processor</span><span class="o">.</span><span class="n">process_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">valid_columns</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+</span><span id="SpellChecker-63"><a href="#SpellChecker-63"><span class="linenos">63</span></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">processing_warnings</span><span class="p">)</span>
+</span><span id="SpellChecker-64"><a href="#SpellChecker-64"><span class="linenos">64</span></a>
+</span><span id="SpellChecker-65"><a href="#SpellChecker-65"><span class="linenos">65</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="SpellChecker-66"><a href="#SpellChecker-66"><span class="linenos">66</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erro ao processar o arquivo </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="SpellChecker-67"><a href="#SpellChecker-67"><span class="linenos">67</span></a>
+</span><span id="SpellChecker-68"><a href="#SpellChecker-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Serviço principal para verificação ortográfica</p>
+</div>
+
+
+                            <div id="SpellChecker.__init__" class="classattr">
+                                        <input id="SpellChecker.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpellChecker</span><span class="signature pdoc-code condensed">(<span class="param"><span class="n">lang_dict_spell</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s1">&#39;pt_BR&#39;</span>, </span><span class="param"><span class="n">list_words_user</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></span>)</span>
+
+                <label class="view-source-button" for="SpellChecker.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpellChecker.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpellChecker.__init__-21"><a href="#SpellChecker.__init__-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lang_dict_spell</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;pt_BR&quot;</span><span class="p">,</span> <span class="n">list_words_user</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="SpellChecker.__init__-22"><a href="#SpellChecker.__init__-22"><span class="linenos">22</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span> <span class="o">=</span> <span class="n">list_words_user</span>
+</span><span id="SpellChecker.__init__-23"><a href="#SpellChecker.__init__-23"><span class="linenos">23</span></a>        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="SpellChecker.__init__-24"><a href="#SpellChecker.__init__-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">list_words_user</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SpellChecker.__init__-25"><a href="#SpellChecker.__init__-25"><span class="linenos">25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lang_dict_spell</span> <span class="o">=</span> <span class="n">lang_dict_spell</span>
+</span><span id="SpellChecker.__init__-26"><a href="#SpellChecker.__init__-26"><span class="linenos">26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span> <span class="o">=</span> <span class="n">DictionaryManager</span><span class="p">(</span><span class="n">lang_dict_spell</span><span class="p">)</span>
+</span><span id="SpellChecker.__init__-27"><a href="#SpellChecker.__init__-27"><span class="linenos">27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">spell_checker_controller</span> <span class="o">=</span> <span class="n">SpellCheckerController</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span><span class="p">)</span>
+</span><span id="SpellChecker.__init__-28"><a href="#SpellChecker.__init__-28"><span class="linenos">28</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">df_processor</span> <span class="o">=</span> <span class="n">DataFrameProcessor</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spell_checker_controller</span><span class="p">)</span>
+</span><span id="SpellChecker.__init__-29"><a href="#SpellChecker.__init__-29"><span class="linenos">29</span></a>
+</span><span id="SpellChecker.__init__-30"><a href="#SpellChecker.__init__-30"><span class="linenos">30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">errors_dictionary</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="SpellChecker.__init__-31"><a href="#SpellChecker.__init__-31"><span class="linenos">31</span></a>
+</span><span id="SpellChecker.__init__-32"><a href="#SpellChecker.__init__-32"><span class="linenos">32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_statement</span><span class="p">()</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="SpellChecker.list_words_user" class="classattr">
+                                <div class="attr variable">
+            <span class="name">list_words_user</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SpellChecker.list_words_user"></a>
+    
+    
+
+                            </div>
+                            <div id="SpellChecker.lang_dict_spell" class="classattr">
+                                <div class="attr variable">
+            <span class="name">lang_dict_spell</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SpellChecker.lang_dict_spell"></a>
+    
+    
+
+                            </div>
+                            <div id="SpellChecker.dictionary_manager" class="classattr">
+                                <div class="attr variable">
+            <span class="name">dictionary_manager</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SpellChecker.dictionary_manager"></a>
+    
+    
+
+                            </div>
+                            <div id="SpellChecker.spell_checker_controller" class="classattr">
+                                <div class="attr variable">
+            <span class="name">spell_checker_controller</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SpellChecker.spell_checker_controller"></a>
+    
+    
+
+                            </div>
+                            <div id="SpellChecker.df_processor" class="classattr">
+                                <div class="attr variable">
+            <span class="name">df_processor</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SpellChecker.df_processor"></a>
+    
+    
+
+                            </div>
+                            <div id="SpellChecker.errors_dictionary" class="classattr">
+                                <div class="attr variable">
+            <span class="name">errors_dictionary</span>
+
+        
+    </div>
+    <a class="headerlink" href="#SpellChecker.errors_dictionary"></a>
+    
+    
+
+                            </div>
+                            <div id="SpellChecker.clean_files_generated" class="classattr">
+                                        <input id="SpellChecker.clean_files_generated-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">clean_files_generated</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
+
+                <label class="view-source-button" for="SpellChecker.clean_files_generated-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpellChecker.clean_files_generated"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpellChecker.clean_files_generated-43"><a href="#SpellChecker.clean_files_generated-43"><span class="linenos">43</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">clean_files_generated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="SpellChecker.clean_files_generated-44"><a href="#SpellChecker.clean_files_generated-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">dictionary_manager</span><span class="o">.</span><span class="n">clean_temporary_files</span><span class="p">()</span>
+</span></pre></div>
+
+
+    
+
+                            </div>
+                            <div id="SpellChecker.check_spelling_text" class="classattr">
+                                        <input id="SpellChecker.check_spelling_text-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="def">def</span>
+        <span class="name">check_spelling_text</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">df</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">core</span><span class="o">.</span><span class="n">frame</span><span class="o">.</span><span class="n">DataFrame</span>,</span><span class="param">	<span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">columns_sheets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>:</span></span>
+
+                <label class="view-source-button" for="SpellChecker.check_spelling_text-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpellChecker.check_spelling_text"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpellChecker.check_spelling_text-46"><a href="#SpellChecker.check_spelling_text-46"><span class="linenos">46</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_spelling_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">columns_sheets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="SpellChecker.check_spelling_text-47"><a href="#SpellChecker.check_spelling_text-47"><span class="linenos">47</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Verifica ortografia em texto com tratamento melhorado de erros&quot;&quot;&quot;</span>
+</span><span id="SpellChecker.check_spelling_text-48"><a href="#SpellChecker.check_spelling_text-48"><span class="linenos">48</span></a>
+</span><span id="SpellChecker.check_spelling_text-49"><a href="#SpellChecker.check_spelling_text-49"><span class="linenos">49</span></a>        <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+</span><span id="SpellChecker.check_spelling_text-50"><a href="#SpellChecker.check_spelling_text-50"><span class="linenos">50</span></a>
+</span><span id="SpellChecker.check_spelling_text-51"><a href="#SpellChecker.check_spelling_text-51"><span class="linenos">51</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="SpellChecker.check_spelling_text-52"><a href="#SpellChecker.check_spelling_text-52"><span class="linenos">52</span></a>            <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</span><span id="SpellChecker.check_spelling_text-53"><a href="#SpellChecker.check_spelling_text-53"><span class="linenos">53</span></a>            <span class="k">if</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+</span><span id="SpellChecker.check_spelling_text-54"><a href="#SpellChecker.check_spelling_text-54"><span class="linenos">54</span></a>                <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+</span><span id="SpellChecker.check_spelling_text-55"><a href="#SpellChecker.check_spelling_text-55"><span class="linenos">55</span></a>
+</span><span id="SpellChecker.check_spelling_text-56"><a href="#SpellChecker.check_spelling_text-56"><span class="linenos">56</span></a>            <span class="c1"># Valida colunas</span>
+</span><span id="SpellChecker.check_spelling_text-57"><a href="#SpellChecker.check_spelling_text-57"><span class="linenos">57</span></a>            <span class="n">valid_columns</span><span class="p">,</span> <span class="n">column_warnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_processor</span><span class="o">.</span><span class="n">validate_columns</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">columns_sheets</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+</span><span id="SpellChecker.check_spelling_text-58"><a href="#SpellChecker.check_spelling_text-58"><span class="linenos">58</span></a>            <span class="c1"># warnings.extend(column_warnings)</span>
+</span><span id="SpellChecker.check_spelling_text-59"><a href="#SpellChecker.check_spelling_text-59"><span class="linenos">59</span></a>
+</span><span id="SpellChecker.check_spelling_text-60"><a href="#SpellChecker.check_spelling_text-60"><span class="linenos">60</span></a>            <span class="c1"># Processa DataFrame</span>
+</span><span id="SpellChecker.check_spelling_text-61"><a href="#SpellChecker.check_spelling_text-61"><span class="linenos">61</span></a>            <span class="k">if</span> <span class="n">valid_columns</span><span class="p">:</span>
+</span><span id="SpellChecker.check_spelling_text-62"><a href="#SpellChecker.check_spelling_text-62"><span class="linenos">62</span></a>                <span class="n">processing_warnings</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_processor</span><span class="o">.</span><span class="n">process_dataframe</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">valid_columns</span><span class="p">,</span> <span class="n">file_name</span><span class="p">)</span>
+</span><span id="SpellChecker.check_spelling_text-63"><a href="#SpellChecker.check_spelling_text-63"><span class="linenos">63</span></a>                <span class="n">warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">processing_warnings</span><span class="p">)</span>
+</span><span id="SpellChecker.check_spelling_text-64"><a href="#SpellChecker.check_spelling_text-64"><span class="linenos">64</span></a>
+</span><span id="SpellChecker.check_spelling_text-65"><a href="#SpellChecker.check_spelling_text-65"><span class="linenos">65</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="SpellChecker.check_spelling_text-66"><a href="#SpellChecker.check_spelling_text-66"><span class="linenos">66</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Erro ao processar o arquivo </span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="SpellChecker.check_spelling_text-67"><a href="#SpellChecker.check_spelling_text-67"><span class="linenos">67</span></a>
+</span><span id="SpellChecker.check_spelling_text-68"><a href="#SpellChecker.check_spelling_text-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Verifica ortografia em texto com tratamento melhorado de erros</p>
 </div>
 
 

@@ -120,18 +120,22 @@ class SpDescriptionValidator(ValidatorModelABC):
                 original_series = (
                     filtered_data[column]
                     .astype(str)
-                    .str.replace("\r", "<CR>")
-                    .str.replace("\n", "<LF>")
-                    .str.replace("\x0d", "<CR>")
-                    .str.replace("\x0a", "<LF>")
+                    .str.replace("\r", "(CR)")
+                    .str.replace("\n", "(LF)")
+                    .str.replace("\x0d", "(CR)")
+                    .str.replace("\x09", "(TAB)")
+                    .str.replace("\x0a", "(LF)")
                 )
 
                 # Process expected correct text with all replacements and capitalization
                 expected_series = (
                     filtered_data[column]
                     .astype(str)
+                    .str.replace("\r", "")
+                    .str.replace("\n", "")
                     .str.replace("\x0d", "")
                     .str.replace("\x0a", "")
+                    .str.replace("\x09", " ")
                     .str.strip()
                     .apply(lambda x: capitalize_text_keep_acronyms(x.strip()))
                 )
