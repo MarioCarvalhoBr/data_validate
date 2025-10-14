@@ -35,7 +35,7 @@ class ModelMappingLegend:
         self.max_value = default_max_value
 
     def __str__(self):
-        return f"ModelMappingLegend:(column_sp_value={self.column_sp_value}, indicator_id={self.indicator_id}, legend_description={self.legend_id}, min_value={self.min_value}, max_value={self.max_value})"
+        return f"ModelMappingLegend:(column_sp_value={self.column_sp_value}, indicator_id={self.indicator_id}, legend_id={self.legend_id}, min_value={self.min_value}, max_value={self.max_value})"
 
 
 class SpLegendValidator(ValidatorModelABC):
@@ -344,10 +344,12 @@ class SpLegendValidator(ValidatorModelABC):
 
                         aux_min_value = group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name].min()
                         aux_max_value = group_legend[SpLegend.RequiredColumn.COLUMN_MAXIMUM.name].max()
+                        legend_id = group_legend.iloc[0][SpLegend.RequiredColumn.COLUMN_CODE.name]
 
-                        if not pd.isna(aux_min_value) and not pd.isna(aux_max_value):
+                        if (not pd.isna(aux_min_value)) and (not pd.isna(aux_max_value)):
                             aux_data_mapping_legend.min_value = aux_min_value
                             aux_data_mapping_legend.max_value = aux_max_value
+                            aux_data_mapping_legend.legend_id = legend_id
 
             mapping_legends[data_column_sp_value] = aux_data_mapping_legend
 
@@ -370,8 +372,13 @@ class SpLegendValidator(ValidatorModelABC):
                     continue
 
                 if value_numeric < min_value or value_numeric > max_value:
+
+                    text_code_legend = "padrão"
+                    if mapping_legends[data_column_sp_value].legend_id is not None:
+                        text_code_legend = f"de código '{mapping_legends[data_column_sp_value].legend_id}'"
+
                     errors.append(
-                        f"{self.sp_name_value}, linha {index + 2}: O valor {value_original} está fora do intervalo da legenda ({min_value} a {max_value}) para a coluna '{data_column_sp_value}'."
+                        f"{self.sp_name_value}, linha {index + 2}: O valor {value_original} está fora do intervalo da legenda {text_code_legend} ({min_value} a {max_value}) para a coluna '{data_column_sp_value}'."
                     )
 
         return errors, warnings

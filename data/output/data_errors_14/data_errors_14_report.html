@@ -116,6 +116,7 @@
         .text-danger-errors {
             color: #FF0000;
             font-weight: normal;
+            white-space: pre-wrap;
         }
 
         .text-warning {
@@ -125,6 +126,7 @@
         .text-orange-warning {
             color: #FFA500;
             font-weight: normal;
+            white-space: pre-wrap;
         }
 
         .text-green {
@@ -188,6 +190,10 @@
             background-color: #343a40;
         }
 
+        .preserve-spaces {
+            white-space: pre-wrap;
+        }
+
         /* END MY CUSTOM STYLES */
         /* ---------------------------------------------------------- */
 
@@ -244,10 +250,10 @@
         </div>
         <div class="card-body">
             <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
-<br><span class='text-danger-errors'>valores.xlsx: A coluna ':5-2050-P' não é esperada.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A coluna de nível 1 ':8-2015' não é esperada.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A coluna de nível 2 ':8-2015' não é esperada.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: A coluna de nível 2 ':9-2015' não é esperada.</span>
+<br><span class='text-danger-errors' preserve-spaces>valores.xlsx: A coluna ':5-2050-P' não é esperada.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: A coluna de nível 1 ':8-2015' não é esperada.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: A coluna de nível 2 ':8-2015' não é esperada.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: A coluna de nível 2 ':9-2015' não é esperada.</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 <br><span class='text-primary'>Relações entre indicadores</span>
 <br><span class='text-primary'>Hierarquia como árvore</span>
@@ -267,7 +273,7 @@
 <br><span class='text-primary'>Relações de valores únicos em cenários</span>
 <br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
 <br><span class='text-primary'>Relações de combinações de valores</span>
-<br><span class='text-danger-errors'>valores.xlsx: A coluna '5-2050-P' é obrigatória.</span>
+<br><span class='text-danger-errors' preserve-spaces>valores.xlsx: A coluna '5-2050-P' é obrigatória.</span>
 <br><span class='text-primary'>Valores indisponíveis e inválidos</span>
 <br><span class='text-primary'>Quebra de linha para descrição</span>
 <br><span class='text-primary'>Quebra de linha para cenários</span>
@@ -279,18 +285,18 @@
 <br><span class='text-primary'>Propriedades de soma nos fatores influenciadores</span>
 <br><span class='text-primary'>Indicadores repetidos em proporcionalidades</span>
 <br><span class='text-primary'>Relações de indicadores em proporcionalidades</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.xlsx.</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: O indicador pai '6' (em '6-2015') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2015') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-O') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2030-P') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-O') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: O indicador '3' (em '3-2015') não é filho do indicador '2' (em '2-2050-P') conforme especificado em composicao.xlsx.</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: O indicador pai '6' (em '6-2015') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.</span>
 <br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
-<br><span class='text-danger-errors'>proporcionalidades.xlsx: Códigos dos indicadores ausentes em valores.xlsx: ['5-2050-P', ':8-2015', ':9-2015'].</span>
-<br><span class='text-danger-errors'>valores.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [':5-2050-P'].</span>
+<br><span class='text-danger-errors' preserve-spaces>proporcionalidades.xlsx: Códigos dos indicadores ausentes em valores.xlsx: ['5-2050-P', ':8-2015', ':9-2015'].</span>
+<br><span class='text-danger-errors' preserve-spaces>valores.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [':5-2050-P'].</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
 <br><span class='text-primary'>Níveis dos indicadores filhos</span>
-<br><span class='text-danger-errors'>descricao.xlsx: Indicadores filhos do pai 1 não estão no mesmo nível: [indicador 2 possui nível '2', indicador 3 possui nível '3'].</span>
+<br><span class='text-danger-errors' preserve-spaces>descricao.xlsx: Indicadores filhos do pai 1 não estão no mesmo nível: [indicador 2 possui nível '2', indicador 3 possui nível '3'].</span>
         </div>
     </div>
 
@@ -310,10 +316,10 @@
 <br><span class='text-primary'>Códigos HTML nas descrições simples</span>
 <br><span class='text-primary'>Ortografia</span>
 <br><span class='text-primary'>Títulos únicos</span>
-<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes simples duplicados: ['Seca'].</span>
-<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca'].</span>
-<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].</span>
-<br><span class='text-orange-warning'>descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].</span>
+<br><span class='text-orange-warning' preserve-spaces>descricao.xlsx: Existem nomes simples duplicados: ['Seca'].</span>
+<br><span class='text-orange-warning' preserve-spaces>descricao.xlsx: Existem nomes completos duplicados: ['Índice de risco de impacto para seca'].</span>
+<br><span class='text-orange-warning' preserve-spaces>descricao.xlsx: Existem nomes simples duplicados: ['Sensibilidade'].</span>
+<br><span class='text-orange-warning' preserve-spaces>descricao.xlsx: Existem nomes completos duplicados: ['Índice de sensibilidade'].</span>
 <br><span class='text-primary'>Códigos sequenciais</span>
 <br><span class='text-primary'>Campos vazios</span>
 <br><span class='text-primary'>Padrão para nomes dos indicadores</span>
@@ -326,7 +332,7 @@
 <br><span class='text-primary'>Relações de valores únicos em referência temporal</span>
 <br><span class='text-primary'>Relações de combinações de valores</span>
 <br><span class='text-primary'>Valores indisponíveis e inválidos</span>
-<br><span class='text-orange-warning'>valores.xlsx: Existem 205 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas 2 e 20.</span>
+<br><span class='text-orange-warning' preserve-spaces>valores.xlsx: Existem 205 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas 2 e 20.</span>
 <br><span class='text-primary'>Quebra de linha para descrição</span>
 <br><span class='text-primary'>Quebra de linha para cenários</span>
 <br><span class='text-primary'>Quebra de linha para referência temporal</span>

@@ -178,7 +178,12 @@ def check_special_characters_cr_lf_columns_start_end(
         if not non_empty_mask.any():
             continue
 
-        text_series = dataframe.loc[non_empty_mask, column].astype(str)
+        # Get non-empty values safely
+        non_empty_values = dataframe[column][non_empty_mask]
+        if len(non_empty_values) == 0:
+            continue
+
+        text_series = non_empty_values.astype(str)
 
         # Check for CR/LF at positions using vectorized operations
         patterns = {
@@ -233,7 +238,12 @@ def check_special_characters_cr_lf_columns_anywhere(
         if not non_empty_mask.any():
             continue
 
-        text_series = dataframe.loc[non_empty_mask, column].astype(str)
+        # Get non-empty values safely
+        non_empty_values = dataframe[column][non_empty_mask]
+        if len(non_empty_values) == 0:
+            continue
+
+        text_series = non_empty_values.astype(str)
 
         def find_cr_lf_positions(text: str) -> List[Tuple[int, str]]:
             """Find positions of CR/LF characters in text."""
@@ -387,13 +397,15 @@ def check_dataframe_titles_uniques(
         duplicated = dataframe[column].duplicated().any()
 
         if duplicated:
-            titles_duplicated = dataframe[dataframe[column].duplicated()][column].tolist()
+            # Get unique duplicated values using a different approach
+            value_counts = dataframe[column].value_counts()
+            duplicated_values = value_counts[value_counts > 1].index.tolist()
             # Rename columns to plural
             if column == column_one:
                 column = plural_column_one
             elif column == column_two:
                 column = plural_column_two
 
-            warnings.append(f"Existem {column.replace('_', ' ')} duplicados: {titles_duplicated}.")
+            warnings.append(f"Existem {column.replace('_', ' ')} duplicados: {duplicated_values}.")
 
     return warnings
