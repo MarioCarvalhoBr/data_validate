@@ -10,7 +10,10 @@ def is_acronym(text: str) -> bool:
     Returns:
         bool: True if the text is an acronym, False otherwise.
     """
-    return text.isupper() and len(text) > 1
+    is_uppercase = text.isupper()
+    has_multiple_characters = len(text) > 1
+
+    return is_uppercase and has_multiple_characters
 
 
 def capitalize_text_keep_acronyms(text: str) -> str:

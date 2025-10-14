@@ -120,10 +120,10 @@ class SpDescriptionValidator(ValidatorModelABC):
                 original_series = (
                     filtered_data[column]
                     .astype(str)
+                    .str.replace("  ", " (EXTRA_SPACE)")
                     .str.replace("\r", "(CR)")
                     .str.replace("\n", "(LF)")
                     .str.replace("\x0d", "(CR)")
-                    .str.replace("\x09", "(TAB)")
                     .str.replace("\x0a", "(LF)")
                 )
 
@@ -135,7 +135,6 @@ class SpDescriptionValidator(ValidatorModelABC):
                     .str.replace("\n", "")
                     .str.replace("\x0d", "")
                     .str.replace("\x0a", "")
-                    .str.replace("\x09", " ")
                     .str.strip()
                     .apply(lambda x: capitalize_text_keep_acronyms(x.strip()))
                 )

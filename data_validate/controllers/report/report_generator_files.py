@@ -235,7 +235,7 @@ class ReportGeneratorFiles:
 
             messages = getattr(report, message_type, [])
             for message in messages:
-                html_parts.append(f"<br><span class='{css_class}'>{message}</span>")
+                html_parts.append(f"<br><span class='{css_class}' preserve-spaces>{message}</span>")
 
         result = "\n".join(html_parts)
         return result[4:] if result.startswith("<br>") else result
