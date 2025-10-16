@@ -9,13 +9,6 @@ repos:
           always_run: true
           pass_filenames: false
 
-        - id: prepare-pyproject
-          name: prepare pyproject
-          entry: bash scripts/prepare_pyproject.sh
-          language: system
-          always_run: true
-          pass_filenames: false
-
         - id: prepare-metadata
           name: prepare metadata
           entry: bash scripts/prepare_metadata.sh
