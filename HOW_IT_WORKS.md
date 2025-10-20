@@ -87,7 +87,7 @@ O `Makefile` fornece comandos para executar os testes:
 make test
 
 # Rodar testes com relatório de cobertura
-make test-cov
+make test
 ```
 
 ### Geração de Badges

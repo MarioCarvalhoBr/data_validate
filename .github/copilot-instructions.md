@@ -147,7 +147,7 @@ make lint     # Run both
 
 ### Dependencies & Package Management
 - **Package Manager**: Poetry (see `pyproject.toml`)
-- **Key Dependencies**: pandas, chardet, openpyxl, pyenchant, pdfkit, babel, jinja2, networkx
+- **Key Dependencies**: pandas, chardet, calamine, pyenchant, pdfkit, babel, jinja2, networkx
 - **Dev Dependencies**: pytest, pytest-cov, pytest-mock, black, ruff, pre-commit, pdoc
 - **Installation**: `poetry install` (development), `pip install canoa-data-validate` (production)
 

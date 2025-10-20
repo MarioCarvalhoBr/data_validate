@@ -75,7 +75,7 @@ docs: ## Generate documentation with pdoc
 	poetry run pdoc ./$(PATH_SRC)/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 
 readme: ## Generate README documentation
-	$(PYTHON) $(PATH_SRC)/helpers/tools/readme/gerador_readme.py
+	$(PYTHON) $(PATH_SRC)/helpers/tools/readme/generate_readme.py
 
 # 7. Code formatting and linting
 black: ## Format code with black

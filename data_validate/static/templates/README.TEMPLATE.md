@@ -65,7 +65,7 @@ O Data Validate implementa a especificação detalhada no protocolo de validaç�
 - **Python 3.12+**: Linguagem principal
 - **Pandas**: Manipulação e análise de dados
 - **PyEnchant**: Verificação ortográfica
-- **OpenPyXL**: Leitura de arquivos Excel
+- **Calamine**: Leitura de arquivos Excel
 - **Babel**: Internacionalização
 - **PDFKit**: Geração de relatórios PDF
 - **Poetry**: Gerenciamento de dependências
@@ -434,7 +434,7 @@ pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/
 ### Produção
 - **pandas** (>=2.2.3): Manipulação de dados
 - **chardet** (>=5.2.0): Detecção de encoding
-- **openpyxl** (>=3.1.5): Leitura de arquivos Excel
+- **calamine** (>=0.5.3): Leitura de arquivos Excel
 - **pyenchant** (>=3.2.2): Verificação ortográfica
 - **pdfkit** (>=1.0.0): Geração de PDFs
 - **babel** (>=2.17.0): Internacionalização

@@ -11,7 +11,7 @@
 | Testing Windows | [![Windows Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/MarioCarvalhoBr/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/MarioCarvalhoBr/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/MarioCarvalhoBr/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.61b664.dev20-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.61b665.dev20-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -65,7 +65,7 @@ O Data Validate implementa a especificação detalhada no protocolo de validaç�
 - **Python 3.12+**: Linguagem principal
 - **Pandas**: Manipulação e análise de dados
 - **PyEnchant**: Verificação ortográfica
-- **OpenPyXL**: Leitura de arquivos Excel
+- **Calamine**: Leitura de arquivos Excel
 - **Babel**: Internacionalização
 - **PDFKit**: Geração de relatórios PDF
 - **Poetry**: Gerenciamento de dependências
@@ -434,7 +434,7 @@ pdoc ./data_validate/ -o ./docs --logo "https://avatars.githubusercontent.com/u/
 ### Produção
 - **pandas** (>=2.2.3): Manipulação de dados
 - **chardet** (>=5.2.0): Detecção de encoding
-- **openpyxl** (>=3.1.5): Leitura de arquivos Excel
+- **calamine** (>=0.5.3): Leitura de arquivos Excel
 - **pyenchant** (>=3.2.2): Verificação ortográfica
 - **pdfkit** (>=1.0.0): Geração de PDFs
 - **babel** (>=2.17.0): Internacionalização

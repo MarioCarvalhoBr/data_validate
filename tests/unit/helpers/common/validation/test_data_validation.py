@@ -1234,6 +1234,22 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         assert len(result[1]) == 2  # Two warnings for normal_col
         assert all("normal_col" in msg for msg in result[1])  # Only normal_col should have warnings
 
+    def test_check_special_characters_cr_lf_columns_start_end_all_empty_values_edge_case(self):
+        """Test edge case where all values are empty/NaN (covers line 184)."""
+        df = pd.DataFrame({"completely_empty_col": [None, "", pd.NA, None, None]})
+
+        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["completely_empty_col"])
+        # Should not crash and return no warnings since all values are empty
+        assert result == (True, [])
+
+    def test_check_special_characters_cr_lf_columns_anywhere_all_empty_values_edge_case(self):
+        """Test edge case where all values are empty/NaN (covers line 244)."""
+        df = pd.DataFrame({"completely_empty_col": [None, "", pd.NA, None, None]})
+
+        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["completely_empty_col"])
+        # Should not crash and return no warnings since all values are empty
+        assert result == (True, [])
+
 
 class TestColumnExistsMultiIndex:
     """Test suite for column_exists function with MultiIndex."""
