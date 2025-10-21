@@ -6,7 +6,7 @@ from typing import List, Any
 import pandas as pd
 
 from data_validate.controllers.context.general_context import GeneralContext
-from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
+from data_validate.helpers.common.formatting.number_formatting import check_cell_integer, has_excessive_decimals
 
 
 class LegendProcessing:
@@ -136,6 +136,47 @@ class LegendProcessing:
                 )
         return errors
 
+    def validate_min_max_has_excessive_decimals(
+        self,
+        dataframe: pd.DataFrame,
+        code: Any,
+        min_col: str,
+        max_col: str,
+        label_col: str,
+    ) -> List[str]:
+        """Validates min/max values for legends, ensuring they are logical and sequential."""
+        errors = []
+        # Filter out 'Dado indisponível' and sort by min value
+        sorted_group = dataframe[dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE].copy()
+
+        # Convert to numeric, coercing errors
+        sorted_group[min_col] = pd.to_numeric(sorted_group[min_col], errors="coerce")
+        sorted_group[max_col] = pd.to_numeric(sorted_group[max_col], errors="coerce")
+
+        # Drop rows where conversion resulted in NaT
+        sorted_group.dropna(subset=[min_col, max_col], inplace=True)
+
+        if sorted_group.empty:
+            return errors
+
+        sorted_group = sorted_group.sort_values(by=min_col)
+
+        for index, row in sorted_group.iterrows():
+            min_val = row[min_col]
+            max_val = row[max_col]
+            index = int(str(index))
+
+            if has_excessive_decimals(min_val):
+                errors.append(
+                    f"{self.filename} [código: {code}, linha: {index + 2}]: Legenda inválida. O valor mínimo '{min_val}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
+                )
+            if has_excessive_decimals(max_val):
+                errors.append(
+                    f"{self.filename} [código: {code}, linha: {index + 2}]: Legenda inválida. O valor máximo '{max_val}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
+                )
+
+        return errors
+
     def validate_min_max_values(
         self,
         dataframe: pd.DataFrame,
@@ -160,6 +201,11 @@ class LegendProcessing:
             return errors
 
         sorted_group = sorted_group.sort_values(by=min_col)
+
+        # Se qualquer valor de min ou max tiver mais de 2 casas decimais, pular as validações seguintes e retornar o errors
+
+        if any(has_excessive_decimals(row[min_col]) or has_excessive_decimals(row[max_col]) for _, row in sorted_group.iterrows()):
+            return errors
 
         prev_max_val = None
         for index, row in sorted_group.iterrows():

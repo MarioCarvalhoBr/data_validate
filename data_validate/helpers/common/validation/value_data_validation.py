@@ -1,8 +1,9 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from decimal import Decimal
 from typing import List, Tuple, Any, Set
 
 import pandas as pd
+
+from data_validate.helpers.common.formatting.number_formatting import has_excessive_decimals
 
 
 def validate_numeric_value(value: Any, row_index: int, column: str, filename: str) -> Tuple[bool, str, bool]:
@@ -32,11 +33,13 @@ def validate_numeric_value(value: Any, row_index: int, column: str, filename: st
         )
         return False, error_msg, False
 
+    if value in [float("-inf"), float("inf")] or pd.isna(value):
+        return False, "", False
+
     # Check decimal places using Decimal for precision
     try:
-        decimal_value = Decimal(str(value).replace(",", "."))
-        has_excessive_decimals = decimal_value.as_tuple().exponent < -2
-        return True, "", has_excessive_decimals
+
+        return True, "", has_excessive_decimals(value)
     except (ValueError, TypeError):
         error_msg = f"{filename}, linha {row_index + 2}: " f"Erro ao processar valor decimal para a coluna '{column}'."
         return False, error_msg, False

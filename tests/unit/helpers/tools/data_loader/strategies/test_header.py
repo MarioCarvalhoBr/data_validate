@@ -8,11 +8,7 @@ single and double header strategies.
 import pytest
 from pathlib import Path
 
-from data_validate.helpers.tools.data_loader.strategies.header import (
-    HeaderStrategy,
-    SingleHeaderStrategy,
-    DoubleHeaderStrategy
-)
+from data_validate.helpers.tools.data_loader.strategies.header import HeaderStrategy, SingleHeaderStrategy, DoubleHeaderStrategy
 
 
 class TestHeaderStrategy:
@@ -25,8 +21,8 @@ class TestHeaderStrategy:
 
     def test_header_strategy_has_abstract_method(self, mocker) -> None:
         """Test that HeaderStrategy has abstract get_header method."""
-        assert hasattr(HeaderStrategy, 'get_header')
-        assert getattr(HeaderStrategy.get_header, '__isabstractmethod__', False)
+        assert hasattr(HeaderStrategy, "get_header")
+        assert getattr(HeaderStrategy.get_header, "__isabstractmethod__", False)
 
 
 class TestSingleHeaderStrategy:
@@ -41,22 +37,17 @@ class TestSingleHeaderStrategy:
         """Test that get_header returns 0 for single header."""
         strategy = SingleHeaderStrategy()
         file_path = Path("test.csv")
-        
+
         result = strategy.get_header(file_path)
-        
+
         assert result == 0
 
     def test_get_header_with_different_paths(self, mocker) -> None:
         """Test that get_header returns 0 regardless of file path."""
         strategy = SingleHeaderStrategy()
-        
-        paths = [
-            Path("test.csv"),
-            Path("test.xlsx"),
-            Path("/absolute/path/test.csv"),
-            Path("relative/path/test.xlsx")
-        ]
-        
+
+        paths = [Path("test.csv"), Path("test.xlsx"), Path("/absolute/path/test.csv"), Path("relative/path/test.xlsx")]
+
         for path in paths:
             result = strategy.get_header(path)
             assert result == 0
@@ -65,15 +56,15 @@ class TestSingleHeaderStrategy:
         """Test get_header with string path."""
         strategy = SingleHeaderStrategy()
         file_path = "test.csv"
-        
+
         result = strategy.get_header(file_path)
-        
+
         assert result == 0
 
     def test_get_header_ignores_file_path(self, mocker) -> None:
         """Test that get_header ignores the file_path parameter."""
         strategy = SingleHeaderStrategy()
-        
+
         # Should return 0 regardless of what file_path is
         assert strategy.get_header(None) == 0
         assert strategy.get_header("") == 0
@@ -92,22 +83,17 @@ class TestDoubleHeaderStrategy:
         """Test that get_header returns [0, 1] for double header."""
         strategy = DoubleHeaderStrategy()
         file_path = Path("test.csv")
-        
+
         result = strategy.get_header(file_path)
-        
+
         assert result == [0, 1]
 
     def test_get_header_with_different_paths(self, mocker) -> None:
         """Test that get_header returns [0, 1] regardless of file path."""
         strategy = DoubleHeaderStrategy()
-        
-        paths = [
-            Path("test.csv"),
-            Path("test.xlsx"),
-            Path("/absolute/path/test.csv"),
-            Path("relative/path/test.xlsx")
-        ]
-        
+
+        paths = [Path("test.csv"), Path("test.xlsx"), Path("/absolute/path/test.csv"), Path("relative/path/test.xlsx")]
+
         for path in paths:
             result = strategy.get_header(path)
             assert result == [0, 1]
@@ -116,15 +102,15 @@ class TestDoubleHeaderStrategy:
         """Test get_header with string path."""
         strategy = DoubleHeaderStrategy()
         file_path = "test.csv"
-        
+
         result = strategy.get_header(file_path)
-        
+
         assert result == [0, 1]
 
     def test_get_header_ignores_file_path(self, mocker) -> None:
         """Test that get_header ignores the file_path parameter."""
         strategy = DoubleHeaderStrategy()
-        
+
         # Should return [0, 1] regardless of what file_path is
         assert strategy.get_header(None) == [0, 1]
         assert strategy.get_header("") == [0, 1]
@@ -134,9 +120,9 @@ class TestDoubleHeaderStrategy:
         """Test that get_header returns a list with correct values."""
         strategy = DoubleHeaderStrategy()
         file_path = Path("test.csv")
-        
+
         result = strategy.get_header(file_path)
-        
+
         assert isinstance(result, list)
         assert len(result) == 2
         assert result[0] == 0
@@ -151,10 +137,10 @@ class TestHeaderStrategyIntegration:
         single_strategy = SingleHeaderStrategy()
         double_strategy = DoubleHeaderStrategy()
         file_path = Path("test.csv")
-        
+
         single_result = single_strategy.get_header(file_path)
         double_result = double_strategy.get_header(file_path)
-        
+
         assert single_result != double_result
         assert single_result == 0
         assert double_result == [0, 1]
@@ -164,7 +150,7 @@ class TestHeaderStrategyIntegration:
         single_strategy = SingleHeaderStrategy()
         double_strategy = DoubleHeaderStrategy()
         file_path = Path("test.csv")
-        
+
         # Multiple calls should return the same result
         for _ in range(5):
             assert single_strategy.get_header(file_path) == 0
@@ -175,10 +161,10 @@ class TestHeaderStrategyIntegration:
         single_strategy = SingleHeaderStrategy()
         double_strategy = DoubleHeaderStrategy()
         file_path = Path("test.csv")
-        
+
         single_result = single_strategy.get_header(file_path)
         double_result = double_strategy.get_header(file_path)
-        
+
         # These should be valid header values for pandas.read_csv/read_excel
         assert isinstance(single_result, int)
         assert isinstance(double_result, list)

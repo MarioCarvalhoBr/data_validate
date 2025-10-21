@@ -5,8 +5,6 @@ This module tests the TextProcessor class functionality including text cleaning,
 acronym detection, and various text preprocessing methods.
 """
 
-import pytest
-
 from data_validate.helpers.tools.spellchecker.text_processor import TextProcessor
 
 
@@ -181,11 +179,11 @@ class TestTextProcessorIntegration:
     def test_text_processing_chain(self, mocker) -> None:
         """Test that text processing methods can be chained."""
         text = "Hello (World) 123!"
-        
+
         # Apply methods individually
         step1 = TextProcessor.clean_text_parentheses_punctuation_numbers(text)
         step2 = TextProcessor.clean_text_extra_spaces(step1)
-        
+
         # Should match sanitize_text result
         expected = TextProcessor.sanitize_text(text)
         assert step2 == expected
@@ -195,7 +193,7 @@ class TestTextProcessorIntegration:
         text_with_acronym = "NASA (National Aeronautics and Space Administration)"
         processed = TextProcessor.clean_text_parentheses_punctuation_numbers(text_with_acronym)
         words = processed.split()
-        
+
         # Should still detect acronyms after processing
         for word in words:
             if word == "NASA":

@@ -113,6 +113,15 @@ class SpLegend(SpModelABC):
                 errors.extend(legend_validator.validate_legend_labels(group, code_value, self.column_name_label))
                 errors.extend(legend_validator.validate_color_format(group, code_value, self.column_name_color))
                 errors.extend(
+                    legend_validator.validate_min_max_has_excessive_decimals(
+                        group,
+                        code_value,
+                        self.column_name_minimum,
+                        self.column_name_maximum,
+                        self.column_name_label,
+                    )
+                )
+                errors.extend(
                     legend_validator.validate_min_max_values(
                         group,
                         code_value,

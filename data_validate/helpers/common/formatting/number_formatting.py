@@ -1,11 +1,20 @@
 import math
 from typing import Tuple, Any
+from decimal import Decimal
 
 import pandas as pd
 from babel.numbers import format_decimal
 
 
-# def truncate_number(x, precision):
+def has_excessive_decimals(value) -> bool:
+    if value in [float("-inf"), float("inf")] or pd.isna(value):
+        return False
+
+    # Check if a numeric value has more than 2 decimal places.
+    decimal_value = Decimal(str(value).replace(",", "."))
+    return decimal_value.as_tuple().exponent < -2
+
+
 def truncate_number(x, precision):
     """Trunca o valor 'x' à precisão especificada sem arredondamento."""
     # Se não tiver casas decimais, retorna o valor original

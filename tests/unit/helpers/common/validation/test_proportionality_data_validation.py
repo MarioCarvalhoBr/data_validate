@@ -8,7 +8,6 @@ including code validation and subdataset building.
 
 import pytest
 import pandas as pd
-from typing import Set
 
 from data_validate.helpers.common.validation.proportionality_data_validation import (
     get_valids_codes_from_description,
@@ -56,14 +55,12 @@ class TestGetValidsCodesFromDescription:
 
     def test_get_valids_codes_basic_functionality(self, sample_description_dataframe: pd.DataFrame) -> None:
         """Test basic functionality of get_valids_codes_from_description."""
-        result = get_valids_codes_from_description(
-            sample_description_dataframe, "level", "code", "scenario"
-        )
+        result = get_valids_codes_from_description(sample_description_dataframe, "level", "code", "scenario")
 
         assert isinstance(result, set)
         assert "2" in result  # Valid code
         assert "3" in result  # Valid code
-        assert "4" in result   # Valid code
+        assert "4" in result  # Valid code
         assert "5" in result  # Valid code
         # Level 1 codes should be excluded
         assert "1" not in result
@@ -71,9 +68,7 @@ class TestGetValidsCodesFromDescription:
 
     def test_get_valids_codes_without_scenario_column(self, description_without_scenario: pd.DataFrame) -> None:
         """Test function when scenario column is not present."""
-        result = get_valids_codes_from_description(
-            description_without_scenario, "level", "code", "nonexistent_scenario"
-        )
+        result = get_valids_codes_from_description(description_without_scenario, "level", "code", "nonexistent_scenario")
 
         assert isinstance(result, set)
         assert "2" in result
@@ -84,9 +79,7 @@ class TestGetValidsCodesFromDescription:
 
     def test_get_valids_codes_filters_level_1_codes(self, sample_description_dataframe: pd.DataFrame) -> None:
         """Test that level 1 codes are properly filtered out."""
-        result = get_valids_codes_from_description(
-            sample_description_dataframe, "level", "code", "scenario"
-        )
+        result = get_valids_codes_from_description(sample_description_dataframe, "level", "code", "scenario")
 
         # Level 1 codes should not be in result
         assert "1" not in result
@@ -94,9 +87,7 @@ class TestGetValidsCodesFromDescription:
 
     def test_get_valids_codes_filters_scenario_0_level_2(self, sample_description_dataframe: pd.DataFrame) -> None:
         """Test that level 2 codes with scenario 0 are filtered out."""
-        result = get_valids_codes_from_description(
-            sample_description_dataframe, "level", "code", "scenario"
-        )
+        result = get_valids_codes_from_description(sample_description_dataframe, "level", "code", "scenario")
 
         # Code 3 has level 2 and scenario 0, should be filtered out
         # Note: The function filters out level 2 with scenario 0, but code 3 is level 2 with scenario 0
@@ -108,9 +99,7 @@ class TestGetValidsCodesFromDescription:
 
     def test_get_valids_codes_with_invalid_codes(self, description_with_invalid_codes: pd.DataFrame) -> None:
         """Test function with invalid codes (non-integer, negative, float)."""
-        result = get_valids_codes_from_description(
-            description_with_invalid_codes, "level", "code", "scenario"
-        )
+        result = get_valids_codes_from_description(description_with_invalid_codes, "level", "code", "scenario")
 
         # Only valid integer codes >= 1 should be included
         assert "2" in result
@@ -215,9 +204,7 @@ class TestGetValidsCodesFromDescription:
         """Test that function doesn't modify the original DataFrame."""
         original_df = sample_description_dataframe.copy()
 
-        get_valids_codes_from_description(
-            sample_description_dataframe, "level", "code", "scenario"
-        )
+        get_valids_codes_from_description(sample_description_dataframe, "level", "code", "scenario")
 
         pd.testing.assert_frame_equal(sample_description_dataframe, original_df)
 
@@ -338,7 +325,7 @@ class TestBuildSubdatasets:
         if "value_1" in parent_1_data.columns:
             value_1_col = parent_1_data["value_1"] if isinstance(parent_1_data["value_1"], pd.Series) else parent_1_data["value_1"].iloc[:, 0]
             assert value_1_col.tolist() == [10, 20, 30]
-        
+
         if "value_2" in parent_1_data.columns:
             value_2_col = parent_1_data["value_2"] if isinstance(parent_1_data["value_2"], pd.Series) else parent_1_data["value_2"].iloc[:, 0]
             assert value_2_col.tolist() == [100, 200, 300]

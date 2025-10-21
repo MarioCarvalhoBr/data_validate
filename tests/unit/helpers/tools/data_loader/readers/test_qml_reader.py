@@ -5,7 +5,6 @@ This module tests the QMLReader class functionality including
 QML file reading and text content retrieval.
 """
 
-import pytest
 from pathlib import Path
 
 from data_validate.helpers.tools.data_loader.readers.qml_reader import QMLReader
@@ -18,9 +17,9 @@ class TestQMLReader:
         """Test QMLReader initialization."""
         file_path = Path("test.qml")
         header_strategy = mocker.MagicMock()
-        
+
         reader = QMLReader(file_path, header_strategy)
-        
+
         assert reader.file_path == file_path
         assert reader.header_strategy == header_strategy
 
@@ -29,12 +28,12 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = "QML file content"
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         assert result == "QML file content"
         mock_path.read_text.assert_called_once()
 
@@ -43,18 +42,18 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = "QML content"
-        
+
         # Mock Path constructor to return our mock
-        mocker.patch('pathlib.Path', return_value=mock_path)
-        
+        mocker.patch("pathlib.Path", return_value=mock_path)
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(Path("test.qml"), header_strategy)
-        
+
         # Mock the file_path attribute to use our mock
         reader.file_path = mock_path
-        
+
         result = reader._read_file()
-        
+
         assert result == "QML content"
         mock_path.read_text.assert_called_once()
 
@@ -63,12 +62,12 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = "QML content from Path object"
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         assert result == "QML content from Path object"
         mock_path.read_text.assert_called_once()
 
@@ -77,12 +76,12 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = "QML file content"
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         assert isinstance(result, str)
         assert result == "QML file content"
 
@@ -91,12 +90,12 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = ""
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         assert result == ""
         mock_path.read_text.assert_called_once()
 
@@ -112,12 +111,12 @@ class TestQMLReader:
 </qgis>"""
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = multiline_content
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         assert result == multiline_content
         mock_path.read_text.assert_called_once()
 
@@ -126,12 +125,12 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = "QML content"
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         # Header strategy should not be used for QML files
         header_strategy.get_header.assert_not_called()
         assert result == "QML content"
@@ -142,12 +141,12 @@ class TestQMLReader:
         unicode_content = "QML content with unicode: 中文, émojis 🎉"
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = unicode_content
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         result = reader._read_file()
-        
+
         assert result == unicode_content
         mock_path.read_text.assert_called_once()
 
@@ -156,11 +155,11 @@ class TestQMLReader:
         # Mock file path
         mock_path = mocker.MagicMock()
         mock_path.read_text.return_value = "QML content"
-        
+
         header_strategy = mocker.MagicMock()
         reader = QMLReader(mock_path, header_strategy)
-        
+
         reader._read_file()
-        
+
         # Should call read_text exactly once
         assert mock_path.read_text.call_count == 1

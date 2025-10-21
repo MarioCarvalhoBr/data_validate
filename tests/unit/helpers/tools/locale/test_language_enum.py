@@ -5,8 +5,6 @@ This module tests the LanguageEnum class functionality including
 enumeration values, supported languages listing, and default language retrieval.
 """
 
-import pytest
-
 from data_validate.helpers.tools.locale.language_enum import LanguageEnum
 
 
@@ -24,7 +22,7 @@ class TestLanguageEnum:
     def test_list_supported_languages(self, mocker) -> None:
         """Test listing of supported languages."""
         supported_languages = LanguageEnum.list_supported_languages()
-        
+
         assert isinstance(supported_languages, list)
         # Note: DEFAULT_LANGUAGE is an alias for PT_BR, actual enum has 2 unique members
         assert len(supported_languages) >= 2
@@ -34,7 +32,7 @@ class TestLanguageEnum:
     def test_default_language(self, mocker) -> None:
         """Test default language retrieval."""
         default_lang = LanguageEnum.default_language()
-        
+
         assert default_lang == "pt_BR"
         assert isinstance(default_lang, str)
 
@@ -76,7 +74,7 @@ class TestLanguageEnumEdgeCases:
         """Test that enum values cannot be modified."""
         original_pt_br = LanguageEnum.PT_BR.value
         original_en_us = LanguageEnum.EN_US.value
-        
+
         assert LanguageEnum.PT_BR.value == original_pt_br
         assert LanguageEnum.EN_US.value == original_en_us
 
@@ -97,12 +95,10 @@ class TestLanguageEnumEdgeCases:
     def test_enum_hash(self, mocker) -> None:
         """Test that enum members are hashable and work as dict keys."""
         # DEFAULT_LANGUAGE is an alias for PT_BR, so they have the same hash
-        enum_dict = {
-            LanguageEnum.EN_US: "English"
-        }
+        enum_dict = {LanguageEnum.EN_US: "English"}
         enum_dict[LanguageEnum.PT_BR] = "Portuguese"
         enum_dict[LanguageEnum.DEFAULT_LANGUAGE] = "Default"
-        
+
         # Since DEFAULT_LANGUAGE == PT_BR, the last assignment overwrites
         assert enum_dict[LanguageEnum.PT_BR] == "Default"
         assert enum_dict[LanguageEnum.EN_US] == "English"
@@ -118,7 +114,7 @@ class TestLanguageEnumEdgeCases:
     def test_enum_in_set(self, mocker) -> None:
         """Test enum members in set operations."""
         supported_set = {LanguageEnum.PT_BR, LanguageEnum.EN_US, LanguageEnum.DEFAULT_LANGUAGE}
-        
+
         assert LanguageEnum.PT_BR in supported_set
         assert LanguageEnum.EN_US in supported_set
         assert LanguageEnum.DEFAULT_LANGUAGE in supported_set
@@ -132,14 +128,14 @@ class TestLanguageEnumIntegration:
     def test_enum_with_language_codes(self, mocker) -> None:
         """Test enum integration with language code validation."""
         valid_codes = ["pt_BR", "en_US"]
-        
+
         for code in valid_codes:
             enum_member = None
             for member in LanguageEnum:
                 if member.value == code:
                     enum_member = member
                     break
-            
+
             assert enum_member is not None
             assert enum_member.value == code
 
@@ -147,36 +143,37 @@ class TestLanguageEnumIntegration:
         """Test consistency between different enum methods."""
         listed_languages = LanguageEnum.list_supported_languages()
         enum_values = [member.value for member in LanguageEnum]
-        
+
         assert set(listed_languages) == set(enum_values)
         assert LanguageEnum.default_language() in listed_languages
 
     def test_enum_usage_patterns(self, mocker) -> None:
         """Test common usage patterns with the enum."""
+
         def is_supported(lang_code: str) -> bool:
             return lang_code in LanguageEnum.list_supported_languages()
-        
+
         assert is_supported("pt_BR") is True
         assert is_supported("en_US") is True
         assert is_supported("fr_FR") is False
         assert is_supported("invalid") is False
-        
+
         def get_enum_by_value(lang_code: str):
             for member in LanguageEnum:
                 if member.value == lang_code:
                     return member
             return None
-        
+
         assert get_enum_by_value("pt_BR") == LanguageEnum.PT_BR
         assert get_enum_by_value("en_US") == LanguageEnum.EN_US
         assert get_enum_by_value("invalid") is None
 
     def test_enum_with_type_hints(self, mocker) -> None:
         """Test enum usage with type hints."""
+
         def process_language(lang: LanguageEnum) -> str:
             return f"Processing {lang.value}"
-        
+
         assert process_language(LanguageEnum.PT_BR) == "Processing pt_BR"
         assert process_language(LanguageEnum.EN_US) == "Processing en_US"
         assert process_language(LanguageEnum.DEFAULT_LANGUAGE) == "Processing pt_BR"
-
