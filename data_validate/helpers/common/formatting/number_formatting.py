@@ -32,15 +32,6 @@ def check_two_decimals_places(value) -> bool:
     return check_n_decimals_places(value, 0, 2)
 
 
-def truncate_number(x, precision):
-    """Trunca o valor 'x' à precisão especificada sem arredondamento."""
-    # Se não tiver casas decimais, retorna o valor original
-    if x == int(x):
-        return x
-    factor = 10**precision
-    return math.trunc(x * factor) / factor
-
-
 def format_number_brazilian(n: float, locale: str = "pt_BR") -> str:
     """
     Format a number using Brazilian locale.

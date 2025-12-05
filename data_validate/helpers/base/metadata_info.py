@@ -12,8 +12,8 @@ class MetadataInfo(ConstantBase):
         project_name: Final = "Canoa"
         dist_name: Final = "canoa_data_validate"
         release_level: Final = "beta"
-        serial: Final = 670
-        status_dev: Final = 10
+        serial: Final = 671
+        status_dev: Final = 0
 
         self.__version__ = "0.0.0"
         self.__name__ = dist_name
