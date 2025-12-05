@@ -3,7 +3,7 @@ from typing import List, Tuple, Any, Set
 
 import pandas as pd
 
-from data_validate.helpers.common.formatting.number_formatting import has_excessive_decimals
+from data_validate.helpers.common.formatting.number_formatting import check_two_decimals_places
 
 
 def validate_numeric_value(value: Any, row_index: int, column: str, filename: str) -> Tuple[bool, str, bool]:
@@ -39,7 +39,7 @@ def validate_numeric_value(value: Any, row_index: int, column: str, filename: st
     # Check decimal places using Decimal for precision
     try:
 
-        return True, "", has_excessive_decimals(value)
+        return True, "", check_two_decimals_places(value)
     except (ValueError, TypeError):
         error_msg = f"{filename}, linha {row_index + 2}: " f"Erro ao processar valor decimal para a coluna '{column}'."
         return False, error_msg, False

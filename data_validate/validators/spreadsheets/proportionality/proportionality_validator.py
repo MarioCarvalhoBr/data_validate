@@ -1,5 +1,5 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from decimal import Decimal
+from decimal import Decimal, ROUND_DOWN
 from typing import List, Tuple, Dict, Any
 
 import pandas as pd
@@ -9,7 +9,10 @@ from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.common.formatting.number_formatting import format_number_brazilian
-from data_validate.helpers.common.formatting.number_formatting import truncate_number
+from data_validate.helpers.common.formatting.number_formatting import (
+    to_decimal_truncated,
+    check_n_decimals_places
+)
 from data_validate.helpers.common.processing.collections_processing import (
     categorize_strings_by_id_pattern_from_list,
     find_differences_in_two_set_with_message,
@@ -130,108 +133,141 @@ class SpProportionalityValidator(ValidatorModelABC):
         errors = []
         warnings = []
 
-        has_more_than_3_decimal_places = False
-        count_values_has_more_than_3_decimal_places = 0
-        line_init_values = 0
+        # Constantes para otimização de acesso
+        VALUE_DI = self._data_models_context.config.VALUE_DI
+
+        # Variáveis globais de estado
+        global_has_more_than_3_decimals = False
+        global_count_more_than_3 = 0
+        first_line_init_more_than_3 = 0
 
         for parent_id, subdataset in subdatasets.items():
+            df_data = subdataset.iloc[:, 1:].copy()
+            ids = subdataset.iloc[:, 0]
 
-            line_init = None
-            line_end = None
-            count_errors = 0
-            errors_column = []
+            # ---------------------------------------------------------
+            # 1. Validação de Formato (Numérico ou DI)
+            # ---------------------------------------------------------
+            # Máscara de onde é DI
+            is_di = df_data == VALUE_DI
 
-            for index, row in subdataset.iterrows():
-                all_cells = []
+            df_numeric = df_data.replace(",", ".", regex=True).apply(pd.to_numeric, errors='coerce')
+            is_invalid = df_numeric.isna() & (~is_di) & (df_data.notna())
 
-                # Iterrows retorna uma tupla nome da coluna, dados da linha
-                lista_id_coluna_valor = []
-                id_linha = 0
-                # sub_col = ""
-                for i, cell in enumerate(row):
-                    # Nome da coluna
-                    nome_coluna = row.index[i]
+            if is_invalid.any().any():
+                rows_with_errors = is_invalid.any(axis=1)
+                error_indices = rows_with_errors[rows_with_errors].index
+                excel_indices = error_indices + 3
 
-                    if i == 0:
-                        id_linha = cell
-                        continue
+                count_errors = is_invalid.sum().sum()
 
-                    lista_id_coluna_valor.append([id_linha, nome_coluna, cell])
-
-                    # Se a célula for 'self._data_models_context.config.VALUE_DI', pula para a próxima
-                    if cell == self._data_models_context.config.VALUE_DI:
-                        continue
-
-                    if pd.isna(cell) or pd.isna(pd.to_numeric(cell, errors="coerce")):
-                        if line_init is None:
-                            line_init = index + 3
-                            errors_column.append(
-                                f"{self.sp_name_proportionality}, linha {index + 3}: O valor não é um número válido e nem {self._data_models_context.config.VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}'."
-                            )
-                        count_errors += 1
-
-                        line_end = index + 3
-                        continue
-
-                    cell_aux = cell.replace(",", ".")
-                    cell_aux = pd.to_numeric(cell_aux, errors="coerce")
-
-                    # Trunca o valor para 3 casas decimais
-                    new_value = truncate_number(cell_aux, 3)
-                    a = Decimal(str(cell))
-
-                    # Verifica se o valor tem mais de 3 casas decimais
-                    if a.as_tuple().exponent < -3:
-                        if not has_more_than_3_decimal_places:
-                            line_init_values = index + 3
-                        has_more_than_3_decimal_places = True
-                        count_values_has_more_than_3_decimal_places += 1
-
-                    all_cells.append(str(new_value))
-
-                # Soma os valores válidos da linha
-                row_sum = sum([Decimal(cell) for cell in all_cells])
-
-                if row_sum == 0:
-                    for data in lista_id_coluna_valor:
-                        id_linha, id_coluna, valor = data
-
-                        try:
-                            valor = sp_df_values.loc[sp_df_values[self.column_name_id] == id_linha][id_coluna].values[0]
-                            if valor != self._data_models_context.config.VALUE_DI and float(valor) != 0:
-                                errors.append(
-                                    f"{self.sp_name_proportionality}: A soma de fatores influenciadores para o ID '{id_linha}' no pai '{id_coluna}' é 0 (zero). Na planilha {self.sp_name_value}, existe(m) valor(es) para os filhos do indicador '{id_coluna}', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
-                                )
-
-                        except Exception:
-                            continue
-                elif row_sum < Decimal("0.99") or row_sum > Decimal("1.01"):
-
+                if count_errors == 1:
+                    row_idx = error_indices[0]
                     errors.append(
-                        f"{self.sp_name_proportionality}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {format_number_brazilian(row_sum, self._data_models_context.lm.current_language)}, e não 1."
+                        f"{self.sp_name_proportionality}, linha {row_idx + 3}: O valor não é um número válido e nem {VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}'."
                     )
-                elif row_sum != 1 and Decimal("0.99") <= row_sum <= Decimal(
-                    "1.01"
-                ):  # elif row_sum != 1 and row_sum >= Decimal('0.99') and row_sum <= Decimal('1.01'):
+                else:
+                    line_init = excel_indices.min()
+                    line_end = excel_indices.max()
+                    errors.append(
+                        f"{self.sp_name_proportionality}: {count_errors} valores que não são número válido nem {VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}."
+                    )
+                df_data[is_invalid] = VALUE_DI
+
+            # ---------------------------------------------------------
+            # 2. Verificação de Casas Decimais (> 3)
+            # ---------------------------------------------------------
+            # Aplica verificação boolean
+            has_excess_decimals_mask = df_data.map(
+                lambda value_number: check_n_decimals_places(value_number, VALUE_DI, self._data_models_context.config.PRECISION_DECIMAL_PLACE_TRUNCATE)
+            )
+            count_excess = has_excess_decimals_mask.sum().sum()
+
+            if count_excess > 0:
+                if not global_has_more_than_3_decimals:
+                    first_row_idx = has_excess_decimals_mask.any(axis=1).idxmax()
+                    first_line_init_more_than_3 = first_row_idx + 3
+
+                global_has_more_than_3_decimals = True
+                global_count_more_than_3 += count_excess
+
+            # ---------------------------------------------------------
+            # 3. Conversão para Decimal e Soma
+            # ---------------------------------------------------------
+            # Transforma o dataframe em objetos Decimal (truncados)
+            df_decimals = df_data.map(
+                lambda value_number: to_decimal_truncated(value_number, VALUE_DI, self._data_models_context.config.PRECISION_DECIMAL_PLACE_TRUNCATE)
+            )
+            row_sums = df_decimals.sum(axis=1)
+
+            # ---------------------------------------------------------
+            # 4. Validação da Soma (= 1)
+            # ---------------------------------------------------------
+            # CASO A: Soma igual a 0 (Verificação cruzada complexa)
+            zero_sum_mask = row_sums == 0
+            if zero_sum_mask.any():
+                zero_indices = zero_sum_mask[zero_sum_mask].index
+                zero_ids = ids.loc[zero_indices]
+
+                relevant_values = sp_df_values[sp_df_values[self.column_name_id].isin(zero_ids)]
+                df_check = relevant_values.set_index(self.column_name_id)
+
+                for idx in zero_indices:
+                    row_id = ids[idx]
+                    if row_id not in df_check.index:
+                        continue
+                    values_row = df_check.loc[row_id]
+                    cols_to_check = [c for c in df_data.columns if c in values_row.index]
+
+                    for col in cols_to_check:
+                        val = values_row[col]
+                        if val != VALUE_DI:
+                            try:
+                                if float(str(val).replace(',', '.')) != 0:
+                                    errors.append(
+                                        f"{self.sp_name_proportionality}: A soma de fatores influenciadores para o ID '{row_id}' no pai '{col}' é 0 (zero). Na planilha {self.sp_name_value}, existe(m) valor(es) para os filhos do indicador '{col}', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+                                    )
+                            except:
+                                pass
+
+            # CASO B: Soma fora de [0.99, 1.01] e != 0
+            limit_low = Decimal("0.99")
+            limit_high = Decimal("1.01")
+
+            # Erro Crítico
+            error_mask = (row_sums != 0) & ((row_sums < limit_low) | (row_sums > limit_high))
+
+            if error_mask.any():
+                for idx in error_mask[error_mask].index:
+                    val_sum = row_sums[idx]
+                    formatted_sum = format_number_brazilian(val_sum, self._data_models_context.lm.current_language)
+                    errors.append(
+                        f"{self.sp_name_proportionality}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1."
+                    )
+
+            # Aviso (Warning): Soma diferente de 1 mas dentro da margem [0.99, 1.01]
+            warning_mask = (row_sums != 1) & (row_sums >= limit_low) & (row_sums <= limit_high)
+
+            if warning_mask.any():
+                for idx in warning_mask[warning_mask].index:
+                    val_sum = row_sums[idx]
+                    formatted_sum = format_number_brazilian(val_sum, self._data_models_context.lm.current_language)
                     warnings.append(
-                        f"{self.sp_name_proportionality}, linha {index + 3}: A soma dos valores para o indicador pai {parent_id} é {format_number_brazilian(row_sum, self._data_models_context.lm.current_language)}, e não 1."
+                        f"{self.sp_name_proportionality}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1."
                     )
-            if count_errors > 1:
-                errors_column.clear()
-                errors_column.append(
-                    f"{self.sp_name_proportionality}: {count_errors} valores que não são número válido nem {self._data_models_context.config.VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}."
-                )
 
-            errors.extend(errors_column)
-
-        if has_more_than_3_decimal_places:
-            text_existem = "Existem" if count_values_has_more_than_3_decimal_places > 1 else "Existe"
-            text_valores = "valores" if count_values_has_more_than_3_decimal_places > 1 else "valor"
+        # ---------------------------------------------------------
+        # 5. Aviso Global de Casas Decimais
+        # ---------------------------------------------------------
+        if global_has_more_than_3_decimals:
+            text_existem = "Existem" if global_count_more_than_3 > 1 else "Existe"
+            text_valores = "valores" if global_count_more_than_3 > 1 else "valor"
             warnings.append(
-                f"{self.sp_name_proportionality}, linha {line_init_values}: {text_existem} {count_values_has_more_than_3_decimal_places} {text_valores} com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais."
+                f"{self.sp_name_proportionality}, linha {first_line_init_more_than_3}: {text_existem} {global_count_more_than_3} {text_valores} com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais."
             )
 
         return errors, warnings
+
 
     def validate_relation_indicators_in_proportionality(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []

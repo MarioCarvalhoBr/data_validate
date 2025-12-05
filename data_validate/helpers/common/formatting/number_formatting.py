@@ -5,14 +5,31 @@ from decimal import Decimal
 import pandas as pd
 from babel.numbers import format_decimal
 
+def to_decimal_truncated(value_number, value_to_ignore, precision):
+    if pd.isna(value_number) or value_number == value_to_ignore:
+        return Decimal("0")
 
-def has_excessive_decimals(value) -> bool:
+    s_val = str(value_number).replace(",", ".")
+    try:
+        if "." in s_val:
+            integer_part, decimal_part = s_val.split(".")
+            truncated_val = f"{integer_part}.{decimal_part[:precision]}"
+        else:
+            truncated_val = s_val
+        return Decimal(truncated_val)
+    except:
+        return Decimal("0")
+
+def check_n_decimals_places(value_number, value_to_ignore, number_decimal_places):
+    if pd.isna(value_number) or value_number == value_to_ignore:
+        return False
+    decimal_value = Decimal(str(value_number).replace(",", "."))
+    return decimal_value.as_tuple().exponent < -number_decimal_places
+
+def check_two_decimals_places(value) -> bool:
     if value in [float("-inf"), float("inf")] or pd.isna(value):
         return False
-
-    # Check if a numeric value has more than 2 decimal places.
-    decimal_value = Decimal(str(value).replace(",", "."))
-    return decimal_value.as_tuple().exponent < -2
+    return check_n_decimals_places(value, 0, 2)
 
 
 def truncate_number(x, precision):

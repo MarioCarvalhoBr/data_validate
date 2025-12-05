@@ -70,33 +70,34 @@ class SpProportionality(SpModelABC):
             self.data_loader_model.header_type = "invalid"
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
-        unique_columns_level_1 = self.data_loader_model.df_data.columns.get_level_values(0).unique().tolist()
-        unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
+        if self.data_loader_model.header_type == "double":
+            unique_columns_level_1 = self.data_loader_model.df_data.columns.get_level_values(0).unique().tolist()
+            unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
 
-        # Check extra columns in level 1 (do not ignore 'id')
-        _, extras_level_1 = extract_numeric_ids_and_unmatched_strings_from_list(
-            source_list=unique_columns_level_1,
-            strings_to_ignore=[],  # Do not ignore 'id' here
-            suffixes_for_matching=self.scenarios_list,
-        )
-        for extra_column in extras_level_1:
-            if not extra_column.lower().startswith("unnamed"):
-                self.structural_errors.append(f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada.")
+            # Check extra columns in level 1 (do not ignore 'id')
+            _, extras_level_1 = extract_numeric_ids_and_unmatched_strings_from_list(
+                source_list=unique_columns_level_1,
+                strings_to_ignore=[],  # Do not ignore 'id' here
+                suffixes_for_matching=self.scenarios_list,
+            )
+            for extra_column in extras_level_1:
+                if not extra_column.lower().startswith("unnamed"):
+                    self.structural_errors.append(f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada.")
 
-        # Check extra columns in level 2 (ignore 'id')
-        _, extras_level_2 = extract_numeric_ids_and_unmatched_strings_from_list(
-            source_list=unique_columns_level_2,
-            strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
-            suffixes_for_matching=self.scenarios_list,
-        )
-        for extra_column in extras_level_2:
-            if not extra_column.lower().startswith("unnamed"):
-                self.structural_errors.append(f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada.")
+            # Check extra columns in level 2 (ignore 'id')
+            _, extras_level_2 = extract_numeric_ids_and_unmatched_strings_from_list(
+                source_list=unique_columns_level_2,
+                strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
+                suffixes_for_matching=self.scenarios_list,
+            )
+            for extra_column in extras_level_2:
+                if not extra_column.lower().startswith("unnamed"):
+                    self.structural_errors.append(f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada.")
 
-        # Check for missing expected columns in level 2
-        for col in self.EXPECTED_COLUMNS:
-            if col not in unique_columns_level_2:
-                self.structural_errors.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
+            # Check for missing expected columns in level 2
+            for col in self.EXPECTED_COLUMNS:
+                if col not in unique_columns_level_2:
+                    self.structural_errors.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
 
     def data_cleaning(self, *args, **kwargs) -> List[str]:
         pass
