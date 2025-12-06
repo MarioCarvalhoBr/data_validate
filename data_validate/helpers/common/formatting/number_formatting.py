@@ -1,11 +1,12 @@
 import math
 from typing import Tuple, Any
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 
 import pandas as pd
 from babel.numbers import format_decimal
 
-def to_decimal_truncated(value_number, value_to_ignore, precision):
+
+def to_decimal_truncated(value_number: Any, value_to_ignore: Any, precision: int) -> Decimal:
     if pd.isna(value_number) or value_number == value_to_ignore:
         return Decimal("0")
 
@@ -17,16 +18,18 @@ def to_decimal_truncated(value_number, value_to_ignore, precision):
         else:
             truncated_val = s_val
         return Decimal(truncated_val)
-    except:
+    except (ValueError, InvalidOperation, Exception):
         return Decimal("0")
 
-def check_n_decimals_places(value_number, value_to_ignore, number_decimal_places):
+
+def check_n_decimals_places(value_number: Any, value_to_ignore: Any, number_decimal_places: int) -> bool:
     if pd.isna(value_number) or value_number == value_to_ignore:
         return False
     decimal_value = Decimal(str(value_number).replace(",", "."))
     return decimal_value.as_tuple().exponent < -number_decimal_places
 
-def check_two_decimals_places(value) -> bool:
+
+def check_two_decimals_places(value: Any) -> bool:
     if value in [float("-inf"), float("inf")] or pd.isna(value):
         return False
     return check_n_decimals_places(value, 0, 2)
@@ -56,7 +59,7 @@ def is_nan(value: Any) -> bool:
     """
     try:
         return pd.isna(value) or math.isnan(float(value))
-    except Exception:
+    except (ValueError, TypeError, Exception):
         return False
 
 

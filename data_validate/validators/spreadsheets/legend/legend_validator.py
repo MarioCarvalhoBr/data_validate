@@ -330,7 +330,7 @@ class SpLegendValidator(ValidatorModelABC):
                     aux_data_mapping_legend.legend_id = key_legend
 
                     group_legend = group_legend[
-                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name] != self._data_models_context.config.VALUE_DATA_UNAVAILABLE
+                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name] != self._data_models_context.config.LABEL_DATA_UNAVAILABLE
                     ]
                     if not group_legend.empty:
                         group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name] = pd.to_numeric(
@@ -368,7 +368,7 @@ class SpLegendValidator(ValidatorModelABC):
 
             for index, value_numeric in df_values_numeric[data_column_sp_value].items():
                 value_original = df_values[data_column_sp_value][index]
-                if value_original == self._data_models_context.config.VALUE_DI or pd.isna(value_numeric):
+                if value_original == self._data_models_context.config.VALUE_DATA_UNAVAILABLE or pd.isna(value_numeric):
                     continue
 
                 if value_numeric < min_value or value_numeric > max_value:

@@ -56,8 +56,8 @@ class Config:
     DATE_NOW = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
     # VALUE AND LEGEND
-    VALUE_DATA_UNAVAILABLE = "Dado indisponível"
-    VALUE_DI = "DI"
+    LABEL_DATA_UNAVAILABLE = "Dado indisponível"
+    VALUE_DATA_UNAVAILABLE = "DI"
 
     # REPORT
     REPORT_LIMIT_N_MESSAGES = 20

@@ -1,18 +1,11 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-from decimal import Decimal, ROUND_DOWN
 from typing import List, Tuple, Dict, Any
 
-import pandas as pd
 from pandas import DataFrame
 
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.formatting.number_formatting import format_number_brazilian
-from data_validate.helpers.common.formatting.number_formatting import (
-    to_decimal_truncated,
-    check_n_decimals_places
-)
 from data_validate.helpers.common.processing.collections_processing import (
     categorize_strings_by_id_pattern_from_list,
     find_differences_in_two_set_with_message,
@@ -21,10 +14,10 @@ from data_validate.helpers.common.processing.collections_processing import gener
 from data_validate.helpers.common.processing.data_cleaning import (
     clean_dataframe_integers,
 )
-from data_validate.helpers.common.validation.proportionality_data_validation import (
-    get_valids_codes_from_description,
-    build_subdatasets,
-)
+from data_validate.helpers.common.validation.proportionality_processing import ProportionalityProcessing
+from data_validate.helpers.common.validation.description_processing import DescriptionProcessing
+
+
 from data_validate.models import SpProportionality, SpDescription, SpValue, SpComposition
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
@@ -54,6 +47,10 @@ class SpProportionalityValidator(ValidatorModelABC):
         self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
         self.model_sp_value = self._data_models_context.get_instance_of(SpValue)
         self.model_sp_composition = self._data_models_context.get_instance_of(SpComposition)
+
+        # Configure processing helpers
+        self.proportionality_processing: ProportionalityProcessing | None = None
+        self.description_processing: DescriptionProcessing | None = None
 
         # Get model properties once
         self.exists_scenario = self.model_sp_value.scenario_exists_file
@@ -129,145 +126,78 @@ class SpProportionalityValidator(ValidatorModelABC):
             self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
         }
 
-    def _check_sum_equals_one(self, subdatasets, sp_df_values):
-        errors = []
-        warnings = []
+        # Configure processing helpers
+        self.proportionality_processing = ProportionalityProcessing(self.model_dataframes[self.sp_name_proportionality])
+        self.description_processing = DescriptionProcessing(self.model_dataframes[self.sp_name_description])
 
-        # Constantes para otimização de acesso
-        VALUE_DI = self._data_models_context.config.VALUE_DI
+    def _check_sum_equals_one(self, subdatasets: Dict[str, DataFrame], sp_df_values: DataFrame, value_di: Any) -> Tuple[List[str], List[str]]:
+        """Orchestrates validation of sum equals one for all subdatasets."""
+        all_errors = []
+        all_warnings = []
 
-        # Variáveis globais de estado
-        global_has_more_than_3_decimals = False
-        global_count_more_than_3 = 0
-        first_line_init_more_than_3 = 0
+        global_has_excessive_decimals = False
+        global_count_excessive = 0
+        global_first_line_excessive = 0
+
+        precision = self._data_models_context.config.PRECISION_DECIMAL_PLACE_TRUNCATE
 
         for parent_id, subdataset in subdatasets.items():
             df_data = subdataset.iloc[:, 1:].copy()
             ids = subdataset.iloc[:, 0]
 
-            # ---------------------------------------------------------
-            # 1. Validação de Formato (Numérico ou DI)
-            # ---------------------------------------------------------
-            # Máscara de onde é DI
-            is_di = df_data == VALUE_DI
-
-            df_numeric = df_data.replace(",", ".", regex=True).apply(pd.to_numeric, errors='coerce')
-            is_invalid = df_numeric.isna() & (~is_di) & (df_data.notna())
-
-            if is_invalid.any().any():
-                rows_with_errors = is_invalid.any(axis=1)
-                error_indices = rows_with_errors[rows_with_errors].index
-                excel_indices = error_indices + 3
-
-                count_errors = is_invalid.sum().sum()
-
-                if count_errors == 1:
-                    row_idx = error_indices[0]
-                    errors.append(
-                        f"{self.sp_name_proportionality}, linha {row_idx + 3}: O valor não é um número válido e nem {VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}'."
-                    )
-                else:
-                    line_init = excel_indices.min()
-                    line_end = excel_indices.max()
-                    errors.append(
-                        f"{self.sp_name_proportionality}: {count_errors} valores que não são número válido nem {VALUE_DI} ({self._data_models_context.config.VALUE_DATA_UNAVAILABLE.capitalize()}) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}."
-                    )
-                df_data[is_invalid] = VALUE_DI
-
-            # ---------------------------------------------------------
-            # 2. Verificação de Casas Decimais (> 3)
-            # ---------------------------------------------------------
-            # Aplica verificação boolean
-            has_excess_decimals_mask = df_data.map(
-                lambda value_number: check_n_decimals_places(value_number, VALUE_DI, self._data_models_context.config.PRECISION_DECIMAL_PLACE_TRUNCATE)
+            # Step 1: Validate numeric format
+            is_di = df_data == value_di
+            df_data, format_errors = self.proportionality_processing.validate_numeric_format(
+                df_data, is_di, value_di, parent_id, self.sp_name_proportionality
             )
-            count_excess = has_excess_decimals_mask.sum().sum()
+            all_errors.extend(format_errors)
 
-            if count_excess > 0:
-                if not global_has_more_than_3_decimals:
-                    first_row_idx = has_excess_decimals_mask.any(axis=1).idxmax()
-                    first_line_init_more_than_3 = first_row_idx + 3
+            # Step 2: Check excessive decimals
+            has_excess, count_excess, first_line = self.proportionality_processing.check_excessive_decimals(df_data, value_di, precision)
 
-                global_has_more_than_3_decimals = True
-                global_count_more_than_3 += count_excess
+            if has_excess:
+                if not global_has_excessive_decimals:
+                    global_first_line_excessive = first_line
+                global_has_excessive_decimals = True
+                global_count_excessive += count_excess
 
-            # ---------------------------------------------------------
-            # 3. Conversão para Decimal e Soma
-            # ---------------------------------------------------------
-            # Transforma o dataframe em objetos Decimal (truncados)
-            df_decimals = df_data.map(
-                lambda value_number: to_decimal_truncated(value_number, VALUE_DI, self._data_models_context.config.PRECISION_DECIMAL_PLACE_TRUNCATE)
+            # Step 3: Convert to Decimal and sum
+            row_sums = self.proportionality_processing.convert_to_decimal_and_sum(df_data, value_di, precision)
+
+            # Step 4: Validate zero sum rows
+            zero_errors = self.proportionality_processing.validate_zero_sum_rows(
+                row_sums,
+                ids,
+                df_data,
+                sp_df_values,
+                self.column_name_id,
+                value_di,
+                self.sp_name_proportionality,
+                self.sp_name_value,
             )
-            row_sums = df_decimals.sum(axis=1)
+            all_errors.extend(zero_errors)
 
-            # ---------------------------------------------------------
-            # 4. Validação da Soma (= 1)
-            # ---------------------------------------------------------
-            # CASO A: Soma igual a 0 (Verificação cruzada complexa)
-            zero_sum_mask = row_sums == 0
-            if zero_sum_mask.any():
-                zero_indices = zero_sum_mask[zero_sum_mask].index
-                zero_ids = ids.loc[zero_indices]
+            # Step 5: Validate sum tolerance
+            tolerance_errors, tolerance_warnings = self.proportionality_processing.validate_sum_tolerance(
+                row_sums,
+                parent_id,
+                self.sp_name_proportionality,
+                self._data_models_context.lm.current_language,
+            )
+            all_errors.extend(tolerance_errors)
+            all_warnings.extend(tolerance_warnings)
 
-                relevant_values = sp_df_values[sp_df_values[self.column_name_id].isin(zero_ids)]
-                df_check = relevant_values.set_index(self.column_name_id)
-
-                for idx in zero_indices:
-                    row_id = ids[idx]
-                    if row_id not in df_check.index:
-                        continue
-                    values_row = df_check.loc[row_id]
-                    cols_to_check = [c for c in df_data.columns if c in values_row.index]
-
-                    for col in cols_to_check:
-                        val = values_row[col]
-                        if val != VALUE_DI:
-                            try:
-                                if float(str(val).replace(',', '.')) != 0:
-                                    errors.append(
-                                        f"{self.sp_name_proportionality}: A soma de fatores influenciadores para o ID '{row_id}' no pai '{col}' é 0 (zero). Na planilha {self.sp_name_value}, existe(m) valor(es) para os filhos do indicador '{col}', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
-                                    )
-                            except:
-                                pass
-
-            # CASO B: Soma fora de [0.99, 1.01] e != 0
-            limit_low = Decimal("0.99")
-            limit_high = Decimal("1.01")
-
-            # Erro Crítico
-            error_mask = (row_sums != 0) & ((row_sums < limit_low) | (row_sums > limit_high))
-
-            if error_mask.any():
-                for idx in error_mask[error_mask].index:
-                    val_sum = row_sums[idx]
-                    formatted_sum = format_number_brazilian(val_sum, self._data_models_context.lm.current_language)
-                    errors.append(
-                        f"{self.sp_name_proportionality}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1."
-                    )
-
-            # Aviso (Warning): Soma diferente de 1 mas dentro da margem [0.99, 1.01]
-            warning_mask = (row_sums != 1) & (row_sums >= limit_low) & (row_sums <= limit_high)
-
-            if warning_mask.any():
-                for idx in warning_mask[warning_mask].index:
-                    val_sum = row_sums[idx]
-                    formatted_sum = format_number_brazilian(val_sum, self._data_models_context.lm.current_language)
-                    warnings.append(
-                        f"{self.sp_name_proportionality}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1."
-                    )
-
-        # ---------------------------------------------------------
-        # 5. Aviso Global de Casas Decimais
-        # ---------------------------------------------------------
-        if global_has_more_than_3_decimals:
-            text_existem = "Existem" if global_count_more_than_3 > 1 else "Existe"
-            text_valores = "valores" if global_count_more_than_3 > 1 else "valor"
-            warnings.append(
-                f"{self.sp_name_proportionality}, linha {first_line_init_more_than_3}: {text_existem} {global_count_more_than_3} {text_valores} com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais."
+        # Global warning for excessive decimals
+        if global_has_excessive_decimals:
+            text_existem = "Existem" if global_count_excessive > 1 else "Existe"
+            text_valores = "valores" if global_count_excessive > 1 else "valor"
+            all_warnings.append(
+                f"{self.sp_name_proportionality}, linha {global_first_line_excessive}: "
+                f"{text_existem} {global_count_excessive} {text_valores} com mais de 3 casas decimais, "
+                f"serão consideradas apenas as 3 primeiras casas decimais."
             )
 
-        return errors, warnings
-
+        return all_errors, all_warnings
 
     def validate_relation_indicators_in_proportionality(self) -> Tuple[List[str], List[str]]:
         errors, warnings = [], []
@@ -307,8 +237,8 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         # List of codes at level 1 to remove
         codes_level_to_remove = df_description[df_description[self.column_name_level] == "1"][self.column_name_code].astype(str).tolist()
-        set_valid_codes_description = get_valids_codes_from_description(
-            df_description, self.column_name_level, self.column_name_code, self.column_name_scenario
+        set_valid_codes_description = self.description_processing.get_valids_codes_from_description(
+            self.column_name_level, self.column_name_code, self.column_name_scenario
         )
 
         # List all codes in proportionality (both levels of MultiIndex)
@@ -460,11 +390,10 @@ class SpProportionalityValidator(ValidatorModelABC):
             return column_errors, warnings
 
         # Setup dataframes
-        df_proportionalities = self.model_dataframes[self.sp_name_proportionality].copy()
         df_composition = self.model_dataframes[self.sp_name_composition].copy()
 
         # Build subdatasets
-        subdatasets = build_subdatasets(df_proportionalities, self.column_name_id)
+        subdatasets = self.proportionality_processing.build_subdatasets(self.column_name_id)
 
         # Filter composition to remove level 1 parents
         df_composition = df_composition[df_composition[self.column_name_parent] != "1"]
@@ -538,12 +467,11 @@ class SpProportionalityValidator(ValidatorModelABC):
         if column_errors:
             return column_errors, warnings
 
-        df_proportionalities = self.model_dataframes[self.sp_name_proportionality].copy()
         df_values = self.model_dataframes[self.sp_name_value].copy()
 
-        subdatasets = build_subdatasets(df_proportionalities, self.column_name_id)
+        subdatasets = self.proportionality_processing.build_subdatasets(self.column_name_id)
 
-        errors, warnings = self._check_sum_equals_one(subdatasets, df_values)
+        errors, warnings = self._check_sum_equals_one(subdatasets, df_values, self._data_models_context.config.VALUE_DATA_UNAVAILABLE)
 
         return errors, warnings
 

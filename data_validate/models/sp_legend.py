@@ -89,7 +89,7 @@ class SpLegend(SpModelABC):
         if self.structural_errors:
             return errors
 
-        legend_validator = LegendProcessing(value_data_unavailable=self.context.config.VALUE_DATA_UNAVAILABLE, filename=self.filename)
+        legend_validator = LegendProcessing(value_data_unavailable=self.context.config.LABEL_DATA_UNAVAILABLE, filename=self.filename)
 
         errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code))
 
