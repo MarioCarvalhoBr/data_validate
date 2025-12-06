@@ -163,13 +163,16 @@ eval $(poetry env activate)
 ```
 
 #### Comando completo
+```bash
 python -m data_validate.main
     --input_folder data/input
     --output_folder data/output
     --locale pt_BR
     --debug
+```
 
 #### Comando abreviado
+```bash
 python -m data_validate.main --i data/input --o data/output --l pt_BR --d
 ```
 
