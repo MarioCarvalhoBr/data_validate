@@ -44,6 +44,7 @@ class ProportionalityProcessing:
             subdatasets[parent_id] = pd.concat([sub_dataset_id, df_proportionalities[parent_id]], axis=1)
 
         return subdatasets
+
     @staticmethod
     def validate_numeric_format(
         df_data: DataFrame,
@@ -98,6 +99,7 @@ class ProportionalityProcessing:
         first_line_excel = first_row_idx + 3
 
         return True, count_excess, first_line_excel
+
     @staticmethod
     def convert_to_decimal_and_sum(
         df_data: DataFrame,
@@ -107,6 +109,7 @@ class ProportionalityProcessing:
         """Converts data to Decimal and returns row sums."""
         df_decimals = df_data.map(lambda value_number: to_decimal_truncated(value_number, value_di, precision))
         return df_decimals.sum(axis=1)
+
     @staticmethod
     def validate_zero_sum_rows(
         row_sums: pd.Series,
@@ -155,8 +158,8 @@ class ProportionalityProcessing:
                     pass
 
         return errors
-    @staticmethod
 
+    @staticmethod
     def validate_sum_tolerance(
         row_sums: pd.Series,
         parent_id: str,
