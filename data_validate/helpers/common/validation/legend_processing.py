@@ -5,15 +5,14 @@ from typing import List, Any
 
 import pandas as pd
 
-from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.common.formatting.number_formatting import check_cell_integer, check_two_decimals_places
 
 
 class LegendProcessing:
     """Class for processing legend data validation."""
 
-    def __init__(self, context: GeneralContext, filename: str):
-        self.context = context
+    def __init__(self, value_data_unavailable: Any, filename: str):
+        self.value_data_unavailable = value_data_unavailable
         self.filename = filename
 
     @staticmethod
@@ -66,7 +65,7 @@ class LegendProcessing:
         for col in columns_to_check:
             local_dataframe[col] = pd.to_numeric(local_dataframe[col], errors="coerce")
         for col in columns_to_check:
-            filtered_df = local_dataframe[local_dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE]
+            filtered_df = local_dataframe[local_dataframe[label_col] != self.value_data_unavailable]
             if filtered_df[col].isnull().any():
                 indices_non_numeric_values = filtered_df[filtered_df[col].isnull()].index.tolist()
                 non_numeric_values_original = original_dataframe.loc[indices_non_numeric_values, col].to_list()
@@ -81,7 +80,7 @@ class LegendProcessing:
 
         # 2.2 - If the label is 'Dado indisponível', the min, max values must be empty (cannot have any values)
         if min_col in local_dataframe.columns and max_col in local_dataframe.columns and label_col in local_dataframe.columns:
-            unavailable_mask = original_dataframe[label_col] == self.context.config.VALUE_DATA_UNAVAILABLE
+            unavailable_mask = original_dataframe[label_col] == self.value_data_unavailable
             invalid_min = local_dataframe.loc[unavailable_mask & local_dataframe[min_col].notnull()]
             invalid_max = local_dataframe.loc[unavailable_mask & local_dataframe[max_col].notnull()]
 
@@ -89,27 +88,27 @@ class LegendProcessing:
                 indices_invalid_min = invalid_min.index.tolist()
                 indices_invalid_min = [idx + 2 for idx in indices_invalid_min]
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_min))}]: A coluna '{min_col}' deve estar vazia quando o label é '{self.context.config.VALUE_DATA_UNAVAILABLE}'."
+                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_min))}]: A coluna '{min_col}' deve estar vazia quando o label é '{self.value_data_unavailable}'."
                 )
             if not invalid_max.empty:
                 indices_invalid_max = invalid_max.index.tolist()
                 indices_invalid_max = [idx + 2 for idx in indices_invalid_max]
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_max))}]: A coluna '{max_col}' deve estar vazia quando o label é '{self.context.config.VALUE_DATA_UNAVAILABLE}'."
+                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_max))}]: A coluna '{max_col}' deve estar vazia quando o label é '{self.value_data_unavailable}'."
                 )
 
         # 2.3 - There must be exactly one label 'Dado indisponível'. If there is more than one, error. If there is none, error. If there is exactly one, ok.
         if label_col in local_dataframe.columns:
-            unavailable_labels = original_dataframe[original_dataframe[label_col] == self.context.config.VALUE_DATA_UNAVAILABLE]
+            unavailable_labels = original_dataframe[original_dataframe[label_col] == self.value_data_unavailable]
             if len(unavailable_labels) == 0:
                 errors.append(
-                    f"{self.filename} [código: {code_value}]: Deve existir um label '{self.context.config.VALUE_DATA_UNAVAILABLE}' por código, mas nenhum foi encontrado."
+                    f"{self.filename} [código: {code_value}]: Deve existir um label '{self.value_data_unavailable}' por código, mas nenhum foi encontrado."
                 )
             elif len(unavailable_labels) > 1:
                 indices_unavailable_labels = unavailable_labels.index.tolist()
                 indices_unavailable_labels = [idx + 2 for idx in indices_unavailable_labels]
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_unavailable_labels))}]: Deve existir exatamente um label '{self.context.config.VALUE_DATA_UNAVAILABLE}' por código, mas foram encontrados {len(unavailable_labels)}."
+                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_unavailable_labels))}]: Deve existir exatamente um label '{self.value_data_unavailable}' por código, mas foram encontrados {len(unavailable_labels)}."
                 )
 
         # 3 - Check column code, order: Integer values
@@ -147,7 +146,7 @@ class LegendProcessing:
         """Validates min/max values for legends, ensuring they are logical and sequential."""
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
-        sorted_group = dataframe[dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE].copy()
+        sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
 
         # Convert to numeric, coercing errors
         sorted_group[min_col] = pd.to_numeric(sorted_group[min_col], errors="coerce")
@@ -188,7 +187,7 @@ class LegendProcessing:
         """Validates min/max values for legends, ensuring they are logical and sequential."""
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
-        sorted_group = dataframe[dataframe[label_col] != self.context.config.VALUE_DATA_UNAVAILABLE].copy()
+        sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
 
         # Convert to numeric, coercing errors
         sorted_group[min_col] = pd.to_numeric(sorted_group[min_col], errors="coerce")

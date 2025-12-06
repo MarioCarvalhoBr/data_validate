@@ -14,23 +14,18 @@ from data_validate.helpers.common.validation.legend_processing import LegendProc
 @pytest.fixture
 def mock_context(mocker):
     """
-    Cria um mock do GeneralContext para testes usando a fixture 'mocker'.
+    Cria um mock para ter apenas value_data_unavailable="Dado indisponível" e  filename="test_legend.xlsx"
     """
-    # Usar spec=GeneralContext garante que o mock só aceitará
-    # atributos que existem na classe real, evitando erros de digitação.
-    context = mocker.MagicMock(spec=GeneralContext)
-
-    config_mock = mocker.MagicMock()
-    config_mock.VALUE_DATA_UNAVAILABLE = "Dado indisponível"
-
-    context.config = config_mock
-    return context
+    mock = mocker.Mock(spec=GeneralContext)
+    mock.value_data_unavailable = "Dado indisponível"
+    mock.filename = "test_legend.xlsx"
+    return mock
 
 
 @pytest.fixture
 def legend_processor(mock_context) -> LegendProcessing:
     """Create LegendProcessing instance for testing."""
-    return LegendProcessing(context=mock_context, filename="test_legend.xlsx")
+    return LegendProcessing(value_data_unavailable=mock_context.value_data_unavailable, filename="test_legend.xlsx")
 
 
 @pytest.fixture
@@ -83,9 +78,8 @@ class TestLegendProcessing:
     def test_init(self, mock_context) -> None:
         """Test LegendProcessing initialization."""
         filename = "test_file.xlsx"
-        processor = LegendProcessing(context=mock_context, filename=filename)
+        processor = LegendProcessing(value_data_unavailable=mock_context.value_data_unavailable, filename=filename)
 
-        assert processor.context == mock_context
         assert processor.filename == filename
 
     def test_get_min_max_values_basic(self) -> None:
