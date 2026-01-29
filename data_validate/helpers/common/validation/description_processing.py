@@ -3,15 +3,19 @@ from typing import Set
 
 from pandas import DataFrame
 
-from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
 class DescriptionProcessing:
-    def __init__(self, dataframe: DataFrame) -> None:
-        self.df_description = dataframe
 
-    def get_valids_codes_from_description(self, column_name_level: str, column_name_code: str, column_name_scenario: str) -> Set[str]:
-        df_description = self.df_description.copy()
+    def __init__(self) -> None:
+        pass
+
+    @staticmethod
+    def get_valids_codes_from_description(
+        df_description: DataFrame, column_name_level: str, column_name_code: str, column_name_scenario: str
+    ) -> Set[str]:
+        df_description = df_description.copy()
         df_description = df_description[df_description[column_name_level] != "1"]
 
         if column_name_scenario in df_description.columns:
@@ -21,7 +25,7 @@ class DescriptionProcessing:
         valid_codes = set()
 
         for code in codes_cleaned:
-            is_correct, __ = check_cell_integer(code, 1)
+            is_correct, __ = NumberFormattingProcessing.check_cell_integer(code, 1)
             if is_correct:
                 valid_codes.add(code)
 

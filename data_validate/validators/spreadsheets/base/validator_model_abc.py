@@ -5,10 +5,8 @@ import pandas as pd
 
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.validation.data_validation import (
-    check_text_length,
-    column_exists,
-)
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
+
 from data_validate.models.sp_model_abc import SpModelABC
 
 
@@ -69,21 +67,21 @@ class ValidatorModelABC(ABC):
     def column_exists(self, dataframe, filename, column) -> Tuple[bool, str]:
 
         # How use: To use this method, you can call it directly with the dataframe and column name.
-        exists, msg_error_column = column_exists(dataframe, filename, column)
+        exists, msg_error_column = DataFrameProcessing.column_exists(dataframe, filename, column)
         return exists, msg_error_column
 
     def _column_exists(self, column: str) -> Tuple[bool, str]:
-        exists, msg_error_column = column_exists(self._dataframe, self._filename, column)
+        exists, msg_error_column = DataFrameProcessing.column_exists(self._dataframe, self._filename, column)
         return exists, msg_error_column
 
     def _column_exists_dataframe(self, dataframe, column: str) -> Tuple[bool, str]:
-        exists, msg_error_column = column_exists(dataframe, self._filename, column)
+        exists, msg_error_column = DataFrameProcessing.column_exists(dataframe, self._filename, column)
         return exists, msg_error_column
 
     def _check_text_length(self, column: str, max_len: int) -> Tuple[List[str], List[str]]:
         """Helper function to validate text length in a column."""
         warnings = []
-        __, warnings_text_length = check_text_length(
+        __, warnings_text_length = DataFrameProcessing.check_dataframe_text_length(
             dataframe=self._dataframe,
             file_name=self._filename,
             column=column,

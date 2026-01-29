@@ -6,16 +6,16 @@ from typing import List, Tuple, Any
 import pandas as pd
 from pandas import DataFrame
 
-from data_validate.helpers.common.formatting.number_formatting import format_number_brazilian
-from data_validate.helpers.common.formatting.number_formatting import to_decimal_truncated, check_n_decimals_places
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
 class ProportionalityProcessing:
-    def __init__(self, dataframe: DataFrame) -> None:
-        self.df_proportionalities = dataframe
+    def __init__(self) -> None:
+        pass
 
-    def build_subdatasets(self, column_name_id: str):
-        df_proportionalities = self.df_proportionalities.copy()
+    @staticmethod
+    def build_subdatasets(df_proportionalities: DataFrame, column_name_id: str):
+        df_proportionalities = df_proportionalities.copy()
 
         # Create columns information
         columns_multi_index_prop = df_proportionalities.columns
@@ -89,7 +89,9 @@ class ProportionalityProcessing:
         precision: int,
     ) -> Tuple[bool, int, int]:
         """Checks for excessive decimal places and returns statistics."""
-        has_excess_decimals_mask = df_data.map(lambda value_number: check_n_decimals_places(value_number, value_di, precision))
+        has_excess_decimals_mask = df_data.map(
+            lambda value_number: NumberFormattingProcessing.check_n_decimals_places(value_number, value_di, precision)
+        )
         count_excess = has_excess_decimals_mask.sum().sum()
 
         if count_excess == 0:
@@ -107,7 +109,7 @@ class ProportionalityProcessing:
         precision: int,
     ) -> pd.Series:
         """Converts data to Decimal and returns row sums."""
-        df_decimals = df_data.map(lambda value_number: to_decimal_truncated(value_number, value_di, precision))
+        df_decimals = df_data.map(lambda value_number: NumberFormattingProcessing.to_decimal_truncated(value_number, value_di, precision))
         return df_decimals.sum(axis=1)
 
     @staticmethod
@@ -178,7 +180,7 @@ class ProportionalityProcessing:
 
         for idx in error_mask[error_mask].index:
             val_sum = row_sums[idx]
-            formatted_sum = format_number_brazilian(val_sum, current_language)
+            formatted_sum = NumberFormattingProcessing.format_number_brazilian(val_sum, current_language)
             errors.append(f"{sp_name}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1.")
 
         # Warnings: sum within [0.99, 1.01] but != 1
@@ -186,7 +188,7 @@ class ProportionalityProcessing:
 
         for idx in warning_mask[warning_mask].index:
             val_sum = row_sums[idx]
-            formatted_sum = format_number_brazilian(val_sum, current_language)
+            formatted_sum = NumberFormattingProcessing.format_number_brazilian(val_sum, current_language)
             warnings.append(f"{sp_name}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1.")
 
         return errors, warnings

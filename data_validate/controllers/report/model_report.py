@@ -1,8 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 from data_validate.controllers import GeneralContext
-from data_validate.helpers.common.formatting.number_formatting import (
-    format_number_brazilian,
-)
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
 class ModelItemReport:
@@ -89,11 +87,11 @@ class ModelListReport:
                 warnings=report.warnings[:n_messages],
             )
             if len(report.errors) > n_messages:
-                count_omitted_errors = format_number_brazilian(len(report.errors) - n_messages, locale)
+                count_omitted_errors = NumberFormattingProcessing.format_number_brazilian(len(report.errors) - n_messages, locale)
                 flattened_report.add_error(self.context.lm.text("model_report_msg_errors_omitted", count=count_omitted_errors))
 
             if len(report.warnings) > n_messages:
-                count_omitted_warnings = format_number_brazilian(len(report.warnings) - n_messages, locale)
+                count_omitted_warnings = NumberFormattingProcessing.format_number_brazilian(len(report.warnings) - n_messages, locale)
                 flattened_report.add_warning(
                     self.context.lm.text(
                         "model_report_msg_warnings_omitted",

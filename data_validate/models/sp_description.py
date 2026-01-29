@@ -8,10 +8,8 @@ from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.error_formatting import (
     format_errors_and_warnings,
 )
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
-from data_validate.helpers.common.validation.column_validation import check_column_names
+from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.tools.data_loader.api.facade import (
     DataLoaderModel,
 )
@@ -118,7 +116,7 @@ class SpDescription(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, self.EXPECTED_COLUMNS)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(self.data_loader_model.df_data, self.EXPECTED_COLUMNS)
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
@@ -133,7 +131,7 @@ class SpDescription(SpModelABC):
 
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
-            df, errors = clean_dataframe_integers(
+            df, errors = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
                 [column_name],
@@ -149,7 +147,7 @@ class SpDescription(SpModelABC):
         # 2. Se houver cenários, limpar e validar a coluna 'cenario' (mínimo -1)
         if self.scenarios_list:
             col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
-            df, errors_cenario = clean_dataframe_integers(
+            df, errors_cenario = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
                 [col_cenario],
@@ -162,7 +160,7 @@ class SpDescription(SpModelABC):
         # 3. Se houver coluna 'legenda', garantir que todos os valores são numeros inteiros (mínimo 1) ou vazios: erro se não
         if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
             col_legenda = self.DynamicColumn.COLUMN_LEGEND.name
-            df, errors_legenda = clean_dataframe_integers(
+            df, errors_legenda = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
                 [col_legenda],

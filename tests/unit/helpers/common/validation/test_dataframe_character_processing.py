@@ -11,18 +11,8 @@ import pytest
 import pandas as pd
 from typing import List, Tuple, Optional
 
-from data_validate.helpers.common.validation.data_validation import (
-    check_vertical_bar,
-    check_unnamed_columns,
-    check_punctuation,
-    check_special_characters_cr_lf_columns_start_end,
-    check_special_characters_cr_lf_columns_anywhere,
-    check_special_characters_cr_lf,
-    check_unique_values,
-    column_exists,
-    check_text_length,
-    check_dataframe_titles_uniques,
-)
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
+from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
 
 class TestCheckVerticalBar:
@@ -82,7 +72,7 @@ class TestCheckVerticalBar:
     def test_check_vertical_bar_clean_dataframe_success(self, simple_dataframe: pd.DataFrame) -> None:
         """Test check_vertical_bar with clean DataFrame (no vertical bars)."""
         # Act
-        is_valid, errors = check_vertical_bar(simple_dataframe, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(simple_dataframe, "test.xlsx")
 
         # Assert
         assert is_valid is True
@@ -91,7 +81,7 @@ class TestCheckVerticalBar:
     def test_check_vertical_bar_data_with_vertical_bars(self, dataframe_with_vertical_bars: pd.DataFrame) -> None:
         """Test check_vertical_bar with vertical bars in data values."""
         # Act
-        is_valid, errors = check_vertical_bar(dataframe_with_vertical_bars, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(dataframe_with_vertical_bars, "test.xlsx")
 
         # Assert
         assert is_valid is False
@@ -106,7 +96,7 @@ class TestCheckVerticalBar:
     def test_check_vertical_bar_column_names_with_vertical_bars(self, dataframe_with_vertical_bar_columns: pd.DataFrame) -> None:
         """Test check_vertical_bar with vertical bars in column names."""
         # Act
-        is_valid, errors = check_vertical_bar(dataframe_with_vertical_bar_columns, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(dataframe_with_vertical_bar_columns, "test.xlsx")
 
         # Assert
         assert is_valid is False
@@ -119,7 +109,7 @@ class TestCheckVerticalBar:
     def test_check_vertical_bar_multiindex_columns(self, multiindex_dataframe: pd.DataFrame) -> None:
         """Test check_vertical_bar with MultiIndex columns containing vertical bars."""
         # Act
-        is_valid, errors = check_vertical_bar(multiindex_dataframe, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(multiindex_dataframe, "test.xlsx")
 
         # Assert
         assert is_valid is False
@@ -132,7 +122,7 @@ class TestCheckVerticalBar:
     def test_check_vertical_bar_empty_dataframe(self, empty_dataframe: pd.DataFrame) -> None:
         """Test check_vertical_bar with empty DataFrame."""
         # Act
-        is_valid, errors = check_vertical_bar(empty_dataframe, "empty.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(empty_dataframe, "empty.xlsx")
 
         # Assert
         assert is_valid is True
@@ -159,7 +149,7 @@ class TestCheckVerticalBar:
         df = pd.DataFrame({"test_column": data_values})
 
         # Act
-        is_valid, errors = check_vertical_bar(df, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(df, "test.xlsx")
 
         # Assert
         assert len(errors) == expected_error_count
@@ -171,7 +161,7 @@ class TestCheckVerticalBar:
         original_data = simple_dataframe.copy()
 
         # Act
-        check_vertical_bar(simple_dataframe, "test.xlsx")
+        DataFrameProcessing.check_dataframe_vertical_bar(simple_dataframe, "test.xlsx")
 
         # Assert
         pd.testing.assert_frame_equal(simple_dataframe, original_data)
@@ -179,11 +169,11 @@ class TestCheckVerticalBar:
     def test_check_vertical_bar_exception_handling(self, simple_dataframe: pd.DataFrame, mocker) -> None:
         """Test check_vertical_bar exception handling."""
         # Arrange
-        mock_astype = mocker.patch("data_validate.helpers.common.validation.data_validation.pd.DataFrame.astype")
+        mock_astype = mocker.patch("data_validate.helpers.common.validation.dataframe_processing.pd.DataFrame.astype")
         mock_astype.side_effect = Exception("Test exception")
 
         # Act
-        is_valid, errors = check_vertical_bar(simple_dataframe, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(simple_dataframe, "test.xlsx")
 
         # Assert
         assert is_valid is False
@@ -203,7 +193,7 @@ class TestCheckVerticalBar:
         df = pd.DataFrame([["data|bar", "normal", "text|here"]], columns=columns)
 
         # Act
-        is_valid, errors = check_vertical_bar(df, "complex.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_vertical_bar(df, "complex.xlsx")
 
         # Assert
         assert is_valid is False
@@ -247,7 +237,7 @@ class TestCheckUnnamedColumns:
         df = pd.DataFrame({"id": [1, 2, 3], "nome": ["João", "Maria", "Pedro"], "valor": [10, 20, 30]})
 
         # Act
-        is_valid, errors = check_unnamed_columns(df, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_unnamed_columns(df, "test.xlsx")
 
         # Assert
         assert is_valid is True
@@ -256,7 +246,7 @@ class TestCheckUnnamedColumns:
     def test_check_unnamed_columns_with_unnamed_and_extra_data(self, dataframe_with_unnamed_columns: pd.DataFrame) -> None:
         """Test check_unnamed_columns with unnamed columns and extra data."""
         # Act
-        is_valid, errors = check_unnamed_columns(dataframe_with_unnamed_columns, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_unnamed_columns(dataframe_with_unnamed_columns, "test.xlsx")
 
         # Assert
         assert is_valid is False
@@ -271,7 +261,7 @@ class TestCheckUnnamedColumns:
     def test_check_unnamed_columns_multiindex_with_unnamed(self, multiindex_with_unnamed: pd.DataFrame) -> None:
         """Test check_unnamed_columns with MultiIndex containing unnamed columns."""
         # Act
-        is_valid, errors = check_unnamed_columns(multiindex_with_unnamed, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_unnamed_columns(multiindex_with_unnamed, "test.xlsx")
 
         # Assert
         # The function should handle MultiIndex by checking level 1 names
@@ -309,7 +299,7 @@ class TestCheckUnnamedColumns:
         df = pd.DataFrame(data_rows, columns=columns)
 
         # Act
-        is_valid, errors = check_unnamed_columns(df, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_unnamed_columns(df, "test.xlsx")
 
         # Assert
         assert (len(errors) > 0) == expected_has_errors
@@ -321,7 +311,7 @@ class TestCheckUnnamedColumns:
         df = pd.DataFrame()
 
         # Act
-        is_valid, errors = check_unnamed_columns(df, "empty.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_unnamed_columns(df, "empty.xlsx")
 
         # Assert
         assert is_valid is True
@@ -335,7 +325,7 @@ class TestCheckUnnamedColumns:
         df = pd.DataFrame({"test": [1, 2, 3]})
 
         # Act
-        is_valid, errors = check_unnamed_columns(df, "test.xlsx")
+        is_valid, errors = DataFrameProcessing.check_dataframe_unnamed_columns(df, "test.xlsx")
 
         # Assert
         assert is_valid is False
@@ -386,7 +376,7 @@ class TestCheckPunctuation:
     ) -> None:
         """Test check_punctuation with various column configurations."""
         # Act
-        is_valid, warnings = check_punctuation(
+        is_valid, warnings = CharacterProcessing.check_characters_punctuation_rules(
             sample_dataframe,
             "test.xlsx",
             columns_dont_punctuation,
@@ -403,7 +393,7 @@ class TestCheckPunctuation:
         df = pd.DataFrame()
 
         # Act
-        is_valid, warnings = check_punctuation(df, "empty.xlsx", ["col1"], ["col2"])
+        is_valid, warnings = CharacterProcessing.check_characters_punctuation_rules(df, "empty.xlsx", ["col1"], ["col2"])
 
         # Assert
         assert is_valid is True
@@ -415,7 +405,7 @@ class TestCheckPunctuation:
         df = pd.DataFrame({"test_col": [None, "", "Valid text.", "Invalid text,"]})
 
         # Act
-        is_valid, warnings = check_punctuation(df, "test.xlsx", ["test_col"], [])
+        is_valid, warnings = CharacterProcessing.check_characters_punctuation_rules(df, "test.xlsx", ["test_col"], [])
 
         # Assert
         assert len(warnings) == 2  # Fixed: Both Valid text. and Invalid text, trigger warnings
@@ -446,10 +436,10 @@ class TestCheckPunctuation:
         df = pd.DataFrame({"test_col": [text_value]})
 
         # Act - Test no punctuation rule
-        is_valid_no_punct, warnings_no_punct = check_punctuation(df, "test.xlsx", ["test_col"], [])
+        is_valid_no_punct, warnings_no_punct = CharacterProcessing.check_characters_punctuation_rules(df, "test.xlsx", ["test_col"], [])
 
         # Act - Test must end with dot rule
-        is_valid_dot, warnings_dot = check_punctuation(df, "test.xlsx", [], ["test_col"])
+        is_valid_dot, warnings_dot = CharacterProcessing.check_characters_punctuation_rules(df, "test.xlsx", [], ["test_col"])
 
         # Assert
         assert (len(warnings_no_punct) > 0) == should_warn_no_punct
@@ -484,7 +474,9 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_cr_lf_columns_start_end_clean_data(self, clean_dataframe_no_special_chars: pd.DataFrame) -> None:
         """Test start/end CR/LF check with clean data."""
         # Act
-        is_valid, warnings = check_special_characters_cr_lf_columns_start_end(clean_dataframe_no_special_chars, "test.xlsx", ["column1", "column2"])
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
+            clean_dataframe_no_special_chars, "test.xlsx", ["column1", "column2"]
+        )
 
         # Assert
         assert is_valid is True
@@ -493,7 +485,7 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_cr_lf_columns_start_end_with_issues(self, dataframe_with_cr_lf_characters: pd.DataFrame) -> None:
         """Test start/end CR/LF check with problematic data."""
         # Act
-        is_valid, warnings = check_special_characters_cr_lf_columns_start_end(
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
             dataframe_with_cr_lf_characters,
             "test.xlsx",
             ["text_start_cr", "text_end_lf"],
@@ -510,7 +502,9 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_cr_lf_columns_anywhere_clean_data(self, clean_dataframe_no_special_chars: pd.DataFrame) -> None:
         """Test anywhere CR/LF check with clean data."""
         # Act
-        is_valid, warnings = check_special_characters_cr_lf_columns_anywhere(clean_dataframe_no_special_chars, "test.xlsx", ["column1"])
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
+            clean_dataframe_no_special_chars, "test.xlsx", ["column1"]
+        )
 
         # Assert
         assert is_valid is True
@@ -519,7 +513,9 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_cr_lf_columns_anywhere_with_issues(self, dataframe_with_cr_lf_characters: pd.DataFrame) -> None:
         """Test anywhere CR/LF check with problematic data."""
         # Act
-        is_valid, warnings = check_special_characters_cr_lf_columns_anywhere(dataframe_with_cr_lf_characters, "test.xlsx", ["text_middle_cr"])
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
+            dataframe_with_cr_lf_characters, "test.xlsx", ["text_middle_cr"]
+        )
 
         # Assert
         assert is_valid is False
@@ -531,7 +527,7 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_cr_lf_combined_function(self, dataframe_with_cr_lf_characters: pd.DataFrame) -> None:
         """Test the combined CR/LF checking function."""
         # Act
-        is_valid, warnings = check_special_characters_cr_lf(
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf(
             dataframe_with_cr_lf_characters,
             "test.xlsx",
             columns_start_end=["text_start_cr", "text_end_lf"],
@@ -569,7 +565,7 @@ class TestCheckSpecialCharactersCrLf:
         df = pd.DataFrame({"test_col": [text_with_special_chars]})
 
         # Act
-        is_valid, warnings = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["test_col"])
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["test_col"])
 
         # Assert
         assert len(warnings) == len(expected_positions)
@@ -584,9 +580,13 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_empty_columns_list(self, dataframe_with_cr_lf_characters: pd.DataFrame) -> None:
         """Test CR/LF functions with empty column lists."""
         # Act
-        is_valid_start_end, warnings_start_end = check_special_characters_cr_lf_columns_start_end(dataframe_with_cr_lf_characters, "test.xlsx", [])
+        is_valid_start_end, warnings_start_end = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
+            dataframe_with_cr_lf_characters, "test.xlsx", []
+        )
 
-        is_valid_anywhere, warnings_anywhere = check_special_characters_cr_lf_columns_anywhere(dataframe_with_cr_lf_characters, "test.xlsx", [])
+        is_valid_anywhere, warnings_anywhere = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
+            dataframe_with_cr_lf_characters, "test.xlsx", []
+        )
 
         # Assert
         assert is_valid_start_end is True
@@ -597,7 +597,7 @@ class TestCheckSpecialCharactersCrLf:
     def test_check_special_characters_nonexistent_columns(self, clean_dataframe_no_special_chars: pd.DataFrame) -> None:
         """Test CR/LF functions with non-existent columns."""
         # Act
-        is_valid, warnings = check_special_characters_cr_lf(
+        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf(
             clean_dataframe_no_special_chars,
             "test.xlsx",
             columns_start_end=["nonexistent1"],
@@ -638,7 +638,7 @@ class TestCheckUniqueValues:
     def test_check_unique_values_all_unique_columns(self, dataframe_all_unique: pd.DataFrame) -> None:
         """Test check_unique_values with columns that have all unique values."""
         # Act
-        is_valid, warnings = check_unique_values(dataframe_all_unique, "test.xlsx", ["id", "codigo", "nome"])
+        is_valid, warnings = DataFrameProcessing.check_dataframe_unique_values(dataframe_all_unique, "test.xlsx", ["id", "codigo", "nome"])
 
         # Assert
         assert is_valid is True
@@ -647,7 +647,7 @@ class TestCheckUniqueValues:
     def test_check_unique_values_with_duplicates(self, dataframe_with_duplicates: pd.DataFrame) -> None:
         """Test check_unique_values with columns containing duplicates."""
         # Act
-        is_valid, warnings = check_unique_values(
+        is_valid, warnings = DataFrameProcessing.check_dataframe_unique_values(
             dataframe_with_duplicates,
             "test.xlsx",
             ["codigo_duplicate", "nome_duplicate"],
@@ -664,7 +664,7 @@ class TestCheckUniqueValues:
     def test_check_unique_values_mixed_unique_and_duplicate(self, dataframe_with_duplicates: pd.DataFrame) -> None:
         """Test check_unique_values with mix of unique and duplicate columns."""
         # Act
-        is_valid, warnings = check_unique_values(
+        is_valid, warnings = DataFrameProcessing.check_dataframe_unique_values(
             dataframe_with_duplicates,
             "test.xlsx",
             ["id_unique", "codigo_duplicate", "valor_unique"],
@@ -678,7 +678,7 @@ class TestCheckUniqueValues:
     def test_check_unique_values_nonexistent_columns(self, dataframe_all_unique: pd.DataFrame) -> None:
         """Test check_unique_values with non-existent columns."""
         # Act
-        is_valid, warnings = check_unique_values(dataframe_all_unique, "test.xlsx", ["nonexistent1", "nonexistent2"])
+        is_valid, warnings = DataFrameProcessing.check_dataframe_unique_values(dataframe_all_unique, "test.xlsx", ["nonexistent1", "nonexistent2"])
 
         # Assert
         assert is_valid is True
@@ -687,7 +687,7 @@ class TestCheckUniqueValues:
     def test_check_unique_values_empty_columns_list(self, dataframe_with_duplicates: pd.DataFrame) -> None:
         """Test check_unique_values with empty columns list."""
         # Act
-        is_valid, warnings = check_unique_values(dataframe_with_duplicates, "test.xlsx", [])
+        is_valid, warnings = DataFrameProcessing.check_dataframe_unique_values(dataframe_with_duplicates, "test.xlsx", [])
 
         # Assert
         assert is_valid is True
@@ -718,7 +718,7 @@ class TestCheckUniqueValues:
         df = pd.DataFrame({"test_column": column_data})
 
         # Act
-        is_valid, warnings = check_unique_values(df, "test.xlsx", ["test_column"])
+        is_valid, warnings = DataFrameProcessing.check_dataframe_unique_values(df, "test.xlsx", ["test_column"])
 
         # Assert
         assert is_valid == expected_is_unique
@@ -742,7 +742,7 @@ class TestColumnExists:
     def test_column_exists_existing_column(self, sample_dataframe: pd.DataFrame) -> None:
         """Test column_exists with existing column."""
         # Act
-        exists, error_message = column_exists(sample_dataframe, "test.xlsx", "nome")
+        exists, error_message = DataFrameProcessing.column_exists(sample_dataframe, "test.xlsx", "nome")
 
         # Assert
         assert exists is True
@@ -751,7 +751,7 @@ class TestColumnExists:
     def test_column_exists_nonexistent_column(self, sample_dataframe: pd.DataFrame) -> None:
         """Test column_exists with non-existent column."""
         # Act
-        exists, error_message = column_exists(sample_dataframe, "test.xlsx", "nonexistent")
+        exists, error_message = DataFrameProcessing.column_exists(sample_dataframe, "test.xlsx", "nonexistent")
 
         # Assert
         assert exists is False
@@ -772,7 +772,7 @@ class TestColumnExists:
     def test_column_exists_parametrized(self, sample_dataframe: pd.DataFrame, column_name: str, should_exist: bool) -> None:
         """Test column_exists with various column names."""
         # Act
-        exists, error_message = column_exists(sample_dataframe, "test.xlsx", column_name)
+        exists, error_message = DataFrameProcessing.column_exists(sample_dataframe, "test.xlsx", column_name)
 
         # Assert
         assert exists == should_exist
@@ -788,7 +788,7 @@ class TestColumnExists:
         df = pd.DataFrame()
 
         # Act
-        exists, error_message = column_exists(df, "empty.xlsx", "any_column")
+        exists, error_message = DataFrameProcessing.column_exists(df, "empty.xlsx", "any_column")
 
         # Assert
         assert exists is False
@@ -825,7 +825,7 @@ class TestCheckTextLength:
     def test_check_text_length_all_within_limit(self, dataframe_with_various_text_lengths: pd.DataFrame) -> None:
         """Test check_text_length with all texts within limit."""
         # Act
-        is_valid, errors = check_text_length(dataframe_with_various_text_lengths, "test.xlsx", "short_text", 10)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(dataframe_with_various_text_lengths, "test.xlsx", "short_text", 10)
 
         # Assert
         assert is_valid is True
@@ -834,7 +834,7 @@ class TestCheckTextLength:
     def test_check_text_length_some_exceed_limit(self, dataframe_with_various_text_lengths: pd.DataFrame) -> None:
         """Test check_text_length with some texts exceeding limit."""
         # Act
-        is_valid, errors = check_text_length(dataframe_with_various_text_lengths, "test.xlsx", "long_text", 30)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(dataframe_with_various_text_lengths, "test.xlsx", "long_text", 30)
 
         # Assert
         assert is_valid is False
@@ -848,7 +848,7 @@ class TestCheckTextLength:
     def test_check_text_length_nonexistent_column(self, dataframe_with_various_text_lengths: pd.DataFrame) -> None:
         """Test check_text_length with non-existent column."""
         # Act
-        is_valid, errors = check_text_length(dataframe_with_various_text_lengths, "test.xlsx", "nonexistent", 50)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(dataframe_with_various_text_lengths, "test.xlsx", "nonexistent", 50)
 
         # Assert
         assert is_valid is False
@@ -884,7 +884,7 @@ class TestCheckTextLength:
         df = pd.DataFrame({"test_column": text_values})
 
         # Act
-        is_valid, errors = check_text_length(df, "test.xlsx", "test_column", max_length)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "test.xlsx", "test_column", max_length)
 
         # Assert
         assert len(errors) == expected_error_count
@@ -896,7 +896,7 @@ class TestCheckTextLength:
         df = pd.DataFrame({"test_col": [None, "Valid text", None, "Another valid text"]})
 
         # Act
-        is_valid, errors = check_text_length(df, "test.xlsx", "test_col", 20)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "test.xlsx", "test_col", 20)
 
         # Assert
         assert is_valid is True
@@ -908,7 +908,7 @@ class TestCheckTextLength:
         df = pd.DataFrame({"test_col": []})
 
         # Act
-        is_valid, errors = check_text_length(df, "empty.xlsx", "test_col", 10)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "empty.xlsx", "test_col", 10)
 
         # Assert
         assert is_valid is True
@@ -920,7 +920,7 @@ class TestCheckTextLength:
         original_data = dataframe_with_various_text_lengths.copy()
 
         # Act
-        check_text_length(dataframe_with_various_text_lengths, "test.xlsx", "short_text", 10)
+        DataFrameProcessing.check_dataframe_text_length(dataframe_with_various_text_lengths, "test.xlsx", "short_text", 10)
 
         # Assert
         pd.testing.assert_frame_equal(dataframe_with_various_text_lengths, original_data)
@@ -939,7 +939,7 @@ class TestCheckTextLength:
         )
 
         # Act
-        is_valid, errors = check_text_length(df, "test.xlsx", "special_text", 20)
+        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "test.xlsx", "special_text", 20)
 
         # Assert
         assert is_valid is False
@@ -978,23 +978,25 @@ class TestDataValidationIntegration:
         all_warnings = []
 
         # 1. Check vertical bars
-        is_valid_vbar, errors_vbar = check_vertical_bar(complex_test_dataframe, file_name)
+        is_valid_vbar, errors_vbar = DataFrameProcessing.check_dataframe_vertical_bar(complex_test_dataframe, file_name)
         all_errors.extend(errors_vbar)
 
         # 2. Check unnamed columns
-        is_valid_unnamed, errors_unnamed = check_unnamed_columns(complex_test_dataframe, file_name)
+        is_valid_unnamed, errors_unnamed = DataFrameProcessing.check_dataframe_unnamed_columns(complex_test_dataframe, file_name)
         all_errors.extend(errors_unnamed)
 
         # 3. Check punctuation
-        is_valid_punct, warnings_punct = check_punctuation(complex_test_dataframe, file_name, ["titulo"], ["descricao"])
+        is_valid_punct, warnings_punct = CharacterProcessing.check_characters_punctuation_rules(
+            complex_test_dataframe, file_name, ["titulo"], ["descricao"]
+        )
         all_warnings.extend(warnings_punct)
 
         # 4. Check unique values
-        is_valid_unique, warnings_unique = check_unique_values(complex_test_dataframe, file_name, ["codigo_unico"])
+        is_valid_unique, warnings_unique = DataFrameProcessing.check_dataframe_unique_values(complex_test_dataframe, file_name, ["codigo_unico"])
         all_warnings.extend(warnings_unique)
 
         # 5. Check text length
-        is_valid_length, errors_length = check_text_length(complex_test_dataframe, file_name, "texto_longo", 20)
+        is_valid_length, errors_length = DataFrameProcessing.check_dataframe_text_length(complex_test_dataframe, file_name, "texto_longo", 20)
         all_errors.extend(errors_length)
 
         # Assert comprehensive results
@@ -1014,12 +1016,12 @@ class TestDataValidationIntegration:
 
         # Test each function returns (bool, list) tuple
         functions_to_test = [
-            (check_vertical_bar, (df, file_name)),
-            (check_unnamed_columns, (df, file_name)),
-            (check_punctuation, (df, file_name, [], [])),
-            (check_unique_values, (df, file_name, [])),
-            (column_exists, (df, file_name, "test")),
-            (check_text_length, (df, file_name, "test", 50)),
+            (DataFrameProcessing.check_dataframe_vertical_bar, (df, file_name)),
+            (DataFrameProcessing.check_dataframe_unnamed_columns, (df, file_name)),
+            (CharacterProcessing.check_characters_punctuation_rules, (df, file_name, [], [])),
+            (DataFrameProcessing.check_dataframe_unique_values, (df, file_name, [])),
+            (DataFrameProcessing.column_exists, (df, file_name, "test")),
+            (DataFrameProcessing.check_dataframe_text_length, (df, file_name, "test", 50)),
         ]
 
         for func, args in functions_to_test:
@@ -1036,14 +1038,14 @@ class TestCheckDataframeTitlesUniques:
         """Test with no duplicate titles."""
         df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]})
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert result == []
 
     def test_check_dataframe_titles_uniques_with_duplicates_first_column(self):
         """Test with duplicates in first column."""
         df = pd.DataFrame({"title_one": ["Title 1", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]})
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 1
         assert "titles one duplicados: ['Title 1']" in result[0]
 
@@ -1051,7 +1053,7 @@ class TestCheckDataframeTitlesUniques:
         """Test with duplicates in second column."""
         df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]})
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 1
         assert "titles two duplicados: ['Subtitle 1']" in result[0]
 
@@ -1059,7 +1061,7 @@ class TestCheckDataframeTitlesUniques:
         """Test with duplicates in both columns."""
         df = pd.DataFrame({"title_one": ["Title 1", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]})
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 2
         assert any("titles one duplicados: ['Title 1']" in msg for msg in result)
         assert any("titles two duplicados: ['Subtitle 1']" in msg for msg in result)
@@ -1068,14 +1070,14 @@ class TestCheckDataframeTitlesUniques:
         """Test with empty DataFrame."""
         df = pd.DataFrame(columns=["title_one", "title_two"])
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert result == []
 
     def test_check_dataframe_titles_uniques_missing_columns(self):
         """Test with missing columns."""
         df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"]})
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 0  # Should not find duplicates in missing column
 
     def test_check_dataframe_titles_uniques_multiple_duplicates(self):
@@ -1087,7 +1089,7 @@ class TestCheckDataframeTitlesUniques:
             }
         )
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 2
         assert any("titles one duplicados: ['Title 1', 'Title 2']" in msg for msg in result)
         assert any("titles two duplicados: ['Subtitle 3']" in msg for msg in result)
@@ -1096,7 +1098,7 @@ class TestCheckDataframeTitlesUniques:
         """Test with titles that have leading/trailing whitespace."""
         df = pd.DataFrame({"title_one": [" Title 1 ", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]})
 
-        result = check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
+        result = DataFrameProcessing.check_dataframe_titles_uniques(df, "title_one", "title_two", "titles_one", "titles_two")
         assert len(result) == 1
         assert "titles one duplicados: ['Title 1']" in result[0]
 
@@ -1108,14 +1110,14 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
         """Test with no CR/LF characters."""
         df = pd.DataFrame({"text_col": ["Normal text", "Another text", "Clean text"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_start_end_with_cr_end(self):
         """Test with CR character at end."""
         df = pd.DataFrame({"text_col": ["Text with CR\r", "Normal text", "Another with CR\r"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
         assert all("CR) no final do texto" in msg for msg in result[1])
@@ -1124,7 +1126,7 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
         """Test with LF character at end."""
         df = pd.DataFrame({"text_col": ["Text with LF\n", "Normal text", "Another with LF\n"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
         assert all("LF) no final do texto" in msg for msg in result[1])
@@ -1133,7 +1135,7 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
         """Test with CR character at start."""
         df = pd.DataFrame({"text_col": ["\rText with CR", "Normal text", "\rAnother with CR"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
         assert all("CR) no início do texto" in msg for msg in result[1])
@@ -1142,7 +1144,7 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
         """Test with LF character at start."""
         df = pd.DataFrame({"text_col": ["\nText with LF", "Normal text", "\nAnother with LF"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
         assert all("LF) no início do texto" in msg for msg in result[1])
@@ -1151,14 +1153,14 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
         """Test with empty or None columns."""
         df = pd.DataFrame({"text_col": ["", None, "Normal text"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_start_end_missing_column(self):
         """Test with missing column."""
         df = pd.DataFrame({"other_col": ["Text", "More text"]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_start_end_all_empty_values(self):
@@ -1167,7 +1169,7 @@ class TestCheckSpecialCharactersCrLfColumnsStartEnd:
             {"empty_col": [None, "", pd.NA, None], "normal_col": ["Normal text", "\rText with CR at start", "Text with LF at end\n", "Another text"]}
         )
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["empty_col", "normal_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["empty_col", "normal_col"])
         # Should only check normal_col since empty_col has no non-empty values
         assert result[0] is False
         assert len(result[1]) == 2  # Two warnings for normal_col
@@ -1181,14 +1183,14 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         """Test with no CR/LF characters."""
         df = pd.DataFrame({"text_col": ["Normal text", "Another text", "Clean text"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_anywhere_with_cr_middle(self):
         """Test with CR character in middle of text."""
         df = pd.DataFrame({"text_col": ["Text\rwith CR", "Normal text", "Another\rwith CR"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
         assert all("CR) na posição" in msg for msg in result[1])
@@ -1197,7 +1199,7 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         """Test with LF character in middle of text."""
         df = pd.DataFrame({"text_col": ["Text\nwith LF", "Normal text", "Another\nwith LF"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2
         assert all("LF) na posição" in msg for msg in result[1])
@@ -1206,7 +1208,7 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         """Test with multiple CR/LF characters in same text."""
         df = pd.DataFrame({"text_col": ["Text\r\nwith both", "Normal text"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result[0] is False
         assert len(result[1]) == 2  # One for CR, one for LF
 
@@ -1214,21 +1216,21 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         """Test with empty or None columns."""
         df = pd.DataFrame({"text_col": ["", None, "Normal text"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_anywhere_missing_column(self):
         """Test with missing column."""
         df = pd.DataFrame({"other_col": ["Text", "More text"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
         assert result == (True, [])
 
     def test_check_special_characters_cr_lf_columns_anywhere_all_empty_values(self):
         """Test with column containing only empty/NaN values (covers line 234)."""
         df = pd.DataFrame({"empty_col": [None, "", pd.NA, None], "normal_col": ["Normal text", "Text with\nLF", "Text with\rCR", "Another text"]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["empty_col", "normal_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["empty_col", "normal_col"])
         # Should only check normal_col since empty_col has no non-empty values
         assert result[0] is False
         assert len(result[1]) == 2  # Two warnings for normal_col
@@ -1238,7 +1240,7 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         """Test edge case where all values are empty/NaN (covers line 184)."""
         df = pd.DataFrame({"completely_empty_col": [None, "", pd.NA, None, None]})
 
-        result = check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["completely_empty_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["completely_empty_col"])
         # Should not crash and return no warnings since all values are empty
         assert result == (True, [])
 
@@ -1246,7 +1248,7 @@ class TestCheckSpecialCharactersCrLfColumnsAnywhere:
         """Test edge case where all values are empty/NaN (covers line 244)."""
         df = pd.DataFrame({"completely_empty_col": [None, "", pd.NA, None, None]})
 
-        result = check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["completely_empty_col"])
+        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["completely_empty_col"])
         # Should not crash and return no warnings since all values are empty
         assert result == (True, [])
 
@@ -1258,13 +1260,13 @@ class TestColumnExistsMultiIndex:
         """Test column_exists with MultiIndex when column is found."""
         df = pd.DataFrame({("level1", "level2_col"): [1, 2, 3], ("level1", "other_col"): ["a", "b", "c"]})
 
-        result = column_exists(df, "test.xlsx", "level2_col")
+        result = DataFrameProcessing.column_exists(df, "test.xlsx", "level2_col")
         assert result == (True, "")
 
     def test_column_exists_multiindex_column_not_found(self):
         """Test column_exists with MultiIndex when column is not found."""
         df = pd.DataFrame({("level1", "level2_col"): [1, 2, 3], ("level1", "other_col"): ["a", "b", "c"]})
 
-        result = column_exists(df, "test.xlsx", "missing_col")
+        result = DataFrameProcessing.column_exists(df, "test.xlsx", "missing_col")
         assert result == (False, "test.xlsx: A verificação foi abortada para a coluna nível 2 obrigatória 'missing_col' que está ausente.")
         assert isinstance(result[1], (list, str))  # column_exists returns str for second element

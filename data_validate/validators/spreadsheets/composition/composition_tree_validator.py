@@ -8,14 +8,8 @@ import pandas as pd
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
-from data_validate.helpers.common.validation.tree_data_validation import (
-    create_tree_structure,
-    validate_level_hierarchy,
-    detect_tree_cycles,
-)
+from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.tree_processing import TreeProcessing
 from data_validate.models import SpComposition, SpDescription
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
@@ -131,13 +125,13 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         df_description = self.model_dataframes[self.sp_name_description].copy()
 
         # Clean integer columns: df_composition
-        df_composition, _ = clean_dataframe_integers(
+        df_composition, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_composition,
             file_name=self.sp_name_composition,
             columns_to_clean=[self.column_name_parent],
             min_value=0,
         )
-        df_composition, _ = clean_dataframe_integers(
+        df_composition, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_composition,
             file_name=self.sp_name_composition,
             columns_to_clean=[self.column_name_child],
@@ -145,7 +139,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         )
 
         # Clean integer columns: df_description
-        df_description, _ = clean_dataframe_integers(
+        df_description, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_description,
             file_name=self.sp_name_description,
             columns_to_clean=[self.column_name_code, self.column_name_level],
@@ -161,14 +155,14 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             df_description = pd.concat([df_description, root_row], ignore_index=True)
 
         # Build tree and check for cycles
-        tree = create_tree_structure(df_composition, self.column_name_parent, self.column_name_child)
+        tree = TreeProcessing.create_tree_structure(df_composition, self.column_name_parent, self.column_name_child)
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
         if cycle_found:
             errors.append(f"{self.sp_name_composition}: Ciclo encontrado: [{' -> '.join(cycle)}].")
 
         # Validate level composition
-        level_errors = validate_level_hierarchy(
+        level_errors = TreeProcessing.validate_level_hierarchy(
             df_composition,
             df_description,
             self.column_name_code,

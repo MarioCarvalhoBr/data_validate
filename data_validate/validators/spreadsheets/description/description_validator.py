@@ -8,14 +8,13 @@ import pandas as pd
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.formatting.number_formatting import check_cell_integer
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 from data_validate.helpers.common.formatting.text_formatting import (
     capitalize_text_keep_acronyms,
 )
-from data_validate.helpers.common.validation.data_validation import (
-    check_punctuation,
-    check_special_characters_cr_lf,
-)
+
+from data_validate.helpers.common.validation.character_processing import CharacterProcessing
+
 from data_validate.models import SpDescription
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
@@ -161,7 +160,7 @@ class SpDescriptionValidator(ValidatorModelABC):
 
         for index, row in self._dataframe.iterrows():
             level = row[column]
-            is_valid, __ = check_cell_integer(level, min_value=1)
+            is_valid, __ = NumberFormattingProcessing.check_cell_integer(level, min_value=1)
             if not is_valid:
                 line_updated = int(index) + 2
                 errors.append(
@@ -185,7 +184,7 @@ class SpDescriptionValidator(ValidatorModelABC):
             if not exists_column:
                 warnings.append(msg_error_column)
 
-        _, punctuation_warnings = check_punctuation(
+        _, punctuation_warnings = CharacterProcessing.check_characters_punctuation_rules(
             self._dataframe,
             self._filename,
             columns_dont_punctuation,
@@ -234,7 +233,9 @@ class SpDescriptionValidator(ValidatorModelABC):
                 continue
 
         # Run the checks for CR/LF characters
-        __, all_warnings_cr_lf = check_special_characters_cr_lf(self._dataframe, self._filename, columns_start_end, columns_anywhere)
+        __, all_warnings_cr_lf = CharacterProcessing.check_special_characters_cr_lf(
+            self._dataframe, self._filename, columns_start_end, columns_anywhere
+        )
 
         warnings.extend(all_warnings_cr_lf)
         return [], warnings

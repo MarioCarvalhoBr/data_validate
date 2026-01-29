@@ -4,10 +4,9 @@ from typing import List, Tuple, Dict, Any
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.validation.data_validation import (
-    check_punctuation,
-    check_unique_values,
-)
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
+from data_validate.helpers.common.validation.character_processing import CharacterProcessing
+
 from data_validate.models import SpTemporalReference
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
@@ -47,7 +46,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
             if not exists_column:
                 warnings.append(msg_error_column)
 
-        _, punctuation_warnings = check_punctuation(
+        _, punctuation_warnings = CharacterProcessing.check_characters_punctuation_rules(
             self._dataframe,
             self._filename,
             columns_dont_punctuation,
@@ -93,7 +92,7 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
             if not exists_column:
                 errors.append(msg_error_column)
 
-        __, unique_errors = check_unique_values(
+        __, unique_errors = DataFrameProcessing.check_dataframe_unique_values(
             dataframe=self._dataframe,
             file_name=self._filename,
             columns_uniques=columns_to_check,

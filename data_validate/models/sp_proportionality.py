@@ -5,10 +5,9 @@ import pandas as pd
 
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
-from data_validate.helpers.common.processing.collections_processing import (
-    extract_numeric_ids_and_unmatched_strings_from_list,
-    categorize_strings_by_id_pattern_from_list,
-)  # Added
+
+from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
+
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.models.sp_model_abc import SpModelABC
 
@@ -48,7 +47,9 @@ class SpProportionality(SpModelABC):
         unique_columns_level_1 = self.data_loader_model.df_data.columns.get_level_values(0).unique().tolist()
         unique_columns_level_1 = [col for col in unique_columns_level_1 if not col.lower().startswith("unnamed: 0_level_0")]
 
-        __, level_1_codes_not_matched_by_pattern = categorize_strings_by_id_pattern_from_list(unique_columns_level_1, self.scenarios_list)
+        __, level_1_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
+            unique_columns_level_1, self.scenarios_list
+        )
 
         if level_1_codes_not_matched_by_pattern:
             self.structural_errors.append(
@@ -58,7 +59,9 @@ class SpProportionality(SpModelABC):
             unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
             unique_columns_level_2 = [col for col in unique_columns_level_2 if col != self.RequiredColumn.COLUMN_ID.name]
 
-            __, level_2_codes_not_matched_by_pattern = categorize_strings_by_id_pattern_from_list(unique_columns_level_2, self.scenarios_list)
+            __, level_2_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
+                unique_columns_level_2, self.scenarios_list
+            )
 
             if level_2_codes_not_matched_by_pattern and not level_1_codes_not_matched_by_pattern:
                 self.structural_errors.append(
@@ -75,7 +78,7 @@ class SpProportionality(SpModelABC):
             unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
 
             # Check extra columns in level 1 (do not ignore 'id')
-            _, extras_level_1 = extract_numeric_ids_and_unmatched_strings_from_list(
+            _, extras_level_1 = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
                 source_list=unique_columns_level_1,
                 strings_to_ignore=[],  # Do not ignore 'id' here
                 suffixes_for_matching=self.scenarios_list,
@@ -85,7 +88,7 @@ class SpProportionality(SpModelABC):
                     self.structural_errors.append(f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada.")
 
             # Check extra columns in level 2 (ignore 'id')
-            _, extras_level_2 = extract_numeric_ids_and_unmatched_strings_from_list(
+            _, extras_level_2 = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
                 source_list=unique_columns_level_2,
                 strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
                 suffixes_for_matching=self.scenarios_list,

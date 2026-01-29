@@ -6,7 +6,8 @@ import pytest
 import pandas as pd
 from typing import List
 
-from data_validate.helpers.common.validation.column_validation import check_column_names
+# from data_validate.helpers.common.validation.column_validation import check_column_names
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 
 
 class TestCheckColumnNames:
@@ -86,7 +87,7 @@ class TestCheckColumnNames:
     ) -> None:
         """Test check_column_names with various column combinations using simple DataFrame."""
         # Act
-        missing_columns, extra_columns = check_column_names(simple_dataframe, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(simple_dataframe, expected_columns)
 
         # Assert
         assert missing_columns == expected_missing, f"Expected missing: {expected_missing}, got: {missing_columns}"
@@ -114,7 +115,7 @@ class TestCheckColumnNames:
     ) -> None:
         """Test check_column_names with empty DataFrame scenarios."""
         # Act
-        missing_columns, extra_columns = check_column_names(empty_dataframe, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(empty_dataframe, expected_columns)
 
         # Assert
         assert missing_columns == expected_missing
@@ -127,7 +128,7 @@ class TestCheckColumnNames:
         expected_columns = ["id", "nome"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(dataframe_with_unnamed_columns, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(dataframe_with_unnamed_columns, expected_columns)
 
         # Assert
         assert missing_columns == []
@@ -155,7 +156,7 @@ class TestCheckColumnNames:
         expected_columns = ["id"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == []
@@ -167,7 +168,7 @@ class TestCheckColumnNames:
         expected_columns = ["id", "nome", "valor"]  # lowercase
 
         # Act
-        missing_columns, extra_columns = check_column_names(dataframe_with_mixed_case_columns, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(dataframe_with_mixed_case_columns, expected_columns)
 
         # Assert
         assert missing_columns == ["id", "nome", "valor"]
@@ -180,7 +181,7 @@ class TestCheckColumnNames:
         expected_columns = ["col_a", "col_b", "existing_col", "col_c", "col_d"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == ["col_a", "col_b", "col_c", "col_d"]
@@ -193,7 +194,7 @@ class TestCheckColumnNames:
         expected_columns = ["id", "nome", "id", "valor"]  # 'id' appears twice
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == ["valor"], "Should only report 'valor' as missing once"
@@ -213,7 +214,7 @@ class TestCheckColumnNames:
         expected_columns = ["código_pai", "nome-simples", "categoria"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == ["categoria"]
@@ -229,7 +230,7 @@ class TestCheckColumnNames:
         ]  # numeric columns as integers (how pandas stores them)
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == []
@@ -242,7 +243,7 @@ class TestCheckColumnNames:
         expected_columns = ["test", "missing"]
 
         # Act
-        result = check_column_names(df, expected_columns)
+        result = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert isinstance(result, tuple), "Function should return a tuple"
@@ -263,7 +264,7 @@ class TestCheckColumnNames:
         expected_missing = [f"col_{i}" for i in range(1, num_cols, 2)]  # Odd numbered columns
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == []
@@ -311,7 +312,7 @@ class TestCheckColumnNames:
         df = pd.DataFrame(df_data)
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_cols)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_cols)
 
         # Assert
         if should_have_missing:
@@ -331,7 +332,7 @@ class TestCheckColumnNames:
         expected_columns = ["id", "nome", "valor"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == ["id", "valor"]
@@ -356,7 +357,7 @@ class TestCheckColumnNames:
         expected_columns = ["id", "código_pai", "descrição", "nível", "status", "tipo"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         expected_missing = ["nível", "status", "tipo"]
@@ -384,7 +385,7 @@ class TestCheckColumnNamesEdgeCases:
         df = pd.DataFrame({"test": [1, 2, 3]})
 
         with pytest.raises(TypeError):
-            check_column_names(df, None)  # type: ignore
+            DataFrameProcessing.check_dataframe_column_names(df, None)  # type: ignore
 
     def test_check_column_names_empty_string_columns(self) -> None:
         """Test with empty string column names."""
@@ -393,7 +394,7 @@ class TestCheckColumnNamesEdgeCases:
         expected_columns = ["", "nome"]
 
         # Act
-        missing_columns, extra_columns = check_column_names(df, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_columns)
 
         # Assert
         assert missing_columns == []
@@ -408,7 +409,7 @@ class TestCheckColumnNamesEdgeCases:
         original_shape = df.shape
 
         # Act
-        check_column_names(df, ["id", "nome", "extra"])
+        DataFrameProcessing.check_dataframe_column_names(df, ["id", "nome", "extra"])
 
         # Assert
         assert df.columns.tolist() == original_columns, "Original DataFrame should not be modified"

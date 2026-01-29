@@ -3,10 +3,7 @@ from typing import List, Dict, Any
 
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
-from data_validate.helpers.common.validation.data_validation import (
-    check_vertical_bar,
-    check_unnamed_columns,
-)
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 
 
@@ -82,11 +79,11 @@ class SpModelABC(ABC):
             self.structural_errors.append(f"{self.filename}: O arquivo enviado está vazio.")
 
         # CHECK 1: Vertical Bar Check
-        _, errors_vertical_bar = check_vertical_bar(self.data_loader_model.df_data, self.filename)
+        _, errors_vertical_bar = DataFrameProcessing.check_dataframe_vertical_bar(self.data_loader_model.df_data, self.filename)
         self.structural_errors.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        _, errors_unnamed_columns = check_unnamed_columns(self.data_loader_model.df_data, self.filename)
+        _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(self.data_loader_model.df_data, self.filename)
         self.structural_errors.extend(errors_unnamed_columns)
 
     @abstractmethod

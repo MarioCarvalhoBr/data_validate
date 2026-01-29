@@ -8,7 +8,7 @@ from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.error_formatting import (
     format_errors_and_warnings,
 )
-from data_validate.helpers.common.validation.column_validation import check_column_names
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.models.sp_model_abc import SpModelABC
 
@@ -64,7 +64,9 @@ class SpScenario(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
+            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+        )
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)

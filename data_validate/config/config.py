@@ -117,15 +117,6 @@ class Config:
     def __init__(self):
         self.lm: LanguageManager = LanguageManager()
 
-    def debug_messages(self, errors, warnings):
-        # self._data_models_context.config.debug_messages(errors, warnings)
-        print("DEBUG ERRORS:")
-        for error in errors:
-            print(error)
-        print("DEBUG WARNINGS:")
-        for warning in warnings:
-            print(warning)
-
     def get_verify_names(self):
         keys = [element for element in NamesEnum]
         values = [

@@ -1,16 +1,8 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-"""Unit tests for tree_data_validation module."""
-
-import pytest
 import pandas as pd
+import pytest
 
-from data_validate.helpers.common.validation.tree_data_validation import (
-    create_tree_structure,
-    validate_level_hierarchy,
-    validate_missing_codes_in_description,
-    detect_cycles_dfs,
-    detect_tree_cycles,
-)
+from data_validate.helpers.common.validation.tree_processing import TreeProcessing
 
 
 class TestCreateTreeStructure:
@@ -28,7 +20,7 @@ class TestCreateTreeStructure:
 
     def test_create_tree_structure_basic(self, sample_composition_df: pd.DataFrame) -> None:
         """Test create_tree_structure with basic parent-child relationships."""
-        tree = create_tree_structure(sample_composition_df, "codigo_pai", "codigo_filho")
+        tree = TreeProcessing.create_tree_structure(sample_composition_df, "codigo_pai", "codigo_filho")
 
         expected_tree = {
             "A": ["B", "C"],
@@ -41,14 +33,14 @@ class TestCreateTreeStructure:
     def test_create_tree_structure_empty_dataframe(self) -> None:
         """Test create_tree_structure with empty DataFrame."""
         df = pd.DataFrame({"parent": [], "child": []})
-        tree = create_tree_structure(df, "parent", "child")
+        tree = TreeProcessing.create_tree_structure(df, "parent", "child")
 
         assert tree == {}
 
     def test_create_tree_structure_single_relationship(self) -> None:
         """Test create_tree_structure with single parent-child relationship."""
         df = pd.DataFrame({"parent": ["A"], "child": ["B"]})
-        tree = create_tree_structure(df, "parent", "child")
+        tree = TreeProcessing.create_tree_structure(df, "parent", "child")
 
         assert tree == {"A": ["B"]}
 
@@ -60,7 +52,7 @@ class TestCreateTreeStructure:
                 "child": ["B", "B", "C", "D"],
             }
         )
-        tree = create_tree_structure(df, "parent", "child")
+        tree = TreeProcessing.create_tree_structure(df, "parent", "child")
 
         expected_tree = {
             "A": ["B", "B", "C"],
@@ -77,7 +69,7 @@ class TestCreateTreeStructure:
                 "codigo_filho": [2, 3, 4, 5],
             }
         )
-        tree = create_tree_structure(df, "codigo_pai", "codigo_filho")
+        tree = TreeProcessing.create_tree_structure(df, "codigo_pai", "codigo_filho")
 
         expected_tree = {
             "1": ["2", "3"],
@@ -95,7 +87,7 @@ class TestCreateTreeStructure:
                 "child": [1, "B", 2.5, "C"],
             }
         )
-        tree = create_tree_structure(df, "parent", "child")
+        tree = TreeProcessing.create_tree_structure(df, "parent", "child")
 
         expected_tree = {
             "A": ["1"],
@@ -132,7 +124,7 @@ class TestValidateLevelHierarchy:
 
     def test_validate_level_hierarchy_valid(self, sample_composition_df: pd.DataFrame, sample_description_df: pd.DataFrame) -> None:
         """Test validate_level_hierarchy with valid composition."""
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             sample_composition_df,
             sample_description_df,
             "codigo",
@@ -158,7 +150,7 @@ class TestValidateLevelHierarchy:
             }
         )
 
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -185,7 +177,7 @@ class TestValidateLevelHierarchy:
             }
         )
 
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -212,7 +204,7 @@ class TestValidateLevelHierarchy:
             }
         )
 
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -239,7 +231,7 @@ class TestValidateLevelHierarchy:
             }
         )
 
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -256,7 +248,7 @@ class TestValidateLevelHierarchy:
         composition_df = pd.DataFrame({"codigo_pai": [], "codigo_filho": []})
         description_df = pd.DataFrame({"codigo": [], "nivel": []})
 
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -282,7 +274,7 @@ class TestValidateLevelHierarchy:
             }
         )
 
-        errors = validate_level_hierarchy(
+        errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -330,7 +322,7 @@ class TestValidateMissingCodesInDescription:
 
     def test_validate_missing_codes_all_present(self, sample_composition_df: pd.DataFrame, complete_description_df: pd.DataFrame) -> None:
         """Test validate_missing_codes_in_description with all codes present."""
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             sample_composition_df,
             complete_description_df,
             "codigo",
@@ -349,7 +341,7 @@ class TestValidateMissingCodesInDescription:
             }
         )
 
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             sample_composition_df,
             description_df,
             "codigo",
@@ -370,7 +362,7 @@ class TestValidateMissingCodesInDescription:
             }
         )
 
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             sample_composition_df,
             description_df,
             "codigo",
@@ -390,7 +382,7 @@ class TestValidateMissingCodesInDescription:
             }
         )
 
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             sample_composition_df,
             description_df,
             "codigo",
@@ -409,7 +401,7 @@ class TestValidateMissingCodesInDescription:
         composition_df = pd.DataFrame({"codigo_pai": [], "codigo_filho": []})
         description_df = pd.DataFrame({"codigo": [1, 2, 3], "nome": ["A", "B", "C"]})
 
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             composition_df,
             description_df,
             "codigo",
@@ -423,7 +415,7 @@ class TestValidateMissingCodesInDescription:
         """Test validate_missing_codes_in_description with empty description DataFrame."""
         description_df = pd.DataFrame({"codigo": [], "nome": []})
 
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             sample_composition_df,
             description_df,
             "codigo",
@@ -453,7 +445,7 @@ class TestValidateMissingCodesInDescription:
             }
         )
 
-        errors = validate_missing_codes_in_description(
+        errors = TreeProcessing.validate_missing_codes_in_description(
             composition_df,
             description_df,
             "codigo",
@@ -478,7 +470,7 @@ class TestDetectCyclesDfs:
             "E": [],
         }
 
-        cycle_found, cycle = detect_cycles_dfs(tree, "A", set(), [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "A", set(), [])
 
         assert cycle_found is False
         assert cycle == []
@@ -491,7 +483,7 @@ class TestDetectCyclesDfs:
             "C": ["A"],  # Creates cycle A -> B -> C -> A
         }
 
-        cycle_found, cycle = detect_cycles_dfs(tree, "A", set(), [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "A", set(), [])
 
         assert cycle_found is True
         assert "A" in cycle
@@ -503,7 +495,7 @@ class TestDetectCyclesDfs:
             "A": ["A"],  # Self-loop
         }
 
-        cycle_found, cycle = detect_cycles_dfs(tree, "A", set(), [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "A", set(), [])
 
         assert cycle_found is True
         assert cycle == ["A", "A"]
@@ -519,7 +511,7 @@ class TestDetectCyclesDfs:
             "F": ["B"],  # Creates cycle B -> D -> F -> B
         }
 
-        cycle_found, cycle = detect_cycles_dfs(tree, "A", set(), [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "A", set(), [])
 
         assert cycle_found is True
         assert "B" in cycle and "D" in cycle and "F" in cycle
@@ -531,7 +523,7 @@ class TestDetectCyclesDfs:
             "B": ["C"],
         }
 
-        cycle_found, cycle = detect_cycles_dfs(tree, "Z", set(), [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "Z", set(), [])
 
         assert cycle_found is False
         assert cycle == []
@@ -540,7 +532,7 @@ class TestDetectCyclesDfs:
         """Test detect_cycles_dfs with empty tree."""
         tree = {}
 
-        cycle_found, cycle = detect_cycles_dfs(tree, "A", set(), [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "A", set(), [])
 
         assert cycle_found is False
         assert cycle == []
@@ -555,7 +547,7 @@ class TestDetectCyclesDfs:
         }
 
         visited = {"B", "C", "D"}
-        cycle_found, cycle = detect_cycles_dfs(tree, "A", visited, [])
+        cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, "A", visited, [])
 
         assert cycle_found is False
         assert cycle == []
@@ -575,7 +567,7 @@ class TestDetectTreeCycles:
             "F": [],
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is False
         assert cycle == []
@@ -588,7 +580,7 @@ class TestDetectTreeCycles:
             "C": ["A"],
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is True
         assert len(cycle) >= 3
@@ -605,7 +597,7 @@ class TestDetectTreeCycles:
             "Z": ["X"],  # Cycle in second component
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is True
         assert any(node in cycle for node in ["X", "Y", "Z"])
@@ -616,7 +608,7 @@ class TestDetectTreeCycles:
             "A": ["A"],
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is True
         assert cycle == ["A", "A"]
@@ -625,7 +617,7 @@ class TestDetectTreeCycles:
         """Test detect_tree_cycles with empty tree."""
         tree = {}
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is False
         assert cycle == []
@@ -642,7 +634,7 @@ class TestDetectTreeCycles:
             "W": [],
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is False
         assert cycle == []
@@ -659,7 +651,7 @@ class TestDetectTreeCycles:
             "G": ["B"],  # Creates long cycle B -> D -> F -> G -> B
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is True
         assert all(node in cycle for node in ["B", "D", "F", "G"])
@@ -670,7 +662,7 @@ class TestDetectTreeCycles:
             "A": [],
         }
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
 
         assert cycle_found is False
         assert cycle == []
@@ -695,11 +687,11 @@ class TestIntegrationScenarios:
         )
 
         # Test tree creation
-        tree = create_tree_structure(composition_df, "codigo_pai", "codigo_filho")
+        tree = TreeProcessing.create_tree_structure(composition_df, "codigo_pai", "codigo_filho")
         assert tree == {"1": ["2", "3"], "2": ["4"]}
 
         # Test level composition
-        level_errors = validate_level_hierarchy(
+        level_errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -710,11 +702,11 @@ class TestIntegrationScenarios:
         assert len(level_errors) == 0
 
         # Test missing codes
-        missing_errors = validate_missing_codes_in_description(composition_df, description_df, "codigo", "codigo_pai", "codigo_filho")
+        missing_errors = TreeProcessing.validate_missing_codes_in_description(composition_df, description_df, "codigo", "codigo_pai", "codigo_filho")
         assert len(missing_errors) == 0
 
         # Test cycles
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
         assert cycle_found is False
 
     def test_complete_validation_workflow_with_errors(self) -> None:
@@ -737,10 +729,10 @@ class TestIntegrationScenarios:
         )
 
         # Test tree creation
-        tree = create_tree_structure(composition_df, "codigo_pai", "codigo_filho")
+        tree = TreeProcessing.create_tree_structure(composition_df, "codigo_pai", "codigo_filho")
 
         # Test level composition
-        level_errors = validate_level_hierarchy(
+        level_errors = TreeProcessing.validate_level_hierarchy(
             composition_df,
             description_df,
             "codigo",
@@ -751,11 +743,11 @@ class TestIntegrationScenarios:
         assert len(level_errors) > 0
 
         # Test missing codes
-        missing_errors = validate_missing_codes_in_description(composition_df, description_df, "codigo", "codigo_pai", "codigo_filho")
+        missing_errors = TreeProcessing.validate_missing_codes_in_description(composition_df, description_df, "codigo", "codigo_pai", "codigo_filho")
         assert len(missing_errors) > 0
 
         # Test cycles
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
         assert cycle_found is True
 
 
@@ -771,11 +763,11 @@ class TestEdgeCasesAndBoundaryConditions:
             composition_data.append({"parent": i, "child": i * 2 + 1})
 
         df = pd.DataFrame(composition_data)
-        tree = create_tree_structure(df, "parent", "child")
+        tree = TreeProcessing.create_tree_structure(df, "parent", "child")
 
         # Should handle large tree without issues
         assert len(tree) > 0
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
         assert cycle_found is False
 
     def test_very_long_cycle(self) -> None:
@@ -785,7 +777,7 @@ class TestEdgeCasesAndBoundaryConditions:
         for i in range(100):
             tree[str(i)] = [str((i + 1) % 100)]
 
-        cycle_found, cycle = detect_tree_cycles(tree)
+        cycle_found, cycle = TreeProcessing.detect_tree_cycles(tree)
         assert cycle_found is True
 
     def test_mixed_data_types_in_tree(self) -> None:
@@ -804,12 +796,12 @@ class TestEdgeCasesAndBoundaryConditions:
         )
 
         # Should handle mixed types by converting to strings
-        tree = create_tree_structure(composition_df, "parent", "child")
+        tree = TreeProcessing.create_tree_structure(composition_df, "parent", "child")
         assert "1" in tree
         assert "A" in tree
 
         # Should validate composition correctly with proper level progression
-        errors = validate_level_hierarchy(composition_df, description_df, "codigo", "nivel", "parent", "child")
+        errors = TreeProcessing.validate_level_hierarchy(composition_df, description_df, "codigo", "nivel", "parent", "child")
         assert len(errors) == 0
 
     def test_duplicate_codes_in_description(self) -> None:
@@ -828,6 +820,6 @@ class TestEdgeCasesAndBoundaryConditions:
         )
 
         # Should still work (uses first occurrence)
-        errors = validate_level_hierarchy(composition_df, description_df, "codigo", "nivel", "parent", "child")
+        errors = TreeProcessing.validate_level_hierarchy(composition_df, description_df, "codigo", "nivel", "parent", "child")
         # Should be valid since first occurrence is used
         assert len(errors) == 0

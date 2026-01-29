@@ -7,14 +7,10 @@ from pandas import DataFrame
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.processing.collections_processing import (
-    find_differences_in_two_set_with_message,
-    extract_numeric_integer_ids_from_list,
-)
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
-from data_validate.helpers.common.validation.data_validation import check_dataframe_titles_uniques
+from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
+from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
+
 from data_validate.helpers.common.validation.graph_processing import GraphProcessing
 from data_validate.models import (
     SpModelABC,
@@ -120,18 +116,19 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         df_composition: DataFrame = self.model_dataframes[self.sp_name_composition].copy()
 
         # Clean integer columns: df_composition
-        df_composition, _ = clean_dataframe_integers(
+        df_composition, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_composition,
             file_name=self.sp_name_composition,
             columns_to_clean=[self.column_name_parent],
             min_value=0,
         )
-        df_composition, _ = clean_dataframe_integers(
+        df_composition, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_composition,
             file_name=self.sp_name_composition,
             columns_to_clean=[self.column_name_child],
             min_value=1,
         )
+        # Configure processing helpers
         self.graph_processing = GraphProcessing(
             dataframe=df_composition,
             parent_column=self.column_name_parent,
@@ -174,18 +171,18 @@ class SpCompositionGraphValidator(ValidatorModelABC):
 
         # Extract valid description codes
         list_codes = self.model_sp_description.RequiredColumn.COLUMN_CODE.astype(str).to_list()
-        valid_description_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_codes)))
+        valid_description_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(id_values_list=list(set(list_codes)))
 
         # Extract valid composition parent
         list_parents = self.model_sp_composition.RequiredColumn.COLUMN_PARENT_CODE.astype(str).to_list()
-        valid_compositions_parent_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_parents)))
+        valid_compositions_parent_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(id_values_list=list(set(list_parents)))
 
         # Extract valid composition child codes
         list_childs = self.model_sp_composition.RequiredColumn.COLUMN_CHILD_CODE.astype(str).to_list()
-        valid_compositions_childs_codes, _ = extract_numeric_integer_ids_from_list(id_values_list=list(set(list_childs)))
+        valid_compositions_childs_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(id_values_list=list(set(list_childs)))
 
         # Compare codes between description and values
-        comparison_errors = find_differences_in_two_set_with_message(
+        comparison_errors = CollectionsProcessing.find_differences_in_two_set_with_message(
             first_set=valid_description_codes,
             label_1=self.sp_name_description,
             second_set=valid_compositions_parent_codes.union(valid_compositions_childs_codes),
@@ -268,7 +265,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         column_plural_complete_name = SpDescription.PluralColumn.COLUMN_PLURAL_COMPLETE_NAME.name
 
         # Clean integer columns: df_description
-        df_description, _ = clean_dataframe_integers(
+        df_description, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_description,
             file_name=self.sp_name_description,
             columns_to_clean=[self.column_name_code],
@@ -309,7 +306,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             df_slice_description = df_description[df_description[self.column_name_code].astype(str).isin(nodes)]
 
             # Check if the titles are unique
-            warnings_i = check_dataframe_titles_uniques(
+            warnings_i = DataFrameProcessing.check_dataframe_titles_uniques(
                 dataframe=df_slice_description,
                 column_one=self.column_name_simple_name,
                 column_two=self.column_name_complete_name,

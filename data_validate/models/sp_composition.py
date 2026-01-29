@@ -7,10 +7,8 @@ from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.error_formatting import (
     format_errors_and_warnings,
 )
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
-from data_validate.helpers.common.validation.column_validation import check_column_names
+from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.models.sp_model_abc import SpModelABC
 
@@ -51,7 +49,9 @@ class SpComposition(SpModelABC):
 
     def expected_structure_columns(self, *args, **kwargs) -> None:
         # Check missing columns expected columns and extra columns
-        missing_columns, extra_columns = check_column_names(self.data_loader_model.df_data, list(self.RequiredColumn.ALL))
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
+            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+        )
         col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
 
         self.structural_errors.extend(col_errors)
@@ -66,7 +66,7 @@ class SpComposition(SpModelABC):
 
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
-            df, errors = clean_dataframe_integers(
+            df, errors = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
                 [column_name],

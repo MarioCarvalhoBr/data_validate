@@ -6,14 +6,10 @@ from pandas import DataFrame
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.processing.collections_processing import (
-    categorize_strings_by_id_pattern_from_list,
-    find_differences_in_two_set_with_message,
-)
-from data_validate.helpers.common.processing.collections_processing import generate_group_from_list
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
+
+from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
+
+from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.helpers.common.validation.proportionality_processing import ProportionalityProcessing
 from data_validate.helpers.common.validation.description_processing import DescriptionProcessing
 
@@ -47,10 +43,6 @@ class SpProportionalityValidator(ValidatorModelABC):
         self.model_sp_description = self._data_models_context.get_instance_of(SpDescription)
         self.model_sp_value = self._data_models_context.get_instance_of(SpValue)
         self.model_sp_composition = self._data_models_context.get_instance_of(SpComposition)
-
-        # Configure processing helpers
-        self.proportionality_processing: ProportionalityProcessing | None = None
-        self.description_processing: DescriptionProcessing | None = None
 
         # Get model properties once
         self.exists_scenario = self.model_sp_value.scenario_exists_file
@@ -126,10 +118,6 @@ class SpProportionalityValidator(ValidatorModelABC):
             self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
         }
 
-        # Configure processing helpers
-        self.proportionality_processing = ProportionalityProcessing(self.model_dataframes[self.sp_name_proportionality])
-        self.description_processing = DescriptionProcessing(self.model_dataframes[self.sp_name_description])
-
     def _check_sum_equals_one(self, subdatasets: Dict[str, DataFrame], sp_df_values: DataFrame, value_di: Any) -> Tuple[List[str], List[str]]:
         """Orchestrates validation of sum equals one for all subdatasets."""
         all_errors = []
@@ -147,13 +135,13 @@ class SpProportionalityValidator(ValidatorModelABC):
 
             # Step 1: Validate numeric format
             is_di = df_data == value_di
-            df_data, format_errors = self.proportionality_processing.validate_numeric_format(
+            df_data, format_errors = ProportionalityProcessing.validate_numeric_format(
                 df_data, is_di, value_di, parent_id, self.sp_name_proportionality
             )
             all_errors.extend(format_errors)
 
             # Step 2: Check excessive decimals
-            has_excess, count_excess, first_line = self.proportionality_processing.check_excessive_decimals(df_data, value_di, precision)
+            has_excess, count_excess, first_line = ProportionalityProcessing.check_excessive_decimals(df_data, value_di, precision)
 
             if has_excess:
                 if not global_has_excessive_decimals:
@@ -162,10 +150,10 @@ class SpProportionalityValidator(ValidatorModelABC):
                 global_count_excessive += count_excess
 
             # Step 3: Convert to Decimal and sum
-            row_sums = self.proportionality_processing.convert_to_decimal_and_sum(df_data, value_di, precision)
+            row_sums = ProportionalityProcessing.convert_to_decimal_and_sum(df_data, value_di, precision)
 
             # Step 4: Validate zero sum rows
-            zero_errors = self.proportionality_processing.validate_zero_sum_rows(
+            zero_errors = ProportionalityProcessing.validate_zero_sum_rows(
                 row_sums,
                 ids,
                 df_data,
@@ -178,7 +166,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             all_errors.extend(zero_errors)
 
             # Step 5: Validate sum tolerance
-            tolerance_errors, tolerance_warnings = self.proportionality_processing.validate_sum_tolerance(
+            tolerance_errors, tolerance_warnings = ProportionalityProcessing.validate_sum_tolerance(
                 row_sums,
                 parent_id,
                 self.sp_name_proportionality,
@@ -229,7 +217,7 @@ class SpProportionalityValidator(ValidatorModelABC):
         df_proportionality: DataFrame = self.model_dataframes[self.sp_name_proportionality].copy()
 
         # Clean integer columns: df_description
-        df_description, _ = clean_dataframe_integers(
+        df_description, _ = DataCleaningProcessing.clean_dataframe_integers(
             df=df_description,
             file_name=self.sp_name_description,
             columns_to_clean=[self.column_name_code],
@@ -237,8 +225,8 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         # List of codes at level 1 to remove
         codes_level_to_remove = df_description[df_description[self.column_name_level] == "1"][self.column_name_code].astype(str).tolist()
-        set_valid_codes_description = self.description_processing.get_valids_codes_from_description(
-            self.column_name_level, self.column_name_code, self.column_name_scenario
+        set_valid_codes_description = DescriptionProcessing.get_valids_codes_from_description(
+            self.model_dataframes[self.sp_name_description], self.column_name_level, self.column_name_code, self.column_name_scenario
         )
 
         # List all codes in proportionality (both levels of MultiIndex)
@@ -257,7 +245,7 @@ class SpProportionalityValidator(ValidatorModelABC):
         set_valid_codes_prop = set()
         level_columns = [level_one_columns, level_two_columns]
         for level_column in level_columns:
-            codes_matched_by_pattern, __ = categorize_strings_by_id_pattern_from_list(level_column, self.list_scenarios)
+            codes_matched_by_pattern, __ = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(level_column, self.list_scenarios)
             codes_matched_by_pattern = [str(code) for code in codes_matched_by_pattern]
             codes_cleaned = set([code.split("-")[0] for code in codes_matched_by_pattern]) - set(codes_level_to_remove)
 
@@ -269,7 +257,7 @@ class SpProportionalityValidator(ValidatorModelABC):
         set_valid_codes_prop = set([int(code) for code in set(set_valid_codes_prop)])
 
         # Compare codes between description and proportionality
-        comparison_errors = find_differences_in_two_set_with_message(
+        comparison_errors = CollectionsProcessing.find_differences_in_two_set_with_message(
             first_set=set_valid_codes_description,
             label_1=self.sp_name_description,
             second_set=set_valid_codes_prop,
@@ -295,7 +283,7 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         # Códigos dos indicadores que estão em nível 1
         level_one_columns = [col for col in df_proportionalities.columns.get_level_values(0).tolist() if not col.lower().startswith("unnamed")]
-        grouped_columns = generate_group_from_list(level_one_columns)
+        grouped_columns = CollectionsProcessing.generate_group_from_list(level_one_columns)
 
         unique_list = []
         for group in grouped_columns:
@@ -355,7 +343,7 @@ class SpProportionalityValidator(ValidatorModelABC):
         set_all_columns_values = set(columns_values)
 
         # Compare codes between description and proportionality
-        comparison_errors = find_differences_in_two_set_with_message(
+        comparison_errors = CollectionsProcessing.find_differences_in_two_set_with_message(
             first_set=set_all_columns_prop,
             label_1=self.sp_name_proportionality,
             second_set=set_all_columns_values,
@@ -393,7 +381,7 @@ class SpProportionalityValidator(ValidatorModelABC):
         df_composition = self.model_dataframes[self.sp_name_composition].copy()
 
         # Build subdatasets
-        subdatasets = self.proportionality_processing.build_subdatasets(self.column_name_id)
+        subdatasets = ProportionalityProcessing.build_subdatasets(self.model_dataframes[self.sp_name_proportionality], self.column_name_id)
 
         # Filter composition to remove level 1 parents
         df_composition = df_composition[df_composition[self.column_name_parent] != "1"]
@@ -469,7 +457,7 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         df_values = self.model_dataframes[self.sp_name_value].copy()
 
-        subdatasets = self.proportionality_processing.build_subdatasets(self.column_name_id)
+        subdatasets = ProportionalityProcessing.build_subdatasets(self.model_dataframes[self.sp_name_proportionality], self.column_name_id)
 
         errors, warnings = self._check_sum_equals_one(subdatasets, df_values, self._data_models_context.config.VALUE_DATA_UNAVAILABLE)
 

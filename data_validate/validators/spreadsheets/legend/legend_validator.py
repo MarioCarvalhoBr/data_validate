@@ -6,13 +6,9 @@ import pandas as pd
 from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.common.processing.collections_processing import (
-    categorize_strings_by_id_pattern_from_list,
-    find_differences_in_two_set,
-)
-from data_validate.helpers.common.processing.data_cleaning import (
-    clean_dataframe_integers,
-)
+from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
+
+from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.models import SpDescription, SpLegend, SpValue
 from data_validate.validators.spreadsheets.base.validator_model_abc import (
     ValidatorModelABC,
@@ -122,7 +118,7 @@ class SpLegendValidator(ValidatorModelABC):
         df_legend = self.model_dataframes[self.sp_name_legend].copy()
         df_description = self.model_dataframes[self.sp_name_description].copy()
 
-        df_description_clean, __ = clean_dataframe_integers(
+        df_description_clean, __ = DataCleaningProcessing.clean_dataframe_integers(
             df_description,
             self.sp_name_description,
             [SpDescription.RequiredColumn.COLUMN_CODE.name],
@@ -161,7 +157,7 @@ class SpLegendValidator(ValidatorModelABC):
         set_one = set(legends_id_in_description)
         set_two = set(legends_id_in_legend)
 
-        missing_in_b, missing_in_a = find_differences_in_two_set(
+        missing_in_b, missing_in_a = CollectionsProcessing.find_differences_in_two_set(
             first_set=set_one,
             second_set=set_two,
         )
@@ -271,7 +267,7 @@ class SpLegendValidator(ValidatorModelABC):
         if SpValue.RequiredColumn.COLUMN_ID.name in df_values.columns:
             df_values.drop(columns=[SpValue.RequiredColumn.COLUMN_ID.name], inplace=True)
 
-        df_description_clean, __ = clean_dataframe_integers(
+        df_description_clean, __ = DataCleaningProcessing.clean_dataframe_integers(
             df_description,
             self.sp_name_description,
             [SpDescription.RequiredColumn.COLUMN_CODE.name],
@@ -296,7 +292,7 @@ class SpLegendValidator(ValidatorModelABC):
             .astype(str)
             .tolist()
         )
-        valid_columns_from_values, __ = categorize_strings_by_id_pattern_from_list(
+        valid_columns_from_values, __ = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
             items_to_categorize=df_values.columns.tolist(),
             allowed_scenario_suffixes=self.scenarios_list,
         )

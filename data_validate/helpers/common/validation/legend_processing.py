@@ -5,7 +5,7 @@ from typing import List, Any
 
 import pandas as pd
 
-from data_validate.helpers.common.formatting.number_formatting import check_cell_integer, check_two_decimals_places
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
 class LegendProcessing:
@@ -115,7 +115,7 @@ class LegendProcessing:
         for col in [code_col, order_col]:
             if col in local_dataframe.columns:
                 for index, value in local_dataframe[col].items():
-                    valid, message = check_cell_integer(value, min_value=1)
+                    valid, message = NumberFormattingProcessing.check_cell_integer(value, min_value=1)
                     origina_value = original_dataframe.at[index, col]
                     if not valid:
                         errors.append(
@@ -165,11 +165,11 @@ class LegendProcessing:
             max_val = row[max_col]
             index = int(str(index))
 
-            if check_two_decimals_places(min_val):
+            if NumberFormattingProcessing.check_two_decimals_places(min_val):
                 errors.append(
                     f"{self.filename} [código: {code}, linha: {index + 2}]: Legenda inválida. O valor mínimo '{min_val}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
                 )
-            if check_two_decimals_places(max_val):
+            if NumberFormattingProcessing.check_two_decimals_places(max_val):
                 errors.append(
                     f"{self.filename} [código: {code}, linha: {index + 2}]: Legenda inválida. O valor máximo '{max_val}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
                 )
@@ -203,7 +203,10 @@ class LegendProcessing:
 
         # Se qualquer valor de min ou max tiver mais de 2 casas decimais, pular as validações seguintes e retornar o errors
 
-        if any(check_two_decimals_places(row[min_col]) or check_two_decimals_places(row[max_col]) for _, row in sorted_group.iterrows()):
+        if any(
+            NumberFormattingProcessing.check_two_decimals_places(row[min_col]) or NumberFormattingProcessing.check_two_decimals_places(row[max_col])
+            for _, row in sorted_group.iterrows()
+        ):
             return errors
 
         prev_max_val = None

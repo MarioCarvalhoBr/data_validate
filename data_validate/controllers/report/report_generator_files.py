@@ -12,9 +12,7 @@ from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.base.metadata_info import METADATA
-from data_validate.helpers.common.formatting.number_formatting import (
-    format_number_brazilian,
-)
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
 class ReportGeneratorFiles:
@@ -167,8 +165,8 @@ class ReportGeneratorFiles:
             "name": METADATA.__project_name__,
             "errors": text_html_errors,
             "warnings": text_html_warnings,
-            "num_errors": format_number_brazilian(self.num_errors),
-            "num_warnings": format_number_brazilian(self.num_warnings),
+            "num_errors": NumberFormattingProcessing.format_number_brazilian(self.num_errors),
+            "num_warnings": NumberFormattingProcessing.format_number_brazilian(self.num_warnings),
             "number_tests": self.number_tests,
             "text_display_version_and_os_info": text_html_version_and_os_info,
             "text_display_date": text_html_date_display,
