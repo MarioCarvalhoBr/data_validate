@@ -143,6 +143,9 @@
                     <a class="class" href="#Config">Config</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="variable" href="#Config.PRECISION_DECIMAL_PLACE_TRUNCATE">PRECISION_DECIMAL_PLACE_TRUNCATE</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#Config.TITLE_OVER_N_CHARS">TITLE_OVER_N_CHARS</a>
                         </li>
                         <li>
@@ -155,10 +158,10 @@
                                 <a class="variable" href="#Config.DATE_NOW">DATE_NOW</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Config.VALUE_DATA_UNAVAILABLE">VALUE_DATA_UNAVAILABLE</a>
+                                <a class="variable" href="#Config.LABEL_DATA_UNAVAILABLE">LABEL_DATA_UNAVAILABLE</a>
                         </li>
                         <li>
-                                <a class="variable" href="#Config.VALUE_DI">VALUE_DI</a>
+                                <a class="variable" href="#Config.VALUE_DATA_UNAVAILABLE">VALUE_DATA_UNAVAILABLE</a>
                         </li>
                         <li>
                                 <a class="variable" href="#Config.REPORT_LIMIT_N_MESSAGES">REPORT_LIMIT_N_MESSAGES</a>
@@ -180,9 +183,6 @@
                         </li>
                         <li>
                                 <a class="variable" href="#Config.lm">lm</a>
-                        </li>
-                        <li>
-                                <a class="function" href="#Config.debug_messages">debug_messages</a>
                         </li>
                         <li>
                                 <a class="function" href="#Config.get_verify_names">get_verify_names</a>
@@ -698,108 +698,115 @@
     </div>
     <a class="headerlink" href="#Config"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="Config-46"><a href="#Config-46"><span class="linenos"> 46</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
-</span><span id="Config-47"><a href="#Config-47"><span class="linenos"> 47</span></a>    <span class="c1"># DESCRIPTION LIMITS</span>
-</span><span id="Config-48"><a href="#Config-48"><span class="linenos"> 48</span></a>    <span class="n">TITLE_OVER_N_CHARS</span> <span class="o">=</span> <span class="mi">40</span>
-</span><span id="Config-49"><a href="#Config-49"><span class="linenos"> 49</span></a>    <span class="n">SIMPLE_DESCRIPTIONS_OVER_N_CHARS</span> <span class="o">=</span> <span class="mi">150</span>
+</span><span id="Config-47"><a href="#Config-47"><span class="linenos"> 47</span></a>
+</span><span id="Config-48"><a href="#Config-48"><span class="linenos"> 48</span></a>    <span class="c1"># NUMBERS</span>
+</span><span id="Config-49"><a href="#Config-49"><span class="linenos"> 49</span></a>    <span class="n">PRECISION_DECIMAL_PLACE_TRUNCATE</span> <span class="o">=</span> <span class="mi">3</span>
 </span><span id="Config-50"><a href="#Config-50"><span class="linenos"> 50</span></a>
-</span><span id="Config-51"><a href="#Config-51"><span class="linenos"> 51</span></a>    <span class="c1"># DATE AND TIME</span>
-</span><span id="Config-52"><a href="#Config-52"><span class="linenos"> 52</span></a>    <span class="n">CURRENT_YEAR</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
-</span><span id="Config-53"><a href="#Config-53"><span class="linenos"> 53</span></a>    <span class="n">DATE_NOW</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y %H:%M:%S&quot;</span><span class="p">)</span>
+</span><span id="Config-51"><a href="#Config-51"><span class="linenos"> 51</span></a>    <span class="c1"># DESCRIPTION LIMITS</span>
+</span><span id="Config-52"><a href="#Config-52"><span class="linenos"> 52</span></a>    <span class="n">TITLE_OVER_N_CHARS</span> <span class="o">=</span> <span class="mi">40</span>
+</span><span id="Config-53"><a href="#Config-53"><span class="linenos"> 53</span></a>    <span class="n">SIMPLE_DESCRIPTIONS_OVER_N_CHARS</span> <span class="o">=</span> <span class="mi">150</span>
 </span><span id="Config-54"><a href="#Config-54"><span class="linenos"> 54</span></a>
-</span><span id="Config-55"><a href="#Config-55"><span class="linenos"> 55</span></a>    <span class="c1"># VALUE AND LEGEND</span>
-</span><span id="Config-56"><a href="#Config-56"><span class="linenos"> 56</span></a>    <span class="n">VALUE_DATA_UNAVAILABLE</span> <span class="o">=</span> <span class="s2">&quot;Dado indisponível&quot;</span>
-</span><span id="Config-57"><a href="#Config-57"><span class="linenos"> 57</span></a>    <span class="n">VALUE_DI</span> <span class="o">=</span> <span class="s2">&quot;DI&quot;</span>
+</span><span id="Config-55"><a href="#Config-55"><span class="linenos"> 55</span></a>    <span class="c1"># DATE AND TIME</span>
+</span><span id="Config-56"><a href="#Config-56"><span class="linenos"> 56</span></a>    <span class="n">CURRENT_YEAR</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">year</span>
+</span><span id="Config-57"><a href="#Config-57"><span class="linenos"> 57</span></a>    <span class="n">DATE_NOW</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%d</span><span class="s2">/%m/%Y %H:%M:%S&quot;</span><span class="p">)</span>
 </span><span id="Config-58"><a href="#Config-58"><span class="linenos"> 58</span></a>
-</span><span id="Config-59"><a href="#Config-59"><span class="linenos"> 59</span></a>    <span class="c1"># REPORT</span>
-</span><span id="Config-60"><a href="#Config-60"><span class="linenos"> 60</span></a>    <span class="n">REPORT_LIMIT_N_MESSAGES</span> <span class="o">=</span> <span class="mi">20</span>
-</span><span id="Config-61"><a href="#Config-61"><span class="linenos"> 61</span></a>    <span class="n">REPORT_OUTPUT_DEFAULT_HTML</span> <span class="o">=</span> <span class="s2">&quot;default.html&quot;</span>
-</span><span id="Config-62"><a href="#Config-62"><span class="linenos"> 62</span></a>    <span class="n">REPORT_OUTPUT_REPORT_HTML</span> <span class="o">=</span> <span class="s2">&quot;_report.html&quot;</span>
-</span><span id="Config-63"><a href="#Config-63"><span class="linenos"> 63</span></a>    <span class="n">REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
-</span><span id="Config-64"><a href="#Config-64"><span class="linenos"> 64</span></a><span class="s2">                                &lt;!DOCTYPE html&gt;</span>
-</span><span id="Config-65"><a href="#Config-65"><span class="linenos"> 65</span></a><span class="s2">                                &lt;html lang=&quot;pt-br&quot;&gt;</span>
-</span><span id="Config-66"><a href="#Config-66"><span class="linenos"> 66</span></a><span class="s2">                                &lt;head&gt;</span>
-</span><span id="Config-67"><a href="#Config-67"><span class="linenos"> 67</span></a><span class="s2">                                    &lt;meta charset=&quot;UTF-8&quot;&gt;</span>
-</span><span id="Config-68"><a href="#Config-68"><span class="linenos"> 68</span></a><span class="s2">                                    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, shrink-to-fit=no&quot;&gt;</span>
-</span><span id="Config-69"><a href="#Config-69"><span class="linenos"> 69</span></a><span class="s2">                                    &lt;title&gt;Canoa Report&lt;/title&gt;</span>
-</span><span id="Config-70"><a href="#Config-70"><span class="linenos"> 70</span></a><span class="s2">                                &lt;/head&gt;</span>
-</span><span id="Config-71"><a href="#Config-71"><span class="linenos"> 71</span></a><span class="s2">                                &lt;body&gt;</span>
-</span><span id="Config-72"><a href="#Config-72"><span class="linenos"> 72</span></a><span class="s2">                                    &lt;h1 style=&quot;color:#FF0000;&quot;&gt;Relat&amp;oacute;rio gerando com o template padr&amp;atilde;o de erro&lt;/h1&gt;</span>
-</span><span id="Config-73"><a href="#Config-73"><span class="linenos"> 73</span></a><span class="s2">                                    &lt;p&gt;Esse relat&amp;oacute;rio foi gerado com o template padr&amp;atilde;o de erro, pois o template personalizado n&amp;atilde;o foi encontrado ou est&amp;aacute; faltando vari&amp;aacute;veis obrigat&amp;oacute;rias.&lt;/p&gt;</span>
-</span><span id="Config-74"><a href="#Config-74"><span class="linenos"> 74</span></a><span class="s2">                                    &lt;p&gt;Entre em contato com o administrador do sistema para corrigir o problema.&lt;/p&gt;</span>
-</span><span id="Config-75"><a href="#Config-75"><span class="linenos"> 75</span></a><span class="s2">                                    &lt;p&gt;RELAT&amp;Oacute;RIO&lt;/p&gt;</span>
-</span><span id="Config-76"><a href="#Config-76"><span class="linenos"> 76</span></a><span class="s2">                                    {{ name }}</span>
-</span><span id="Config-77"><a href="#Config-77"><span class="linenos"> 77</span></a><span class="s2">                                    Relat&amp;oacute;rio de Valida&amp;ccedil;&amp;atilde;o de Dados</span>
-</span><span id="Config-78"><a href="#Config-78"><span class="linenos"> 78</span></a><span class="s2">                                    Informa&amp;ccedil;&amp;otilde;es: </span>
-</span><span id="Config-79"><a href="#Config-79"><span class="linenos"> 79</span></a><span class="s2">                                    {{ text_display_user }}</span>
-</span><span id="Config-80"><a href="#Config-80"><span class="linenos"> 80</span></a><span class="s2">                                    {{ text_display_sector }}</span>
-</span><span id="Config-81"><a href="#Config-81"><span class="linenos"> 81</span></a><span class="s2">                                    {{ text_display_protocol }}</span>
-</span><span id="Config-82"><a href="#Config-82"><span class="linenos"> 82</span></a><span class="s2">                                    {{ text_display_date }}</span>
-</span><span id="Config-83"><a href="#Config-83"><span class="linenos"> 83</span></a><span class="s2">                                    {{ text_display_version_and_os_info }}</span>
-</span><span id="Config-84"><a href="#Config-84"><span class="linenos"> 84</span></a><span class="s2">                                    {{ text_display_file }}</span>
-</span><span id="Config-85"><a href="#Config-85"><span class="linenos"> 85</span></a><span class="s2">                                    Resumo da validação</span>
-</span><span id="Config-86"><a href="#Config-86"><span class="linenos"> 86</span></a><span class="s2">                                    N&amp;uacute;mero de Erros: {{ num_errors }}</span>
-</span><span id="Config-87"><a href="#Config-87"><span class="linenos"> 87</span></a><span class="s2">                                    N&amp;uacute;mero de Avisos: {{ num_warnings }}</span>
-</span><span id="Config-88"><a href="#Config-88"><span class="linenos"> 88</span></a><span class="s2">                                    N&amp;uacute;mero de testes executados: {{ number_tests }}</span>
-</span><span id="Config-89"><a href="#Config-89"><span class="linenos"> 89</span></a><span class="s2">                                    Testes n&amp;atilde;o executados: {{ tests_not_executed }}</span>
-</span><span id="Config-90"><a href="#Config-90"><span class="linenos"> 90</span></a><span class="s2">                                    Mostrar erros n&amp;atilde;o executados: {{ display_tests_not_executed }}</span>
-</span><span id="Config-91"><a href="#Config-91"><span class="linenos"> 91</span></a><span class="s2">                                    Erros</span>
-</span><span id="Config-92"><a href="#Config-92"><span class="linenos"> 92</span></a><span class="s2">                                    {{ errors }}</span>
-</span><span id="Config-93"><a href="#Config-93"><span class="linenos"> 93</span></a><span class="s2">                                    Avisos</span>
-</span><span id="Config-94"><a href="#Config-94"><span class="linenos"> 94</span></a><span class="s2">                                    {{ warnings }}</span>
-</span><span id="Config-95"><a href="#Config-95"><span class="linenos"> 95</span></a><span class="s2">                                &lt;/body&gt;</span>
-</span><span id="Config-96"><a href="#Config-96"><span class="linenos"> 96</span></a><span class="s2">                                &lt;/html&gt;</span>
-</span><span id="Config-97"><a href="#Config-97"><span class="linenos"> 97</span></a><span class="s2">                                &quot;&quot;&quot;</span>
-</span><span id="Config-98"><a href="#Config-98"><span class="linenos"> 98</span></a>
-</span><span id="Config-99"><a href="#Config-99"><span class="linenos"> 99</span></a>    <span class="c1"># Expected and optional files with their respective extensions</span>
-</span><span id="Config-100"><a href="#Config-100"><span class="linenos">100</span></a>    <span class="c1"># Improve this logic in the future to allow more flexibility</span>
-</span><span id="Config-101"><a href="#Config-101"><span class="linenos">101</span></a>    <span class="n">EXPECTED_FILES</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="Config-102"><a href="#Config-102"><span class="linenos">102</span></a>        <span class="s2">&quot;descricao&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-103"><a href="#Config-103"><span class="linenos">103</span></a>        <span class="s2">&quot;composicao&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-104"><a href="#Config-104"><span class="linenos">104</span></a>        <span class="s2">&quot;valores&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-105"><a href="#Config-105"><span class="linenos">105</span></a>        <span class="s2">&quot;referencia_temporal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-106"><a href="#Config-106"><span class="linenos">106</span></a>    <span class="p">}</span>
-</span><span id="Config-107"><a href="#Config-107"><span class="linenos">107</span></a>    <span class="n">OPTIONAL_FILES</span> <span class="o">=</span> <span class="p">{</span>
-</span><span id="Config-108"><a href="#Config-108"><span class="linenos">108</span></a>        <span class="s2">&quot;proporcionalidades&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-109"><a href="#Config-109"><span class="linenos">109</span></a>        <span class="s2">&quot;cenarios&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-110"><a href="#Config-110"><span class="linenos">110</span></a>        <span class="s2">&quot;legenda&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-111"><a href="#Config-111"><span class="linenos">111</span></a>        <span class="s2">&quot;dicionario&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
-</span><span id="Config-112"><a href="#Config-112"><span class="linenos">112</span></a>    <span class="p">}</span>
-</span><span id="Config-113"><a href="#Config-113"><span class="linenos">113</span></a>
-</span><span id="Config-114"><a href="#Config-114"><span class="linenos">114</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Config-115"><a href="#Config-115"><span class="linenos">115</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="p">:</span> <span class="n">LanguageManager</span> <span class="o">=</span> <span class="n">LanguageManager</span><span class="p">()</span>
-</span><span id="Config-116"><a href="#Config-116"><span class="linenos">116</span></a>
-</span><span id="Config-117"><a href="#Config-117"><span class="linenos">117</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">debug_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span><span class="p">):</span>
-</span><span id="Config-118"><a href="#Config-118"><span class="linenos">118</span></a>        <span class="c1"># self._data_models_context.config.debug_messages(errors, warnings)</span>
-</span><span id="Config-119"><a href="#Config-119"><span class="linenos">119</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG ERRORS:&quot;</span><span class="p">)</span>
-</span><span id="Config-120"><a href="#Config-120"><span class="linenos">120</span></a>        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
-</span><span id="Config-121"><a href="#Config-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-</span><span id="Config-122"><a href="#Config-122"><span class="linenos">122</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG WARNINGS:&quot;</span><span class="p">)</span>
-</span><span id="Config-123"><a href="#Config-123"><span class="linenos">123</span></a>        <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">warnings</span><span class="p">:</span>
-</span><span id="Config-124"><a href="#Config-124"><span class="linenos">124</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
-</span><span id="Config-125"><a href="#Config-125"><span class="linenos">125</span></a>
-</span><span id="Config-126"><a href="#Config-126"><span class="linenos">126</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_verify_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Config-127"><a href="#Config-127"><span class="linenos">127</span></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">NamesEnum</span><span class="p">]</span>
-</span><span id="Config-128"><a href="#Config-128"><span class="linenos">128</span></a>        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="Config-129"><a href="#Config-129"><span class="linenos">129</span></a>            <span class="p">(</span>
-</span><span id="Config-130"><a href="#Config-130"><span class="linenos">130</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-</span><span id="Config-131"><a href="#Config-131"><span class="linenos">131</span></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
-</span><span id="Config-132"><a href="#Config-132"><span class="linenos">132</span></a>                    <span class="n">value</span><span class="o">=</span><span class="p">(</span>
-</span><span id="Config-133"><a href="#Config-133"><span class="linenos">133</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">TITLE_OVER_N_CHARS</span>
-</span><span id="Config-134"><a href="#Config-134"><span class="linenos">134</span></a>                        <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span>
-</span><span id="Config-135"><a href="#Config-135"><span class="linenos">135</span></a>                        <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SIMPLE_DESCRIPTIONS_OVER_N_CHARS</span> <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="Config-136"><a href="#Config-136"><span class="linenos">136</span></a>                    <span class="p">),</span>
-</span><span id="Config-137"><a href="#Config-137"><span class="linenos">137</span></a>                <span class="p">)</span>
-</span><span id="Config-138"><a href="#Config-138"><span class="linenos">138</span></a>                <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span><span class="p">,</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span><span class="p">)</span>
-</span><span id="Config-139"><a href="#Config-139"><span class="linenos">139</span></a>                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-</span><span id="Config-140"><a href="#Config-140"><span class="linenos">140</span></a>            <span class="p">)</span>
-</span><span id="Config-141"><a href="#Config-141"><span class="linenos">141</span></a>            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">keys</span>
-</span><span id="Config-142"><a href="#Config-142"><span class="linenos">142</span></a>        <span class="p">]</span>
-</span><span id="Config-143"><a href="#Config-143"><span class="linenos">143</span></a>        <span class="k">return</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">],</span> <span class="n">values</span><span class="p">)))</span>
+</span><span id="Config-59"><a href="#Config-59"><span class="linenos"> 59</span></a>    <span class="c1"># VALUE AND LEGEND</span>
+</span><span id="Config-60"><a href="#Config-60"><span class="linenos"> 60</span></a>    <span class="n">LABEL_DATA_UNAVAILABLE</span> <span class="o">=</span> <span class="s2">&quot;Dado indisponível&quot;</span>
+</span><span id="Config-61"><a href="#Config-61"><span class="linenos"> 61</span></a>    <span class="n">VALUE_DATA_UNAVAILABLE</span> <span class="o">=</span> <span class="s2">&quot;DI&quot;</span>
+</span><span id="Config-62"><a href="#Config-62"><span class="linenos"> 62</span></a>
+</span><span id="Config-63"><a href="#Config-63"><span class="linenos"> 63</span></a>    <span class="c1"># REPORT</span>
+</span><span id="Config-64"><a href="#Config-64"><span class="linenos"> 64</span></a>    <span class="n">REPORT_LIMIT_N_MESSAGES</span> <span class="o">=</span> <span class="mi">20</span>
+</span><span id="Config-65"><a href="#Config-65"><span class="linenos"> 65</span></a>    <span class="n">REPORT_OUTPUT_DEFAULT_HTML</span> <span class="o">=</span> <span class="s2">&quot;default.html&quot;</span>
+</span><span id="Config-66"><a href="#Config-66"><span class="linenos"> 66</span></a>    <span class="n">REPORT_OUTPUT_REPORT_HTML</span> <span class="o">=</span> <span class="s2">&quot;_report.html&quot;</span>
+</span><span id="Config-67"><a href="#Config-67"><span class="linenos"> 67</span></a>    <span class="n">REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span>
+</span><span id="Config-68"><a href="#Config-68"><span class="linenos"> 68</span></a><span class="s2">                                &lt;!DOCTYPE html&gt;</span>
+</span><span id="Config-69"><a href="#Config-69"><span class="linenos"> 69</span></a><span class="s2">                                &lt;html lang=&quot;pt-br&quot;&gt;</span>
+</span><span id="Config-70"><a href="#Config-70"><span class="linenos"> 70</span></a><span class="s2">                                &lt;head&gt;</span>
+</span><span id="Config-71"><a href="#Config-71"><span class="linenos"> 71</span></a><span class="s2">                                    &lt;meta charset=&quot;UTF-8&quot;&gt;</span>
+</span><span id="Config-72"><a href="#Config-72"><span class="linenos"> 72</span></a><span class="s2">                                    &lt;meta name=&quot;viewport&quot; content=&quot;width=device-width, initial-scale=1, shrink-to-fit=no&quot;&gt;</span>
+</span><span id="Config-73"><a href="#Config-73"><span class="linenos"> 73</span></a><span class="s2">                                    &lt;title&gt;Canoa Report&lt;/title&gt;</span>
+</span><span id="Config-74"><a href="#Config-74"><span class="linenos"> 74</span></a><span class="s2">                                &lt;/head&gt;</span>
+</span><span id="Config-75"><a href="#Config-75"><span class="linenos"> 75</span></a><span class="s2">                                &lt;body&gt;</span>
+</span><span id="Config-76"><a href="#Config-76"><span class="linenos"> 76</span></a><span class="s2">                                    &lt;h1 style=&quot;color:#FF0000;&quot;&gt;Relat&amp;oacute;rio gerando com o template padr&amp;atilde;o de erro&lt;/h1&gt;</span>
+</span><span id="Config-77"><a href="#Config-77"><span class="linenos"> 77</span></a><span class="s2">                                    &lt;p&gt;Esse relat&amp;oacute;rio foi gerado com o template padr&amp;atilde;o de erro, pois o template personalizado n&amp;atilde;o foi encontrado ou est&amp;aacute; faltando vari&amp;aacute;veis obrigat&amp;oacute;rias.&lt;/p&gt;</span>
+</span><span id="Config-78"><a href="#Config-78"><span class="linenos"> 78</span></a><span class="s2">                                    &lt;p&gt;Entre em contato com o administrador do sistema para corrigir o problema.&lt;/p&gt;</span>
+</span><span id="Config-79"><a href="#Config-79"><span class="linenos"> 79</span></a><span class="s2">                                    &lt;p&gt;RELAT&amp;Oacute;RIO&lt;/p&gt;</span>
+</span><span id="Config-80"><a href="#Config-80"><span class="linenos"> 80</span></a><span class="s2">                                    {{ name }}</span>
+</span><span id="Config-81"><a href="#Config-81"><span class="linenos"> 81</span></a><span class="s2">                                    Relat&amp;oacute;rio de Valida&amp;ccedil;&amp;atilde;o de Dados</span>
+</span><span id="Config-82"><a href="#Config-82"><span class="linenos"> 82</span></a><span class="s2">                                    Informa&amp;ccedil;&amp;otilde;es: </span>
+</span><span id="Config-83"><a href="#Config-83"><span class="linenos"> 83</span></a><span class="s2">                                    {{ text_display_user }}</span>
+</span><span id="Config-84"><a href="#Config-84"><span class="linenos"> 84</span></a><span class="s2">                                    {{ text_display_sector }}</span>
+</span><span id="Config-85"><a href="#Config-85"><span class="linenos"> 85</span></a><span class="s2">                                    {{ text_display_protocol }}</span>
+</span><span id="Config-86"><a href="#Config-86"><span class="linenos"> 86</span></a><span class="s2">                                    {{ text_display_date }}</span>
+</span><span id="Config-87"><a href="#Config-87"><span class="linenos"> 87</span></a><span class="s2">                                    {{ text_display_version_and_os_info }}</span>
+</span><span id="Config-88"><a href="#Config-88"><span class="linenos"> 88</span></a><span class="s2">                                    {{ text_display_file }}</span>
+</span><span id="Config-89"><a href="#Config-89"><span class="linenos"> 89</span></a><span class="s2">                                    Resumo da validação</span>
+</span><span id="Config-90"><a href="#Config-90"><span class="linenos"> 90</span></a><span class="s2">                                    N&amp;uacute;mero de Erros: {{ num_errors }}</span>
+</span><span id="Config-91"><a href="#Config-91"><span class="linenos"> 91</span></a><span class="s2">                                    N&amp;uacute;mero de Avisos: {{ num_warnings }}</span>
+</span><span id="Config-92"><a href="#Config-92"><span class="linenos"> 92</span></a><span class="s2">                                    N&amp;uacute;mero de testes executados: {{ number_tests }}</span>
+</span><span id="Config-93"><a href="#Config-93"><span class="linenos"> 93</span></a><span class="s2">                                    Testes n&amp;atilde;o executados: {{ tests_not_executed }}</span>
+</span><span id="Config-94"><a href="#Config-94"><span class="linenos"> 94</span></a><span class="s2">                                    Mostrar erros n&amp;atilde;o executados: {{ display_tests_not_executed }}</span>
+</span><span id="Config-95"><a href="#Config-95"><span class="linenos"> 95</span></a><span class="s2">                                    Erros</span>
+</span><span id="Config-96"><a href="#Config-96"><span class="linenos"> 96</span></a><span class="s2">                                    {{ errors }}</span>
+</span><span id="Config-97"><a href="#Config-97"><span class="linenos"> 97</span></a><span class="s2">                                    Avisos</span>
+</span><span id="Config-98"><a href="#Config-98"><span class="linenos"> 98</span></a><span class="s2">                                    {{ warnings }}</span>
+</span><span id="Config-99"><a href="#Config-99"><span class="linenos"> 99</span></a><span class="s2">                                &lt;/body&gt;</span>
+</span><span id="Config-100"><a href="#Config-100"><span class="linenos">100</span></a><span class="s2">                                &lt;/html&gt;</span>
+</span><span id="Config-101"><a href="#Config-101"><span class="linenos">101</span></a><span class="s2">                                &quot;&quot;&quot;</span>
+</span><span id="Config-102"><a href="#Config-102"><span class="linenos">102</span></a>
+</span><span id="Config-103"><a href="#Config-103"><span class="linenos">103</span></a>    <span class="c1"># Expected and optional files with their respective extensions</span>
+</span><span id="Config-104"><a href="#Config-104"><span class="linenos">104</span></a>    <span class="c1"># Improve this logic in the future to allow more flexibility</span>
+</span><span id="Config-105"><a href="#Config-105"><span class="linenos">105</span></a>    <span class="n">EXPECTED_FILES</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="Config-106"><a href="#Config-106"><span class="linenos">106</span></a>        <span class="s2">&quot;descricao&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-107"><a href="#Config-107"><span class="linenos">107</span></a>        <span class="s2">&quot;composicao&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-108"><a href="#Config-108"><span class="linenos">108</span></a>        <span class="s2">&quot;valores&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-109"><a href="#Config-109"><span class="linenos">109</span></a>        <span class="s2">&quot;referencia_temporal&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-110"><a href="#Config-110"><span class="linenos">110</span></a>    <span class="p">}</span>
+</span><span id="Config-111"><a href="#Config-111"><span class="linenos">111</span></a>    <span class="n">OPTIONAL_FILES</span> <span class="o">=</span> <span class="p">{</span>
+</span><span id="Config-112"><a href="#Config-112"><span class="linenos">112</span></a>        <span class="s2">&quot;proporcionalidades&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-113"><a href="#Config-113"><span class="linenos">113</span></a>        <span class="s2">&quot;cenarios&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-114"><a href="#Config-114"><span class="linenos">114</span></a>        <span class="s2">&quot;legenda&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-115"><a href="#Config-115"><span class="linenos">115</span></a>        <span class="s2">&quot;dicionario&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;.xlsx&quot;</span><span class="p">],</span>
+</span><span id="Config-116"><a href="#Config-116"><span class="linenos">116</span></a>    <span class="p">}</span>
+</span><span id="Config-117"><a href="#Config-117"><span class="linenos">117</span></a>
+</span><span id="Config-118"><a href="#Config-118"><span class="linenos">118</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Config-119"><a href="#Config-119"><span class="linenos">119</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="p">:</span> <span class="n">LanguageManager</span> <span class="o">=</span> <span class="n">LanguageManager</span><span class="p">()</span>
+</span><span id="Config-120"><a href="#Config-120"><span class="linenos">120</span></a>
+</span><span id="Config-121"><a href="#Config-121"><span class="linenos">121</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_verify_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Config-122"><a href="#Config-122"><span class="linenos">122</span></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">NamesEnum</span><span class="p">]</span>
+</span><span id="Config-123"><a href="#Config-123"><span class="linenos">123</span></a>        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="Config-124"><a href="#Config-124"><span class="linenos">124</span></a>            <span class="p">(</span>
+</span><span id="Config-125"><a href="#Config-125"><span class="linenos">125</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+</span><span id="Config-126"><a href="#Config-126"><span class="linenos">126</span></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+</span><span id="Config-127"><a href="#Config-127"><span class="linenos">127</span></a>                    <span class="n">value</span><span class="o">=</span><span class="p">(</span>
+</span><span id="Config-128"><a href="#Config-128"><span class="linenos">128</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">TITLE_OVER_N_CHARS</span>
+</span><span id="Config-129"><a href="#Config-129"><span class="linenos">129</span></a>                        <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span>
+</span><span id="Config-130"><a href="#Config-130"><span class="linenos">130</span></a>                        <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SIMPLE_DESCRIPTIONS_OVER_N_CHARS</span> <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="Config-131"><a href="#Config-131"><span class="linenos">131</span></a>                    <span class="p">),</span>
+</span><span id="Config-132"><a href="#Config-132"><span class="linenos">132</span></a>                <span class="p">)</span>
+</span><span id="Config-133"><a href="#Config-133"><span class="linenos">133</span></a>                <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span><span class="p">,</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span><span class="p">)</span>
+</span><span id="Config-134"><a href="#Config-134"><span class="linenos">134</span></a>                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+</span><span id="Config-135"><a href="#Config-135"><span class="linenos">135</span></a>            <span class="p">)</span>
+</span><span id="Config-136"><a href="#Config-136"><span class="linenos">136</span></a>            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">keys</span>
+</span><span id="Config-137"><a href="#Config-137"><span class="linenos">137</span></a>        <span class="p">]</span>
+</span><span id="Config-138"><a href="#Config-138"><span class="linenos">138</span></a>        <span class="k">return</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">],</span> <span class="n">values</span><span class="p">)))</span>
 </span></pre></div>
 
 
     
 
+                            <div id="Config.PRECISION_DECIMAL_PLACE_TRUNCATE" class="classattr">
+                                <div class="attr variable">
+            <span class="name">PRECISION_DECIMAL_PLACE_TRUNCATE</span>        =
+<span class="default_value">3</span>
+
+        
+    </div>
+    <a class="headerlink" href="#Config.PRECISION_DECIMAL_PLACE_TRUNCATE"></a>
+    
+    
+
+                            </div>
                             <div id="Config.TITLE_OVER_N_CHARS" class="classattr">
                                 <div class="attr variable">
             <span class="name">TITLE_OVER_N_CHARS</span>        =
@@ -827,7 +834,7 @@
                             <div id="Config.CURRENT_YEAR" class="classattr">
                                 <div class="attr variable">
             <span class="name">CURRENT_YEAR</span>        =
-<span class="default_value">2025</span>
+<span class="default_value">2026</span>
 
         
     </div>
@@ -839,7 +846,7 @@
                             <div id="Config.DATE_NOW" class="classattr">
                                 <div class="attr variable">
             <span class="name">DATE_NOW</span>        =
-<span class="default_value">&#39;13/10/2025 22:43:55&#39;</span>
+<span class="default_value">&#39;29/01/2026 18:16:57&#39;</span>
 
         
     </div>
@@ -848,26 +855,26 @@
     
 
                             </div>
-                            <div id="Config.VALUE_DATA_UNAVAILABLE" class="classattr">
+                            <div id="Config.LABEL_DATA_UNAVAILABLE" class="classattr">
                                 <div class="attr variable">
-            <span class="name">VALUE_DATA_UNAVAILABLE</span>        =
+            <span class="name">LABEL_DATA_UNAVAILABLE</span>        =
 <span class="default_value">&#39;Dado indisponível&#39;</span>
 
         
     </div>
-    <a class="headerlink" href="#Config.VALUE_DATA_UNAVAILABLE"></a>
+    <a class="headerlink" href="#Config.LABEL_DATA_UNAVAILABLE"></a>
     
     
 
                             </div>
-                            <div id="Config.VALUE_DI" class="classattr">
+                            <div id="Config.VALUE_DATA_UNAVAILABLE" class="classattr">
                                 <div class="attr variable">
-            <span class="name">VALUE_DI</span>        =
+            <span class="name">VALUE_DATA_UNAVAILABLE</span>        =
 <span class="default_value">&#39;DI&#39;</span>
 
         
     </div>
-    <a class="headerlink" href="#Config.VALUE_DI"></a>
+    <a class="headerlink" href="#Config.VALUE_DATA_UNAVAILABLE"></a>
     
     
 
@@ -958,31 +965,6 @@
     
 
                             </div>
-                            <div id="Config.debug_messages" class="classattr">
-                                        <input id="Config.debug_messages-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
-<div class="attr function">
-            
-        <span class="def">def</span>
-        <span class="name">debug_messages</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">errors</span>, </span><span class="param"><span class="n">warnings</span></span><span class="return-annotation">):</span></span>
-
-                <label class="view-source-button" for="Config.debug_messages-view-source"><span>View Source</span></label>
-
-    </div>
-    <a class="headerlink" href="#Config.debug_messages"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Config.debug_messages-117"><a href="#Config.debug_messages-117"><span class="linenos">117</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">debug_messages</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span><span class="p">):</span>
-</span><span id="Config.debug_messages-118"><a href="#Config.debug_messages-118"><span class="linenos">118</span></a>        <span class="c1"># self._data_models_context.config.debug_messages(errors, warnings)</span>
-</span><span id="Config.debug_messages-119"><a href="#Config.debug_messages-119"><span class="linenos">119</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG ERRORS:&quot;</span><span class="p">)</span>
-</span><span id="Config.debug_messages-120"><a href="#Config.debug_messages-120"><span class="linenos">120</span></a>        <span class="k">for</span> <span class="n">error</span> <span class="ow">in</span> <span class="n">errors</span><span class="p">:</span>
-</span><span id="Config.debug_messages-121"><a href="#Config.debug_messages-121"><span class="linenos">121</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
-</span><span id="Config.debug_messages-122"><a href="#Config.debug_messages-122"><span class="linenos">122</span></a>        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;DEBUG WARNINGS:&quot;</span><span class="p">)</span>
-</span><span id="Config.debug_messages-123"><a href="#Config.debug_messages-123"><span class="linenos">123</span></a>        <span class="k">for</span> <span class="n">warning</span> <span class="ow">in</span> <span class="n">warnings</span><span class="p">:</span>
-</span><span id="Config.debug_messages-124"><a href="#Config.debug_messages-124"><span class="linenos">124</span></a>            <span class="nb">print</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
-</span></pre></div>
-
-
-    
-
-                            </div>
                             <div id="Config.get_verify_names" class="classattr">
                                         <input id="Config.get_verify_names-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -994,24 +976,24 @@
 
     </div>
     <a class="headerlink" href="#Config.get_verify_names"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Config.get_verify_names-126"><a href="#Config.get_verify_names-126"><span class="linenos">126</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_verify_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="Config.get_verify_names-127"><a href="#Config.get_verify_names-127"><span class="linenos">127</span></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">NamesEnum</span><span class="p">]</span>
-</span><span id="Config.get_verify_names-128"><a href="#Config.get_verify_names-128"><span class="linenos">128</span></a>        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="Config.get_verify_names-129"><a href="#Config.get_verify_names-129"><span class="linenos">129</span></a>            <span class="p">(</span>
-</span><span id="Config.get_verify_names-130"><a href="#Config.get_verify_names-130"><span class="linenos">130</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
-</span><span id="Config.get_verify_names-131"><a href="#Config.get_verify_names-131"><span class="linenos">131</span></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
-</span><span id="Config.get_verify_names-132"><a href="#Config.get_verify_names-132"><span class="linenos">132</span></a>                    <span class="n">value</span><span class="o">=</span><span class="p">(</span>
-</span><span id="Config.get_verify_names-133"><a href="#Config.get_verify_names-133"><span class="linenos">133</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">TITLE_OVER_N_CHARS</span>
-</span><span id="Config.get_verify_names-134"><a href="#Config.get_verify_names-134"><span class="linenos">134</span></a>                        <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span>
-</span><span id="Config.get_verify_names-135"><a href="#Config.get_verify_names-135"><span class="linenos">135</span></a>                        <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SIMPLE_DESCRIPTIONS_OVER_N_CHARS</span> <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
-</span><span id="Config.get_verify_names-136"><a href="#Config.get_verify_names-136"><span class="linenos">136</span></a>                    <span class="p">),</span>
-</span><span id="Config.get_verify_names-137"><a href="#Config.get_verify_names-137"><span class="linenos">137</span></a>                <span class="p">)</span>
-</span><span id="Config.get_verify_names-138"><a href="#Config.get_verify_names-138"><span class="linenos">138</span></a>                <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span><span class="p">,</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span><span class="p">)</span>
-</span><span id="Config.get_verify_names-139"><a href="#Config.get_verify_names-139"><span class="linenos">139</span></a>                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
-</span><span id="Config.get_verify_names-140"><a href="#Config.get_verify_names-140"><span class="linenos">140</span></a>            <span class="p">)</span>
-</span><span id="Config.get_verify_names-141"><a href="#Config.get_verify_names-141"><span class="linenos">141</span></a>            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">keys</span>
-</span><span id="Config.get_verify_names-142"><a href="#Config.get_verify_names-142"><span class="linenos">142</span></a>        <span class="p">]</span>
-</span><span id="Config.get_verify_names-143"><a href="#Config.get_verify_names-143"><span class="linenos">143</span></a>        <span class="k">return</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">],</span> <span class="n">values</span><span class="p">)))</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Config.get_verify_names-121"><a href="#Config.get_verify_names-121"><span class="linenos">121</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">get_verify_names</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="Config.get_verify_names-122"><a href="#Config.get_verify_names-122"><span class="linenos">122</span></a>        <span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">element</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">NamesEnum</span><span class="p">]</span>
+</span><span id="Config.get_verify_names-123"><a href="#Config.get_verify_names-123"><span class="linenos">123</span></a>        <span class="n">values</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="Config.get_verify_names-124"><a href="#Config.get_verify_names-124"><span class="linenos">124</span></a>            <span class="p">(</span>
+</span><span id="Config.get_verify_names-125"><a href="#Config.get_verify_names-125"><span class="linenos">125</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
+</span><span id="Config.get_verify_names-126"><a href="#Config.get_verify_names-126"><span class="linenos">126</span></a>                    <span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">),</span>
+</span><span id="Config.get_verify_names-127"><a href="#Config.get_verify_names-127"><span class="linenos">127</span></a>                    <span class="n">value</span><span class="o">=</span><span class="p">(</span>
+</span><span id="Config.get_verify_names-128"><a href="#Config.get_verify_names-128"><span class="linenos">128</span></a>                        <span class="bp">self</span><span class="o">.</span><span class="n">TITLE_OVER_N_CHARS</span>
+</span><span id="Config.get_verify_names-129"><a href="#Config.get_verify_names-129"><span class="linenos">129</span></a>                        <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span>
+</span><span id="Config.get_verify_names-130"><a href="#Config.get_verify_names-130"><span class="linenos">130</span></a>                        <span class="k">else</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">SIMPLE_DESCRIPTIONS_OVER_N_CHARS</span> <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span> <span class="k">else</span> <span class="kc">None</span><span class="p">)</span>
+</span><span id="Config.get_verify_names-131"><a href="#Config.get_verify_names-131"><span class="linenos">131</span></a>                    <span class="p">),</span>
+</span><span id="Config.get_verify_names-132"><a href="#Config.get_verify_names-132"><span class="linenos">132</span></a>                <span class="p">)</span>
+</span><span id="Config.get_verify_names-133"><a href="#Config.get_verify_names-133"><span class="linenos">133</span></a>                <span class="k">if</span> <span class="n">element</span> <span class="ow">in</span> <span class="p">(</span><span class="n">NamesEnum</span><span class="o">.</span><span class="n">TITLES_N</span><span class="p">,</span> <span class="n">NamesEnum</span><span class="o">.</span><span class="n">SIMP_DESC_N</span><span class="p">)</span>
+</span><span id="Config.get_verify_names-134"><a href="#Config.get_verify_names-134"><span class="linenos">134</span></a>                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">element</span><span class="o">.</span><span class="n">value</span><span class="p">))</span>
+</span><span id="Config.get_verify_names-135"><a href="#Config.get_verify_names-135"><span class="linenos">135</span></a>            <span class="p">)</span>
+</span><span id="Config.get_verify_names-136"><a href="#Config.get_verify_names-136"><span class="linenos">136</span></a>            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">keys</span>
+</span><span id="Config.get_verify_names-137"><a href="#Config.get_verify_names-137"><span class="linenos">137</span></a>        <span class="p">]</span>
+</span><span id="Config.get_verify_names-138"><a href="#Config.get_verify_names-138"><span class="linenos">138</span></a>        <span class="k">return</span> <span class="n">MappingProxyType</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="n">e</span><span class="o">.</span><span class="n">value</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">],</span> <span class="n">values</span><span class="p">)))</span>
 </span></pre></div>
 
 
