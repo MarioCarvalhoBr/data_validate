@@ -9,9 +9,7 @@ from data_validate.config.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
-from data_validate.helpers.common.formatting.text_formatting import (
-    capitalize_text_keep_acronyms,
-)
+from data_validate.helpers.common.formatting.text_formatting_processing import TextFormattingProcessing
 
 from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
@@ -135,7 +133,7 @@ class SpDescriptionValidator(ValidatorModelABC):
                     .str.replace("\x0d", "")
                     .str.replace("\x0a", "")
                     .str.strip()
-                    .apply(lambda x: capitalize_text_keep_acronyms(x.strip()))
+                    .apply(lambda x: TextFormattingProcessing.capitalize_text_keep_acronyms(x.strip()))
                 )
 
                 # Find mismatches
