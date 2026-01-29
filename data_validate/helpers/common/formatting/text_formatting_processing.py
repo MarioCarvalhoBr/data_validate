@@ -1,5 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
+
 class TextFormattingProcessing:
 
     def __init__(self) -> None:

@@ -4,9 +4,7 @@ import pandas as pd
 
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
-from data_validate.helpers.common.formatting.error_formatting import (
-    format_errors_and_warnings,
-)
+from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.legend_processing import LegendProcessing
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
@@ -73,7 +71,9 @@ class SpLegend(SpModelABC):
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
             self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
         )
-        col_errors, col_warnings = format_errors_and_warnings(self.filename, missing_columns, extra_columns)
+        col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
+            self.filename, missing_columns, extra_columns
+        )
 
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
