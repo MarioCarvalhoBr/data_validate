@@ -80,6 +80,10 @@ class LoggerManager:
         """
         logger = logging.getLogger(logger_name)
         logger.setLevel(level or self.default_level)
+        logger.propagate = False
+
+        if logger.hasHandlers():
+            logger.handlers.clear()
 
         # Console handler
         console_handler = logging.StreamHandler()
