@@ -1,3 +1,11 @@
+"""
+Configuration module for the Data Validate application.
+
+This module defines the configuration settings, constants, and enumerations used throughout
+the application. It includes the `NamesEnum` for verification names and the `Config` class
+for managing application-wide settings such as limits, date formats, and report templates.
+"""
+
 from datetime import datetime
 from enum import Enum
 from types import MappingProxyType
@@ -6,6 +14,12 @@ from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
 
 class NamesEnum(Enum):
+    """
+    Enumeration for verification names used in validation reports.
+
+    Each member represents a specific type of verification or validation rule applied
+    to the data. These keys are used to look up localized messages and aggregate errors.
+    """
     FS = "verification_name_file_structure"
     FC = "verification_name_file_cleaning"
     IR = "verification_name_indicator_relations"
@@ -43,26 +57,46 @@ class NamesEnum(Enum):
 
 
 class Config:
+    """
+    Configuration class for Data Validate application.
+
+    This class holds all the configuration constants and settings for the application.
+    It includes settings for numeric precision, text limits, date/time formats,
+    value representations, report generation settings, and file extensions.
+
+    Attributes:
+        lm (LanguageManager): Manager for handling localized text.
+    """
 
     # NUMBERS
     PRECISION_DECIMAL_PLACE_TRUNCATE = 3
+    """int: The number of decimal places to truncate numbers to."""
 
     # DESCRIPTION LIMITS
     TITLE_OVER_N_CHARS = 40
+    """int: Maximum number of characters allowed for titles."""
     SIMPLE_DESCRIPTIONS_OVER_N_CHARS = 150
+    """int: Maximum number of characters allowed for simple description fields."""
 
     # DATE AND TIME
     CURRENT_YEAR = datetime.now().year
+    """int: The current year."""
     DATE_NOW = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+    """str: The current date and time formatted as 'dd/mm/yyyy HH:MM:SS'."""
 
     # VALUE AND LEGEND
     LABEL_DATA_UNAVAILABLE = "Dado indisponível"
+    """str: Label used for unavailable data in reports."""
     VALUE_DATA_UNAVAILABLE = "DI"
+    """str: Value used to represent unavailable data in datasets."""
 
     # REPORT
     REPORT_LIMIT_N_MESSAGES = 20
+    """int: Maximum number of error messages to display per validation type in reports."""
     REPORT_OUTPUT_DEFAULT_HTML = "default.html"
+    """str: Filename for the default HTML report output."""
     REPORT_OUTPUT_REPORT_HTML = "_report.html"
+    """str: Suffix for generated HTML report files."""
     REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS = """
                                 <!DOCTYPE html>
                                 <html lang="pt-br">
@@ -98,6 +132,7 @@ class Config:
                                 </body>
                                 </html>
                                 """
+    """str: Default HTML template for reports when the custom template cannot be loaded."""
 
     # Expected and optional files with their respective extensions
     # Improve this logic in the future to allow more flexibility
@@ -107,17 +142,37 @@ class Config:
         "valores": [".csv", ".xlsx"],
         "referencia_temporal": [".csv", ".xlsx"],
     }
+    """dict: Dictionary of expected file identifiers and their allowed extensions."""
+
     OPTIONAL_FILES = {
         "proporcionalidades": [".csv", ".xlsx"],
         "cenarios": [".csv", ".xlsx"],
         "legenda": [".csv", ".xlsx"],
         "dicionario": [".csv", ".xlsx"],
     }
+    """dict: Dictionary of optional file identifiers and their allowed extensions."""
 
     def __init__(self):
+        """
+        Initializes the Config instance.
+
+        Sets up the LanguageManager for handling localized strings throughout the application.
+        """
         self.lm: LanguageManager = LanguageManager()
 
     def get_verify_names(self):
+        """
+        Retrieves a dictionary of verification names with localized text.
+
+        The method iterates over `NamesEnum` members and retrieves their localized
+        string representation using the `LanguageManager`. For specific verifications
+        like `TITLES_N` and `SIMP_DESC_N`, it formats the message with dynamic values
+        from configuration constants.
+
+        Returns:
+            MappingProxyType: A read-only dictionary mapping verification keys (from `NamesEnum`)
+            to their localized text descriptions.
+        """
         keys = [element for element in NamesEnum]
         values = [
             (
