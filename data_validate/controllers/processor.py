@@ -1,4 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module for processing spreadsheet data validation workflows.
+
+This module defines the `ProcessorSpreadsheet` class, which orchestrates the entire
+data validation pipeline: loading data, initializing models, running validators,
+aggregating results, and generating reports.
+"""
+
 import time
 
 import data_validate
@@ -13,10 +21,38 @@ FLAG = None
 
 class ProcessorSpreadsheet:
     """
-    Classe principal para processar as planilhas, validar dados e gerar relatórios.
+    Main processor class for spreadsheet validation and report generation.
+
+    Orchestrates the data validation pipeline by coordinating data loading,
+    model initialization, validation execution (structure, spelling, business rules),
+    and result reporting.
+
+    Attributes:
+        context (GeneralContext): The application's dependency injection context.
+        lm (LanguageManager): Localization manager for internationalized strings.
+        TITLES_INFO (Dict[str, str]): Dictionary mapping validation keys to human-readable titles.
+        input_folder (str): Directory path containing input data files.
+        output_folder (str): Directory path for generating output reports.
+        scenarios_list (List[str]): List of detected scenarios (e.g., SSPs) from scenario file.
+        all_load_data (Dict[str, Any]): Raw data loaded from files via DataLoaderFacade.
+        data_loader_facade (DataLoaderFacade): Facade handles reading/parsing input files.
+        kwargs (Dict[str, Any]): Shared arguments passed to model constructors.
+        data_models_context (DataModelsContext): Specialized context holding initialized data models.
+        models_to_use (List[SpModelABC]): List of instantiated spreadsheet models.
+        classes_to_initialize (List[Type[SpModelABC]]): List of model classes to process.
+        report_list (ModelListReport): Aggregator for validation errors and warnings.
     """
 
     def __init__(self, context: controllers.GeneralContext):
+        """
+        Initialize the processor and start the pipeline globally.
+
+        Sets up the environment, initializes contexts, prepares report structures,
+        and automatically triggers the `run()` pipeline execution.
+
+        Args:
+            context (GeneralContext): The main application context.
+        """
         # SETUP GENERAL CONTEXT
         self.context = context
 
@@ -64,11 +100,24 @@ class ProcessorSpreadsheet:
             print("Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos")
 
     def _prepare_statement(self) -> None:
+        """
+        Initialize the report structure with all known test categories.
+
+        Pre-populates the `report_list` with empty reports for all validation
+        categories defined in `NamesEnum` to ensure consistent reporting order.
+        """
         self.context.logger.info("Preparing statements and environment...")
         for name in config.NamesEnum:
             self.report_list.add_by_name(self.TITLES_INFO[name.value])
 
     def _read_data(self) -> None:
+        """
+        Execute the ETL (Extract) phase of the pipeline.
+
+        Uses `DataLoaderFacade` to read all authorized files from the input folder.
+        Populates `all_load_data`, captures initial load errors (e.g., file not found),
+        and extracts global metadata (e.g., available scenarios) for downstream validations.
+        """
         self.context.logger.info("Data reading and preprocessing...")
 
         # 0 ETL: Extract, Transform, Load
@@ -93,6 +142,16 @@ class ProcessorSpreadsheet:
         }
 
     def _configure(self) -> None:
+        """
+        Configure models and execute initial structural/cleaning validations.
+
+        Instantiates specific spreadsheet models (e.g., `SpDescription`, `SpValue`).
+        During initialization, models perform:
+        1. Structural checks (required columns presence).
+        2. Data cleaning (type conversion, trimming).
+
+        Collected structural and cleaning errors are immediately added to the report.
+        """
         self.context.logger.info("Configuring the processor...")
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.classes_to_initialize:
@@ -126,7 +185,14 @@ class ProcessorSpreadsheet:
 
     def _build_pipeline(self) -> None:
         """
-        Build the validation pipeline by initializing the data context and running the validations.
+        Construct and execute the main validation pipeline.
+
+        Initializes the `DataModelsContext` with the configured models and runs
+        a sequence of validators:
+        1. **Structure**: File structure checks.
+        2. **Spelling**: Spell checking on text fields.
+        3. **Mandatory**: Core business rules (Description, Composition, Timing).
+        4. **Optional**: Secondary business rules (Values, Scenarios, Legends).
         """
         self.context.logger.info("Building validation pipeline...")
 
@@ -154,6 +220,13 @@ class ProcessorSpreadsheet:
         validators.SpLegendValidator(data_models_context=self.data_models_context, report_list=self.report_list)
 
     def _report(self) -> None:
+        """
+        Generate final validation reports.
+
+        Compiles all collected errors and warnings into `ModelListReport`,
+        logs debug information (if enabled), calculates summary statistics,
+        and triggers the generation of HTML/PDF reports via `ReportGeneratorFiles`.
+        """
         self.context.logger.info("Generating reports...")
         # Debug all reports and their errors
         if self.context.data_args.data_action.debug:
@@ -182,6 +255,16 @@ class ProcessorSpreadsheet:
         controllers.ReportGeneratorFiles(context=self.context).build_report(report_list=self.report_list)
 
     def run(self):
+        """
+        Execute the complete processing workflow.
+
+        Orchestrates the sequential execution of:
+        1. `_prepare_statement()`: Setup.
+        2. `_read_data()`: Data loading.
+        3. `_configure()`: Model initialization and cleaning.
+        4. `_build_pipeline()`: Core validation logic.
+        5. `_report()`: Output generation.
+        """
         self.context.logger.info("Starting processing...")
 
         self._prepare_statement()

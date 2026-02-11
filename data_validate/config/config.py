@@ -20,6 +20,7 @@ class NamesEnum(Enum):
     Each member represents a specific type of verification or validation rule applied
     to the data. These keys are used to look up localized messages and aggregate errors.
     """
+
     FS = "verification_name_file_structure"
     FC = "verification_name_file_cleaning"
     IR = "verification_name_indicator_relations"
