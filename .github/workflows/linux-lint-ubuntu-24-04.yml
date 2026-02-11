@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false # Garante que todos os jobs rodem, mesmo que um falhe
       matrix:
-        python-version: ["3.11", "3.12"] # Roda os testes em múltiplas versões do Python
+        python-version: ["3.12"] # Roda os testes na versão 3.12 do Python
 
     steps:
       - name: Checkout repository

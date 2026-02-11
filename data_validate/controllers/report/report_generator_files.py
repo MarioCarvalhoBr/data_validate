@@ -1,4 +1,13 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module for generating validation reports in HTML and PDF formats.
+
+This module provides the `ReportGeneratorFiles` class, which handles the creation
+of detailed validation reports based on the results collected during the data
+validation process. It supports template-based HTML generation and PDF conversion
+using `pdfkit` and `jinja2`.
+"""
+
 import os
 import platform
 import re
@@ -16,31 +25,31 @@ from data_validate.helpers.common.formatting.number_formatting_processing import
 
 
 class ReportGeneratorFiles:
-    """PDF and HTML report generator for data validation results.
+    """
+    PDF and HTML report generator for data validation results.
 
     This class handles the generation of HTML and PDF reports from validation
     test results, including error summaries, warnings, and metadata information.
 
     Attributes:
-        context: General context containing configuration and arguments
-        num_errors: Total number of errors found in validation
-        num_warnings: Total number of warnings found in validation
-        number_tests: Total number of tests executed
-
-        input_folder: Path to the input data folder
-        output_folder: Path to the output folder for reports
-        template_name: Name of the HTML template file
-        template_data_text: Content of the HTML template
-        required_variables: List of required variables in the template
-        env: Jinja2 environment for template rendering
-
+        context (GeneralContext): General context containing configuration and arguments.
+        num_errors (int): Total number of errors found in validation.
+        num_warnings (int): Total number of warnings found in validation.
+        number_tests (int): Total number of tests executed.
+        input_folder (str): Path to the input data folder.
+        output_folder (str): Path to the output folder for reports.
+        template_name (str): Name of the HTML template file.
+        template_data_text (str): Content of the HTML template.
+        required_variables (List[str]): List of required variables in the template.
+        env (Environment): Jinja2 environment for template rendering.
     """
 
     def __init__(self, context: GeneralContext = None):
-        """Initialize the report generator with context configuration.
+        """
+        Initialize the report generator with context configuration.
 
         Args:
-            context: General context containing validation configuration
+            context (GeneralContext): General context containing validation configuration.
         """
         self.context = context
         self.locale = self.context.lm.current_language
@@ -62,10 +71,22 @@ class ReportGeneratorFiles:
         self._validate_html_template()
 
     def _prepare_environment(self) -> None:
+        """
+        Prepare the output environment by ensuring the output directory exists.
+
+        Uses the context's file system utils to create the directory if it
+        doesn't already exist.
+        """
         self.context.fs_utils.create_directory(self.output_folder)
 
     def _validate_html_template(self) -> None:
-        """Validate HTML template existence and required variables."""
+        """
+        Validate HTML template existence and required variables.
+
+        Loads the report template from the static files directory. If the file
+        doesn't exist or misses required variables, falls back to a default basic
+        template defined in the configuration.
+        """
         # Extract template variables using regex
         variable_pattern = r"\{\{\s*.*?\s*\}\}"
         self.required_variables = re.findall(variable_pattern, self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS)
@@ -81,10 +102,19 @@ class ReportGeneratorFiles:
             self.template_data_text = self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
 
     def build_report(self, report_list: ModelListReport) -> None:
-        """Generate and save HTML and PDF reports from validation results.
+        """
+        Generate and save HTML and PDF reports from validation results.
+
+        Orchestrates the report generation process:
+        1. Aggregates error and warning statistics.
+        2. Identifies tests that were skipped.
+        3. Flattens the report list (truncating excessive messages).
+        4. Generates HTML content from the template.
+        5. Saves the HTML file and converts it to PDF.
+        6. Prints a JSON summary to stdout.
 
         Args:
-            report_list: List of validation test reports
+            report_list (ModelListReport): List of validation test reports.
         """
         file_name = self.context.fs_utils.get_last_directory_name(path=self.input_folder)
         html_output_file = self.context.config.REPORT_OUTPUT_REPORT_HTML
@@ -123,28 +153,36 @@ class ReportGeneratorFiles:
             print(msg_error, file=sys.stderr)
 
     def _generate_html_content(self, report_list: ModelListReport, tests_not_executed: List[str]) -> str:
-        """Generate HTML content from template and report data.
+        """
+        Generate HTML content from template and report data.
+
+        Renders the Jinja2 template with the prepared variables derived from
+        the validation results.
 
         Args:
-            report_list: List of validation test reports
-            tests_not_executed: List of test names that were not executed
+            report_list (ModelListReport): List of validation test reports.
+            tests_not_executed (List[str]): List of test names that were not executed.
 
         Returns:
-            Rendered HTML content as string
+            str: Rendered HTML content as string.
         """
         template = self.env.from_string(self.template_data_text)
         template_vars = self._build_template_variables(report_list, tests_not_executed)
         return template.render(template_vars)
 
     def _build_template_variables(self, report_list: ModelListReport, tests_not_executed: List[str]) -> Dict[str, Any]:
-        """Build template variables dictionary for HTML generation.
+        """
+        Build template variables dictionary for HTML generation.
+
+        Constructs a dictionary containing all necessary data bits (metadata,
+        formatted lists of issues, statistics) required by the HTML template.
 
         Args:
-            report_list: List of validation test reports
-            tests_not_executed: List of test names that were not executed
+            report_list (ModelListReport): List of validation test reports.
+            tests_not_executed (List[str]): List of test names that were not executed.
 
         Returns:
-            Dictionary containing all template variables
+            Dict[str, Any]: Dictionary containing all template variables.
         """
         text_html_errors = self._format_messages_as_html(report_list, "errors", "text-danger-errors")
         text_html_warnings = self._format_messages_as_html(report_list, "warnings", "text-orange-warning")
@@ -179,14 +217,18 @@ class ReportGeneratorFiles:
         }
 
     def _get_optional_field_text(self, field_name: str, display_label: str) -> str:
-        """Get formatted text for optional report fields.
+        """
+        Get formatted text for optional report fields.
+
+        Helper method to format optional metadata fields (like sector, protocol,
+        user) for display in the report header.
 
         Args:
-            field_name: Name of the field in data_report
-            display_label: Label to display for the field
+            field_name (str): Name of the field in data_report.
+            display_label (str): Label to display for the field in the HTML.
 
         Returns:
-            Formatted field text or empty string if field is None
+            str: Formatted field text (HTML) or empty string if field is None.
         """
         field_value = getattr(self.context.data_args.data_report, field_name, None)
         if field_value is None:
@@ -195,7 +237,13 @@ class ReportGeneratorFiles:
         return f"<strong>{display_label}: " f"<strong class='text-gray'>{field_value}</strong></strong><br>"
 
     def _print_json_summary(self) -> None:
-        """Print JSON summary of validation results."""
+        """
+        Print JSON summary of validation results.
+
+        Outputs a concise JSON structure to stdout and logs, containing the
+        version, and counts of errors, warnings, and tests run. Useful for parsing
+        by external tools.
+        """
         summary = {
             "data_validate": {
                 "version": METADATA.__version__,
@@ -216,15 +264,19 @@ class ReportGeneratorFiles:
 
     @staticmethod
     def _format_messages_as_html(report_list: ModelListReport, message_type: str, css_class: str) -> str:
-        """Format error or warning messages as HTML.
+        """
+        Format error or warning messages as HTML.
+
+        Iterates through reports and formats lists of messages into HTML spans
+        with appropriate CSS classes.
 
         Args:
-            report_list: List of validation test reports
-            message_type: Type of messages to format ('errors' or 'warnings')
-            css_class: CSS class for styling the messages
+            report_list (ModelListReport): List of validation test reports.
+            message_type (str): Type of messages to format ('errors' or 'warnings').
+            css_class (str): CSS class for styling the messages.
 
         Returns:
-            Formatted HTML string with messages
+            str: Formatted HTML string with messages.
         """
         html_parts = []
 
@@ -240,10 +292,14 @@ class ReportGeneratorFiles:
 
     @staticmethod
     def _get_pdf_options() -> Dict[str, Any]:
-        """Get PDF generation options.
+        """
+        Get PDF generation options.
+
+        Returns a dictionary of configuration options for `pdfkit` (wkhtmltopdf wrapper).
+        Configures page size, margins, and encoding.
 
         Returns:
-            Dictionary with PDF generation options
+            Dict[str, Any]: Dictionary with PDF generation options.
         """
         return {
             "page-size": "Letter",
@@ -259,11 +315,15 @@ class ReportGeneratorFiles:
 
     @staticmethod
     def _save_html_file(html_content: str, output_path: str, logger) -> None:
-        """Save HTML content to file.
+        """
+        Save HTML content to file.
+
+        Writes the rendered HTML content to the specified file path.
 
         Args:
-            html_content: HTML content to save
-            output_path: Path where to save the HTML file
+            html_content (str): HTML content to save.
+            output_path (str): Path where to save the HTML file.
+            logger (logging.Logger): Logger instance for status messages.
         """
         try:
             with open(output_path, "w", encoding="utf-8") as file:
@@ -281,10 +341,16 @@ class ReportGeneratorFiles:
 
     @staticmethod
     def _save_pdf_file(pdf_options: Dict[str, Any], html_file_path: str, logger) -> None:
-        """Generate and save PDF report from HTML file.
+        """
+        Generate and save PDF report from HTML file.
+
+        Uses the `pdfkit` library to convert the saved HTML file into a PDF report.
+        The PDF filename is derived from the HTML filename.
 
         Args:
-            html_file_path: Path to the HTML file to convert to PDF
+            pdf_options (Dict[str, Any]): Options for PDF generation.
+            html_file_path (str): Path to the source HTML file.
+            logger (logging.Logger): Logger instance for status messages.
         """
         try:
             pdf_file_path = html_file_path.replace(".html", ".pdf")
