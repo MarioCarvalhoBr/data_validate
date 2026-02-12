@@ -1,4 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module defining project metadata and version information.
+
+This module provides the `MetadataInfo` class, which retrieves and stores
+package metadata (version, author, license, etc.) using `importlib.metadata`.
+It also handles version string construction including release levels (alpha, beta, final).
+"""
+
 import importlib.metadata
 from typing import Final
 
@@ -6,13 +14,41 @@ from data_validate.helpers.base.constant_base import ConstantBase
 
 
 class MetadataInfo(ConstantBase):
+    """
+    Class holding immutable metadata and version information for the project.
+
+    Retrieves metadata from the installed package (if available) or falls back
+    to default values. It constructs the full version string based on major,
+    minor, micro components, release level, and serial number.
+
+    Attributes:
+        __version__ (str): Full version string (e.g., '1.0.0b1.dev5').
+        __name__ (str): Distribution package name.
+        __project_name__ (str): Human-readable project name.
+        __description__ (str): Project summary/description.
+        __license__ (str): License type (e.g., 'MIT').
+        __python_version__ (str): Supported Python version requirements.
+        __author__ (str): Author's name.
+        __author_email__ (str): Author's email address.
+        __url__ (str): Project repository URL.
+        __status__ (str): Development status ('Development' or 'Production/Stable').
+        __welcome__ (str): Standard welcome message string.
+    """
+
     def __init__(self):
+        """
+        Initialize MetadataInfo with package metadata.
+
+        Attempts to load metadata from `importlib.metadata`. If the package is not
+        installed, warnings are printed and default values are used.
+        Finalizes initialization to make attributes immutable.
+        """
         super().__init__()
 
         project_name: Final = "Canoa"
         dist_name: Final = "canoa_data_validate"
         release_level: Final = "beta"
-        serial: Final = 692
+        serial: Final = 693
         status_dev: Final = 10
 
         self.__version__ = "0.0.0"
@@ -69,7 +105,22 @@ class MetadataInfo(ConstantBase):
         serial: int = 0,
         dev: int = 0,
     ) -> str:
-        """Create a readable version string from version_info tuple components."""
+        """
+        Create a readable version string from version info components.
+
+        Constructs a PEP 440 compatible version string based on the provided components.
+
+        Args:
+            major (int): Major version number.
+            minor (int): Minor version number.
+            micro (int): Micro (patch) version number.
+            release_level (str, optional): Release level ('alpha', 'beta', 'candidate', 'final'). Defaults to "final".
+            serial (int, optional): Serial number for pre-releases. Defaults to 0.
+            dev (int, optional): Development release number. Defaults to 0.
+
+        Returns:
+            str: The formatted version string.
+        """
         assert release_level in ["alpha", "beta", "candidate", "final"]
         version = "%d.%d.%d" % (major, minor, micro)
         if release_level != "final":
@@ -88,7 +139,20 @@ class MetadataInfo(ConstantBase):
         serial: int = 0,
         dev: int = 0,
     ) -> str:
-        """Make the URL people should start at for this version of data_validate.__init__.py."""
+        """
+        Generate the documentation URL for this specific version.
+
+        Args:
+            major (int): Major version number.
+            minor (int): Minor version number.
+            micro (int): Micro version number.
+            release_level (str): Release level.
+            serial (int, optional): Serial number. Defaults to 0.
+            dev (int, optional): Development number. Defaults to 0.
+
+        Returns:
+            str: URL pointing to the documentation for this version.
+        """
         return "https://data_validate.readthedocs.io/en/" + MetadataInfo._make_version(major, minor, micro, release_level, serial, dev)
 
 

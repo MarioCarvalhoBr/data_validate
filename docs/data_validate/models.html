@@ -38,6 +38,9 @@
                                 <a class="class" href="#SpModelABC.DEFINITIONS">SpModelABC.DEFINITIONS</a>
                                         <ul class="memberlist">
                                     <li>
+                                            <a class="function" href="#SpModelABC.DEFINITIONS.__init__">DEFINITIONS</a>
+                                    </li>
+                                    <li>
                                             <a class="variable" href="#SpModelABC.DEFINITIONS.CSV">CSV</a>
                                     </li>
                                     <li>
@@ -151,6 +154,9 @@
                         <li>
                                 <a class="class" href="#SpDescription.INFO">SpDescription.INFO</a>
                                         <ul class="memberlist">
+                                    <li>
+                                            <a class="function" href="#SpDescription.INFO.__init__">INFO</a>
+                                    </li>
                                     <li>
                                             <a class="variable" href="#SpDescription.INFO.SP_NAME">SP_NAME</a>
                                     </li>
@@ -278,6 +284,9 @@
                                 <a class="class" href="#SpComposition.INFO">SpComposition.INFO</a>
                                         <ul class="memberlist">
                                     <li>
+                                            <a class="function" href="#SpComposition.INFO.__init__">INFO</a>
+                                    </li>
+                                    <li>
                                             <a class="variable" href="#SpComposition.INFO.SP_NAME">SP_NAME</a>
                                     </li>
                                     <li>
@@ -332,6 +341,9 @@
                                 <a class="class" href="#SpValue.INFO">SpValue.INFO</a>
                                         <ul class="memberlist">
                                     <li>
+                                            <a class="function" href="#SpValue.INFO.__init__">INFO</a>
+                                    </li>
+                                    <li>
                                             <a class="variable" href="#SpValue.INFO.SP_NAME">SP_NAME</a>
                                     </li>
                                     <li>
@@ -383,6 +395,9 @@
                                 <a class="class" href="#SpProportionality.INFO">SpProportionality.INFO</a>
                                         <ul class="memberlist">
                                     <li>
+                                            <a class="function" href="#SpProportionality.INFO.__init__">INFO</a>
+                                    </li>
+                                    <li>
                                             <a class="variable" href="#SpProportionality.INFO.SP_NAME">SP_NAME</a>
                                     </li>
                                     <li>
@@ -433,6 +448,9 @@
                         <li>
                                 <a class="class" href="#SpScenario.INFO">SpScenario.INFO</a>
                                         <ul class="memberlist">
+                                    <li>
+                                            <a class="function" href="#SpScenario.INFO.__init__">INFO</a>
+                                    </li>
                                     <li>
                                             <a class="variable" href="#SpScenario.INFO.SP_NAME">SP_NAME</a>
                                     </li>
@@ -497,6 +515,9 @@
                                 <a class="class" href="#SpTemporalReference.INFO">SpTemporalReference.INFO</a>
                                         <ul class="memberlist">
                                     <li>
+                                            <a class="function" href="#SpTemporalReference.INFO.__init__">INFO</a>
+                                    </li>
+                                    <li>
                                             <a class="variable" href="#SpTemporalReference.INFO.SP_NAME">SP_NAME</a>
                                     </li>
                                     <li>
@@ -556,6 +577,9 @@
                         <li>
                                 <a class="class" href="#SpLegend.INFO">SpLegend.INFO</a>
                                         <ul class="memberlist">
+                                    <li>
+                                            <a class="function" href="#SpLegend.INFO.__init__">INFO</a>
+                                    </li>
                                     <li>
                                             <a class="variable" href="#SpLegend.INFO.SP_NAME">SP_NAME</a>
                                     </li>
@@ -646,6 +670,9 @@
                         <li>
                                 <a class="class" href="#SpDictionary.INFO">SpDictionary.INFO</a>
                                         <ul class="memberlist">
+                                    <li>
+                                            <a class="function" href="#SpDictionary.INFO.__init__">INFO</a>
+                                    </li>
                                     <li>
                                             <a class="variable" href="#SpDictionary.INFO.SP_NAME">SP_NAME</a>
                                     </li>
@@ -1361,10 +1388,51 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpModelABC.DEFINITIONS.__init__" class="classattr">
+                                        <input id="SpModelABC.DEFINITIONS.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpModelABC.DEFINITIONS</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpModelABC.DEFINITIONS.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpModelABC.DEFINITIONS.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpModelABC.DEFINITIONS.__init__-13"><a href="#SpModelABC.DEFINITIONS.__init__-13"><span class="linenos">13</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-14"><a href="#SpModelABC.DEFINITIONS.__init__-14"><span class="linenos">14</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-15"><a href="#SpModelABC.DEFINITIONS.__init__-15"><span class="linenos">15</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">CSV</span> <span class="o">=</span> <span class="s2">&quot;.csv&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-16"><a href="#SpModelABC.DEFINITIONS.__init__-16"><span class="linenos">16</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">XLSX</span> <span class="o">=</span> <span class="s2">&quot;.xlsx&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-17"><a href="#SpModelABC.DEFINITIONS.__init__-17"><span class="linenos">17</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">EXTENSIONS</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">CSV</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">XLSX</span><span class="p">]</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-18"><a href="#SpModelABC.DEFINITIONS.__init__-18"><span class="linenos">18</span></a>
+</span><span id="SpModelABC.DEFINITIONS.__init__-19"><a href="#SpModelABC.DEFINITIONS.__init__-19"><span class="linenos">19</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">LEGEND_EXISTS_FILE</span> <span class="o">=</span> <span class="s2">&quot;legend_exists_file&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-20"><a href="#SpModelABC.DEFINITIONS.__init__-20"><span class="linenos">20</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">LEGEND_READ_SUCCESS</span> <span class="o">=</span> <span class="s2">&quot;legend_read_success&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-21"><a href="#SpModelABC.DEFINITIONS.__init__-21"><span class="linenos">21</span></a>
+</span><span id="SpModelABC.DEFINITIONS.__init__-22"><a href="#SpModelABC.DEFINITIONS.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SCENARIO_EXISTS_FILE</span> <span class="o">=</span> <span class="s2">&quot;scenario_exists_file&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-23"><a href="#SpModelABC.DEFINITIONS.__init__-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SCENARIO_READ_SUCCESS</span> <span class="o">=</span> <span class="s2">&quot;scenario_read_success&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-24"><a href="#SpModelABC.DEFINITIONS.__init__-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SCENARIOS_LIST</span> <span class="o">=</span> <span class="s2">&quot;scenarios_list&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-25"><a href="#SpModelABC.DEFINITIONS.__init__-25"><span class="linenos">25</span></a>
+</span><span id="SpModelABC.DEFINITIONS.__init__-26"><a href="#SpModelABC.DEFINITIONS.__init__-26"><span class="linenos">26</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAMAE_SCENARIO</span> <span class="o">=</span> <span class="s2">&quot;cenarios&quot;</span>
+</span><span id="SpModelABC.DEFINITIONS.__init__-27"><a href="#SpModelABC.DEFINITIONS.__init__-27"><span class="linenos">27</span></a>
+</span><span id="SpModelABC.DEFINITIONS.__init__-28"><a href="#SpModelABC.DEFINITIONS.__init__-28"><span class="linenos">28</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpModelABC.DEFINITIONS.CSV" class="classattr">
                                 <div class="attr variable">
             <span class="name">CSV</span>
@@ -1929,10 +1997,42 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpDescription.INFO.__init__" class="classattr">
+                                        <input id="SpDescription.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpDescription.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpDescription.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpDescription.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpDescription.INFO.__init__-22"><a href="#SpDescription.INFO.__init__-22"><span class="linenos">22</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpDescription.INFO.__init__-23"><a href="#SpDescription.INFO.__init__-23"><span class="linenos">23</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpDescription.INFO.__init__-24"><a href="#SpDescription.INFO.__init__-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;descricao&quot;</span>
+</span><span id="SpDescription.INFO.__init__-25"><a href="#SpDescription.INFO.__init__-25"><span class="linenos">25</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de descricao&quot;</span>
+</span><span id="SpDescription.INFO.__init__-26"><a href="#SpDescription.INFO.__init__-26"><span class="linenos">26</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">MAX_TITLE_LENGTH</span> <span class="o">=</span> <span class="mi">40</span>
+</span><span id="SpDescription.INFO.__init__-27"><a href="#SpDescription.INFO.__init__-27"><span class="linenos">27</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">MAX_SIMPLE_DESC_LENGTH</span> <span class="o">=</span> <span class="mi">150</span>
+</span><span id="SpDescription.INFO.__init__-28"><a href="#SpDescription.INFO.__init__-28"><span class="linenos">28</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpDescription.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -2630,10 +2730,40 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpComposition.INFO.__init__" class="classattr">
+                                        <input id="SpComposition.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpComposition.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpComposition.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpComposition.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpComposition.INFO.__init__-18"><a href="#SpComposition.INFO.__init__-18"><span class="linenos">18</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpComposition.INFO.__init__-19"><a href="#SpComposition.INFO.__init__-19"><span class="linenos">19</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpComposition.INFO.__init__-20"><a href="#SpComposition.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;composicao&quot;</span>
+</span><span id="SpComposition.INFO.__init__-21"><a href="#SpComposition.INFO.__init__-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de composicao&quot;</span>
+</span><span id="SpComposition.INFO.__init__-22"><a href="#SpComposition.INFO.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpComposition.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -3003,10 +3133,40 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpValue.INFO.__init__" class="classattr">
+                                        <input id="SpValue.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpValue.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpValue.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpValue.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpValue.INFO.__init__-18"><a href="#SpValue.INFO.__init__-18"><span class="linenos">18</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpValue.INFO.__init__-19"><a href="#SpValue.INFO.__init__-19"><span class="linenos">19</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpValue.INFO.__init__-20"><a href="#SpValue.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;valores&quot;</span>
+</span><span id="SpValue.INFO.__init__-21"><a href="#SpValue.INFO.__init__-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de valores&quot;</span>
+</span><span id="SpValue.INFO.__init__-22"><a href="#SpValue.INFO.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpValue.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -3446,10 +3606,40 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpProportionality.INFO.__init__" class="classattr">
+                                        <input id="SpProportionality.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpProportionality.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpProportionality.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpProportionality.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpProportionality.INFO.__init__-19"><a href="#SpProportionality.INFO.__init__-19"><span class="linenos">19</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpProportionality.INFO.__init__-20"><a href="#SpProportionality.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpProportionality.INFO.__init__-21"><a href="#SpProportionality.INFO.__init__-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;proporcionalidades&quot;</span>
+</span><span id="SpProportionality.INFO.__init__-22"><a href="#SpProportionality.INFO.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de proporcionalidades&quot;</span>
+</span><span id="SpProportionality.INFO.__init__-23"><a href="#SpProportionality.INFO.__init__-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpProportionality.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -3853,10 +4043,41 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpScenario.INFO.__init__" class="classattr">
+                                        <input id="SpScenario.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpScenario.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpScenario.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpScenario.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpScenario.INFO.__init__-18"><a href="#SpScenario.INFO.__init__-18"><span class="linenos">18</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpScenario.INFO.__init__-19"><a href="#SpScenario.INFO.__init__-19"><span class="linenos">19</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpScenario.INFO.__init__-20"><a href="#SpScenario.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;cenarios&quot;</span>
+</span><span id="SpScenario.INFO.__init__-21"><a href="#SpScenario.INFO.__init__-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de cenarios&quot;</span>
+</span><span id="SpScenario.INFO.__init__-22"><a href="#SpScenario.INFO.__init__-22"><span class="linenos">22</span></a>
+</span><span id="SpScenario.INFO.__init__-23"><a href="#SpScenario.INFO.__init__-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpScenario.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -4270,10 +4491,42 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpTemporalReference.INFO.__init__" class="classattr">
+                                        <input id="SpTemporalReference.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpTemporalReference.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpTemporalReference.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpTemporalReference.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpTemporalReference.INFO.__init__-19"><a href="#SpTemporalReference.INFO.__init__-19"><span class="linenos">19</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpTemporalReference.INFO.__init__-20"><a href="#SpTemporalReference.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpTemporalReference.INFO.__init__-21"><a href="#SpTemporalReference.INFO.__init__-21"><span class="linenos">21</span></a>
+</span><span id="SpTemporalReference.INFO.__init__-22"><a href="#SpTemporalReference.INFO.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;referencia_temporal&quot;</span>
+</span><span id="SpTemporalReference.INFO.__init__-23"><a href="#SpTemporalReference.INFO.__init__-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de referência temporal&quot;</span>
+</span><span id="SpTemporalReference.INFO.__init__-24"><a href="#SpTemporalReference.INFO.__init__-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_SCENARIO_NAME</span> <span class="o">=</span> <span class="s2">&quot;cenarios&quot;</span>
+</span><span id="SpTemporalReference.INFO.__init__-25"><a href="#SpTemporalReference.INFO.__init__-25"><span class="linenos">25</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpTemporalReference.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -4858,10 +5111,43 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpLegend.INFO.__init__" class="classattr">
+                                        <input id="SpLegend.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpLegend.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpLegend.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpLegend.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpLegend.INFO.__init__-19"><a href="#SpLegend.INFO.__init__-19"><span class="linenos">19</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpLegend.INFO.__init__-20"><a href="#SpLegend.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpLegend.INFO.__init__-21"><a href="#SpLegend.INFO.__init__-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;legenda&quot;</span>
+</span><span id="SpLegend.INFO.__init__-22"><a href="#SpLegend.INFO.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de legendas&quot;</span>
+</span><span id="SpLegend.INFO.__init__-23"><a href="#SpLegend.INFO.__init__-23"><span class="linenos">23</span></a>            <span class="c1"># Others constants</span>
+</span><span id="SpLegend.INFO.__init__-24"><a href="#SpLegend.INFO.__init__-24"><span class="linenos">24</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">MIN_LOWER_LEGEND_DEFAULT</span> <span class="o">=</span> <span class="mi">0</span>
+</span><span id="SpLegend.INFO.__init__-25"><a href="#SpLegend.INFO.__init__-25"><span class="linenos">25</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">MAX_UPPER_LEGEND_DEFAULT</span> <span class="o">=</span> <span class="mi">1</span>
+</span><span id="SpLegend.INFO.__init__-26"><a href="#SpLegend.INFO.__init__-26"><span class="linenos">26</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpLegend.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>
@@ -5339,10 +5625,40 @@ classes to provide their own implementation.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Class base to create immutable constants after initialization</p>
+            <div class="docstring"><p>Class base to create immutable constants after initialization.</p>
+
+<p>Allows attributes to be set only during the initialization phase. Once
+<code>_finalize_initialization</code> is called (or logic implies initialization is done),
+attributes become read-only.</p>
+
+<p>Attributes:
+    _initialized (bool): Internal flag to track initialization state.</p>
 </div>
 
 
+                            <div id="SpDictionary.INFO.__init__" class="classattr">
+                                        <input id="SpDictionary.INFO.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">SpDictionary.INFO</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="SpDictionary.INFO.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#SpDictionary.INFO.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="SpDictionary.INFO.__init__-19"><a href="#SpDictionary.INFO.__init__-19"><span class="linenos">19</span></a>        <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+</span><span id="SpDictionary.INFO.__init__-20"><a href="#SpDictionary.INFO.__init__-20"><span class="linenos">20</span></a>            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+</span><span id="SpDictionary.INFO.__init__-21"><a href="#SpDictionary.INFO.__init__-21"><span class="linenos">21</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_NAME</span> <span class="o">=</span> <span class="s2">&quot;dicionario&quot;</span>
+</span><span id="SpDictionary.INFO.__init__-22"><a href="#SpDictionary.INFO.__init__-22"><span class="linenos">22</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">SP_DESCRIPTION</span> <span class="o">=</span> <span class="s2">&quot;Planilha de dicionario&quot;</span>
+</span><span id="SpDictionary.INFO.__init__-23"><a href="#SpDictionary.INFO.__init__-23"><span class="linenos">23</span></a>            <span class="bp">self</span><span class="o">.</span><span class="n">_finalize_initialization</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the constant base object.</p>
+</div>
+
+
+                            </div>
                             <div id="SpDictionary.INFO.SP_NAME" class="classattr">
                                 <div class="attr variable">
             <span class="name">SP_NAME</span>

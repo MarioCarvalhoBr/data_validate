@@ -1,3 +1,12 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing file system utility operations with localization support.
+
+This module defines the `FileSystemUtils` class, which offers methods for
+common file system tasks such as encoding detection, file/directory checks,
+and path manipulation, all returning localized messages managed by `LanguageManager`.
+"""
+
 import os
 from pathlib import Path
 from typing import Tuple, List
@@ -9,29 +18,39 @@ from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
 class FileSystemUtils:
     """
-    A class to provide file system utilities with localized messages.
+    Utility class for file system operations with localized messaging.
+
+    Provides a comprehensive set of methods to interact with the file system,
+    including file existence checks, directory creation, encoding detection,
+    and cleanup. All methods return localized success/error messages.
+
+    Attributes:
+        lm (LanguageManager): Instance for handling localized string retrieval.
     """
 
     def __init__(self):
         """
-        Initializes the FileSystemUtils with a LocaleManager instance.
+        Initialize the FileSystemUtils instance.
 
-        Atributes:
-            lm (LanguageManager): An instance of LanguageManager for localization.
+        Sets up the LanguageManager to provide localized feedback for file system operations.
         """
         self.lm: LanguageManager = LanguageManager()
 
     def detect_encoding(self, file_path: str, num_bytes: int = 1024) -> Tuple[bool, str]:
         """
-        Detects the encoding of a file by reading a specified number of bytes.
+        Detect file encoding by reading a sample of bytes.
+
+        Reads the first `num_bytes` of a file and uses `chardet` to guess its
+        character encoding.
 
         Args:
-            file_path (str): The path to the file.
-            num_bytes (int): The number of bytes to read for encoding detection. Default is 1024.
+            file_path (str): Absolute or relative path to the file.
+            num_bytes (int, optional): Number of bytes to read for detection. Defaults to 1024.
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean indicating success or failure
-                              and the detected encoding or a translated error message.
+            Tuple[bool, str]:
+                - bool: True if detection was successful, False otherwise.
+                - str: The detected encoding name (e.g., 'utf-8') or a localized error message.
         """
         try:
             if not file_path:
@@ -57,18 +76,31 @@ class FileSystemUtils:
             return False, self.lm.text("fs_utils_error_unexpected", error=str(e))
 
     def get_last_directory_name(self, path: str) -> str:
+        """
+        Extract the last component of a directory path.
+
+        Args:
+            path (str): The file system path.
+
+        Returns:
+            str: The name of the last directory or file in the path.
+        """
         return Path(path).name
 
     def remove_file(self, file_path: str) -> Tuple[bool, str]:
         """
-        Removes a file at the given path if it exists.
+        Securely remove a file from the filesystem.
+
+        Checks if the file exists and is indeed a file before attempting removal.
+        dempotent operation: returns success if the file is already gone.
 
         Args:
-            file_path (str): The path to the file to remove.
+            file_path (str): Path to the file to be removed.
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean indicating success or failure
-                              and a translated message describing the result.
+            Tuple[bool, str]:
+                - bool: True if removal was successful or file didn't exist.
+                - str: Localized message describing the outcome.
         """
         try:
             if not file_path:
@@ -86,14 +118,15 @@ class FileSystemUtils:
 
     def create_directory(self, dir_name: str) -> Tuple[bool, str]:
         """
-        Creates a directory with the given name if it does not already exist.
+        Create a new directory if it does not exist.
 
         Args:
-            dir_name (str): The name of the directory to create.
+            dir_name (str): Name or path of the directory to create.
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean indicating success or failure
-                              and a translated message describing the result.
+            Tuple[bool, str]:
+                - bool: True if created or already exists as a directory.
+                - str: Localized message describing the result.
         """
         try:
             if not dir_name:
@@ -112,14 +145,15 @@ class FileSystemUtils:
 
     def check_file_exists(self, file_path: str) -> Tuple[bool, List[str]]:
         """
-        Checks if a file exists at the given path.
+        Verify if a file exists and is a valid file.
 
         Args:
-            file_path (str): The path to the file.
+            file_path (str): Path to the file.
 
         Returns:
-            Tuple[bool, List[str]]: A tuple containing a boolean indicating if the file exists
-                                    and a list containing a single translated error message if it does not.
+            Tuple[bool, List[str]]:
+                - bool: True if the file exists and is valid.
+                - List[str]: List containing a localized error message if check fails, empty otherwise.
         """
         try:
             if not file_path:
@@ -139,14 +173,15 @@ class FileSystemUtils:
 
     def check_directory_exists(self, dir_path: str) -> Tuple[bool, str]:
         """
-        Checks if a directory exists at the given path.
+        Verify if a directory exists and is a valid directory.
 
         Args:
-            dir_path (str): The path to the directory.
+            dir_path (str): Path to the directory.
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean indicating if the directory exists
-                              and a translated error message if it does not.
+            Tuple[bool, str]:
+                - bool: True if the directory exists.
+                - str: Localized error message if check fails, empty string otherwise.
         """
         try:
             if not dir_path:
@@ -161,14 +196,15 @@ class FileSystemUtils:
 
     def check_directory_is_empty(self, dir_path: str) -> Tuple[bool, str]:
         """
-        Checks if a directory is empty.
+        Check if a directory contains no files or subdirectories.
 
         Args:
-            dir_path (str): The path to the directory.
+            dir_path (str): Path to the directory.
 
         Returns:
-            Tuple[bool, str]: A tuple containing a boolean indicating if the directory is empty
-                              and a translated message describing the result.
+            Tuple[bool, str]:
+                - bool: True if directory is empty.
+                - str: Localized message describing the result (e.g., directory not found, or not empty).
         """
         try:
             if not os.path.exists(dir_path):

@@ -1,15 +1,12 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 """
-This module provides classes for argument parsing, validation, and configuration
-used in the Adapta Parser project.
+Module provided to handle argument parsing, validation, and configuration.
 
-Classes:
-    DataModelABC: Abstract base class for argument parsing and validation.
-    DataFile: Handles file-related arguments and operations.
-    DataAction: Handles action-related arguments and operations.
-    DataReport: Handles report-related arguments and operations.
-    DataArgs: Main class for parsing and managing all program arguments.
-
+This module defines classes for managing command-line arguments related to:
+- Input/output files and folders (DataFile)
+- Execution flags and actions (DataAction)
+- Report metadata (DataReport)
+- Main argument orchestration (DataArgs)
 """
 
 import argparse
@@ -23,20 +20,21 @@ class DataModelABC(ABC):
     """
     Abstract base class for argument parsing and validation.
 
+    Defines the contract for argument collection classes, requiring implementation
+    of validation logic.
+
     Methods:
         _validate_arguments(): Abstract method to validate parsed arguments.
     """
 
     def __init__(self):
-        """
-        Initializes the DataModelABC class.
-        """
+        """Initialize the DataModelABC class."""
         pass
 
     @abstractmethod
     def _validate_arguments(self):
         """
-        Validates the parsed arguments.
+        Validate the parsed arguments.
 
         Raises:
             NotImplementedError: If the method is not implemented in a subclass.
@@ -48,19 +46,18 @@ class DataFile(DataModelABC):
     """
     Handles file-related arguments and operations.
 
-    Attributes:
-        input_folder (str): Path to the input folder.
-        output_folder (str): Path to the output folder.
-        locale (str): Locale setting.
+    Manages input and output paths and localization settings.
+    Executes validation logic immediately upon instantiation.
 
-    Methods:
-        _validate_arguments(): Validates the file-related arguments.
-        run(): Parses and validates the arguments.
+    Attributes:
+        input_folder (str): Absolute or relative path to the input data directory.
+        output_folder (str): Absolute or relative path to the output directory.
+        locale (str): Language/region code (e.g., 'pt_BR', 'en_US').
     """
 
     def __init__(self, input_folder=None, output_folder=None, locale=None):
         """
-        Initializes the DataFile class with default attributes.
+        Initialize the DataFile class with file paths and locale.
 
         Args:
             input_folder (str, optional): Path to the input folder.
@@ -77,7 +74,10 @@ class DataFile(DataModelABC):
 
     def _validate_arguments(self):
         """
-        Validates the file-related arguments.
+        Validate the file-related arguments.
+
+        Checks if the input folder exists and if the output folder name is valid
+        (cannot be a file name, must be a directory path).
 
         Raises:
             ValueError: If the input folder does not exist or the output folder name is invalid.
@@ -89,30 +89,23 @@ class DataFile(DataModelABC):
             raise ValueError(f"Output folder name is invalid: {self.output_folder}")
 
     def run(self):
-        """
-        Parses and validates the file-related arguments.
-        """
+        """Execute parsing and validation of file arguments."""
         self._validate_arguments()
 
 
 class DataAction(DataModelABC):
     """
-    Handles action-related arguments and operations.
+    Handles action-related arguments and operations settings.
+
+    Manages boolean flags that control the behavior of the validation process,
+    such as disabling checks, hiding information, or enabling debug mode.
 
     Attributes:
-        no_spellchecker (bool): Indicates whether the spell checker should be disabled.
-        no_warning_titles_length (bool): Indicates whether warnings for title length should be disabled.
-        no_time (bool): Indicates whether execution time and date information should be hidden.
-        no_version (bool): Indicates whether the script version should be hidden in the final report.
-        debug (bool): Indicates whether the program should run in debug mode.
-
-    Methods:
-        __init__(no_spellchecker=None, no_warning_titles_length=None, no_time=None, no_version=None, debug=None):
-            Initializes the DataAction class with the provided arguments.
-        _validate_arguments():
-            Validates the action-related arguments.
-        run():
-            Parses and validates the command-line arguments.
+        no_spellchecker (bool): If True, disables spell checking.
+        no_warning_titles_length (bool): If True, suppresses title length warnings.
+        no_time (bool): If True, hides execution time metadata.
+        no_version (bool): If True, hides version information in reports.
+        debug (bool): If True, enables verbose debug logging.
     """
 
     def __init__(
@@ -124,7 +117,7 @@ class DataAction(DataModelABC):
         debug=None,
     ):
         """
-        Initializes the DataAction class with default attributes.
+        Initialize the DataAction class with configuration flags.
 
         Args:
             no_spellchecker (bool, optional): Disables the spell checker. Defaults to None.
@@ -145,10 +138,12 @@ class DataAction(DataModelABC):
 
     def _validate_arguments(self):
         """
-        Validates the parsed arguments.
+        Validate the action-related arguments.
+
+        Ensures that all action flags are boolean values.
 
         Raises:
-            ValueError: If any of the arguments are not of the expected type.
+            ValueError: If any flag is not a boolean instance.
         """
         if not isinstance(self.no_spellchecker, bool):
             raise ValueError("no_spellchecker must be a boolean value.")
@@ -162,34 +157,27 @@ class DataAction(DataModelABC):
             raise ValueError("debug must be a boolean value.")
 
     def run(self):
-        """
-        Parses and validates the command-line arguments.
-        """
+        """Execute parsing and validation of action arguments."""
         self._validate_arguments()
 
 
 class DataReport(DataModelABC):
     """
-    Handles report-related arguments and operations.
+    Handles report-related metadata arguments.
+
+    Stores optional metadata information to be included in the generated reports,
+    such as user name, sector, and protocol details.
 
     Attributes:
-        sector (str): Name of the strategic sector.
-        protocol (str): Name of the protocol.
-        user (str): Name of the user.
-        file (str): Name of the file to be analyzed.
-
-    Methods:
-        __init__(sector=None, protocol=None, user=None, file=None):
-            Initializes the DataReport class with the provided arguments.
-        _validate_arguments():
-            Validates the report-related arguments.
-        run():
-            Parses and validates the command-line arguments.
+        sector (str): Name of the strategic sector being analyzed.
+        protocol (str): Name of the protocol or standard used.
+        user (str): Name of the user running the validation.
+        file (str): Name of the file being processed.
     """
 
     def __init__(self, sector=None, protocol=None, user=None, file=None):
         """
-        Initializes the DataReport class with default attributes.
+        Initialize the DataReport class with metadata.
 
         Args:
             sector (str, optional): Name of the strategic sector. Defaults to None.
@@ -208,40 +196,38 @@ class DataReport(DataModelABC):
 
     def _validate_arguments(self):
         """
-        Validates the report-related arguments.
+        Validate the report-related arguments.
+
+        Currently performs no specific validation (placeholder for future rules).
 
         Raises:
-            ValueError: If any of the arguments are invalid.
+            ValueError: If any validaton rule fails.
         """
         pass
 
     def run(self):
-        """
-        Parses and validates the command-line arguments.
-        """
+        """Execute parsing and validation of report arguments."""
         self._validate_arguments()
 
 
 class DataArgs:
     """
-    A class to handle argument parsing, configuration, and validation.
+    Main orchestration class for argument parsing, configuration, and validation.
+
+    Aggregates `DataFile`, `DataAction`, and `DataReport` to provide a centralized
+    access point for all application configuration parameters parsed from command line.
 
     Attributes:
-        data_file (DataFile): Instance for handling file-related arguments.
-        data_action (DataAction): Instance for handling action-related arguments.
-        data_report (DataReport): Instance for handling report-related arguments.
-        allow_abbrev (bool): Indicates if argument abbreviations are allowed.
-
-    Methods:
-        _create_parser(): Creates and configures the argument parser.
-        get_dict_args(): Returns the parsed arguments as a dictionary.
-        __str__(): Returns a string representation of the parsed arguments.
-        run(): Parses and validates the command-line arguments.
+        data_file (DataFile): Instance handling file/path inputs.
+        data_action (DataAction): Instance handling execution flags.
+        data_report (DataReport): Instance handling report metadata.
+        allow_abbrev (bool): Whether to allow argument abbreviation in argparse.
+        lm (LanguageManager): Manager for localization strings.
     """
 
     def __init__(self, allow_abbrev=True):
         """
-        Initializes the DataArgs class with default attributes.
+        Initialize the DataArgs class and parse CLI arguments immediately.
 
         Args:
             allow_abbrev (bool, optional): Allows argument abbreviations. Defaults to True.
@@ -259,7 +245,10 @@ class DataArgs:
 
     def _create_parser(self):
         """
-        Creates an argument parser with the required arguments.
+        Create and configure the ArgumentParser object.
+
+        Defines all supported command-line arguments across file, action, and report
+        categories.
 
         Returns:
             argparse.ArgumentParser: The configured argument parser.
@@ -315,10 +304,13 @@ class DataArgs:
 
     def get_dict_args(self):
         """
-        Returns the parsed arguments as a dictionary.
+        Return the parsed arguments as a dictionary.
+
+        Aggregates attributes from all sub-models (file, action, report) into a single
+        dictionary for easier serialization or logging.
 
         Returns:
-            dict: Dictionary of parsed arguments.
+            dict: Dictionary of all parsed arguments.
         """
         return {
             "input_folder": self.data_file.input_folder,
@@ -337,7 +329,7 @@ class DataArgs:
 
     def __str__(self):
         """
-        Returns a string representation of the parsed arguments.
+        Return a string representation of the parsed arguments.
 
         Returns:
             str: String representation of the parsed arguments.
@@ -355,7 +347,12 @@ class DataArgs:
 
     def run(self):
         """
-        Parses and validates the command-line arguments.
+        Parse and validate the command-line arguments.
+
+        Orchestrates the parsing flow:
+        1. Creates the parser.
+        2. Parses arguments from sys.argv.
+        3. Initializes `DataFile`, `DataAction`, and `DataReport` with parsed values.
         """
         # Create argument parser
         parser = self._create_parser()

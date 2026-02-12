@@ -1,3 +1,12 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing a customized logging system with color formatting.
+
+This module defines the `LoggerManager` for managing application-wide logging
+configurations and `CustomFormatter` for adding ANSI color codes to log
+messages based on their severity level.
+"""
+
 import logging
 import os
 from datetime import datetime
@@ -5,6 +14,21 @@ from typing import Optional
 
 
 class CustomFormatter(logging.Formatter):
+    """
+    Log formatter that adds colors to log levels for console output.
+
+    Extends `logging.Formatter` to prepend ANSI color codes to log messages
+    depending on the log level (DEBUG, INFO, WARNING, ERROR, CRITICAL).
+
+    Attributes:
+        grey (str): ANSI code for grey text (Debug/Info).
+        yellow (str): ANSI code for yellow text (Warning).
+        red (str): ANSI code for red text (Error).
+        bold_red (str): ANSI code for bold red text (Critical).
+        reset (str): ANSI code to reset terminal formatting.
+        format (str): The log message format string.
+        FORMATS (dict): Mapping of log levels to formatted strings.
+    """
 
     grey = "\x1b[38;20m"
     yellow = "\x1b[33;20m"
@@ -23,6 +47,15 @@ class CustomFormatter(logging.Formatter):
     }
 
     def format(self, record):
+        """
+        Format the specified record as text.
+
+        Args:
+            record (logging.LogRecord): The log record to format.
+
+        Returns:
+            str: The formatted log message with color codes.
+        """
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
@@ -30,11 +63,17 @@ class CustomFormatter(logging.Formatter):
 
 class LoggerManager:
     """
-    A class to manage logger configuration and log file generation.
+    Manager for logger configuration and log file generation.
+
+    Handles the setup of both console and file loggers, including directory creation
+    and applying custom formatters.
 
     Attributes:
-        log_folder (str): The folder where log files will be stored.
-        default_level (int): The default logging level.
+        log_folder (str): The directory path where log files will be stored.
+        default_level (int): The default logging severity level.
+        console_logger (logging.Logger): Configured logger for console output.
+        log_file (str): Path to the generated log file.
+        file_logger (logging.Logger): Configured logger for file output.
     """
 
     def __init__(
@@ -46,11 +85,16 @@ class LoggerManager:
         logger_name="data_validate_file_logger",
     ):
         """
-        Initializes the LoggerManager.
+        Initialize the LoggerManager.
+
+        Sets up the log directory and initializes both the console and file loggers.
 
         Args:
-            log_folder (str): The folder where log files will be stored. Defaults to "logs".
-            default_level (int): The default logging level. Defaults to logging.INFO.
+            log_folder (str, optional): Directory for log files. Defaults to "logs".
+            default_level (int, optional): Default log level. Defaults to logging.DEBUG.
+            console_logger (str, optional): Name for the console logger. Defaults to "console_logger".
+            prefix (str, optional): Prefix for the log file name. Defaults to "data_validate".
+            logger_name (str, optional): Name for the file logger. Defaults to "data_validate_file_logger".
         """
         self.log_folder = log_folder
         self.default_level = default_level
@@ -68,15 +112,18 @@ class LoggerManager:
         log_file: Optional[str] = None,
     ) -> logging.Logger:
         """
-        Configures a logger with the specified name, level, and optional log file.
+        Configure a logger with the specified name, level, and optional output file.
+
+        Creates or retrieves a logger, clears existing handlers to prevent duplication,
+        and attaches a console handler (with colors) and optionally a file handler.
 
         Args:
-            logger_name (str): The name of the logger.
-            level (Optional[int]): The logging level. If not provided, the default level is used.
-            log_file (Optional[str]): The path to the log file. If provided, logs will also be written to this file.
+            logger_name (str): The unique name of the logger.
+            level (Optional[int]): The logging level. Uses default_level if None.
+            log_file (Optional[str]): Path to a file where logs should be saved.
 
         Returns:
-            logging.Logger: The configured logger instance.
+            logging.Logger: The fully configured logger instance.
         """
         logger = logging.getLogger(logger_name)
         logger.setLevel(level or self.default_level)
@@ -102,13 +149,16 @@ class LoggerManager:
 
     def generate_log_file_name(self, prefix: str = "app") -> str:
         """
-        Generates a unique log file name with a timestamp.
+        Generate a unique timestamped log file name.
+
+        Creates a filename in the format `{prefix}_{YYYYMMDD}_{HHMMSS}.log` inside
+        the configured log folder.
 
         Args:
-            prefix (str): The prefix for the log file name. Defaults to "app".
+            prefix (str, optional): Prefix for the filename. Defaults to "app".
 
         Returns:
-            str: The full path to the generated log file.
+            str: The absolute path to the generated log file.
         """
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"{prefix}_{timestamp}.log"
