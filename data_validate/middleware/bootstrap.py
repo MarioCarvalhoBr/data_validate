@@ -1,3 +1,12 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module for bootstrapping application configuration and environment settings.
+
+This module defines the `Bootstrap` class, which handles initial setup tasks
+such as locale configuration and environment validation before the main
+application logic executes. It supports concurrent execution of setup tasks.
+"""
+
 import os
 from concurrent.futures import ThreadPoolExecutor
 
@@ -6,9 +15,28 @@ from data_validate.helpers.tools.locale.language_enum import LanguageEnum
 
 
 class Bootstrap:
+    """
+    Application bootstrap manager for initial configuration.
+
+    Handles environment setup tasks, specifically locale management validation
+    and persistence. It uses thread pooling to execute independent setup tasks
+    concurrently during initialization.
+
+    Attributes:
+        config_dir (str): Path to the user's configuration directory.
+        locale_file (str): Path to the locale configuration file.
+        default_locale (str): Default locale to use if none is configured.
+    """
+
     def __init__(self, data_args: DataArgs = None):
         """
-        Initializes the Bootstrap class with default configurations.
+        Initialize the Bootstrap class with default configurations.
+
+        Sets up paths for configuration files and triggers the initial
+        bootstrapping process via `run`.
+
+        Args:
+            data_args (DataArgs, optional): Arguments object containing runtime configuration.
         """
         self.config_dir = os.path.expanduser(".config")
         self.locale_file = os.path.join(self.config_dir, "store.locale")
@@ -19,10 +47,17 @@ class Bootstrap:
 
     def _check_and_set_locale(self, locale: str):
         """
-        Checks and configures the `store.locale` file.
+        Check and configure the application locale.
+
+        Validates the provided locale against supported languages. If valid,
+        persists it to `store.locale`. If not provided, attempts to load
+        from file or falls back to default.
 
         Args:
-            locale (str): The locale to set.
+            locale (str): The locale code to set (e.g., 'pt_BR').
+
+        Raises:
+            ValueError: If the provided locale is not supported.
         """
         os.makedirs(self.config_dir, exist_ok=True)
 
@@ -50,14 +85,17 @@ class Bootstrap:
 
     def run(self, args: DataArgs):
         """
-        Executes tasks in parallel using the provided DataArgs object.
+        Execute bootstrap tasks concurrently using thread pool.
+
+        Runs independent initialization tasks (like locale setup) in parallel
+        threads to speed up startup.
 
         Args:
-            args (DataArgs): An instance of the DataArgs class.
+            args (DataArgs): Parsed command-line arguments containing configuration.
 
         Raises:
-            TypeError: If the provided argument is not an instance of DataArgs.
-            ValueError: If the provided argument is None.
+            TypeError: If `args` is not an instance of `DataArgs`.
+            ValueError: If `args` is None.
         """
         if not isinstance(args, DataArgs):
             raise TypeError("The 'args' parameter must be an instance of the DataArgs class.")
