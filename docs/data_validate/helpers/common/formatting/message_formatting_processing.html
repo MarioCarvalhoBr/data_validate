@@ -35,6 +35,9 @@
                     <a class="class" href="#MessageFormattingProcessing">MessageFormattingProcessing</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="function" href="#MessageFormattingProcessing.__init__">MessageFormattingProcessing</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns">format_text_to_missing_and_expected_columns</a>
                         </li>
                 </ul>
@@ -56,41 +59,69 @@
                     <h1 class="modulename">
 <a href="./../../../../data_validate.html">data_validate</a><wbr>.<a href="./../../../helpers.html">helpers</a><wbr>.<a href="./../../common.html">common</a><wbr>.<a href="./../formatting.html">formatting</a><wbr>.message_formatting_processing    </h1>
 
-                
+                        <div class="docstring"><p>Module providing text formatting for error and warning messages.</p>
+
+<p>This module defines the <code><a href="#MessageFormattingProcessing">MessageFormattingProcessing</a></code> class, which generates
+standardized messages for validation issues such as missing or extra columns
+in data files.</p>
+</div>
+
                         <input id="mod-message_formatting_processing-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-message_formatting_processing-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">MessageFormattingProcessing</span><span class="p">:</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>        <span class="k">pass</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_text_to_missing_and_expected_columns</span><span class="p">(</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">extra_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">        Formats error and warning messages for missing and extra columns in a file.</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">        Args:</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">            file_name (str): Name of the file being checked.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">            missing_columns (List[str]): List of missing column names.</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">            extra_columns (List[str]): List of extra column names.</span>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">        Returns:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">            Tuple[List[str], List[str]]: A tuple containing lists of error and warning messages.</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; esperada mas não foi encontrada.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">]</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>            <span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; será ignorada pois não está na especificação.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">extra_columns</span><span class="p">]</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Erro ao processar a formatação de erros e avisos: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1">#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">Module providing text formatting for error and warning messages.</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">This module defines the `MessageFormattingProcessing` class, which generates</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">standardized messages for validation issues such as missing or extra columns</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">in data files.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="k">class</span><span class="w"> </span><span class="nc">MessageFormattingProcessing</span><span class="p">:</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    Utility class for formatting validation messages.</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">    Provides static methods to construct user-friendly error and warning messages</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    related to data structure validation.</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MessageFormattingProcessing class.&quot;&quot;&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_text_to_missing_and_expected_columns</span><span class="p">(</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">extra_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">        Format error and warning messages for missing and extra columns in a file.</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">        Constructs lists of localized strings describing structural issues found</span>
+</span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a><span class="sd">        during file validation.</span>
+</span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">        Args:</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">            file_name (str): Name of the file being checked.</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">            missing_columns (List[str]): List of missing column names.</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">            extra_columns (List[str]): List of extra column names.</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">            Tuple[List[str], List[str]]: A tuple containing:</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">                - List of error messages for missing columns.</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a><span class="sd">                - List of warning messages for extra (unexpected) columns.</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; esperada mas não foi encontrada.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">]</span>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>            <span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; será ignorada pois não está na especificação.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">extra_columns</span><span class="p">]</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Erro ao processar a formatação de erros e avisos: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
 </span></pre></div>
 
 
@@ -106,38 +137,77 @@
 
     </div>
     <a class="headerlink" href="#MessageFormattingProcessing"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="MessageFormattingProcessing-5"><a href="#MessageFormattingProcessing-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">MessageFormattingProcessing</span><span class="p">:</span>
-</span><span id="MessageFormattingProcessing-6"><a href="#MessageFormattingProcessing-6"><span class="linenos"> 6</span></a>
-</span><span id="MessageFormattingProcessing-7"><a href="#MessageFormattingProcessing-7"><span class="linenos"> 7</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="MessageFormattingProcessing-8"><a href="#MessageFormattingProcessing-8"><span class="linenos"> 8</span></a>        <span class="k">pass</span>
-</span><span id="MessageFormattingProcessing-9"><a href="#MessageFormattingProcessing-9"><span class="linenos"> 9</span></a>
-</span><span id="MessageFormattingProcessing-10"><a href="#MessageFormattingProcessing-10"><span class="linenos">10</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="MessageFormattingProcessing-11"><a href="#MessageFormattingProcessing-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_text_to_missing_and_expected_columns</span><span class="p">(</span>
-</span><span id="MessageFormattingProcessing-12"><a href="#MessageFormattingProcessing-12"><span class="linenos">12</span></a>        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">extra_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-</span><span id="MessageFormattingProcessing-13"><a href="#MessageFormattingProcessing-13"><span class="linenos">13</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="MessageFormattingProcessing-14"><a href="#MessageFormattingProcessing-14"><span class="linenos">14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="MessageFormattingProcessing-15"><a href="#MessageFormattingProcessing-15"><span class="linenos">15</span></a><span class="sd">        Formats error and warning messages for missing and extra columns in a file.</span>
-</span><span id="MessageFormattingProcessing-16"><a href="#MessageFormattingProcessing-16"><span class="linenos">16</span></a>
-</span><span id="MessageFormattingProcessing-17"><a href="#MessageFormattingProcessing-17"><span class="linenos">17</span></a><span class="sd">        Args:</span>
-</span><span id="MessageFormattingProcessing-18"><a href="#MessageFormattingProcessing-18"><span class="linenos">18</span></a><span class="sd">            file_name (str): Name of the file being checked.</span>
-</span><span id="MessageFormattingProcessing-19"><a href="#MessageFormattingProcessing-19"><span class="linenos">19</span></a><span class="sd">            missing_columns (List[str]): List of missing column names.</span>
-</span><span id="MessageFormattingProcessing-20"><a href="#MessageFormattingProcessing-20"><span class="linenos">20</span></a><span class="sd">            extra_columns (List[str]): List of extra column names.</span>
-</span><span id="MessageFormattingProcessing-21"><a href="#MessageFormattingProcessing-21"><span class="linenos">21</span></a><span class="sd">        Returns:</span>
-</span><span id="MessageFormattingProcessing-22"><a href="#MessageFormattingProcessing-22"><span class="linenos">22</span></a><span class="sd">            Tuple[List[str], List[str]]: A tuple containing lists of error and warning messages.</span>
-</span><span id="MessageFormattingProcessing-23"><a href="#MessageFormattingProcessing-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="MessageFormattingProcessing-24"><a href="#MessageFormattingProcessing-24"><span class="linenos">24</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="MessageFormattingProcessing-25"><a href="#MessageFormattingProcessing-25"><span class="linenos">25</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="MessageFormattingProcessing-26"><a href="#MessageFormattingProcessing-26"><span class="linenos">26</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="MessageFormattingProcessing-27"><a href="#MessageFormattingProcessing-27"><span class="linenos">27</span></a>            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; esperada mas não foi encontrada.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">]</span>
-</span><span id="MessageFormattingProcessing-28"><a href="#MessageFormattingProcessing-28"><span class="linenos">28</span></a>            <span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; será ignorada pois não está na especificação.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">extra_columns</span><span class="p">]</span>
-</span><span id="MessageFormattingProcessing-29"><a href="#MessageFormattingProcessing-29"><span class="linenos">29</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-</span><span id="MessageFormattingProcessing-30"><a href="#MessageFormattingProcessing-30"><span class="linenos">30</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Erro ao processar a formatação de erros e avisos: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="MessageFormattingProcessing-31"><a href="#MessageFormattingProcessing-31"><span class="linenos">31</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="MessageFormattingProcessing-14"><a href="#MessageFormattingProcessing-14"><span class="linenos">14</span></a><span class="k">class</span><span class="w"> </span><span class="nc">MessageFormattingProcessing</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing-15"><a href="#MessageFormattingProcessing-15"><span class="linenos">15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing-16"><a href="#MessageFormattingProcessing-16"><span class="linenos">16</span></a><span class="sd">    Utility class for formatting validation messages.</span>
+</span><span id="MessageFormattingProcessing-17"><a href="#MessageFormattingProcessing-17"><span class="linenos">17</span></a>
+</span><span id="MessageFormattingProcessing-18"><a href="#MessageFormattingProcessing-18"><span class="linenos">18</span></a><span class="sd">    Provides static methods to construct user-friendly error and warning messages</span>
+</span><span id="MessageFormattingProcessing-19"><a href="#MessageFormattingProcessing-19"><span class="linenos">19</span></a><span class="sd">    related to data structure validation.</span>
+</span><span id="MessageFormattingProcessing-20"><a href="#MessageFormattingProcessing-20"><span class="linenos">20</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing-21"><a href="#MessageFormattingProcessing-21"><span class="linenos">21</span></a>
+</span><span id="MessageFormattingProcessing-22"><a href="#MessageFormattingProcessing-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing-23"><a href="#MessageFormattingProcessing-23"><span class="linenos">23</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MessageFormattingProcessing class.&quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing-24"><a href="#MessageFormattingProcessing-24"><span class="linenos">24</span></a>        <span class="k">pass</span>
+</span><span id="MessageFormattingProcessing-25"><a href="#MessageFormattingProcessing-25"><span class="linenos">25</span></a>
+</span><span id="MessageFormattingProcessing-26"><a href="#MessageFormattingProcessing-26"><span class="linenos">26</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="MessageFormattingProcessing-27"><a href="#MessageFormattingProcessing-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_text_to_missing_and_expected_columns</span><span class="p">(</span>
+</span><span id="MessageFormattingProcessing-28"><a href="#MessageFormattingProcessing-28"><span class="linenos">28</span></a>        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">extra_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="MessageFormattingProcessing-29"><a href="#MessageFormattingProcessing-29"><span class="linenos">29</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="MessageFormattingProcessing-30"><a href="#MessageFormattingProcessing-30"><span class="linenos">30</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing-31"><a href="#MessageFormattingProcessing-31"><span class="linenos">31</span></a><span class="sd">        Format error and warning messages for missing and extra columns in a file.</span>
+</span><span id="MessageFormattingProcessing-32"><a href="#MessageFormattingProcessing-32"><span class="linenos">32</span></a>
+</span><span id="MessageFormattingProcessing-33"><a href="#MessageFormattingProcessing-33"><span class="linenos">33</span></a><span class="sd">        Constructs lists of localized strings describing structural issues found</span>
+</span><span id="MessageFormattingProcessing-34"><a href="#MessageFormattingProcessing-34"><span class="linenos">34</span></a><span class="sd">        during file validation.</span>
+</span><span id="MessageFormattingProcessing-35"><a href="#MessageFormattingProcessing-35"><span class="linenos">35</span></a>
+</span><span id="MessageFormattingProcessing-36"><a href="#MessageFormattingProcessing-36"><span class="linenos">36</span></a><span class="sd">        Args:</span>
+</span><span id="MessageFormattingProcessing-37"><a href="#MessageFormattingProcessing-37"><span class="linenos">37</span></a><span class="sd">            file_name (str): Name of the file being checked.</span>
+</span><span id="MessageFormattingProcessing-38"><a href="#MessageFormattingProcessing-38"><span class="linenos">38</span></a><span class="sd">            missing_columns (List[str]): List of missing column names.</span>
+</span><span id="MessageFormattingProcessing-39"><a href="#MessageFormattingProcessing-39"><span class="linenos">39</span></a><span class="sd">            extra_columns (List[str]): List of extra column names.</span>
+</span><span id="MessageFormattingProcessing-40"><a href="#MessageFormattingProcessing-40"><span class="linenos">40</span></a>
+</span><span id="MessageFormattingProcessing-41"><a href="#MessageFormattingProcessing-41"><span class="linenos">41</span></a><span class="sd">        Returns:</span>
+</span><span id="MessageFormattingProcessing-42"><a href="#MessageFormattingProcessing-42"><span class="linenos">42</span></a><span class="sd">            Tuple[List[str], List[str]]: A tuple containing:</span>
+</span><span id="MessageFormattingProcessing-43"><a href="#MessageFormattingProcessing-43"><span class="linenos">43</span></a><span class="sd">                - List of error messages for missing columns.</span>
+</span><span id="MessageFormattingProcessing-44"><a href="#MessageFormattingProcessing-44"><span class="linenos">44</span></a><span class="sd">                - List of warning messages for extra (unexpected) columns.</span>
+</span><span id="MessageFormattingProcessing-45"><a href="#MessageFormattingProcessing-45"><span class="linenos">45</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing-46"><a href="#MessageFormattingProcessing-46"><span class="linenos">46</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="MessageFormattingProcessing-47"><a href="#MessageFormattingProcessing-47"><span class="linenos">47</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="MessageFormattingProcessing-48"><a href="#MessageFormattingProcessing-48"><span class="linenos">48</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing-49"><a href="#MessageFormattingProcessing-49"><span class="linenos">49</span></a>            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; esperada mas não foi encontrada.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">]</span>
+</span><span id="MessageFormattingProcessing-50"><a href="#MessageFormattingProcessing-50"><span class="linenos">50</span></a>            <span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; será ignorada pois não está na especificação.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">extra_columns</span><span class="p">]</span>
+</span><span id="MessageFormattingProcessing-51"><a href="#MessageFormattingProcessing-51"><span class="linenos">51</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing-52"><a href="#MessageFormattingProcessing-52"><span class="linenos">52</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Erro ao processar a formatação de erros e avisos: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="MessageFormattingProcessing-53"><a href="#MessageFormattingProcessing-53"><span class="linenos">53</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Utility class for formatting validation messages.</p>
 
+<p>Provides static methods to construct user-friendly error and warning messages
+related to data structure validation.</p>
+</div>
+
+
+                            <div id="MessageFormattingProcessing.__init__" class="classattr">
+                                        <input id="MessageFormattingProcessing.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">MessageFormattingProcessing</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="MessageFormattingProcessing.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#MessageFormattingProcessing.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="MessageFormattingProcessing.__init__-22"><a href="#MessageFormattingProcessing.__init__-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing.__init__-23"><a href="#MessageFormattingProcessing.__init__-23"><span class="linenos">23</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the MessageFormattingProcessing class.&quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing.__init__-24"><a href="#MessageFormattingProcessing.__init__-24"><span class="linenos">24</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the MessageFormattingProcessing class.</p>
+</div>
+
+
+                            </div>
                             <div id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns" class="classattr">
                                         <input id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -150,39 +220,51 @@
 
     </div>
     <a class="headerlink" href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-10"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-10"><span class="linenos">10</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-11"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_text_to_missing_and_expected_columns</span><span class="p">(</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-12"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-12"><span class="linenos">12</span></a>        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">extra_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-13"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-13"><span class="linenos">13</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-14"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-14"><span class="linenos">14</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-15"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-15"><span class="linenos">15</span></a><span class="sd">        Formats error and warning messages for missing and extra columns in a file.</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-16"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-16"><span class="linenos">16</span></a>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-17"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-17"><span class="linenos">17</span></a><span class="sd">        Args:</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-18"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-18"><span class="linenos">18</span></a><span class="sd">            file_name (str): Name of the file being checked.</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-19"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-19"><span class="linenos">19</span></a><span class="sd">            missing_columns (List[str]): List of missing column names.</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-20"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-20"><span class="linenos">20</span></a><span class="sd">            extra_columns (List[str]): List of extra column names.</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-21"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-21"><span class="linenos">21</span></a><span class="sd">        Returns:</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-22"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-22"><span class="linenos">22</span></a><span class="sd">            Tuple[List[str], List[str]]: A tuple containing lists of error and warning messages.</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-23"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-24"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-24"><span class="linenos">24</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-25"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-25"><span class="linenos">25</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-26"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-26"><span class="linenos">26</span></a>        <span class="k">try</span><span class="p">:</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-27"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-27"><span class="linenos">27</span></a>            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; esperada mas não foi encontrada.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">]</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-28"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-28"><span class="linenos">28</span></a>            <span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; será ignorada pois não está na especificação.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">extra_columns</span><span class="p">]</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-29"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-29"><span class="linenos">29</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-30"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-30"><span class="linenos">30</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Erro ao processar a formatação de erros e avisos: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-31"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-31"><span class="linenos">31</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-26"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-26"><span class="linenos">26</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-27"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">format_text_to_missing_and_expected_columns</span><span class="p">(</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-28"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-28"><span class="linenos">28</span></a>        <span class="n">file_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">missing_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">extra_columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-29"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-29"><span class="linenos">29</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-30"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-30"><span class="linenos">30</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-31"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-31"><span class="linenos">31</span></a><span class="sd">        Format error and warning messages for missing and extra columns in a file.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-32"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-32"><span class="linenos">32</span></a>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-33"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-33"><span class="linenos">33</span></a><span class="sd">        Constructs lists of localized strings describing structural issues found</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-34"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-34"><span class="linenos">34</span></a><span class="sd">        during file validation.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-35"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-35"><span class="linenos">35</span></a>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-36"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-36"><span class="linenos">36</span></a><span class="sd">        Args:</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-37"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-37"><span class="linenos">37</span></a><span class="sd">            file_name (str): Name of the file being checked.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-38"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-38"><span class="linenos">38</span></a><span class="sd">            missing_columns (List[str]): List of missing column names.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-39"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-39"><span class="linenos">39</span></a><span class="sd">            extra_columns (List[str]): List of extra column names.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-40"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-40"><span class="linenos">40</span></a>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-41"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-41"><span class="linenos">41</span></a><span class="sd">        Returns:</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-42"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-42"><span class="linenos">42</span></a><span class="sd">            Tuple[List[str], List[str]]: A tuple containing:</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-43"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-43"><span class="linenos">43</span></a><span class="sd">                - List of error messages for missing columns.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-44"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-44"><span class="linenos">44</span></a><span class="sd">                - List of warning messages for extra (unexpected) columns.</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-45"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-45"><span class="linenos">45</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-46"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-46"><span class="linenos">46</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-47"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-47"><span class="linenos">47</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-48"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-48"><span class="linenos">48</span></a>        <span class="k">try</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-49"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-49"><span class="linenos">49</span></a>            <span class="n">errors</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; esperada mas não foi encontrada.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing_columns</span><span class="p">]</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-50"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-50"><span class="linenos">50</span></a>            <span class="n">warnings</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Coluna &#39;</span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">&#39; será ignorada pois não está na especificação.&quot;</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">extra_columns</span><span class="p">]</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-51"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-51"><span class="linenos">51</span></a>        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-52"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-52"><span class="linenos">52</span></a>            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_name</span><span class="si">}</span><span class="s2">: Erro ao processar a formatação de erros e avisos: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="MessageFormattingProcessing.format_text_to_missing_and_expected_columns-53"><a href="#MessageFormattingProcessing.format_text_to_missing_and_expected_columns-53"><span class="linenos">53</span></a>        <span class="k">return</span> <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Formats error and warning messages for missing and extra columns in a file.</p>
+            <div class="docstring"><p>Format error and warning messages for missing and extra columns in a file.</p>
+
+<p>Constructs lists of localized strings describing structural issues found
+during file validation.</p>
 
 <p>Args:
     file_name (str): Name of the file being checked.
     missing_columns (List[str]): List of missing column names.
-    extra_columns (List[str]): List of extra column names.
-Returns:
-    Tuple[List[str], List[str]]: A tuple containing lists of error and warning messages.</p>
+    extra_columns (List[str]): List of extra column names.</p>
+
+<p>Returns:
+    Tuple[List[str], List[str]]: A tuple containing:
+        - List of error messages for missing columns.
+        - List of warning messages for extra (unexpected) columns.</p>
 </div>
 
 

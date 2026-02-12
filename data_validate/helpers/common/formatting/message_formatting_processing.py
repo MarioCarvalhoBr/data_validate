@@ -1,9 +1,25 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing text formatting for error and warning messages.
+
+This module defines the `MessageFormattingProcessing` class, which generates
+standardized messages for validation issues such as missing or extra columns
+in data files.
+"""
+
 from typing import List, Tuple
 
 
 class MessageFormattingProcessing:
+    """
+    Utility class for formatting validation messages.
+
+    Provides static methods to construct user-friendly error and warning messages
+    related to data structure validation.
+    """
 
     def __init__(self) -> None:
+        """Initialize the MessageFormattingProcessing class."""
         pass
 
     @staticmethod
@@ -11,14 +27,20 @@ class MessageFormattingProcessing:
         file_name: str, missing_columns: List[str], extra_columns: List[str]
     ) -> Tuple[List[str], List[str]]:
         """
-        Formats error and warning messages for missing and extra columns in a file.
+        Format error and warning messages for missing and extra columns in a file.
+
+        Constructs lists of localized strings describing structural issues found
+        during file validation.
 
         Args:
             file_name (str): Name of the file being checked.
             missing_columns (List[str]): List of missing column names.
             extra_columns (List[str]): List of extra column names.
+
         Returns:
-            Tuple[List[str], List[str]]: A tuple containing lists of error and warning messages.
+            Tuple[List[str], List[str]]: A tuple containing:
+                - List of error messages for missing columns.
+                - List of warning messages for extra (unexpected) columns.
         """
         errors = []
         warnings = []

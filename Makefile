@@ -14,9 +14,11 @@ help: ## Shows available commands
 
 # 2. Install dependencies
 install: ## Install development dependencies
+	rm -rf poetry.lock
 	poetry install
 
 update: ## Update dependencies to latest versions
+	rm -rf poetry.lock
 	poetry update
 	poetry update --only=dev
 
