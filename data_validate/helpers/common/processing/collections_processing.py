@@ -1,3 +1,12 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module for processing and analyzing collections of data.
+
+This module defines the `CollectionsProcessing` class, which offers utility static
+methods for grouping list elements, categorizing specific string patterns (like IDs),
+extracting numeric identifiers, and comparing sets to find differences.
+"""
+
 import re
 from typing import List, Set, Any, Tuple
 
@@ -5,8 +14,15 @@ from data_validate.helpers.common.formatting.number_formatting_processing import
 
 
 class CollectionsProcessing:
+    """
+    Utility class for processing collections (Lists, Sets) of data.
+
+    Provides static methods for grouping, pattern extraction, ID validation,
+    and set difference analysis commonly required in data validation logic.
+    """
 
     def __init__(self) -> None:
+        """Initialize the CollectionsProcessing class."""
         pass
 
     @staticmethod
@@ -14,11 +30,13 @@ class CollectionsProcessing:
         """
         Group consecutive identical elements in a list.
 
+        Iterates through the list and groups sequential items that are equal.
+
         Args:
-            items: List of elements to group.
+            items (List): List of elements to group.
 
         Returns:
-            List of lists, where each sublist contains consecutive identical elements.
+            List[List]: List of lists, where each sublist contains consecutive identical elements.
 
         Raises:
             ValueError: If the input list is empty.
@@ -46,15 +64,17 @@ class CollectionsProcessing:
         """
         Categorizes a list of items (converted to strings) based on predefined ID patterns.
 
-        Items can match a base 'ID-YEAR' pattern or an extended 'ID-YEAR-SCENARIO_SUFFIX' pattern
-        if scenario suffixes are provided.
+        Items can match a base 'ID-YEAR' pattern (e.g., '1-2020') or an extended
+        'ID-YEAR-SCENARIO_SUFFIX' pattern (e.g., '1-2030-SSP1') if scenario suffixes are provided.
 
         Args:
             items_to_categorize (List[Any]): List of items to be categorized (converted to strings).
             allowed_scenario_suffixes (List[Any], optional): List of allowed scenario suffixes. Defaults to None.
 
         Returns:
-            Tuple[List[str], List[str]]: Items matched by pattern and items not matched by pattern.
+            Tuple[List[str], List[str]]: A tuple containing:
+                - List[str]: Items matched by the pattern.
+                - List[str]: Items NOT natural by the pattern.
         """
         if allowed_scenario_suffixes is None:
             allowed_scenario_suffixes = []
@@ -88,11 +108,15 @@ class CollectionsProcessing:
         """
         Extracts and categorizes valid and invalid IDs from a list of values.
 
+        Valid IDs must be positive integers >= 1.
+
         Args:
             id_values_list (List[Any]): List of values to validate and categorize as IDs.
 
         Returns:
-            Tuple[Set[int], Set[Any]]: Set of valid integer IDs and set of invalid values.
+            Tuple[Set[int], Set[Any]]: A tuple containing:
+                - Set[int]: Set of valid integer IDs.
+                - Set[Any]: Set of invalid values found.
         """
         valid_ids: Set[int] = set()
         invalid_ids: Set[Any] = set()
@@ -115,13 +139,18 @@ class CollectionsProcessing:
         Extracts numeric IDs from a list of strings that match specific patterns and returns a list of strings
         that do not match or are not ignored.
 
+        First attempts to match items against 'ID-YEAR[-SCENARIO]' patterns to extract the ID part.
+        Unmatched items are returned unless they are in the ignore list.
+
         Args:
             source_list (List[Any], optional): List of source strings to process. Defaults to None.
-            strings_to_ignore (List[Any], optional): List of strings to ignore from unmatched items. Defaults to None.
+            strings_to_ignore (List[Any], optional): List of strings to exclude if unmatched. Defaults to None.
             suffixes_for_matching (List[Any], optional): List of scenario suffixes for pattern matching. Defaults to None.
 
         Returns:
-            Tuple[Set[int], List[str]]: Set of unique integer IDs and list of unmatched strings not ignored.
+            Tuple[Set[int], List[str]]: A tuple containing:
+                - Set[int]: Set of unique integer IDs extracted from matched strings.
+                - List[str]: List of unmatched strings that were not ignored.
         """
         if source_list is None:
             source_list = []
@@ -141,14 +170,16 @@ class CollectionsProcessing:
     @staticmethod
     def find_differences_in_two_set(first_set: Set[Any], second_set: Set[Any]) -> Tuple[Set[Any], Set[Any]]:
         """
-        Compares two sets and identifies missing elements in each set.
+        Compares two sets and identifies missing elements in each set relative to the other.
 
         Args:
             first_set (Set[Any]): First set to compare.
             second_set (Set[Any]): Second set to compare.
 
         Returns:
-            Tuple[Set[Any], Set[Any]]: Elements missing in second_set and elements missing in first_set.
+            Tuple[Set[Any], Set[Any]]: A tuple containing:
+                - Set[Any]: Elements present in first_set but MISSING in second_set.
+                - Set[Any]: Elements present in second_set but MISSING in first_set.
         """
         if first_set is None:
             first_set = set()
@@ -161,16 +192,19 @@ class CollectionsProcessing:
     @staticmethod
     def find_differences_in_two_set_with_message(first_set: Set[Any], label_1: str, second_set: Set[Any], label_2: str) -> List[str]:
         """
-        Compares two sets and returns error messages for missing elements in each set.
+        Compares two sets and returns formatted error messages for missing elements.
+
+        Wraps `find_differences_in_two_set` to generate human-readable error messages
+        identifying which elements are missing from which set.
 
         Args:
             first_set (Set[Any]): First set to compare.
-            label_1 (str): Label for the first set (used in error messages).
+            label_1 (str): Label for the first set (for error messages).
             second_set (Set[Any]): Second set to compare.
-            label_2 (str): Label for the second set (used in error messages).
+            label_2 (str): Label for the second set (for error messages).
 
         Returns:
-            List[str]: Error messages describing missing elements in each set.
+            List[str]: List of error strings describing the set differences found.
         """
         errors: List[str] = []
         if first_set is None:

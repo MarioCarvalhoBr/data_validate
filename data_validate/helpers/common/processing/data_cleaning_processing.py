@@ -1,3 +1,12 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing data cleaning utilities including integer validation.
+
+This module defines the `DataCleaningProcessing` class, which offers methods
+to clean and validate DataFrame columns, specifically ensuring integer integrity
+and handling empty values.
+"""
+
 from typing import Tuple, List
 
 import pandas as pd
@@ -6,8 +15,15 @@ from data_validate.helpers.common.formatting.number_formatting_processing import
 
 
 class DataCleaningProcessing:
+    """
+    Utility class for data cleaning and validation operations.
+
+    Provides static methods to clean DataFrame columns by validating data types
+    (e.g., integrity checks for integer columns) and filtering out invalid rows.
+    """
 
     def __init__(self) -> None:
+        """Initialize the DataCleaningProcessing class."""
         pass
 
     @staticmethod
@@ -19,9 +35,22 @@ class DataCleaningProcessing:
         allow_empty: bool = False,
     ) -> Tuple[pd.DataFrame, List[str]]:
         """
-        Validate and clean a single column, dropping invalid rows.
+        Validate and clean a single DataFrame column, enforcing integer constraints.
 
-        Returns the cleaned DataFrame and a list of error messages.
+        Iterates through the column to verify each cell contains a valid integer
+        (or is empty if allowed). Drops invalid rows and returns cleaning errors.
+
+        Args:
+            df (pd.DataFrame): The DataFrame containing the column to clean.
+            column (str): The name of the column to validate.
+            file_name (str): Original file name for error reporting context.
+            min_value (int, optional): The minimum allowed integer value. Defaults to 0.
+            allow_empty (bool, optional): If True, treats empty cells as valid. Defaults to False.
+
+        Returns:
+            Tuple[pd.DataFrame, List[str]]: A tuple containing:
+                - pd.DataFrame: A new DataFrame with only valid rows for this column.
+                - List[str]: A list of error messages for invalid cells found.
         """
         errors: List[str] = []
         if column not in df.columns:
@@ -56,9 +85,22 @@ class DataCleaningProcessing:
         allow_empty: bool = False,
     ) -> Tuple[pd.DataFrame, List[str]]:
         """
-        Clean multiple columns in the DataFrame, validating integer values.
+        Clean multiple columns in the DataFrame, enforcing integer validation on all.
 
-        Returns the cleaned DataFrame and a list of all errors.
+        Sequentially applies `clean_column_integer` to each specified column,
+        accumulating errors and progressively filtering the DataFrame.
+
+        Args:
+            df (pd.DataFrame): The DataFrame to process.
+            file_name (str): Original file name for error reporting context.
+            columns_to_clean (List[str]): List of column names to validate and clean.
+            min_value (int, optional): Minimum allowed value for integers. Defaults to 0.
+            allow_empty (bool, optional): If True, allows empty values in the columns. Defaults to False.
+
+        Returns:
+            Tuple[pd.DataFrame, List[str]]: A tuple containing:
+                - pd.DataFrame: The fully cleaned DataFrame.
+                - List[str]: Aggregated list of all validation errors encountered.
         """
         df_work = df.copy()
         all_errors: List[str] = []
