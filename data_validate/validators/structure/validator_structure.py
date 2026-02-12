@@ -3,13 +3,11 @@
 import os
 from typing import List, Dict, Any, Tuple
 
-from data_validate.config.config import NamesEnum
+from data_validate.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.models import SpDescription
-from data_validate.validators.spreadsheets.base.validator_model_abc import (
-    ValidatorModelABC,
-)
+from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
 
 
 class ValidatorStructureFiles(ValidatorModelABC):
@@ -80,8 +78,8 @@ class ValidatorStructureFiles(ValidatorModelABC):
         Check for unexpected folders or files in the input directory.
         """
         local_errors = []
-        expected_files = self.context.config.EXPECTED_FILES
-        optional_files = self.context.config.OPTIONAL_FILES
+        expected_files: Dict[str, List[str]] = self.context.config.spreadsheet_info.EXPECTED_FILES
+        optional_files: Dict[str, List[str]] = self.context.config.spreadsheet_info.OPTIONAL_FILES
 
         if len(self.dir_files) == 1:
             dir_path = os.path.join(self.context.data_args.data_file.input_folder, self.dir_files[0])
@@ -98,6 +96,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
                 continue
 
             file_base, file_ext = os.path.splitext(file_name)
+
             if file_base in expected_files and file_ext in expected_files[file_base]:
                 continue
             if file_base in optional_files and file_ext in optional_files[file_base]:
@@ -112,7 +111,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
         Check if all expected files are present in the input directory.
         """
         local_errors = []
-        expected_files = self.context.config.EXPECTED_FILES
+        expected_files: Dict[str, List[str]] = self.context.config.spreadsheet_info.EXPECTED_FILES
 
         for file_base, extensions in expected_files.items():
             file_found = False

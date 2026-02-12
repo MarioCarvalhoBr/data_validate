@@ -94,75 +94,115 @@
 
     </div>
     <a class="headerlink" href="#Bootstrap"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap-9"><a href="#Bootstrap-9"><span class="linenos"> 9</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Bootstrap</span><span class="p">:</span>
-</span><span id="Bootstrap-10"><a href="#Bootstrap-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_args</span><span class="p">:</span> <span class="n">DataArgs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="Bootstrap-11"><a href="#Bootstrap-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Bootstrap-12"><a href="#Bootstrap-12"><span class="linenos">12</span></a><span class="sd">        Initializes the Bootstrap class with default configurations.</span>
-</span><span id="Bootstrap-13"><a href="#Bootstrap-13"><span class="linenos">13</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Bootstrap-14"><a href="#Bootstrap-14"><span class="linenos">14</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;.config&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-15"><a href="#Bootstrap-15"><span class="linenos">15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;store.locale&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-16"><a href="#Bootstrap-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span> <span class="o">=</span> <span class="n">LanguageEnum</span><span class="o">.</span><span class="n">DEFAULT_LANGUAGE</span><span class="o">.</span><span class="n">value</span>
-</span><span id="Bootstrap-17"><a href="#Bootstrap-17"><span class="linenos">17</span></a>
-</span><span id="Bootstrap-18"><a href="#Bootstrap-18"><span class="linenos">18</span></a>        <span class="c1"># Run the argument parser</span>
-</span><span id="Bootstrap-19"><a href="#Bootstrap-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data_args</span><span class="p">)</span>
-</span><span id="Bootstrap-20"><a href="#Bootstrap-20"><span class="linenos">20</span></a>
-</span><span id="Bootstrap-21"><a href="#Bootstrap-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_set_locale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locale</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-</span><span id="Bootstrap-22"><a href="#Bootstrap-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Bootstrap-23"><a href="#Bootstrap-23"><span class="linenos">23</span></a><span class="sd">        Checks and configures the `store.locale` file.</span>
-</span><span id="Bootstrap-24"><a href="#Bootstrap-24"><span class="linenos">24</span></a>
-</span><span id="Bootstrap-25"><a href="#Bootstrap-25"><span class="linenos">25</span></a><span class="sd">        Args:</span>
-</span><span id="Bootstrap-26"><a href="#Bootstrap-26"><span class="linenos">26</span></a><span class="sd">            locale (str): The locale to set.</span>
-</span><span id="Bootstrap-27"><a href="#Bootstrap-27"><span class="linenos">27</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Bootstrap-28"><a href="#Bootstrap-28"><span class="linenos">28</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-</span><span id="Bootstrap-29"><a href="#Bootstrap-29"><span class="linenos">29</span></a>
-</span><span id="Bootstrap-30"><a href="#Bootstrap-30"><span class="linenos">30</span></a>        <span class="k">if</span> <span class="n">locale</span><span class="p">:</span>
-</span><span id="Bootstrap-31"><a href="#Bootstrap-31"><span class="linenos">31</span></a>            <span class="k">if</span> <span class="n">locale</span> <span class="ow">in</span> <span class="n">LanguageEnum</span><span class="o">.</span><span class="n">list_supported_languages</span><span class="p">():</span>
-</span><span id="Bootstrap-32"><a href="#Bootstrap-32"><span class="linenos">32</span></a>                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Bootstrap-33"><a href="#Bootstrap-33"><span class="linenos">33</span></a>                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">locale</span><span class="p">)</span>
-</span><span id="Bootstrap-34"><a href="#Bootstrap-34"><span class="linenos">34</span></a>                <span class="k">return</span>
-</span><span id="Bootstrap-35"><a href="#Bootstrap-35"><span class="linenos">35</span></a>            <span class="k">else</span><span class="p">:</span>
-</span><span id="Bootstrap-36"><a href="#Bootstrap-36"><span class="linenos">36</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid locale: </span><span class="si">{</span><span class="n">locale</span><span class="si">}</span><span class="s2">. Use &#39;</span><span class="si">{</span><span class="n">LanguageEnum</span><span class="o">.</span><span class="n">DEFAULT_LANGUAGE</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39; or &#39;en_US&#39;.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-37"><a href="#Bootstrap-37"><span class="linenos">37</span></a>
-</span><span id="Bootstrap-38"><a href="#Bootstrap-38"><span class="linenos">38</span></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">):</span>
-</span><span id="Bootstrap-39"><a href="#Bootstrap-39"><span class="linenos">39</span></a>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Bootstrap-40"><a href="#Bootstrap-40"><span class="linenos">40</span></a>                <span class="n">current_locale</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-</span><span id="Bootstrap-41"><a href="#Bootstrap-41"><span class="linenos">41</span></a>                <span class="k">if</span> <span class="n">current_locale</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pt_BR&quot;</span><span class="p">,</span> <span class="s2">&quot;en_US&quot;</span><span class="p">]:</span>
-</span><span id="Bootstrap-42"><a href="#Bootstrap-42"><span class="linenos">42</span></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Locale configured: </span><span class="si">{</span><span class="n">current_locale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-43"><a href="#Bootstrap-43"><span class="linenos">43</span></a>                    <span class="k">return</span>
-</span><span id="Bootstrap-44"><a href="#Bootstrap-44"><span class="linenos">44</span></a>                <span class="k">else</span><span class="p">:</span>
-</span><span id="Bootstrap-45"><a href="#Bootstrap-45"><span class="linenos">45</span></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid locale found: </span><span class="si">{</span><span class="n">current_locale</span><span class="si">}</span><span class="s2">. Using default &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-46"><a href="#Bootstrap-46"><span class="linenos">46</span></a>        <span class="k">else</span><span class="p">:</span>
-</span><span id="Bootstrap-47"><a href="#Bootstrap-47"><span class="linenos">47</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;store.locale&#39; not found. Creating with default locale &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-48"><a href="#Bootstrap-48"><span class="linenos">48</span></a>
-</span><span id="Bootstrap-49"><a href="#Bootstrap-49"><span class="linenos">49</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-</span><span id="Bootstrap-50"><a href="#Bootstrap-50"><span class="linenos">50</span></a>            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span><span class="p">)</span>
-</span><span id="Bootstrap-51"><a href="#Bootstrap-51"><span class="linenos">51</span></a>
-</span><span id="Bootstrap-52"><a href="#Bootstrap-52"><span class="linenos">52</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">DataArgs</span><span class="p">):</span>
-</span><span id="Bootstrap-53"><a href="#Bootstrap-53"><span class="linenos">53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Bootstrap-54"><a href="#Bootstrap-54"><span class="linenos">54</span></a><span class="sd">        Executes tasks in parallel using the provided DataArgs object.</span>
-</span><span id="Bootstrap-55"><a href="#Bootstrap-55"><span class="linenos">55</span></a>
-</span><span id="Bootstrap-56"><a href="#Bootstrap-56"><span class="linenos">56</span></a><span class="sd">        Args:</span>
-</span><span id="Bootstrap-57"><a href="#Bootstrap-57"><span class="linenos">57</span></a><span class="sd">            args (DataArgs): An instance of the DataArgs class.</span>
-</span><span id="Bootstrap-58"><a href="#Bootstrap-58"><span class="linenos">58</span></a>
-</span><span id="Bootstrap-59"><a href="#Bootstrap-59"><span class="linenos">59</span></a><span class="sd">        Raises:</span>
-</span><span id="Bootstrap-60"><a href="#Bootstrap-60"><span class="linenos">60</span></a><span class="sd">            TypeError: If the provided argument is not an instance of DataArgs.</span>
-</span><span id="Bootstrap-61"><a href="#Bootstrap-61"><span class="linenos">61</span></a><span class="sd">            ValueError: If the provided argument is None.</span>
-</span><span id="Bootstrap-62"><a href="#Bootstrap-62"><span class="linenos">62</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Bootstrap-63"><a href="#Bootstrap-63"><span class="linenos">63</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">DataArgs</span><span class="p">):</span>
-</span><span id="Bootstrap-64"><a href="#Bootstrap-64"><span class="linenos">64</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter must be an instance of the DataArgs class.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-65"><a href="#Bootstrap-65"><span class="linenos">65</span></a>        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Bootstrap-66"><a href="#Bootstrap-66"><span class="linenos">66</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter cannot be None.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap-67"><a href="#Bootstrap-67"><span class="linenos">67</span></a>
-</span><span id="Bootstrap-68"><a href="#Bootstrap-68"><span class="linenos">68</span></a>        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="Bootstrap-69"><a href="#Bootstrap-69"><span class="linenos">69</span></a>            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="Bootstrap-70"><a href="#Bootstrap-70"><span class="linenos">70</span></a>                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_and_set_locale</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data_file</span><span class="o">.</span><span class="n">locale</span><span class="p">),</span>
-</span><span id="Bootstrap-71"><a href="#Bootstrap-71"><span class="linenos">71</span></a>            <span class="p">]</span>
-</span><span id="Bootstrap-72"><a href="#Bootstrap-72"><span class="linenos">72</span></a>            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
-</span><span id="Bootstrap-73"><a href="#Bootstrap-73"><span class="linenos">73</span></a>                <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># Wait for each task to complete</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap-18"><a href="#Bootstrap-18"><span class="linenos"> 18</span></a><span class="k">class</span><span class="w"> </span><span class="nc">Bootstrap</span><span class="p">:</span>
+</span><span id="Bootstrap-19"><a href="#Bootstrap-19"><span class="linenos"> 19</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap-20"><a href="#Bootstrap-20"><span class="linenos"> 20</span></a><span class="sd">    Application bootstrap manager for initial configuration.</span>
+</span><span id="Bootstrap-21"><a href="#Bootstrap-21"><span class="linenos"> 21</span></a>
+</span><span id="Bootstrap-22"><a href="#Bootstrap-22"><span class="linenos"> 22</span></a><span class="sd">    Handles environment setup tasks, specifically locale management validation</span>
+</span><span id="Bootstrap-23"><a href="#Bootstrap-23"><span class="linenos"> 23</span></a><span class="sd">    and persistence. It uses thread pooling to execute independent setup tasks</span>
+</span><span id="Bootstrap-24"><a href="#Bootstrap-24"><span class="linenos"> 24</span></a><span class="sd">    concurrently during initialization.</span>
+</span><span id="Bootstrap-25"><a href="#Bootstrap-25"><span class="linenos"> 25</span></a>
+</span><span id="Bootstrap-26"><a href="#Bootstrap-26"><span class="linenos"> 26</span></a><span class="sd">    Attributes:</span>
+</span><span id="Bootstrap-27"><a href="#Bootstrap-27"><span class="linenos"> 27</span></a><span class="sd">        config_dir (str): Path to the user&#39;s configuration directory.</span>
+</span><span id="Bootstrap-28"><a href="#Bootstrap-28"><span class="linenos"> 28</span></a><span class="sd">        locale_file (str): Path to the locale configuration file.</span>
+</span><span id="Bootstrap-29"><a href="#Bootstrap-29"><span class="linenos"> 29</span></a><span class="sd">        default_locale (str): Default locale to use if none is configured.</span>
+</span><span id="Bootstrap-30"><a href="#Bootstrap-30"><span class="linenos"> 30</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="Bootstrap-31"><a href="#Bootstrap-31"><span class="linenos"> 31</span></a>
+</span><span id="Bootstrap-32"><a href="#Bootstrap-32"><span class="linenos"> 32</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_args</span><span class="p">:</span> <span class="n">DataArgs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="Bootstrap-33"><a href="#Bootstrap-33"><span class="linenos"> 33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap-34"><a href="#Bootstrap-34"><span class="linenos"> 34</span></a><span class="sd">        Initialize the Bootstrap class with default configurations.</span>
+</span><span id="Bootstrap-35"><a href="#Bootstrap-35"><span class="linenos"> 35</span></a>
+</span><span id="Bootstrap-36"><a href="#Bootstrap-36"><span class="linenos"> 36</span></a><span class="sd">        Sets up paths for configuration files and triggers the initial</span>
+</span><span id="Bootstrap-37"><a href="#Bootstrap-37"><span class="linenos"> 37</span></a><span class="sd">        bootstrapping process via `run`.</span>
+</span><span id="Bootstrap-38"><a href="#Bootstrap-38"><span class="linenos"> 38</span></a>
+</span><span id="Bootstrap-39"><a href="#Bootstrap-39"><span class="linenos"> 39</span></a><span class="sd">        Args:</span>
+</span><span id="Bootstrap-40"><a href="#Bootstrap-40"><span class="linenos"> 40</span></a><span class="sd">            data_args (DataArgs, optional): Arguments object containing runtime configuration.</span>
+</span><span id="Bootstrap-41"><a href="#Bootstrap-41"><span class="linenos"> 41</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Bootstrap-42"><a href="#Bootstrap-42"><span class="linenos"> 42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;.config&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-43"><a href="#Bootstrap-43"><span class="linenos"> 43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;store.locale&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-44"><a href="#Bootstrap-44"><span class="linenos"> 44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span> <span class="o">=</span> <span class="n">LanguageEnum</span><span class="o">.</span><span class="n">DEFAULT_LANGUAGE</span><span class="o">.</span><span class="n">value</span>
+</span><span id="Bootstrap-45"><a href="#Bootstrap-45"><span class="linenos"> 45</span></a>
+</span><span id="Bootstrap-46"><a href="#Bootstrap-46"><span class="linenos"> 46</span></a>        <span class="c1"># Run the argument parser</span>
+</span><span id="Bootstrap-47"><a href="#Bootstrap-47"><span class="linenos"> 47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data_args</span><span class="p">)</span>
+</span><span id="Bootstrap-48"><a href="#Bootstrap-48"><span class="linenos"> 48</span></a>
+</span><span id="Bootstrap-49"><a href="#Bootstrap-49"><span class="linenos"> 49</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_and_set_locale</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">locale</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+</span><span id="Bootstrap-50"><a href="#Bootstrap-50"><span class="linenos"> 50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap-51"><a href="#Bootstrap-51"><span class="linenos"> 51</span></a><span class="sd">        Check and configure the application locale.</span>
+</span><span id="Bootstrap-52"><a href="#Bootstrap-52"><span class="linenos"> 52</span></a>
+</span><span id="Bootstrap-53"><a href="#Bootstrap-53"><span class="linenos"> 53</span></a><span class="sd">        Validates the provided locale against supported languages. If valid,</span>
+</span><span id="Bootstrap-54"><a href="#Bootstrap-54"><span class="linenos"> 54</span></a><span class="sd">        persists it to `store.locale`. If not provided, attempts to load</span>
+</span><span id="Bootstrap-55"><a href="#Bootstrap-55"><span class="linenos"> 55</span></a><span class="sd">        from file or falls back to default.</span>
+</span><span id="Bootstrap-56"><a href="#Bootstrap-56"><span class="linenos"> 56</span></a>
+</span><span id="Bootstrap-57"><a href="#Bootstrap-57"><span class="linenos"> 57</span></a><span class="sd">        Args:</span>
+</span><span id="Bootstrap-58"><a href="#Bootstrap-58"><span class="linenos"> 58</span></a><span class="sd">            locale (str): The locale code to set (e.g., &#39;pt_BR&#39;).</span>
+</span><span id="Bootstrap-59"><a href="#Bootstrap-59"><span class="linenos"> 59</span></a>
+</span><span id="Bootstrap-60"><a href="#Bootstrap-60"><span class="linenos"> 60</span></a><span class="sd">        Raises:</span>
+</span><span id="Bootstrap-61"><a href="#Bootstrap-61"><span class="linenos"> 61</span></a><span class="sd">            ValueError: If the provided locale is not supported.</span>
+</span><span id="Bootstrap-62"><a href="#Bootstrap-62"><span class="linenos"> 62</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Bootstrap-63"><a href="#Bootstrap-63"><span class="linenos"> 63</span></a>        <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</span><span id="Bootstrap-64"><a href="#Bootstrap-64"><span class="linenos"> 64</span></a>
+</span><span id="Bootstrap-65"><a href="#Bootstrap-65"><span class="linenos"> 65</span></a>        <span class="k">if</span> <span class="n">locale</span><span class="p">:</span>
+</span><span id="Bootstrap-66"><a href="#Bootstrap-66"><span class="linenos"> 66</span></a>            <span class="k">if</span> <span class="n">locale</span> <span class="ow">in</span> <span class="n">LanguageEnum</span><span class="o">.</span><span class="n">list_supported_languages</span><span class="p">():</span>
+</span><span id="Bootstrap-67"><a href="#Bootstrap-67"><span class="linenos"> 67</span></a>                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Bootstrap-68"><a href="#Bootstrap-68"><span class="linenos"> 68</span></a>                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">locale</span><span class="p">)</span>
+</span><span id="Bootstrap-69"><a href="#Bootstrap-69"><span class="linenos"> 69</span></a>                <span class="k">return</span>
+</span><span id="Bootstrap-70"><a href="#Bootstrap-70"><span class="linenos"> 70</span></a>            <span class="k">else</span><span class="p">:</span>
+</span><span id="Bootstrap-71"><a href="#Bootstrap-71"><span class="linenos"> 71</span></a>                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid locale: </span><span class="si">{</span><span class="n">locale</span><span class="si">}</span><span class="s2">. Use &#39;</span><span class="si">{</span><span class="n">LanguageEnum</span><span class="o">.</span><span class="n">DEFAULT_LANGUAGE</span><span class="o">.</span><span class="n">value</span><span class="si">}</span><span class="s2">&#39; or &#39;en_US&#39;.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-72"><a href="#Bootstrap-72"><span class="linenos"> 72</span></a>
+</span><span id="Bootstrap-73"><a href="#Bootstrap-73"><span class="linenos"> 73</span></a>        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">):</span>
+</span><span id="Bootstrap-74"><a href="#Bootstrap-74"><span class="linenos"> 74</span></a>            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Bootstrap-75"><a href="#Bootstrap-75"><span class="linenos"> 75</span></a>                <span class="n">current_locale</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+</span><span id="Bootstrap-76"><a href="#Bootstrap-76"><span class="linenos"> 76</span></a>                <span class="k">if</span> <span class="n">current_locale</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;pt_BR&quot;</span><span class="p">,</span> <span class="s2">&quot;en_US&quot;</span><span class="p">]:</span>
+</span><span id="Bootstrap-77"><a href="#Bootstrap-77"><span class="linenos"> 77</span></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Locale configured: </span><span class="si">{</span><span class="n">current_locale</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-78"><a href="#Bootstrap-78"><span class="linenos"> 78</span></a>                    <span class="k">return</span>
+</span><span id="Bootstrap-79"><a href="#Bootstrap-79"><span class="linenos"> 79</span></a>                <span class="k">else</span><span class="p">:</span>
+</span><span id="Bootstrap-80"><a href="#Bootstrap-80"><span class="linenos"> 80</span></a>                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid locale found: </span><span class="si">{</span><span class="n">current_locale</span><span class="si">}</span><span class="s2">. Using default &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-81"><a href="#Bootstrap-81"><span class="linenos"> 81</span></a>        <span class="k">else</span><span class="p">:</span>
+</span><span id="Bootstrap-82"><a href="#Bootstrap-82"><span class="linenos"> 82</span></a>            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File &#39;store.locale&#39; not found. Creating with default locale &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span><span class="si">}</span><span class="s2">&#39;.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-83"><a href="#Bootstrap-83"><span class="linenos"> 83</span></a>
+</span><span id="Bootstrap-84"><a href="#Bootstrap-84"><span class="linenos"> 84</span></a>        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</span><span id="Bootstrap-85"><a href="#Bootstrap-85"><span class="linenos"> 85</span></a>            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span><span class="p">)</span>
+</span><span id="Bootstrap-86"><a href="#Bootstrap-86"><span class="linenos"> 86</span></a>
+</span><span id="Bootstrap-87"><a href="#Bootstrap-87"><span class="linenos"> 87</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">DataArgs</span><span class="p">):</span>
+</span><span id="Bootstrap-88"><a href="#Bootstrap-88"><span class="linenos"> 88</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap-89"><a href="#Bootstrap-89"><span class="linenos"> 89</span></a><span class="sd">        Execute bootstrap tasks concurrently using thread pool.</span>
+</span><span id="Bootstrap-90"><a href="#Bootstrap-90"><span class="linenos"> 90</span></a>
+</span><span id="Bootstrap-91"><a href="#Bootstrap-91"><span class="linenos"> 91</span></a><span class="sd">        Runs independent initialization tasks (like locale setup) in parallel</span>
+</span><span id="Bootstrap-92"><a href="#Bootstrap-92"><span class="linenos"> 92</span></a><span class="sd">        threads to speed up startup.</span>
+</span><span id="Bootstrap-93"><a href="#Bootstrap-93"><span class="linenos"> 93</span></a>
+</span><span id="Bootstrap-94"><a href="#Bootstrap-94"><span class="linenos"> 94</span></a><span class="sd">        Args:</span>
+</span><span id="Bootstrap-95"><a href="#Bootstrap-95"><span class="linenos"> 95</span></a><span class="sd">            args (DataArgs): Parsed command-line arguments containing configuration.</span>
+</span><span id="Bootstrap-96"><a href="#Bootstrap-96"><span class="linenos"> 96</span></a>
+</span><span id="Bootstrap-97"><a href="#Bootstrap-97"><span class="linenos"> 97</span></a><span class="sd">        Raises:</span>
+</span><span id="Bootstrap-98"><a href="#Bootstrap-98"><span class="linenos"> 98</span></a><span class="sd">            TypeError: If `args` is not an instance of `DataArgs`.</span>
+</span><span id="Bootstrap-99"><a href="#Bootstrap-99"><span class="linenos"> 99</span></a><span class="sd">            ValueError: If `args` is None.</span>
+</span><span id="Bootstrap-100"><a href="#Bootstrap-100"><span class="linenos">100</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Bootstrap-101"><a href="#Bootstrap-101"><span class="linenos">101</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">DataArgs</span><span class="p">):</span>
+</span><span id="Bootstrap-102"><a href="#Bootstrap-102"><span class="linenos">102</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter must be an instance of the DataArgs class.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-103"><a href="#Bootstrap-103"><span class="linenos">103</span></a>        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Bootstrap-104"><a href="#Bootstrap-104"><span class="linenos">104</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter cannot be None.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap-105"><a href="#Bootstrap-105"><span class="linenos">105</span></a>
+</span><span id="Bootstrap-106"><a href="#Bootstrap-106"><span class="linenos">106</span></a>        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+</span><span id="Bootstrap-107"><a href="#Bootstrap-107"><span class="linenos">107</span></a>            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="Bootstrap-108"><a href="#Bootstrap-108"><span class="linenos">108</span></a>                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_and_set_locale</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data_file</span><span class="o">.</span><span class="n">locale</span><span class="p">),</span>
+</span><span id="Bootstrap-109"><a href="#Bootstrap-109"><span class="linenos">109</span></a>            <span class="p">]</span>
+</span><span id="Bootstrap-110"><a href="#Bootstrap-110"><span class="linenos">110</span></a>            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+</span><span id="Bootstrap-111"><a href="#Bootstrap-111"><span class="linenos">111</span></a>                <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># Wait for each task to complete</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Application bootstrap manager for initial configuration.</p>
+
+<p>Handles environment setup tasks, specifically locale management validation
+and persistence. It uses thread pooling to execute independent setup tasks
+concurrently during initialization.</p>
+
+<p>Attributes:
+    config_dir (str): Path to the user's configuration directory.
+    locale_file (str): Path to the locale configuration file.
+    default_locale (str): Default locale to use if none is configured.</p>
+</div>
+
 
                             <div id="Bootstrap.__init__" class="classattr">
                                         <input id="Bootstrap.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -174,20 +214,32 @@
 
     </div>
     <a class="headerlink" href="#Bootstrap.__init__"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap.__init__-10"><a href="#Bootstrap.__init__-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_args</span><span class="p">:</span> <span class="n">DataArgs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-</span><span id="Bootstrap.__init__-11"><a href="#Bootstrap.__init__-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Bootstrap.__init__-12"><a href="#Bootstrap.__init__-12"><span class="linenos">12</span></a><span class="sd">        Initializes the Bootstrap class with default configurations.</span>
-</span><span id="Bootstrap.__init__-13"><a href="#Bootstrap.__init__-13"><span class="linenos">13</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Bootstrap.__init__-14"><a href="#Bootstrap.__init__-14"><span class="linenos">14</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;.config&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap.__init__-15"><a href="#Bootstrap.__init__-15"><span class="linenos">15</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;store.locale&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap.__init__-16"><a href="#Bootstrap.__init__-16"><span class="linenos">16</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span> <span class="o">=</span> <span class="n">LanguageEnum</span><span class="o">.</span><span class="n">DEFAULT_LANGUAGE</span><span class="o">.</span><span class="n">value</span>
-</span><span id="Bootstrap.__init__-17"><a href="#Bootstrap.__init__-17"><span class="linenos">17</span></a>
-</span><span id="Bootstrap.__init__-18"><a href="#Bootstrap.__init__-18"><span class="linenos">18</span></a>        <span class="c1"># Run the argument parser</span>
-</span><span id="Bootstrap.__init__-19"><a href="#Bootstrap.__init__-19"><span class="linenos">19</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data_args</span><span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap.__init__-32"><a href="#Bootstrap.__init__-32"><span class="linenos">32</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_args</span><span class="p">:</span> <span class="n">DataArgs</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+</span><span id="Bootstrap.__init__-33"><a href="#Bootstrap.__init__-33"><span class="linenos">33</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap.__init__-34"><a href="#Bootstrap.__init__-34"><span class="linenos">34</span></a><span class="sd">        Initialize the Bootstrap class with default configurations.</span>
+</span><span id="Bootstrap.__init__-35"><a href="#Bootstrap.__init__-35"><span class="linenos">35</span></a>
+</span><span id="Bootstrap.__init__-36"><a href="#Bootstrap.__init__-36"><span class="linenos">36</span></a><span class="sd">        Sets up paths for configuration files and triggers the initial</span>
+</span><span id="Bootstrap.__init__-37"><a href="#Bootstrap.__init__-37"><span class="linenos">37</span></a><span class="sd">        bootstrapping process via `run`.</span>
+</span><span id="Bootstrap.__init__-38"><a href="#Bootstrap.__init__-38"><span class="linenos">38</span></a>
+</span><span id="Bootstrap.__init__-39"><a href="#Bootstrap.__init__-39"><span class="linenos">39</span></a><span class="sd">        Args:</span>
+</span><span id="Bootstrap.__init__-40"><a href="#Bootstrap.__init__-40"><span class="linenos">40</span></a><span class="sd">            data_args (DataArgs, optional): Arguments object containing runtime configuration.</span>
+</span><span id="Bootstrap.__init__-41"><a href="#Bootstrap.__init__-41"><span class="linenos">41</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Bootstrap.__init__-42"><a href="#Bootstrap.__init__-42"><span class="linenos">42</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">expanduser</span><span class="p">(</span><span class="s2">&quot;.config&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap.__init__-43"><a href="#Bootstrap.__init__-43"><span class="linenos">43</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">locale_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config_dir</span><span class="p">,</span> <span class="s2">&quot;store.locale&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap.__init__-44"><a href="#Bootstrap.__init__-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">default_locale</span> <span class="o">=</span> <span class="n">LanguageEnum</span><span class="o">.</span><span class="n">DEFAULT_LANGUAGE</span><span class="o">.</span><span class="n">value</span>
+</span><span id="Bootstrap.__init__-45"><a href="#Bootstrap.__init__-45"><span class="linenos">45</span></a>
+</span><span id="Bootstrap.__init__-46"><a href="#Bootstrap.__init__-46"><span class="linenos">46</span></a>        <span class="c1"># Run the argument parser</span>
+</span><span id="Bootstrap.__init__-47"><a href="#Bootstrap.__init__-47"><span class="linenos">47</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">data_args</span><span class="p">)</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Initializes the Bootstrap class with default configurations.</p>
+            <div class="docstring"><p>Initialize the Bootstrap class with default configurations.</p>
+
+<p>Sets up paths for configuration files and triggers the initial
+bootstrapping process via <code><a href="#Bootstrap.run">run</a></code>.</p>
+
+<p>Args:
+    data_args (DataArgs, optional): Arguments object containing runtime configuration.</p>
 </div>
 
 
@@ -236,39 +288,45 @@
 
     </div>
     <a class="headerlink" href="#Bootstrap.run"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap.run-52"><a href="#Bootstrap.run-52"><span class="linenos">52</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">DataArgs</span><span class="p">):</span>
-</span><span id="Bootstrap.run-53"><a href="#Bootstrap.run-53"><span class="linenos">53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="Bootstrap.run-54"><a href="#Bootstrap.run-54"><span class="linenos">54</span></a><span class="sd">        Executes tasks in parallel using the provided DataArgs object.</span>
-</span><span id="Bootstrap.run-55"><a href="#Bootstrap.run-55"><span class="linenos">55</span></a>
-</span><span id="Bootstrap.run-56"><a href="#Bootstrap.run-56"><span class="linenos">56</span></a><span class="sd">        Args:</span>
-</span><span id="Bootstrap.run-57"><a href="#Bootstrap.run-57"><span class="linenos">57</span></a><span class="sd">            args (DataArgs): An instance of the DataArgs class.</span>
-</span><span id="Bootstrap.run-58"><a href="#Bootstrap.run-58"><span class="linenos">58</span></a>
-</span><span id="Bootstrap.run-59"><a href="#Bootstrap.run-59"><span class="linenos">59</span></a><span class="sd">        Raises:</span>
-</span><span id="Bootstrap.run-60"><a href="#Bootstrap.run-60"><span class="linenos">60</span></a><span class="sd">            TypeError: If the provided argument is not an instance of DataArgs.</span>
-</span><span id="Bootstrap.run-61"><a href="#Bootstrap.run-61"><span class="linenos">61</span></a><span class="sd">            ValueError: If the provided argument is None.</span>
-</span><span id="Bootstrap.run-62"><a href="#Bootstrap.run-62"><span class="linenos">62</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="Bootstrap.run-63"><a href="#Bootstrap.run-63"><span class="linenos">63</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">DataArgs</span><span class="p">):</span>
-</span><span id="Bootstrap.run-64"><a href="#Bootstrap.run-64"><span class="linenos">64</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter must be an instance of the DataArgs class.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap.run-65"><a href="#Bootstrap.run-65"><span class="linenos">65</span></a>        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="Bootstrap.run-66"><a href="#Bootstrap.run-66"><span class="linenos">66</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter cannot be None.&quot;</span><span class="p">)</span>
-</span><span id="Bootstrap.run-67"><a href="#Bootstrap.run-67"><span class="linenos">67</span></a>
-</span><span id="Bootstrap.run-68"><a href="#Bootstrap.run-68"><span class="linenos">68</span></a>        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-</span><span id="Bootstrap.run-69"><a href="#Bootstrap.run-69"><span class="linenos">69</span></a>            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
-</span><span id="Bootstrap.run-70"><a href="#Bootstrap.run-70"><span class="linenos">70</span></a>                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_and_set_locale</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data_file</span><span class="o">.</span><span class="n">locale</span><span class="p">),</span>
-</span><span id="Bootstrap.run-71"><a href="#Bootstrap.run-71"><span class="linenos">71</span></a>            <span class="p">]</span>
-</span><span id="Bootstrap.run-72"><a href="#Bootstrap.run-72"><span class="linenos">72</span></a>            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
-</span><span id="Bootstrap.run-73"><a href="#Bootstrap.run-73"><span class="linenos">73</span></a>                <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># Wait for each task to complete</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="Bootstrap.run-87"><a href="#Bootstrap.run-87"><span class="linenos"> 87</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">DataArgs</span><span class="p">):</span>
+</span><span id="Bootstrap.run-88"><a href="#Bootstrap.run-88"><span class="linenos"> 88</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="Bootstrap.run-89"><a href="#Bootstrap.run-89"><span class="linenos"> 89</span></a><span class="sd">        Execute bootstrap tasks concurrently using thread pool.</span>
+</span><span id="Bootstrap.run-90"><a href="#Bootstrap.run-90"><span class="linenos"> 90</span></a>
+</span><span id="Bootstrap.run-91"><a href="#Bootstrap.run-91"><span class="linenos"> 91</span></a><span class="sd">        Runs independent initialization tasks (like locale setup) in parallel</span>
+</span><span id="Bootstrap.run-92"><a href="#Bootstrap.run-92"><span class="linenos"> 92</span></a><span class="sd">        threads to speed up startup.</span>
+</span><span id="Bootstrap.run-93"><a href="#Bootstrap.run-93"><span class="linenos"> 93</span></a>
+</span><span id="Bootstrap.run-94"><a href="#Bootstrap.run-94"><span class="linenos"> 94</span></a><span class="sd">        Args:</span>
+</span><span id="Bootstrap.run-95"><a href="#Bootstrap.run-95"><span class="linenos"> 95</span></a><span class="sd">            args (DataArgs): Parsed command-line arguments containing configuration.</span>
+</span><span id="Bootstrap.run-96"><a href="#Bootstrap.run-96"><span class="linenos"> 96</span></a>
+</span><span id="Bootstrap.run-97"><a href="#Bootstrap.run-97"><span class="linenos"> 97</span></a><span class="sd">        Raises:</span>
+</span><span id="Bootstrap.run-98"><a href="#Bootstrap.run-98"><span class="linenos"> 98</span></a><span class="sd">            TypeError: If `args` is not an instance of `DataArgs`.</span>
+</span><span id="Bootstrap.run-99"><a href="#Bootstrap.run-99"><span class="linenos"> 99</span></a><span class="sd">            ValueError: If `args` is None.</span>
+</span><span id="Bootstrap.run-100"><a href="#Bootstrap.run-100"><span class="linenos">100</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="Bootstrap.run-101"><a href="#Bootstrap.run-101"><span class="linenos">101</span></a>        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">DataArgs</span><span class="p">):</span>
+</span><span id="Bootstrap.run-102"><a href="#Bootstrap.run-102"><span class="linenos">102</span></a>            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter must be an instance of the DataArgs class.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap.run-103"><a href="#Bootstrap.run-103"><span class="linenos">103</span></a>        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="Bootstrap.run-104"><a href="#Bootstrap.run-104"><span class="linenos">104</span></a>            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The &#39;args&#39; parameter cannot be None.&quot;</span><span class="p">)</span>
+</span><span id="Bootstrap.run-105"><a href="#Bootstrap.run-105"><span class="linenos">105</span></a>
+</span><span id="Bootstrap.run-106"><a href="#Bootstrap.run-106"><span class="linenos">106</span></a>        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">()</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
+</span><span id="Bootstrap.run-107"><a href="#Bootstrap.run-107"><span class="linenos">107</span></a>            <span class="n">tasks</span> <span class="o">=</span> <span class="p">[</span>
+</span><span id="Bootstrap.run-108"><a href="#Bootstrap.run-108"><span class="linenos">108</span></a>                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_check_and_set_locale</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">data_file</span><span class="o">.</span><span class="n">locale</span><span class="p">),</span>
+</span><span id="Bootstrap.run-109"><a href="#Bootstrap.run-109"><span class="linenos">109</span></a>            <span class="p">]</span>
+</span><span id="Bootstrap.run-110"><a href="#Bootstrap.run-110"><span class="linenos">110</span></a>            <span class="k">for</span> <span class="n">task</span> <span class="ow">in</span> <span class="n">tasks</span><span class="p">:</span>
+</span><span id="Bootstrap.run-111"><a href="#Bootstrap.run-111"><span class="linenos">111</span></a>                <span class="n">task</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>  <span class="c1"># Wait for each task to complete</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Executes tasks in parallel using the provided DataArgs object.</p>
+            <div class="docstring"><p>Execute bootstrap tasks concurrently using thread pool.</p>
+
+<p>Runs independent initialization tasks (like locale setup) in parallel
+threads to speed up startup.</p>
 
 <p>Args:
-    args (DataArgs): An instance of the DataArgs class.</p>
+    args (DataArgs): Parsed command-line arguments containing configuration.</p>
 
 <p>Raises:
-    TypeError: If the provided argument is not an instance of DataArgs.
-    ValueError: If the provided argument is None.</p>
+    TypeError: If <code>args</code> is not an instance of <code>DataArgs</code>.
+    ValueError: If <code>args</code> is None.</p>
 </div>
 
 

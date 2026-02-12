@@ -2,62 +2,19 @@
 Configuration module for the Data Validate application.
 
 This module defines the configuration settings, constants, and enumerations used throughout
-the application. It includes the `NamesEnum` for verification names and the `Config` class
+the application. It includes the `NamesEnum` for verification names and the `ApplicationConfig` class
 for managing application-wide settings such as limits, date formats, and report templates.
 """
 
 from datetime import datetime
-from enum import Enum
 from types import MappingProxyType
 
+from data_validate.config.names_enum import NamesEnum
+from data_validate.config.spreadsheet_info import SpreadsheetInfo
 from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
 
-class NamesEnum(Enum):
-    """
-    Enumeration for verification names used in validation reports.
-
-    Each member represents a specific type of verification or validation rule applied
-    to the data. These keys are used to look up localized messages and aggregate errors.
-    """
-
-    FS = "verification_name_file_structure"
-    FC = "verification_name_file_cleaning"
-    IR = "verification_name_indicator_relations"
-    TH = "verification_name_tree_hierarchy"
-    IL = "verification_name_indicator_levels"
-    CO_UN = "verification_name_code_uniqueness"
-    HTML_DESC = "verification_name_html_codes_in_descriptions"
-    SPELL = "verification_name_spelling"
-    UT = "verification_name_unique_titles"
-    SC = "verification_name_sequential_codes"
-    EF = "verification_name_empty_fields"
-    INP = "verification_name_indicator_name_pattern"
-    TITLES_N = "verification_name_titles_over_n_chars"
-    SIMP_DESC_N = "verification_name_simple_descriptions_over_n_chars"
-    MAND_PUNC_DESC = "verification_name_mandatory_and_prohibited_punctuation_in_descriptions"
-    MAND_PUNC_SCEN = "verification_name_mandatory_and_prohibited_punctuation_in_scenarios"
-    MAND_PUNC_TEMP = "verification_name_mandatory_and_prohibited_punctuation_in_temporal_reference"
-    UVR_SCEN = "verification_name_unique_value_relations_in_scenarios"
-    UVR_TEMP = "verification_name_unique_value_relations_in_temporal_reference"
-    VAL_COMB = "verification_name_value_combination_relations"
-    UNAV_INV = "verification_name_unavailable_and_invalid_values"
-    LB_DESC = "verification_name_line_break_in_description"
-    LB_SCEN = "verification_name_line_break_in_scenarios"
-    LB_TEMP = "verification_name_line_break_in_temporal_reference"
-    YEARS_TEMP = "verification_name_years_in_temporal_reference"
-    LEG_RANGE = "verification_name_legend_data_range"
-    LEG_OVER = "verification_name_legend_value_overlap"
-    LEG_REL = "verification_name_legend_relations"
-    SUM_PROP = "verification_name_sum_properties_in_influencing_factors"
-    REP_IND_PROP = "verification_name_repeated_indicators_in_proportionalities"
-    IR_PROP = "verification_name_indicator_relations_in_proportionalities"
-    IND_VAL_PROP = "verification_name_indicators_in_values_and_proportionalities"
-    LEAF_NO_DATA = "verification_name_leaf_indicators_without_associated_data"
-    CHILD_LVL = "verification_name_child_indicator_levels"
-
-
-class Config:
+class ApplicationConfig:
     """
     Configuration class for Data Validate application.
 
@@ -135,31 +92,15 @@ class Config:
                                 """
     """str: Default HTML template for reports when the custom template cannot be loaded."""
 
-    # Expected and optional files with their respective extensions
-    # Improve this logic in the future to allow more flexibility
-    EXPECTED_FILES = {
-        "descricao": [".csv", ".xlsx"],
-        "composicao": [".csv", ".xlsx"],
-        "valores": [".csv", ".xlsx"],
-        "referencia_temporal": [".csv", ".xlsx"],
-    }
-    """dict: Dictionary of expected file identifiers and their allowed extensions."""
-
-    OPTIONAL_FILES = {
-        "proporcionalidades": [".csv", ".xlsx"],
-        "cenarios": [".csv", ".xlsx"],
-        "legenda": [".csv", ".xlsx"],
-        "dicionario": [".csv", ".xlsx"],
-    }
-    """dict: Dictionary of optional file identifiers and their allowed extensions."""
-
     def __init__(self):
         """
-        Initializes the Config instance.
+        Initializes the ApplicationConfig instance.
 
         Sets up the LanguageManager for handling localized strings throughout the application.
         """
         self.lm: LanguageManager = LanguageManager()
+        self.spreadsheet_info = SpreadsheetInfo()
+        self.names_enum = NamesEnum
 
     def get_verify_names(self):
         """

@@ -17,7 +17,7 @@ embora o suporte possa variar dependendo da versão do pdoc.
 # Lazy loading - só importa quando necessário
 def get_metadata():
     """Get package metadata lazily."""
-    from data_validate.helpers.base.metadata_info import METADATA
+    from data_validate.config.metadata_info import METADATA
 
     return METADATA
 

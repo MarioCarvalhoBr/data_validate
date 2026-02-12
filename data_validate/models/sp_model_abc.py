@@ -1,3 +1,12 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module defining the abstract base class for spreadsheet models.
+
+This module provides `SpModelABC`, the foundational template for all spreadsheet
+models in the application. It establishes the interface for validation, data loading,
+and processing required by all specific spreadsheet implementations.
+"""
+
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
@@ -8,12 +17,40 @@ from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 
 
 class SpModelABC(ABC):
+    """
+    Abstract base class for all spreadsheet models.
+
+    Defines the contract and shared functionality for spreadsheet data models,
+    including initialization, data loading, validation pipelines (pre-processing,
+    structure checking, data cleaning), and error reporting.
+
+    Attributes:
+        structural_errors (List[str]): List of structural validation errors.
+        structural_warnings (List[str]): List of structural validation warnings.
+        data_cleaning_errors (List[str]): List of data cleaning/integrity errors.
+        data_cleaning_warnings (List[str]): List of data cleaning/integrity warnings.
+        filename (str): Name of the file associated with this model.
+        data_loader_model (DataLoaderModel): Facade for data loading operations.
+        context (GeneralContext): Application context.
+    """
+
     class DEFINITIONS(ConstantBase):
+        """
+        Global definitions for spreadsheet models.
+
+        Attributes:
+            LEGEND_EXISTS_FILE (str): Key for legend file existence in kwargs.
+            LEGEND_READ_SUCCESS (str): Key for legend file read success in kwargs.
+            SCENARIO_EXISTS_FILE (str): Key for scenario file existence in kwargs.
+            SCENARIO_READ_SUCCESS (str): Key for scenario file read success in kwargs.
+            SCENARIOS_LIST (str): Key for scenarios list in kwargs.
+            SP_NAMAE_SCENARIO (str): Internal name for the scenario dataset ('cenarios').
+
+        """
+
         def __init__(self):
+            """Initialize the DEFINITIONS constants."""
             super().__init__()
-            self.CSV = ".csv"
-            self.XLSX = ".xlsx"
-            self.EXTENSIONS = [self.CSV, self.XLSX]
 
             self.LEGEND_EXISTS_FILE = "legend_exists_file"
             self.LEGEND_READ_SUCCESS = "legend_read_success"
@@ -36,7 +73,17 @@ class SpModelABC(ABC):
         data_model: DataLoaderModel,
         **kwargs: Dict[str, Any],
     ):
+        """
+        Initialize the Abstract Spreadsheet Model.
 
+        Sets up error tracking lists, loads context and data model, and extracts
+        optional configuration from kwargs (e.g. scenario availability).
+
+        Args:
+            context (GeneralContext): Application context.
+            data_model (DataLoaderModel): Data loading facade.
+            **kwargs: Additional configuration parameters.
+        """
         # SETUP
         self.context: GeneralContext = context
         self.data_loader_model: DataLoaderModel = data_model
@@ -69,6 +116,12 @@ class SpModelABC(ABC):
         self.init()
 
     def init(self):
+        """
+        Initialize the verification process by performing basic sanity checks.
+
+        This method removes duplicates from the scenario list, checks if the data frame is empty,
+        and performs initial validations like vertical bar checks and unnamed column checks.
+        """
         self.scenarios_list = list(set(self.scenarios_list))
 
         # CHECK 0: Add COLUMNS
@@ -89,18 +142,21 @@ class SpModelABC(ABC):
     @abstractmethod
     def pre_processing(self):
         """
-        Defines an abstract method for pre-processing. This method is intended to be implemented
-        by subclasses to perform necessary operations prior to executing the primary logic or task.
+        Abstract method for pre-processing logic.
 
-        This serves as a placeholder for subclass-specific preprocessing logic, and forces derived
-        classes to provide their own implementation.
-
-        :raises NotImplementedError: If the method is not overridden in a subclass.
+        Should implement initial checks, column adjustments, or dependency verification
+        before main validation starts.
         """
         pass
 
     @property
     def is_sanity_check_passed(self) -> bool:
+        """
+        Check if the basic sanity checks passed.
+
+        Returns:
+            bool: True if there are no structural or data cleaning errors and the file is valid, False otherwise.
+        """
         exists_errors_legend = self.structural_errors or self.data_cleaning_errors
         exists_file_errors_legend = (
             not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty or not self.data_loader_model.read_success
@@ -113,46 +169,46 @@ class SpModelABC(ABC):
     @abstractmethod
     def post_processing(self):
         """
-        Defines an abstract method for post-processing. This method is intended to be implemented
-        by subclasses to perform necessary operations after executing the primary logic or task.
+        Abstract method for post-processing logic.
 
-        This serves as a placeholder for subclass-specific postprocessing logic, and forces derived
-        classes to provide their own implementation.
-
-        :raises NotImplementedError: If the method is not overridden in a subclass.
+        Should implement final adjustments or derived calculations after cleaning.
         """
         pass
 
     @abstractmethod
     def expected_structure_columns(self, *args, **kwargs) -> List[str]:
-        # Check if there is a vertical bar in the column name
+        """
+        Abstract method for validating column structure.
+
+        Should check if the DataFrame contains all required columns and verify column naming conventions.
+        """
         pass
 
     @abstractmethod
     def data_cleaning(self, *args, **kwargs):
         """
-        Defines an abstract method for data cleaning. This method is intended to be implemented
-        by subclasses to perform necessary operations for cleaning the data.
+        Abstract method for data cleaning.
 
-        This serves as a placeholder for subclass-specific data cleaning logic, and forces derived
-        classes to provide their own implementation.
-
-        :raises NotImplementedError: If the method is not overridden in a subclass.
+        Should implement type conversion, valid value checks (e.g., positive integers),
+        and cleaning of raw data.
         """
         pass
 
     @abstractmethod
     def run(self):
         """
-        Executa o processamento do arquivo.
+        Abstract method to execute the validation pipeline.
+
+        Should orchestrate the calling of `pre_processing`, `expected_structure_columns`,
+        `data_cleaning`, and `post_processing`.
         """
         pass
 
     def __str__(self):
         """
-        Retorna uma representação em string do objeto.
+        Return a string representation of the model.
 
         Returns:
-            str: Representação em string do objeto.
+            str: String containing information about the file and data model.
         """
         return f"SpModelABC(FILENAME: {self.filename}):\n" + f"  DATA_MODEL: {self.data_loader_model}\n"

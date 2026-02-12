@@ -17,10 +17,10 @@ from typing import List, Dict, Any
 import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
-from data_validate.config.config import NamesEnum
+from data_validate.config import NamesEnum
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.controllers.report.model_report import ModelListReport
-from data_validate.helpers.base.metadata_info import METADATA
+from data_validate.config.metadata_info import METADATA
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 

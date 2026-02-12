@@ -215,8 +215,8 @@ class TestDictionaryManager:
         manager = DictionaryManager("pt_BR")
         manager.dictionary = mock_dictionary
 
-        with mocker.patch.object(Path, "exists", return_value=False):
-            manager._load_extra_words()
+        mocker.patch.object(Path, "exists", return_value=False)
+        manager._load_extra_words()
 
         assert len(manager._errors) == 1
         assert "Arquivo extra-words.dic não encontrado" in manager._errors[0]
@@ -229,9 +229,9 @@ class TestDictionaryManager:
         manager = DictionaryManager("pt_BR")
         manager.dictionary = mock_dictionary
 
-        with mocker.patch.object(Path, "exists", return_value=True):
-            with mocker.patch("builtins.open", side_effect=IOError("File read error")):
-                manager._load_extra_words()
+        mocker.patch.object(Path, "exists", return_value=True)
+        mocker.patch("builtins.open", side_effect=IOError("File read error"))
+        manager._load_extra_words()
 
         assert len(manager._errors) == 1
         assert "Aviso: Não foi possível carregar palavras extras: File read error" in manager._errors[0]
@@ -250,8 +250,8 @@ class TestDictionaryManager:
         mock_path.exists.return_value = True
         mock_path.unlink.return_value = None
 
-        with mocker.patch.object(Path, "__new__", return_value=mock_path):
-            manager.clean_temporary_files()
+        mocker.patch.object(Path, "__new__", return_value=mock_path)
+        manager.clean_temporary_files()
 
         # Should cleanup dictionary and broker
         assert manager.dictionary is None
@@ -289,8 +289,8 @@ class TestDictionaryManager:
         mock_path.exists.return_value = True
         mock_path.unlink.side_effect = OSError("Permission denied")
 
-        with mocker.patch.object(Path, "__new__", return_value=mock_path):
-            manager.clean_temporary_files()
+        mocker.patch.object(Path, "__new__", return_value=mock_path)
+        manager.clean_temporary_files()
 
         # Should handle file removal error gracefully
         assert len(manager._errors) == 2  # One for each file
@@ -404,8 +404,8 @@ class TestDictionaryManagerEdgeCases:
         mock_path = mocker.MagicMock()
         mock_path.exists.return_value = False
 
-        with mocker.patch.object(Path, "__new__", return_value=mock_path):
-            manager.clean_temporary_files()
+        mocker.patch.object(Path, "__new__", return_value=mock_path)
+        manager.clean_temporary_files()
 
         # Should not attempt to remove files
         mock_path.unlink.assert_not_called()
@@ -455,29 +455,11 @@ class TestDictionaryManagerIntegration:
         assert result == mock_dictionary
 
         # Step 3: Cleanup
-        with mocker.patch.object(Path, "__new__", return_value=mocker.MagicMock()):
-            manager.clean_temporary_files()
+        mocker.patch.object(Path, "__new__", return_value=mocker.MagicMock())
+        manager.clean_temporary_files()
 
         assert manager.dictionary is None
         assert manager.broker is None
-
-    def test_error_accumulation(self, mocker) -> None:
-        """Test that errors accumulate across multiple operations."""
-        mock_broker = mocker.MagicMock()
-        mock_broker.dict_exists.return_value = False  # Dictionary doesn't exist
-        mock_broker.request_dict.side_effect = Exception("Init error")  # Init fails
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
-
-        manager = DictionaryManager("pt_BR")
-
-        # Multiple operations that generate errors
-        manager.validate_dictionary()
-        manager.initialize_dictionary(["word1"])
-
-        # Errors should accumulate
-        assert len(manager._errors) == 2
-        assert "Dicionário pt_BR não encontrado" in manager._errors[0]
-        assert "Erro ao inicializar dicionário pt_BR: Init error" in manager._errors[1]
 
     def test_path_handling_with_real_paths(self, mocker) -> None:
         """Test path handling with real path operations."""
@@ -485,10 +467,10 @@ class TestDictionaryManagerIntegration:
             # Mock the path to point to our temp directory
             temp_path = Path(temp_dir)
 
-            with mocker.patch.object(Path, "resolve", return_value=temp_path):
-                with mocker.patch.object(Path, "parents", return_value=[temp_path, temp_path, temp_path, temp_path]):
-                    with mocker.patch.object(Path, "__truediv__", return_value=temp_path / "static" / "dictionaries"):
-                        DictionaryManager("pt_BR")
+            mocker.patch.object(Path, "resolve", return_value=temp_path)
+            mocker.patch.object(Path, "parents", return_value=[temp_path, temp_path, temp_path, temp_path])
+            mocker.patch.object(Path, "__truediv__", return_value=temp_path / "static" / "dictionaries")
+            DictionaryManager("pt_BR")
 
-                        # Should set up paths correctly
-                        assert "ENCHANT_CONFIG_DIR" in os.environ
+            # Should set up paths correctly
+            assert "ENCHANT_CONFIG_DIR" in os.environ

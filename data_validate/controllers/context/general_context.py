@@ -10,7 +10,7 @@ language management, configuration, file system utilities, and logging.
 
 Components managed by GeneralContext:
     - LanguageManager (i18n)
-    - Config (application settings)
+    - ApplicationConfig (application settings)
     - FileSystemUtils (file operations)
     - LoggerManager (logging)
     - DataArgs (command line arguments)
@@ -18,7 +18,7 @@ Components managed by GeneralContext:
 
 from typing import Any, Dict
 
-from data_validate.config import Config
+from data_validate.config import ApplicationConfig
 from data_validate.helpers.base import DataArgs, FileSystemUtils, LoggerManager
 from data_validate.helpers.tools import LanguageManager
 
@@ -36,7 +36,7 @@ class GeneralContext:
         data_args (DataArgs): Command-line arguments and runtime data configurations.
         kwargs (Dict[str, Any]): Additional keyword arguments passed during initialization.
         lm (LanguageManager): Manager for handling internationalization and localized strings.
-        config (Config): Central configuration object for application settings and constants.
+        config (ApplicationConfig): Central configuration object for application settings and constants.
         fs_utils (FileSystemUtils): Utilities for file system operations.
         logger_manager (LoggerManager): Manager responsible for configuring the logging system.
         logger (logging.Logger): The primary logger instance for the application.
@@ -58,7 +58,7 @@ class GeneralContext:
         The initialization process involves:
         1.  Storing arguments and kwargs.
         2.  Initializing the `LanguageManager` for i18n support.
-        3.  Loading the application `Config`.
+        3.  Loading the application `ApplicationConfig`.
         4.  Setting up `FileSystemUtils` for file handling.
         5.  Configuring the logging system via `LoggerManager`.
         6.  Disabling the logger if debug mode is not active.
@@ -69,7 +69,7 @@ class GeneralContext:
 
         # Configure the Toolkit
         self.lm: LanguageManager = LanguageManager()
-        self.config: Config = Config()
+        self.config: ApplicationConfig = ApplicationConfig()
         self.fs_utils: FileSystemUtils = FileSystemUtils()
         self.logger_manager = LoggerManager(
             log_folder="data/output/logs",

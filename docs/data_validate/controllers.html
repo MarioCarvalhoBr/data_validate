@@ -547,7 +547,7 @@ during the validation pipeline.</p>
 </span><span id="GeneralContext-37"><a href="#GeneralContext-37"><span class="linenos"> 37</span></a><span class="sd">        data_args (DataArgs): Command-line arguments and runtime data configurations.</span>
 </span><span id="GeneralContext-38"><a href="#GeneralContext-38"><span class="linenos"> 38</span></a><span class="sd">        kwargs (Dict[str, Any]): Additional keyword arguments passed during initialization.</span>
 </span><span id="GeneralContext-39"><a href="#GeneralContext-39"><span class="linenos"> 39</span></a><span class="sd">        lm (LanguageManager): Manager for handling internationalization and localized strings.</span>
-</span><span id="GeneralContext-40"><a href="#GeneralContext-40"><span class="linenos"> 40</span></a><span class="sd">        config (Config): Central configuration object for application settings and constants.</span>
+</span><span id="GeneralContext-40"><a href="#GeneralContext-40"><span class="linenos"> 40</span></a><span class="sd">        config (ApplicationConfig): Central configuration object for application settings and constants.</span>
 </span><span id="GeneralContext-41"><a href="#GeneralContext-41"><span class="linenos"> 41</span></a><span class="sd">        fs_utils (FileSystemUtils): Utilities for file system operations.</span>
 </span><span id="GeneralContext-42"><a href="#GeneralContext-42"><span class="linenos"> 42</span></a><span class="sd">        logger_manager (LoggerManager): Manager responsible for configuring the logging system.</span>
 </span><span id="GeneralContext-43"><a href="#GeneralContext-43"><span class="linenos"> 43</span></a><span class="sd">        logger (logging.Logger): The primary logger instance for the application.</span>
@@ -569,7 +569,7 @@ during the validation pipeline.</p>
 </span><span id="GeneralContext-59"><a href="#GeneralContext-59"><span class="linenos"> 59</span></a><span class="sd">        The initialization process involves:</span>
 </span><span id="GeneralContext-60"><a href="#GeneralContext-60"><span class="linenos"> 60</span></a><span class="sd">        1.  Storing arguments and kwargs.</span>
 </span><span id="GeneralContext-61"><a href="#GeneralContext-61"><span class="linenos"> 61</span></a><span class="sd">        2.  Initializing the `LanguageManager` for i18n support.</span>
-</span><span id="GeneralContext-62"><a href="#GeneralContext-62"><span class="linenos"> 62</span></a><span class="sd">        3.  Loading the application `Config`.</span>
+</span><span id="GeneralContext-62"><a href="#GeneralContext-62"><span class="linenos"> 62</span></a><span class="sd">        3.  Loading the application `ApplicationConfig`.</span>
 </span><span id="GeneralContext-63"><a href="#GeneralContext-63"><span class="linenos"> 63</span></a><span class="sd">        4.  Setting up `FileSystemUtils` for file handling.</span>
 </span><span id="GeneralContext-64"><a href="#GeneralContext-64"><span class="linenos"> 64</span></a><span class="sd">        5.  Configuring the logging system via `LoggerManager`.</span>
 </span><span id="GeneralContext-65"><a href="#GeneralContext-65"><span class="linenos"> 65</span></a><span class="sd">        6.  Disabling the logger if debug mode is not active.</span>
@@ -580,7 +580,7 @@ during the validation pipeline.</p>
 </span><span id="GeneralContext-70"><a href="#GeneralContext-70"><span class="linenos"> 70</span></a>
 </span><span id="GeneralContext-71"><a href="#GeneralContext-71"><span class="linenos"> 71</span></a>        <span class="c1"># Configure the Toolkit</span>
 </span><span id="GeneralContext-72"><a href="#GeneralContext-72"><span class="linenos"> 72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="p">:</span> <span class="n">LanguageManager</span> <span class="o">=</span> <span class="n">LanguageManager</span><span class="p">()</span>
-</span><span id="GeneralContext-73"><a href="#GeneralContext-73"><span class="linenos"> 73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+</span><span id="GeneralContext-73"><a href="#GeneralContext-73"><span class="linenos"> 73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> <span class="n">ApplicationConfig</span> <span class="o">=</span> <span class="n">ApplicationConfig</span><span class="p">()</span>
 </span><span id="GeneralContext-74"><a href="#GeneralContext-74"><span class="linenos"> 74</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">fs_utils</span><span class="p">:</span> <span class="n">FileSystemUtils</span> <span class="o">=</span> <span class="n">FileSystemUtils</span><span class="p">()</span>
 </span><span id="GeneralContext-75"><a href="#GeneralContext-75"><span class="linenos"> 75</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger_manager</span> <span class="o">=</span> <span class="n">LoggerManager</span><span class="p">(</span>
 </span><span id="GeneralContext-76"><a href="#GeneralContext-76"><span class="linenos"> 76</span></a>            <span class="n">log_folder</span><span class="o">=</span><span class="s2">&quot;data/output/logs&quot;</span><span class="p">,</span>
@@ -626,7 +626,7 @@ available globally through the context object.</p>
     data_args (DataArgs): Command-line arguments and runtime data configurations.
     kwargs (Dict[str, Any]): Additional keyword arguments passed during initialization.
     lm (LanguageManager): Manager for handling internationalization and localized strings.
-    config (Config): Central configuration object for application settings and constants.
+    config (ApplicationConfig): Central configuration object for application settings and constants.
     fs_utils (FileSystemUtils): Utilities for file system operations.
     logger_manager (LoggerManager): Manager responsible for configuring the logging system.
     logger (logging.Logger): The primary logger instance for the application.
@@ -659,7 +659,7 @@ available globally through the context object.</p>
 </span><span id="GeneralContext.__init__-59"><a href="#GeneralContext.__init__-59"><span class="linenos">59</span></a><span class="sd">        The initialization process involves:</span>
 </span><span id="GeneralContext.__init__-60"><a href="#GeneralContext.__init__-60"><span class="linenos">60</span></a><span class="sd">        1.  Storing arguments and kwargs.</span>
 </span><span id="GeneralContext.__init__-61"><a href="#GeneralContext.__init__-61"><span class="linenos">61</span></a><span class="sd">        2.  Initializing the `LanguageManager` for i18n support.</span>
-</span><span id="GeneralContext.__init__-62"><a href="#GeneralContext.__init__-62"><span class="linenos">62</span></a><span class="sd">        3.  Loading the application `Config`.</span>
+</span><span id="GeneralContext.__init__-62"><a href="#GeneralContext.__init__-62"><span class="linenos">62</span></a><span class="sd">        3.  Loading the application `ApplicationConfig`.</span>
 </span><span id="GeneralContext.__init__-63"><a href="#GeneralContext.__init__-63"><span class="linenos">63</span></a><span class="sd">        4.  Setting up `FileSystemUtils` for file handling.</span>
 </span><span id="GeneralContext.__init__-64"><a href="#GeneralContext.__init__-64"><span class="linenos">64</span></a><span class="sd">        5.  Configuring the logging system via `LoggerManager`.</span>
 </span><span id="GeneralContext.__init__-65"><a href="#GeneralContext.__init__-65"><span class="linenos">65</span></a><span class="sd">        6.  Disabling the logger if debug mode is not active.</span>
@@ -670,7 +670,7 @@ available globally through the context object.</p>
 </span><span id="GeneralContext.__init__-70"><a href="#GeneralContext.__init__-70"><span class="linenos">70</span></a>
 </span><span id="GeneralContext.__init__-71"><a href="#GeneralContext.__init__-71"><span class="linenos">71</span></a>        <span class="c1"># Configure the Toolkit</span>
 </span><span id="GeneralContext.__init__-72"><a href="#GeneralContext.__init__-72"><span class="linenos">72</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">lm</span><span class="p">:</span> <span class="n">LanguageManager</span> <span class="o">=</span> <span class="n">LanguageManager</span><span class="p">()</span>
-</span><span id="GeneralContext.__init__-73"><a href="#GeneralContext.__init__-73"><span class="linenos">73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> <span class="n">Config</span> <span class="o">=</span> <span class="n">Config</span><span class="p">()</span>
+</span><span id="GeneralContext.__init__-73"><a href="#GeneralContext.__init__-73"><span class="linenos">73</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">:</span> <span class="n">ApplicationConfig</span> <span class="o">=</span> <span class="n">ApplicationConfig</span><span class="p">()</span>
 </span><span id="GeneralContext.__init__-74"><a href="#GeneralContext.__init__-74"><span class="linenos">74</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">fs_utils</span><span class="p">:</span> <span class="n">FileSystemUtils</span> <span class="o">=</span> <span class="n">FileSystemUtils</span><span class="p">()</span>
 </span><span id="GeneralContext.__init__-75"><a href="#GeneralContext.__init__-75"><span class="linenos">75</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">logger_manager</span> <span class="o">=</span> <span class="n">LoggerManager</span><span class="p">(</span>
 </span><span id="GeneralContext.__init__-76"><a href="#GeneralContext.__init__-76"><span class="linenos">76</span></a>            <span class="n">log_folder</span><span class="o">=</span><span class="s2">&quot;data/output/logs&quot;</span><span class="p">,</span>
@@ -699,7 +699,7 @@ available globally through the context object.</p>
 <ol>
 <li>Storing arguments and kwargs.</li>
 <li>Initializing the <code>LanguageManager</code> for i18n support.</li>
-<li>Loading the application <code>Config</code>.</li>
+<li>Loading the application <code>ApplicationConfig</code>.</li>
 <li>Setting up <code>FileSystemUtils</code> for file handling.</li>
 <li>Configuring the logging system via <code>LoggerManager</code>.</li>
 <li>Disabling the logger if debug mode is not active.</li>
@@ -743,7 +743,7 @@ available globally through the context object.</p>
                             </div>
                             <div id="GeneralContext.config" class="classattr">
                                 <div class="attr variable">
-            <span class="name">config</span><span class="annotation">: <a href="config.html#Config">data_validate.config.Config</a></span>
+            <span class="name">config</span><span class="annotation">: <a href="config.html#ApplicationConfig">data_validate.config.ApplicationConfig</a></span>
 
         
     </div>

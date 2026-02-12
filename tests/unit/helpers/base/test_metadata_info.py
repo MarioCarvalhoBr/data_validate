@@ -4,7 +4,7 @@ import importlib.metadata
 
 import pytest
 
-from data_validate.helpers.base.metadata_info import MetadataInfo, METADATA
+from data_validate.config.metadata_info import MetadataInfo, METADATA
 
 
 class TestMetadataInfo:

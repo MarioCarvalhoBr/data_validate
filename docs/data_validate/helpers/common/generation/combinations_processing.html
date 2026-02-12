@@ -35,6 +35,9 @@
                     <a class="class" href="#CombinationsProcessing">CombinationsProcessing</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="function" href="#CombinationsProcessing.__init__">CombinationsProcessing</a>
+                        </li>
+                        <li>
                                 <a class="function" href="#CombinationsProcessing.generate_combinations">generate_combinations</a>
                         </li>
                         <li>
@@ -59,53 +62,84 @@
                     <h1 class="modulename">
 <a href="./../../../../data_validate.html">data_validate</a><wbr>.<a href="./../../../helpers.html">helpers</a><wbr>.<a href="./../../common.html">common</a><wbr>.<a href="./../generation.html">generation</a><wbr>.combinations_processing    </h1>
 
-                
+                        <div class="docstring"><p>Module for generating text pattern combinations.</p>
+
+<p>This module defines the <code><a href="#CombinationsProcessing">CombinationsProcessing</a></code> class, which handles the generation
+and validation of string combinations (e.g., 'CODE-YEAR-SCENARIO') used in
+data validation and structure verification.</p>
+</div>
+
                         <input id="mod-combinations_processing-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 
                         <label class="view-source-button" for="mod-combinations_processing-view-source"><span>View Source</span></label>
 
-                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
-</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
-</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="k">class</span><span class="w"> </span><span class="nc">CombinationsProcessing</span><span class="p">:</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a>
-</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>        <span class="k">pass</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_combinations</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">scenario_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">        Generate combinations using the base code, start year, temporal symbols, and scenario symbols.</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a>
-</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">        Args:</span>
-</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">            code: Base code for combinations.</span>
-</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a><span class="sd">            start_year: Initial year for combinations.</span>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">            temporal_symbols: List of temporal symbols.</span>
-</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">            scenario_symbols: List of scenario symbols.</span>
-</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
-</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a><span class="sd">        Returns:</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a><span class="sd">            List of generated combinations in the format &#39;code-year-scenario&#39;.</span>
-</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">temporal_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">scenario_symbols</span><span class="p">:</span>
-</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>                <span class="n">combinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a>        <span class="k">return</span> <span class="n">combinations</span>
-</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a>
-</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_extra_combinations</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">actual_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">        Find extra combinations present in actual_combinations but not in expected_combinations.</span>
+                        <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1">#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).</span>
+</span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="sd">Module for generating text pattern combinations.</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">This module defines the `CombinationsProcessing` class, which handles the generation</span>
+</span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="sd">and validation of string combinations (e.g., &#39;CODE-YEAR-SCENARIO&#39;) used in</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">data validation and structure verification.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
+</span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="k">class</span><span class="w"> </span><span class="nc">CombinationsProcessing</span><span class="p">:</span>
+</span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a><span class="sd">    Utility class for generating and validating identifier combinations.</span>
+</span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="sd">    Provides static methods to create expected combination strings based on base codes,</span>
+</span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="sd">    temporal ranges, and scenario symbols, and to identify unexpected (extra) combinations.</span>
+</span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the CombinationsProcessing class.&quot;&quot;&quot;</span>
+</span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>        <span class="k">pass</span>
+</span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_combinations</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">scenario_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="sd">        Generate a list of combination strings based on code, time, and scenarios.</span>
+</span><span id="L-29"><a href="#L-29"><span class="linenos">29</span></a>
+</span><span id="L-30"><a href="#L-30"><span class="linenos">30</span></a><span class="sd">        Creates identifiers in the format &#39;code-year-scenario&#39;. The output includes</span>
+</span><span id="L-31"><a href="#L-31"><span class="linenos">31</span></a><span class="sd">        a base combination (code-start_year) followed by combinations for subsequent</span>
+</span><span id="L-32"><a href="#L-32"><span class="linenos">32</span></a><span class="sd">        years and all provided scenario symbols.</span>
 </span><span id="L-33"><a href="#L-33"><span class="linenos">33</span></a>
 </span><span id="L-34"><a href="#L-34"><span class="linenos">34</span></a><span class="sd">        Args:</span>
-</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">            expected_combinations: List of expected combinations.</span>
-</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">            actual_combinations: List of actual combinations.</span>
-</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a>
-</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">        Returns:</span>
-</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a><span class="sd">            Tuple with a boolean indicating if extras exist and a list of extra combinations.</span>
-</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a>        <span class="n">extras</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">actual_combinations</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">))</span>
-</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">extras</span><span class="p">),</span> <span class="n">extras</span>
+</span><span id="L-35"><a href="#L-35"><span class="linenos">35</span></a><span class="sd">            code (str): Base code for the combinations.</span>
+</span><span id="L-36"><a href="#L-36"><span class="linenos">36</span></a><span class="sd">            start_year (int): The initial year (base year).</span>
+</span><span id="L-37"><a href="#L-37"><span class="linenos">37</span></a><span class="sd">            temporal_symbols (List[Any]): List of temporal symbols (e.g., years).</span>
+</span><span id="L-38"><a href="#L-38"><span class="linenos">38</span></a><span class="sd">            scenario_symbols (List[Any]): List of scenario symbols (e.g., SSPs).</span>
+</span><span id="L-39"><a href="#L-39"><span class="linenos">39</span></a>
+</span><span id="L-40"><a href="#L-40"><span class="linenos">40</span></a><span class="sd">        Returns:</span>
+</span><span id="L-41"><a href="#L-41"><span class="linenos">41</span></a><span class="sd">            List[str]: List of generated combination strings (e.g., [&#39;X-2020&#39;, &#39;X-2030-SSP1&#39;, ...]).</span>
+</span><span id="L-42"><a href="#L-42"><span class="linenos">42</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-43"><a href="#L-43"><span class="linenos">43</span></a>        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</span><span id="L-44"><a href="#L-44"><span class="linenos">44</span></a>        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">temporal_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+</span><span id="L-45"><a href="#L-45"><span class="linenos">45</span></a>            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">scenario_symbols</span><span class="p">:</span>
+</span><span id="L-46"><a href="#L-46"><span class="linenos">46</span></a>                <span class="n">combinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="L-47"><a href="#L-47"><span class="linenos">47</span></a>        <span class="k">return</span> <span class="n">combinations</span>
+</span><span id="L-48"><a href="#L-48"><span class="linenos">48</span></a>
+</span><span id="L-49"><a href="#L-49"><span class="linenos">49</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="L-50"><a href="#L-50"><span class="linenos">50</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_extra_combinations</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">actual_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="L-51"><a href="#L-51"><span class="linenos">51</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="L-52"><a href="#L-52"><span class="linenos">52</span></a><span class="sd">        Identify extra combinations that are present but not expected.</span>
+</span><span id="L-53"><a href="#L-53"><span class="linenos">53</span></a>
+</span><span id="L-54"><a href="#L-54"><span class="linenos">54</span></a><span class="sd">        Compares the actual list of combinations found against the expected list</span>
+</span><span id="L-55"><a href="#L-55"><span class="linenos">55</span></a><span class="sd">        generated by business rules.</span>
+</span><span id="L-56"><a href="#L-56"><span class="linenos">56</span></a>
+</span><span id="L-57"><a href="#L-57"><span class="linenos">57</span></a><span class="sd">        Args:</span>
+</span><span id="L-58"><a href="#L-58"><span class="linenos">58</span></a><span class="sd">            expected_combinations (List[str]): List of valid/expected combinations.</span>
+</span><span id="L-59"><a href="#L-59"><span class="linenos">59</span></a><span class="sd">            actual_combinations (List[str]): List of combinations actually found in the data.</span>
+</span><span id="L-60"><a href="#L-60"><span class="linenos">60</span></a>
+</span><span id="L-61"><a href="#L-61"><span class="linenos">61</span></a><span class="sd">        Returns:</span>
+</span><span id="L-62"><a href="#L-62"><span class="linenos">62</span></a><span class="sd">            Tuple[bool, List[str]]:</span>
+</span><span id="L-63"><a href="#L-63"><span class="linenos">63</span></a><span class="sd">                - bool: True if any extra combinations exist, False otherwise.</span>
+</span><span id="L-64"><a href="#L-64"><span class="linenos">64</span></a><span class="sd">                - List[str]: The list of extra (unexpected) combination strings.</span>
+</span><span id="L-65"><a href="#L-65"><span class="linenos">65</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="L-66"><a href="#L-66"><span class="linenos">66</span></a>        <span class="n">extras</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">actual_combinations</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">))</span>
+</span><span id="L-67"><a href="#L-67"><span class="linenos">67</span></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">extras</span><span class="p">),</span> <span class="n">extras</span>
 </span></pre></div>
 
 
@@ -121,50 +155,92 @@
 
     </div>
     <a class="headerlink" href="#CombinationsProcessing"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing-5"><a href="#CombinationsProcessing-5"><span class="linenos"> 5</span></a><span class="k">class</span><span class="w"> </span><span class="nc">CombinationsProcessing</span><span class="p">:</span>
-</span><span id="CombinationsProcessing-6"><a href="#CombinationsProcessing-6"><span class="linenos"> 6</span></a>
-</span><span id="CombinationsProcessing-7"><a href="#CombinationsProcessing-7"><span class="linenos"> 7</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="CombinationsProcessing-8"><a href="#CombinationsProcessing-8"><span class="linenos"> 8</span></a>        <span class="k">pass</span>
-</span><span id="CombinationsProcessing-9"><a href="#CombinationsProcessing-9"><span class="linenos"> 9</span></a>
-</span><span id="CombinationsProcessing-10"><a href="#CombinationsProcessing-10"><span class="linenos">10</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="CombinationsProcessing-11"><a href="#CombinationsProcessing-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_combinations</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">scenario_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="CombinationsProcessing-12"><a href="#CombinationsProcessing-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing-13"><a href="#CombinationsProcessing-13"><span class="linenos">13</span></a><span class="sd">        Generate combinations using the base code, start year, temporal symbols, and scenario symbols.</span>
-</span><span id="CombinationsProcessing-14"><a href="#CombinationsProcessing-14"><span class="linenos">14</span></a>
-</span><span id="CombinationsProcessing-15"><a href="#CombinationsProcessing-15"><span class="linenos">15</span></a><span class="sd">        Args:</span>
-</span><span id="CombinationsProcessing-16"><a href="#CombinationsProcessing-16"><span class="linenos">16</span></a><span class="sd">            code: Base code for combinations.</span>
-</span><span id="CombinationsProcessing-17"><a href="#CombinationsProcessing-17"><span class="linenos">17</span></a><span class="sd">            start_year: Initial year for combinations.</span>
-</span><span id="CombinationsProcessing-18"><a href="#CombinationsProcessing-18"><span class="linenos">18</span></a><span class="sd">            temporal_symbols: List of temporal symbols.</span>
-</span><span id="CombinationsProcessing-19"><a href="#CombinationsProcessing-19"><span class="linenos">19</span></a><span class="sd">            scenario_symbols: List of scenario symbols.</span>
-</span><span id="CombinationsProcessing-20"><a href="#CombinationsProcessing-20"><span class="linenos">20</span></a>
-</span><span id="CombinationsProcessing-21"><a href="#CombinationsProcessing-21"><span class="linenos">21</span></a><span class="sd">        Returns:</span>
-</span><span id="CombinationsProcessing-22"><a href="#CombinationsProcessing-22"><span class="linenos">22</span></a><span class="sd">            List of generated combinations in the format &#39;code-year-scenario&#39;.</span>
-</span><span id="CombinationsProcessing-23"><a href="#CombinationsProcessing-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing-24"><a href="#CombinationsProcessing-24"><span class="linenos">24</span></a>        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-</span><span id="CombinationsProcessing-25"><a href="#CombinationsProcessing-25"><span class="linenos">25</span></a>        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">temporal_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-</span><span id="CombinationsProcessing-26"><a href="#CombinationsProcessing-26"><span class="linenos">26</span></a>            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">scenario_symbols</span><span class="p">:</span>
-</span><span id="CombinationsProcessing-27"><a href="#CombinationsProcessing-27"><span class="linenos">27</span></a>                <span class="n">combinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="CombinationsProcessing-28"><a href="#CombinationsProcessing-28"><span class="linenos">28</span></a>        <span class="k">return</span> <span class="n">combinations</span>
-</span><span id="CombinationsProcessing-29"><a href="#CombinationsProcessing-29"><span class="linenos">29</span></a>
-</span><span id="CombinationsProcessing-30"><a href="#CombinationsProcessing-30"><span class="linenos">30</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="CombinationsProcessing-31"><a href="#CombinationsProcessing-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_extra_combinations</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">actual_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="CombinationsProcessing-32"><a href="#CombinationsProcessing-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing-33"><a href="#CombinationsProcessing-33"><span class="linenos">33</span></a><span class="sd">        Find extra combinations present in actual_combinations but not in expected_combinations.</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing-14"><a href="#CombinationsProcessing-14"><span class="linenos">14</span></a><span class="k">class</span><span class="w"> </span><span class="nc">CombinationsProcessing</span><span class="p">:</span>
+</span><span id="CombinationsProcessing-15"><a href="#CombinationsProcessing-15"><span class="linenos">15</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-16"><a href="#CombinationsProcessing-16"><span class="linenos">16</span></a><span class="sd">    Utility class for generating and validating identifier combinations.</span>
+</span><span id="CombinationsProcessing-17"><a href="#CombinationsProcessing-17"><span class="linenos">17</span></a>
+</span><span id="CombinationsProcessing-18"><a href="#CombinationsProcessing-18"><span class="linenos">18</span></a><span class="sd">    Provides static methods to create expected combination strings based on base codes,</span>
+</span><span id="CombinationsProcessing-19"><a href="#CombinationsProcessing-19"><span class="linenos">19</span></a><span class="sd">    temporal ranges, and scenario symbols, and to identify unexpected (extra) combinations.</span>
+</span><span id="CombinationsProcessing-20"><a href="#CombinationsProcessing-20"><span class="linenos">20</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-21"><a href="#CombinationsProcessing-21"><span class="linenos">21</span></a>
+</span><span id="CombinationsProcessing-22"><a href="#CombinationsProcessing-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CombinationsProcessing-23"><a href="#CombinationsProcessing-23"><span class="linenos">23</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the CombinationsProcessing class.&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-24"><a href="#CombinationsProcessing-24"><span class="linenos">24</span></a>        <span class="k">pass</span>
+</span><span id="CombinationsProcessing-25"><a href="#CombinationsProcessing-25"><span class="linenos">25</span></a>
+</span><span id="CombinationsProcessing-26"><a href="#CombinationsProcessing-26"><span class="linenos">26</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="CombinationsProcessing-27"><a href="#CombinationsProcessing-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_combinations</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">scenario_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="CombinationsProcessing-28"><a href="#CombinationsProcessing-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-29"><a href="#CombinationsProcessing-29"><span class="linenos">29</span></a><span class="sd">        Generate a list of combination strings based on code, time, and scenarios.</span>
+</span><span id="CombinationsProcessing-30"><a href="#CombinationsProcessing-30"><span class="linenos">30</span></a>
+</span><span id="CombinationsProcessing-31"><a href="#CombinationsProcessing-31"><span class="linenos">31</span></a><span class="sd">        Creates identifiers in the format &#39;code-year-scenario&#39;. The output includes</span>
+</span><span id="CombinationsProcessing-32"><a href="#CombinationsProcessing-32"><span class="linenos">32</span></a><span class="sd">        a base combination (code-start_year) followed by combinations for subsequent</span>
+</span><span id="CombinationsProcessing-33"><a href="#CombinationsProcessing-33"><span class="linenos">33</span></a><span class="sd">        years and all provided scenario symbols.</span>
 </span><span id="CombinationsProcessing-34"><a href="#CombinationsProcessing-34"><span class="linenos">34</span></a>
 </span><span id="CombinationsProcessing-35"><a href="#CombinationsProcessing-35"><span class="linenos">35</span></a><span class="sd">        Args:</span>
-</span><span id="CombinationsProcessing-36"><a href="#CombinationsProcessing-36"><span class="linenos">36</span></a><span class="sd">            expected_combinations: List of expected combinations.</span>
-</span><span id="CombinationsProcessing-37"><a href="#CombinationsProcessing-37"><span class="linenos">37</span></a><span class="sd">            actual_combinations: List of actual combinations.</span>
-</span><span id="CombinationsProcessing-38"><a href="#CombinationsProcessing-38"><span class="linenos">38</span></a>
-</span><span id="CombinationsProcessing-39"><a href="#CombinationsProcessing-39"><span class="linenos">39</span></a><span class="sd">        Returns:</span>
-</span><span id="CombinationsProcessing-40"><a href="#CombinationsProcessing-40"><span class="linenos">40</span></a><span class="sd">            Tuple with a boolean indicating if extras exist and a list of extra combinations.</span>
-</span><span id="CombinationsProcessing-41"><a href="#CombinationsProcessing-41"><span class="linenos">41</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing-42"><a href="#CombinationsProcessing-42"><span class="linenos">42</span></a>        <span class="n">extras</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">actual_combinations</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">))</span>
-</span><span id="CombinationsProcessing-43"><a href="#CombinationsProcessing-43"><span class="linenos">43</span></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">extras</span><span class="p">),</span> <span class="n">extras</span>
+</span><span id="CombinationsProcessing-36"><a href="#CombinationsProcessing-36"><span class="linenos">36</span></a><span class="sd">            code (str): Base code for the combinations.</span>
+</span><span id="CombinationsProcessing-37"><a href="#CombinationsProcessing-37"><span class="linenos">37</span></a><span class="sd">            start_year (int): The initial year (base year).</span>
+</span><span id="CombinationsProcessing-38"><a href="#CombinationsProcessing-38"><span class="linenos">38</span></a><span class="sd">            temporal_symbols (List[Any]): List of temporal symbols (e.g., years).</span>
+</span><span id="CombinationsProcessing-39"><a href="#CombinationsProcessing-39"><span class="linenos">39</span></a><span class="sd">            scenario_symbols (List[Any]): List of scenario symbols (e.g., SSPs).</span>
+</span><span id="CombinationsProcessing-40"><a href="#CombinationsProcessing-40"><span class="linenos">40</span></a>
+</span><span id="CombinationsProcessing-41"><a href="#CombinationsProcessing-41"><span class="linenos">41</span></a><span class="sd">        Returns:</span>
+</span><span id="CombinationsProcessing-42"><a href="#CombinationsProcessing-42"><span class="linenos">42</span></a><span class="sd">            List[str]: List of generated combination strings (e.g., [&#39;X-2020&#39;, &#39;X-2030-SSP1&#39;, ...]).</span>
+</span><span id="CombinationsProcessing-43"><a href="#CombinationsProcessing-43"><span class="linenos">43</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-44"><a href="#CombinationsProcessing-44"><span class="linenos">44</span></a>        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</span><span id="CombinationsProcessing-45"><a href="#CombinationsProcessing-45"><span class="linenos">45</span></a>        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">temporal_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+</span><span id="CombinationsProcessing-46"><a href="#CombinationsProcessing-46"><span class="linenos">46</span></a>            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">scenario_symbols</span><span class="p">:</span>
+</span><span id="CombinationsProcessing-47"><a href="#CombinationsProcessing-47"><span class="linenos">47</span></a>                <span class="n">combinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="CombinationsProcessing-48"><a href="#CombinationsProcessing-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="n">combinations</span>
+</span><span id="CombinationsProcessing-49"><a href="#CombinationsProcessing-49"><span class="linenos">49</span></a>
+</span><span id="CombinationsProcessing-50"><a href="#CombinationsProcessing-50"><span class="linenos">50</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="CombinationsProcessing-51"><a href="#CombinationsProcessing-51"><span class="linenos">51</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_extra_combinations</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">actual_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="CombinationsProcessing-52"><a href="#CombinationsProcessing-52"><span class="linenos">52</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-53"><a href="#CombinationsProcessing-53"><span class="linenos">53</span></a><span class="sd">        Identify extra combinations that are present but not expected.</span>
+</span><span id="CombinationsProcessing-54"><a href="#CombinationsProcessing-54"><span class="linenos">54</span></a>
+</span><span id="CombinationsProcessing-55"><a href="#CombinationsProcessing-55"><span class="linenos">55</span></a><span class="sd">        Compares the actual list of combinations found against the expected list</span>
+</span><span id="CombinationsProcessing-56"><a href="#CombinationsProcessing-56"><span class="linenos">56</span></a><span class="sd">        generated by business rules.</span>
+</span><span id="CombinationsProcessing-57"><a href="#CombinationsProcessing-57"><span class="linenos">57</span></a>
+</span><span id="CombinationsProcessing-58"><a href="#CombinationsProcessing-58"><span class="linenos">58</span></a><span class="sd">        Args:</span>
+</span><span id="CombinationsProcessing-59"><a href="#CombinationsProcessing-59"><span class="linenos">59</span></a><span class="sd">            expected_combinations (List[str]): List of valid/expected combinations.</span>
+</span><span id="CombinationsProcessing-60"><a href="#CombinationsProcessing-60"><span class="linenos">60</span></a><span class="sd">            actual_combinations (List[str]): List of combinations actually found in the data.</span>
+</span><span id="CombinationsProcessing-61"><a href="#CombinationsProcessing-61"><span class="linenos">61</span></a>
+</span><span id="CombinationsProcessing-62"><a href="#CombinationsProcessing-62"><span class="linenos">62</span></a><span class="sd">        Returns:</span>
+</span><span id="CombinationsProcessing-63"><a href="#CombinationsProcessing-63"><span class="linenos">63</span></a><span class="sd">            Tuple[bool, List[str]]:</span>
+</span><span id="CombinationsProcessing-64"><a href="#CombinationsProcessing-64"><span class="linenos">64</span></a><span class="sd">                - bool: True if any extra combinations exist, False otherwise.</span>
+</span><span id="CombinationsProcessing-65"><a href="#CombinationsProcessing-65"><span class="linenos">65</span></a><span class="sd">                - List[str]: The list of extra (unexpected) combination strings.</span>
+</span><span id="CombinationsProcessing-66"><a href="#CombinationsProcessing-66"><span class="linenos">66</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing-67"><a href="#CombinationsProcessing-67"><span class="linenos">67</span></a>        <span class="n">extras</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">actual_combinations</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">))</span>
+</span><span id="CombinationsProcessing-68"><a href="#CombinationsProcessing-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">extras</span><span class="p">),</span> <span class="n">extras</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Utility class for generating and validating identifier combinations.</p>
 
+<p>Provides static methods to create expected combination strings based on base codes,
+temporal ranges, and scenario symbols, and to identify unexpected (extra) combinations.</p>
+</div>
+
+
+                            <div id="CombinationsProcessing.__init__" class="classattr">
+                                        <input id="CombinationsProcessing.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">CombinationsProcessing</span><span class="signature pdoc-code condensed">()</span>
+
+                <label class="view-source-button" for="CombinationsProcessing.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#CombinationsProcessing.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing.__init__-22"><a href="#CombinationsProcessing.__init__-22"><span class="linenos">22</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="CombinationsProcessing.__init__-23"><a href="#CombinationsProcessing.__init__-23"><span class="linenos">23</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the CombinationsProcessing class.&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing.__init__-24"><a href="#CombinationsProcessing.__init__-24"><span class="linenos">24</span></a>        <span class="k">pass</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the CombinationsProcessing class.</p>
+</div>
+
+
+                            </div>
                             <div id="CombinationsProcessing.generate_combinations" class="classattr">
                                         <input id="CombinationsProcessing.generate_combinations-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
@@ -177,38 +253,46 @@
 
     </div>
     <a class="headerlink" href="#CombinationsProcessing.generate_combinations"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing.generate_combinations-10"><a href="#CombinationsProcessing.generate_combinations-10"><span class="linenos">10</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="CombinationsProcessing.generate_combinations-11"><a href="#CombinationsProcessing.generate_combinations-11"><span class="linenos">11</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_combinations</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">scenario_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="CombinationsProcessing.generate_combinations-12"><a href="#CombinationsProcessing.generate_combinations-12"><span class="linenos">12</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing.generate_combinations-13"><a href="#CombinationsProcessing.generate_combinations-13"><span class="linenos">13</span></a><span class="sd">        Generate combinations using the base code, start year, temporal symbols, and scenario symbols.</span>
-</span><span id="CombinationsProcessing.generate_combinations-14"><a href="#CombinationsProcessing.generate_combinations-14"><span class="linenos">14</span></a>
-</span><span id="CombinationsProcessing.generate_combinations-15"><a href="#CombinationsProcessing.generate_combinations-15"><span class="linenos">15</span></a><span class="sd">        Args:</span>
-</span><span id="CombinationsProcessing.generate_combinations-16"><a href="#CombinationsProcessing.generate_combinations-16"><span class="linenos">16</span></a><span class="sd">            code: Base code for combinations.</span>
-</span><span id="CombinationsProcessing.generate_combinations-17"><a href="#CombinationsProcessing.generate_combinations-17"><span class="linenos">17</span></a><span class="sd">            start_year: Initial year for combinations.</span>
-</span><span id="CombinationsProcessing.generate_combinations-18"><a href="#CombinationsProcessing.generate_combinations-18"><span class="linenos">18</span></a><span class="sd">            temporal_symbols: List of temporal symbols.</span>
-</span><span id="CombinationsProcessing.generate_combinations-19"><a href="#CombinationsProcessing.generate_combinations-19"><span class="linenos">19</span></a><span class="sd">            scenario_symbols: List of scenario symbols.</span>
-</span><span id="CombinationsProcessing.generate_combinations-20"><a href="#CombinationsProcessing.generate_combinations-20"><span class="linenos">20</span></a>
-</span><span id="CombinationsProcessing.generate_combinations-21"><a href="#CombinationsProcessing.generate_combinations-21"><span class="linenos">21</span></a><span class="sd">        Returns:</span>
-</span><span id="CombinationsProcessing.generate_combinations-22"><a href="#CombinationsProcessing.generate_combinations-22"><span class="linenos">22</span></a><span class="sd">            List of generated combinations in the format &#39;code-year-scenario&#39;.</span>
-</span><span id="CombinationsProcessing.generate_combinations-23"><a href="#CombinationsProcessing.generate_combinations-23"><span class="linenos">23</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing.generate_combinations-24"><a href="#CombinationsProcessing.generate_combinations-24"><span class="linenos">24</span></a>        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
-</span><span id="CombinationsProcessing.generate_combinations-25"><a href="#CombinationsProcessing.generate_combinations-25"><span class="linenos">25</span></a>        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">temporal_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-</span><span id="CombinationsProcessing.generate_combinations-26"><a href="#CombinationsProcessing.generate_combinations-26"><span class="linenos">26</span></a>            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">scenario_symbols</span><span class="p">:</span>
-</span><span id="CombinationsProcessing.generate_combinations-27"><a href="#CombinationsProcessing.generate_combinations-27"><span class="linenos">27</span></a>                <span class="n">combinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-</span><span id="CombinationsProcessing.generate_combinations-28"><a href="#CombinationsProcessing.generate_combinations-28"><span class="linenos">28</span></a>        <span class="k">return</span> <span class="n">combinations</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing.generate_combinations-26"><a href="#CombinationsProcessing.generate_combinations-26"><span class="linenos">26</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="CombinationsProcessing.generate_combinations-27"><a href="#CombinationsProcessing.generate_combinations-27"><span class="linenos">27</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">generate_combinations</span><span class="p">(</span><span class="n">code</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">start_year</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">temporal_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span> <span class="n">scenario_symbols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="CombinationsProcessing.generate_combinations-28"><a href="#CombinationsProcessing.generate_combinations-28"><span class="linenos">28</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing.generate_combinations-29"><a href="#CombinationsProcessing.generate_combinations-29"><span class="linenos">29</span></a><span class="sd">        Generate a list of combination strings based on code, time, and scenarios.</span>
+</span><span id="CombinationsProcessing.generate_combinations-30"><a href="#CombinationsProcessing.generate_combinations-30"><span class="linenos">30</span></a>
+</span><span id="CombinationsProcessing.generate_combinations-31"><a href="#CombinationsProcessing.generate_combinations-31"><span class="linenos">31</span></a><span class="sd">        Creates identifiers in the format &#39;code-year-scenario&#39;. The output includes</span>
+</span><span id="CombinationsProcessing.generate_combinations-32"><a href="#CombinationsProcessing.generate_combinations-32"><span class="linenos">32</span></a><span class="sd">        a base combination (code-start_year) followed by combinations for subsequent</span>
+</span><span id="CombinationsProcessing.generate_combinations-33"><a href="#CombinationsProcessing.generate_combinations-33"><span class="linenos">33</span></a><span class="sd">        years and all provided scenario symbols.</span>
+</span><span id="CombinationsProcessing.generate_combinations-34"><a href="#CombinationsProcessing.generate_combinations-34"><span class="linenos">34</span></a>
+</span><span id="CombinationsProcessing.generate_combinations-35"><a href="#CombinationsProcessing.generate_combinations-35"><span class="linenos">35</span></a><span class="sd">        Args:</span>
+</span><span id="CombinationsProcessing.generate_combinations-36"><a href="#CombinationsProcessing.generate_combinations-36"><span class="linenos">36</span></a><span class="sd">            code (str): Base code for the combinations.</span>
+</span><span id="CombinationsProcessing.generate_combinations-37"><a href="#CombinationsProcessing.generate_combinations-37"><span class="linenos">37</span></a><span class="sd">            start_year (int): The initial year (base year).</span>
+</span><span id="CombinationsProcessing.generate_combinations-38"><a href="#CombinationsProcessing.generate_combinations-38"><span class="linenos">38</span></a><span class="sd">            temporal_symbols (List[Any]): List of temporal symbols (e.g., years).</span>
+</span><span id="CombinationsProcessing.generate_combinations-39"><a href="#CombinationsProcessing.generate_combinations-39"><span class="linenos">39</span></a><span class="sd">            scenario_symbols (List[Any]): List of scenario symbols (e.g., SSPs).</span>
+</span><span id="CombinationsProcessing.generate_combinations-40"><a href="#CombinationsProcessing.generate_combinations-40"><span class="linenos">40</span></a>
+</span><span id="CombinationsProcessing.generate_combinations-41"><a href="#CombinationsProcessing.generate_combinations-41"><span class="linenos">41</span></a><span class="sd">        Returns:</span>
+</span><span id="CombinationsProcessing.generate_combinations-42"><a href="#CombinationsProcessing.generate_combinations-42"><span class="linenos">42</span></a><span class="sd">            List[str]: List of generated combination strings (e.g., [&#39;X-2020&#39;, &#39;X-2030-SSP1&#39;, ...]).</span>
+</span><span id="CombinationsProcessing.generate_combinations-43"><a href="#CombinationsProcessing.generate_combinations-43"><span class="linenos">43</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing.generate_combinations-44"><a href="#CombinationsProcessing.generate_combinations-44"><span class="linenos">44</span></a>        <span class="n">combinations</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">start_year</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">]</span>
+</span><span id="CombinationsProcessing.generate_combinations-45"><a href="#CombinationsProcessing.generate_combinations-45"><span class="linenos">45</span></a>        <span class="k">for</span> <span class="n">year</span> <span class="ow">in</span> <span class="n">temporal_symbols</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+</span><span id="CombinationsProcessing.generate_combinations-46"><a href="#CombinationsProcessing.generate_combinations-46"><span class="linenos">46</span></a>            <span class="k">for</span> <span class="n">symbol</span> <span class="ow">in</span> <span class="n">scenario_symbols</span><span class="p">:</span>
+</span><span id="CombinationsProcessing.generate_combinations-47"><a href="#CombinationsProcessing.generate_combinations-47"><span class="linenos">47</span></a>                <span class="n">combinations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">code</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">year</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">symbol</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</span><span id="CombinationsProcessing.generate_combinations-48"><a href="#CombinationsProcessing.generate_combinations-48"><span class="linenos">48</span></a>        <span class="k">return</span> <span class="n">combinations</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Generate combinations using the base code, start year, temporal symbols, and scenario symbols.</p>
+            <div class="docstring"><p>Generate a list of combination strings based on code, time, and scenarios.</p>
+
+<p>Creates identifiers in the format 'code-year-scenario'. The output includes
+a base combination (code-start_year) followed by combinations for subsequent
+years and all provided scenario symbols.</p>
 
 <p>Args:
-    code: Base code for combinations.
-    start_year: Initial year for combinations.
-    temporal_symbols: List of temporal symbols.
-    scenario_symbols: List of scenario symbols.</p>
+    code (str): Base code for the combinations.
+    start_year (int): The initial year (base year).
+    temporal_symbols (List[Any]): List of temporal symbols (e.g., years).
+    scenario_symbols (List[Any]): List of scenario symbols (e.g., SSPs).</p>
 
 <p>Returns:
-    List of generated combinations in the format 'code-year-scenario'.</p>
+    List[str]: List of generated combination strings (e.g., ['X-2020', 'X-2030-SSP1', ...]).</p>
 </div>
 
 
@@ -225,31 +309,41 @@
 
     </div>
     <a class="headerlink" href="#CombinationsProcessing.find_extra_combinations"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing.find_extra_combinations-30"><a href="#CombinationsProcessing.find_extra_combinations-30"><span class="linenos">30</span></a>    <span class="nd">@staticmethod</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-31"><a href="#CombinationsProcessing.find_extra_combinations-31"><span class="linenos">31</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_extra_combinations</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">actual_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-32"><a href="#CombinationsProcessing.find_extra_combinations-32"><span class="linenos">32</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-33"><a href="#CombinationsProcessing.find_extra_combinations-33"><span class="linenos">33</span></a><span class="sd">        Find extra combinations present in actual_combinations but not in expected_combinations.</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-34"><a href="#CombinationsProcessing.find_extra_combinations-34"><span class="linenos">34</span></a>
-</span><span id="CombinationsProcessing.find_extra_combinations-35"><a href="#CombinationsProcessing.find_extra_combinations-35"><span class="linenos">35</span></a><span class="sd">        Args:</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-36"><a href="#CombinationsProcessing.find_extra_combinations-36"><span class="linenos">36</span></a><span class="sd">            expected_combinations: List of expected combinations.</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-37"><a href="#CombinationsProcessing.find_extra_combinations-37"><span class="linenos">37</span></a><span class="sd">            actual_combinations: List of actual combinations.</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-38"><a href="#CombinationsProcessing.find_extra_combinations-38"><span class="linenos">38</span></a>
-</span><span id="CombinationsProcessing.find_extra_combinations-39"><a href="#CombinationsProcessing.find_extra_combinations-39"><span class="linenos">39</span></a><span class="sd">        Returns:</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-40"><a href="#CombinationsProcessing.find_extra_combinations-40"><span class="linenos">40</span></a><span class="sd">            Tuple with a boolean indicating if extras exist and a list of extra combinations.</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-41"><a href="#CombinationsProcessing.find_extra_combinations-41"><span class="linenos">41</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-42"><a href="#CombinationsProcessing.find_extra_combinations-42"><span class="linenos">42</span></a>        <span class="n">extras</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">actual_combinations</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">))</span>
-</span><span id="CombinationsProcessing.find_extra_combinations-43"><a href="#CombinationsProcessing.find_extra_combinations-43"><span class="linenos">43</span></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">extras</span><span class="p">),</span> <span class="n">extras</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="CombinationsProcessing.find_extra_combinations-50"><a href="#CombinationsProcessing.find_extra_combinations-50"><span class="linenos">50</span></a>    <span class="nd">@staticmethod</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-51"><a href="#CombinationsProcessing.find_extra_combinations-51"><span class="linenos">51</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">find_extra_combinations</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">actual_combinations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-52"><a href="#CombinationsProcessing.find_extra_combinations-52"><span class="linenos">52</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-53"><a href="#CombinationsProcessing.find_extra_combinations-53"><span class="linenos">53</span></a><span class="sd">        Identify extra combinations that are present but not expected.</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-54"><a href="#CombinationsProcessing.find_extra_combinations-54"><span class="linenos">54</span></a>
+</span><span id="CombinationsProcessing.find_extra_combinations-55"><a href="#CombinationsProcessing.find_extra_combinations-55"><span class="linenos">55</span></a><span class="sd">        Compares the actual list of combinations found against the expected list</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-56"><a href="#CombinationsProcessing.find_extra_combinations-56"><span class="linenos">56</span></a><span class="sd">        generated by business rules.</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-57"><a href="#CombinationsProcessing.find_extra_combinations-57"><span class="linenos">57</span></a>
+</span><span id="CombinationsProcessing.find_extra_combinations-58"><a href="#CombinationsProcessing.find_extra_combinations-58"><span class="linenos">58</span></a><span class="sd">        Args:</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-59"><a href="#CombinationsProcessing.find_extra_combinations-59"><span class="linenos">59</span></a><span class="sd">            expected_combinations (List[str]): List of valid/expected combinations.</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-60"><a href="#CombinationsProcessing.find_extra_combinations-60"><span class="linenos">60</span></a><span class="sd">            actual_combinations (List[str]): List of combinations actually found in the data.</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-61"><a href="#CombinationsProcessing.find_extra_combinations-61"><span class="linenos">61</span></a>
+</span><span id="CombinationsProcessing.find_extra_combinations-62"><a href="#CombinationsProcessing.find_extra_combinations-62"><span class="linenos">62</span></a><span class="sd">        Returns:</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-63"><a href="#CombinationsProcessing.find_extra_combinations-63"><span class="linenos">63</span></a><span class="sd">            Tuple[bool, List[str]]:</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-64"><a href="#CombinationsProcessing.find_extra_combinations-64"><span class="linenos">64</span></a><span class="sd">                - bool: True if any extra combinations exist, False otherwise.</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-65"><a href="#CombinationsProcessing.find_extra_combinations-65"><span class="linenos">65</span></a><span class="sd">                - List[str]: The list of extra (unexpected) combination strings.</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-66"><a href="#CombinationsProcessing.find_extra_combinations-66"><span class="linenos">66</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-67"><a href="#CombinationsProcessing.find_extra_combinations-67"><span class="linenos">67</span></a>        <span class="n">extras</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">actual_combinations</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="n">expected_combinations</span><span class="p">))</span>
+</span><span id="CombinationsProcessing.find_extra_combinations-68"><a href="#CombinationsProcessing.find_extra_combinations-68"><span class="linenos">68</span></a>        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="n">extras</span><span class="p">),</span> <span class="n">extras</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Find extra combinations present in actual_combinations but not in expected_combinations.</p>
+            <div class="docstring"><p>Identify extra combinations that are present but not expected.</p>
+
+<p>Compares the actual list of combinations found against the expected list
+generated by business rules.</p>
 
 <p>Args:
-    expected_combinations: List of expected combinations.
-    actual_combinations: List of actual combinations.</p>
+    expected_combinations (List[str]): List of valid/expected combinations.
+    actual_combinations (List[str]): List of combinations actually found in the data.</p>
 
 <p>Returns:
-    Tuple with a boolean indicating if extras exist and a list of extra combinations.</p>
+    Tuple[bool, List[str]]:
+        - bool: True if any extra combinations exist, False otherwise.
+        - List[str]: The list of extra (unexpected) combination strings.</p>
 </div>
 
 

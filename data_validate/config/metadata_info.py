@@ -1,11 +1,4 @@
-#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
-"""
-Module defining project metadata and version information.
-
-This module provides the `MetadataInfo` class, which retrieves and stores
-package metadata (version, author, license, etc.) using `importlib.metadata`.
-It also handles version string construction including release levels (alpha, beta, final).
-"""
+#  Copyright (c) 2026 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 
 import importlib.metadata
 from typing import Final
@@ -48,7 +41,7 @@ class MetadataInfo(ConstantBase):
         project_name: Final = "Canoa"
         dist_name: Final = "canoa_data_validate"
         release_level: Final = "beta"
-        serial: Final = 697
+        serial: Final = 698
         status_dev: Final = 10
 
         self.__version__ = "0.0.0"

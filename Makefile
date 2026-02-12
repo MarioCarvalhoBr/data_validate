@@ -87,3 +87,6 @@ ruff: ## Lint and fix code with ruff
 	poetry run ruff check . --fix
 
 lint: black ruff ## Run all linting tools
+
+exec: ## Execute main pipeline script
+	python3 data_validate/main.py --o data/output/temp/ --i data/input/data_ground_truth_01/

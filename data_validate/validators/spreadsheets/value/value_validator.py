@@ -3,7 +3,7 @@ from typing import List, Tuple, Dict, Any
 
 import pandas as pd
 
-from data_validate.config.config import NamesEnum
+from data_validate.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.common.generation.combinations_processing import CombinationsProcessing
