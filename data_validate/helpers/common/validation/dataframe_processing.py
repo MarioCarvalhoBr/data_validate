@@ -1,3 +1,4 @@
+#  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 """Data validation utilities for DataFrame processing.
 
 This module provides functions for validating pandas DataFrames against
@@ -11,8 +12,15 @@ import pandas as pd
 
 
 class DataFrameProcessing:
+    """
+    Utility class for general DataFrame validation and structural checks.
+
+    Provides static methods to check valid column naming (no vertical bars),
+    missing or extra columns, unnamed columns, duplicates, and text length limits.
+    """
 
     def __init__(self) -> None:
+        """Initialize the DataFrameProcessing class."""
         pass
 
     @staticmethod
@@ -129,6 +137,22 @@ class DataFrameProcessing:
     def check_dataframe_titles_uniques(
         dataframe: pd.DataFrame, column_one: str, column_two: str, plural_column_one: str, plural_column_two: str
     ) -> List[str]:
+        """
+        Check for duplicate values in specified columns and return warnings.
+
+        Iterates over the given columns (singular/plural variations) and identifies
+        duplicated entries.
+
+        Args:
+            dataframe: The pandas DataFrame to check
+            column_one: First column name to check for duplicates
+            column_two: Second column name to check for duplicates
+            plural_column_one: Plural name of first column for reporting
+            plural_column_two: Plural name of second column for reporting
+
+        Returns:
+            List of warning messages about duplicates
+        """
         dataframe = dataframe.copy()
         warnings = []
 

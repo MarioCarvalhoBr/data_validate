@@ -7,8 +7,16 @@ import pandas as pd
 
 
 class TreeProcessing:
+    """
+    Utility class for processing and validating tree structures.
+
+    Provides static methods to build tree representations from flat data,
+    validate hierarchical constraints (levels), check code consistency,
+    and detect cycles within the tree.
+    """
 
     def __init__(self) -> None:
+        """Initialize the TreeProcessing class."""
         pass
 
     @staticmethod

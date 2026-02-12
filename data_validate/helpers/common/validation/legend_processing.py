@@ -1,4 +1,11 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing legend data validation utilities.
+
+This module defines the `LegendProcessing` class, which offers methods
+to validate legend labels, sequential types, color formats, order sequences,
+and logical consistency of min/max values.
+"""
 import re
 from decimal import Decimal, InvalidOperation
 from typing import List, Any
@@ -9,21 +16,58 @@ from data_validate.helpers.common.formatting.number_formatting_processing import
 
 
 class LegendProcessing:
-    """Class for processing legend data validation."""
+    """
+    Utility class for processing and validating legend data.
+
+    Provides methods to validate labels (uniqueness, emptiness), numeric columns checks,
+    logical consistency of intervals (min < max, continuity), color formats, and sequence order.
+
+    Attributes:
+        value_data_unavailable: Value representing unavailable data (e.g. "DI" or specific string)
+        filename: Name of the file being processed for error reporting
+    """
 
     def __init__(self, value_data_unavailable: Any, filename: str):
+        """
+        Initialize the LegendProcessing.
+
+        Args:
+            value_data_unavailable: The value designated for unavailable data
+            filename: The name of the file being validated
+        """
         self.value_data_unavailable = value_data_unavailable
         self.filename = filename
 
     @staticmethod
     def get_min_max_values(df, key_lower, key_upper):
+        """
+        Calculate global min and max values from dataframe columns.
+
+        Args:
+            df: DataFrame containing the data
+            key_lower: Column name for lower bounds
+            key_upper: Column name for upper bounds
+
+        Returns:
+            Tuple of (min_value, max_value)
+        """
         min_value = df[key_lower].min()
         max_value = df[key_upper].max()
 
         return min_value, max_value
 
     def validate_legend_labels(self, dataframe: pd.DataFrame, code: Any, label_col: str) -> List[str]:
-        """Validates that labels are unique within a legend group."""
+        """
+        Validate that labels are unique within a legend group.
+
+        Args:
+            dataframe: Validating DataFrame subset
+            code: Legend code identifier
+            label_col: Column name containing labels
+
+        Returns:
+            List of error messages for duplicated labels
+        """
         errors = []
         if dataframe[label_col].duplicated().any():
             duplicate_labels = dataframe[dataframe[label_col].duplicated()][label_col].unique()
@@ -43,7 +87,24 @@ class LegendProcessing:
         max_col: str,
         order_col: str,
     ) -> List[str]:
-        """Validates that required columns have the correct data types."""
+        """
+        Validate that required columns have the correct data types (numeric).
+
+        Checks for empty labels, ensures code/min/max/order are numeric, and verifies
+        specific rules for 'unavailable data' rows (min/max should be empty).
+
+        Args:
+            original_dataframe: Detailed DataFrame
+            code_value: Current legend code
+            code_col: Column name for codes
+            label_col: Column name for labels
+            min_col: Column name for minimum values
+            max_col: Column name for maximum values
+            order_col: Column name for order
+
+        Returns:
+            List of validation error messages
+        """
         errors = []
         # Check if columns exist
         columns_to_check = [col for col in [code_col, min_col, max_col, order_col] if col in original_dataframe.columns]
@@ -124,7 +185,17 @@ class LegendProcessing:
         return errors
 
     def validate_color_format(self, dataframe: pd.DataFrame, code: Any, color_col: str) -> List[str]:
-        """Validates that color format is a valid hexadecimal string."""
+        """
+        Validate that color format is a valid hexadecimal string.
+
+        Args:
+            dataframe: DataFrame to validate
+            code: Legend code identifier
+            color_col: Column name containing color codes
+
+        Returns:
+            List of error messages for invalid color formats
+        """
         errors = []
         hex_color_pattern = re.compile(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
         for index, row in dataframe.iterrows():
@@ -143,7 +214,21 @@ class LegendProcessing:
         max_col: str,
         label_col: str,
     ) -> List[str]:
-        """Validates min/max values for legends, ensuring they are logical and sequential."""
+        """
+        Validate min/max values for excessive decimals.
+
+        Checks if min/max values exceed allowed decimal precision (usually 2 places).
+
+        Args:
+            dataframe: DataFrame to validate
+            code: Legend code identifier
+            min_col: Column name for minimum values
+            max_col: Column name for maximum values
+            label_col: Column name for labels
+
+        Returns:
+            List of error messages for excessive decimals
+        """
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
         sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
@@ -184,7 +269,21 @@ class LegendProcessing:
         max_col: str,
         label_col: str,
     ) -> List[str]:
-        """Validates min/max values for legends, ensuring they are logical and sequential."""
+        """
+        Validate min/max values logical consistency.
+
+        Ensures min < max and that intervals are continuous (next min = prev max + 0.01).
+
+        Args:
+            dataframe: DataFrame to validate
+            code: Legend code identifier
+            min_col: Column name for minimum values
+            max_col: Column name for maximum values
+            label_col: Column name for labels
+
+        Returns:
+            List of error messages for logical inconsistencies
+        """
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
         sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
@@ -234,7 +333,17 @@ class LegendProcessing:
         return errors
 
     def validate_order_sequence(self, dataframe: pd.DataFrame, code: Any, order_col: str) -> List[str]:
-        """Validates that order is sequential starting from 1."""
+        """
+        Validate that order is sequential starting from 1.
+
+        Args:
+            dataframe: DataFrame to validate
+            code: Legend code identifier
+            order_col: Column name for order
+
+        Returns:
+            List of error messages if sequence is broken or invalid
+        """
         errors = []
         dataframe = dataframe.copy()
         dataframe[order_col] = pd.to_numeric(dataframe[order_col], errors="coerce")
@@ -251,7 +360,16 @@ class LegendProcessing:
         return errors
 
     def validate_code_sequence(self, dataframe: pd.DataFrame, code_col: str) -> List[str]:
-        """Validates that legend codes are sequential."""
+        """
+        Validate that legend codes are sequential.
+
+        Args:
+            dataframe: DataFrame to validate
+            code_col: Column name for legend codes
+
+        Returns:
+            List of error messages if codes are not sequential
+        """
         errors = []
         local_dataframe = dataframe.copy()
         local_dataframe[code_col] = pd.to_numeric(local_dataframe[code_col], errors="coerce")

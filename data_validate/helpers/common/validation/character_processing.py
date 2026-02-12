@@ -1,4 +1,10 @@
 #  Copyright (c) 2026 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing character validation utilities for DataFrames.
+
+This module defines the `CharacterProcessing` class, which includes methods
+to check for punctuation rules and special characters (CR/LF) in DataFrame text columns.
+"""
 
 import re
 from typing import Optional, List, Tuple
@@ -7,8 +13,15 @@ import pandas as pd
 
 
 class CharacterProcessing:
+    """
+    Utility class for validating character content in DataFrame columns.
+
+    Provides static methods to enforce punctuation rules (e.g., must/must not end with dot)
+    and to detect prohibited special characters like Carriage Return (CR) and Line Feed (LF).
+    """
 
     def __init__(self) -> None:
+        """Initialize the CharacterProcessing class."""
         pass
 
     @staticmethod

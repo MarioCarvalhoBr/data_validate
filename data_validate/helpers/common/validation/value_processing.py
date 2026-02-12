@@ -1,4 +1,11 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing text value processing and validation utilities.
+
+This module defines the `ValueProcessing` class, which offers methods
+for validating numeric values, checking for excessive decimal places,
+and generating warnings for data quality issues in DataFrame columns.
+"""
 from typing import List, Tuple, Any, Set
 
 import pandas as pd
@@ -8,7 +15,16 @@ from data_validate.helpers.common.formatting.number_formatting_processing import
 
 
 class ValueProcessing:
+    """
+    Utility class for validating numeric values in DataFrames.
+
+    Provides static methods to check if values are valid numbers (ignoring specific
+    flags like 'DI'), validating decimal precision, and generating summary warnings
+    for decimal place violations.
+    """
+
     def __init__(self) -> None:
+        """Initialize the ValueProcessing class."""
         pass
 
     @staticmethod

@@ -1,4 +1,11 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+"""
+Module providing proportionality data cleaning and validation utilities.
+
+This module defines the `ProportionalityProcessing` class, which offers methods
+to construct subdatasets for proportionality analysis, validate numeric types,
+sum constraints, and decimal precisions in proportionality datasets.
+"""
 
 from decimal import Decimal
 from typing import List, Tuple, Any
@@ -10,11 +17,32 @@ from data_validate.helpers.common.formatting.number_formatting_processing import
 
 
 class ProportionalityProcessing:
+    """
+    Utility class for processing proportionality data.
+
+    Provides static methods to build hierarchical sub-datasets, check sums equal 1 (or 100%),
+    verify decimal precision, and validate numeric consistency in proportionality tables.
+    """
+
     def __init__(self) -> None:
+        """Initialize the ProportionalityProcessing class."""
         pass
 
     @staticmethod
     def build_subdatasets(df_proportionalities: DataFrame, column_name_id: str):
+        """
+        Construct subdatasets mapping parent indicators to their children data.
+
+        Iterates through the DataFrame columns to identify parent-child groups
+        based on the multi-level column structure.
+
+        Args:
+            df_proportionalities: The main DataFrame containing proportionality data
+            column_name_id: The specific column name identifying the ID
+
+        Returns:
+            Dictionary mapping parent IDs to DataFrames of their children
+        """
         df_proportionalities = df_proportionalities.copy()
 
         # Create columns information
@@ -53,7 +81,22 @@ class ProportionalityProcessing:
         parent_id: str,
         sp_name: str,
     ) -> Tuple[DataFrame, List[str]]:
-        """Validates numeric format and returns cleaned data with errors."""
+        """
+        Validate that data contains valid numeric values.
+
+        Checks for non-numeric values that are not marked as 'Data Unavailable' (DI).
+        Invalid entries are collected as errors and replaced with DI value in the returned DataFrame.
+
+        Args:
+            df_data: DataFrame with data to validate
+            is_di: boolean DataFrame mask indicating DI values
+            value_di: Value representing 'Data Unavailable'
+            parent_id: ID of the parent indicator
+            sp_name: Name of the spreadsheet for error reporting
+
+        Returns:
+            Tuple of (cleaned DataFrame, list of error messages)
+        """
         errors = []
 
         df_numeric = df_data.replace(",", ".", regex=True).apply(pd.to_numeric, errors="coerce")
@@ -88,7 +131,17 @@ class ProportionalityProcessing:
         value_di: Any,
         precision: int,
     ) -> Tuple[bool, int, int]:
-        """Checks for excessive decimal places and returns statistics."""
+        """
+        Check for values exceeding the allowed decimal precision.
+
+        Args:
+            df_data: DataFrame to check
+            value_di: Value to ignore (DI)
+            precision: Maximum allowed decimal places
+
+        Returns:
+            Tuple of (has_excess, count_of_errors, first_line_index)
+        """
         has_excess_decimals_mask = df_data.map(
             lambda value_number: NumberFormattingProcessing.check_n_decimals_places(value_number, value_di, precision)
         )
@@ -108,7 +161,19 @@ class ProportionalityProcessing:
         value_di: Any,
         precision: int,
     ) -> pd.Series:
-        """Converts data to Decimal and returns row sums."""
+        """
+        Convert values to Decimal type and calculate row sums.
+
+        Ensures precision handling by truncating decimals before summation.
+
+        Args:
+            df_data: DataFrame with values
+            value_di: Value to ignore (DI)
+            precision: Decimal precision for truncation
+
+        Returns:
+            Series containing the sum for each row
+        """
         df_decimals = df_data.map(lambda value_number: NumberFormattingProcessing.to_decimal_truncated(value_number, value_di, precision))
         return df_decimals.sum(axis=1)
 
@@ -123,7 +188,25 @@ class ProportionalityProcessing:
         sp_name: str,
         sp_name_value: str,
     ) -> List[str]:
-        """Validates rows with zero sum against values spreadsheet."""
+        """
+        Validate that rows summing to zero also have zero values in the source values spreadsheet.
+
+        If a proportionality row sums to 0, the corresponding indicator values in the values spreadsheet
+        must also be 0 or DI. Deviations generate errors.
+
+        Args:
+            row_sums: Series of row sums
+            ids: Series of IDs corresponding to rows
+            df_data: Proportionality DataFrame
+            sp_df_values: Values spreadsheet DataFrame
+            column_name_id: Name of ID column
+            value_di: DI value string
+            sp_name: Name of proportionality spreadsheet
+            sp_name_value: Name of values spreadsheet
+
+        Returns:
+            List of error messages
+        """
         errors = []
         zero_sum_mask = row_sums == 0
 
@@ -168,7 +251,21 @@ class ProportionalityProcessing:
         sp_name: str,
         current_language: str,
     ) -> Tuple[List[str], List[str]]:
-        """Validates sum tolerance and returns errors and warnings."""
+        """
+        Validate that row sums are within acceptable tolerance of 1 (100%).
+
+        Checks if sums fall strictly outside tolerance (error) or just slightly off 1 within tolerance (warning).
+        Tolerance range: [0.99, 1.01].
+
+        Args:
+            row_sums: Series of row sums
+            parent_id: Parent indicator ID
+            sp_name: Spreadsheet name
+            current_language: Language code for number formatting
+
+        Returns:
+            Tuple of (list of errors, list of warnings)
+        """
         errors = []
         warnings = []
 
