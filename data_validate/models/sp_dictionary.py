@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
@@ -45,8 +46,8 @@ class SpDictionary(SpModelABC):
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
-            self.SP_NAME = "dicionario"
-            self.SP_DESCRIPTION = "Planilha de dicionario"
+            self.SP_NAME = SHEET.SP_NAME_DICTIONARY
+            self.SP_DESCRIPTION = "Dictionary sheet listing custom words to ignore in spell checking."
             self._finalize_initialization()
 
     CONSTANTS = INFO()

@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
@@ -48,8 +49,8 @@ class SpDescription(SpModelABC):
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
-            self.SP_NAME = "descricao"
-            self.SP_DESCRIPTION = "Planilha de descricao"
+            self.SP_NAME = SHEET.SP_NAME_DESCRIPTION
+            self.SP_DESCRIPTION = "Description sheet defining indicator metadata, names, and narrative fields."
             self.MAX_TITLE_LENGTH = 40
             self.MAX_SIMPLE_DESC_LENGTH = 150
             self._finalize_initialization()
@@ -172,7 +173,7 @@ class SpDescription(SpModelABC):
         # 1.0. Handling dynamic columns: scenarios
         if (not self.scenario_read_success) and (self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns):
             self.structural_errors.append(
-                f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{self.VAR_CONSTS.SP_NAMAE_SCENARIO}' não estiver configurado ou não existir."
+                f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{SHEET.SP_NAME_SCENARIOS}' não estiver configurado ou não existir."
             )
             self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         elif self.scenario_exists_file:

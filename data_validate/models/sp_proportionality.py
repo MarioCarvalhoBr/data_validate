@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 
@@ -43,8 +44,8 @@ class SpProportionality(SpModelABC):
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
-            self.SP_NAME = "proporcionalidades"
-            self.SP_DESCRIPTION = "Planilha de proporcionalidades"
+            self.SP_NAME = SHEET.SP_NAME_PROPORTIONALITIES
+            self.SP_DESCRIPTION = "Proportionality sheet with influence weights between indicators."
             self._finalize_initialization()
 
     CONSTANTS = INFO()

@@ -260,9 +260,7 @@ class TestSpellCheckerEdgeCases:
             mock_dataframe_processor = mocker.MagicMock()
 
             mocker.patch("data_validate.helpers.tools.spellchecker.spellchecker.DictionaryManager", return_value=mock_dictionary_manager)
-            mocker.patch(
-                "data_validate.helpers.tools.spellchecker.spellchecker.SpellCheckerController", return_value=mock_spellchecker_controller
-            )
+            mocker.patch("data_validate.helpers.tools.spellchecker.spellchecker.SpellCheckerController", return_value=mock_spellchecker_controller)
             mocker.patch("data_validate.helpers.tools.spellchecker.spellchecker.DataFrameProcessor", return_value=mock_dataframe_processor)
 
             spellchecker = SpellChecker(lang, ["word1"])

@@ -24,6 +24,8 @@ class ApplicationConfig:
 
     Attributes:
         lm (LanguageManager): Manager for handling localized text.
+        spreadsheet_info (SpreadsheetInfo): Information about the spreadsheets used in the application.
+        names_enum (NamesEnum): Enumeration of verification names used in the application.
     """
 
     # NUMBERS

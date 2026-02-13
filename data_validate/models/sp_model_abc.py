@@ -44,7 +44,6 @@ class SpModelABC(ABC):
             SCENARIO_EXISTS_FILE (str): Key for scenario file existence in kwargs.
             SCENARIO_READ_SUCCESS (str): Key for scenario file read success in kwargs.
             SCENARIOS_LIST (str): Key for scenarios list in kwargs.
-            SP_NAMAE_SCENARIO (str): Internal name for the scenario dataset ('cenarios').
 
         """
 
@@ -58,8 +57,6 @@ class SpModelABC(ABC):
             self.SCENARIO_EXISTS_FILE = "scenario_exists_file"
             self.SCENARIO_READ_SUCCESS = "scenario_read_success"
             self.SCENARIOS_LIST = "scenarios_list"
-
-            self.SP_NAMAE_SCENARIO = "cenarios"
 
             self._finalize_initialization()
 

@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
@@ -43,8 +44,8 @@ class SpLegend(SpModelABC):
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
-            self.SP_NAME = "legenda"
-            self.SP_DESCRIPTION = "Planilha de legendas"
+            self.SP_NAME = SHEET.SP_NAME_LEGEND
+            self.SP_DESCRIPTION = "Legend sheet defining labels, colors, and value ranges for classification."
             # Others constants
             self.MIN_LOWER_LEGEND_DEFAULT = 0
             self.MAX_UPPER_LEGEND_DEFAULT = 1

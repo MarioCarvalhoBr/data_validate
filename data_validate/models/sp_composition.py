@@ -10,6 +10,7 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
@@ -43,8 +44,8 @@ class SpComposition(SpModelABC):
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
-            self.SP_NAME = "composicao"
-            self.SP_DESCRIPTION = "Planilha de composicao"
+            self.SP_NAME = SHEET.SP_NAME_COMPOSITION
+            self.SP_DESCRIPTION = "Composition sheet representing parent-child indicator relationships."
             self._finalize_initialization()
 
     CONSTANTS = INFO()

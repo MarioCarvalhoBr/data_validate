@@ -10,11 +10,10 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
-from data_validate.helpers.common.processing.collections_processing import (
-    CollectionsProcessing,
-)  # Added
+from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.models.sp_model_abc import SpModelABC
 
@@ -43,8 +42,8 @@ class SpValue(SpModelABC):
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
-            self.SP_NAME = "valores"
-            self.SP_DESCRIPTION = "Planilha de valores"
+            self.SP_NAME = SHEET.SP_NAME_VALUES
+            self.SP_DESCRIPTION = "Values sheet storing indicator values across scenarios and time."
             self._finalize_initialization()
 
     CONSTANTS = INFO()

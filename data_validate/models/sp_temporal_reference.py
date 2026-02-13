@@ -11,6 +11,7 @@ from typing import List, Dict, Any
 
 import pandas as pd
 
+from data_validate.config import SHEET
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
@@ -39,16 +40,14 @@ class SpTemporalReference(SpModelABC):
         Attributes:
             SP_NAME (str): Internal name of the spreadsheet/dataset ('referencia_temporal').
             SP_DESCRIPTION (str): Description of the dataset.
-            SP_SCENARIO_NAME (str): Name of the associated scenario dataset ('cenarios').
         """
 
         def __init__(self):
             """Initialize the INFO constants."""
             super().__init__()
 
-            self.SP_NAME = "referencia_temporal"
-            self.SP_DESCRIPTION = "Planilha de referência temporal"
-            self.SP_SCENARIO_NAME = "cenarios"
+            self.SP_NAME = SHEET.SP_NAME_TEMPORAL_REFERENCE
+            self.SP_DESCRIPTION = "Temporal reference sheet defining time symbols and descriptions."
             self._finalize_initialization()
 
     CONSTANTS = INFO()
@@ -125,7 +124,7 @@ class SpTemporalReference(SpModelABC):
         # Verify if the scenarios list is empty and handle single-value constraint
         if (not self.scenarios_list) and (len(self.data_loader_model.df_data) != 1):
             self.data_cleaning_errors.append(
-                f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{self.CONSTANTS.SP_SCENARIO_NAME}' não existe ou está vazio."
+                f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{SHEET.SP_NAME_SCENARIOS}' não existe ou está vazio."
             )
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
