@@ -74,6 +74,7 @@ badges: genbadge-coverage genbadge-tests ## Generate all badges
 
 # 6. Documentation
 docs: ## Generate documentation with pdoc
+	rm -rf docs/
 	poetry run pdoc ./$(PATH_SRC)/ -o ./docs --logo "https://avatars.githubusercontent.com/u/141270342?s=400&v=4"
 
 readme: ## Generate README documentation
