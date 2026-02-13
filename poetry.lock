@@ -529,6 +529,24 @@ MarkupSafe = ">=2.0"
 i18n = ["Babel (>=2.7)"]
 
 [[package]]
+name = "markdown2"
+version = "2.5.4"
+description = "A fast and complete Python implementation of Markdown"
+optional = false
+python-versions = "<4,>=3.9"
+groups = ["dev"]
+files = [
+    {file = "markdown2-2.5.4-py3-none-any.whl", hash = "sha256:3c4b2934e677be7fec0e6f2de4410e116681f4ad50ec8e5ba7557be506d3f439"},
+    {file = "markdown2-2.5.4.tar.gz", hash = "sha256:a09873f0b3c23dbfae589b0080587df52ad75bb09a5fa6559147554736676889"},
+]
+
+[package.extras]
+all = ["latex2mathml ; python_version >= \"3.8.1\"", "pygments (>=2.7.3)", "wavedrom"]
+code-syntax-highlighting = ["pygments (>=2.7.3)"]
+latex = ["latex2mathml ; python_version >= \"3.8.1\""]
+wavedrom = ["wavedrom"]
+
+[[package]]
 name = "markupsafe"
 version = "3.0.3"
 description = "Safely add untrusted strings to HTML/XML markup."
@@ -653,36 +671,11 @@ files = [
 
 [[package]]
 name = "networkx"
-version = "3.6"
-description = "Python package for creating and manipulating graphs and networks"
-optional = false
-python-versions = ">=3.11"
-groups = ["main"]
-markers = "python_version >= \"3.14\""
-files = [
-    {file = "networkx-3.6-py3-none-any.whl", hash = "sha256:cdb395b105806062473d3be36458d8f1459a4e4b98e236a66c3a48996e07684f"},
-    {file = "networkx-3.6.tar.gz", hash = "sha256:285276002ad1f7f7da0f7b42f004bcba70d381e936559166363707fdad3d72ad"},
-]
-
-[package.extras]
-benchmarking = ["asv", "virtualenv"]
-default = ["matplotlib (>=3.8)", "numpy (>=1.25)", "pandas (>=2.0)", "scipy (>=1.11.2)"]
-developer = ["mypy (>=1.15)", "pre-commit (>=4.1)"]
-doc = ["intersphinx-registry", "myst-nb (>=1.1)", "numpydoc (>=1.8.0)", "pillow (>=10)", "pydata-sphinx-theme (>=0.16)", "sphinx (>=8.0)", "sphinx-gallery (>=0.18)", "texext (>=0.6.7)"]
-example = ["cairocffi (>=1.7)", "contextily (>=1.6)", "igraph (>=0.11)", "iplotx (>=0.9.0)", "momepy (>=0.7.2)", "osmnx (>=2.0.0)", "scikit-learn (>=1.5)", "seaborn (>=0.13)"]
-extra = ["lxml (>=4.6)", "pydot (>=3.0.1)", "pygraphviz (>=1.14)", "sympy (>=1.10)"]
-release = ["build (>=0.10)", "changelist (==0.5)", "twine (>=4.0)", "wheel (>=0.40)"]
-test = ["pytest (>=7.2)", "pytest-cov (>=4.0)", "pytest-xdist (>=3.0)"]
-test-extras = ["pytest-mpl", "pytest-randomly"]
-
-[[package]]
-name = "networkx"
 version = "3.6.1"
 description = "Python package for creating and manipulating graphs and networks"
 optional = false
 python-versions = "!=3.14.1,>=3.11"
 groups = ["main"]
-markers = "python_version < \"3.14\""
 files = [
     {file = "networkx-3.6.1-py3-none-any.whl", hash = "sha256:d47fbf302e7d9cbbb9e2555a0d267983d2aa476bac30e90dfbe5669bd57f3762"},
     {file = "networkx-3.6.1.tar.gz", hash = "sha256:26b7c357accc0c8cde558ad486283728b65b6a95d85ee1cd66bafab4c8168509"},
@@ -945,18 +938,19 @@ files = [
 
 [[package]]
 name = "pdoc"
-version = "15.0.4"
+version = "16.0.0"
 description = "API Documentation for Python Projects"
 optional = false
-python-versions = ">=3.9"
+python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "pdoc-15.0.4-py3-none-any.whl", hash = "sha256:f9028e85e7bb8475b054e69bde1f6d26fc4693d25d9fa1b1ce9009bec7f7a5c4"},
-    {file = "pdoc-15.0.4.tar.gz", hash = "sha256:cf9680f10f5b4863381f44ef084b1903f8f356acb0d4cc6b64576ba9fb712c82"},
+    {file = "pdoc-16.0.0-py3-none-any.whl", hash = "sha256:070b51de2743b9b1a4e0ab193a06c9e6c12cf4151cf9137656eebb16e8556628"},
+    {file = "pdoc-16.0.0.tar.gz", hash = "sha256:fdadc40cc717ec53919e3cd720390d4e3bcd40405cb51c4918c119447f913514"},
 ]
 
 [package.dependencies]
 Jinja2 = ">=2.11.0"
+markdown2 = ">=2.5.4"
 MarkupSafe = ">=1.1.1"
 pygments = ">=2.12.0"
 
@@ -1071,14 +1065,14 @@ xmp = ["defusedxml"]
 
 [[package]]
 name = "platformdirs"
-version = "4.7.0"
+version = "4.7.1"
 description = "A small Python package for determining appropriate platform-specific dirs, e.g. a `user data dir`."
 optional = false
 python-versions = ">=3.10"
 groups = ["dev"]
 files = [
-    {file = "platformdirs-4.7.0-py3-none-any.whl", hash = "sha256:1ed8db354e344c5bb6039cd727f096af975194b508e37177719d562b2b540ee6"},
-    {file = "platformdirs-4.7.0.tar.gz", hash = "sha256:fd1a5f8599c85d49b9ac7d6e450bc2f1aaf4a23f1fe86d09952fe20ad365cf36"},
+    {file = "platformdirs-4.7.1-py3-none-any.whl", hash = "sha256:06ac79ae0c5025949f62711e3f7cd178736515a29bcc669f42a216016cd1dc7a"},
+    {file = "platformdirs-4.7.1.tar.gz", hash = "sha256:6f4ff8472e482af4b7e67a183fbe63da846a9b34f57d5019c4d112a181003d82"},
 ]
 
 [[package]]
@@ -1634,5 +1628,5 @@ test = ["covdefaults (>=2.3)", "coverage (>=7.2.7)", "coverage-enable-subprocess
 
 [metadata]
 lock-version = "2.1"
-python-versions = ">=3.12"
-content-hash = "bfcbf22ec41230c81c0ca667af53eb5bea7bf65225abe0fd58ed7cdb148874e9"
+python-versions = ">=3.12, !=3.14.1, <4.0"
+content-hash = "2558f752ae10fb9ced4e11c860804a9e0429d0c5a5cbc3a5a7e29f6082a9d5a9"
