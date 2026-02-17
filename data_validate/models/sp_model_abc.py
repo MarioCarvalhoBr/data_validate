@@ -110,9 +110,9 @@ class SpModelABC(ABC):
         # Additional variables
         self.all_ok: bool = True
 
-        self.init()
+        self.initialize()
 
-    def init(self):
+    def initialize(self):
         """
         Initialize the verification process by performing basic sanity checks.
 
@@ -136,16 +136,6 @@ class SpModelABC(ABC):
         _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(self.data_loader_model.df_data, self.filename)
         self.structural_errors.extend(errors_unnamed_columns)
 
-    @abstractmethod
-    def pre_processing(self):
-        """
-        Abstract method for pre-processing logic.
-
-        Should implement initial checks, column adjustments, or dependency verification
-        before main validation starts.
-        """
-        pass
-
     @property
     def is_sanity_check_passed(self) -> bool:
         """
@@ -164,16 +154,17 @@ class SpModelABC(ABC):
         return value
 
     @abstractmethod
-    def post_processing(self):
+    def pre_processing(self):
         """
-        Abstract method for post-processing logic.
+        Abstract method for pre-processing logic.
 
-        Should implement final adjustments or derived calculations after cleaning.
+        Should implement initial checks, column adjustments, or dependency verification
+        before main validation starts.
         """
         pass
 
     @abstractmethod
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Abstract method for validating column structure.
 
@@ -188,6 +179,15 @@ class SpModelABC(ABC):
 
         Should implement type conversion, valid value checks (e.g., positive integers),
         and cleaning of raw data.
+        """
+        pass
+
+    @abstractmethod
+    def post_processing(self):
+        """
+        Abstract method for post-processing logic.
+
+        Should implement final adjustments or derived calculations after cleaning.
         """
         pass
 

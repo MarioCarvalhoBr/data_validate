@@ -62,7 +62,7 @@ class SpProportionality(SpModelABC):
 
         COLUMN_ID = pd.Series(dtype="int64", name="id")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_ID.name,
         ]
 
@@ -103,24 +103,20 @@ class SpProportionality(SpModelABC):
             self.structural_errors.append(
                 f"{self.filename}, linha 1: Colunas de nível 1 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_1_codes_not_matched_by_pattern}"
             )
-        else:
-            unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
-            unique_columns_level_2 = [col for col in unique_columns_level_2 if col != self.RequiredColumn.COLUMN_ID.name]
 
-            __, level_2_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
-                unique_columns_level_2, self.scenarios_list
+        unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
+        unique_columns_level_2 = [col for col in unique_columns_level_2 if col != self.RequiredColumn.COLUMN_ID.name]
+
+        __, level_2_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
+            unique_columns_level_2, self.scenarios_list
+        )
+
+        if level_2_codes_not_matched_by_pattern:
+            self.structural_errors.append(
+                f"{self.filename}, linha 2: Colunas de nível 2 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_2_codes_not_matched_by_pattern}"
             )
 
-            if level_2_codes_not_matched_by_pattern and not level_1_codes_not_matched_by_pattern:
-                self.structural_errors.append(
-                    f"{self.filename}, linha 2: Colunas de nível 2 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_2_codes_not_matched_by_pattern}"
-                )
-
-        if self.structural_errors:
-            self.data_loader_model.df_data = pd.DataFrame()  # Clear DataFrame to avoid further processing
-            self.data_loader_model.header_type = "invalid"
-
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -156,13 +152,16 @@ class SpProportionality(SpModelABC):
                 if col not in unique_columns_level_2:
                     self.structural_errors.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+
+    def data_cleaning(self, *args, **kwargs):
         """Run data cleaning steps (currently empty)."""
         pass
 
     def post_processing(self):
         """Run post-processing steps (currently empty)."""
-        pass
+        if self.structural_errors:
+            self.data_loader_model.df_data = pd.DataFrame()  # Clear DataFrame to avoid further processing
+            self.data_loader_model.header_type = "invalid"
 
     def run(self):
         """
@@ -174,3 +173,4 @@ class SpProportionality(SpModelABC):
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()
+            self.post_processing()

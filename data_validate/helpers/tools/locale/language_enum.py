@@ -18,6 +18,7 @@ Usage Example:
     >>> print(LanguageEnum.default_language())
     'pt_BR'
 """
+
 import enum
 
 

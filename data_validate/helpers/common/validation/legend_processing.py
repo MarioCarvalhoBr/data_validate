@@ -6,6 +6,7 @@ This module defines the `LegendProcessing` class, which offers methods
 to validate legend labels, sequential types, color formats, order sequences,
 and logical consistency of min/max values.
 """
+
 import re
 from decimal import Decimal, InvalidOperation
 from typing import List, Any

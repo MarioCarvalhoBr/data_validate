@@ -83,7 +83,7 @@ class SpDescription(SpModelABC):
         COLUMN_SOURCES = pd.Series(dtype="str", name="fontes")
         COLUMN_META = pd.Series(dtype="str", name="meta")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_CODE.name,
             COLUMN_LEVEL.name,
             COLUMN_SIMPLE_NAME.name,
@@ -106,7 +106,7 @@ class SpDescription(SpModelABC):
 
         COLUMN_SCENARIO = pd.Series(dtype="int64", name="cenario")
         COLUMN_LEGEND = pd.Series(dtype="str", name="legenda")
-        ALL = [COLUMN_SCENARIO.name, COLUMN_LEGEND.name]
+        ALL: List[str] = [COLUMN_SCENARIO.name, COLUMN_LEGEND.name]
 
     class OptionalColumn:
         """
@@ -123,7 +123,7 @@ class SpDescription(SpModelABC):
         COLUMN_RELATION = pd.Series(dtype="int64", name="relacao")
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_UNIT.name,
             COLUMN_RELATION.name,
             COLUMN_ORDER.name,
@@ -141,7 +141,7 @@ class SpDescription(SpModelABC):
 
         COLUMN_PLURAL_SIMPLE_NAME = pd.Series(dtype="str", name="nomes_simples")
         COLUMN_PLURAL_COMPLETE_NAME = pd.Series(dtype="str", name="nomes_completos")
-        ALL = [COLUMN_PLURAL_SIMPLE_NAME.name, COLUMN_PLURAL_COMPLETE_NAME.name]
+        ALL: List[str] = [COLUMN_PLURAL_SIMPLE_NAME.name, COLUMN_PLURAL_COMPLETE_NAME.name]
 
     def __init__(
         self,
@@ -177,7 +177,7 @@ class SpDescription(SpModelABC):
             )
             self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         elif self.scenario_exists_file:
-            local_expected_columns.append(self.DynamicColumn.COLUMN_SCENARIO.name)
+            local_expected_columns.append(str(self.DynamicColumn.COLUMN_SCENARIO.name))
 
         # 1.1 Handling dynamic columns: legend
         if (not self.legend_read_success) and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
@@ -186,7 +186,7 @@ class SpDescription(SpModelABC):
             )
             self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
         elif self.legend_exists_file:
-            local_expected_columns.append(self.DynamicColumn.COLUMN_LEGEND.name)
+            local_expected_columns.append(str(self.DynamicColumn.COLUMN_LEGEND.name))
 
         # 2. Handling optional columns
         if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.df_data.columns:
@@ -199,7 +199,7 @@ class SpDescription(SpModelABC):
                 local_expected_columns.append(opt_column_name)
         self.EXPECTED_COLUMNS = local_expected_columns
 
-    def expected_structure_columns(self, *args, **kwargs) -> None:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -215,7 +215,7 @@ class SpDescription(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """
         Perform data cleaning operations.
 
@@ -237,45 +237,45 @@ class SpDescription(SpModelABC):
 
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
-            df, errors = DataCleaningProcessing.clean_dataframe_integers(
+            dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
-                [column_name],
+                [str(column_name)],
                 min_value=1,
             )
-            self.data_cleaning_errors.extend(errors)
+            self.data_cleaning_errors.extend(errors_data_clean_local)
 
-            if column_name in df.columns:
+            if column_name in dataframe_cleaned.columns:
                 # Use setattr to dynamically set the attribute
                 attribute_name = column_attribute_mapping[column_name]
-                setattr(self.RequiredColumn, attribute_name, df[column_name])
+                setattr(self.RequiredColumn, attribute_name, dataframe_cleaned[column_name])
 
         # 2. If scenarios exist, clean and validate 'cenario' column (minimum -1)
         if self.scenarios_list:
-            col_cenario = self.DynamicColumn.COLUMN_SCENARIO.name
-            df, errors_cenario = DataCleaningProcessing.clean_dataframe_integers(
+            column_name_scenario = self.DynamicColumn.COLUMN_SCENARIO.name
+            dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
-                [col_cenario],
+                [str(column_name_scenario)],
                 min_value=-1,
             )
-            if col_cenario in df.columns:
-                self.DynamicColumn.COLUMN_SCENARIO = df[col_cenario]
-            self.data_cleaning_errors.extend(errors_cenario)
+            if column_name_scenario in dataframe_cleaned.columns:
+                self.DynamicColumn.COLUMN_SCENARIO = dataframe_cleaned[column_name_scenario]
+            self.data_cleaning_errors.extend(errors_data_clean_local)
 
         # 3. If legend column exists, ensure values are integers (minimum 1) or empty
         if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
-            col_legenda = self.DynamicColumn.COLUMN_LEGEND.name
-            df, errors_legenda = DataCleaningProcessing.clean_dataframe_integers(
+            column_name_legend = self.DynamicColumn.COLUMN_LEGEND.name
+            dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
-                [col_legenda],
+                [str(column_name_legend)],
                 min_value=1,
                 allow_empty=True,
             )
-            if col_legenda in df.columns:
-                self.DynamicColumn.COLUMN_LEGEND = df[col_legenda]
-            self.data_cleaning_errors.extend(errors_legenda)
+            if column_name_legend in dataframe_cleaned.columns:
+                self.DynamicColumn.COLUMN_LEGEND = dataframe_cleaned[column_name_legend]
+            self.data_cleaning_errors.extend(errors_data_clean_local)
 
     def post_processing(self):
         """Run post-processing steps (currently empty)."""

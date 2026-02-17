@@ -1,5 +1,6 @@
 #  Copyright (c) 2025 Mário Carvalho (https://github.com/MarioCarvalhoBr).
 """Tree composition validation for spreadsheet composition structures."""
+
 from typing import List, Tuple, Dict, Any
 
 from pandas import DataFrame
@@ -340,7 +341,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             self.sp_name_value: self.global_required_columns[self.sp_name_value],
         }
 
-        if self.model_sp_proportionality.data_loader_model.read_success:
+        if self.model_sp_proportionality.data_loader_model.read_success and not self.model_sp_proportionality.data_loader_model.df_data.empty:
             local_required_columns[self.sp_name_proportionality] = [SpProportionality.RequiredColumn.COLUMN_ID.name]
 
         column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)

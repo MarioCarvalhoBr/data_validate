@@ -67,7 +67,7 @@ class SpScenario(SpModelABC):
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
-        ALL = [COLUMN_NAME.name, COLUMN_DESCRIPTION.name, COLUMN_SYMBOL.name]
+        ALL: List[str] = [COLUMN_NAME.name, COLUMN_DESCRIPTION.name, COLUMN_SYMBOL.name]
 
     OPTIONAL_COLUMNS = MappingProxyType({})
 
@@ -107,7 +107,7 @@ class SpScenario(SpModelABC):
                     f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]"
                 )
 
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -125,7 +125,7 @@ class SpScenario(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """Run data cleaning steps (currently empty)."""
         pass
 

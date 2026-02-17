@@ -22,6 +22,12 @@ update: ## Update dependencies to latest versions
 	poetry update
 	poetry update --only=dev
 
+configure-auto-update: # Configure Poetry plugins
+	poetry self add poetry-plugin-up
+
+auto-update:
+	poetry up --latest
+
 build: ## Build the package
 	rm -rf dist/
 	poetry build

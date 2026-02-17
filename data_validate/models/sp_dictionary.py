@@ -64,7 +64,7 @@ class SpDictionary(SpModelABC):
 
         COLUMN_WORD = pd.Series(dtype="str", name="palavra")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_WORD.name,
         ]
 
@@ -106,7 +106,7 @@ class SpDictionary(SpModelABC):
 
                 self.words_to_ignore = remaining_words
 
-    def expected_structure_columns(self, *args, **kwargs) -> None:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -124,7 +124,7 @@ class SpDictionary(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """
         Perform data cleaning operations.
 

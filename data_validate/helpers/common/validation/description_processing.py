@@ -6,6 +6,7 @@ This module defines the `DescriptionProcessing` class, which offers methods
 to extract and validate codes from description DataFrames, filtering by levels
 and checking for integer validity.
 """
+
 from typing import Set
 
 from pandas import DataFrame

@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Type, Tuple
 
 import pandas as pd
-
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
@@ -34,9 +33,9 @@ class ValidatorModelABC(ABC):
         self._errors: List[str] = []
         self._warnings: List[str] = []
 
-        self.init()
+        self.initialize()
 
-    def init(self):
+    def initialize(self):
         pass
 
     def check_columns_in_models_dataframes(
@@ -54,7 +53,7 @@ class ValidatorModelABC(ABC):
 
         # Check if columns exist
         for model_name, columns in required_columns.items():
-            dataframe = model_dataframes[model_name]
+            dataframe: pd.DataFrame = model_dataframes[model_name]
             if dataframe is not None:
                 for column in columns:
                     exists_column, error_msg = self.column_exists(dataframe, model_name, column)
@@ -93,7 +92,7 @@ class ValidatorModelABC(ABC):
     def set_not_executed(self, validations):
         pass
         """
-        # VERIFICAR
+        # FUTURE FEATURE: Implement a method to mark validations as not executed in the report list.
         for _, report_key in validations:
             self._report_list.set_not_executed(self.TITLES_INFO[report_key])
         """

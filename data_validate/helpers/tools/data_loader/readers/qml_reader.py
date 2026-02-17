@@ -4,6 +4,7 @@
 """
 Retorna o conteúdo textual de um arquivo QML.
 """
+
 from .base_reader import BaseReader
 
 

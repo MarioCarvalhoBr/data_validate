@@ -60,7 +60,7 @@ class SpValue(SpModelABC):
 
         COLUMN_ID = pd.Series(dtype="int64", name="id")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_ID.name,
         ]
 
@@ -86,7 +86,21 @@ class SpValue(SpModelABC):
         """Run pre-processing steps."""
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
-    def expected_structure_columns(self, *args, **kwargs) -> List[str]:
+        unique_columns = self.data_loader_model.df_data.columns.unique().tolist()
+
+        # Remove ID self.RequiredColumn.COLUMN_ID.name
+        unique_columns = [col for col in unique_columns if col != self.RequiredColumn.COLUMN_ID.name]
+
+        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
+            unique_columns, self.scenarios_list
+        )
+
+        if codes_not_matched_by_pattern:
+            self.structural_errors.append(
+                f"{self.filename}, linha 1: Colunas fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {codes_not_matched_by_pattern}"
+            )
+
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -107,7 +121,7 @@ class SpValue(SpModelABC):
             if col not in self.DF_COLUMNS:
                 self.structural_errors.append(f"{self.filename}: Coluna '{col}' esperada mas não foi encontrada.")
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """Run data cleaning steps (currently empty)."""
         pass
 

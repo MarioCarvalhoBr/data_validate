@@ -56,7 +56,7 @@ All components receive context via constructor - **never use globals**.
 Each spreadsheet type has a model inheriting `SpModelABC`:
 - `sp_legend.py`, `sp_value.py`, `sp_scenario.py`, etc.
 - Models define `EXPECTED_COLUMNS`, `RequiredColumn` enums, and business rules
-- Call sequence: `init()` → `pre_processing()` → `data_cleaning()` → `specific_validations()`
+- Call sequence: `initialize()` → `pre_processing()` → `data_cleaning()` → `specific_validations()`
 
 #### Validator Categories (in `validators/`)
 - **structure/**: File/column existence checks

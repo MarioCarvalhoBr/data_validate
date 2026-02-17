@@ -75,7 +75,7 @@ class SpLegend(SpModelABC):
         COLUMN_MAXIMUM = pd.Series(dtype="float64", name="maximo")
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_CODE.name,
             COLUMN_LABEL.name,
             COLUMN_COLOR.name,
@@ -112,10 +112,9 @@ class SpLegend(SpModelABC):
 
     def pre_processing(self):
         """Run pre-processing steps (currently empty)."""
-        if not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty:
-            return
+        pass
 
-    def expected_structure_columns(self, *args, **kwargs) -> None:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -133,25 +132,16 @@ class SpLegend(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """
         Perform data cleaning operations.
 
         Specific rules:
         1. Clean and validate the 'legenda' column ensuring it contains positive integers (minimum 1).
         2. Perform specific legend validations (handled in SpLegendValidator now).
-
-        Returns:
-            List[str]: List of data cleaning errors (unused return in this implementation).
         """
         errors = []
         dataframe = self.data_loader_model.df_data
-        if dataframe.empty:
-            return errors
-
-        # If there are structural errors, do not proceed with data cleaning
-        if self.structural_errors:
-            return errors
 
         legend_validator = LegendProcessing(value_data_unavailable=self.context.config.LABEL_DATA_UNAVAILABLE, filename=self.filename)
 
@@ -208,7 +198,9 @@ class SpLegend(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+
         if self.data_loader_model.exists_file:
             self.pre_processing()
             self.expected_structure_columns()
+        if self.is_sanity_check_passed:
             self.data_cleaning()

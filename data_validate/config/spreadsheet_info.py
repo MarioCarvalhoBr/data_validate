@@ -13,7 +13,7 @@ class SpreadsheetInfo(ConstantBase):
         Initialize SpreadsheetInfo with spreadsheet names and allowed file extensions.
         """
         super().__init__()
-        
+
         # NAMES Spreadsheet Names
         self.SP_NAME_DESCRIPTION: str = "descricao"
         self.SP_NAME_COMPOSITION: str = "composicao"

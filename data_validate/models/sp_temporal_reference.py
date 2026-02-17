@@ -68,7 +68,7 @@ class SpTemporalReference(SpModelABC):
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
-        ALL = [COLUMN_NAME.name, COLUMN_DESCRIPTION.name, COLUMN_SYMBOL.name]
+        ALL: List[str] = [COLUMN_NAME.name, COLUMN_DESCRIPTION.name, COLUMN_SYMBOL.name]
 
     def __init__(
         self,
@@ -92,7 +92,7 @@ class SpTemporalReference(SpModelABC):
         """Run pre-processing steps (currently empty)."""
         pass
 
-    def expected_structure_columns(self, *args, **kwargs) -> None:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -110,7 +110,7 @@ class SpTemporalReference(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """
         Perform data cleaning operations.
 
@@ -134,7 +134,7 @@ class SpTemporalReference(SpModelABC):
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
             df, errors_symbol = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.df_data, self.filename, [col_symbol], min_value=0
+                self.data_loader_model.df_data, self.filename, [str(col_symbol)], min_value=0
             )
             self.data_cleaning_errors.extend(errors_symbol)
 

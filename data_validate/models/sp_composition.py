@@ -64,7 +64,7 @@ class SpComposition(SpModelABC):
         COLUMN_PARENT_CODE = pd.Series(dtype="int64", name="codigo_pai")
         COLUMN_CHILD_CODE = pd.Series(dtype="int64", name="codigo_filho")
 
-        ALL = [
+        ALL: List[str] = [
             COLUMN_PARENT_CODE.name,
             COLUMN_CHILD_CODE.name,
         ]
@@ -91,7 +91,7 @@ class SpComposition(SpModelABC):
         """Run pre-processing steps (currently empty)."""
         pass
 
-    def expected_structure_columns(self, *args, **kwargs) -> None:
+    def expected_structure_columns(self, *args, **kwargs):
         """
         Validate the structure of columns in the DataFrame.
 
@@ -109,7 +109,7 @@ class SpComposition(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs) -> List[str]:
+    def data_cleaning(self, *args, **kwargs):
         """
         Perform data cleaning operations.
 
@@ -131,7 +131,7 @@ class SpComposition(SpModelABC):
             df, errors = DataCleaningProcessing.clean_dataframe_integers(
                 self.data_loader_model.df_data,
                 self.filename,
-                [column_name],
+                [str(column_name)],
                 min_value=1,
             )
             self.data_cleaning_errors.extend(errors)
