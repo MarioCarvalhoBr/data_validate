@@ -574,14 +574,14 @@ bash scripts/run_main_pipeline.sh
 ### Code Guidelines
 
 - Follow PEP 8 standard
-- Maintain test coverage >= 4%
+- Maintain test coverage >= 50%
 - Use type hints
 - Document public functions
 - Run `make black` before commit
 
 ## 📋 Roadmap
 
-### Version 0.6.0 (Planned)
+### Version 0.7.X (Planned)
 - [X] Complete code refactoring to improve modularity
 - [X] Creation of detailed documentation for each module and function in PDOC style
 - [X] Full deployment flow via PyPI to facilitate installation and use

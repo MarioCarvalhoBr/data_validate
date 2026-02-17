@@ -12,7 +12,7 @@
 | Testing Windows | [![Windows Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/MarioCarvalhoBr/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/MarioCarvalhoBr/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/MarioCarvalhoBr/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.66b706.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.67b707.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -574,14 +574,14 @@ bash scripts/run_main_pipeline.sh
 ### Code Guidelines
 
 - Follow PEP 8 standard
-- Maintain test coverage >= 4%
+- Maintain test coverage >= 50%
 - Use type hints
 - Document public functions
 - Run `make black` before commit
 
 ## 📋 Roadmap
 
-### Version 0.6.0 (Planned)
+### Version 0.7.X (Planned)
 - [X] Complete code refactoring to improve modularity
 - [X] Creation of detailed documentation for each module and function in PDOC style
 - [X] Full deployment flow via PyPI to facilitate installation and use
