@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [0.7.66] - 2026-02-16
+
+### Fixed
+- Corrected the spelling of 'déficit' in the extra-words dictionary file (`static/dictionaries/extra-words.dic`). The word was previously misspelled and has been updated to use the proper Portuguese spelling with the accent mark.
+
 ## [0.7.0] - 2025-09-03
 
 ### Added
