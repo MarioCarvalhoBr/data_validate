@@ -199,7 +199,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             )
             return errors, warnings
 
-        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        # Only with description and composition data (should be equal, just extract)
         local_required_columns = {
             self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
             self.sp_name_description: self.global_required_columns[self.sp_name_description],
@@ -279,7 +279,7 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         df_proportionalities: DataFrame = self.model_dataframes[self.sp_name_proportionality].copy()
 
-        # Códigos dos indicadores que estão em nível 1
+        # Indicator codes that are at level 1
         level_one_columns = [col for col in df_proportionalities.columns.get_level_values(0).tolist() if not col.lower().startswith("unnamed")]
         grouped_columns = CollectionsProcessing.generate_group_from_list(level_one_columns)
 
@@ -308,7 +308,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             )
             return errors, warnings
 
-        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        # Only with description and composition data (should be equal, just extract)
         local_required_columns = {
             self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
             self.sp_name_value: self.global_required_columns[self.sp_name_value],
@@ -364,7 +364,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             )
             return errors, warnings
 
-        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        # Only with description and composition data (should be equal, just extract)
         local_required_columns = {
             self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
@@ -442,7 +442,7 @@ class SpProportionalityValidator(ValidatorModelABC):
             )
             return errors, warnings
 
-        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        # Only with description and composition data (should be equal, just extract)
         local_required_columns = {
             self.sp_name_proportionality: self.global_required_columns[self.sp_name_proportionality],
             self.sp_name_value: self.global_required_columns[self.sp_name_value],

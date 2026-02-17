@@ -33,12 +33,12 @@ class DataFrameProcessor:
         warnings = []
 
         for column in columns:
-            # Filtra linhas não vazias
+            # Filter non-empty rows
             mask = df[column].notna() & (df[column] != "")
             if not mask.any():
                 continue
 
-            # Processa cada linha válida
+            # Process each valid row
             for idx in df[mask].index:
                 text = str(df.loc[idx, column])
                 text_warnings = self.spell_checker.check_text_quality(text, column, idx, sheet_name)

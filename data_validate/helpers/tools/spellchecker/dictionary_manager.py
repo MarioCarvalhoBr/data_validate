@@ -37,7 +37,7 @@ class DictionaryManager:
         """Configure Enchant dictionary paths and environment variables."""
         enchant_config_dir = self.path_dictionary
 
-        # Define o diretório de configuração do Enchant
+        # Set the Enchant configuration directory
         os.environ["ENCHANT_CONFIG_DIR"] = str(enchant_config_dir)
 
     def validate_dictionary(self) -> List[str]:
@@ -72,10 +72,10 @@ class DictionaryManager:
 
             self.dictionary = self.broker.request_dict(self.lang_dict_spell)
 
-            # Adiciona palavras extras do arquivo extra-words.dic
+            # Add extra words from extra-words.dic file
             self._load_extra_words()
 
-            # Adiciona palavras do usuário
+            # Add user words
             for word in list_words_user:
                 if word and not word.startswith("#"):
                     self.dictionary.add(word)
@@ -97,13 +97,13 @@ class DictionaryManager:
                 with open(extra_words_path, "r", encoding="utf-8") as file:
                     for line in file:
                         word = line.strip()
-                        if word and not word.startswith("#"):  # Ignora linhas vazias e comentários
+                        if word and not word.startswith("#"):  # Ignore empty lines and comments
                             self.dictionary.add(word)
             else:
                 self._errors.append("Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema.")
 
         except Exception as e:
-            # Log do erro mas não interrompe a execução
+            # Log the error but don't interrupt execution
             self._errors.append(f"Aviso: Não foi possível carregar palavras extras: {e}")
 
     def __del__(self):

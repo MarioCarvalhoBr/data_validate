@@ -12,7 +12,7 @@
 | Testing Windows | [![Windows Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/MarioCarvalhoBr/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/MarioCarvalhoBr/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/MarioCarvalhoBr/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.66b705.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.66b706.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -437,10 +437,10 @@ make docs
 
 ### Available Documents
 
-- **[HOW_IT_WORKS.md](../../../HOW_IT_WORKS.md)**: Detailed system architecture
-- **[TESTING.md](../../../TESTING.md)**: Complete testing and coverage guide
-- **[CODE_OF_CONDUCT.md](../../../CODE_OF_CONDUCT.md)**: Development guidelines
-- **[CHANGELOG.md](../../../CHANGELOG.md)**: Version history
+- **[HOW_IT_WORKS.md](https://github.com/MarioCarvalhoBr/data_validate/blob/main/HOW_IT_WORKS.md)**: Detailed system architecture
+- **[TESTING.md](https://github.com/MarioCarvalhoBr/data_validate/blob/main/TESTING.md)**: Complete testing and coverage guide
+- **[CODE_OF_CONDUCT.md](https://github.com/MarioCarvalhoBr/data_validate/blob/main/CODE_OF_CONDUCT.md)**: Development guidelines
+- **[CHANGELOG.md](https://github.com/MarioCarvalhoBr/data_validate/blob/main/CHANGELOG.md)**: Version history
 
 ## 🔧 Main Dependencies
 
@@ -567,7 +567,7 @@ bash scripts/run_main_pipeline.sh
 3. **Create** a branch for your feature (`git checkout -b feature/new-feature`)
 4. **Implement** your changes with tests
 5. **Run** tests (`make test`)
-6. **Commit** following the [guidelines](../../../CODE_OF_CONDUCT.md)
+6. **Commit** following the [guidelines](https://github.com/MarioCarvalhoBr/data_validate/blob/main/CODE_OF_CONDUCT.md)
 7. **Push** to your branch (`git push origin feature/new-feature`)
 8. **Open** a Pull Request
 
@@ -581,21 +581,19 @@ bash scripts/run_main_pipeline.sh
 
 ## 📋 Roadmap
 
-### Version 0.8.0 (Planned)
-- [ ] FAIR metadata validation
-- [ ] Support for additional formats (CSV, JSON)
-- [ ] Basic web interface
-- [ ] REST API
-
-### Version 1.0.0 (Planned)
-- [ ] Complete graphical interface
-- [ ] Customizable schema validation
-- [ ] Database integration
-- [ ] Automated workflow support
+### Version 0.6.0 (Planned)
+- [X] Complete code refactoring to improve modularity
+- [X] Creation of detailed documentation for each module and function in PDOC style
+- [X] Full deployment flow via PyPI to facilitate installation and use
+- [X] Improvements in the CI/CD Pipeline to include integration tests
+- [X] Implementation of integration tests to validate the complete system flow
+- [X] Optimization of the logging system for better performance and readability
+- [X] Addition of more specific validations for each type of spreadsheet
+- [X] Creation of a detailed contribution guide for new collaborators
 
 ## 📄 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](../../../LICENSE) file for details.
+This project is licensed under the **MIT License** - see the [LICENSE](https://github.com/MarioCarvalhoBr/data_validate/blob/main/LICENSE) file for details.
 
 ## 👥 Authors
 - **Pedro Andrade** - *Coordinator* - [MAIL](mailto:pedro.andrade@inpe.br) and [GitHub](https://www.github.com/pedro-andrade-inpe)
@@ -608,7 +606,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](../../../
 - **Homepage**: [AdaptaBrasil GitHub](https://github.com/AdaptaBrasil/)
 - **Documentation**: [Docs](https://github.com/MarioCarvalhoBr/data_validate/docs)
 - **Issues**: [Bug Tracker](https://github.com/MarioCarvalhoBr/data_validate/issues)
-- **Changelog**: [Version History](../../../CHANGELOG.md)
+- **Changelog**: [Version History](https://github.com/MarioCarvalhoBr/data_validate/blob/main/CHANGELOG.md) 
 
 ## 🐛 Troubleshooting
 

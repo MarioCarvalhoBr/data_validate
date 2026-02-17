@@ -155,7 +155,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             )
             return errors, warnings
 
-        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        # Only with description and composition data (should be equal, just extract)
         local_required_columns = {
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
             self.sp_name_description: [
@@ -201,7 +201,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         errors: List[str] = []
         warnings: List[str] = []
 
-        # Somente com dados de descricao e composicao (deve ser igual, apenas extrair)
+        # Only with description and composition data (should be equal, just extract)
         local_required_columns = {
             self.sp_name_composition: self.global_required_columns[self.sp_name_composition],
         }
@@ -282,7 +282,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         if grafos_desconectados:
             return errors, warnings
 
-        # Verifica se existe pelo menos 1 nó pai == 1, senão, mostrar erro e solicitar correção
+        # Check if there is at least 1 parent node == 1, otherwise show error and request correction
         if not self.graph_processing.graph.has_node("1"):
             errors.append(f"{self.sp_name_composition}: Nó raiz '{root_node}' não encontrado.")
             return errors, warnings
@@ -293,15 +293,15 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         # All children of root node (1)
         childs_root_node = list(tree.neighbors(root_node))
 
-        # Para cada filho de 1, pegar toda a sub-arvore abaixo
+        # For each child of 1, get the entire subtree below
         for child in childs_root_node:
-            # Rodar um BFS a partir do filho
+            # Run a BFS from the child
             sub_tree = self.graph_processing.breadth_first_search_from_node(child)
 
-            # Monta uma lista somente com os código dos nós
+            # Build a list with only node codes
             nodes = list(sub_tree.nodes())
 
-            # Busca todos um sub-dataframe de descrição com os códigos (SP_DESCRIPTION_COLUMNS.CODIGO) que estão na lista_nos
+            # Search for a sub-dataframe from description with codes that are in the node list
             df_slice_description = df_description[df_description[self.column_name_code].astype(str).isin(nodes)]
 
             # Check if the titles are unique

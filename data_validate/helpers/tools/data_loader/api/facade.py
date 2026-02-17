@@ -101,7 +101,7 @@ class DataLoaderFacade:
             elif header_type == "double":
                 strat = DoubleHeaderStrategy()
             else:
-                # qml não vai passar por aqui
+                # qml will not pass through here
                 continue
             reader = ReaderFactory.get_reader(path, strat)
 
@@ -135,10 +135,10 @@ class DataLoaderFacade:
 
             data[name] = data_model
 
-        # adiciona QMLs brutas
+        # Add raw QMLs
         data["qmls"] = [ReaderFactory.get_reader(q, SingleHeaderStrategy()).read() for q in qml_files]
 
-        # Adiciona arquivos faltando ou não obrigatórios como vazios
+        # Add missing or non-required files as empty
         for name, (req, _, _) in self.config.file_specs.items():
             if name not in data:
                 data[name] = DataLoaderModel(

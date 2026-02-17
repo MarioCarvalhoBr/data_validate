@@ -301,7 +301,7 @@ class LegendProcessing:
 
         sorted_group = sorted_group.sort_values(by=min_col)
 
-        # Se qualquer valor de min ou max tiver mais de 2 casas decimais, pular as validações seguintes e retornar o errors
+        # If any min or max value has more than 2 decimal places, skip the following validations and return errors
 
         if any(
             NumberFormattingProcessing.check_two_decimals_places(row[min_col]) or NumberFormattingProcessing.check_two_decimals_places(row[max_col])

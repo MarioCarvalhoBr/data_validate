@@ -16,7 +16,7 @@ if METADATA.__status__ == METADATA.__status_dev__:
 
 # --------------------
 TEMPLATE_FILE: Path = Path(__file__).resolve().parents[3] / "static" / "templates" / "README.TEMPLATE.md"
-# Se o arquivo não existir, lança um erro
+# If the file doesn't exist, raise an error
 if not TEMPLATE_FILE.exists():
     raise FileNotFoundError(f"Template file not found: {TEMPLATE_FILE}")
 
@@ -27,23 +27,23 @@ OUTPUT_FILE = Path(__file__).resolve().parents[4] / "README.md"
 
 def generate_readme():
     """
-    Lê o arquivo de template, substitui o placeholder {{USER_REPO}}
-    e gera o arquivo README.TEMPLATE.md final.
+    Reads the template file, replaces the {{USER_REPO}} placeholder
+    and generates the final README.TEMPLATE.md file.
     """
     try:
-        # Garante que o script encontre o template no mesmo diretório
+        # Ensures the script finds the template in the same directory
         script_dir = os.path.dirname(os.path.abspath(__file__))
         template_path = os.path.join(script_dir, TEMPLATE_FILE)
         output_path = os.path.join(script_dir, OUTPUT_FILE)
 
-        # Lê o conteúdo do arquivo de template
+        # Read the content of the template file
         with open(template_path, "r", encoding="utf-8") as f:
             content = f.read()
 
-        # Substitui o placeholder pelo valor da variável
+        # Replace the placeholder with the variable value
         new_content = content.replace("{{USER_REPO}}", USER_REPO).replace("{{REPO_VERSION}}", REPO_VERSION)
 
-        # Escreve o novo conteúdo no arquivo de saída
+        # Write the new content to the output file
         with open(output_path, "w", encoding="utf-8") as f:
             f.write(new_content)
 

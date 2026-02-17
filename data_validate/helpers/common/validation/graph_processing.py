@@ -30,7 +30,7 @@ class GraphProcessing:
         """
         self.graph: Optional[nx.DiGraph] = None
 
-        # Se as colunas estiverem no dataframe, cria o grafo
+        # If columns are in the dataframe, create the graph
         if (
             dataframe is not None
             and not dataframe.empty

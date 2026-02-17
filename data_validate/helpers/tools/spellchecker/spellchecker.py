@@ -52,11 +52,11 @@ class SpellChecker:
             if df.empty:
                 return errors, warnings
 
-            # Valida colunas
+            # Validate columns
             valid_columns, column_warnings = self.df_processor.validate_columns(df, columns_sheets, file_name)
             # warnings.extend(column_warnings)
 
-            # Processa DataFrame
+            # Process DataFrame
             if valid_columns:
                 processing_warnings = self.df_processor.process_dataframe(df, valid_columns, file_name)
                 warnings.extend(processing_warnings)

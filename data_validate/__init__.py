@@ -1,20 +1,20 @@
 """
 # Adapta Parser
 
-Esta é a descrição principal do projeto Adapta Parser.
-Aqui você pode adicionar informações como:
+This is the main description of the Adapta Parser project.
+Here you can add information such as:
 
-- Uma visão geral do projeto.
-- Como instalar e usar.
-- Exemplos de uso.
-- Informações de licença.
+- An overview of the project.
+- How to install and use.
+- Usage examples.
+- License information.
 
-Você pode até usar formatação Markdown básica aqui,
-embora o suporte possa variar dependendo da versão do pdoc.
+You can even use basic Markdown formatting here,
+although support may vary depending on the pdoc version.
 """
 
 
-# Lazy loading - só importa quando necessário
+# Lazy loading - imports only when necessary
 def get_metadata():
     """Get package metadata lazily."""
     from data_validate.config.metadata_info import METADATA
@@ -22,7 +22,7 @@ def get_metadata():
     return METADATA
 
 
-# Package metadata - usando lazy loading
+# Package metadata - using lazy loading
 def __getattr__(name: str):
     """Lazy attribute access for metadata."""
     """Get package metadata lazily."""

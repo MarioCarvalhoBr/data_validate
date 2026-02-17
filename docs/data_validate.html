@@ -62,18 +62,18 @@ data_validate    </h1>
 
                         <div class="docstring"><h1 id="adapta-parser">Adapta Parser</h1>
 
-<p>Esta é a descrição principal do projeto Adapta Parser.
-Aqui você pode adicionar informações como:</p>
+<p>This is the main description of the Adapta Parser project.
+Here you can add information such as:</p>
 
 <ul>
-<li>Uma visão geral do projeto.</li>
-<li>Como instalar e usar.</li>
-<li>Exemplos de uso.</li>
-<li>Informações de licença.</li>
+<li>An overview of the project.</li>
+<li>How to install and use.</li>
+<li>Usage examples.</li>
+<li>License information.</li>
 </ul>
 
-<p>Você pode até usar formatação Markdown básica aqui,
-embora o suporte possa variar dependendo da versão do pdoc.</p>
+<p>You can even use basic Markdown formatting here,
+although support may vary depending on the pdoc version.</p>
 </div>
 
                         <input id="mod-data_validate-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
@@ -83,20 +83,20 @@ embora o suporte possa variar dependendo da versão do pdoc.</p>
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a><span class="sd"># Adapta Parser</span>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">Esta é a descrição principal do projeto Adapta Parser.</span>
-</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">Aqui você pode adicionar informações como:</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="sd">This is the main description of the Adapta Parser project.</span>
+</span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="sd">Here you can add information such as:</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a>
-</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">- Uma visão geral do projeto.</span>
-</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">- Como instalar e usar.</span>
-</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">- Exemplos de uso.</span>
-</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">- Informações de licença.</span>
+</span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a><span class="sd">- An overview of the project.</span>
+</span><span id="L-8"><a href="#L-8"><span class="linenos"> 8</span></a><span class="sd">- How to install and use.</span>
+</span><span id="L-9"><a href="#L-9"><span class="linenos"> 9</span></a><span class="sd">- Usage examples.</span>
+</span><span id="L-10"><a href="#L-10"><span class="linenos">10</span></a><span class="sd">- License information.</span>
 </span><span id="L-11"><a href="#L-11"><span class="linenos">11</span></a>
-</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">Você pode até usar formatação Markdown básica aqui,</span>
-</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">embora o suporte possa variar dependendo da versão do pdoc.</span>
+</span><span id="L-12"><a href="#L-12"><span class="linenos">12</span></a><span class="sd">You can even use basic Markdown formatting here,</span>
+</span><span id="L-13"><a href="#L-13"><span class="linenos">13</span></a><span class="sd">although support may vary depending on the pdoc version.</span>
 </span><span id="L-14"><a href="#L-14"><span class="linenos">14</span></a><span class="sd">&quot;&quot;&quot;</span>
 </span><span id="L-15"><a href="#L-15"><span class="linenos">15</span></a>
 </span><span id="L-16"><a href="#L-16"><span class="linenos">16</span></a>
-</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="c1"># Lazy loading - só importa quando necessário</span>
+</span><span id="L-17"><a href="#L-17"><span class="linenos">17</span></a><span class="c1"># Lazy loading - imports only when necessary</span>
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a><span class="k">def</span><span class="w"> </span><span class="nf">get_metadata</span><span class="p">():</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get package metadata lazily.&quot;&quot;&quot;</span>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.config.metadata_info</span><span class="w"> </span><span class="kn">import</span> <span class="n">METADATA</span>
@@ -104,7 +104,7 @@ embora o suporte possa variar dependendo da versão do pdoc.</p>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>    <span class="k">return</span> <span class="n">METADATA</span>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>
-</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="c1"># Package metadata - usando lazy loading</span>
+</span><span id="L-25"><a href="#L-25"><span class="linenos">25</span></a><span class="c1"># Package metadata - using lazy loading</span>
 </span><span id="L-26"><a href="#L-26"><span class="linenos">26</span></a><span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
 </span><span id="L-27"><a href="#L-27"><span class="linenos">27</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Lazy attribute access for metadata.&quot;&quot;&quot;</span>
 </span><span id="L-28"><a href="#L-28"><span class="linenos">28</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Get package metadata lazily.&quot;&quot;&quot;</span>
