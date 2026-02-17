@@ -1,100 +1,129 @@
-# Como Funciona
+# How It Works
 
-Este documento detalha a arquitetura e o fluxo de execução do projeto `data-validate`, fornecendo uma visão geral de como os componentes interagem para validar os dados das planilhas.
+This document details the architecture and execution flow of the `DataValidate` project, providing an overview of how components interact to validate spreadsheet data.
 
-## Estrutura de Diretórios
+## Directory Structure
 
-A estrutura do projeto foi organizada para separar responsabilidades, facilitando a manutenção e a escalabilidade.
+The project structure is organized to separate responsibilities, facilitating maintenance and scalability.
 
 ```
-data-validate/
-├── assets/               # Badges de cobertura e testes
-├── data/                 # Dados de entrada e saída
-│   ├── input/            # Planilhas a serem validadas
-│   └── output/           # Relatórios e logs gerados
-├── data_validate/        # Código-fonte da aplicação
-│   ├── config/           # Configurações globais
-│   ├── controllers/      # Orquestração do fluxo de validação
-│   ├── helpers/          # Funções utilitárias
-│   ├── middleware/       # Camada de inicialização e configuração
-│   ├── models/           # Modelos de dados que representam as planilhas
-│   ├── static/           # Arquivos estáticos (dicionários, templates)
-│   └── validators/       # Lógica de validação (estrutura, ortografia, etc.)
-├── dev-reports/          # Relatórios de desenvolvimento (cobertura, etc.)
-├── docs/                 # Documentação gerada
-├── scripts/              # Scripts de automação
-├── tests/                # Testes unitários e de integração
-├── Makefile              # Comandos de automação (test, clean, badge)
-├── pyproject.toml        # Definição do projeto e dependências (Poetry)
-└── README.md             # Documentação principal
+data_validate/
+├── assets/               # Coverage and test badges, protocol PDFs
+│   ├── coverage/
+│   ├── protocolo-1.0.pdf
+│   └── protocolo-v-1.13.pdf
+├── data/                 # Input and output data
+│   ├── input/            # Spreadsheets to be validated
+│   └── output/           # Generated reports and logs
+├── data_validate/        # Application source code
+│   ├── config/           # Global configurations
+│   ├── controllers/      # Validation flow orchestration
+│   │   ├── context/      # Dependency injection contexts
+│   │   ├── report/       # Report generation
+│   │   └── processor.py  # Main orchestrator
+│   ├── helpers/          # Utility functions
+│   │   ├── base/         # Core utilities (logging, args, filesystem)
+│   │   ├── common/       # Shared validation and processing logic
+│   │   └── tools/        # Specialized tools (data loader, locale, spellchecker)
+│   ├── middleware/       # Initialization and configuration layer
+│   ├── models/           # Data models representing spreadsheets
+│   ├── static/           # Static files (dictionaries, locales, templates)
+│   └── validators/       # Validation logic
+│       ├── spell/        # Spell checking
+│       ├── spreadsheets/ # Business rule validators
+│       └── structure/    # File and column structure validation
+├── dev-reports/          # Development reports (coverage, junit)
+├── docs/                 # Generated documentation (pdoc)
+├── scripts/              # Automation scripts
+├── tests/                # Unit and integration tests
+│   └── unit/
+├── Makefile              # Automation commands
+├── pyproject.toml        # Project definition and dependencies (Poetry)
+└── README.md             # Main documentation
 ```
 
-### Componentes Principais
+## Core Components
 
--   **`data_validate/main.py`**: Ponto de entrada da aplicação. Ele inicializa o processo de validação.
--   **`data_validate/middleware/bootstrap.py`**: Responsável por configurar o ambiente, como a criação de diretórios e a configuração de logs, antes da execução principal.
--   **`data_validate/controllers/processor.py`**: O coração da aplicação. Ele orquestra a leitura dos dados, a execução das validações em sequência e a geração dos relatórios de saída.
--   **`data_validate/models/`**: Contém classes que modelam a estrutura esperada de cada planilha (e.g., `sp_legend.py`, `sp_value.py`). Eles definem as colunas, tipos de dados e regras de negócio.
--   **`data_validate/validators/`**: Contém a lógica específica para cada tipo de validação. Por exemplo:
-    -   `structure/`: Valida a estrutura das planilhas (nomes de colunas, ordem, etc.).
-    -   `spell/`: Realiza a verificação ortográfica.
-    -   `spreadsheets/`: Contém validações de regras de negócio específicas para cada planilha.
--   **`data_validate/helpers/`**: Funções genéricas e reutilizáveis que auxiliam os outros componentes, como manipulação de DataFrames, leitura de arquivos e formatação de logs.
--   **`data/`**: Diretório crucial para a operação. Os dados a serem validados são colocados em `data/input/`, e os resultados, incluindo logs de erros e relatórios, são salvos em `data/output/`.
+- **`main.py`**: Application entry point that initializes the validation process
+- **`middleware/bootstrap.py`**: Configures environment (directories, logs, locale) before execution
+- **`controllers/processor.py`**: Main orchestrator that reads data, executes validators sequentially, and generates reports
+- **`models/`**: Classes modeling expected spreadsheet structure (columns, data types, business rules)
+- **`validators/`**: Validation logic modules:
+  - `structure/`: File and column structure validation
+  - `spell/`: Multilingual spell checking (Portuguese/English)
+  - `spreadsheets/`: Business rule validators for each spreadsheet type
+- **`helpers/`**: Reusable utility functions for DataFrame manipulation, file reading, and formatting
 
-## Fluxo de Execução
+## Execution Flow
 
-O processo de validação segue as seguintes etapas:
+The validation process follows these steps:
 
-1.  **Inicialização**: O `main.py` é executado, acionando o `Bootstrap` para preparar o ambiente.
-2.  **Carga de Dados**: O `Processor` lê as planilhas do diretório `data/input/`.
-3.  **Execução das Validações**: O `Processor` invoca uma série de validadores em uma ordem predefinida:
-    -   **Validação de Estrutura**: Verifica se as planilhas e colunas existem e estão nomeadas corretamente.
-    -   **Validação de Conteúdo**: Aplica as regras definidas nos `models` e `validators` para cada planilha, como:
-        -   Verificação de tipos de dados.
-        -   Checagem de valores obrigatórios.
-        -   Validação de relações entre diferentes planilhas.
-        -   Verificação ortográfica em campos de texto.
-4.  **Coleta de Erros**: Cada validador retorna uma lista de erros e avisos encontrados. O `Processor` agrega todos esses resultados.
-5.  **Geração de Relatórios**: Ao final, o `Processor` utiliza os erros e avisos coletados para gerar relatórios detalhados em `data/output/`, geralmente em formatos como `.txt`, `.csv` ou `.html`.
+1. **Bootstrap**: `main.py` triggers `Bootstrap` to prepare the environment
+2. **Data Loading**: `Processor` reads spreadsheets from `data/input/` using `DataLoaderFacade`
+3. **Validation Chain**: `Processor` executes validators in sequence:
+   - **Structure Validation**: Checks file/column existence and naming
+   - **Content Validation**: Applies business rules (data types, required values, cross-spreadsheet relations)
+   - **Spell Checking**: Validates text fields in Portuguese/English
+4. **Error Aggregation**: Each validator returns errors/warnings; `Processor` aggregates results into `ModelListReport`
+5. **Report Generation**: Creates detailed reports in `data/output/` (HTML, PDF, logs)
 
-## Como Usar
+## Usage
 
-O projeto utiliza `Poetry` para gerenciamento de dependências e `Make` para automação de tarefas comuns.
+The project uses **Poetry** for dependency management and **Make** for task automation.
 
-### Instalação
+### Installation
 
-Para instalar as dependências, execute:
-
-```sh
+```bash
 poetry install
 ```
 
-### Execução da Validação
+### Running Validation
 
-Para rodar o pipeline completo de validação:
-
-```sh
+```bash
+# Full pipeline
 bash scripts/run_main_pipeline.sh
+
+# Manual execution
+poetry run python -m data_validate.main --i=data/input/ --o=data/output/ --l=pt_BR
+
+# Installed package
+canoa-data-validate --i=data/input/ --o=data/output/
 ```
 
-### Execução dos Testes
+### Testing
 
-O `Makefile` fornece comandos para executar os testes:
-
-```sh
-# Rodar todos os testes
-make test
-
-# Rodar testes com relatório de cobertura
-make test
+```bash
+make test          # Run all tests with coverage
+make test-fast     # Quick run (no coverage, fail fast)
+make test-short    # Show only file names
+make badges        # Generate coverage and test badges
 ```
 
-### Geração de Badges
+### Available Make Commands
 
-Para gerar os badges de cobertura e testes (salvos em `assets/coverage/`):
-
-```sh
-make make-badge
+```bash
+make help          # Show all available commands
+make install       # Install development dependencies
+make update        # Update dependencies to latest versions
+make build         # Build the package
+make publish       # Build and publish to PyPI
+make run           # Execute main pipeline script
+make clean         # Remove output data and temporary files
+make docs          # Generate documentation with pdoc
+make readme        # Generate README documentation
+make black         # Format code with black
+make ruff          # Lint and fix code with ruff
+make lint          # Run all linting tools
 ```
+
+## Key Files
+
+- **Protocol**: `assets/protocolo-v-1.13.pdf` - Formal validation specification
+- **Entry Point**: `data_validate/main.py`
+- **Pipeline Orchestrator**: `data_validate/controllers/processor.py`
+- **Base Model**: `data_validate/models/sp_model_abc.py`
+- **i18n Manager**: `data_validate/helpers/tools/locale/language_manager.py`
+- **Test Config**: `pyproject.toml` (pytest configuration)
+
+For more details, see [README.md](README.md), [TESTING.md](TESTING.md), and [CHANGELOG.md](CHANGELOG.md).
 
