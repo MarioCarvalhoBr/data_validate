@@ -495,4 +495,4 @@ poetry run python -m data_validate.main --debug
 
 ### Classes processing
 A Processing class is a class that has a set of functions that are auxiliary to Validators and that use a dataframe of a model.
-For example, ProportionalityProcessing has the function build_subdatasets which is useful for the
+For example, ProportionalityProcessing has the function build_subdatasets which is useful.
