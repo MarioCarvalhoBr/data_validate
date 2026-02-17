@@ -49,7 +49,7 @@
 ## 🚀 Features and Validation Protocol
 
 ### Validation Protocol
-Data Validate implements the detailed specification defined in the validation protocol [version 1.13](assets/protocolo-1.13.pdf), which establishes clear rules for the structure and content of spreadsheets used in the AdaptaBrasil platform.
+Data Validate implements the detailed specification defined in the validation protocol [version 1.13](https://github.com/{{USER_REPO}}/blob/main/assets/protocolo-v-1.13.pdf), which establishes clear rules for the structure and content of spreadsheets used in the AdaptaBrasil platform.
 
 ### Key Features
 
@@ -83,7 +83,7 @@ The project follows a modular architecture based on clean design patterns:
 ├── 🛠️ helpers/        # Utilities and helper functions
 ├── ⚙️ config/         # Global configurations
 ├── 🔧 middleware/     # Initialization layer
-└── 📄 static/         # Static resources (templates, dictionaries)
+└── 📄 static/         # Static resources (templates, dictionaries, i18n)
 ```
 
 ### Processing Flow
@@ -604,7 +604,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](https://g
 ## 🔗 Useful Links
 
 - **Homepage**: [AdaptaBrasil GitHub](https://github.com/AdaptaBrasil/)
-- **Documentation**: [Docs](https://github.com/{{USER_REPO}}/docs)
+- **Documentation**: [Docs](https://github.com/{{USER_REPO}}/tree/main/docs)
 - **Issues**: [Bug Tracker](https://github.com/{{USER_REPO}}/issues)
 - **Changelog**: [Version History](https://github.com/{{USER_REPO}}/blob/main/CHANGELOG.md) 
 

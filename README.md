@@ -12,7 +12,7 @@
 | Testing Windows | [![Windows Build](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-ci-build-windows-2022.yml) [![Windows Unit Tests](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml/badge.svg)](https://github.com/MarioCarvalhoBr/data_validate/actions/workflows/windows-unit-tests-windows-2022.yml)                                                                                                                                                                               |
 | Coverage        | ![Coverage Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/coverage_badge.svg) ![Tests Status](https://raw.githubusercontent.com/MarioCarvalhoBr/data_validate/refs/heads/main/assets/coverage/tests_badge.svg)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | Package         | ![Last Commit](https://img.shields.io/github/last-commit/MarioCarvalhoBr/data_validate?style=flat&logo=git&logoColor=white&color=0080ff) ![Top Language](https://img.shields.io/github/languages/top/MarioCarvalhoBr/data_validate?style=flat&color=0080ff) ![Language Count](https://img.shields.io/github/languages/count/MarioCarvalhoBr/data_validate?style=flat&color=0080ff)                                                                                                                                                                                                                                                                       |
-| Meta            | ![Version](https://img.shields.io/badge/version-0.7.67b707.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
+| Meta            | ![Version](https://img.shields.io/badge/version-0.7.67b708.dev10-orange.svg) [![License - MIT](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)](https://img.shields.io/github/license/MarioCarvalhoBr/data_validate)                                                                                                                                                                                                                                                                                                                                                                                                |
 
 <p><em>Built with the tools and technologies:</em></p>
 
@@ -49,7 +49,7 @@
 ## 🚀 Features and Validation Protocol
 
 ### Validation Protocol
-Data Validate implements the detailed specification defined in the validation protocol [version 1.13](assets/protocolo-1.13.pdf), which establishes clear rules for the structure and content of spreadsheets used in the AdaptaBrasil platform.
+Data Validate implements the detailed specification defined in the validation protocol [version 1.13](https://github.com/MarioCarvalhoBr/data_validate/blob/main/assets/protocolo-v-1.13.pdf), which establishes clear rules for the structure and content of spreadsheets used in the AdaptaBrasil platform.
 
 ### Key Features
 
@@ -83,7 +83,7 @@ The project follows a modular architecture based on clean design patterns:
 ├── 🛠️ helpers/        # Utilities and helper functions
 ├── ⚙️ config/         # Global configurations
 ├── 🔧 middleware/     # Initialization layer
-└── 📄 static/         # Static resources (templates, dictionaries)
+└── 📄 static/         # Static resources (templates, dictionaries, i18n)
 ```
 
 ### Processing Flow
@@ -604,7 +604,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](https://g
 ## 🔗 Useful Links
 
 - **Homepage**: [AdaptaBrasil GitHub](https://github.com/AdaptaBrasil/)
-- **Documentation**: [Docs](https://github.com/MarioCarvalhoBr/data_validate/docs)
+- **Documentation**: [Docs](https://github.com/MarioCarvalhoBr/data_validate/tree/main/docs)
 - **Issues**: [Bug Tracker](https://github.com/MarioCarvalhoBr/data_validate/issues)
 - **Changelog**: [Version History](https://github.com/MarioCarvalhoBr/data_validate/blob/main/CHANGELOG.md) 
 
