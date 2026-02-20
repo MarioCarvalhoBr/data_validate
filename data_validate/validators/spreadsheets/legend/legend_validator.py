@@ -1,5 +1,12 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
-from typing import List, Tuple, Dict, Any
+"""
+Legend spreadsheet validator module.
+
+This module validates legend data including legend-indicator relationships, value ranges,
+and ensures that indicators at different levels have appropriate legend references.
+"""
+
+from typing import List, Tuple, Dict, Any, Optional
 
 import pandas as pd
 
@@ -14,27 +21,100 @@ from data_validate.validators.spreadsheets.base.validator_model_abc import Valid
 
 
 class ModelMappingLegend:
+    """
+    Maps legend information to value columns for range validation.
+
+    This class stores the relationship between value columns and their corresponding
+    legends, including the valid min/max ranges for validation purposes.
+
+    Attributes
+    ----------
+    column_sp_value : str | None
+        Name of the column in the value spreadsheet.
+    indicator_id : str | None
+        Indicator code associated with this mapping.
+    legend_id : str | None
+        Legend code associated with this indicator.
+    min_value : float
+        Minimum allowed value for this indicator (from legend or default).
+    max_value : float
+        Maximum allowed value for this indicator (from legend or default).
+    """
+
     def __init__(
         self,
-        column_sp_value=None,
-        indicator_id=None,
-        legend_id=None,
-        default_min_value=0,
-        default_max_value=1,
-    ):
+        column_sp_value: Optional[str] = None,
+        indicator_id: Optional[str] = None,
+        legend_id: Optional[str] = None,
+        default_min_value: float = 0,
+        default_max_value: float = 1,
+    ) -> None:
+        """
+        Initialize legend mapping for a value column.
+
+        Args
+        ----
+        column_sp_value : Optional[str]
+            Name of the column in the value spreadsheet.
+        indicator_id : Optional[str]
+            Indicator code associated with this mapping.
+        legend_id : Optional[str]
+            Legend code associated with this indicator.
+        default_min_value : float
+            Default minimum value if no legend is specified (default: 0).
+        default_max_value : float
+            Default maximum value if no legend is specified (default: 1).
+        """
         self.column_sp_value = column_sp_value
         self.indicator_id = indicator_id
         self.legend_id = legend_id
         self.min_value = default_min_value
         self.max_value = default_max_value
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """
+        Return string representation of the legend mapping.
+
+        Returns
+        -------
+        str
+            Formatted string with all mapping attributes.
+        """
         return f"ModelMappingLegend:(column_sp_value={self.column_sp_value}, indicator_id={self.indicator_id}, legend_id={self.legend_id}, min_value={self.min_value}, max_value={self.max_value})"
 
 
 class SpLegendValidator(ValidatorModelABC):
     """
-    Validates the content of the SpLegend spreadsheet.
+    Validates Legend spreadsheet content and relationships.
+
+    This validator performs comprehensive checks on legend data including:
+    - Legend-indicator relationship validation
+    - Value range validation against legend definitions
+    - Level-based legend requirement enforcement
+    - Legend reference consistency checks
+
+    Attributes
+    ----------
+    model_sp_legend : SpLegend
+        Legend model instance containing legend definitions.
+    model_sp_description : SpDescription
+        Description model instance containing indicator metadata.
+    model_sp_value : SpValue
+        Value model instance containing indicator data.
+    scenario_exists_file : bool
+        Flag indicating if scenario file exists.
+    scenarios_list : List[str]
+        List of available scenario identifiers.
+    sp_name_legend : str
+        Legend spreadsheet filename.
+    sp_name_description : str
+        Description spreadsheet filename.
+    sp_name_value : str
+        Value spreadsheet filename.
+    global_required_columns : Dict[str, List[str]]
+        Required columns mapping for validation.
+    model_dataframes : Dict[str, pd.DataFrame]
+        DataFrames mapping for each model.
     """
 
     def __init__(
@@ -42,7 +122,19 @@ class SpLegendValidator(ValidatorModelABC):
         data_models_context: DataModelsContext,
         report_list: ModelListReport,
         **kwargs: Dict[str, Any],
-    ):
+    ) -> None:
+        """
+        Initialize the Legend validator.
+
+        Args
+        ----
+        data_models_context : DataModelsContext
+            Context containing all loaded spreadsheet models and configuration.
+        report_list : ModelListReport
+            Report aggregator for collecting validation results.
+        **kwargs : Dict[str, Any]
+            Additional keyword arguments passed to parent validator.
+        """
         super().__init__(
             data_models_context=data_models_context,
             report_list=report_list,
@@ -73,7 +165,18 @@ class SpLegendValidator(ValidatorModelABC):
         # Run pipeline
         self.run()
 
-    def _prepare_statement(self):
+    def _prepare_statement(self) -> None:
+        """
+        Prepare validation context and dataframe mappings.
+
+        Sets up:
+        - Spreadsheet names for all models
+        - DataFrame references for legend, description, and value models
+
+        Notes
+        -----
+        DataFrames are copied to prevent modification of original data.
+        """
         # Get model properties once
         self.sp_name_legend = self.model_sp_legend.filename
         self.sp_name_description = self.model_sp_description.filename
@@ -87,6 +190,30 @@ class SpLegendValidator(ValidatorModelABC):
         }
 
     def validate_relation_indicators_in_legend(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate legend-indicator relationships and level-based requirements.
+
+        Performs comprehensive validation including:
+        - Checking that all legend codes in description exist in legend spreadsheet
+        - Validating that level 1 indicators do not have legend references
+        - Ensuring indicators at levels other than 1 and 2 have legend references
+        - Identifying unreferenced legend codes
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for validation failures
+                - List[str]: Warning messages for unreferenced legend codes
+
+        Notes
+        -----
+        - Validation is skipped if legend sanity check fails
+        - Level 1 indicators must not have legend references
+        - Indicators at levels != 1 and != 2 must have legend references
+        - Missing legend codes in legend file are errors
+        - Unreferenced legend codes are warnings
+        """
         errors, warnings = [], []
 
         if not self.model_sp_legend.is_sanity_check_passed:
@@ -228,6 +355,30 @@ class SpLegendValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_range_multiple_legend(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate that indicator values fall within their legend-defined ranges.
+
+        Performs value range validation by:
+        - Mapping each value column to its corresponding legend
+        - Extracting min/max ranges from legend definitions
+        - Checking that all non-unavailable values fall within valid ranges
+        - Using default ranges when no legend is specified
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for values outside valid ranges
+                - List[str]: Empty list (no warnings generated)
+
+        Notes
+        -----
+        - Validation is skipped if value dataframe is empty
+        - Level 1 indicators are excluded from range validation
+        - Default range is [0, 1] when no legend is specified
+        - 'Dado indisponível' (unavailable data) values are excluded
+        - Each error message includes: file, line, value, range, and column
+        """
         errors, warnings = [], []
 
         if self.model_sp_value.data_loader_model.df_data.empty:
@@ -378,7 +529,26 @@ class SpLegendValidator(ValidatorModelABC):
         return errors, warnings
 
     def run(self) -> Tuple[List[str], List[str]]:
-        """Runs all content validations for SpLegend."""
+        """
+        Execute all legend validations.
+
+        Orchestrates the execution of legend validators including relationship
+        validation and range validation. Validations are conditionally executed
+        based on data availability and sanity check status.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: All validation errors collected during execution
+                - List[str]: All validation warnings collected during execution
+
+        Notes
+        -----
+        - Relationship validation only runs if legend sanity check passes
+        - All validations are skipped if description dataframe is empty
+        - Results are aggregated into reports via `build_reports()`
+        """
         validations = []
 
         if self.model_sp_legend.is_sanity_check_passed:
