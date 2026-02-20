@@ -35,6 +35,9 @@
                     <a class="class" href="#ValidatorModelABC">ValidatorModelABC</a>
                             <ul class="memberlist">
                         <li>
+                                <a class="function" href="#ValidatorModelABC.__init__">ValidatorModelABC</a>
+                        </li>
+                        <li>
                                 <a class="variable" href="#ValidatorModelABC.TITLES_INFO">TITLES_INFO</a>
                         </li>
                         <li>
@@ -604,124 +607,419 @@
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC-15"><a href="#ValidatorModelABC-15"><span class="linenos"> 15</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ValidatorModelABC</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
-</span><span id="ValidatorModelABC-16"><a href="#ValidatorModelABC-16"><span class="linenos"> 16</span></a>
-</span><span id="ValidatorModelABC-17"><a href="#ValidatorModelABC-17"><span class="linenos"> 17</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
-</span><span id="ValidatorModelABC-18"><a href="#ValidatorModelABC-18"><span class="linenos"> 18</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-19"><a href="#ValidatorModelABC-19"><span class="linenos"> 19</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-20"><a href="#ValidatorModelABC-20"><span class="linenos"> 20</span></a>        <span class="n">report_list</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-21"><a href="#ValidatorModelABC-21"><span class="linenos"> 21</span></a>        <span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SpModelABC</span><span class="p">],</span>
-</span><span id="ValidatorModelABC-22"><a href="#ValidatorModelABC-22"><span class="linenos"> 22</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
-</span><span id="ValidatorModelABC-23"><a href="#ValidatorModelABC-23"><span class="linenos"> 23</span></a>    <span class="p">):</span>
-</span><span id="ValidatorModelABC-24"><a href="#ValidatorModelABC-24"><span class="linenos"> 24</span></a>        <span class="c1"># SETUP</span>
-</span><span id="ValidatorModelABC-25"><a href="#ValidatorModelABC-25"><span class="linenos"> 25</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span> <span class="o">=</span> <span class="n">data_models_context</span>
-</span><span id="ValidatorModelABC-26"><a href="#ValidatorModelABC-26"><span class="linenos"> 26</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span> <span class="o">=</span> <span class="n">report_list</span>
-</span><span id="ValidatorModelABC-27"><a href="#ValidatorModelABC-27"><span class="linenos"> 27</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span> <span class="o">=</span> <span class="n">type_class</span>
-</span><span id="ValidatorModelABC-28"><a href="#ValidatorModelABC-28"><span class="linenos"> 28</span></a>
-</span><span id="ValidatorModelABC-29"><a href="#ValidatorModelABC-29"><span class="linenos"> 29</span></a>        <span class="c1"># UNPACK DATA</span>
-</span><span id="ValidatorModelABC-30"><a href="#ValidatorModelABC-30"><span class="linenos"> 30</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span><span class="o">.</span><span class="n">get_instance_of</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-31"><a href="#ValidatorModelABC-31"><span class="linenos"> 31</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span><span class="o">.</span><span class="n">filename</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="k">else</span> <span class="s2">&quot;Unknown&quot;</span>
-</span><span id="ValidatorModelABC-32"><a href="#ValidatorModelABC-32"><span class="linenos"> 32</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span><span class="o">.</span><span class="n">data_loader_model</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
-</span><span id="ValidatorModelABC-33"><a href="#ValidatorModelABC-33"><span class="linenos"> 33</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_verify_names</span><span class="p">()</span>
-</span><span id="ValidatorModelABC-34"><a href="#ValidatorModelABC-34"><span class="linenos"> 34</span></a>
-</span><span id="ValidatorModelABC-35"><a href="#ValidatorModelABC-35"><span class="linenos"> 35</span></a>        <span class="c1"># LIST OF ERRORS AND WARNINGS</span>
-</span><span id="ValidatorModelABC-36"><a href="#ValidatorModelABC-36"><span class="linenos"> 36</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ValidatorModelABC-37"><a href="#ValidatorModelABC-37"><span class="linenos"> 37</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ValidatorModelABC-38"><a href="#ValidatorModelABC-38"><span class="linenos"> 38</span></a>
-</span><span id="ValidatorModelABC-39"><a href="#ValidatorModelABC-39"><span class="linenos"> 39</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
-</span><span id="ValidatorModelABC-40"><a href="#ValidatorModelABC-40"><span class="linenos"> 40</span></a>
-</span><span id="ValidatorModelABC-41"><a href="#ValidatorModelABC-41"><span class="linenos"> 41</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ValidatorModelABC-42"><a href="#ValidatorModelABC-42"><span class="linenos"> 42</span></a>        <span class="k">pass</span>
-</span><span id="ValidatorModelABC-43"><a href="#ValidatorModelABC-43"><span class="linenos"> 43</span></a>
-</span><span id="ValidatorModelABC-44"><a href="#ValidatorModelABC-44"><span class="linenos"> 44</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_columns_in_models_dataframes</span><span class="p">(</span>
-</span><span id="ValidatorModelABC-45"><a href="#ValidatorModelABC-45"><span class="linenos"> 45</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-46"><a href="#ValidatorModelABC-46"><span class="linenos"> 46</span></a>        <span class="n">required_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-</span><span id="ValidatorModelABC-47"><a href="#ValidatorModelABC-47"><span class="linenos"> 47</span></a>        <span class="n">model_dataframes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
-</span><span id="ValidatorModelABC-48"><a href="#ValidatorModelABC-48"><span class="linenos"> 48</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="ValidatorModelABC-49"><a href="#ValidatorModelABC-49"><span class="linenos"> 49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC-50"><a href="#ValidatorModelABC-50"><span class="linenos"> 50</span></a><span class="sd">        Check if required columns exist in the provided dataframes for different models.</span>
-</span><span id="ValidatorModelABC-51"><a href="#ValidatorModelABC-51"><span class="linenos"> 51</span></a><span class="sd">        :param required_columns: A dictionary where keys are model names and values are lists of required column names.</span>
-</span><span id="ValidatorModelABC-52"><a href="#ValidatorModelABC-52"><span class="linenos"> 52</span></a><span class="sd">        :param model_dataframes: A dictionary where keys are model names and values are their corresponding dataframes.</span>
-</span><span id="ValidatorModelABC-53"><a href="#ValidatorModelABC-53"><span class="linenos"> 53</span></a><span class="sd">        :return: A list of error messages for missing columns.</span>
-</span><span id="ValidatorModelABC-54"><a href="#ValidatorModelABC-54"><span class="linenos"> 54</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC-55"><a href="#ValidatorModelABC-55"><span class="linenos"> 55</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ValidatorModelABC-56"><a href="#ValidatorModelABC-56"><span class="linenos"> 56</span></a>
-</span><span id="ValidatorModelABC-57"><a href="#ValidatorModelABC-57"><span class="linenos"> 57</span></a>        <span class="c1"># Check if columns exist</span>
-</span><span id="ValidatorModelABC-58"><a href="#ValidatorModelABC-58"><span class="linenos"> 58</span></a>        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">columns</span> <span class="ow">in</span> <span class="n">required_columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="ValidatorModelABC-59"><a href="#ValidatorModelABC-59"><span class="linenos"> 59</span></a>            <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">model_dataframes</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span>
-</span><span id="ValidatorModelABC-60"><a href="#ValidatorModelABC-60"><span class="linenos"> 60</span></a>            <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-61"><a href="#ValidatorModelABC-61"><span class="linenos"> 61</span></a>                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-62"><a href="#ValidatorModelABC-62"><span class="linenos"> 62</span></a>                    <span class="n">exists_column</span><span class="p">,</span> <span class="n">error_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-63"><a href="#ValidatorModelABC-63"><span class="linenos"> 63</span></a>                    <span class="k">if</span> <span class="ow">not</span> <span class="n">exists_column</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-64"><a href="#ValidatorModelABC-64"><span class="linenos"> 64</span></a>                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-65"><a href="#ValidatorModelABC-65"><span class="linenos"> 65</span></a>
-</span><span id="ValidatorModelABC-66"><a href="#ValidatorModelABC-66"><span class="linenos"> 66</span></a>        <span class="k">return</span> <span class="n">errors</span>
-</span><span id="ValidatorModelABC-67"><a href="#ValidatorModelABC-67"><span class="linenos"> 67</span></a>
-</span><span id="ValidatorModelABC-68"><a href="#ValidatorModelABC-68"><span class="linenos"> 68</span></a>    <span class="c1"># Create static method to check if column exists</span>
-</span><span id="ValidatorModelABC-69"><a href="#ValidatorModelABC-69"><span class="linenos"> 69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="ValidatorModelABC-70"><a href="#ValidatorModelABC-70"><span class="linenos"> 70</span></a>
-</span><span id="ValidatorModelABC-71"><a href="#ValidatorModelABC-71"><span class="linenos"> 71</span></a>        <span class="c1"># How use: To use this method, you can call it directly with the dataframe and column name.</span>
-</span><span id="ValidatorModelABC-72"><a href="#ValidatorModelABC-72"><span class="linenos"> 72</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-73"><a href="#ValidatorModelABC-73"><span class="linenos"> 73</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
-</span><span id="ValidatorModelABC-74"><a href="#ValidatorModelABC-74"><span class="linenos"> 74</span></a>
-</span><span id="ValidatorModelABC-75"><a href="#ValidatorModelABC-75"><span class="linenos"> 75</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_column_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="ValidatorModelABC-76"><a href="#ValidatorModelABC-76"><span class="linenos"> 76</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-77"><a href="#ValidatorModelABC-77"><span class="linenos"> 77</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
-</span><span id="ValidatorModelABC-78"><a href="#ValidatorModelABC-78"><span class="linenos"> 78</span></a>
-</span><span id="ValidatorModelABC-79"><a href="#ValidatorModelABC-79"><span class="linenos"> 79</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_column_exists_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="ValidatorModelABC-80"><a href="#ValidatorModelABC-80"><span class="linenos"> 80</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-81"><a href="#ValidatorModelABC-81"><span class="linenos"> 81</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
-</span><span id="ValidatorModelABC-82"><a href="#ValidatorModelABC-82"><span class="linenos"> 82</span></a>
-</span><span id="ValidatorModelABC-83"><a href="#ValidatorModelABC-83"><span class="linenos"> 83</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_text_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
-</span><span id="ValidatorModelABC-84"><a href="#ValidatorModelABC-84"><span class="linenos"> 84</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to validate text length in a column.&quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC-85"><a href="#ValidatorModelABC-85"><span class="linenos"> 85</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ValidatorModelABC-86"><a href="#ValidatorModelABC-86"><span class="linenos"> 86</span></a>        <span class="n">__</span><span class="p">,</span> <span class="n">warnings_text_length</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">check_dataframe_text_length</span><span class="p">(</span>
-</span><span id="ValidatorModelABC-87"><a href="#ValidatorModelABC-87"><span class="linenos"> 87</span></a>            <span class="n">dataframe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-88"><a href="#ValidatorModelABC-88"><span class="linenos"> 88</span></a>            <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-89"><a href="#ValidatorModelABC-89"><span class="linenos"> 89</span></a>            <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-90"><a href="#ValidatorModelABC-90"><span class="linenos"> 90</span></a>            <span class="n">max_length</span><span class="o">=</span><span class="n">max_len</span><span class="p">,</span>
-</span><span id="ValidatorModelABC-91"><a href="#ValidatorModelABC-91"><span class="linenos"> 91</span></a>        <span class="p">)</span>
-</span><span id="ValidatorModelABC-92"><a href="#ValidatorModelABC-92"><span class="linenos"> 92</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">warnings_text_length</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-93"><a href="#ValidatorModelABC-93"><span class="linenos"> 93</span></a>        <span class="k">return</span> <span class="p">[],</span> <span class="n">warnings</span>
-</span><span id="ValidatorModelABC-94"><a href="#ValidatorModelABC-94"><span class="linenos"> 94</span></a>
-</span><span id="ValidatorModelABC-95"><a href="#ValidatorModelABC-95"><span class="linenos"> 95</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_not_executed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">):</span>
-</span><span id="ValidatorModelABC-96"><a href="#ValidatorModelABC-96"><span class="linenos"> 96</span></a>        <span class="k">pass</span>
-</span><span id="ValidatorModelABC-97"><a href="#ValidatorModelABC-97"><span class="linenos"> 97</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC-98"><a href="#ValidatorModelABC-98"><span class="linenos"> 98</span></a><span class="sd">        # FUTURE FEATURE: Implement a method to mark validations as not executed in the report list.</span>
-</span><span id="ValidatorModelABC-99"><a href="#ValidatorModelABC-99"><span class="linenos"> 99</span></a><span class="sd">        for _, report_key in validations:</span>
-</span><span id="ValidatorModelABC-100"><a href="#ValidatorModelABC-100"><span class="linenos">100</span></a><span class="sd">            self._report_list.set_not_executed(self.TITLES_INFO[report_key])</span>
-</span><span id="ValidatorModelABC-101"><a href="#ValidatorModelABC-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC-102"><a href="#ValidatorModelABC-102"><span class="linenos">102</span></a>
-</span><span id="ValidatorModelABC-103"><a href="#ValidatorModelABC-103"><span class="linenos">103</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">):</span>
-</span><span id="ValidatorModelABC-104"><a href="#ValidatorModelABC-104"><span class="linenos">104</span></a>        <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">report_key</span> <span class="ow">in</span> <span class="n">validations</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-105"><a href="#ValidatorModelABC-105"><span class="linenos">105</span></a>            <span class="k">try</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-106"><a href="#ValidatorModelABC-106"><span class="linenos">106</span></a>                <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
-</span><span id="ValidatorModelABC-107"><a href="#ValidatorModelABC-107"><span class="linenos">107</span></a>                <span class="k">if</span> <span class="n">errors</span> <span class="ow">or</span> <span class="n">warnings</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-108"><a href="#ValidatorModelABC-108"><span class="linenos">108</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span><span class="o">=</span><span class="n">warnings</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-109"><a href="#ValidatorModelABC-109"><span class="linenos">109</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-110"><a href="#ValidatorModelABC-110"><span class="linenos">110</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">warnings</span><span class="p">)</span>
-</span><span id="ValidatorModelABC-111"><a href="#ValidatorModelABC-111"><span class="linenos">111</span></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="ValidatorModelABC-112"><a href="#ValidatorModelABC-112"><span class="linenos">112</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-</span><span id="ValidatorModelABC-113"><a href="#ValidatorModelABC-113"><span class="linenos">113</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span>
-</span><span id="ValidatorModelABC-114"><a href="#ValidatorModelABC-114"><span class="linenos">114</span></a>                    <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Exception validation in file during </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
-</span><span id="ValidatorModelABC-115"><a href="#ValidatorModelABC-115"><span class="linenos">115</span></a>                    <span class="n">warnings</span><span class="o">=</span><span class="p">[],</span>
-</span><span id="ValidatorModelABC-116"><a href="#ValidatorModelABC-116"><span class="linenos">116</span></a>                <span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC-22"><a href="#ValidatorModelABC-22"><span class="linenos"> 22</span></a><span class="k">class</span><span class="w"> </span><span class="nc">ValidatorModelABC</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+</span><span id="ValidatorModelABC-23"><a href="#ValidatorModelABC-23"><span class="linenos"> 23</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-24"><a href="#ValidatorModelABC-24"><span class="linenos"> 24</span></a><span class="sd">    Abstract base class for all spreadsheet model validators.</span>
+</span><span id="ValidatorModelABC-25"><a href="#ValidatorModelABC-25"><span class="linenos"> 25</span></a>
+</span><span id="ValidatorModelABC-26"><a href="#ValidatorModelABC-26"><span class="linenos"> 26</span></a><span class="sd">    This class provides the foundation for all specific validators (e.g., Description,</span>
+</span><span id="ValidatorModelABC-27"><a href="#ValidatorModelABC-27"><span class="linenos"> 27</span></a><span class="sd">    Value, Legend validators). It handles common validation tasks such as column existence</span>
+</span><span id="ValidatorModelABC-28"><a href="#ValidatorModelABC-28"><span class="linenos"> 28</span></a><span class="sd">    checks, text length validation, and report generation.</span>
+</span><span id="ValidatorModelABC-29"><a href="#ValidatorModelABC-29"><span class="linenos"> 29</span></a>
+</span><span id="ValidatorModelABC-30"><a href="#ValidatorModelABC-30"><span class="linenos"> 30</span></a><span class="sd">    Attributes</span>
+</span><span id="ValidatorModelABC-31"><a href="#ValidatorModelABC-31"><span class="linenos"> 31</span></a><span class="sd">    ----------</span>
+</span><span id="ValidatorModelABC-32"><a href="#ValidatorModelABC-32"><span class="linenos"> 32</span></a><span class="sd">    _data_models_context : DataModelsContext</span>
+</span><span id="ValidatorModelABC-33"><a href="#ValidatorModelABC-33"><span class="linenos"> 33</span></a><span class="sd">        Context containing all loaded spreadsheet models and configuration.</span>
+</span><span id="ValidatorModelABC-34"><a href="#ValidatorModelABC-34"><span class="linenos"> 34</span></a><span class="sd">    _report_list : ModelListReport</span>
+</span><span id="ValidatorModelABC-35"><a href="#ValidatorModelABC-35"><span class="linenos"> 35</span></a><span class="sd">        Aggregator for collecting and organizing validation results.</span>
+</span><span id="ValidatorModelABC-36"><a href="#ValidatorModelABC-36"><span class="linenos"> 36</span></a><span class="sd">    _type_class : Type[SpModelABC]</span>
+</span><span id="ValidatorModelABC-37"><a href="#ValidatorModelABC-37"><span class="linenos"> 37</span></a><span class="sd">        The model class type this validator is responsible for validating.</span>
+</span><span id="ValidatorModelABC-38"><a href="#ValidatorModelABC-38"><span class="linenos"> 38</span></a><span class="sd">    _data_model : SpModelABC</span>
+</span><span id="ValidatorModelABC-39"><a href="#ValidatorModelABC-39"><span class="linenos"> 39</span></a><span class="sd">        The specific model instance being validated.</span>
+</span><span id="ValidatorModelABC-40"><a href="#ValidatorModelABC-40"><span class="linenos"> 40</span></a><span class="sd">    _filename : str</span>
+</span><span id="ValidatorModelABC-41"><a href="#ValidatorModelABC-41"><span class="linenos"> 41</span></a><span class="sd">        Name of the file being validated.</span>
+</span><span id="ValidatorModelABC-42"><a href="#ValidatorModelABC-42"><span class="linenos"> 42</span></a><span class="sd">    _dataframe : pd.DataFrame</span>
+</span><span id="ValidatorModelABC-43"><a href="#ValidatorModelABC-43"><span class="linenos"> 43</span></a><span class="sd">        DataFrame containing the data to validate.</span>
+</span><span id="ValidatorModelABC-44"><a href="#ValidatorModelABC-44"><span class="linenos"> 44</span></a><span class="sd">    TITLES_INFO : Dict[str, str]</span>
+</span><span id="ValidatorModelABC-45"><a href="#ValidatorModelABC-45"><span class="linenos"> 45</span></a><span class="sd">        Mapping of validation types to human-readable titles.</span>
+</span><span id="ValidatorModelABC-46"><a href="#ValidatorModelABC-46"><span class="linenos"> 46</span></a><span class="sd">    _errors : List[str]</span>
+</span><span id="ValidatorModelABC-47"><a href="#ValidatorModelABC-47"><span class="linenos"> 47</span></a><span class="sd">        Accumulated list of validation errors.</span>
+</span><span id="ValidatorModelABC-48"><a href="#ValidatorModelABC-48"><span class="linenos"> 48</span></a><span class="sd">    _warnings : List[str]</span>
+</span><span id="ValidatorModelABC-49"><a href="#ValidatorModelABC-49"><span class="linenos"> 49</span></a><span class="sd">        Accumulated list of validation warnings.</span>
+</span><span id="ValidatorModelABC-50"><a href="#ValidatorModelABC-50"><span class="linenos"> 50</span></a><span class="sd">    &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-51"><a href="#ValidatorModelABC-51"><span class="linenos"> 51</span></a>
+</span><span id="ValidatorModelABC-52"><a href="#ValidatorModelABC-52"><span class="linenos"> 52</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="ValidatorModelABC-53"><a href="#ValidatorModelABC-53"><span class="linenos"> 53</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-54"><a href="#ValidatorModelABC-54"><span class="linenos"> 54</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-55"><a href="#ValidatorModelABC-55"><span class="linenos"> 55</span></a>        <span class="n">report_list</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-56"><a href="#ValidatorModelABC-56"><span class="linenos"> 56</span></a>        <span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SpModelABC</span><span class="p">],</span>
+</span><span id="ValidatorModelABC-57"><a href="#ValidatorModelABC-57"><span class="linenos"> 57</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="ValidatorModelABC-58"><a href="#ValidatorModelABC-58"><span class="linenos"> 58</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-59"><a href="#ValidatorModelABC-59"><span class="linenos"> 59</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-60"><a href="#ValidatorModelABC-60"><span class="linenos"> 60</span></a><span class="sd">        Initialize the validator with context, report aggregator, and model class.</span>
+</span><span id="ValidatorModelABC-61"><a href="#ValidatorModelABC-61"><span class="linenos"> 61</span></a>
+</span><span id="ValidatorModelABC-62"><a href="#ValidatorModelABC-62"><span class="linenos"> 62</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-63"><a href="#ValidatorModelABC-63"><span class="linenos"> 63</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-64"><a href="#ValidatorModelABC-64"><span class="linenos"> 64</span></a><span class="sd">        data_models_context : DataModelsContext</span>
+</span><span id="ValidatorModelABC-65"><a href="#ValidatorModelABC-65"><span class="linenos"> 65</span></a><span class="sd">            Context containing all loaded spreadsheet models, configuration, and utilities.</span>
+</span><span id="ValidatorModelABC-66"><a href="#ValidatorModelABC-66"><span class="linenos"> 66</span></a><span class="sd">        report_list : ModelListReport</span>
+</span><span id="ValidatorModelABC-67"><a href="#ValidatorModelABC-67"><span class="linenos"> 67</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
+</span><span id="ValidatorModelABC-68"><a href="#ValidatorModelABC-68"><span class="linenos"> 68</span></a><span class="sd">        type_class : Type[SpModelABC]</span>
+</span><span id="ValidatorModelABC-69"><a href="#ValidatorModelABC-69"><span class="linenos"> 69</span></a><span class="sd">            The specific model class type this validator will validate.</span>
+</span><span id="ValidatorModelABC-70"><a href="#ValidatorModelABC-70"><span class="linenos"> 70</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
+</span><span id="ValidatorModelABC-71"><a href="#ValidatorModelABC-71"><span class="linenos"> 71</span></a><span class="sd">            Additional keyword arguments for future extensibility.</span>
+</span><span id="ValidatorModelABC-72"><a href="#ValidatorModelABC-72"><span class="linenos"> 72</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-73"><a href="#ValidatorModelABC-73"><span class="linenos"> 73</span></a>        <span class="c1"># SETUP</span>
+</span><span id="ValidatorModelABC-74"><a href="#ValidatorModelABC-74"><span class="linenos"> 74</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span> <span class="o">=</span> <span class="n">data_models_context</span>
+</span><span id="ValidatorModelABC-75"><a href="#ValidatorModelABC-75"><span class="linenos"> 75</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span> <span class="o">=</span> <span class="n">report_list</span>
+</span><span id="ValidatorModelABC-76"><a href="#ValidatorModelABC-76"><span class="linenos"> 76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span> <span class="o">=</span> <span class="n">type_class</span>
+</span><span id="ValidatorModelABC-77"><a href="#ValidatorModelABC-77"><span class="linenos"> 77</span></a>
+</span><span id="ValidatorModelABC-78"><a href="#ValidatorModelABC-78"><span class="linenos"> 78</span></a>        <span class="c1"># UNPACK DATA</span>
+</span><span id="ValidatorModelABC-79"><a href="#ValidatorModelABC-79"><span class="linenos"> 79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span><span class="o">.</span><span class="n">get_instance_of</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-80"><a href="#ValidatorModelABC-80"><span class="linenos"> 80</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span><span class="o">.</span><span class="n">filename</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="k">else</span> <span class="s2">&quot;Unknown&quot;</span>
+</span><span id="ValidatorModelABC-81"><a href="#ValidatorModelABC-81"><span class="linenos"> 81</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span><span class="o">.</span><span class="n">data_loader_model</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
+</span><span id="ValidatorModelABC-82"><a href="#ValidatorModelABC-82"><span class="linenos"> 82</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_verify_names</span><span class="p">()</span>
+</span><span id="ValidatorModelABC-83"><a href="#ValidatorModelABC-83"><span class="linenos"> 83</span></a>
+</span><span id="ValidatorModelABC-84"><a href="#ValidatorModelABC-84"><span class="linenos"> 84</span></a>        <span class="c1"># LIST OF ERRORS AND WARNINGS</span>
+</span><span id="ValidatorModelABC-85"><a href="#ValidatorModelABC-85"><span class="linenos"> 85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC-86"><a href="#ValidatorModelABC-86"><span class="linenos"> 86</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC-87"><a href="#ValidatorModelABC-87"><span class="linenos"> 87</span></a>
+</span><span id="ValidatorModelABC-88"><a href="#ValidatorModelABC-88"><span class="linenos"> 88</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+</span><span id="ValidatorModelABC-89"><a href="#ValidatorModelABC-89"><span class="linenos"> 89</span></a>
+</span><span id="ValidatorModelABC-90"><a href="#ValidatorModelABC-90"><span class="linenos"> 90</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-91"><a href="#ValidatorModelABC-91"><span class="linenos"> 91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-92"><a href="#ValidatorModelABC-92"><span class="linenos"> 92</span></a><span class="sd">        Initialize additional validator-specific setup.</span>
+</span><span id="ValidatorModelABC-93"><a href="#ValidatorModelABC-93"><span class="linenos"> 93</span></a>
+</span><span id="ValidatorModelABC-94"><a href="#ValidatorModelABC-94"><span class="linenos"> 94</span></a><span class="sd">        This method is called after __init__ and can be overridden by subclasses</span>
+</span><span id="ValidatorModelABC-95"><a href="#ValidatorModelABC-95"><span class="linenos"> 95</span></a><span class="sd">        to perform custom initialization logic. The default implementation does nothing.</span>
+</span><span id="ValidatorModelABC-96"><a href="#ValidatorModelABC-96"><span class="linenos"> 96</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-97"><a href="#ValidatorModelABC-97"><span class="linenos"> 97</span></a>        <span class="k">pass</span>
+</span><span id="ValidatorModelABC-98"><a href="#ValidatorModelABC-98"><span class="linenos"> 98</span></a>
+</span><span id="ValidatorModelABC-99"><a href="#ValidatorModelABC-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_columns_in_models_dataframes</span><span class="p">(</span>
+</span><span id="ValidatorModelABC-100"><a href="#ValidatorModelABC-100"><span class="linenos">100</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-101"><a href="#ValidatorModelABC-101"><span class="linenos">101</span></a>        <span class="n">required_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span id="ValidatorModelABC-102"><a href="#ValidatorModelABC-102"><span class="linenos">102</span></a>        <span class="n">model_dataframes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+</span><span id="ValidatorModelABC-103"><a href="#ValidatorModelABC-103"><span class="linenos">103</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="ValidatorModelABC-104"><a href="#ValidatorModelABC-104"><span class="linenos">104</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-105"><a href="#ValidatorModelABC-105"><span class="linenos">105</span></a><span class="sd">        Check if required columns exist in the provided dataframes for different models.</span>
+</span><span id="ValidatorModelABC-106"><a href="#ValidatorModelABC-106"><span class="linenos">106</span></a>
+</span><span id="ValidatorModelABC-107"><a href="#ValidatorModelABC-107"><span class="linenos">107</span></a><span class="sd">        Validates that all specified columns exist in their corresponding model dataframes.</span>
+</span><span id="ValidatorModelABC-108"><a href="#ValidatorModelABC-108"><span class="linenos">108</span></a><span class="sd">        This is useful for cross-model validations where multiple spreadsheet models need</span>
+</span><span id="ValidatorModelABC-109"><a href="#ValidatorModelABC-109"><span class="linenos">109</span></a><span class="sd">        to be checked for column presence.</span>
+</span><span id="ValidatorModelABC-110"><a href="#ValidatorModelABC-110"><span class="linenos">110</span></a>
+</span><span id="ValidatorModelABC-111"><a href="#ValidatorModelABC-111"><span class="linenos">111</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-112"><a href="#ValidatorModelABC-112"><span class="linenos">112</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-113"><a href="#ValidatorModelABC-113"><span class="linenos">113</span></a><span class="sd">        required_columns : Dict[str, List[str]]</span>
+</span><span id="ValidatorModelABC-114"><a href="#ValidatorModelABC-114"><span class="linenos">114</span></a><span class="sd">            Dictionary where keys are model names and values are lists of required column names.</span>
+</span><span id="ValidatorModelABC-115"><a href="#ValidatorModelABC-115"><span class="linenos">115</span></a><span class="sd">        model_dataframes : Dict[str, pd.DataFrame]</span>
+</span><span id="ValidatorModelABC-116"><a href="#ValidatorModelABC-116"><span class="linenos">116</span></a><span class="sd">            Dictionary where keys are model names and values are their corresponding DataFrames.</span>
 </span><span id="ValidatorModelABC-117"><a href="#ValidatorModelABC-117"><span class="linenos">117</span></a>
-</span><span id="ValidatorModelABC-118"><a href="#ValidatorModelABC-118"><span class="linenos">118</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="ValidatorModelABC-119"><a href="#ValidatorModelABC-119"><span class="linenos">119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ValidatorModelABC-120"><a href="#ValidatorModelABC-120"><span class="linenos">120</span></a>        <span class="k">pass</span>
-</span><span id="ValidatorModelABC-121"><a href="#ValidatorModelABC-121"><span class="linenos">121</span></a>
-</span><span id="ValidatorModelABC-122"><a href="#ValidatorModelABC-122"><span class="linenos">122</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="ValidatorModelABC-123"><a href="#ValidatorModelABC-123"><span class="linenos">123</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_statement</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ValidatorModelABC-124"><a href="#ValidatorModelABC-124"><span class="linenos">124</span></a>        <span class="k">pass</span>
+</span><span id="ValidatorModelABC-118"><a href="#ValidatorModelABC-118"><span class="linenos">118</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC-119"><a href="#ValidatorModelABC-119"><span class="linenos">119</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC-120"><a href="#ValidatorModelABC-120"><span class="linenos">120</span></a><span class="sd">        List[str]</span>
+</span><span id="ValidatorModelABC-121"><a href="#ValidatorModelABC-121"><span class="linenos">121</span></a><span class="sd">            List of error messages for missing columns. Empty list if all columns exist.</span>
+</span><span id="ValidatorModelABC-122"><a href="#ValidatorModelABC-122"><span class="linenos">122</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-123"><a href="#ValidatorModelABC-123"><span class="linenos">123</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC-124"><a href="#ValidatorModelABC-124"><span class="linenos">124</span></a>
+</span><span id="ValidatorModelABC-125"><a href="#ValidatorModelABC-125"><span class="linenos">125</span></a>        <span class="c1"># Check if columns exist</span>
+</span><span id="ValidatorModelABC-126"><a href="#ValidatorModelABC-126"><span class="linenos">126</span></a>        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">columns</span> <span class="ow">in</span> <span class="n">required_columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="ValidatorModelABC-127"><a href="#ValidatorModelABC-127"><span class="linenos">127</span></a>            <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">model_dataframes</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span>
+</span><span id="ValidatorModelABC-128"><a href="#ValidatorModelABC-128"><span class="linenos">128</span></a>            <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-129"><a href="#ValidatorModelABC-129"><span class="linenos">129</span></a>                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-130"><a href="#ValidatorModelABC-130"><span class="linenos">130</span></a>                    <span class="n">exists_column</span><span class="p">,</span> <span class="n">error_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-131"><a href="#ValidatorModelABC-131"><span class="linenos">131</span></a>                    <span class="k">if</span> <span class="ow">not</span> <span class="n">exists_column</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-132"><a href="#ValidatorModelABC-132"><span class="linenos">132</span></a>                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-133"><a href="#ValidatorModelABC-133"><span class="linenos">133</span></a>
+</span><span id="ValidatorModelABC-134"><a href="#ValidatorModelABC-134"><span class="linenos">134</span></a>        <span class="k">return</span> <span class="n">errors</span>
+</span><span id="ValidatorModelABC-135"><a href="#ValidatorModelABC-135"><span class="linenos">135</span></a>
+</span><span id="ValidatorModelABC-136"><a href="#ValidatorModelABC-136"><span class="linenos">136</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="ValidatorModelABC-137"><a href="#ValidatorModelABC-137"><span class="linenos">137</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-138"><a href="#ValidatorModelABC-138"><span class="linenos">138</span></a><span class="sd">        Check if a column exists in a given DataFrame.</span>
+</span><span id="ValidatorModelABC-139"><a href="#ValidatorModelABC-139"><span class="linenos">139</span></a>
+</span><span id="ValidatorModelABC-140"><a href="#ValidatorModelABC-140"><span class="linenos">140</span></a><span class="sd">        This is a convenience wrapper around DataFrameProcessing.column_exists that can be</span>
+</span><span id="ValidatorModelABC-141"><a href="#ValidatorModelABC-141"><span class="linenos">141</span></a><span class="sd">        used to validate column presence in any DataFrame-filename pair.</span>
+</span><span id="ValidatorModelABC-142"><a href="#ValidatorModelABC-142"><span class="linenos">142</span></a>
+</span><span id="ValidatorModelABC-143"><a href="#ValidatorModelABC-143"><span class="linenos">143</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-144"><a href="#ValidatorModelABC-144"><span class="linenos">144</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-145"><a href="#ValidatorModelABC-145"><span class="linenos">145</span></a><span class="sd">        dataframe : pd.DataFrame</span>
+</span><span id="ValidatorModelABC-146"><a href="#ValidatorModelABC-146"><span class="linenos">146</span></a><span class="sd">            The DataFrame to check for column existence.</span>
+</span><span id="ValidatorModelABC-147"><a href="#ValidatorModelABC-147"><span class="linenos">147</span></a><span class="sd">        filename : str</span>
+</span><span id="ValidatorModelABC-148"><a href="#ValidatorModelABC-148"><span class="linenos">148</span></a><span class="sd">            Name of the file for error message generation.</span>
+</span><span id="ValidatorModelABC-149"><a href="#ValidatorModelABC-149"><span class="linenos">149</span></a><span class="sd">        column : str</span>
+</span><span id="ValidatorModelABC-150"><a href="#ValidatorModelABC-150"><span class="linenos">150</span></a><span class="sd">            Name of the column to check for.</span>
+</span><span id="ValidatorModelABC-151"><a href="#ValidatorModelABC-151"><span class="linenos">151</span></a>
+</span><span id="ValidatorModelABC-152"><a href="#ValidatorModelABC-152"><span class="linenos">152</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC-153"><a href="#ValidatorModelABC-153"><span class="linenos">153</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC-154"><a href="#ValidatorModelABC-154"><span class="linenos">154</span></a><span class="sd">        Tuple[bool, str]</span>
+</span><span id="ValidatorModelABC-155"><a href="#ValidatorModelABC-155"><span class="linenos">155</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC-156"><a href="#ValidatorModelABC-156"><span class="linenos">156</span></a><span class="sd">                - bool: True if column exists, False otherwise</span>
+</span><span id="ValidatorModelABC-157"><a href="#ValidatorModelABC-157"><span class="linenos">157</span></a><span class="sd">                - str: Error message if column doesn&#39;t exist, empty string otherwise</span>
+</span><span id="ValidatorModelABC-158"><a href="#ValidatorModelABC-158"><span class="linenos">158</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-159"><a href="#ValidatorModelABC-159"><span class="linenos">159</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-160"><a href="#ValidatorModelABC-160"><span class="linenos">160</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
+</span><span id="ValidatorModelABC-161"><a href="#ValidatorModelABC-161"><span class="linenos">161</span></a>
+</span><span id="ValidatorModelABC-162"><a href="#ValidatorModelABC-162"><span class="linenos">162</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_column_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="ValidatorModelABC-163"><a href="#ValidatorModelABC-163"><span class="linenos">163</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-164"><a href="#ValidatorModelABC-164"><span class="linenos">164</span></a><span class="sd">        Check if a column exists in the validator&#39;s internal DataFrame.</span>
+</span><span id="ValidatorModelABC-165"><a href="#ValidatorModelABC-165"><span class="linenos">165</span></a>
+</span><span id="ValidatorModelABC-166"><a href="#ValidatorModelABC-166"><span class="linenos">166</span></a><span class="sd">        This method validates column presence in the DataFrame currently being validated</span>
+</span><span id="ValidatorModelABC-167"><a href="#ValidatorModelABC-167"><span class="linenos">167</span></a><span class="sd">        by this validator instance (self._dataframe).</span>
+</span><span id="ValidatorModelABC-168"><a href="#ValidatorModelABC-168"><span class="linenos">168</span></a>
+</span><span id="ValidatorModelABC-169"><a href="#ValidatorModelABC-169"><span class="linenos">169</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-170"><a href="#ValidatorModelABC-170"><span class="linenos">170</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-171"><a href="#ValidatorModelABC-171"><span class="linenos">171</span></a><span class="sd">        column : str</span>
+</span><span id="ValidatorModelABC-172"><a href="#ValidatorModelABC-172"><span class="linenos">172</span></a><span class="sd">            Name of the column to check for.</span>
+</span><span id="ValidatorModelABC-173"><a href="#ValidatorModelABC-173"><span class="linenos">173</span></a>
+</span><span id="ValidatorModelABC-174"><a href="#ValidatorModelABC-174"><span class="linenos">174</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC-175"><a href="#ValidatorModelABC-175"><span class="linenos">175</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC-176"><a href="#ValidatorModelABC-176"><span class="linenos">176</span></a><span class="sd">        Tuple[bool, str]</span>
+</span><span id="ValidatorModelABC-177"><a href="#ValidatorModelABC-177"><span class="linenos">177</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC-178"><a href="#ValidatorModelABC-178"><span class="linenos">178</span></a><span class="sd">                - bool: True if column exists, False otherwise</span>
+</span><span id="ValidatorModelABC-179"><a href="#ValidatorModelABC-179"><span class="linenos">179</span></a><span class="sd">                - str: Error message if column doesn&#39;t exist, empty string otherwise</span>
+</span><span id="ValidatorModelABC-180"><a href="#ValidatorModelABC-180"><span class="linenos">180</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-181"><a href="#ValidatorModelABC-181"><span class="linenos">181</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-182"><a href="#ValidatorModelABC-182"><span class="linenos">182</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
+</span><span id="ValidatorModelABC-183"><a href="#ValidatorModelABC-183"><span class="linenos">183</span></a>
+</span><span id="ValidatorModelABC-184"><a href="#ValidatorModelABC-184"><span class="linenos">184</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_column_exists_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="ValidatorModelABC-185"><a href="#ValidatorModelABC-185"><span class="linenos">185</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-186"><a href="#ValidatorModelABC-186"><span class="linenos">186</span></a><span class="sd">        Check if a column exists in a specified DataFrame.</span>
+</span><span id="ValidatorModelABC-187"><a href="#ValidatorModelABC-187"><span class="linenos">187</span></a>
+</span><span id="ValidatorModelABC-188"><a href="#ValidatorModelABC-188"><span class="linenos">188</span></a><span class="sd">        This method validates column presence in a given DataFrame using the</span>
+</span><span id="ValidatorModelABC-189"><a href="#ValidatorModelABC-189"><span class="linenos">189</span></a><span class="sd">        validator&#39;s filename for error message generation.</span>
+</span><span id="ValidatorModelABC-190"><a href="#ValidatorModelABC-190"><span class="linenos">190</span></a>
+</span><span id="ValidatorModelABC-191"><a href="#ValidatorModelABC-191"><span class="linenos">191</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-192"><a href="#ValidatorModelABC-192"><span class="linenos">192</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-193"><a href="#ValidatorModelABC-193"><span class="linenos">193</span></a><span class="sd">        dataframe : pd.DataFrame</span>
+</span><span id="ValidatorModelABC-194"><a href="#ValidatorModelABC-194"><span class="linenos">194</span></a><span class="sd">            The DataFrame to check for column existence.</span>
+</span><span id="ValidatorModelABC-195"><a href="#ValidatorModelABC-195"><span class="linenos">195</span></a><span class="sd">        column : str</span>
+</span><span id="ValidatorModelABC-196"><a href="#ValidatorModelABC-196"><span class="linenos">196</span></a><span class="sd">            Name of the column to check for.</span>
+</span><span id="ValidatorModelABC-197"><a href="#ValidatorModelABC-197"><span class="linenos">197</span></a>
+</span><span id="ValidatorModelABC-198"><a href="#ValidatorModelABC-198"><span class="linenos">198</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC-199"><a href="#ValidatorModelABC-199"><span class="linenos">199</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC-200"><a href="#ValidatorModelABC-200"><span class="linenos">200</span></a><span class="sd">        Tuple[bool, str]</span>
+</span><span id="ValidatorModelABC-201"><a href="#ValidatorModelABC-201"><span class="linenos">201</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC-202"><a href="#ValidatorModelABC-202"><span class="linenos">202</span></a><span class="sd">                - bool: True if column exists, False otherwise</span>
+</span><span id="ValidatorModelABC-203"><a href="#ValidatorModelABC-203"><span class="linenos">203</span></a><span class="sd">                - str: Error message if column doesn&#39;t exist, empty string otherwise</span>
+</span><span id="ValidatorModelABC-204"><a href="#ValidatorModelABC-204"><span class="linenos">204</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-205"><a href="#ValidatorModelABC-205"><span class="linenos">205</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-206"><a href="#ValidatorModelABC-206"><span class="linenos">206</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
+</span><span id="ValidatorModelABC-207"><a href="#ValidatorModelABC-207"><span class="linenos">207</span></a>
+</span><span id="ValidatorModelABC-208"><a href="#ValidatorModelABC-208"><span class="linenos">208</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_check_text_length</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">max_len</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="ValidatorModelABC-209"><a href="#ValidatorModelABC-209"><span class="linenos">209</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-210"><a href="#ValidatorModelABC-210"><span class="linenos">210</span></a><span class="sd">        Validate text length in a column of the validator&#39;s DataFrame.</span>
+</span><span id="ValidatorModelABC-211"><a href="#ValidatorModelABC-211"><span class="linenos">211</span></a>
+</span><span id="ValidatorModelABC-212"><a href="#ValidatorModelABC-212"><span class="linenos">212</span></a><span class="sd">        Checks that all text values in the specified column do not exceed the maximum</span>
+</span><span id="ValidatorModelABC-213"><a href="#ValidatorModelABC-213"><span class="linenos">213</span></a><span class="sd">        allowed length. Violations are reported as warnings.</span>
+</span><span id="ValidatorModelABC-214"><a href="#ValidatorModelABC-214"><span class="linenos">214</span></a>
+</span><span id="ValidatorModelABC-215"><a href="#ValidatorModelABC-215"><span class="linenos">215</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-216"><a href="#ValidatorModelABC-216"><span class="linenos">216</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-217"><a href="#ValidatorModelABC-217"><span class="linenos">217</span></a><span class="sd">        column : str</span>
+</span><span id="ValidatorModelABC-218"><a href="#ValidatorModelABC-218"><span class="linenos">218</span></a><span class="sd">            Name of the column to validate for text length.</span>
+</span><span id="ValidatorModelABC-219"><a href="#ValidatorModelABC-219"><span class="linenos">219</span></a><span class="sd">        max_len : int</span>
+</span><span id="ValidatorModelABC-220"><a href="#ValidatorModelABC-220"><span class="linenos">220</span></a><span class="sd">            Maximum allowed length for text values in the column.</span>
+</span><span id="ValidatorModelABC-221"><a href="#ValidatorModelABC-221"><span class="linenos">221</span></a>
+</span><span id="ValidatorModelABC-222"><a href="#ValidatorModelABC-222"><span class="linenos">222</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC-223"><a href="#ValidatorModelABC-223"><span class="linenos">223</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC-224"><a href="#ValidatorModelABC-224"><span class="linenos">224</span></a><span class="sd">        Tuple[List[str], List[str]]</span>
+</span><span id="ValidatorModelABC-225"><a href="#ValidatorModelABC-225"><span class="linenos">225</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC-226"><a href="#ValidatorModelABC-226"><span class="linenos">226</span></a><span class="sd">                - List[str]: Empty list (no errors generated)</span>
+</span><span id="ValidatorModelABC-227"><a href="#ValidatorModelABC-227"><span class="linenos">227</span></a><span class="sd">                - List[str]: List of warning messages for text exceeding max_len</span>
+</span><span id="ValidatorModelABC-228"><a href="#ValidatorModelABC-228"><span class="linenos">228</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-229"><a href="#ValidatorModelABC-229"><span class="linenos">229</span></a>        <span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC-230"><a href="#ValidatorModelABC-230"><span class="linenos">230</span></a>        <span class="n">__</span><span class="p">,</span> <span class="n">warnings_text_length</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">check_dataframe_text_length</span><span class="p">(</span>
+</span><span id="ValidatorModelABC-231"><a href="#ValidatorModelABC-231"><span class="linenos">231</span></a>            <span class="n">dataframe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-232"><a href="#ValidatorModelABC-232"><span class="linenos">232</span></a>            <span class="n">file_name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_filename</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-233"><a href="#ValidatorModelABC-233"><span class="linenos">233</span></a>            <span class="n">column</span><span class="o">=</span><span class="n">column</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-234"><a href="#ValidatorModelABC-234"><span class="linenos">234</span></a>            <span class="n">max_length</span><span class="o">=</span><span class="n">max_len</span><span class="p">,</span>
+</span><span id="ValidatorModelABC-235"><a href="#ValidatorModelABC-235"><span class="linenos">235</span></a>        <span class="p">)</span>
+</span><span id="ValidatorModelABC-236"><a href="#ValidatorModelABC-236"><span class="linenos">236</span></a>        <span class="n">warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">warnings_text_length</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-237"><a href="#ValidatorModelABC-237"><span class="linenos">237</span></a>        <span class="k">return</span> <span class="p">[],</span> <span class="n">warnings</span>
+</span><span id="ValidatorModelABC-238"><a href="#ValidatorModelABC-238"><span class="linenos">238</span></a>
+</span><span id="ValidatorModelABC-239"><a href="#ValidatorModelABC-239"><span class="linenos">239</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_not_executed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-240"><a href="#ValidatorModelABC-240"><span class="linenos">240</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-241"><a href="#ValidatorModelABC-241"><span class="linenos">241</span></a><span class="sd">        Mark validations as not executed in the report list.</span>
+</span><span id="ValidatorModelABC-242"><a href="#ValidatorModelABC-242"><span class="linenos">242</span></a>
+</span><span id="ValidatorModelABC-243"><a href="#ValidatorModelABC-243"><span class="linenos">243</span></a><span class="sd">        This is a placeholder method for a future feature that will allow marking</span>
+</span><span id="ValidatorModelABC-244"><a href="#ValidatorModelABC-244"><span class="linenos">244</span></a><span class="sd">        certain validations as intentionally skipped or not executed.</span>
+</span><span id="ValidatorModelABC-245"><a href="#ValidatorModelABC-245"><span class="linenos">245</span></a>
+</span><span id="ValidatorModelABC-246"><a href="#ValidatorModelABC-246"><span class="linenos">246</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-247"><a href="#ValidatorModelABC-247"><span class="linenos">247</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-248"><a href="#ValidatorModelABC-248"><span class="linenos">248</span></a><span class="sd">        validations : List[Tuple[Callable, str]]</span>
+</span><span id="ValidatorModelABC-249"><a href="#ValidatorModelABC-249"><span class="linenos">249</span></a><span class="sd">            List of validation tuples containing (validation_function, report_key).</span>
+</span><span id="ValidatorModelABC-250"><a href="#ValidatorModelABC-250"><span class="linenos">250</span></a>
+</span><span id="ValidatorModelABC-251"><a href="#ValidatorModelABC-251"><span class="linenos">251</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC-252"><a href="#ValidatorModelABC-252"><span class="linenos">252</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC-253"><a href="#ValidatorModelABC-253"><span class="linenos">253</span></a><span class="sd">        This method is currently not implemented and serves as a placeholder for</span>
+</span><span id="ValidatorModelABC-254"><a href="#ValidatorModelABC-254"><span class="linenos">254</span></a><span class="sd">        future functionality.</span>
+</span><span id="ValidatorModelABC-255"><a href="#ValidatorModelABC-255"><span class="linenos">255</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-256"><a href="#ValidatorModelABC-256"><span class="linenos">256</span></a>        <span class="k">pass</span>
+</span><span id="ValidatorModelABC-257"><a href="#ValidatorModelABC-257"><span class="linenos">257</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-258"><a href="#ValidatorModelABC-258"><span class="linenos">258</span></a><span class="sd">        # FUTURE FEATURE: Implement a method to mark validations as not executed in the report list.</span>
+</span><span id="ValidatorModelABC-259"><a href="#ValidatorModelABC-259"><span class="linenos">259</span></a><span class="sd">        for _, report_key in validations:</span>
+</span><span id="ValidatorModelABC-260"><a href="#ValidatorModelABC-260"><span class="linenos">260</span></a><span class="sd">            self._report_list.set_not_executed(self.TITLES_INFO[report_key])</span>
+</span><span id="ValidatorModelABC-261"><a href="#ValidatorModelABC-261"><span class="linenos">261</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-262"><a href="#ValidatorModelABC-262"><span class="linenos">262</span></a>
+</span><span id="ValidatorModelABC-263"><a href="#ValidatorModelABC-263"><span class="linenos">263</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-264"><a href="#ValidatorModelABC-264"><span class="linenos">264</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-265"><a href="#ValidatorModelABC-265"><span class="linenos">265</span></a><span class="sd">        Execute validations and build reports from results.</span>
+</span><span id="ValidatorModelABC-266"><a href="#ValidatorModelABC-266"><span class="linenos">266</span></a>
+</span><span id="ValidatorModelABC-267"><a href="#ValidatorModelABC-267"><span class="linenos">267</span></a><span class="sd">        Orchestrates the execution of multiple validation functions, collecting their</span>
+</span><span id="ValidatorModelABC-268"><a href="#ValidatorModelABC-268"><span class="linenos">268</span></a><span class="sd">        errors and warnings, and aggregating them into structured reports. If any</span>
+</span><span id="ValidatorModelABC-269"><a href="#ValidatorModelABC-269"><span class="linenos">269</span></a><span class="sd">        validation raises an exception, it is caught and reported as an error.</span>
+</span><span id="ValidatorModelABC-270"><a href="#ValidatorModelABC-270"><span class="linenos">270</span></a>
+</span><span id="ValidatorModelABC-271"><a href="#ValidatorModelABC-271"><span class="linenos">271</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC-272"><a href="#ValidatorModelABC-272"><span class="linenos">272</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC-273"><a href="#ValidatorModelABC-273"><span class="linenos">273</span></a><span class="sd">        validations : List[Tuple[Callable, str]]</span>
+</span><span id="ValidatorModelABC-274"><a href="#ValidatorModelABC-274"><span class="linenos">274</span></a><span class="sd">            List of tuples containing (validation_function, report_key). Each validation</span>
+</span><span id="ValidatorModelABC-275"><a href="#ValidatorModelABC-275"><span class="linenos">275</span></a><span class="sd">            function should return Tuple[List[str], List[str]] representing (errors, warnings).</span>
+</span><span id="ValidatorModelABC-276"><a href="#ValidatorModelABC-276"><span class="linenos">276</span></a>
+</span><span id="ValidatorModelABC-277"><a href="#ValidatorModelABC-277"><span class="linenos">277</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC-278"><a href="#ValidatorModelABC-278"><span class="linenos">278</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC-279"><a href="#ValidatorModelABC-279"><span class="linenos">279</span></a><span class="sd">        - Each validation function is executed sequentially</span>
+</span><span id="ValidatorModelABC-280"><a href="#ValidatorModelABC-280"><span class="linenos">280</span></a><span class="sd">        - Exceptions during validation are caught and reported as errors</span>
+</span><span id="ValidatorModelABC-281"><a href="#ValidatorModelABC-281"><span class="linenos">281</span></a><span class="sd">        - Results are extended to both the report list and internal error/warning lists</span>
+</span><span id="ValidatorModelABC-282"><a href="#ValidatorModelABC-282"><span class="linenos">282</span></a><span class="sd">        - Report keys are used to categorize validation results by type</span>
+</span><span id="ValidatorModelABC-283"><a href="#ValidatorModelABC-283"><span class="linenos">283</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-284"><a href="#ValidatorModelABC-284"><span class="linenos">284</span></a>        <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">report_key</span> <span class="ow">in</span> <span class="n">validations</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-285"><a href="#ValidatorModelABC-285"><span class="linenos">285</span></a>            <span class="k">try</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-286"><a href="#ValidatorModelABC-286"><span class="linenos">286</span></a>                <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
+</span><span id="ValidatorModelABC-287"><a href="#ValidatorModelABC-287"><span class="linenos">287</span></a>                <span class="k">if</span> <span class="n">errors</span> <span class="ow">or</span> <span class="n">warnings</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-288"><a href="#ValidatorModelABC-288"><span class="linenos">288</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span><span class="o">=</span><span class="n">warnings</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-289"><a href="#ValidatorModelABC-289"><span class="linenos">289</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-290"><a href="#ValidatorModelABC-290"><span class="linenos">290</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">warnings</span><span class="p">)</span>
+</span><span id="ValidatorModelABC-291"><a href="#ValidatorModelABC-291"><span class="linenos">291</span></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-292"><a href="#ValidatorModelABC-292"><span class="linenos">292</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+</span><span id="ValidatorModelABC-293"><a href="#ValidatorModelABC-293"><span class="linenos">293</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span>
+</span><span id="ValidatorModelABC-294"><a href="#ValidatorModelABC-294"><span class="linenos">294</span></a>                    <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Exception validation in file during </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+</span><span id="ValidatorModelABC-295"><a href="#ValidatorModelABC-295"><span class="linenos">295</span></a>                    <span class="n">warnings</span><span class="o">=</span><span class="p">[],</span>
+</span><span id="ValidatorModelABC-296"><a href="#ValidatorModelABC-296"><span class="linenos">296</span></a>                <span class="p">)</span>
+</span><span id="ValidatorModelABC-297"><a href="#ValidatorModelABC-297"><span class="linenos">297</span></a>
+</span><span id="ValidatorModelABC-298"><a href="#ValidatorModelABC-298"><span class="linenos">298</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="ValidatorModelABC-299"><a href="#ValidatorModelABC-299"><span class="linenos">299</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="ValidatorModelABC-300"><a href="#ValidatorModelABC-300"><span class="linenos">300</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-301"><a href="#ValidatorModelABC-301"><span class="linenos">301</span></a><span class="sd">        Execute all validations for the specific model type.</span>
+</span><span id="ValidatorModelABC-302"><a href="#ValidatorModelABC-302"><span class="linenos">302</span></a>
+</span><span id="ValidatorModelABC-303"><a href="#ValidatorModelABC-303"><span class="linenos">303</span></a><span class="sd">        This abstract method must be implemented by all concrete validator subclasses</span>
+</span><span id="ValidatorModelABC-304"><a href="#ValidatorModelABC-304"><span class="linenos">304</span></a><span class="sd">        to define their specific validation pipeline. It should orchestrate the execution</span>
+</span><span id="ValidatorModelABC-305"><a href="#ValidatorModelABC-305"><span class="linenos">305</span></a><span class="sd">        of all validation checks appropriate for the model being validated.</span>
+</span><span id="ValidatorModelABC-306"><a href="#ValidatorModelABC-306"><span class="linenos">306</span></a>
+</span><span id="ValidatorModelABC-307"><a href="#ValidatorModelABC-307"><span class="linenos">307</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC-308"><a href="#ValidatorModelABC-308"><span class="linenos">308</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC-309"><a href="#ValidatorModelABC-309"><span class="linenos">309</span></a><span class="sd">        Tuple[List[str], List[str]]</span>
+</span><span id="ValidatorModelABC-310"><a href="#ValidatorModelABC-310"><span class="linenos">310</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC-311"><a href="#ValidatorModelABC-311"><span class="linenos">311</span></a><span class="sd">                - List[str]: All validation errors collected during execution</span>
+</span><span id="ValidatorModelABC-312"><a href="#ValidatorModelABC-312"><span class="linenos">312</span></a><span class="sd">                - List[str]: All validation warnings collected during execution</span>
+</span><span id="ValidatorModelABC-313"><a href="#ValidatorModelABC-313"><span class="linenos">313</span></a>
+</span><span id="ValidatorModelABC-314"><a href="#ValidatorModelABC-314"><span class="linenos">314</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC-315"><a href="#ValidatorModelABC-315"><span class="linenos">315</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC-316"><a href="#ValidatorModelABC-316"><span class="linenos">316</span></a><span class="sd">        Implementations should call `build_reports()` with their validation functions</span>
+</span><span id="ValidatorModelABC-317"><a href="#ValidatorModelABC-317"><span class="linenos">317</span></a><span class="sd">        and return the accumulated errors and warnings.</span>
+</span><span id="ValidatorModelABC-318"><a href="#ValidatorModelABC-318"><span class="linenos">318</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-319"><a href="#ValidatorModelABC-319"><span class="linenos">319</span></a>        <span class="k">pass</span>
+</span><span id="ValidatorModelABC-320"><a href="#ValidatorModelABC-320"><span class="linenos">320</span></a>
+</span><span id="ValidatorModelABC-321"><a href="#ValidatorModelABC-321"><span class="linenos">321</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="ValidatorModelABC-322"><a href="#ValidatorModelABC-322"><span class="linenos">322</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_statement</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC-323"><a href="#ValidatorModelABC-323"><span class="linenos">323</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-324"><a href="#ValidatorModelABC-324"><span class="linenos">324</span></a><span class="sd">        Prepare initial validation statements and setup.</span>
+</span><span id="ValidatorModelABC-325"><a href="#ValidatorModelABC-325"><span class="linenos">325</span></a>
+</span><span id="ValidatorModelABC-326"><a href="#ValidatorModelABC-326"><span class="linenos">326</span></a><span class="sd">        This abstract method must be implemented by concrete validator subclasses to</span>
+</span><span id="ValidatorModelABC-327"><a href="#ValidatorModelABC-327"><span class="linenos">327</span></a><span class="sd">        perform any necessary initialization or preparation before running validations.</span>
+</span><span id="ValidatorModelABC-328"><a href="#ValidatorModelABC-328"><span class="linenos">328</span></a><span class="sd">        This may include loading additional data, preparing validation contexts, or</span>
+</span><span id="ValidatorModelABC-329"><a href="#ValidatorModelABC-329"><span class="linenos">329</span></a><span class="sd">        setting up internal state.</span>
+</span><span id="ValidatorModelABC-330"><a href="#ValidatorModelABC-330"><span class="linenos">330</span></a>
+</span><span id="ValidatorModelABC-331"><a href="#ValidatorModelABC-331"><span class="linenos">331</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC-332"><a href="#ValidatorModelABC-332"><span class="linenos">332</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC-333"><a href="#ValidatorModelABC-333"><span class="linenos">333</span></a><span class="sd">        This method is typically called during validator initialization or before</span>
+</span><span id="ValidatorModelABC-334"><a href="#ValidatorModelABC-334"><span class="linenos">334</span></a><span class="sd">        the validation pipeline begins execution.</span>
+</span><span id="ValidatorModelABC-335"><a href="#ValidatorModelABC-335"><span class="linenos">335</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC-336"><a href="#ValidatorModelABC-336"><span class="linenos">336</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+            <div class="docstring"><p>Abstract base class for all spreadsheet model validators.</p>
+
+<p>This class provides the foundation for all specific validators (e.g., Description,
+Value, Legend validators). It handles common validation tasks such as column existence
+checks, text length validation, and report generation.</p>
+
+<h2 id="attributes">Attributes</h2>
+
+<p>_data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models and configuration.
+_report_list : ModelListReport
+    Aggregator for collecting and organizing validation results.
+_type_class : Type[SpModelABC]
+    The model class type this validator is responsible for validating.
+_data_model : SpModelABC
+    The specific model instance being validated.
+_filename : str
+    Name of the file being validated.
+_dataframe : pd.DataFrame
+    DataFrame containing the data to validate.
+TITLES_INFO : Dict[str, str]
+    Mapping of validation types to human-readable titles.
+_errors : List[str]
+    Accumulated list of validation errors.
+_warnings : List[str]
+    Accumulated list of validation warnings.</p>
 </div>
 
 
+                            <div id="ValidatorModelABC.__init__" class="classattr">
+                                        <input id="ValidatorModelABC.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
+<div class="attr function">
+            
+        <span class="name">ValidatorModelABC</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">report_list</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n"><a href="models.html#SpModelABC">data_validate.models.SpModelABC</a></span><span class="p">]</span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+
+                <label class="view-source-button" for="ValidatorModelABC.__init__-view-source"><span>View Source</span></label>
+
+    </div>
+    <a class="headerlink" href="#ValidatorModelABC.__init__"></a>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.__init__-52"><a href="#ValidatorModelABC.__init__-52"><span class="linenos">52</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
+</span><span id="ValidatorModelABC.__init__-53"><a href="#ValidatorModelABC.__init__-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="ValidatorModelABC.__init__-54"><a href="#ValidatorModelABC.__init__-54"><span class="linenos">54</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
+</span><span id="ValidatorModelABC.__init__-55"><a href="#ValidatorModelABC.__init__-55"><span class="linenos">55</span></a>        <span class="n">report_list</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="ValidatorModelABC.__init__-56"><a href="#ValidatorModelABC.__init__-56"><span class="linenos">56</span></a>        <span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SpModelABC</span><span class="p">],</span>
+</span><span id="ValidatorModelABC.__init__-57"><a href="#ValidatorModelABC.__init__-57"><span class="linenos">57</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+</span><span id="ValidatorModelABC.__init__-58"><a href="#ValidatorModelABC.__init__-58"><span class="linenos">58</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.__init__-59"><a href="#ValidatorModelABC.__init__-59"><span class="linenos">59</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.__init__-60"><a href="#ValidatorModelABC.__init__-60"><span class="linenos">60</span></a><span class="sd">        Initialize the validator with context, report aggregator, and model class.</span>
+</span><span id="ValidatorModelABC.__init__-61"><a href="#ValidatorModelABC.__init__-61"><span class="linenos">61</span></a>
+</span><span id="ValidatorModelABC.__init__-62"><a href="#ValidatorModelABC.__init__-62"><span class="linenos">62</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC.__init__-63"><a href="#ValidatorModelABC.__init__-63"><span class="linenos">63</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC.__init__-64"><a href="#ValidatorModelABC.__init__-64"><span class="linenos">64</span></a><span class="sd">        data_models_context : DataModelsContext</span>
+</span><span id="ValidatorModelABC.__init__-65"><a href="#ValidatorModelABC.__init__-65"><span class="linenos">65</span></a><span class="sd">            Context containing all loaded spreadsheet models, configuration, and utilities.</span>
+</span><span id="ValidatorModelABC.__init__-66"><a href="#ValidatorModelABC.__init__-66"><span class="linenos">66</span></a><span class="sd">        report_list : ModelListReport</span>
+</span><span id="ValidatorModelABC.__init__-67"><a href="#ValidatorModelABC.__init__-67"><span class="linenos">67</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
+</span><span id="ValidatorModelABC.__init__-68"><a href="#ValidatorModelABC.__init__-68"><span class="linenos">68</span></a><span class="sd">        type_class : Type[SpModelABC]</span>
+</span><span id="ValidatorModelABC.__init__-69"><a href="#ValidatorModelABC.__init__-69"><span class="linenos">69</span></a><span class="sd">            The specific model class type this validator will validate.</span>
+</span><span id="ValidatorModelABC.__init__-70"><a href="#ValidatorModelABC.__init__-70"><span class="linenos">70</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
+</span><span id="ValidatorModelABC.__init__-71"><a href="#ValidatorModelABC.__init__-71"><span class="linenos">71</span></a><span class="sd">            Additional keyword arguments for future extensibility.</span>
+</span><span id="ValidatorModelABC.__init__-72"><a href="#ValidatorModelABC.__init__-72"><span class="linenos">72</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.__init__-73"><a href="#ValidatorModelABC.__init__-73"><span class="linenos">73</span></a>        <span class="c1"># SETUP</span>
+</span><span id="ValidatorModelABC.__init__-74"><a href="#ValidatorModelABC.__init__-74"><span class="linenos">74</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span> <span class="o">=</span> <span class="n">data_models_context</span>
+</span><span id="ValidatorModelABC.__init__-75"><a href="#ValidatorModelABC.__init__-75"><span class="linenos">75</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span> <span class="o">=</span> <span class="n">report_list</span>
+</span><span id="ValidatorModelABC.__init__-76"><a href="#ValidatorModelABC.__init__-76"><span class="linenos">76</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span> <span class="o">=</span> <span class="n">type_class</span>
+</span><span id="ValidatorModelABC.__init__-77"><a href="#ValidatorModelABC.__init__-77"><span class="linenos">77</span></a>
+</span><span id="ValidatorModelABC.__init__-78"><a href="#ValidatorModelABC.__init__-78"><span class="linenos">78</span></a>        <span class="c1"># UNPACK DATA</span>
+</span><span id="ValidatorModelABC.__init__-79"><a href="#ValidatorModelABC.__init__-79"><span class="linenos">79</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span><span class="o">.</span><span class="n">get_instance_of</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_type_class</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.__init__-80"><a href="#ValidatorModelABC.__init__-80"><span class="linenos">80</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span><span class="o">.</span><span class="n">filename</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="k">else</span> <span class="s2">&quot;Unknown&quot;</span>
+</span><span id="ValidatorModelABC.__init__-81"><a href="#ValidatorModelABC.__init__-81"><span class="linenos">81</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_dataframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span><span class="o">.</span><span class="n">data_loader_model</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_model</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({})</span>
+</span><span id="ValidatorModelABC.__init__-82"><a href="#ValidatorModelABC.__init__-82"><span class="linenos">82</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_models_context</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get_verify_names</span><span class="p">()</span>
+</span><span id="ValidatorModelABC.__init__-83"><a href="#ValidatorModelABC.__init__-83"><span class="linenos">83</span></a>
+</span><span id="ValidatorModelABC.__init__-84"><a href="#ValidatorModelABC.__init__-84"><span class="linenos">84</span></a>        <span class="c1"># LIST OF ERRORS AND WARNINGS</span>
+</span><span id="ValidatorModelABC.__init__-85"><a href="#ValidatorModelABC.__init__-85"><span class="linenos">85</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC.__init__-86"><a href="#ValidatorModelABC.__init__-86"><span class="linenos">86</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC.__init__-87"><a href="#ValidatorModelABC.__init__-87"><span class="linenos">87</span></a>
+</span><span id="ValidatorModelABC.__init__-88"><a href="#ValidatorModelABC.__init__-88"><span class="linenos">88</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">initialize</span><span class="p">()</span>
+</span></pre></div>
+
+
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
+
+                            </div>
                             <div id="ValidatorModelABC.TITLES_INFO" class="classattr">
                                 <div class="attr variable">
             <span class="name">TITLES_INFO</span>
@@ -738,18 +1036,29 @@ inheritance.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">initialize</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">initialize</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="ValidatorModelABC.initialize-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC.initialize"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.initialize-41"><a href="#ValidatorModelABC.initialize-41"><span class="linenos">41</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ValidatorModelABC.initialize-42"><a href="#ValidatorModelABC.initialize-42"><span class="linenos">42</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.initialize-90"><a href="#ValidatorModelABC.initialize-90"><span class="linenos">90</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">initialize</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.initialize-91"><a href="#ValidatorModelABC.initialize-91"><span class="linenos">91</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.initialize-92"><a href="#ValidatorModelABC.initialize-92"><span class="linenos">92</span></a><span class="sd">        Initialize additional validator-specific setup.</span>
+</span><span id="ValidatorModelABC.initialize-93"><a href="#ValidatorModelABC.initialize-93"><span class="linenos">93</span></a>
+</span><span id="ValidatorModelABC.initialize-94"><a href="#ValidatorModelABC.initialize-94"><span class="linenos">94</span></a><span class="sd">        This method is called after __init__ and can be overridden by subclasses</span>
+</span><span id="ValidatorModelABC.initialize-95"><a href="#ValidatorModelABC.initialize-95"><span class="linenos">95</span></a><span class="sd">        to perform custom initialization logic. The default implementation does nothing.</span>
+</span><span id="ValidatorModelABC.initialize-96"><a href="#ValidatorModelABC.initialize-96"><span class="linenos">96</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.initialize-97"><a href="#ValidatorModelABC.initialize-97"><span class="linenos">97</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize additional validator-specific setup.</p>
+
+<p>This method is called after __init__ and can be overridden by subclasses
+to perform custom initialization logic. The default implementation does nothing.</p>
+</div>
+
 
                             </div>
                             <div id="ValidatorModelABC.check_columns_in_models_dataframes" class="classattr">
@@ -763,46 +1072,62 @@ inheritance.</p>
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC.check_columns_in_models_dataframes"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.check_columns_in_models_dataframes-44"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-44"><span class="linenos">44</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_columns_in_models_dataframes</span><span class="p">(</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-45"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-45"><span class="linenos">45</span></a>        <span class="bp">self</span><span class="p">,</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-46"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-46"><span class="linenos">46</span></a>        <span class="n">required_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-47"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-47"><span class="linenos">47</span></a>        <span class="n">model_dataframes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-48"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-48"><span class="linenos">48</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-49"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-50"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-50"><span class="linenos">50</span></a><span class="sd">        Check if required columns exist in the provided dataframes for different models.</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-51"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-51"><span class="linenos">51</span></a><span class="sd">        :param required_columns: A dictionary where keys are model names and values are lists of required column names.</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-52"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-52"><span class="linenos">52</span></a><span class="sd">        :param model_dataframes: A dictionary where keys are model names and values are their corresponding dataframes.</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-53"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-53"><span class="linenos">53</span></a><span class="sd">        :return: A list of error messages for missing columns.</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-54"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-54"><span class="linenos">54</span></a><span class="sd">        &quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-55"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-55"><span class="linenos">55</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-56"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-56"><span class="linenos">56</span></a>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-57"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-57"><span class="linenos">57</span></a>        <span class="c1"># Check if columns exist</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-58"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-58"><span class="linenos">58</span></a>        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">columns</span> <span class="ow">in</span> <span class="n">required_columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-59"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-59"><span class="linenos">59</span></a>            <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">model_dataframes</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-60"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-60"><span class="linenos">60</span></a>            <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-61"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-61"><span class="linenos">61</span></a>                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-62"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-62"><span class="linenos">62</span></a>                    <span class="n">exists_column</span><span class="p">,</span> <span class="n">error_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-63"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-63"><span class="linenos">63</span></a>                    <span class="k">if</span> <span class="ow">not</span> <span class="n">exists_column</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-64"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-64"><span class="linenos">64</span></a>                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-65"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-65"><span class="linenos">65</span></a>
-</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-66"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-66"><span class="linenos">66</span></a>        <span class="k">return</span> <span class="n">errors</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.check_columns_in_models_dataframes-99"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-99"><span class="linenos"> 99</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">check_columns_in_models_dataframes</span><span class="p">(</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-100"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-100"><span class="linenos">100</span></a>        <span class="bp">self</span><span class="p">,</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-101"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-101"><span class="linenos">101</span></a>        <span class="n">required_columns</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-102"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-102"><span class="linenos">102</span></a>        <span class="n">model_dataframes</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">],</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-103"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-103"><span class="linenos">103</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-104"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-104"><span class="linenos">104</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-105"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-105"><span class="linenos">105</span></a><span class="sd">        Check if required columns exist in the provided dataframes for different models.</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-106"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-106"><span class="linenos">106</span></a>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-107"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-107"><span class="linenos">107</span></a><span class="sd">        Validates that all specified columns exist in their corresponding model dataframes.</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-108"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-108"><span class="linenos">108</span></a><span class="sd">        This is useful for cross-model validations where multiple spreadsheet models need</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-109"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-109"><span class="linenos">109</span></a><span class="sd">        to be checked for column presence.</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-110"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-110"><span class="linenos">110</span></a>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-111"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-111"><span class="linenos">111</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-112"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-112"><span class="linenos">112</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-113"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-113"><span class="linenos">113</span></a><span class="sd">        required_columns : Dict[str, List[str]]</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-114"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-114"><span class="linenos">114</span></a><span class="sd">            Dictionary where keys are model names and values are lists of required column names.</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-115"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-115"><span class="linenos">115</span></a><span class="sd">        model_dataframes : Dict[str, pd.DataFrame]</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-116"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-116"><span class="linenos">116</span></a><span class="sd">            Dictionary where keys are model names and values are their corresponding DataFrames.</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-117"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-117"><span class="linenos">117</span></a>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-118"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-118"><span class="linenos">118</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-119"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-119"><span class="linenos">119</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-120"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-120"><span class="linenos">120</span></a><span class="sd">        List[str]</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-121"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-121"><span class="linenos">121</span></a><span class="sd">            List of error messages for missing columns. Empty list if all columns exist.</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-122"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-122"><span class="linenos">122</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-123"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-123"><span class="linenos">123</span></a>        <span class="n">errors</span> <span class="o">=</span> <span class="p">[]</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-124"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-124"><span class="linenos">124</span></a>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-125"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-125"><span class="linenos">125</span></a>        <span class="c1"># Check if columns exist</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-126"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-126"><span class="linenos">126</span></a>        <span class="k">for</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">columns</span> <span class="ow">in</span> <span class="n">required_columns</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-127"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-127"><span class="linenos">127</span></a>            <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="n">model_dataframes</span><span class="p">[</span><span class="n">model_name</span><span class="p">]</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-128"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-128"><span class="linenos">128</span></a>            <span class="k">if</span> <span class="n">dataframe</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-129"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-129"><span class="linenos">129</span></a>                <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-130"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-130"><span class="linenos">130</span></a>                    <span class="n">exists_column</span><span class="p">,</span> <span class="n">error_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">model_name</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-131"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-131"><span class="linenos">131</span></a>                    <span class="k">if</span> <span class="ow">not</span> <span class="n">exists_column</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-132"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-132"><span class="linenos">132</span></a>                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">error_msg</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-133"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-133"><span class="linenos">133</span></a>
+</span><span id="ValidatorModelABC.check_columns_in_models_dataframes-134"><a href="#ValidatorModelABC.check_columns_in_models_dataframes-134"><span class="linenos">134</span></a>        <span class="k">return</span> <span class="n">errors</span>
 </span></pre></div>
 
 
             <div class="docstring"><p>Check if required columns exist in the provided dataframes for different models.</p>
 
-<h6 id="parameters">Parameters</h6>
+<p>Validates that all specified columns exist in their corresponding model dataframes.
+This is useful for cross-model validations where multiple spreadsheet models need
+to be checked for column presence.</p>
 
-<ul>
-<li><strong>required_columns</strong>:  A dictionary where keys are model names and values are lists of required column names.</li>
-<li><strong>model_dataframes</strong>:  A dictionary where keys are model names and values are their corresponding dataframes.</li>
-</ul>
+<h2 id="args">Args</h2>
 
-<h6 id="returns">Returns</h6>
+<p>required_columns : Dict[str, List[str]]
+    Dictionary where keys are model names and values are lists of required column names.
+model_dataframes : Dict[str, pd.DataFrame]
+    Dictionary where keys are model names and values are their corresponding DataFrames.</p>
 
-<blockquote>
-  <p>A list of error messages for missing columns.</p>
-</blockquote>
+<h2 id="returns">Returns</h2>
+
+<p>List[str]
+    List of error messages for missing columns. Empty list if all columns exist.</p>
 </div>
 
 
@@ -812,21 +1137,62 @@ inheritance.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">column_exists</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">dataframe</span>, </span><span class="param"><span class="n">filename</span>, </span><span class="param"><span class="n">column</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>:</span></span>
+        <span class="name">column_exists</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="bp">self</span>,</span><span class="param">	<span class="n">dataframe</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span>,</span><span class="param">	<span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">column</span><span class="p">:</span> <span class="nb">str</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span>:</span></span>
 
                 <label class="view-source-button" for="ValidatorModelABC.column_exists-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC.column_exists"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.column_exists-69"><a href="#ValidatorModelABC.column_exists-69"><span class="linenos">69</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
-</span><span id="ValidatorModelABC.column_exists-70"><a href="#ValidatorModelABC.column_exists-70"><span class="linenos">70</span></a>
-</span><span id="ValidatorModelABC.column_exists-71"><a href="#ValidatorModelABC.column_exists-71"><span class="linenos">71</span></a>        <span class="c1"># How use: To use this method, you can call it directly with the dataframe and column name.</span>
-</span><span id="ValidatorModelABC.column_exists-72"><a href="#ValidatorModelABC.column_exists-72"><span class="linenos">72</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
-</span><span id="ValidatorModelABC.column_exists-73"><a href="#ValidatorModelABC.column_exists-73"><span class="linenos">73</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.column_exists-136"><a href="#ValidatorModelABC.column_exists-136"><span class="linenos">136</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">column_exists</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">column</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">bool</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+</span><span id="ValidatorModelABC.column_exists-137"><a href="#ValidatorModelABC.column_exists-137"><span class="linenos">137</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.column_exists-138"><a href="#ValidatorModelABC.column_exists-138"><span class="linenos">138</span></a><span class="sd">        Check if a column exists in a given DataFrame.</span>
+</span><span id="ValidatorModelABC.column_exists-139"><a href="#ValidatorModelABC.column_exists-139"><span class="linenos">139</span></a>
+</span><span id="ValidatorModelABC.column_exists-140"><a href="#ValidatorModelABC.column_exists-140"><span class="linenos">140</span></a><span class="sd">        This is a convenience wrapper around DataFrameProcessing.column_exists that can be</span>
+</span><span id="ValidatorModelABC.column_exists-141"><a href="#ValidatorModelABC.column_exists-141"><span class="linenos">141</span></a><span class="sd">        used to validate column presence in any DataFrame-filename pair.</span>
+</span><span id="ValidatorModelABC.column_exists-142"><a href="#ValidatorModelABC.column_exists-142"><span class="linenos">142</span></a>
+</span><span id="ValidatorModelABC.column_exists-143"><a href="#ValidatorModelABC.column_exists-143"><span class="linenos">143</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC.column_exists-144"><a href="#ValidatorModelABC.column_exists-144"><span class="linenos">144</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC.column_exists-145"><a href="#ValidatorModelABC.column_exists-145"><span class="linenos">145</span></a><span class="sd">        dataframe : pd.DataFrame</span>
+</span><span id="ValidatorModelABC.column_exists-146"><a href="#ValidatorModelABC.column_exists-146"><span class="linenos">146</span></a><span class="sd">            The DataFrame to check for column existence.</span>
+</span><span id="ValidatorModelABC.column_exists-147"><a href="#ValidatorModelABC.column_exists-147"><span class="linenos">147</span></a><span class="sd">        filename : str</span>
+</span><span id="ValidatorModelABC.column_exists-148"><a href="#ValidatorModelABC.column_exists-148"><span class="linenos">148</span></a><span class="sd">            Name of the file for error message generation.</span>
+</span><span id="ValidatorModelABC.column_exists-149"><a href="#ValidatorModelABC.column_exists-149"><span class="linenos">149</span></a><span class="sd">        column : str</span>
+</span><span id="ValidatorModelABC.column_exists-150"><a href="#ValidatorModelABC.column_exists-150"><span class="linenos">150</span></a><span class="sd">            Name of the column to check for.</span>
+</span><span id="ValidatorModelABC.column_exists-151"><a href="#ValidatorModelABC.column_exists-151"><span class="linenos">151</span></a>
+</span><span id="ValidatorModelABC.column_exists-152"><a href="#ValidatorModelABC.column_exists-152"><span class="linenos">152</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC.column_exists-153"><a href="#ValidatorModelABC.column_exists-153"><span class="linenos">153</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC.column_exists-154"><a href="#ValidatorModelABC.column_exists-154"><span class="linenos">154</span></a><span class="sd">        Tuple[bool, str]</span>
+</span><span id="ValidatorModelABC.column_exists-155"><a href="#ValidatorModelABC.column_exists-155"><span class="linenos">155</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC.column_exists-156"><a href="#ValidatorModelABC.column_exists-156"><span class="linenos">156</span></a><span class="sd">                - bool: True if column exists, False otherwise</span>
+</span><span id="ValidatorModelABC.column_exists-157"><a href="#ValidatorModelABC.column_exists-157"><span class="linenos">157</span></a><span class="sd">                - str: Error message if column doesn&#39;t exist, empty string otherwise</span>
+</span><span id="ValidatorModelABC.column_exists-158"><a href="#ValidatorModelABC.column_exists-158"><span class="linenos">158</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.column_exists-159"><a href="#ValidatorModelABC.column_exists-159"><span class="linenos">159</span></a>        <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span> <span class="o">=</span> <span class="n">DataFrameProcessing</span><span class="o">.</span><span class="n">column_exists</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span> <span class="n">column</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.column_exists-160"><a href="#ValidatorModelABC.column_exists-160"><span class="linenos">160</span></a>        <span class="k">return</span> <span class="n">exists</span><span class="p">,</span> <span class="n">msg_error_column</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Check if a column exists in a given DataFrame.</p>
+
+<p>This is a convenience wrapper around DataFrameProcessing.column_exists that can be
+used to validate column presence in any DataFrame-filename pair.</p>
+
+<h2 id="args">Args</h2>
+
+<p>dataframe : pd.DataFrame
+    The DataFrame to check for column existence.
+filename : str
+    Name of the file for error message generation.
+column : str
+    Name of the column to check for.</p>
+
+<h2 id="returns">Returns</h2>
+
+<p>Tuple[bool, str]
+    A tuple containing:
+        - bool: True if column exists, False otherwise
+        - str: Error message if column doesn't exist, empty string otherwise</p>
+</div>
+
 
                             </div>
                             <div id="ValidatorModelABC.set_not_executed" class="classattr">
@@ -834,23 +1200,54 @@ inheritance.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">set_not_executed</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">validations</span></span><span class="return-annotation">):</span></span>
+        <span class="name">set_not_executed</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">validations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="ValidatorModelABC.set_not_executed-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC.set_not_executed"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.set_not_executed-95"><a href="#ValidatorModelABC.set_not_executed-95"><span class="linenos"> 95</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_not_executed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">):</span>
-</span><span id="ValidatorModelABC.set_not_executed-96"><a href="#ValidatorModelABC.set_not_executed-96"><span class="linenos"> 96</span></a>        <span class="k">pass</span>
-</span><span id="ValidatorModelABC.set_not_executed-97"><a href="#ValidatorModelABC.set_not_executed-97"><span class="linenos"> 97</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="ValidatorModelABC.set_not_executed-98"><a href="#ValidatorModelABC.set_not_executed-98"><span class="linenos"> 98</span></a><span class="sd">        # FUTURE FEATURE: Implement a method to mark validations as not executed in the report list.</span>
-</span><span id="ValidatorModelABC.set_not_executed-99"><a href="#ValidatorModelABC.set_not_executed-99"><span class="linenos"> 99</span></a><span class="sd">        for _, report_key in validations:</span>
-</span><span id="ValidatorModelABC.set_not_executed-100"><a href="#ValidatorModelABC.set_not_executed-100"><span class="linenos">100</span></a><span class="sd">            self._report_list.set_not_executed(self.TITLES_INFO[report_key])</span>
-</span><span id="ValidatorModelABC.set_not_executed-101"><a href="#ValidatorModelABC.set_not_executed-101"><span class="linenos">101</span></a><span class="sd">        &quot;&quot;&quot;</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.set_not_executed-239"><a href="#ValidatorModelABC.set_not_executed-239"><span class="linenos">239</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_not_executed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.set_not_executed-240"><a href="#ValidatorModelABC.set_not_executed-240"><span class="linenos">240</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.set_not_executed-241"><a href="#ValidatorModelABC.set_not_executed-241"><span class="linenos">241</span></a><span class="sd">        Mark validations as not executed in the report list.</span>
+</span><span id="ValidatorModelABC.set_not_executed-242"><a href="#ValidatorModelABC.set_not_executed-242"><span class="linenos">242</span></a>
+</span><span id="ValidatorModelABC.set_not_executed-243"><a href="#ValidatorModelABC.set_not_executed-243"><span class="linenos">243</span></a><span class="sd">        This is a placeholder method for a future feature that will allow marking</span>
+</span><span id="ValidatorModelABC.set_not_executed-244"><a href="#ValidatorModelABC.set_not_executed-244"><span class="linenos">244</span></a><span class="sd">        certain validations as intentionally skipped or not executed.</span>
+</span><span id="ValidatorModelABC.set_not_executed-245"><a href="#ValidatorModelABC.set_not_executed-245"><span class="linenos">245</span></a>
+</span><span id="ValidatorModelABC.set_not_executed-246"><a href="#ValidatorModelABC.set_not_executed-246"><span class="linenos">246</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC.set_not_executed-247"><a href="#ValidatorModelABC.set_not_executed-247"><span class="linenos">247</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC.set_not_executed-248"><a href="#ValidatorModelABC.set_not_executed-248"><span class="linenos">248</span></a><span class="sd">        validations : List[Tuple[Callable, str]]</span>
+</span><span id="ValidatorModelABC.set_not_executed-249"><a href="#ValidatorModelABC.set_not_executed-249"><span class="linenos">249</span></a><span class="sd">            List of validation tuples containing (validation_function, report_key).</span>
+</span><span id="ValidatorModelABC.set_not_executed-250"><a href="#ValidatorModelABC.set_not_executed-250"><span class="linenos">250</span></a>
+</span><span id="ValidatorModelABC.set_not_executed-251"><a href="#ValidatorModelABC.set_not_executed-251"><span class="linenos">251</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC.set_not_executed-252"><a href="#ValidatorModelABC.set_not_executed-252"><span class="linenos">252</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC.set_not_executed-253"><a href="#ValidatorModelABC.set_not_executed-253"><span class="linenos">253</span></a><span class="sd">        This method is currently not implemented and serves as a placeholder for</span>
+</span><span id="ValidatorModelABC.set_not_executed-254"><a href="#ValidatorModelABC.set_not_executed-254"><span class="linenos">254</span></a><span class="sd">        future functionality.</span>
+</span><span id="ValidatorModelABC.set_not_executed-255"><a href="#ValidatorModelABC.set_not_executed-255"><span class="linenos">255</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.set_not_executed-256"><a href="#ValidatorModelABC.set_not_executed-256"><span class="linenos">256</span></a>        <span class="k">pass</span>
+</span><span id="ValidatorModelABC.set_not_executed-257"><a href="#ValidatorModelABC.set_not_executed-257"><span class="linenos">257</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.set_not_executed-258"><a href="#ValidatorModelABC.set_not_executed-258"><span class="linenos">258</span></a><span class="sd">        # FUTURE FEATURE: Implement a method to mark validations as not executed in the report list.</span>
+</span><span id="ValidatorModelABC.set_not_executed-259"><a href="#ValidatorModelABC.set_not_executed-259"><span class="linenos">259</span></a><span class="sd">        for _, report_key in validations:</span>
+</span><span id="ValidatorModelABC.set_not_executed-260"><a href="#ValidatorModelABC.set_not_executed-260"><span class="linenos">260</span></a><span class="sd">            self._report_list.set_not_executed(self.TITLES_INFO[report_key])</span>
+</span><span id="ValidatorModelABC.set_not_executed-261"><a href="#ValidatorModelABC.set_not_executed-261"><span class="linenos">261</span></a><span class="sd">        &quot;&quot;&quot;</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Mark validations as not executed in the report list.</p>
+
+<p>This is a placeholder method for a future feature that will allow marking
+certain validations as intentionally skipped or not executed.</p>
+
+<h2 id="args">Args</h2>
+
+<p>validations : List[Tuple[Callable, str]]
+    List of validation tuples containing (validation_function, report_key).</p>
+
+<h2 id="notes">Notes</h2>
+
+<p>This method is currently not implemented and serves as a placeholder for
+future functionality.</p>
+</div>
+
 
                             </div>
                             <div id="ValidatorModelABC.build_reports" class="classattr">
@@ -858,30 +1255,71 @@ inheritance.</p>
 <div class="attr function">
             
         <span class="def">def</span>
-        <span class="name">build_reports</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">validations</span></span><span class="return-annotation">):</span></span>
+        <span class="name">build_reports</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span>, </span><span class="param"><span class="n">validations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span></span><span class="return-annotation">) -> <span class="kc">None</span>:</span></span>
 
                 <label class="view-source-button" for="ValidatorModelABC.build_reports-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC.build_reports"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.build_reports-103"><a href="#ValidatorModelABC.build_reports-103"><span class="linenos">103</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">):</span>
-</span><span id="ValidatorModelABC.build_reports-104"><a href="#ValidatorModelABC.build_reports-104"><span class="linenos">104</span></a>        <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">report_key</span> <span class="ow">in</span> <span class="n">validations</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.build_reports-105"><a href="#ValidatorModelABC.build_reports-105"><span class="linenos">105</span></a>            <span class="k">try</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.build_reports-106"><a href="#ValidatorModelABC.build_reports-106"><span class="linenos">106</span></a>                <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
-</span><span id="ValidatorModelABC.build_reports-107"><a href="#ValidatorModelABC.build_reports-107"><span class="linenos">107</span></a>                <span class="k">if</span> <span class="n">errors</span> <span class="ow">or</span> <span class="n">warnings</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.build_reports-108"><a href="#ValidatorModelABC.build_reports-108"><span class="linenos">108</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span><span class="o">=</span><span class="n">warnings</span><span class="p">)</span>
-</span><span id="ValidatorModelABC.build_reports-109"><a href="#ValidatorModelABC.build_reports-109"><span class="linenos">109</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
-</span><span id="ValidatorModelABC.build_reports-110"><a href="#ValidatorModelABC.build_reports-110"><span class="linenos">110</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">warnings</span><span class="p">)</span>
-</span><span id="ValidatorModelABC.build_reports-111"><a href="#ValidatorModelABC.build_reports-111"><span class="linenos">111</span></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-</span><span id="ValidatorModelABC.build_reports-112"><a href="#ValidatorModelABC.build_reports-112"><span class="linenos">112</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
-</span><span id="ValidatorModelABC.build_reports-113"><a href="#ValidatorModelABC.build_reports-113"><span class="linenos">113</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span>
-</span><span id="ValidatorModelABC.build_reports-114"><a href="#ValidatorModelABC.build_reports-114"><span class="linenos">114</span></a>                    <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Exception validation in file during </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
-</span><span id="ValidatorModelABC.build_reports-115"><a href="#ValidatorModelABC.build_reports-115"><span class="linenos">115</span></a>                    <span class="n">warnings</span><span class="o">=</span><span class="p">[],</span>
-</span><span id="ValidatorModelABC.build_reports-116"><a href="#ValidatorModelABC.build_reports-116"><span class="linenos">116</span></a>                <span class="p">)</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.build_reports-263"><a href="#ValidatorModelABC.build_reports-263"><span class="linenos">263</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">build_reports</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">validations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Callable</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.build_reports-264"><a href="#ValidatorModelABC.build_reports-264"><span class="linenos">264</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.build_reports-265"><a href="#ValidatorModelABC.build_reports-265"><span class="linenos">265</span></a><span class="sd">        Execute validations and build reports from results.</span>
+</span><span id="ValidatorModelABC.build_reports-266"><a href="#ValidatorModelABC.build_reports-266"><span class="linenos">266</span></a>
+</span><span id="ValidatorModelABC.build_reports-267"><a href="#ValidatorModelABC.build_reports-267"><span class="linenos">267</span></a><span class="sd">        Orchestrates the execution of multiple validation functions, collecting their</span>
+</span><span id="ValidatorModelABC.build_reports-268"><a href="#ValidatorModelABC.build_reports-268"><span class="linenos">268</span></a><span class="sd">        errors and warnings, and aggregating them into structured reports. If any</span>
+</span><span id="ValidatorModelABC.build_reports-269"><a href="#ValidatorModelABC.build_reports-269"><span class="linenos">269</span></a><span class="sd">        validation raises an exception, it is caught and reported as an error.</span>
+</span><span id="ValidatorModelABC.build_reports-270"><a href="#ValidatorModelABC.build_reports-270"><span class="linenos">270</span></a>
+</span><span id="ValidatorModelABC.build_reports-271"><a href="#ValidatorModelABC.build_reports-271"><span class="linenos">271</span></a><span class="sd">        Args</span>
+</span><span id="ValidatorModelABC.build_reports-272"><a href="#ValidatorModelABC.build_reports-272"><span class="linenos">272</span></a><span class="sd">        ----</span>
+</span><span id="ValidatorModelABC.build_reports-273"><a href="#ValidatorModelABC.build_reports-273"><span class="linenos">273</span></a><span class="sd">        validations : List[Tuple[Callable, str]]</span>
+</span><span id="ValidatorModelABC.build_reports-274"><a href="#ValidatorModelABC.build_reports-274"><span class="linenos">274</span></a><span class="sd">            List of tuples containing (validation_function, report_key). Each validation</span>
+</span><span id="ValidatorModelABC.build_reports-275"><a href="#ValidatorModelABC.build_reports-275"><span class="linenos">275</span></a><span class="sd">            function should return Tuple[List[str], List[str]] representing (errors, warnings).</span>
+</span><span id="ValidatorModelABC.build_reports-276"><a href="#ValidatorModelABC.build_reports-276"><span class="linenos">276</span></a>
+</span><span id="ValidatorModelABC.build_reports-277"><a href="#ValidatorModelABC.build_reports-277"><span class="linenos">277</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC.build_reports-278"><a href="#ValidatorModelABC.build_reports-278"><span class="linenos">278</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC.build_reports-279"><a href="#ValidatorModelABC.build_reports-279"><span class="linenos">279</span></a><span class="sd">        - Each validation function is executed sequentially</span>
+</span><span id="ValidatorModelABC.build_reports-280"><a href="#ValidatorModelABC.build_reports-280"><span class="linenos">280</span></a><span class="sd">        - Exceptions during validation are caught and reported as errors</span>
+</span><span id="ValidatorModelABC.build_reports-281"><a href="#ValidatorModelABC.build_reports-281"><span class="linenos">281</span></a><span class="sd">        - Results are extended to both the report list and internal error/warning lists</span>
+</span><span id="ValidatorModelABC.build_reports-282"><a href="#ValidatorModelABC.build_reports-282"><span class="linenos">282</span></a><span class="sd">        - Report keys are used to categorize validation results by type</span>
+</span><span id="ValidatorModelABC.build_reports-283"><a href="#ValidatorModelABC.build_reports-283"><span class="linenos">283</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.build_reports-284"><a href="#ValidatorModelABC.build_reports-284"><span class="linenos">284</span></a>        <span class="k">for</span> <span class="n">func</span><span class="p">,</span> <span class="n">report_key</span> <span class="ow">in</span> <span class="n">validations</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.build_reports-285"><a href="#ValidatorModelABC.build_reports-285"><span class="linenos">285</span></a>            <span class="k">try</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.build_reports-286"><a href="#ValidatorModelABC.build_reports-286"><span class="linenos">286</span></a>                <span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span> <span class="o">=</span> <span class="n">func</span><span class="p">()</span>
+</span><span id="ValidatorModelABC.build_reports-287"><a href="#ValidatorModelABC.build_reports-287"><span class="linenos">287</span></a>                <span class="k">if</span> <span class="n">errors</span> <span class="ow">or</span> <span class="n">warnings</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.build_reports-288"><a href="#ValidatorModelABC.build_reports-288"><span class="linenos">288</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span> <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span> <span class="n">warnings</span><span class="o">=</span><span class="n">warnings</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.build_reports-289"><a href="#ValidatorModelABC.build_reports-289"><span class="linenos">289</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_errors</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">errors</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.build_reports-290"><a href="#ValidatorModelABC.build_reports-290"><span class="linenos">290</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_warnings</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">warnings</span><span class="p">)</span>
+</span><span id="ValidatorModelABC.build_reports-291"><a href="#ValidatorModelABC.build_reports-291"><span class="linenos">291</span></a>            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+</span><span id="ValidatorModelABC.build_reports-292"><a href="#ValidatorModelABC.build_reports-292"><span class="linenos">292</span></a>                <span class="bp">self</span><span class="o">.</span><span class="n">_report_list</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span>
+</span><span id="ValidatorModelABC.build_reports-293"><a href="#ValidatorModelABC.build_reports-293"><span class="linenos">293</span></a>                    <span class="bp">self</span><span class="o">.</span><span class="n">TITLES_INFO</span><span class="p">[</span><span class="n">report_key</span><span class="p">],</span>
+</span><span id="ValidatorModelABC.build_reports-294"><a href="#ValidatorModelABC.build_reports-294"><span class="linenos">294</span></a>                    <span class="n">errors</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;Exception validation in file during </span><span class="si">{</span><span class="n">func</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
+</span><span id="ValidatorModelABC.build_reports-295"><a href="#ValidatorModelABC.build_reports-295"><span class="linenos">295</span></a>                    <span class="n">warnings</span><span class="o">=</span><span class="p">[],</span>
+</span><span id="ValidatorModelABC.build_reports-296"><a href="#ValidatorModelABC.build_reports-296"><span class="linenos">296</span></a>                <span class="p">)</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Execute validations and build reports from results.</p>
+
+<p>Orchestrates the execution of multiple validation functions, collecting their
+errors and warnings, and aggregating them into structured reports. If any
+validation raises an exception, it is caught and reported as an error.</p>
+
+<h2 id="args">Args</h2>
+
+<p>validations : List[Tuple[Callable, str]]
+    List of tuples containing (validation_function, report_key). Each validation
+    function should return Tuple[List[str], List[str]] representing (errors, warnings).</p>
+
+<h2 id="notes">Notes</h2>
+
+<ul>
+<li>Each validation function is executed sequentially</li>
+<li>Exceptions during validation are caught and reported as errors</li>
+<li>Results are extended to both the report list and internal error/warning lists</li>
+<li>Report keys are used to categorize validation results by type</li>
+</ul>
+</div>
+
 
                             </div>
                             <div id="ValidatorModelABC.run" class="classattr">
@@ -890,19 +1328,56 @@ inheritance.</p>
                     <div class="decorator decorator-abstractmethod">@abstractmethod</div>
 
         <span class="def">def</span>
-        <span class="name">run</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">):</span></span>
+        <span class="name">run</span><span class="signature pdoc-code condensed">(<span class="param"><span class="bp">self</span></span><span class="return-annotation">) -> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>:</span></span>
 
                 <label class="view-source-button" for="ValidatorModelABC.run-view-source"><span>View Source</span></label>
 
     </div>
     <a class="headerlink" href="#ValidatorModelABC.run"></a>
-            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.run-118"><a href="#ValidatorModelABC.run-118"><span class="linenos">118</span></a>    <span class="nd">@abstractmethod</span>
-</span><span id="ValidatorModelABC.run-119"><a href="#ValidatorModelABC.run-119"><span class="linenos">119</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-</span><span id="ValidatorModelABC.run-120"><a href="#ValidatorModelABC.run-120"><span class="linenos">120</span></a>        <span class="k">pass</span>
+            <div class="pdoc-code codehilite"><pre><span></span><span id="ValidatorModelABC.run-298"><a href="#ValidatorModelABC.run-298"><span class="linenos">298</span></a>    <span class="nd">@abstractmethod</span>
+</span><span id="ValidatorModelABC.run-299"><a href="#ValidatorModelABC.run-299"><span class="linenos">299</span></a>    <span class="k">def</span><span class="w"> </span><span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+</span><span id="ValidatorModelABC.run-300"><a href="#ValidatorModelABC.run-300"><span class="linenos">300</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.run-301"><a href="#ValidatorModelABC.run-301"><span class="linenos">301</span></a><span class="sd">        Execute all validations for the specific model type.</span>
+</span><span id="ValidatorModelABC.run-302"><a href="#ValidatorModelABC.run-302"><span class="linenos">302</span></a>
+</span><span id="ValidatorModelABC.run-303"><a href="#ValidatorModelABC.run-303"><span class="linenos">303</span></a><span class="sd">        This abstract method must be implemented by all concrete validator subclasses</span>
+</span><span id="ValidatorModelABC.run-304"><a href="#ValidatorModelABC.run-304"><span class="linenos">304</span></a><span class="sd">        to define their specific validation pipeline. It should orchestrate the execution</span>
+</span><span id="ValidatorModelABC.run-305"><a href="#ValidatorModelABC.run-305"><span class="linenos">305</span></a><span class="sd">        of all validation checks appropriate for the model being validated.</span>
+</span><span id="ValidatorModelABC.run-306"><a href="#ValidatorModelABC.run-306"><span class="linenos">306</span></a>
+</span><span id="ValidatorModelABC.run-307"><a href="#ValidatorModelABC.run-307"><span class="linenos">307</span></a><span class="sd">        Returns</span>
+</span><span id="ValidatorModelABC.run-308"><a href="#ValidatorModelABC.run-308"><span class="linenos">308</span></a><span class="sd">        -------</span>
+</span><span id="ValidatorModelABC.run-309"><a href="#ValidatorModelABC.run-309"><span class="linenos">309</span></a><span class="sd">        Tuple[List[str], List[str]]</span>
+</span><span id="ValidatorModelABC.run-310"><a href="#ValidatorModelABC.run-310"><span class="linenos">310</span></a><span class="sd">            A tuple containing:</span>
+</span><span id="ValidatorModelABC.run-311"><a href="#ValidatorModelABC.run-311"><span class="linenos">311</span></a><span class="sd">                - List[str]: All validation errors collected during execution</span>
+</span><span id="ValidatorModelABC.run-312"><a href="#ValidatorModelABC.run-312"><span class="linenos">312</span></a><span class="sd">                - List[str]: All validation warnings collected during execution</span>
+</span><span id="ValidatorModelABC.run-313"><a href="#ValidatorModelABC.run-313"><span class="linenos">313</span></a>
+</span><span id="ValidatorModelABC.run-314"><a href="#ValidatorModelABC.run-314"><span class="linenos">314</span></a><span class="sd">        Notes</span>
+</span><span id="ValidatorModelABC.run-315"><a href="#ValidatorModelABC.run-315"><span class="linenos">315</span></a><span class="sd">        -----</span>
+</span><span id="ValidatorModelABC.run-316"><a href="#ValidatorModelABC.run-316"><span class="linenos">316</span></a><span class="sd">        Implementations should call `build_reports()` with their validation functions</span>
+</span><span id="ValidatorModelABC.run-317"><a href="#ValidatorModelABC.run-317"><span class="linenos">317</span></a><span class="sd">        and return the accumulated errors and warnings.</span>
+</span><span id="ValidatorModelABC.run-318"><a href="#ValidatorModelABC.run-318"><span class="linenos">318</span></a><span class="sd">        &quot;&quot;&quot;</span>
+</span><span id="ValidatorModelABC.run-319"><a href="#ValidatorModelABC.run-319"><span class="linenos">319</span></a>        <span class="k">pass</span>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Execute all validations for the specific model type.</p>
+
+<p>This abstract method must be implemented by all concrete validator subclasses
+to define their specific validation pipeline. It should orchestrate the execution
+of all validation checks appropriate for the model being validated.</p>
+
+<h2 id="returns">Returns</h2>
+
+<p>Tuple[List[str], List[str]]
+    A tuple containing:
+        - List[str]: All validation errors collected during execution
+        - List[str]: All validation warnings collected during execution</p>
+
+<h2 id="notes">Notes</h2>
+
+<p>Implementations should call <code><a href="#ValidatorModelABC.build_reports">build_reports()</a></code> with their validation functions
+and return the accumulated errors and warnings.</p>
+</div>
+
 
                             </div>
                 </section>
@@ -1211,7 +1686,20 @@ inheritance.</p>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
 
                             </div>
                             <div id="SpDescriptionValidator.validate_html_in_descriptions" class="classattr">
@@ -1986,7 +2474,20 @@ inheritance.</p>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
 
                             </div>
                             <div id="SpValueValidator.model_sp_value" class="classattr">
@@ -3490,8 +3991,32 @@ child indicator relationships.</p>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Helper class that provides a standard way to create an ABC using
-inheritance.</p>
+            <div class="docstring"><p>Abstract base class for all spreadsheet model validators.</p>
+
+<p>This class provides the foundation for all specific validators (e.g., Description,
+Value, Legend validators). It handles common validation tasks such as column existence
+checks, text length validation, and report generation.</p>
+
+<h2 id="attributes">Attributes</h2>
+
+<p>_data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models and configuration.
+_report_list : ModelListReport
+    Aggregator for collecting and organizing validation results.
+_type_class : Type[SpModelABC]
+    The model class type this validator is responsible for validating.
+_data_model : SpModelABC
+    The specific model instance being validated.
+_filename : str
+    Name of the file being validated.
+_dataframe : pd.DataFrame
+    DataFrame containing the data to validate.
+TITLES_INFO : Dict[str, str]
+    Mapping of validation types to human-readable titles.
+_errors : List[str]
+    Accumulated list of validation errors.
+_warnings : List[str]
+    Accumulated list of validation warnings.</p>
 </div>
 
 
@@ -4269,7 +4794,20 @@ inheritance.</p>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
 
                             </div>
                             <div id="SpTemporalReferenceValidator.validate_punctuation" class="classattr">
@@ -4967,7 +5505,20 @@ inheritance.</p>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
 
                             </div>
                             <div id="SpProportionalityValidator.model_sp_proportionality" class="classattr">
@@ -5690,7 +6241,20 @@ inheritance.</p>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
 
                             </div>
                             <div id="SpScenarioValidator.validate_punctuation" class="classattr">
@@ -6230,7 +6794,20 @@ inheritance.</p>
 </span></pre></div>
 
 
-    
+            <div class="docstring"><p>Initialize the validator with context, report aggregator, and model class.</p>
+
+<h2 id="args">Args</h2>
+
+<p>data_models_context : DataModelsContext
+    Context containing all loaded spreadsheet models, configuration, and utilities.
+report_list : ModelListReport
+    Report aggregator for collecting validation results.
+type_class : Type[SpModelABC]
+    The specific model class type this validator will validate.
+**kwargs : Dict[str, Any]
+    Additional keyword arguments for future extensibility.</p>
+</div>
+
 
                             </div>
                             <div id="SpLegendValidator.model_sp_legend" class="classattr">
