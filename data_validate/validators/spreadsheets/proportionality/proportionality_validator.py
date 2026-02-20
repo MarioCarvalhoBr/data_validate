@@ -1,4 +1,11 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+"""
+Proportionality spreadsheet validator module.
+
+This module validates proportionality data including indicator relationships,
+parent-child relationships, sum properties, and ensures proper proportionality
+constraints across indicators.
+"""
 from typing import List, Tuple, Dict, Any
 
 from pandas import DataFrame
@@ -20,7 +27,53 @@ from data_validate.validators.spreadsheets.base.validator_model_abc import Valid
 
 class SpProportionalityValidator(ValidatorModelABC):
     """
-    Validates the content of the SpProportionality spreadsheet.
+    Validates Proportionality spreadsheet content and relationships.
+
+    This validator performs comprehensive checks on proportionality data including:
+    - Indicator relationship validation across multiple models
+    - Parent-child relationship consistency with composition
+    - Sum properties validation (proportions must sum to 1.0)
+    - Duplicate indicator detection
+    - Value-proportionality relationship validation
+
+    Attributes
+    ----------
+    model_sp_proportionality : SpProportionality
+        Proportionality model instance containing proportion data.
+    model_sp_description : SpDescription
+        Description model instance containing indicator metadata.
+    model_sp_value : SpValue
+        Value model instance containing indicator data.
+    model_sp_composition : SpComposition
+        Composition model instance containing parent-child relationships.
+    exists_scenario : bool
+        Flag indicating if scenario file exists.
+    list_scenarios : List[str]
+        List of available scenario identifiers.
+    sp_name_proportionality : str
+        Proportionality spreadsheet filename.
+    sp_name_description : str
+        Description spreadsheet filename.
+    sp_name_value : str
+        Value spreadsheet filename.
+    sp_name_composition : str
+        Composition spreadsheet filename.
+    column_name_id : str
+        ID column name used in proportionality and value.
+    column_name_code : str
+        Code column name from description.
+    column_name_level : str
+        Level column name from description.
+    column_name_scenario : str
+        Scenario column name from description.
+    column_name_parent : str
+        Parent code column name from composition.
+    column_name_child : str
+        Child code column name from composition.
+    global_required_columns : Dict[str, List[str]]
+        Required columns mapping for validation.
+    model_dataframes : Dict[str, DataFrame]
+        DataFrames mapping for each model.
     """
 
     def __init__(
@@ -28,7 +81,19 @@ class SpProportionalityValidator(ValidatorModelABC):
         data_models_context: DataModelsContext,
         report_list: ModelListReport,
         **kwargs: Dict[str, Any],
-    ):
+    ) -> None:
+        """
+        Initialize the Proportionality validator.
+
+        Args
+        ----
+        data_models_context : DataModelsContext
+            Context containing all loaded spreadsheet models and configuration.
+        report_list : ModelListReport
+            Report aggregator for collecting validation results.
+        **kwargs : Dict[str, Any]
+            Additional keyword arguments passed to parent validator.
+        """
         super().__init__(
             data_models_context=data_models_context,
             report_list=report_list,
@@ -77,7 +142,20 @@ class SpProportionalityValidator(ValidatorModelABC):
         # Run pipeline
         self.run()
 
-    def _prepare_statement(self):
+    def _prepare_statement(self) -> None:
+        """
+        Prepare validation context, column mappings, and dataframe references.
+
+        Sets up:
+        - Spreadsheet names for all models
+        - Column name mappings for validation
+        - Required columns dictionary
+        - DataFrame references for all models
+
+        Notes
+        -----
+        DataFrames are referenced (not copied) to maintain consistency with original data.
+        """
         # Get model properties once
         self.sp_name_proportionality = self.model_sp_proportionality.filename
         self.sp_name_description = self.model_sp_description.filename
@@ -117,7 +195,39 @@ class SpProportionalityValidator(ValidatorModelABC):
         }
 
     def _check_sum_equals_one(self, subdatasets: Dict[str, DataFrame], sp_df_values: DataFrame, value_di: Any) -> Tuple[List[str], List[str]]:
-        """Orchestrates validation of sum equals one for all subdatasets."""
+        """
+        Orchestrate validation that proportions sum to 1.0 for all subdatasets.
+
+        Performs comprehensive sum validation including:
+        - Numeric format validation
+        - Excessive decimal detection (>3 decimal places)
+        - Decimal conversion with precision truncation
+        - Zero sum row identification
+        - Sum tolerance validation (must equal 1.0)
+
+        Args
+        ----
+        subdatasets : Dict[str, DataFrame]
+            Dictionary mapping parent indicators to their child proportion data.
+        sp_df_values : DataFrame
+            Value dataframe for cross-validation of unavailable data.
+        value_di : Any
+            Value representing unavailable data (e.g., "Dado indisponível").
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for invalid sums and format issues
+                - List[str]: Warning messages for excessive decimals
+
+        Notes
+        -----
+        - Uses Decimal arithmetic for precise sum calculations
+        - Truncates to configured precision (default 3 decimal places)
+        - Aggregates excessive decimal warnings across all subdatasets
+        - Zero sum rows are errors only if corresponding value data exists
+        """
         all_errors = []
         all_warnings = []
 
@@ -186,6 +296,29 @@ class SpProportionalityValidator(ValidatorModelABC):
         return all_errors, all_warnings
 
     def validate_relation_indicators_in_proportionality(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate indicator relationships between proportionality and description.
+
+        Ensures that:
+        - All indicators in proportionality exist in description
+        - All description indicators (except level 1) exist in proportionality
+        - MultiIndex column codes are properly extracted and validated
+        - Level 1 indicators are excluded from validation
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for missing indicators
+                - List[str]: Empty list (no warnings generated)
+
+        Notes
+        -----
+        - Validation is skipped if description dataframe is empty
+        - Checks both levels of MultiIndex columns in proportionality
+        - Level 1 indicators are automatically excluded from validation
+        - Codes are extracted from pattern matching (e.g., "123-scenario")
+        """
         errors, warnings = [], []
 
         if self.model_dataframes[self.sp_name_description].empty:
@@ -266,6 +399,25 @@ class SpProportionalityValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_columns_repeated_indicators(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate that parent indicators are not duplicated in proportionality.
+
+        Checks the first level of MultiIndex columns to ensure no parent indicator
+        appears more than once in the proportionality spreadsheet structure.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for duplicated parent indicators
+                - List[str]: Empty list (no warnings generated)
+
+        Notes
+        -----
+        - Only checks level 0 of MultiIndex columns (parent indicators)
+        - Unnamed columns are automatically excluded
+        - Duplicate errors are deduplicated before returning
+        """
         errors, warnings = [], []
 
         local_required_columns = {
@@ -296,6 +448,26 @@ class SpProportionalityValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_relation_indicators_in_value_and_proportionality(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate indicator consistency between value and proportionality spreadsheets.
+
+        Ensures that all indicators present in proportionality (both parent and child
+        levels) also exist in the value spreadsheet, and vice versa.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for indicator mismatches
+                - List[str]: Empty list (no warnings generated)
+
+        Notes
+        -----
+        - Validation is skipped if value dataframe is empty
+        - Checks both levels of MultiIndex in proportionality
+        - ID columns are automatically excluded from comparison
+        - Reports indicators missing in either spreadsheet
+        """
         errors, warnings = [], []
         if self.model_dataframes[self.sp_name_value].empty:
             self.set_not_executed(
@@ -352,6 +524,29 @@ class SpProportionalityValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_parent_child_relationships(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate parent-child relationships against composition definitions.
+
+        Ensures that:
+        - All parent indicators in proportionality exist in composition
+        - All children listed under a parent match composition relationships
+        - All composition children are present in proportionality subdatasets
+        - Relationships are consistent with composition hierarchy
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for relationship inconsistencies
+                - List[str]: Empty list (no warnings generated)
+
+        Notes
+        -----
+        - Validation is skipped if composition dataframe is empty
+        - Level 1 parents are automatically excluded from validation
+        - Compares cleaned indicator codes (without scenario suffixes)
+        - Bidirectional validation ensures complete consistency
+        """
         errors, warnings = [], []
         if self.model_dataframes[self.sp_name_composition].empty:
             self.set_not_executed(
@@ -430,6 +625,30 @@ class SpProportionalityValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_sum_properties_in_influencing_factors(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate that proportion sums equal 1.0 for all influencing factor subdatasets.
+
+        Performs comprehensive sum validation by:
+        - Building subdatasets for each parent indicator
+        - Validating numeric format of proportion values
+        - Checking that proportions sum to exactly 1.0 (with tolerance)
+        - Identifying excessive decimal places
+        - Cross-validating with value spreadsheet for unavailable data
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for sum violations and format issues
+                - List[str]: Warning messages for excessive decimals
+
+        Notes
+        -----
+        - Validation is skipped if value dataframe is empty
+        - Uses Decimal arithmetic for precise calculations
+        - Tolerance for sum validation is configurable
+        - Unavailable data markers are excluded from sum calculations
+        """
         errors, warnings = [], []
         if self.model_dataframes[self.sp_name_value].empty:
             self.set_not_executed(
@@ -462,7 +681,29 @@ class SpProportionalityValidator(ValidatorModelABC):
         return errors, warnings
 
     def run(self) -> Tuple[List[str], List[str]]:
-        """Runs all content validations for SpProportionality."""
+        """
+        Execute all proportionality validations.
+
+        Orchestrates the execution of all proportionality validators including:
+        - Indicator relationship validation with description
+        - Duplicate parent indicator detection
+        - Value-proportionality consistency validation
+        - Parent-child relationship validation against composition
+        - Sum properties validation (proportions must sum to 1.0)
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: All validation errors collected during execution
+                - List[str]: All validation warnings collected during execution
+
+        Notes
+        -----
+        - All validations are skipped if proportionality dataframe is empty
+        - Validations are conditionally executed based on related data availability
+        - Results are aggregated into reports via `build_reports()`
+        """
 
         validations = [
             (self.validate_relation_indicators_in_proportionality, NamesEnum.IR.value),
