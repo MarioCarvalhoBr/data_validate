@@ -1,4 +1,11 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+"""
+Spell checking validator module for validating textual content across spreadsheet models.
+
+This module provides spell checking validation functionality for various spreadsheet
+models including Description, Temporal Reference, and Scenario spreadsheets.
+"""
+
 from typing import List, Tuple, Dict, Any, Type, Union
 
 from data_validate.config import NamesEnum
@@ -16,7 +23,24 @@ from data_validate.validators.spreadsheets.base.validator_model_abc import Valid
 
 class SpellCheckerValidator(ValidatorModelABC):
     """
-    Validates the content of the SpScenario spreadsheet.
+    Validates textual content using spell checking across multiple spreadsheet models.
+
+    This validator performs spell checking on text columns in Description, Temporal Reference,
+    and Scenario spreadsheets. It uses a custom dictionary and user-defined words to ignore
+    during validation.
+
+    Attributes
+    ----------
+    dictionary : SpDictionary | None
+        Dictionary model instance containing words to ignore during spell checking.
+    lang_dict_spell : str
+        Language code for spell checking dictionary.
+    list_words_user : List[str]
+        User-defined words to ignore during spell checking.
+    spellchecker : SpellChecker
+        Spell checker instance configured with language and custom dictionary.
+    model_columns_map : Dict[Type[Union[SpDescription, SpTemporalReference, SpScenario]], List[str]]
+        Mapping of model types to their respective columns that require spell checking.
     """
 
     def __init__(
@@ -24,7 +48,19 @@ class SpellCheckerValidator(ValidatorModelABC):
         data_models_context: DataModelsContext,
         report_list: ModelListReport,
         **kwargs: Dict[str, Any],
-    ):
+    ) -> None:
+        """
+        Initialize the spell checker validator.
+
+        Args
+        ----
+        data_models_context : DataModelsContext
+            Context containing all loaded spreadsheet models.
+        report_list : ModelListReport
+            Report aggregator for collecting validation results.
+        **kwargs : Dict[str, Any]
+            Additional keyword arguments passed to parent validator.
+        """
         super().__init__(
             data_models_context=data_models_context,
             report_list=report_list,
@@ -32,17 +68,13 @@ class SpellCheckerValidator(ValidatorModelABC):
             **kwargs,
         )
 
-        # Configure
         self.dictionary: SpDictionary | None = self._data_models_context.get_instance_of(SpDictionary)
-        self.lang_dict_spell = self._data_models_context.data_args.data_file.locale
+        self.lang_dict_spell: str = self._data_models_context.data_args.data_file.locale
 
-        # From SpDictionary extract words to ignore
-        self.list_words_user = self.dictionary.words_to_ignore
+        self.list_words_user: List[str] = self.dictionary.words_to_ignore
 
-        # My spellchecker
-        self.spellchecker = SpellChecker(self.lang_dict_spell, self.list_words_user)
+        self.spellchecker: SpellChecker = SpellChecker(self.lang_dict_spell, self.list_words_user)
 
-        # Define column mappings for each model type
         self.model_columns_map: Dict[Type[Union[SpDescription, SpTemporalReference, SpScenario]], List[str]] = {
             SpDescription: [
                 SpDescription.RequiredColumn.COLUMN_SIMPLE_NAME.name,
@@ -59,18 +91,33 @@ class SpellCheckerValidator(ValidatorModelABC):
             ],
         }
 
-        # Run pipeline
         self.run()
 
     def validate_spellchecker(self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]) -> Tuple[List[str], List[str]]:
         """
-        Generic spellchecker validation method that works with any model class.
+        Perform spell checking validation on specified model class.
 
-        Args:
-            model_class: The model class to validate (e.g., SpDescription, SpTemporalReference, SpScenario)
+        Validates textual content in specified columns of the given model using the
+        configured spell checker. Missing columns generate warnings, while spelling
+        errors generate errors or warnings based on severity.
 
-        Returns:
-            Tuple containing lists of errors and warnings
+        Args
+        ----
+        model_class : Type[Union[SpDescription, SpTemporalReference, SpScenario]]
+            The model class to validate (e.g., SpDescription, SpTemporalReference, SpScenario).
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List of error messages from spell checking
+                - List of warning messages from spell checking
+
+        Notes
+        -----
+        - Returns empty lists if the dataframe is empty
+        - Returns empty lists if no columns are configured for the model
+        - Warns about missing columns but continues validation for existing ones
         """
         errors, warnings = [], []
 
@@ -108,16 +155,44 @@ class SpellCheckerValidator(ValidatorModelABC):
 
         return errors, warnings
 
-    def _prepare_statement(self):
+    def _prepare_statement(self) -> None:
+        """
+        Prepare validation errors from dictionary initialization.
+
+        Extends the internal errors list with any errors encountered during
+        dictionary loading or initialization by the spell checker.
+
+        Notes
+        -----
+        This method is called internally during validation preparation to collect
+        any errors from the spell checker's dictionary initialization process.
+        """
         if self.spellchecker.errors_dictionary:
             self._errors.extend(self.spellchecker.errors_dictionary)
 
     def run(self) -> Tuple[List[str], List[str]]:
-        """Runs all content validations for SpScenario."""
+        """
+        Execute all spell checking validations across configured models.
 
+        Orchestrates the spell checking validation process for Description, Temporal Reference,
+        and optionally Scenario models if they exist and spell checking is enabled.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List of all error messages from validation
+                - List of all warning messages from validation
+
+        Notes
+        -----
+        - Spell checking can be disabled via command line flag `--no-spellchecker`
+        - Scenario validation only runs if scenarios exist in the dataset
+        - Temporary spell checker files are cleaned up after validation completes
+        - All validation results are aggregated into reports via `build_reports()`
+        """
         validations = []
         if not self._data_models_context.data_args.data_action.no_spellchecker:
-            # Add validation for Description
             validations.append(
                 (
                     lambda: self.validate_spellchecker(SpDescription),
@@ -125,7 +200,6 @@ class SpellCheckerValidator(ValidatorModelABC):
                 )
             )
 
-            # Add validation for Temporal Reference
             validations.append(
                 (
                     lambda: self.validate_spellchecker(SpTemporalReference),
@@ -133,7 +207,6 @@ class SpellCheckerValidator(ValidatorModelABC):
                 )
             )
 
-            # Add validation for Scenario if scenarios exist
             if self._data_model.scenarios_list:
                 validations.append(
                     (
@@ -142,10 +215,8 @@ class SpellCheckerValidator(ValidatorModelABC):
                     )
                 )
 
-        # BUILD REPORTS
         self.build_reports(validations)
 
-        # Cleanup temporary files
         self.spellchecker.clean_files_generated()
 
         return self._errors, self._warnings

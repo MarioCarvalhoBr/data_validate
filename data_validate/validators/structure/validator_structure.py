@@ -1,4 +1,11 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+"""
+File structure validator module for validating input folder structure and file presence.
+
+This module provides validation functionality to ensure that the input directory contains
+all required files, does not contain unexpected files or folders, and handles file conflicts
+between different formats (e.g., .xlsx and .csv).
+"""
 
 import os
 from typing import List, Dict, Any, Tuple
@@ -12,13 +19,24 @@ from data_validate.validators.spreadsheets.base.validator_model_abc import Valid
 
 class ValidatorStructureFiles(ValidatorModelABC):
     """
-    A class to validate the structure of files in a given input folder.
+    Validates the structure of files in the input folder.
 
-    Attributes:
-        context (GeneralContext): The context containing configuration and file system utilities.
-        errors (List[str]): List of validation errors.
-        warnings (List[str]): List of validation warnings.
-        dir_files (List[str]): List of files in the input directory.
+    This validator ensures that:
+    - The input directory is not empty
+    - All required files are present
+    - No unexpected files or folders exist
+    - No conflicting file formats exist (e.g., both .xlsx and .csv with same name)
+
+    Attributes
+    ----------
+    context : DataModelsContext
+        Context containing configuration, file system utilities, and data arguments.
+    errors : List[str]
+        Accumulated list of validation errors.
+    warnings : List[str]
+        Accumulated list of validation warnings.
+    dir_files : List[str]
+        List of file names in the input directory.
     """
 
     def __init__(
@@ -26,7 +44,19 @@ class ValidatorStructureFiles(ValidatorModelABC):
         data_models_context: DataModelsContext,
         report_list: ModelListReport,
         **kwargs: Dict[str, Any],
-    ):
+    ) -> None:
+        """
+        Initialize the file structure validator.
+
+        Args
+        ----
+        data_models_context : DataModelsContext
+            Context containing all loaded spreadsheet models and configuration.
+        report_list : ModelListReport
+            Report aggregator for collecting validation results.
+        **kwargs : Dict[str, Any]
+            Additional keyword arguments passed to parent validator.
+        """
         super().__init__(
             data_models_context=data_models_context,
             report_list=report_list,
@@ -34,33 +64,36 @@ class ValidatorStructureFiles(ValidatorModelABC):
             **kwargs,
         )
 
-        """
-        Initialize the ValidatorStructureFiles class.
+        self.context: DataModelsContext = data_models_context
+        self.errors: List[str] = []
+        self.warnings: List[str] = []
+        self.dir_files: List[str] = os.listdir(self.context.data_args.data_file.input_folder)
 
-        Args:
-            context: GeneralContext: The context containing configuration and file system utilities.
-        """
-        self.context = data_models_context
-
-        self.errors = []
-        self.warnings = []
-        self.dir_files = os.listdir(self.context.data_args.data_file.input_folder)
-
-        # Prepare statements
         self._prepare_statement()
-
-        # Run pipeline
         self.run()
 
-    def _prepare_statement(self):
+    def _prepare_statement(self) -> None:
+        """
+        Prepare validation statements.
+
+        This method is currently a placeholder for future initialization logic
+        that may be needed before running validations.
+        """
         pass
 
-    def check_empty_directory(self) -> tuple[bool, List[str]]:
+    def check_empty_directory(self) -> Tuple[bool, List[str]]:
         """
         Check if the input directory is empty.
 
-        Returns:
-            bool: True if the directory is empty, False otherwise.
+        Validates that the input directory contains at least one file or folder.
+        An empty directory is considered a validation error.
+
+        Returns
+        -------
+        Tuple[bool, List[str]]
+            A tuple containing:
+                - bool: True if validation passed (directory not empty), False otherwise
+                - List[str]: List of error messages (empty if directory not empty)
         """
         local_errors = []
         is_empty, message = self.context.fs_utils.check_directory_is_empty(self.context.data_args.data_file.input_folder)
@@ -73,9 +106,22 @@ class ValidatorStructureFiles(ValidatorModelABC):
             )
         return not local_errors, local_errors
 
-    def check_not_expected_files_in_folder_root(self) -> tuple[bool, List[str]]:
+    def check_not_expected_files_in_folder_root(self) -> Tuple[bool, List[str]]:
         """
         Check for unexpected folders or files in the input directory.
+
+        Validates that:
+        - Files are not placed inside a single subdirectory
+        - Only expected files exist in the root directory
+        - No unexpected folders exist
+        - All files match either expected or optional file patterns
+
+        Returns
+        -------
+        Tuple[bool, List[str]]
+            A tuple containing:
+                - bool: True if validation passed (no unexpected files), False otherwise
+                - List[str]: List of error messages for each unexpected file or folder
         """
         local_errors = []
         expected_files: Dict[str, List[str]] = self.context.config.spreadsheet_info.EXPECTED_FILES
@@ -106,9 +152,20 @@ class ValidatorStructureFiles(ValidatorModelABC):
 
         return not local_errors, local_errors
 
-    def check_expected_files_in_folder_root(self) -> tuple[bool, List[str]]:
+    def check_expected_files_in_folder_root(self) -> Tuple[bool, List[str]]:
         """
         Check if all expected files are present in the input directory.
+
+        Validates that all required files defined in the configuration are present
+        in the root directory, accepting any of the allowed file extensions
+        (.xlsx or .csv) for each file.
+
+        Returns
+        -------
+        Tuple[bool, List[str]]
+            A tuple containing:
+                - bool: True if validation passed (all expected files present), False otherwise
+                - List[str]: List of error messages for each missing file
         """
         local_errors = []
         expected_files: Dict[str, List[str]] = self.context.config.spreadsheet_info.EXPECTED_FILES
@@ -125,10 +182,20 @@ class ValidatorStructureFiles(ValidatorModelABC):
                 local_errors.append(self.context.lm.text("validator_structure_error_missing_file").format(file_base=file_base))
         return not local_errors, local_errors
 
-    def check_ignored_files_in_folder_root(self) -> tuple[bool, List[str]]:
+    def check_ignored_files_in_folder_root(self) -> Tuple[bool, List[str]]:
         """
-        Check for files that will be ignored in the root folder.
-        Emit an error if both .xlsx and .csv files with the same name exist.
+        Check for files that will be ignored due to format conflicts.
+
+        Validates that there are no conflicting file formats in the root folder.
+        When both .xlsx and .csv files exist with the same base name, this creates
+        ambiguity in which file to use and is considered an error.
+
+        Returns
+        -------
+        Tuple[bool, List[str]]
+            A tuple containing:
+                - bool: True if validation passed (no conflicting files), False otherwise
+                - List[str]: List of error messages for each file with conflicting formats
         """
         local_errors = []
         file_groups = {}
@@ -148,10 +215,24 @@ class ValidatorStructureFiles(ValidatorModelABC):
 
     def validate_all_general_structure(self) -> Tuple[List[str], List[str]]:
         """
-        Perform all validation checks on the input folder.
+        Perform all validation checks on the input folder structure.
 
-        Returns:
-            List[str]: A list of validation errors.
+        Executes a comprehensive set of structural validations including:
+        - Empty directory check
+        - Unexpected files and folders check
+        - Expected files presence check
+        - Conflicting file formats check
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Accumulated list of all validation errors
+                - List[str]: Empty list (no warnings generated by this method)
+
+        Notes
+        -----
+        All errors from individual checks are aggregated into a single error list.
         """
         all_errors = [
             [self.check_empty_directory()],
@@ -167,13 +248,28 @@ class ValidatorStructureFiles(ValidatorModelABC):
         return self.errors, []
 
     def run(self) -> Tuple[List[str], List[str]]:
-        """Runs all content validations for SpValue."""
+        """
+        Execute all file structure validations.
 
+        Orchestrates the validation process by executing all structural checks
+        and building reports based on the validation results.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: All validation errors collected during execution
+                - List[str]: All validation warnings collected during execution
+
+        Notes
+        -----
+        Validation results are aggregated into reports via the `build_reports()` method
+        and tagged with the file structure validation identifier (NamesEnum.FS).
+        """
         validations = [
             (self.validate_all_general_structure, NamesEnum.FS.value),
         ]
 
-        # BUILD REPORTS
         self.build_reports(validations)
 
         return self._errors, self._warnings
