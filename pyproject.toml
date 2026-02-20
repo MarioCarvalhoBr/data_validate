@@ -1,6 +1,6 @@
 [project]
 name = "canoa_data_validate"
-version = "0.7.67"
+version = "0.7.65"
 
 description = "The software data_validate is a robust multilingual spreadsheet validator and processor developed specifically to automate integrity and structure validation of data files for the AdaptaBrasil climate adaptation platform."
 authors = [
