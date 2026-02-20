@@ -5,6 +5,8 @@ This module tests the SpellCheckerController class functionality including
 spelling error detection, text quality checking, and dictionary integration.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 import pytest
 
 from data_validate.helpers.tools.spellchecker.spellchecker_controller import SpellCheckerController

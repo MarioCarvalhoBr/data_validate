@@ -6,6 +6,8 @@ the application. It includes the `NamesEnum` for verification names and the `App
 for managing application-wide settings such as limits, date formats, and report templates.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 from datetime import datetime
 from types import MappingProxyType
 

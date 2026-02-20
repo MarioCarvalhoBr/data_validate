@@ -5,6 +5,8 @@ This module tests the SpellChecker service class functionality including
 initialization, spell checking operations, and integration with other components.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 import pandas as pd
 
 from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker

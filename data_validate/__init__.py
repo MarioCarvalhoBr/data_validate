@@ -14,6 +14,9 @@ although support may vary depending on the pdoc version.
 """
 
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
+
 # Lazy loading - imports only when necessary
 def get_metadata():
     """Get package metadata lazily."""

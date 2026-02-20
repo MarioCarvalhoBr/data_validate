@@ -5,6 +5,8 @@ This module tests the BaseReader abstract class functionality including
 initialization and template method pattern.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 import pytest
 from pathlib import Path
 from data_validate.helpers.tools.data_loader.readers.base_reader import BaseReader

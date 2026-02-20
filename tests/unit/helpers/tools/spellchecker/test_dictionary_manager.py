@@ -5,6 +5,8 @@ This module tests the DictionaryManager class functionality including
 dictionary initialization, validation, word loading, and cleanup operations.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 import os
 import tempfile
 from pathlib import Path

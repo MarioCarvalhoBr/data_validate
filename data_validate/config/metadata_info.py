@@ -1,4 +1,4 @@
-#  Copyright (c) 2026 Mário Carvalho (https://github.com/MarioCarvalhoBr).
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 import importlib.metadata
 from typing import Final
@@ -41,7 +41,7 @@ class MetadataInfo(ConstantBase):
         project_name: Final = "Canoa"
         dist_name: Final = "canoa_data_validate"
         release_level: Final = "beta"
-        serial: Final = 711
+        serial: Final = 712
         status_dev: Final = 0
 
         self.__version__ = "0.0.0"

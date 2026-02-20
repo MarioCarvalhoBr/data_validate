@@ -1,5 +1,9 @@
 #!/bin/bash
 
+#
+# Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+#
+
 # Importa o arquivo de constantes usando o caminho do diretório do script
 SCRIPT_DIR=$(dirname "$0")
 source "$SCRIPT_DIR/constants.sh"

@@ -5,6 +5,8 @@ This module tests the FileScanner class functionality including
 directory scanning, file detection, and missing file identification.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 from pathlib import Path
 
 from data_validate.helpers.tools.data_loader.engine.scanner import FileScanner

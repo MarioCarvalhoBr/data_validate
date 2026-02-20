@@ -5,6 +5,8 @@ This module tests the QMLReader class functionality including
 QML file reading and text content retrieval.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 from pathlib import Path
 
 from data_validate.helpers.tools.data_loader.readers.qml_reader import QMLReader

@@ -5,6 +5,8 @@ This module tests the LanguageEnum class functionality including
 enumeration values, supported languages listing, and default language retrieval.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 from data_validate.helpers.tools.locale.language_enum import LanguageEnum
 
 

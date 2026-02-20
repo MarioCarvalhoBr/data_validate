@@ -5,6 +5,8 @@ This module tests the CSVReader class functionality including
 CSV file reading, header processing, and separator handling.
 """
 
+#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+
 import pandas as pd
 from pathlib import Path
 
