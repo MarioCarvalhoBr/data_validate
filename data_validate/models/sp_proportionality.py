@@ -152,7 +152,6 @@ class SpProportionality(SpModelABC):
                 if col not in unique_columns_level_2:
                     self.structural_errors.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
 
-
     def data_cleaning(self, *args, **kwargs):
         """Run data cleaning steps (currently empty)."""
         pass

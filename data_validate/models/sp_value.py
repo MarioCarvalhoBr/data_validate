@@ -91,9 +91,7 @@ class SpValue(SpModelABC):
         # Remove ID self.RequiredColumn.COLUMN_ID.name
         unique_columns = [col for col in unique_columns if col != self.RequiredColumn.COLUMN_ID.name]
 
-        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
-            unique_columns, self.scenarios_list
-        )
+        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(unique_columns, self.scenarios_list)
 
         if codes_not_matched_by_pattern:
             self.structural_errors.append(
