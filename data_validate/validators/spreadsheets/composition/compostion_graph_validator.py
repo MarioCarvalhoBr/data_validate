@@ -1,5 +1,10 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
-"""Tree composition validation for spreadsheet composition structures."""
+"""
+Graph composition validation for spreadsheet composition structures.
+
+This module validates composition data using graph theory, detecting cycles, disconnected
+components, and ensuring proper relationships between indicators across multiple models.
+"""
 
 from typing import List, Tuple, Dict, Any
 
@@ -24,6 +29,51 @@ from data_validate.validators.spreadsheets.base.validator_model_abc import Valid
 
 
 class SpCompositionGraphValidator(ValidatorModelABC):
+    """
+    Validates composition structures using graph-based analysis.
+
+    This validator uses graph theory to analyze composition hierarchies, detecting
+    cycles, disconnected components, unique title constraints, and data associations
+    for leaf indicators.
+
+    Attributes
+    ----------
+    model_sp_composition : SpComposition
+        Composition model instance containing parent-child relationships.
+    model_sp_description : SpDescription | SpModelABC
+        Description model instance containing indicator metadata.
+    model_sp_value : SpValue
+        Value model instance containing indicator data.
+    model_sp_proportionality : SpProportionality
+        Proportionality model instance containing indicator proportions.
+    sp_name_composition : str
+        Composition spreadsheet filename.
+    sp_name_description : str
+        Description spreadsheet filename.
+    sp_name_value : str
+        Value spreadsheet filename.
+    sp_name_proportionality : str
+        Proportionality spreadsheet filename.
+    column_name_parent : str
+        Parent code column name.
+    column_name_child : str
+        Child code column name.
+    column_name_code : str
+        Indicator code column name.
+    column_name_simple_name : str
+        Simple name column name.
+    column_name_complete_name : str
+        Complete name column name.
+    column_name_id : str
+        ID column name.
+    global_required_columns : Dict[str, List[str]]
+        Required columns mapping for validation.
+    model_dataframes : Dict[str, DataFrame]
+        DataFrames mapping for each model.
+    graph_processing : GraphProcessing | None
+        Graph processing utility for analysis.
+    """
+
     def __init__(
         self,
         data_models_context: DataModelsContext,
@@ -31,12 +81,16 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         **kwargs: Dict[str, Any],
     ) -> None:
         """
-        Initialize the tree validator with required context and models.
+        Initialize the graph validator with required context and models.
 
-        Args:
-            data_models_context: Context containing all data models
-            report_list: Report list for validation results
-            **kwargs: Additional keyword arguments
+        Args
+        ----
+        data_models_context : DataModelsContext
+            Context containing all data models and configuration.
+        report_list : ModelListReport
+            Report list for validation results aggregation.
+        **kwargs : Dict[str, Any]
+            Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
@@ -73,7 +127,20 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         self.run()
 
     def _prepare_statement(self) -> None:
-        """Prepare validation context and column mappings."""
+        """
+        Prepare validation context, column mappings, and graph processing.
+
+        Sets up:
+        - Spreadsheet names for all models
+        - Column name mappings for validation
+        - Required columns dictionary
+        - DataFrame references for all models
+        - Graph processing utility with cleaned composition data
+
+        Notes
+        -----
+        Integer columns are cleaned during setup to ensure valid graph construction.
+        """
         # Set spreadsheet names
         self.sp_name_composition = self.model_sp_composition.filename
         self.sp_name_description = self.model_sp_description.filename
@@ -138,8 +205,19 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         """
         Validate that all indicators in composition exist in description.
 
-        Returns:
-            Tuple containing (errors, warnings) lists
+        Ensures that every parent and child code referenced in the composition
+        spreadsheet has a corresponding entry in the description spreadsheet.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for codes not found in description
+                - List[str]: Warning messages (currently empty)
+
+        Notes
+        -----
+        This validation is skipped if the description dataframe is empty.
         """
         errors: List[str] = []
         warnings: List[str] = []
@@ -193,10 +271,23 @@ class SpCompositionGraphValidator(ValidatorModelABC):
 
     def validate_relations_hierarchy_with_graph(self) -> Tuple[List[str], List[str]]:
         """
-        Validate tree composition structure and detect cycles.
+        Detect cycles and disconnected components in the composition graph structure.
 
-        Returns:
-            Tuple containing (errors, warnings) lists
+        Uses graph analysis to identify circular dependencies in parent-child
+        relationships and disconnected indicator subgraphs, which would create
+        invalid hierarchical structures.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for detected cycles and disconnected components
+                - List[str]: Warning messages (currently empty)
+
+        Notes
+        -----
+        - Cycles are formatted to show the complete path of the circular dependency
+        - Disconnected components indicate isolated indicator groups not connected to main tree
         """
         errors: List[str] = []
         warnings: List[str] = []
@@ -229,6 +320,27 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_unique_titles_with_graph(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate uniqueness of indicator titles using graph analysis.
+
+        Checks that simple names and complete names are unique within each subtree
+        of the indicator hierarchy, using graph structure to determine sibling
+        relationships. Validates by traversing from root node through all subtrees.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Empty list (no errors for title uniqueness issues)
+                - List[str]: Warning messages for duplicate titles within same subtree
+
+        Notes
+        -----
+        - This validation is skipped if the description dataframe is empty
+        - Requires a valid tree structure without cycles or disconnected components
+        - Root node must exist in the composition graph
+        - Titles are checked within each subtree independently
+        """
         errors: List[str] = []
         warnings: List[str] = []
 
@@ -274,12 +386,12 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         if comparison_errors:
             return errors, warnings
 
-        existe_ciclo, __ = self.graph_processing.detect_cycles()
-        if existe_ciclo:
+        exists_cycle, __ = self.graph_processing.detect_cycles()
+        if exists_cycle:
             return errors, warnings
 
-        grafos_desconectados = self.graph_processing.detect_disconnected_components()
-        if grafos_desconectados:
+        graphs_disconnected = self.graph_processing.detect_disconnected_components()
+        if graphs_disconnected:
             return errors, warnings
 
         # Check if there is at least 1 parent node == 1, otherwise show error and request correction
@@ -321,6 +433,26 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         return errors, warnings
 
     def validate_associated_indicators_leafs(self) -> Tuple[List[str], List[str]]:
+        """
+        Validate that leaf indicators have associated data in value and proportionality.
+
+        Checks that all leaf nodes (indicators with no children) have corresponding
+        data entries in the value spreadsheet and optionally in the proportionality
+        spreadsheet if it exists.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: Error messages for leaf indicators without associated data
+                - List[str]: Warning messages (currently empty)
+
+        Notes
+        -----
+        - This validation is skipped if the value dataframe is empty
+        - Proportionality validation is only performed if that model is available
+        - Leaf nodes are determined from the composition graph structure
+        """
         errors: List[str] = []
         warnings: List[str] = []
 
@@ -383,10 +515,22 @@ class SpCompositionGraphValidator(ValidatorModelABC):
 
     def run(self) -> Tuple[List[str], List[str]]:
         """
-        Execute all tree validation checks.
+        Execute all graph-based composition validations.
 
-        Returns:
-            Tuple containing (errors, warnings) lists
+        Orchestrates the execution of all composition validators using graph analysis,
+        including indicator relationships, hierarchy validation, title uniqueness,
+        and leaf data associations.
+
+        Returns
+        -------
+        Tuple[List[str], List[str]]
+            A tuple containing:
+                - List[str]: All validation errors collected during execution
+                - List[str]: All validation warnings collected during execution
+
+        Notes
+        -----
+        All validations are skipped if the composition dataframe is empty.
         """
         validations = [
             (self.validate_relation_indicators_in_composition, NamesEnum.IR.value),
