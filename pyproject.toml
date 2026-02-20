@@ -33,10 +33,10 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/AdaptaBrasil/"
-Documentation = "https://github.com/AdaptaBrasil/data_validate/docs"
+Documentation = "https://github.com/AdaptaBrasil/data_validate/tree/main/docs"
 Repository = "https://github.com/AdaptaBrasil/data_validate.git"
 "Bug Tracker" = "https://github.com/AdaptaBrasil/data_validate/issues"
-Changelog = "https://github.com/AdaptaBrasil/data_validate/blob/dev/CHANGELOG.md"
+Changelog = "https://github.com/AdaptaBrasil/data_validate/blob/main/CHANGELOG.md"
 
 
 [build-system]
