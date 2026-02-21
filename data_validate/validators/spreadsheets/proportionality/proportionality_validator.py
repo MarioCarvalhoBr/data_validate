@@ -6,6 +6,7 @@ This module validates proportionality data including indicator relationships,
 parent-child relationships, sum properties, and ensures proper proportionality
 constraints across indicators.
 """
+
 from typing import List, Tuple, Dict, Any
 
 from pandas import DataFrame

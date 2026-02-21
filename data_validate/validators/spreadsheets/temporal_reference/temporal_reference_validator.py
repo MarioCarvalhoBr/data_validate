@@ -5,6 +5,7 @@ Temporal Reference spreadsheet validator module.
 This module validates temporal reference data including punctuation rules,
 reference year validation, and unique value constraints for temporal metadata.
 """
+
 from typing import List, Tuple, Dict, Any
 
 from data_validate.config import NamesEnum

@@ -5,6 +5,7 @@ Scenario spreadsheet validator module.
 This module validates scenario data including punctuation rules for descriptions,
 and unique value constraints for scenario identifiers and symbols.
 """
+
 from typing import List, Tuple, Dict, Any
 
 from data_validate.config import NamesEnum
