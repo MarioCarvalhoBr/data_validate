@@ -3,20 +3,313 @@
 ## Project Overview
 **Data Validate** (canoa_data_validate) is a comprehensive multilingual spreadsheet validation and processing system for the AdaptaBrasil climate adaptation platform. It validates Brazilian environmental indicator data against a formal protocol ([protocolo-v-1.13.pdf](../assets/protocolo-v-1.13.pdf)), checking structure, content, hierarchies, and spelling in Portuguese/English.
 
-**Current Version**: 0.7.50  
+**Current Version**: 0.7.65  
 **Python Requirement**: >=3.12  
 **Package Name**: canoa_data_validate  
 **Test Framework**: pytest with pytest-mock (NO unittest.mock)  
 **Build System**: Poetry  
 **License**: MIT
 
+## 🎯 Clean Code Principles (MANDATORY)
+
+**ALL generated code MUST strictly follow these Clean Code principles from Robert C. Martin's book:**
+
+### 1. Boy Scout Rule
+> "Leave the codebase cleaner than you found it."
+
+- Always refactor and improve code when touching it
+- Make small, continuous improvements to prevent technical debt accumulation
+- Remove dead code, unused imports, and obsolete comments
+- Fix code smells immediately when encountered
+
+### 2. Single Responsibility Principle (SRP)
+> "A function should do one thing, do it well, and do it only."
+
+- **Functions must be small** (ideally 5-20 lines, maximum 50 lines)
+- Each function should have a single, well-defined responsibility
+- If a function has multiple responsibilities, split it into smaller functions
+- Classes should have only one reason to change
+- **Example**:
+  ```python
+  # ❌ BAD: Multiple responsibilities
+  def process_and_save_data(data):
+      cleaned = clean_data(data)
+      validated = validate_data(cleaned)
+      save_to_database(validated)
+      send_notification()
+  
+  # ✅ GOOD: Single responsibility
+  def process_data(data):
+      cleaned = clean_data(data)
+      return validate_data(cleaned)
+  
+  def save_validated_data(validated_data):
+      save_to_database(validated_data)
+  
+  def notify_completion():
+      send_notification()
+  ```
+
+### 3. Meaningful Names
+> "Names should reveal intent without requiring comments."
+
+- **Variables**: Use descriptive names that explain the purpose
+  - ❌ `d`, `tmp`, `x1` → ✅ `days_to_expire`, `temporary_buffer`, `column_index`
+- **Functions**: Use verbs that describe the action
+  - ❌ `process()`, `handle()` → ✅ `validate_email_format()`, `calculate_average_temperature()`
+- **Classes**: Use nouns that describe the entity
+  - ❌ `Manager`, `Handler` → ✅ `DataValidator`, `ReportGenerator`
+- **Constants**: Use UPPER_CASE with descriptive names
+  - ❌ `MAX`, `N` → ✅ `MAX_RETRY_ATTEMPTS`, `DEFAULT_TIMEOUT_SECONDS`
+- **Booleans**: Use `is_`, `has_`, `can_`, `should_` prefixes
+  - ✅ `is_valid`, `has_errors`, `can_process`, `should_retry`
+
+### 4. Comments as Last Resort
+> "Code should be self-explanatory. Comments are a failure to express yourself in code."
+
+- **Prefer self-documenting code** over comments
+- **Remove**: Outdated, redundant, or obvious comments
+- **Keep only**:
+  - Legal/copyright headers
+  - Complex algorithm explanations (when code cannot be simplified)
+  - Public API documentation (docstrings for pdoc)
+  - TODOs with context and owner
+  - Warning about consequences
+- **Example**:
+  ```python
+  # ❌ BAD: Redundant comment
+  # Increment counter by 1
+  counter += 1
+  
+  # ✅ GOOD: Self-explanatory code
+  def is_eligible_for_discount(customer_age: int) -> bool:
+      SENIOR_AGE_THRESHOLD = 65
+      return customer_age >= SENIOR_AGE_THRESHOLD
+  
+  # ✅ ACCEPTABLE: Pdoc documentation
+  def calculate_climate_index(temperature: float, humidity: float) -> float:
+      """
+      Calculate the climate adaptation index using WHO methodology.
+      
+      Args:
+          temperature: Temperature in Celsius (-50 to 50)
+          humidity: Relative humidity percentage (0-100)
+      
+      Returns:
+          Climate index value (0-100 scale)
+      """
+      ...
+  ```
+
+### 5. DRY - Don't Repeat Yourself
+> "Duplication is the primary enemy of well-designed systems."
+
+- **Never copy-paste code** - extract to reusable functions
+- Use inheritance, composition, or helper functions to eliminate duplication
+- **One single source of truth** for each piece of logic
+- **Example**:
+  ```python
+  # ❌ BAD: Duplicated validation logic
+  def validate_temperature(value):
+      if value < -50 or value > 50:
+          raise ValueError("Invalid temperature")
+  
+  def validate_pressure(value):
+      if value < 0 or value > 1000:
+          raise ValueError("Invalid pressure")
+  
+  # ✅ GOOD: Reusable validation
+  def validate_numeric_range(value: float, min_val: float, max_val: float, field_name: str) -> None:
+      if value < min_val or value > max_val:
+          raise ValueError(f"Invalid {field_name}: must be between {min_val} and {max_val}")
+  
+  def validate_temperature(value):
+      validate_numeric_range(value, -50, 50, "temperature")
+  
+  def validate_pressure(value):
+      validate_numeric_range(value, 0, 1000, "pressure")
+  ```
+
+### 6. Clean Error Handling
+> "Use exceptions, not error codes. Separate error handling from business logic."
+
+- **Use exceptions** instead of returning error codes or null values
+- **Create specific exception types** for different error scenarios
+- **Don't obscure the main flow** with try-catch blocks
+- **Handle errors at the appropriate level** of abstraction
+- **Example**:
+  ```python
+  # ❌ BAD: Error codes obscure logic
+  def read_file(path):
+      if not os.path.exists(path):
+          return None, "File not found"
+      try:
+          with open(path) as f:
+              return f.read(), "OK"
+      except:
+          return None, "Read error"
+  
+  # ✅ GOOD: Clean exception handling
+  class FileReadError(Exception):
+      """Raised when file cannot be read."""
+      pass
+  
+  def read_file(path: str) -> str:
+      """Read file content or raise FileReadError."""
+      if not os.path.exists(path):
+          raise FileNotFoundError(f"File not found: {path}")
+      
+      try:
+          with open(path, encoding='utf-8') as f:
+              return f.read()
+      except OSError as e:
+          raise FileReadError(f"Cannot read file {path}: {e}")
+  ```
+
+### 7. Test-Driven Development
+> "Tests are as important as production code."
+
+- **Write tests FIRST** (TDD: Red → Green → Refactor)
+- **100% coverage mandatory** for new code
+- **Tests enable refactoring** - you can change code confidently
+- **Tests are documentation** - they show how code should be used
+- Use **pytest-mock** (never unittest.mock)
+- **Example**:
+  ```python
+  # ✅ GOOD: Comprehensive test coverage
+  def test_validate_temperature_within_range():
+      """Test that valid temperature passes validation."""
+      assert validate_temperature(25.0) is None
+  
+  def test_validate_temperature_below_minimum():
+      """Test that temperature below -50 raises error."""
+      with pytest.raises(ValueError, match="Invalid temperature"):
+          validate_temperature(-51.0)
+  
+  def test_validate_temperature_above_maximum():
+      """Test that temperature above 50 raises error."""
+      with pytest.raises(ValueError, match="Invalid temperature"):
+          validate_temperature(51.0)
+  ```
+
+### 8. KISS - Keep It Simple, Stupid
+> "Simplicity is the ultimate sophistication."
+
+- **Avoid unnecessary complexity** - don't over-engineer
+- **Prefer simple solutions** over clever ones
+- **Avoid premature optimization** - make it work first, then optimize if needed
+- **Use standard library** functions when available
+- **Avoid deep nesting** - use early returns and guard clauses
+- **Example**:
+  ```python
+  # ❌ BAD: Overly complex
+  def calculate_discount(customer):
+      if customer is not None:
+          if hasattr(customer, 'age'):
+              if customer.age >= 65:
+                  if customer.is_member:
+                      return 0.25
+                  else:
+                      return 0.15
+              else:
+                  if customer.is_member:
+                      return 0.10
+          else:
+              return 0.0
+      else:
+          return 0.0
+  
+  # ✅ GOOD: Simple and clear with early returns
+  def calculate_discount(customer) -> float:
+      """Calculate customer discount percentage."""
+      if customer is None or not hasattr(customer, 'age'):
+          return 0.0
+      
+      is_senior = customer.age >= 65
+      discount = 0.15 if is_senior else 0.0
+      
+      if customer.is_member:
+          discount += 0.10
+      
+      return discount
+  ```
+
+### 9. Additional Clean Code Practices
+
+#### Avoid Magic Numbers
+```python
+# ❌ BAD
+if temperature > 65:
+    apply_discount()
+
+# ✅ GOOD
+SENIOR_CITIZEN_AGE = 65
+if temperature > SENIOR_CITIZEN_AGE:
+    apply_discount()
+```
+
+#### Use Type Hints
+```python
+# ✅ GOOD: Clear type information
+def calculate_average(values: List[float]) -> float:
+    """Calculate arithmetic mean of values."""
+    return sum(values) / len(values)
+```
+
+#### Fail Fast
+```python
+# ✅ GOOD: Validate inputs immediately
+def process_data(data: pd.DataFrame) -> pd.DataFrame:
+    if data.empty:
+        raise ValueError("Cannot process empty DataFrame")
+    
+    if 'required_column' not in data.columns:
+        raise ValueError("Missing required column: 'required_column'")
+    
+    # Main processing logic here
+    ...
+```
+
+#### Avoid Long Parameter Lists
+```python
+# ❌ BAD: Too many parameters
+def create_report(title, author, date, data, format, output, options, flags):
+    ...
+
+# ✅ GOOD: Use dataclass or dict
+@dataclass
+class ReportConfig:
+    title: str
+    author: str
+    date: datetime
+    format: str
+    output_path: str
+
+def create_report(config: ReportConfig, data: pd.DataFrame) -> None:
+    ...
+```
+
+### 10. Project-Specific Clean Code Rules
+
+- **Never hardcode strings** - use i18n: `context.lm.text("message_key")`
+- **Never use globals** - pass context via constructor
+- **DataFrame operations** - always check `.empty` before accessing columns
+- **Error collection** - use `.extend()` for lists, never `.append()`
+- **Naming** - English for variables/functions, Portuguese OK for string values
+- **No unittest.mock** - use pytest-mock exclusively
+- **Line length** - Maximum 150 characters (project standard)
+
+---
+
+**Remember**: Clean code is not about being clever; it's about being clear. Write code that your future self (and others) will thank you for.
+
 ## Architecture & Data Flow
 
 ### Core Pipeline (5-step ETL)
 1. **Bootstrap** (`middleware/bootstrap.py`): Initializes environment, sets locale from `~/.config/store.locale`
 2. **Data Loading** (`helpers/tools/data_loader/`): Reads Excel/CSV files from `data/input/` using pandas
-3. **Validation Chain** (`controllers/processor.py`): Executes validators sequentially via `ProcessorSpreadsheet`
-4. **Error Aggregation** (`controllers/report/`): Collects errors/warnings into `ModelListReport`
+3. **Validation Chain** (`controllers/spreadsheet_processor.py`): Executes validators sequentially via `SpreadsheetProcessor`
+4. **Error Aggregation** (`controllers/report/`): Collects errors/warnings into `ValidationReport`
 5. **Report Generation**: Outputs HTML/PDF/logs to `data/output/`
 
 ### Project Structure
@@ -25,17 +318,20 @@ data_validate/
 ├── config/                    # Configuration management
 ├── controllers/               # Main processing logic
 │   ├── context/              # Dependency injection contexts
-│   ├── processor.py          # Main validation orchestrator
+│   ├── spreadsheet_processor.py  # Main validation orchestrator
 │   └── report/               # Report generation
 ├── helpers/                   # Utility modules
 │   ├── base/                 # Core utilities (file system, logging, args)
 │   ├── common/               # Shared validation and processing logic
+│   │   ├── formatting/       # Text, number, and error formatting utilities
+│   │   ├── generation/       # Data generation utilities (combinations)
+│   │   ├── processing/       # Data cleaning and collection processing
+│   │   └── validation/       # Reusable validation functions and processing classes
 │   └── tools/                # Specialized tools (data loader, locale, spellchecker)
 ├── middleware/               # Application bootstrap
 ├── models/                   # Data models for spreadsheets
 ├── static/                   # Static resources (dictionaries, locales, templates)
 ├── validators/               # Validation logic
-│   ├── hierarchy/            # Tree/graph validation
 │   ├── spell/                # Spell checking
 │   ├── spreadsheets/         # Business rule validators
 │   └── structure/            # File/column structure validation
@@ -47,8 +343,8 @@ data_validate/
 #### Context Hierarchy (Dependency Injection)
 ```python
 GeneralContext                    # Base: config, logger, i18n, file utils
-    ├── DataModelsContext         # Adds: loaded spreadsheet models
-    └── ModelListReport           # Adds: validation results aggregation
+    ├── DataModelContext          # Adds: loaded spreadsheet models
+    └── ValidationReport          # Adds: validation results aggregation
 ```
 All components receive context via constructor - **never use globals**.
 
@@ -59,10 +355,16 @@ Each spreadsheet type has a model inheriting `SpModelABC`:
 - Call sequence: `initialize()` → `pre_processing()` → `data_cleaning()` → `specific_validations()`
 
 #### Validator Categories (in `validators/`)
-- **structure/**: File/column existence checks
+- **structure/**: File/column existence checks (`FileStructureValidator`)
 - **spell/**: PyEnchant-based multilingual spell checking (uses dictionaries in `static/dictionaries/`)
-- **spreadsheets/**: Business rule validators (inherit `ValidatorModelABC`)
-- **hierarchy/**: Indicator tree validation using NetworkX graphs
+- **spreadsheets/**: Business rule validators (inherit `BaseValidator`)
+  - `composition/`: Composition tree and graph validators
+  - `description/`: Description validator
+  - `legend/`: Legend validator
+  - `proportionality/`: Proportionality validator
+  - `scenario/`: Scenario validator
+  - `temporal_reference/`: Temporal reference validator
+  - `value/`: Value validator
 
 ## Critical Conventions
 
@@ -354,10 +656,10 @@ make badges
 ```
 
 ### Adding New Validations
-1. Create validator class in `validators/spreadsheets/` inheriting `ValidatorModelABC`
+1. Create validator class in `validators/spreadsheets/` inheriting `BaseValidator`
 2. Add message keys to `static/locales/*/messages.json` (both languages!)
-3. Register in `ProcessorSpreadsheet.run()` pipeline
-4. Append errors to `report_list` via `report_list.extend(NamesEnum.YOUR_KEY, errors=errors)`
+3. Register in `SpreadsheetProcessor._build_pipeline()` method
+4. Append errors to `validation_reports` via `validation_reports.add_report(NamesEnum.YOUR_KEY, errors=errors, warnings=warnings)`
 
 ### Debugging Tips
 - Enable verbose logs: Modify `context.logger` level (default in `GeneralContext`)
@@ -376,15 +678,18 @@ make badges
 ## Key Files for Reference
 - Protocol spec: `assets/protocolo-v-1.13.pdf`
 - Entry point: `data_validate/main.py`
-- Pipeline orchestrator: `data_validate/controllers/processor.py` (lines 60-192)
+- Pipeline orchestrator: `data_validate/controllers/spreadsheet_processor.py`
 - Base model: `data_validate/models/sp_model_abc.py`
+- Base validator: `data_validate/validators/spreadsheets/base/base_validator.py`
 - i18n manager: `data_validate/helpers/tools/locale/language_manager.py`
-- Test config: `pyproject.toml` (lines 102-112)
+- Validation report: `data_validate/controllers/report/validation_report.py`
+- Test config: `pyproject.toml` (pytest configuration)
 - Test examples: `tests/unit/helpers/base/test_file_system_utils.py`
 - Project config: `pyproject.toml` (dependencies, coverage, pytest settings)
 - Makefile: Available commands and workflows
 - README.md: Project documentation and usage examples
 - TESTING.md: Detailed testing guidelines
+- HOW_IT_WORKS.md: Architecture and workflow explanation
 
 ## Project-Specific Anti-Patterns
 
@@ -393,7 +698,7 @@ make badges
 - ❌ Don't modify DataFrames in validators - models handle transformations
 - ❌ Don't create new loggers - use `context.logger`
 - ❌ Don't use f-strings for user messages - use `lm.text()`
-- ❌ Don't call validators directly - let `ProcessorSpreadsheet` orchestrate
+- ❌ Don't call validators directly - let `SpreadsheetProcessor` orchestrate
 
 ### Testing Anti-Patterns
 - ❌ **NEVER use `unittest.mock`** - use `pytest-mock` instead
