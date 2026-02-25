@@ -86,12 +86,12 @@ class SpValue(SpModelABC):
         """Run pre-processing steps."""
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
-        unique_columns = self.data_loader_model.df_data.columns.unique().tolist()
+        unique_columns = self.data_loader_model.raw_data.columns.unique().tolist()
 
         # Remove ID self.RequiredColumn.COLUMN_ID.name
         unique_columns = [col for col in unique_columns if col != self.RequiredColumn.COLUMN_ID.name]
 
-        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(unique_columns, self.scenarios_list)
+        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(unique_columns, self.scenarios)
 
         if codes_not_matched_by_pattern:
             self.structural_errors.append(
@@ -108,7 +108,7 @@ class SpValue(SpModelABC):
         __, extras_columns = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
             source_list=self.DF_COLUMNS,
             strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
-            suffixes_for_matching=self.scenarios_list,
+            suffixes_for_matching=self.scenarios,
         )
 
         for extra_column in extras_columns:
@@ -133,7 +133,7 @@ class SpValue(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.data_cleaning()
             self.expected_structure_columns()

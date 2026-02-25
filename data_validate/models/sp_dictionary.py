@@ -96,8 +96,8 @@ class SpDictionary(SpModelABC):
         Handles cases where the file has no explicit header by reading the first column as data.
         """
         self.words_to_ignore = []
-        if self.data_loader_model and self.data_loader_model.df_data is not None:
-            df = self.data_loader_model.df_data
+        if self.data_loader_model and self.data_loader_model.raw_data is not None:
+            df = self.data_loader_model.raw_data
 
             if len(df.columns) > 0:
                 remaining_words = []
@@ -115,7 +115,7 @@ class SpDictionary(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -146,7 +146,7 @@ class SpDictionary(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()

@@ -19,10 +19,10 @@ from data_validate.helpers.common.processing.collections_processing import Colle
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.helpers.common.validation.value_processing import ValueProcessing
 from data_validate.models import SpDescription, SpTemporalReference, SpScenario, SpValue
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpValueValidator(ValidatorModelABC):
+class SpValueValidator(BaseValidator):
     """
     Validates Value spreadsheet content and relationships.
 
@@ -64,7 +64,7 @@ class SpValueValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -74,14 +74,14 @@ class SpValueValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpValue,
             **kwargs,
         )
@@ -94,7 +94,7 @@ class SpValueValidator(ValidatorModelABC):
 
         # Get model properties once
         self.exists_scenario = self.model_sp_value.scenario_exists_file
-        self.list_scenarios = self.model_sp_value.scenarios_list
+        self.list_scenarios = self.model_sp_value.scenarios
 
         self.sp_name_description = ""
         self.sp_name_temporal_reference = ""
@@ -142,10 +142,10 @@ class SpValueValidator(ValidatorModelABC):
 
         # Validate all required columns exist
         self.model_dataframes = {
-            self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.df_data,
-            self.sp_name_temporal_reference: self.model_sp_temporal_reference.data_loader_model.df_data,
-            self.sp_name_scenario: (self.model_sp_scenario.data_loader_model.df_data if self.exists_scenario else pd.DataFrame()),
+            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data,
+            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
+            self.sp_name_temporal_reference: self.model_sp_temporal_reference.data_loader_model.raw_data,
+            self.sp_name_scenario: (self.model_sp_scenario.data_loader_model.raw_data if self.exists_scenario else pd.DataFrame()),
         }
 
     def validate_relation_indicators_in_values(self) -> Tuple[List[str], List[str]]:

@@ -1,7 +1,7 @@
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 import data_validate
-from data_validate.controllers import GeneralContext, ProcessorSpreadsheet
+from data_validate.controllers import GeneralContext, SpreadsheetProcessor
 from data_validate.helpers.base import DataArgs
 from data_validate.middleware import Bootstrap
 
@@ -18,7 +18,7 @@ def main():
     general_context = GeneralContext(data_args=data_args)
 
     # Bussiness Logic
-    ProcessorSpreadsheet(context=general_context)
+    SpreadsheetProcessor(context=general_context)
 
     # Finalize the General Context
     general_context.finalize()

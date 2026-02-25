@@ -39,11 +39,11 @@ class SpModelABC(ABC):
         Global definitions for spreadsheet models.
 
         Attributes:
-            LEGEND_EXISTS_FILE (str): Key for legend file existence in kwargs.
-            LEGEND_READ_SUCCESS (str): Key for legend file read success in kwargs.
-            SCENARIO_EXISTS_FILE (str): Key for scenario file existence in kwargs.
-            SCENARIO_READ_SUCCESS (str): Key for scenario file read success in kwargs.
-            SCENARIOS_LIST (str): Key for scenarios list in kwargs.
+            LEGEND_EXISTS_FILE (str): Key for legend file existence in model_configurations.
+            LEGEND_READ_SUCCESS (str): Key for legend file read success in model_configurations.
+            SCENARIO_EXISTS_FILE (str): Key for scenario file existence in model_configurations.
+            SCENARIO_READ_SUCCESS (str): Key for scenario file read success in model_configurations.
+            SCENARIOS (str): Key for scenarios list in model_configurations.
 
         """
 
@@ -56,7 +56,7 @@ class SpModelABC(ABC):
 
             self.SCENARIO_EXISTS_FILE = "scenario_exists_file"
             self.SCENARIO_READ_SUCCESS = "scenario_read_success"
-            self.SCENARIOS_LIST = "scenarios_list"
+            self.SCENARIOS = "scenarios"
 
             self._finalize_initialization()
 
@@ -68,23 +68,23 @@ class SpModelABC(ABC):
         self,
         context: GeneralContext,
         data_model: DataLoaderModel,
-        **kwargs: Dict[str, Any],
+        **model_configurations: Dict[str, Any],
     ):
         """
         Initialize the Abstract Spreadsheet Model.
 
         Sets up error tracking lists, loads context and data model, and extracts
-        optional configuration from kwargs (e.g. scenario availability).
+        optional configuration from model_configurations (e.g. scenario availability).
 
         Args:
             context (GeneralContext): Application context.
             data_model (DataLoaderModel): Data loading facade.
-            **kwargs: Additional configuration parameters.
+            **model_configurations: Additional configuration parameters.
         """
         # SETUP
         self.context: GeneralContext = context
         self.data_loader_model: DataLoaderModel = data_model
-        self._kwargs: Dict[str, Any] = kwargs
+        self._kwargs: Dict[str, Any] = model_configurations
 
         # UNPACKING DATA ARGS
         self.filename: str = self.data_loader_model.filename
@@ -94,7 +94,7 @@ class SpModelABC(ABC):
 
         self.scenario_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False)
         self.scenario_read_success: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False)
-        self.scenarios_list: List[str] = self._kwargs.get(self.VAR_CONSTS.SCENARIOS_LIST, [])
+        self.scenarios: List[str] = self._kwargs.get(self.VAR_CONSTS.SCENARIOS, [])
 
         # CONFIGURE VARIABLES AND LISTS
         self.structural_errors: List[str] = []
@@ -119,21 +119,21 @@ class SpModelABC(ABC):
         This method removes duplicates from the scenario list, checks if the data frame is empty,
         and performs initial validations like vertical bar checks and unnamed column checks.
         """
-        self.scenarios_list = list(set(self.scenarios_list))
+        self.scenarios = list(set(self.scenarios))
 
         # CHECK 0: Add COLUMNS
-        if not self.data_loader_model.df_data.empty:
-            self.DF_COLUMNS = list(self.data_loader_model.df_data.columns)
+        if not self.data_loader_model.raw_data.empty:
+            self.DF_COLUMNS = list(self.data_loader_model.raw_data.columns)
 
-        if self.data_loader_model.df_data.empty and self.data_loader_model.read_success:
+        if self.data_loader_model.raw_data.empty and self.data_loader_model.is_read_successful:
             self.structural_errors.append(f"{self.filename}: O arquivo enviado está vazio.")
 
         # CHECK 1: Vertical Bar Check
-        _, errors_vertical_bar = DataFrameProcessing.check_dataframe_vertical_bar(self.data_loader_model.df_data, self.filename)
+        _, errors_vertical_bar = DataFrameProcessing.check_dataframe_vertical_bar(self.data_loader_model.raw_data, self.filename)
         self.structural_errors.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(self.data_loader_model.df_data, self.filename)
+        _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(self.data_loader_model.raw_data, self.filename)
         self.structural_errors.extend(errors_unnamed_columns)
 
     @property
@@ -146,7 +146,7 @@ class SpModelABC(ABC):
         """
         exists_errors_legend = self.structural_errors or self.data_cleaning_errors
         exists_file_errors_legend = (
-            not self.data_loader_model.exists_file or self.data_loader_model.df_data.empty or not self.data_loader_model.read_success
+            not self.data_loader_model.does_file_exist or self.data_loader_model.raw_data.empty or not self.data_loader_model.is_read_successful
         )
         value = True
         if exists_errors_legend or exists_file_errors_legend:

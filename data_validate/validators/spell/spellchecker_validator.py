@@ -18,10 +18,10 @@ from data_validate.models import (
     SpTemporalReference,
     SpScenario,
 )
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpellCheckerValidator(ValidatorModelABC):
+class SpellCheckerValidator(BaseValidator):
     """
     Validates textual content using spell checking across multiple spreadsheet models.
 
@@ -46,7 +46,7 @@ class SpellCheckerValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -56,14 +56,14 @@ class SpellCheckerValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpDictionary,
             **kwargs,
         )
@@ -123,7 +123,7 @@ class SpellCheckerValidator(ValidatorModelABC):
 
         # Configure local instances
         self._data_model = self._data_models_context.get_instance_of(model_class)
-        self._dataframe = self._data_model.data_loader_model.df_data.copy()
+        self._dataframe = self._data_model.data_loader_model.raw_data.copy()
         self._filename = self._data_model.filename
 
         if self._dataframe.empty:
@@ -207,7 +207,7 @@ class SpellCheckerValidator(ValidatorModelABC):
                 )
             )
 
-            if self._data_model.scenarios_list:
+            if self._data_model.scenarios:
                 validations.append(
                     (
                         lambda: self.validate_spellchecker(SpScenario),

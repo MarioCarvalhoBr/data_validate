@@ -221,15 +221,17 @@ from unittest.mock import Mock, patch  # DON'T DO THIS!
 ```
 
 ### Fixture Patterns
+
 ```python
 @pytest.fixture
 def fs_utils(self, mocker) -> FileSystemUtils:
     """Create FileSystemUtils instance for testing."""
     mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
     fs_utils = FileSystemUtils()
-    fs_utils.lm = mocker.MagicMock()
-    fs_utils.lm.text.return_value = "mocked_message"
+    fs_utils.language_manager = mocker.MagicMock()
+    fs_utils.language_manager.text.return_value = "mocked_message"
     return fs_utils
+
 
 @pytest.fixture
 def temp_file(self) -> Generator[str, None, None]:
@@ -237,9 +239,9 @@ def temp_file(self) -> Generator[str, None, None]:
     with tempfile.NamedTemporaryFile(mode="w", delete=False, encoding="utf-8") as temp_file:
         temp_file.write("Test content")
         temp_file_path = temp_file.name
-    
+
     yield temp_file_path
-    
+
     # Cleanup
     if os.path.exists(temp_file_path):
         os.unlink(temp_file_path)
@@ -315,13 +317,14 @@ def temp_dir(self) -> Generator[str, None, None]:
 ```
 
 ### Integration with Project Context
+
 ```python
 def test_with_context(self, mocker) -> None:
     """Test methods that require project context."""
     # Mock the context dependencies
     mock_context = mocker.MagicMock()
-    mock_context.lm.text.return_value = "mocked_message"
-    
+    mock_context.language_manager.text.return_value = "mocked_message"
+
     # Test the method
     result = method_under_test(mock_context)
     assert result is not None

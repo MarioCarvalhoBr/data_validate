@@ -58,7 +58,7 @@
                         <div class="pdoc-code codehilite"><pre><span></span><span id="L-1"><a href="#L-1"><span class="linenos"> 1</span></a><span class="c1">#  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.</span>
 </span><span id="L-2"><a href="#L-2"><span class="linenos"> 2</span></a>
 </span><span id="L-3"><a href="#L-3"><span class="linenos"> 3</span></a><span class="kn">import</span><span class="w"> </span><span class="nn">data_validate</span>
-</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeneralContext</span><span class="p">,</span> <span class="n">ProcessorSpreadsheet</span>
+</span><span id="L-4"><a href="#L-4"><span class="linenos"> 4</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.controllers</span><span class="w"> </span><span class="kn">import</span> <span class="n">GeneralContext</span><span class="p">,</span> <span class="n">SpreadsheetProcessor</span>
 </span><span id="L-5"><a href="#L-5"><span class="linenos"> 5</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.helpers.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataArgs</span>
 </span><span id="L-6"><a href="#L-6"><span class="linenos"> 6</span></a><span class="kn">from</span><span class="w"> </span><span class="nn">data_validate.middleware</span><span class="w"> </span><span class="kn">import</span> <span class="n">Bootstrap</span>
 </span><span id="L-7"><a href="#L-7"><span class="linenos"> 7</span></a>
@@ -75,7 +75,7 @@
 </span><span id="L-18"><a href="#L-18"><span class="linenos">18</span></a>    <span class="n">general_context</span> <span class="o">=</span> <span class="n">GeneralContext</span><span class="p">(</span><span class="n">data_args</span><span class="o">=</span><span class="n">data_args</span><span class="p">)</span>
 </span><span id="L-19"><a href="#L-19"><span class="linenos">19</span></a>
 </span><span id="L-20"><a href="#L-20"><span class="linenos">20</span></a>    <span class="c1"># Bussiness Logic</span>
-</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">ProcessorSpreadsheet</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">general_context</span><span class="p">)</span>
+</span><span id="L-21"><a href="#L-21"><span class="linenos">21</span></a>    <span class="n">SpreadsheetProcessor</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">general_context</span><span class="p">)</span>
 </span><span id="L-22"><a href="#L-22"><span class="linenos">22</span></a>
 </span><span id="L-23"><a href="#L-23"><span class="linenos">23</span></a>    <span class="c1"># Finalize the General Context</span>
 </span><span id="L-24"><a href="#L-24"><span class="linenos">24</span></a>    <span class="n">general_context</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>
@@ -111,7 +111,7 @@
 </span><span id="main-19"><a href="#main-19"><span class="linenos">19</span></a>    <span class="n">general_context</span> <span class="o">=</span> <span class="n">GeneralContext</span><span class="p">(</span><span class="n">data_args</span><span class="o">=</span><span class="n">data_args</span><span class="p">)</span>
 </span><span id="main-20"><a href="#main-20"><span class="linenos">20</span></a>
 </span><span id="main-21"><a href="#main-21"><span class="linenos">21</span></a>    <span class="c1"># Bussiness Logic</span>
-</span><span id="main-22"><a href="#main-22"><span class="linenos">22</span></a>    <span class="n">ProcessorSpreadsheet</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">general_context</span><span class="p">)</span>
+</span><span id="main-22"><a href="#main-22"><span class="linenos">22</span></a>    <span class="n">SpreadsheetProcessor</span><span class="p">(</span><span class="n">context</span><span class="o">=</span><span class="n">general_context</span><span class="p">)</span>
 </span><span id="main-23"><a href="#main-23"><span class="linenos">23</span></a>
 </span><span id="main-24"><a href="#main-24"><span class="linenos">24</span></a>    <span class="c1"># Finalize the General Context</span>
 </span><span id="main-25"><a href="#main-25"><span class="linenos">25</span></a>    <span class="n">general_context</span><span class="o">.</span><span class="n">finalize</span><span class="p">()</span>

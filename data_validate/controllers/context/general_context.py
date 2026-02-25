@@ -35,7 +35,7 @@ class GeneralContext:
     Attributes:
         data_args (DataArgs): Command-line arguments and runtime data configurations.
         kwargs (Dict[str, Any]): Additional keyword arguments passed during initialization.
-        lm (LanguageManager): Manager for handling internationalization and localized strings.
+        language_manager (LanguageManager): Manager for handling internationalization and localized strings.
         config (ApplicationConfig): Central configuration object for application settings and constants.
         fs_utils (FileSystemUtils): Utilities for file system operations.
         logger_manager (LoggerManager): Manager responsible for configuring the logging system.
@@ -56,7 +56,7 @@ class GeneralContext:
             **kwargs: Additional keyword arguments for extended context configuration.
 
         The initialization process involves:
-        1.  Storing arguments and kwargs.
+        1.  Storing arguments and model_configurations.
         2.  Initializing the `LanguageManager` for i18n support.
         3.  Loading the application `ApplicationConfig`.
         4.  Setting up `FileSystemUtils` for file handling.
@@ -68,7 +68,7 @@ class GeneralContext:
         self.kwargs = kwargs
 
         # Configure the Toolkit
-        self.lm: LanguageManager = LanguageManager()
+        self.language_manager: LanguageManager = LanguageManager()
         self.config: ApplicationConfig = ApplicationConfig()
         self.fs_utils: FileSystemUtils = FileSystemUtils()
         self.logger_manager = LoggerManager(

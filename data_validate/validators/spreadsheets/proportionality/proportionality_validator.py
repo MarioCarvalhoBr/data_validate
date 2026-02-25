@@ -23,10 +23,10 @@ from data_validate.helpers.common.validation.description_processing import Descr
 
 
 from data_validate.models import SpProportionality, SpDescription, SpValue, SpComposition
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpProportionalityValidator(ValidatorModelABC):
+class SpProportionalityValidator(BaseValidator):
     """
     Validates Proportionality spreadsheet content and relationships.
 
@@ -80,7 +80,7 @@ class SpProportionalityValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -90,14 +90,14 @@ class SpProportionalityValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpProportionality,
             **kwargs,
         )
@@ -110,7 +110,7 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         # Get model properties once
         self.exists_scenario = self.model_sp_value.scenario_exists_file
-        self.list_scenarios = self.model_sp_value.scenarios_list
+        self.list_scenarios = self.model_sp_value.scenarios
 
         # Initialize variables
 
@@ -189,10 +189,10 @@ class SpProportionalityValidator(ValidatorModelABC):
 
         # Validate all required columns exist
         self.model_dataframes = {
-            self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.df_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.df_data,
-            self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
-            self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
+            self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.raw_data,
+            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
+            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data,
+            self.sp_name_composition: self.model_sp_composition.data_loader_model.raw_data,
         }
 
     def _check_sum_equals_one(self, subdatasets: Dict[str, DataFrame], sp_df_values: DataFrame, value_di: Any) -> Tuple[List[str], List[str]]:
@@ -279,7 +279,7 @@ class SpProportionalityValidator(ValidatorModelABC):
                 row_sums,
                 parent_id,
                 self.sp_name_proportionality,
-                self._data_models_context.lm.current_language,
+                self._data_models_context.language_manager.current_language,
             )
             all_errors.extend(tolerance_errors)
             all_warnings.extend(tolerance_warnings)

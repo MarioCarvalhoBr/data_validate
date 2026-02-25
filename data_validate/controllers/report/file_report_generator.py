@@ -2,7 +2,7 @@
 """
 Module for generating validation reports in HTML and PDF formats.
 
-This module provides the `ReportGeneratorFiles` class, which handles the creation
+This module provides the `FileReportGenerator` class, which handles the creation
 of detailed validation reports based on the results collected during the data
 validation process. It supports template-based HTML generation and PDF conversion
 using `pdfkit` and `jinja2`.
@@ -24,7 +24,7 @@ from data_validate.config.metadata_info import METADATA
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
-class ReportGeneratorFiles:
+class FileReportGenerator:
     """
     PDF and HTML report generator for data validation results.
 
@@ -52,7 +52,7 @@ class ReportGeneratorFiles:
             context (GeneralContext): General context containing validation configuration.
         """
         self.context = context
-        self.locale = self.context.lm.current_language
+        self.locale = self.context.language_manager.current_language
 
         # Initialize counters
         self.num_errors = 0

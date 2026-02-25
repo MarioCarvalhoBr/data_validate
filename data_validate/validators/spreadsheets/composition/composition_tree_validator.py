@@ -16,10 +16,10 @@ from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.helpers.common.validation.tree_processing import TreeProcessing
 from data_validate.models import SpComposition, SpDescription
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpCompositionTreeValidator(ValidatorModelABC):
+class SpCompositionTreeValidator(BaseValidator):
     """
     Validates hierarchical tree structures in SpComposition spreadsheets.
 
@@ -54,7 +54,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -64,14 +64,14 @@ class SpCompositionTreeValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all data models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report list for validation results aggregation.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpComposition,
             **kwargs,
         )
@@ -127,8 +127,8 @@ class SpCompositionTreeValidator(ValidatorModelABC):
 
         # Set dataframes
         self.model_dataframes = {
-            self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.df_data,
+            self.sp_name_composition: self.model_sp_composition.data_loader_model.raw_data,
+            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
         }
 
     def validate_hierarchy_with_tree(self) -> Tuple[List[str], List[str]]:
@@ -340,7 +340,7 @@ class SpCompositionTreeValidator(ValidatorModelABC):
             (self.validate_tree_levels_children, NamesEnum.CHILD_LVL.value),
         ]
 
-        if self.model_sp_composition.data_loader_model.df_data.empty or self.model_sp_description.data_loader_model.df_data.empty:
+        if self.model_sp_composition.data_loader_model.raw_data.empty or self.model_sp_description.data_loader_model.raw_data.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 

@@ -65,13 +65,13 @@
                                 <a class="variable" href="#DataLoaderModel.path">path</a>
                         </li>
                         <li>
-                                <a class="variable" href="#DataLoaderModel.df_data">df_data</a>
+                                <a class="variable" href="#DataLoaderModel.raw_data">raw_data</a>
                         </li>
                         <li>
-                                <a class="variable" href="#DataLoaderModel.read_success">read_success</a>
+                                <a class="variable" href="#DataLoaderModel.is_read_successful">is_read_successful</a>
                         </li>
                         <li>
-                                <a class="variable" href="#DataLoaderModel.exists_file">exists_file</a>
+                                <a class="variable" href="#DataLoaderModel.does_file_exist">does_file_exist</a>
                         </li>
                         <li>
                                 <a class="variable" href="#DataLoaderModel.name">name</a>
@@ -212,7 +212,7 @@
     <a class="headerlink" href="#DataLoaderFacade"></a>
             <div class="pdoc-code codehilite"><pre><span></span><span id="DataLoaderFacade-82"><a href="#DataLoaderFacade-82"><span class="linenos"> 82</span></a><span class="k">class</span><span class="w"> </span><span class="nc">DataLoaderFacade</span><span class="p">:</span>
 </span><span id="DataLoaderFacade-83"><a href="#DataLoaderFacade-83"><span class="linenos"> 83</span></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-</span><span id="DataLoaderFacade-84"><a href="#DataLoaderFacade-84"><span class="linenos"> 84</span></a><span class="sd">    Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto).</span>
+</span><span id="DataLoaderFacade-84"><a href="#DataLoaderFacade-84"><span class="linenos"> 84</span></a><span class="sd">    en_US: Loads all files and returns a dict of base_name→object (DataFrame or text).</span>
 </span><span id="DataLoaderFacade-85"><a href="#DataLoaderFacade-85"><span class="linenos"> 85</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="DataLoaderFacade-86"><a href="#DataLoaderFacade-86"><span class="linenos"> 86</span></a>
 </span><span id="DataLoaderFacade-87"><a href="#DataLoaderFacade-87"><span class="linenos"> 87</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
@@ -261,8 +261,8 @@
 </span><span id="DataLoaderFacade-130"><a href="#DataLoaderFacade-130"><span class="linenos">130</span></a>            <span class="n">data_model</span> <span class="o">=</span> <span class="n">DataLoaderModel</span><span class="p">(</span>
 </span><span id="DataLoaderFacade-131"><a href="#DataLoaderFacade-131"><span class="linenos">131</span></a>                <span class="n">input_folder</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">),</span>
 </span><span id="DataLoaderFacade-132"><a href="#DataLoaderFacade-132"><span class="linenos">132</span></a>                <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-</span><span id="DataLoaderFacade-133"><a href="#DataLoaderFacade-133"><span class="linenos">133</span></a>                <span class="n">df_data</span><span class="o">=</span><span class="n">df_local</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
-</span><span id="DataLoaderFacade-134"><a href="#DataLoaderFacade-134"><span class="linenos">134</span></a>                <span class="n">read_success</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="DataLoaderFacade-133"><a href="#DataLoaderFacade-133"><span class="linenos">133</span></a>                <span class="n">raw_data</span><span class="o">=</span><span class="n">df_local</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
+</span><span id="DataLoaderFacade-134"><a href="#DataLoaderFacade-134"><span class="linenos">134</span></a>                <span class="n">is_read_successful</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="DataLoaderFacade-135"><a href="#DataLoaderFacade-135"><span class="linenos">135</span></a>            <span class="p">)</span>
 </span><span id="DataLoaderFacade-136"><a href="#DataLoaderFacade-136"><span class="linenos">136</span></a>
 </span><span id="DataLoaderFacade-137"><a href="#DataLoaderFacade-137"><span class="linenos">137</span></a>            <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_model</span>
@@ -276,15 +276,15 @@
 </span><span id="DataLoaderFacade-145"><a href="#DataLoaderFacade-145"><span class="linenos">145</span></a>                <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataLoaderModel</span><span class="p">(</span>
 </span><span id="DataLoaderFacade-146"><a href="#DataLoaderFacade-146"><span class="linenos">146</span></a>                    <span class="n">input_folder</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">),</span>
 </span><span id="DataLoaderFacade-147"><a href="#DataLoaderFacade-147"><span class="linenos">147</span></a>                    <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
-</span><span id="DataLoaderFacade-148"><a href="#DataLoaderFacade-148"><span class="linenos">148</span></a>                    <span class="n">df_data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
-</span><span id="DataLoaderFacade-149"><a href="#DataLoaderFacade-149"><span class="linenos">149</span></a>                    <span class="n">read_success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="DataLoaderFacade-148"><a href="#DataLoaderFacade-148"><span class="linenos">148</span></a>                    <span class="n">raw_data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
+</span><span id="DataLoaderFacade-149"><a href="#DataLoaderFacade-149"><span class="linenos">149</span></a>                    <span class="n">is_read_successful</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DataLoaderFacade-150"><a href="#DataLoaderFacade-150"><span class="linenos">150</span></a>                <span class="p">)</span>
 </span><span id="DataLoaderFacade-151"><a href="#DataLoaderFacade-151"><span class="linenos">151</span></a>
 </span><span id="DataLoaderFacade-152"><a href="#DataLoaderFacade-152"><span class="linenos">152</span></a>        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">errors</span>
 </span></pre></div>
 
 
-            <div class="docstring"><p>Carga todos os arquivos e retorna um dict nome_base→objeto (DataFrame ou texto).</p>
+            <div class="docstring"><p>en_US: Loads all files and returns a dict of base_name→object (DataFrame or text).</p>
 </div>
 
 
@@ -391,8 +391,8 @@
 </span><span id="DataLoaderFacade.load_all-130"><a href="#DataLoaderFacade.load_all-130"><span class="linenos">130</span></a>            <span class="n">data_model</span> <span class="o">=</span> <span class="n">DataLoaderModel</span><span class="p">(</span>
 </span><span id="DataLoaderFacade.load_all-131"><a href="#DataLoaderFacade.load_all-131"><span class="linenos">131</span></a>                <span class="n">input_folder</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">),</span>
 </span><span id="DataLoaderFacade.load_all-132"><a href="#DataLoaderFacade.load_all-132"><span class="linenos">132</span></a>                <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">,</span>
-</span><span id="DataLoaderFacade.load_all-133"><a href="#DataLoaderFacade.load_all-133"><span class="linenos">133</span></a>                <span class="n">df_data</span><span class="o">=</span><span class="n">df_local</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
-</span><span id="DataLoaderFacade.load_all-134"><a href="#DataLoaderFacade.load_all-134"><span class="linenos">134</span></a>                <span class="n">read_success</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
+</span><span id="DataLoaderFacade.load_all-133"><a href="#DataLoaderFacade.load_all-133"><span class="linenos">133</span></a>                <span class="n">raw_data</span><span class="o">=</span><span class="n">df_local</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
+</span><span id="DataLoaderFacade.load_all-134"><a href="#DataLoaderFacade.load_all-134"><span class="linenos">134</span></a>                <span class="n">is_read_successful</span><span class="o">=</span><span class="kc">True</span> <span class="k">if</span> <span class="n">df_local</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">False</span><span class="p">,</span>
 </span><span id="DataLoaderFacade.load_all-135"><a href="#DataLoaderFacade.load_all-135"><span class="linenos">135</span></a>            <span class="p">)</span>
 </span><span id="DataLoaderFacade.load_all-136"><a href="#DataLoaderFacade.load_all-136"><span class="linenos">136</span></a>
 </span><span id="DataLoaderFacade.load_all-137"><a href="#DataLoaderFacade.load_all-137"><span class="linenos">137</span></a>            <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_model</span>
@@ -406,8 +406,8 @@
 </span><span id="DataLoaderFacade.load_all-145"><a href="#DataLoaderFacade.load_all-145"><span class="linenos">145</span></a>                <span class="n">data</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">DataLoaderModel</span><span class="p">(</span>
 </span><span id="DataLoaderFacade.load_all-146"><a href="#DataLoaderFacade.load_all-146"><span class="linenos">146</span></a>                    <span class="n">input_folder</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_dir</span><span class="p">),</span>
 </span><span id="DataLoaderFacade.load_all-147"><a href="#DataLoaderFacade.load_all-147"><span class="linenos">147</span></a>                    <span class="n">path</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
-</span><span id="DataLoaderFacade.load_all-148"><a href="#DataLoaderFacade.load_all-148"><span class="linenos">148</span></a>                    <span class="n">df_data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
-</span><span id="DataLoaderFacade.load_all-149"><a href="#DataLoaderFacade.load_all-149"><span class="linenos">149</span></a>                    <span class="n">read_success</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+</span><span id="DataLoaderFacade.load_all-148"><a href="#DataLoaderFacade.load_all-148"><span class="linenos">148</span></a>                    <span class="n">raw_data</span><span class="o">=</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(),</span>
+</span><span id="DataLoaderFacade.load_all-149"><a href="#DataLoaderFacade.load_all-149"><span class="linenos">149</span></a>                    <span class="n">is_read_successful</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
 </span><span id="DataLoaderFacade.load_all-150"><a href="#DataLoaderFacade.load_all-150"><span class="linenos">150</span></a>                <span class="p">)</span>
 </span><span id="DataLoaderFacade.load_all-151"><a href="#DataLoaderFacade.load_all-151"><span class="linenos">151</span></a>
 </span><span id="DataLoaderFacade.load_all-152"><a href="#DataLoaderFacade.load_all-152"><span class="linenos">152</span></a>        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">errors</span>
@@ -449,30 +449,30 @@
 </span><span id="DataLoaderModel-36"><a href="#DataLoaderModel-36"><span class="linenos">36</span></a><span class="sd">    :type extension: str</span>
 </span><span id="DataLoaderModel-37"><a href="#DataLoaderModel-37"><span class="linenos">37</span></a><span class="sd">    :ivar path: Full path to the file.</span>
 </span><span id="DataLoaderModel-38"><a href="#DataLoaderModel-38"><span class="linenos">38</span></a><span class="sd">    :type path: Path</span>
-</span><span id="DataLoaderModel-39"><a href="#DataLoaderModel-39"><span class="linenos">39</span></a><span class="sd">    :ivar df_data: Data extracted from the file as a pandas DataFrame.</span>
-</span><span id="DataLoaderModel-40"><a href="#DataLoaderModel-40"><span class="linenos">40</span></a><span class="sd">    :type df_data: pd.DataFrame</span>
+</span><span id="DataLoaderModel-39"><a href="#DataLoaderModel-39"><span class="linenos">39</span></a><span class="sd">    :ivar raw_data: Data extracted from the file as a pandas DataFrame.</span>
+</span><span id="DataLoaderModel-40"><a href="#DataLoaderModel-40"><span class="linenos">40</span></a><span class="sd">    :type raw_data: pd.DataFrame</span>
 </span><span id="DataLoaderModel-41"><a href="#DataLoaderModel-41"><span class="linenos">41</span></a><span class="sd">    &quot;&quot;&quot;</span>
 </span><span id="DataLoaderModel-42"><a href="#DataLoaderModel-42"><span class="linenos">42</span></a>
 </span><span id="DataLoaderModel-43"><a href="#DataLoaderModel-43"><span class="linenos">43</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="DataLoaderModel-44"><a href="#DataLoaderModel-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DataLoaderModel-45"><a href="#DataLoaderModel-45"><span class="linenos">45</span></a>        <span class="n">input_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="DataLoaderModel-46"><a href="#DataLoaderModel-46"><span class="linenos">46</span></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="DataLoaderModel-47"><a href="#DataLoaderModel-47"><span class="linenos">47</span></a>        <span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-</span><span id="DataLoaderModel-48"><a href="#DataLoaderModel-48"><span class="linenos">48</span></a>        <span class="n">read_success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="DataLoaderModel-47"><a href="#DataLoaderModel-47"><span class="linenos">47</span></a>        <span class="n">raw_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+</span><span id="DataLoaderModel-48"><a href="#DataLoaderModel-48"><span class="linenos">48</span></a>        <span class="n">is_read_successful</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="DataLoaderModel-49"><a href="#DataLoaderModel-49"><span class="linenos">49</span></a>    <span class="p">):</span>
 </span><span id="DataLoaderModel-50"><a href="#DataLoaderModel-50"><span class="linenos">50</span></a>        <span class="c1"># SETUP</span>
 </span><span id="DataLoaderModel-51"><a href="#DataLoaderModel-51"><span class="linenos">51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span> <span class="o">=</span> <span class="n">input_folder</span>
 </span><span id="DataLoaderModel-52"><a href="#DataLoaderModel-52"><span class="linenos">52</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
-</span><span id="DataLoaderModel-53"><a href="#DataLoaderModel-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">df_data</span> <span class="o">=</span> <span class="n">df_data</span>
-</span><span id="DataLoaderModel-54"><a href="#DataLoaderModel-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">read_success</span> <span class="o">=</span> <span class="n">read_success</span>
-</span><span id="DataLoaderModel-55"><a href="#DataLoaderModel-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">exists_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+</span><span id="DataLoaderModel-53"><a href="#DataLoaderModel-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">raw_data</span>
+</span><span id="DataLoaderModel-54"><a href="#DataLoaderModel-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_read_successful</span> <span class="o">=</span> <span class="n">is_read_successful</span>
+</span><span id="DataLoaderModel-55"><a href="#DataLoaderModel-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">does_file_exist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
 </span><span id="DataLoaderModel-56"><a href="#DataLoaderModel-56"><span class="linenos">56</span></a>
 </span><span id="DataLoaderModel-57"><a href="#DataLoaderModel-57"><span class="linenos">57</span></a>        <span class="c1"># UNPACKING VARIABLES</span>
 </span><span id="DataLoaderModel-58"><a href="#DataLoaderModel-58"><span class="linenos">58</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span>
 </span><span id="DataLoaderModel-59"><a href="#DataLoaderModel-59"><span class="linenos">59</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">name</span>
 </span><span id="DataLoaderModel-60"><a href="#DataLoaderModel-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">suffix</span>
 </span><span id="DataLoaderModel-61"><a href="#DataLoaderModel-61"><span class="linenos">61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
-</span><span id="DataLoaderModel-62"><a href="#DataLoaderModel-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">header_type</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;double&quot;</span>
+</span><span id="DataLoaderModel-62"><a href="#DataLoaderModel-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">header_type</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;double&quot;</span>
 </span><span id="DataLoaderModel-63"><a href="#DataLoaderModel-63"><span class="linenos">63</span></a>
 </span><span id="DataLoaderModel-64"><a href="#DataLoaderModel-64"><span class="linenos">64</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 </span><span id="DataLoaderModel-65"><a href="#DataLoaderModel-65"><span class="linenos">65</span></a>        <span class="k">return</span> <span class="p">(</span>
@@ -482,13 +482,13 @@
 </span><span id="DataLoaderModel-69"><a href="#DataLoaderModel-69"><span class="linenos">69</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  filename: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 </span><span id="DataLoaderModel-70"><a href="#DataLoaderModel-70"><span class="linenos">70</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  extension: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">extension</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 </span><span id="DataLoaderModel-71"><a href="#DataLoaderModel-71"><span class="linenos">71</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  path: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="DataLoaderModel-72"><a href="#DataLoaderModel-72"><span class="linenos">72</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  df_data: </span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="DataLoaderModel-73"><a href="#DataLoaderModel-73"><span class="linenos">73</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  df_data shape: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="DataLoaderModel-74"><a href="#DataLoaderModel-74"><span class="linenos">74</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  df_data columns: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="DataLoaderModel-75"><a href="#DataLoaderModel-75"><span class="linenos">75</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  df_data dtypes: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">dtypes</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="DataLoaderModel-72"><a href="#DataLoaderModel-72"><span class="linenos">72</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  raw_data: </span><span class="se">\n</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">head</span><span class="p">()</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="DataLoaderModel-73"><a href="#DataLoaderModel-73"><span class="linenos">73</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  raw_data shape: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="DataLoaderModel-74"><a href="#DataLoaderModel-74"><span class="linenos">74</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  raw_data columns: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">columns</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="DataLoaderModel-75"><a href="#DataLoaderModel-75"><span class="linenos">75</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  raw_data dtypes: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">dtypes</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 </span><span id="DataLoaderModel-76"><a href="#DataLoaderModel-76"><span class="linenos">76</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  header_type: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">header_type</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="DataLoaderModel-77"><a href="#DataLoaderModel-77"><span class="linenos">77</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  read_success: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">read_success</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-</span><span id="DataLoaderModel-78"><a href="#DataLoaderModel-78"><span class="linenos">78</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  exists_file: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">exists_file</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="DataLoaderModel-77"><a href="#DataLoaderModel-77"><span class="linenos">77</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  is_read_successful: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">is_read_successful</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+</span><span id="DataLoaderModel-78"><a href="#DataLoaderModel-78"><span class="linenos">78</span></a>            <span class="o">+</span> <span class="sa">f</span><span class="s2">&quot;  does_file_exist: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">does_file_exist</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
 </span><span id="DataLoaderModel-79"><a href="#DataLoaderModel-79"><span class="linenos">79</span></a>        <span class="p">)</span>
 </span></pre></div>
 
@@ -506,7 +506,7 @@ and logging purposes.</p>
 :ivar filename: The full name of the file including the extension.
 :ivar extension: The file extension.
 :ivar path: Full path to the file.
-:ivar df_data: Data extracted from the file as a pandas DataFrame.</p>
+:ivar raw_data: Data extracted from the file as a pandas DataFrame.</p>
 </div>
 
 
@@ -514,7 +514,7 @@ and logging purposes.</p>
                                         <input id="DataLoaderModel.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">DataLoaderModel</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">input_folder</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span>,</span><span class="param">	<span class="n">df_data</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span>,</span><span class="param">	<span class="n">read_success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span>)</span>
+        <span class="name">DataLoaderModel</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">input_folder</span><span class="p">:</span> <span class="nb">str</span>,</span><span class="param">	<span class="n">path</span><span class="p">:</span> <span class="n">pathlib</span><span class="o">.</span><span class="n">Path</span>,</span><span class="param">	<span class="n">raw_data</span><span class="p">:</span> <span class="n">pandas</span><span class="o">.</span><span class="n">DataFrame</span>,</span><span class="param">	<span class="n">is_read_successful</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span></span>)</span>
 
                 <label class="view-source-button" for="DataLoaderModel.__init__-view-source"><span>View Source</span></label>
 
@@ -524,22 +524,22 @@ and logging purposes.</p>
 </span><span id="DataLoaderModel.__init__-44"><a href="#DataLoaderModel.__init__-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="DataLoaderModel.__init__-45"><a href="#DataLoaderModel.__init__-45"><span class="linenos">45</span></a>        <span class="n">input_folder</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
 </span><span id="DataLoaderModel.__init__-46"><a href="#DataLoaderModel.__init__-46"><span class="linenos">46</span></a>        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
-</span><span id="DataLoaderModel.__init__-47"><a href="#DataLoaderModel.__init__-47"><span class="linenos">47</span></a>        <span class="n">df_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
-</span><span id="DataLoaderModel.__init__-48"><a href="#DataLoaderModel.__init__-48"><span class="linenos">48</span></a>        <span class="n">read_success</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+</span><span id="DataLoaderModel.__init__-47"><a href="#DataLoaderModel.__init__-47"><span class="linenos">47</span></a>        <span class="n">raw_data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span>
+</span><span id="DataLoaderModel.__init__-48"><a href="#DataLoaderModel.__init__-48"><span class="linenos">48</span></a>        <span class="n">is_read_successful</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 </span><span id="DataLoaderModel.__init__-49"><a href="#DataLoaderModel.__init__-49"><span class="linenos">49</span></a>    <span class="p">):</span>
 </span><span id="DataLoaderModel.__init__-50"><a href="#DataLoaderModel.__init__-50"><span class="linenos">50</span></a>        <span class="c1"># SETUP</span>
 </span><span id="DataLoaderModel.__init__-51"><a href="#DataLoaderModel.__init__-51"><span class="linenos">51</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">input_folder</span> <span class="o">=</span> <span class="n">input_folder</span>
 </span><span id="DataLoaderModel.__init__-52"><a href="#DataLoaderModel.__init__-52"><span class="linenos">52</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="n">path</span>
-</span><span id="DataLoaderModel.__init__-53"><a href="#DataLoaderModel.__init__-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">df_data</span> <span class="o">=</span> <span class="n">df_data</span>
-</span><span id="DataLoaderModel.__init__-54"><a href="#DataLoaderModel.__init__-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">read_success</span> <span class="o">=</span> <span class="n">read_success</span>
-</span><span id="DataLoaderModel.__init__-55"><a href="#DataLoaderModel.__init__-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">exists_file</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
+</span><span id="DataLoaderModel.__init__-53"><a href="#DataLoaderModel.__init__-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span> <span class="o">=</span> <span class="n">raw_data</span>
+</span><span id="DataLoaderModel.__init__-54"><a href="#DataLoaderModel.__init__-54"><span class="linenos">54</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">is_read_successful</span> <span class="o">=</span> <span class="n">is_read_successful</span>
+</span><span id="DataLoaderModel.__init__-55"><a href="#DataLoaderModel.__init__-55"><span class="linenos">55</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">does_file_exist</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="kc">False</span>
 </span><span id="DataLoaderModel.__init__-56"><a href="#DataLoaderModel.__init__-56"><span class="linenos">56</span></a>
 </span><span id="DataLoaderModel.__init__-57"><a href="#DataLoaderModel.__init__-57"><span class="linenos">57</span></a>        <span class="c1"># UNPACKING VARIABLES</span>
 </span><span id="DataLoaderModel.__init__-58"><a href="#DataLoaderModel.__init__-58"><span class="linenos">58</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">stem</span>
 </span><span id="DataLoaderModel.__init__-59"><a href="#DataLoaderModel.__init__-59"><span class="linenos">59</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">filename</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">name</span>
 </span><span id="DataLoaderModel.__init__-60"><a href="#DataLoaderModel.__init__-60"><span class="linenos">60</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">extension</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">suffix</span>
 </span><span id="DataLoaderModel.__init__-61"><a href="#DataLoaderModel.__init__-61"><span class="linenos">61</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
-</span><span id="DataLoaderModel.__init__-62"><a href="#DataLoaderModel.__init__-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">header_type</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">df_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;double&quot;</span>
+</span><span id="DataLoaderModel.__init__-62"><a href="#DataLoaderModel.__init__-62"><span class="linenos">62</span></a>        <span class="bp">self</span><span class="o">.</span><span class="n">header_type</span> <span class="o">=</span> <span class="s2">&quot;single&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_data</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">nlevels</span> <span class="o">==</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;double&quot;</span>
 </span></pre></div>
 
 
@@ -568,35 +568,35 @@ and logging purposes.</p>
     
 
                             </div>
-                            <div id="DataLoaderModel.df_data" class="classattr">
+                            <div id="DataLoaderModel.raw_data" class="classattr">
                                 <div class="attr variable">
-            <span class="name">df_data</span>
+            <span class="name">raw_data</span>
 
         
     </div>
-    <a class="headerlink" href="#DataLoaderModel.df_data"></a>
+    <a class="headerlink" href="#DataLoaderModel.raw_data"></a>
     
     
 
                             </div>
-                            <div id="DataLoaderModel.read_success" class="classattr">
+                            <div id="DataLoaderModel.is_read_successful" class="classattr">
                                 <div class="attr variable">
-            <span class="name">read_success</span>
+            <span class="name">is_read_successful</span>
 
         
     </div>
-    <a class="headerlink" href="#DataLoaderModel.read_success"></a>
+    <a class="headerlink" href="#DataLoaderModel.is_read_successful"></a>
     
     
 
                             </div>
-                            <div id="DataLoaderModel.exists_file" class="classattr">
+                            <div id="DataLoaderModel.does_file_exist" class="classattr">
                                 <div class="attr variable">
-            <span class="name">exists_file</span>
+            <span class="name">does_file_exist</span>
 
         
     </div>
-    <a class="headerlink" href="#DataLoaderModel.exists_file"></a>
+    <a class="headerlink" href="#DataLoaderModel.does_file_exist"></a>
     
     
 

@@ -18,7 +18,7 @@ from data_validate.helpers.common.validation.dataframe_processing import DataFra
 from data_validate.models.sp_model_abc import SpModelABC
 
 
-class ValidatorModelABC(ABC):
+class BaseValidator(ABC):
     """
     Abstract base class for all spreadsheet model validators.
 
@@ -51,7 +51,7 @@ class ValidatorModelABC(ABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         type_class: Type[SpModelABC],
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -62,7 +62,7 @@ class ValidatorModelABC(ABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models, configuration, and utilities.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         type_class : Type[SpModelABC]
             The specific model class type this validator will validate.
@@ -71,13 +71,13 @@ class ValidatorModelABC(ABC):
         """
         # SETUP
         self._data_models_context = data_models_context
-        self._report_list = report_list
+        self._report_list = validation_reports
         self._type_class = type_class
 
         # UNPACK DATA
         self._data_model = self._data_models_context.get_instance_of(self._type_class)
         self._filename = self._data_model.filename if self._data_model else "Unknown"
-        self._dataframe = self._data_model.data_loader_model.df_data.copy() if self._data_model else pd.DataFrame({})
+        self._dataframe = self._data_model.data_loader_model.raw_data.copy() if self._data_model else pd.DataFrame({})
         self.TITLES_INFO = self._data_models_context.config.get_verify_names()
 
         # LIST OF ERRORS AND WARNINGS
@@ -256,7 +256,7 @@ class ValidatorModelABC(ABC):
         """
         # FUTURE FEATURE: Implement a method to mark validations as not executed in the report list.
         for _, report_key in validations:
-            self._report_list.set_not_executed(self.TITLES_INFO[report_key])
+            self._report_list.set_not_executed(self.validation_titles[report_key])
         """
 
     def build_reports(self, validations: List[Tuple[Callable, str]]) -> None:

@@ -17,9 +17,9 @@ class TestFileSystemUtils:
         """Create FileSystemUtils instance for testing."""
         mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
         fs_utils = FileSystemUtils()
-        fs_utils.lm = mocker.MagicMock()
+        fs_utils.language_manager = mocker.MagicMock()
         # Setup default mock returns for language manager
-        fs_utils.lm.text.return_value = "mocked_message"
+        fs_utils.language_manager.text.return_value = "mocked_message"
         return fs_utils
 
     @pytest.fixture
@@ -50,7 +50,7 @@ class TestFileSystemUtils:
         fs_utils = FileSystemUtils()
 
         mock_lm.assert_called_once()
-        assert fs_utils.lm == mock_instance
+        assert fs_utils.language_manager == mock_instance
 
     def test_detect_encoding_success(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test successful encoding detection."""
@@ -64,38 +64,38 @@ class TestFileSystemUtils:
 
     def test_detect_encoding_empty_file_path(self, fs_utils: FileSystemUtils) -> None:
         """Test detect_encoding with empty file path."""
-        fs_utils.lm.text.return_value = "empty_path_error"
+        fs_utils.language_manager.text.return_value = "empty_path_error"
 
         success, result = fs_utils.detect_encoding("")
 
         assert success is False
         assert result == "empty_path_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_path_empty")
 
     def test_detect_encoding_file_not_found(self, fs_utils: FileSystemUtils) -> None:
         """Test detect_encoding with non-existent file."""
-        fs_utils.lm.text.return_value = "file_not_found_error"
+        fs_utils.language_manager.text.return_value = "file_not_found_error"
         non_existent_file = "/path/that/does/not/exist.txt"
 
         success, result = fs_utils.detect_encoding(non_existent_file)
 
         assert success is False
         assert result == "file_not_found_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file))
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file))
 
     def test_detect_encoding_path_not_file(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test detect_encoding with directory path instead of file."""
-        fs_utils.lm.text.return_value = "path_not_file_error"
+        fs_utils.language_manager.text.return_value = "path_not_file_error"
 
         success, result = fs_utils.detect_encoding(temp_dir)
 
         assert success is False
         assert result == "path_not_file_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
     def test_detect_encoding_chardet_returns_none(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test detect_encoding when chardet returns None encoding."""
-        fs_utils.lm.text.return_value = "encoding_failed_error"
+        fs_utils.language_manager.text.return_value = "encoding_failed_error"
 
         mock_detect = mocker.patch("chardet.detect")
         mock_detect.return_value = {"encoding": None}
@@ -104,11 +104,11 @@ class TestFileSystemUtils:
 
         assert success is False
         assert result == "encoding_failed_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_encoding_failed")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_encoding_failed")
 
     def test_detect_encoding_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with OS error during file reading."""
-        fs_utils.lm.text.return_value = "os_error_message"
+        fs_utils.language_manager.text.return_value = "os_error_message"
 
         # Mock os.path.exists and os.path.isfile to return True, then raise OSError on open
         mocker.patch("os.path.exists", return_value=True)
@@ -119,11 +119,11 @@ class TestFileSystemUtils:
 
         assert success is False
         assert result == "os_error_message"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_encoding_os", error="Permission denied")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_encoding_os", error="Permission denied")
 
     def test_detect_encoding_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test detect_encoding with unexpected exception."""
-        fs_utils.lm.text.return_value = "unexpected_error_message"
+        fs_utils.language_manager.text.return_value = "unexpected_error_message"
 
         # Mock os.path.exists and os.path.isfile to return True, then raise ValueError on open
         mocker.patch("os.path.exists", return_value=True)
@@ -134,7 +134,7 @@ class TestFileSystemUtils:
 
         assert success is False
         assert result == "unexpected_error_message"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
 
     def test_detect_encoding_custom_num_bytes(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test detect_encoding with custom num_bytes parameter."""
@@ -165,49 +165,49 @@ class TestFileSystemUtils:
 
     def test_remove_file_success(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test successful file removal."""
-        fs_utils.lm.text.return_value = "file_removed_success"
+        fs_utils.language_manager.text.return_value = "file_removed_success"
 
         success, message = fs_utils.remove_file(temp_file)
 
         assert success is True
         assert message == "file_removed_success"
         assert not os.path.exists(temp_file)
-        fs_utils.lm.text.assert_called_with("fs_utils_success_file_removed", filename=os.path.basename(temp_file))
+        fs_utils.language_manager.text.assert_called_with("fs_utils_success_file_removed", filename=os.path.basename(temp_file))
 
     def test_remove_file_empty_path(self, fs_utils: FileSystemUtils) -> None:
         """Test remove_file with empty file path."""
-        fs_utils.lm.text.return_value = "empty_path_error"
+        fs_utils.language_manager.text.return_value = "empty_path_error"
 
         success, message = fs_utils.remove_file("")
 
         assert success is False
         assert message == "empty_path_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_path_empty")
 
     def test_remove_file_not_found(self, fs_utils: FileSystemUtils) -> None:
         """Test remove_file with non-existent file."""
-        fs_utils.lm.text.return_value = "file_not_found_info"
+        fs_utils.language_manager.text.return_value = "file_not_found_info"
         non_existent_file = "/path/that/does/not/exist.txt"
 
         success, message = fs_utils.remove_file(non_existent_file)
 
         assert success is True  # Returns True for non-existent files
         assert message == "file_not_found_info"
-        fs_utils.lm.text.assert_called_with("fs_utils_info_file_not_found", filename=os.path.basename(non_existent_file))
+        fs_utils.language_manager.text.assert_called_with("fs_utils_info_file_not_found", filename=os.path.basename(non_existent_file))
 
     def test_remove_file_path_not_file(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test remove_file with directory path instead of file."""
-        fs_utils.lm.text.return_value = "path_not_file_error"
+        fs_utils.language_manager.text.return_value = "path_not_file_error"
 
         success, message = fs_utils.remove_file(temp_dir)
 
         assert success is False
         assert message == "path_not_file_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
     def test_remove_file_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test remove_file with OSError."""
-        fs_utils.lm.text.return_value = "remove_file_os_error"
+        fs_utils.language_manager.text.return_value = "remove_file_os_error"
 
         mocker.patch("os.remove", side_effect=OSError("Permission denied"))
         mocker.patch("os.path.exists", return_value=True)
@@ -217,11 +217,11 @@ class TestFileSystemUtils:
 
         assert success is False
         assert message == "remove_file_os_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_remove_file_os", error="Permission denied")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_remove_file_os", error="Permission denied")
 
     def test_remove_file_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test remove_file with unexpected exception."""
-        fs_utils.lm.text.return_value = "unexpected_error"
+        fs_utils.language_manager.text.return_value = "unexpected_error"
 
         mocker.patch("os.remove", side_effect=ValueError("Unexpected error"))
         mocker.patch("os.path.exists", return_value=True)
@@ -231,11 +231,11 @@ class TestFileSystemUtils:
 
         assert success is False
         assert message == "unexpected_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
 
     def test_create_directory_success(self, fs_utils: FileSystemUtils) -> None:
         """Test successful directory creation."""
-        fs_utils.lm.text.return_value = "directory_created_success"
+        fs_utils.language_manager.text.return_value = "directory_created_success"
 
         with tempfile.TemporaryDirectory() as temp_parent:
             new_dir = os.path.join(temp_parent, "new_directory")
@@ -245,41 +245,41 @@ class TestFileSystemUtils:
             assert success is True
             assert message == "directory_created_success"
             assert os.path.isdir(new_dir)
-            fs_utils.lm.text.assert_called_with("fs_utils_success_dir_created", dir_name=new_dir)
+            fs_utils.language_manager.text.assert_called_with("fs_utils_success_dir_created", dir_name=new_dir)
 
     def test_create_directory_empty_name(self, fs_utils: FileSystemUtils) -> None:
         """Test create_directory with empty directory name."""
-        fs_utils.lm.text.return_value = "empty_dir_path_error"
+        fs_utils.language_manager.text.return_value = "empty_dir_path_error"
 
         success, message = fs_utils.create_directory("")
 
         assert success is False
         assert message == "empty_dir_path_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_path_empty")
 
     def test_create_directory_already_exists(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test create_directory with existing directory."""
-        fs_utils.lm.text.return_value = "directory_exists_info"
+        fs_utils.language_manager.text.return_value = "directory_exists_info"
 
         success, message = fs_utils.create_directory(temp_dir)
 
         assert success is True
         assert message == "directory_exists_info"
-        fs_utils.lm.text.assert_called_with("fs_utils_info_dir_exists", dir_name=temp_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_info_dir_exists", dir_name=temp_dir)
 
     def test_create_directory_path_exists_not_dir(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test create_directory when path exists but is not a directory."""
-        fs_utils.lm.text.return_value = "path_not_dir_error"
+        fs_utils.language_manager.text.return_value = "path_not_dir_error"
 
         success, message = fs_utils.create_directory(temp_file)
 
         assert success is False
         assert message == "path_not_dir_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
     def test_create_directory_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test create_directory with OSError."""
-        fs_utils.lm.text.return_value = "create_dir_os_error"
+        fs_utils.language_manager.text.return_value = "create_dir_os_error"
 
         mocker.patch("os.makedirs", side_effect=OSError("Permission denied"))
         mocker.patch("os.path.exists", return_value=False)
@@ -288,11 +288,11 @@ class TestFileSystemUtils:
 
         assert success is False
         assert message == "create_dir_os_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_create_dir_os", error="Permission denied")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_create_dir_os", error="Permission denied")
 
     def test_create_directory_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test create_directory with unexpected exception."""
-        fs_utils.lm.text.return_value = "unexpected_error"
+        fs_utils.language_manager.text.return_value = "unexpected_error"
 
         mocker.patch("os.makedirs", side_effect=ValueError("Unexpected error"))
         mocker.patch("os.path.exists", return_value=False)
@@ -301,7 +301,7 @@ class TestFileSystemUtils:
 
         assert success is False
         assert message == "unexpected_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
 
     def test_check_file_exists_success(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test check_file_exists with existing file."""
@@ -312,38 +312,38 @@ class TestFileSystemUtils:
 
     def test_check_file_exists_empty_path(self, fs_utils: FileSystemUtils) -> None:
         """Test check_file_exists with empty file path."""
-        fs_utils.lm.text.return_value = "empty_path_error"
+        fs_utils.language_manager.text.return_value = "empty_path_error"
 
         exists, messages = fs_utils.check_file_exists("")
 
         assert exists is False
         assert messages == ["empty_path_error"]
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_path_empty")
 
     def test_check_file_exists_file_not_found(self, fs_utils: FileSystemUtils) -> None:
         """Test check_file_exists with non-existent file."""
-        fs_utils.lm.text.return_value = "file_not_found_error"
+        fs_utils.language_manager.text.return_value = "file_not_found_error"
         non_existent_file = "/path/that/does/not/exist.txt"
 
         exists, messages = fs_utils.check_file_exists(non_existent_file)
 
         assert exists is False
         assert messages == ["file_not_found_error"]
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file))
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file))
 
     def test_check_file_exists_path_not_file(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test check_file_exists with directory path instead of file."""
-        fs_utils.lm.text.return_value = "path_not_file_error"
+        fs_utils.language_manager.text.return_value = "path_not_file_error"
 
         exists, messages = fs_utils.check_file_exists(temp_dir)
 
         assert exists is False
         assert messages == ["path_not_file_error"]
-        fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
     def test_check_file_exists_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test check_file_exists with unexpected exception."""
-        fs_utils.lm.text.return_value = "file_check_fail_error"
+        fs_utils.language_manager.text.return_value = "file_check_fail_error"
 
         mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
 
@@ -351,7 +351,7 @@ class TestFileSystemUtils:
 
         assert exists is False
         assert messages == ["file_check_fail_error"]
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_check_fail", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_check_fail", error="Unexpected error")
 
     def test_check_directory_exists_success(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test check_directory_exists with existing directory."""
@@ -362,38 +362,38 @@ class TestFileSystemUtils:
 
     def test_check_directory_exists_empty_path(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_exists with empty directory path."""
-        fs_utils.lm.text.return_value = "empty_dir_path_error"
+        fs_utils.language_manager.text.return_value = "empty_dir_path_error"
 
         exists, message = fs_utils.check_directory_exists("")
 
         assert exists is False
         assert message == "empty_dir_path_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_path_empty")
 
     def test_check_directory_exists_dir_not_found(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_exists with non-existent directory."""
-        fs_utils.lm.text.return_value = "dir_not_found_error"
+        fs_utils.language_manager.text.return_value = "dir_not_found_error"
         non_existent_dir = "/path/that/does/not/exist"
 
         exists, message = fs_utils.check_directory_exists(non_existent_dir)
 
         assert exists is False
         assert message == "dir_not_found_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_not_found", dir_path=non_existent_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_not_found", dir_path=non_existent_dir)
 
     def test_check_directory_exists_path_not_dir(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test check_directory_exists with file path instead of directory."""
-        fs_utils.lm.text.return_value = "path_not_dir_error"
+        fs_utils.language_manager.text.return_value = "path_not_dir_error"
 
         exists, message = fs_utils.check_directory_exists(temp_file)
 
         assert exists is False
         assert message == "path_not_dir_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
     def test_check_directory_exists_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test check_directory_exists with unexpected exception."""
-        fs_utils.lm.text.return_value = "dir_check_fail_error"
+        fs_utils.language_manager.text.return_value = "dir_check_fail_error"
 
         mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
 
@@ -401,22 +401,22 @@ class TestFileSystemUtils:
 
         assert exists is False
         assert message == "dir_check_fail_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
 
     def test_check_directory_is_empty_true(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_is_empty with empty directory."""
-        fs_utils.lm.text.return_value = "dir_empty_message"
+        fs_utils.language_manager.text.return_value = "dir_empty_message"
 
         with tempfile.TemporaryDirectory() as empty_dir:
             is_empty, message = fs_utils.check_directory_is_empty(empty_dir)
 
             assert is_empty is True
             assert message == "dir_empty_message"
-            fs_utils.lm.text.assert_called_with("fs_utils_error_dir_empty", dir_path=empty_dir)
+            fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_empty", dir_path=empty_dir)
 
     def test_check_directory_is_empty_false(self, fs_utils: FileSystemUtils, temp_dir: str, temp_file: str) -> None:
         """Test check_directory_is_empty with non-empty directory."""
-        fs_utils.lm.text.return_value = "dir_not_empty_message"
+        fs_utils.language_manager.text.return_value = "dir_not_empty_message"
 
         # Create a file in the temp_dir to make it non-empty
         file_in_dir = os.path.join(temp_dir, "test_file.txt")
@@ -427,32 +427,32 @@ class TestFileSystemUtils:
 
         assert is_empty is False
         assert message == "dir_not_empty_message"
-        fs_utils.lm.text.assert_called_with("fs_utils_info_dir_not_empty", dir_path=temp_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_info_dir_not_empty", dir_path=temp_dir)
 
     def test_check_directory_is_empty_dir_not_found(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_is_empty with non-existent directory."""
-        fs_utils.lm.text.return_value = "dir_not_found_error"
+        fs_utils.language_manager.text.return_value = "dir_not_found_error"
         non_existent_dir = "/path/that/does/not/exist"
 
         is_empty, message = fs_utils.check_directory_is_empty(non_existent_dir)
 
         assert is_empty is False
         assert message == "dir_not_found_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_not_found", dir_path=non_existent_dir)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_not_found", dir_path=non_existent_dir)
 
     def test_check_directory_is_empty_path_not_dir(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test check_directory_is_empty with file path instead of directory."""
-        fs_utils.lm.text.return_value = "path_not_dir_error"
+        fs_utils.language_manager.text.return_value = "path_not_dir_error"
 
         is_empty, message = fs_utils.check_directory_is_empty(temp_file)
 
         assert is_empty is False
         assert message == "path_not_dir_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
     def test_check_directory_is_empty_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test check_directory_is_empty with unexpected exception."""
-        fs_utils.lm.text.return_value = "dir_check_fail_error"
+        fs_utils.language_manager.text.return_value = "dir_check_fail_error"
 
         mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
 
@@ -460,7 +460,7 @@ class TestFileSystemUtils:
 
         assert is_empty is False
         assert message == "dir_check_fail_error"
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
 
 
 class TestFileSystemUtilsDataDrivenTests:
@@ -471,8 +471,8 @@ class TestFileSystemUtilsDataDrivenTests:
         """Create FileSystemUtils instance for testing."""
         mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
         fs_utils = FileSystemUtils()
-        fs_utils.lm = mocker.MagicMock()
-        fs_utils.lm.text.return_value = "mocked_message"
+        fs_utils.language_manager = mocker.MagicMock()
+        fs_utils.language_manager.text.return_value = "mocked_message"
         return fs_utils
 
     @pytest.mark.parametrize(
@@ -546,7 +546,7 @@ class TestFileSystemUtilsDataDrivenTests:
 
         assert success is False
         assert result == "mocked_message"
-        fs_utils.lm.text.assert_called_with(expected_lm_call, error=exception_message)
+        fs_utils.language_manager.text.assert_called_with(expected_lm_call, error=exception_message)
 
     @pytest.mark.parametrize(
         "num_bytes_value",
@@ -580,8 +580,8 @@ class TestFileSystemUtilsEdgeCases:
         """Create FileSystemUtils instance for testing."""
         mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
         fs_utils = FileSystemUtils()
-        fs_utils.lm = mocker.MagicMock()
-        fs_utils.lm.text.return_value = "mocked_message"
+        fs_utils.language_manager = mocker.MagicMock()
+        fs_utils.language_manager.text.return_value = "mocked_message"
         return fs_utils
 
     def test_detect_encoding_very_small_file(self, fs_utils: FileSystemUtils, mocker) -> None:
@@ -640,7 +640,7 @@ class TestFileSystemUtilsEdgeCases:
 
     def test_create_directory_nested_path(self, fs_utils: FileSystemUtils) -> None:
         """Test create_directory with nested directory structure."""
-        fs_utils.lm.text.return_value = "directory_created_success"
+        fs_utils.language_manager.text.return_value = "directory_created_success"
 
         with tempfile.TemporaryDirectory() as temp_parent:
             nested_dir = os.path.join(temp_parent, "level1", "level2", "level3")
@@ -653,7 +653,7 @@ class TestFileSystemUtilsEdgeCases:
 
     def test_create_directory_with_special_characters(self, fs_utils: FileSystemUtils) -> None:
         """Test create_directory with special characters in directory name."""
-        fs_utils.lm.text.return_value = "directory_created_success"
+        fs_utils.language_manager.text.return_value = "directory_created_success"
 
         with tempfile.TemporaryDirectory() as temp_parent:
             special_dir = os.path.join(temp_parent, "test-dir_with.special@chars")
@@ -666,7 +666,7 @@ class TestFileSystemUtilsEdgeCases:
 
     def test_remove_file_readonly_file(self, fs_utils: FileSystemUtils, mocker) -> None:
         """Test remove_file with read-only file (simulated with OSError)."""
-        fs_utils.lm.text.return_value = "remove_file_os_error"
+        fs_utils.language_manager.text.return_value = "remove_file_os_error"
 
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_file_path = temp_file.name
@@ -686,7 +686,7 @@ class TestFileSystemUtilsEdgeCases:
 
     def test_check_directory_is_empty_with_hidden_files(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_is_empty with hidden files."""
-        fs_utils.lm.text.return_value = "dir_not_empty_message"
+        fs_utils.language_manager.text.return_value = "dir_not_empty_message"
 
         with tempfile.TemporaryDirectory() as temp_dir:
             # Create hidden file
@@ -720,8 +720,8 @@ class TestFileSystemUtilsIntegration:
         """Create FileSystemUtils instance for testing."""
         mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
         fs_utils = FileSystemUtils()
-        fs_utils.lm = mocker.MagicMock()
-        fs_utils.lm.text.return_value = "mocked_message"
+        fs_utils.language_manager = mocker.MagicMock()
+        fs_utils.language_manager.text.return_value = "mocked_message"
         return fs_utils
 
     def test_complete_file_workflow(self, fs_utils: FileSystemUtils, mocker) -> None:
@@ -746,7 +746,7 @@ class TestFileSystemUtilsIntegration:
             assert encoding == "utf-8"
 
             # Remove file
-            fs_utils.lm.text.return_value = "file_removed_success"
+            fs_utils.language_manager.text.return_value = "file_removed_success"
             success, message = fs_utils.remove_file(test_file)
             assert success is True
             assert not os.path.exists(test_file)
@@ -757,7 +757,7 @@ class TestFileSystemUtilsIntegration:
             test_dir = os.path.join(temp_parent, "test_directory")
 
             # Create directory
-            fs_utils.lm.text.return_value = "directory_created_success"
+            fs_utils.language_manager.text.return_value = "directory_created_success"
             success, message = fs_utils.create_directory(test_dir)
             assert success is True
             assert os.path.isdir(test_dir)
@@ -768,7 +768,7 @@ class TestFileSystemUtilsIntegration:
             assert message == ""
 
             # Check directory is empty
-            fs_utils.lm.text.return_value = "dir_empty_message"
+            fs_utils.language_manager.text.return_value = "dir_empty_message"
             is_empty, message = fs_utils.check_directory_is_empty(test_dir)
             assert is_empty is True
 
@@ -778,7 +778,7 @@ class TestFileSystemUtilsIntegration:
                 f.write("directory content")
 
             # Check directory is not empty
-            fs_utils.lm.text.return_value = "dir_not_empty_message"
+            fs_utils.language_manager.text.return_value = "dir_not_empty_message"
             is_empty, message = fs_utils.check_directory_is_empty(test_dir)
             assert is_empty is False
 
@@ -788,39 +788,39 @@ class TestFileSystemUtilsIntegration:
         non_existent = "/path/that/does/not/exist.txt"
 
         # Check file exists - should fail
-        fs_utils.lm.text.return_value = "file_not_found_error"
+        fs_utils.language_manager.text.return_value = "file_not_found_error"
         exists, messages = fs_utils.check_file_exists(non_existent)
         assert exists is False
         assert len(messages) == 1
 
         # Try to remove non-existent file - should succeed (no-op)
-        fs_utils.lm.text.return_value = "file_not_found_info"
+        fs_utils.language_manager.text.return_value = "file_not_found_info"
         success, message = fs_utils.remove_file(non_existent)
         assert success is True  # Remove returns True for non-existent files
 
         # Try to detect encoding - should fail
-        fs_utils.lm.text.return_value = "file_not_found_error"
+        fs_utils.language_manager.text.return_value = "file_not_found_error"
         success, result = fs_utils.detect_encoding(non_existent)
         assert success is False
 
     def test_multilingual_message_integration(self, fs_utils: FileSystemUtils) -> None:
         """Test that language manager is properly called with correct keys."""
-        # Test various operations to ensure lm.text is called with correct keys
+        # Test various operations to ensure language_manager.text is called with correct keys
 
         # Empty path test
-        fs_utils.lm.text.reset_mock()
+        fs_utils.language_manager.text.reset_mock()
         fs_utils.detect_encoding("")
-        fs_utils.lm.text.assert_called_with("fs_utils_error_file_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_path_empty")
 
         # Non-existent file test
-        fs_utils.lm.text.reset_mock()
+        fs_utils.language_manager.text.reset_mock()
         fs_utils.remove_file("/non/existent/file.txt")
-        fs_utils.lm.text.assert_called_with("fs_utils_info_file_not_found", filename="file.txt")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_info_file_not_found", filename="file.txt")
 
         # Empty directory name test
-        fs_utils.lm.text.reset_mock()
+        fs_utils.language_manager.text.reset_mock()
         fs_utils.create_directory("")
-        fs_utils.lm.text.assert_called_with("fs_utils_error_dir_path_empty")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_path_empty")
 
     def test_cross_platform_path_handling(self, fs_utils: FileSystemUtils) -> None:
         """Test that file system operations work with different path formats."""

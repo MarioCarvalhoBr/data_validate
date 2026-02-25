@@ -15,10 +15,10 @@ from data_validate.helpers.common.validation.dataframe_processing import DataFra
 from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
 from data_validate.models import SpTemporalReference
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpTemporalReferenceValidator(ValidatorModelABC):
+class SpTemporalReferenceValidator(BaseValidator):
     """
     Validates Temporal Reference spreadsheet content.
 
@@ -29,14 +29,14 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
 
     Notes
     -----
-    Inherits validation infrastructure from ValidatorModelABC including column
+    Inherits validation infrastructure from BaseValidator including column
     existence checks and report generation capabilities.
     """
 
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -46,14 +46,14 @@ class SpTemporalReferenceValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpTemporalReference,
             **kwargs,
         )

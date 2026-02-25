@@ -422,7 +422,7 @@ class TestDataArgs:
         mocker.patch.object(DataReport, "__init__", return_value=None)
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.lm = mocker.MagicMock()
+        data_args.language_manager = mocker.MagicMock()
         data_args.allow_abbrev = True
         data_args.run()
 
@@ -571,7 +571,7 @@ class TestDataArgsEdgeCases:
         mock_parse_args.return_value = mocker.MagicMock()
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.lm = mocker.MagicMock()
+        data_args.language_manager = mocker.MagicMock()
         data_args.allow_abbrev = True
 
         parser = data_args._create_parser()
@@ -606,7 +606,7 @@ class TestDataArgsEdgeCases:
         mock_parse_args.return_value = mocker.MagicMock()
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.lm = mocker.MagicMock()
+        data_args.language_manager = mocker.MagicMock()
         data_args.allow_abbrev = False
 
         parser = data_args._create_parser()
@@ -681,7 +681,7 @@ class TestDataArgsIntegration:
 
         # Verify all components initialized correctly
         assert data_args.allow_abbrev is False
-        assert isinstance(data_args.lm, mocker.MagicMock)
+        assert isinstance(data_args.language_manager, mocker.MagicMock)
 
         # Verify DataFile
         assert data_args.data_file.input_folder == temp_input_dir

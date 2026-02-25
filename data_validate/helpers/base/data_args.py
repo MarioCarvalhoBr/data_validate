@@ -222,7 +222,7 @@ class DataArgs:
         data_action (DataAction): Instance handling execution flags.
         data_report (DataReport): Instance handling report metadata.
         allow_abbrev (bool): Whether to allow argument abbreviation in argparse.
-        lm (LanguageManager): Manager for localization strings.
+        language_manager (LanguageManager): Manager for localization strings.
     """
 
     def __init__(self, allow_abbrev=True):
@@ -233,7 +233,7 @@ class DataArgs:
             allow_abbrev (bool, optional): Allows argument abbreviations. Defaults to True.
         """
 
-        self.lm: LanguageManager = LanguageManager()
+        self.language_manager: LanguageManager = LanguageManager()
 
         self.data_file = None
         self.data_action = None

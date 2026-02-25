@@ -25,10 +25,10 @@ from data_validate.models import (
     SpValue,
     SpProportionality,
 )
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpCompositionGraphValidator(ValidatorModelABC):
+class SpCompositionGraphValidator(BaseValidator):
     """
     Validates composition structures using graph-based analysis.
 
@@ -77,7 +77,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -87,14 +87,14 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all data models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report list for validation results aggregation.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpComposition,
             **kwargs,
         )
@@ -171,10 +171,10 @@ class SpCompositionGraphValidator(ValidatorModelABC):
 
         # Set dataframes
         self.model_dataframes = {
-            self.sp_name_composition: self.model_sp_composition.data_loader_model.df_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.df_data,
-            self.sp_name_value: self.model_sp_value.data_loader_model.df_data,
-            self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.df_data,
+            self.sp_name_composition: self.model_sp_composition.data_loader_model.raw_data,
+            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
+            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data,
+            self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.raw_data,
         }
 
         # Setup graph processing if composition data is available
@@ -456,7 +456,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
         errors: List[str] = []
         warnings: List[str] = []
 
-        if self.model_sp_value.data_loader_model.df_data.empty:
+        if self.model_sp_value.data_loader_model.raw_data.empty:
             self.set_not_executed(
                 [
                     (
@@ -473,7 +473,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             self.sp_name_value: self.global_required_columns[self.sp_name_value],
         }
 
-        if self.model_sp_proportionality.data_loader_model.read_success and not self.model_sp_proportionality.data_loader_model.df_data.empty:
+        if self.model_sp_proportionality.data_loader_model.is_read_successful and not self.model_sp_proportionality.data_loader_model.raw_data.empty:
             local_required_columns[self.sp_name_proportionality] = [SpProportionality.RequiredColumn.COLUMN_ID.name]
 
         column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
@@ -539,7 +539,7 @@ class SpCompositionGraphValidator(ValidatorModelABC):
             (self.validate_associated_indicators_leafs, NamesEnum.LEAF_NO_DATA.value),
         ]
 
-        if self.model_sp_composition.data_loader_model.df_data.empty:
+        if self.model_sp_composition.data_loader_model.raw_data.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 

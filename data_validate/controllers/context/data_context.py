@@ -34,7 +34,7 @@ class DataModelsContext(GeneralContext):
     def __init__(
         self,
         context: GeneralContext,
-        models_to_use: List[Any] = None,
+        initialized_models: List[Any] = None,
         **kwargs: Dict[str, Any],
     ):
         """
@@ -42,7 +42,7 @@ class DataModelsContext(GeneralContext):
 
         Args:
             context (GeneralContext): The parent application context.
-            models_to_use (List[Any], optional): List of models to be managed. Defaults to None.
+            initialized_models (List[Any], optional): List of models to be managed. Defaults to None.
             **kwargs: Additional keyword arguments passed to the parent `GeneralContext`.
         """
         super().__init__(
@@ -51,7 +51,7 @@ class DataModelsContext(GeneralContext):
         )
 
         self.context = context
-        self.models_to_use = models_to_use or []
+        self.models_to_use = initialized_models or []
 
         self.data = {}
         self.errors = []

@@ -4,7 +4,7 @@
 from data_validate.validators.spell.spellchecker_validator import SpellCheckerValidator
 
 # Package spreadsheets
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 from data_validate.validators.spreadsheets.composition import (
     SpCompositionTreeValidator,
     SpCompositionGraphValidator,
@@ -29,13 +29,13 @@ from data_validate.validators.spreadsheets.value.value_validator import (
 )
 
 # Package structure
-from data_validate.validators.structure.validator_structure import (
-    ValidatorStructureFiles,
+from data_validate.validators.structure.file_structure_validator import (
+    FileStructureValidator,
 )
 
 __all__ = [
     # Package spreadsheets
-    "ValidatorModelABC",
+    "BaseValidator",
     "SpDescriptionValidator",
     "SpValueValidator",
     "SpCompositionTreeValidator",
@@ -47,5 +47,5 @@ __all__ = [
     # Package spell
     "SpellCheckerValidator",
     # Package structure
-    "ValidatorStructureFiles",
+    "FileStructureValidator",
 ]

@@ -25,7 +25,7 @@ class ApplicationConfig:
     value representations, report generation settings, and file extensions.
 
     Attributes:
-        lm (LanguageManager): Manager for handling localized text.
+        language_manager (LanguageManager): Manager for handling localized text.
         spreadsheet_info (SpreadsheetInfo): Information about the spreadsheets used in the application.
         names_enum (NamesEnum): Enumeration of verification names used in the application.
     """
@@ -102,7 +102,7 @@ class ApplicationConfig:
 
         Sets up the LanguageManager for handling localized strings throughout the application.
         """
-        self.lm: LanguageManager = LanguageManager()
+        self.language_manager: LanguageManager = LanguageManager()
         self.spreadsheet_info = SpreadsheetInfo()
         self.names_enum = NamesEnum
 
@@ -122,7 +122,7 @@ class ApplicationConfig:
         keys = [element for element in NamesEnum]
         values = [
             (
-                self.lm.text(
+                self.language_manager.text(
                     str(element.value),
                     value=(
                         self.TITLE_OVER_N_CHARS
@@ -131,7 +131,7 @@ class ApplicationConfig:
                     ),
                 )
                 if element in (NamesEnum.TITLES_N, NamesEnum.SIMP_DESC_N)
-                else self.lm.text(str(element.value))
+                else self.language_manager.text(str(element.value))
             )
             for element in keys
         ]

@@ -100,7 +100,7 @@ class SpComposition(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -129,7 +129,7 @@ class SpComposition(SpModelABC):
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
             df, errors = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.df_data,
+                self.data_loader_model.raw_data,
                 self.filename,
                 [str(column_name)],
                 min_value=1,
@@ -151,7 +151,7 @@ class SpComposition(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()

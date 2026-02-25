@@ -205,12 +205,12 @@ class ModelListReport:
             )
             if len(report.errors) > n_messages:
                 count_omitted_errors = NumberFormattingProcessing.format_number_brazilian(len(report.errors) - n_messages, locale)
-                flattened_report.add_error(self.context.lm.text("model_report_msg_errors_omitted", count=count_omitted_errors))
+                flattened_report.add_error(self.context.language_manager.text("model_report_msg_errors_omitted", count=count_omitted_errors))
 
             if len(report.warnings) > n_messages:
                 count_omitted_warnings = NumberFormattingProcessing.format_number_brazilian(len(report.warnings) - n_messages, locale)
                 flattened_report.add_warning(
-                    self.context.lm.text(
+                    self.context.language_manager.text(
                         "model_report_msg_warnings_omitted",
                         count=count_omitted_warnings,
                     )

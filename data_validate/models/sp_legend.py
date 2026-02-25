@@ -123,7 +123,7 @@ class SpLegend(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -141,7 +141,7 @@ class SpLegend(SpModelABC):
         2. Perform specific legend validations (handled in SpLegendValidator now).
         """
         errors = []
-        dataframe = self.data_loader_model.df_data
+        dataframe = self.data_loader_model.raw_data
 
         legend_validator = LegendProcessing(value_data_unavailable=self.context.config.LABEL_DATA_UNAVAILABLE, filename=self.filename)
 
@@ -199,7 +199,7 @@ class SpLegend(SpModelABC):
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
 
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()
         if self.is_sanity_check_passed:

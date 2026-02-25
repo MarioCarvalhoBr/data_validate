@@ -171,31 +171,31 @@ class SpDescription(SpModelABC):
         local_expected_columns = list(self.RequiredColumn.ALL)
 
         # 1.0. Handling dynamic columns: scenarios
-        if (not self.scenario_read_success) and (self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.df_data.columns):
+        if (not self.scenario_read_success) and (self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.raw_data.columns):
             self.structural_errors.append(
                 f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{SHEET.SP_NAME_SCENARIOS}' não estiver configurado ou não existir."
             )
-            self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
+            self.data_loader_model.raw_data = self.data_loader_model.raw_data.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         elif self.scenario_exists_file:
             local_expected_columns.append(str(self.DynamicColumn.COLUMN_SCENARIO.name))
 
         # 1.1 Handling dynamic columns: legend
-        if (not self.legend_read_success) and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
+        if (not self.legend_read_success) and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.raw_data.columns):
             self.structural_errors.append(
                 f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir."
             )
-            self.data_loader_model.df_data = self.data_loader_model.df_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
+            self.data_loader_model.raw_data = self.data_loader_model.raw_data.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
         elif self.legend_exists_file:
             local_expected_columns.append(str(self.DynamicColumn.COLUMN_LEGEND.name))
 
         # 2. Handling optional columns
-        if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.df_data.columns:
-            self.data_loader_model.df_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
-        if self.OptionalColumn.COLUMN_UNIT.name not in self.data_loader_model.df_data.columns:
-            self.data_loader_model.df_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
+        if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.raw_data.columns:
+            self.data_loader_model.raw_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
+        if self.OptionalColumn.COLUMN_UNIT.name not in self.data_loader_model.raw_data.columns:
+            self.data_loader_model.raw_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
 
         for opt_column_name in self.OptionalColumn.ALL:
-            if (opt_column_name in self.data_loader_model.df_data.columns) and (opt_column_name not in local_expected_columns):
+            if (opt_column_name in self.data_loader_model.raw_data.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
         self.EXPECTED_COLUMNS = local_expected_columns
 
@@ -207,7 +207,7 @@ class SpDescription(SpModelABC):
         Updates structural errors and warnings lists.
         """
         # Check missing columns, expected columns, and extra columns
-        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(self.data_loader_model.df_data, self.EXPECTED_COLUMNS)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(self.data_loader_model.raw_data, self.EXPECTED_COLUMNS)
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
         )
@@ -238,7 +238,7 @@ class SpDescription(SpModelABC):
         # Clean and validate required columns (minimum value: 1)
         for column_name in column_attribute_mapping.keys():
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.df_data,
+                self.data_loader_model.raw_data,
                 self.filename,
                 [str(column_name)],
                 min_value=1,
@@ -251,10 +251,10 @@ class SpDescription(SpModelABC):
                 setattr(self.RequiredColumn, attribute_name, dataframe_cleaned[column_name])
 
         # 2. If scenarios exist, clean and validate 'cenario' column (minimum -1)
-        if self.scenarios_list:
+        if self.scenarios:
             column_name_scenario = self.DynamicColumn.COLUMN_SCENARIO.name
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.df_data,
+                self.data_loader_model.raw_data,
                 self.filename,
                 [str(column_name_scenario)],
                 min_value=-1,
@@ -264,10 +264,10 @@ class SpDescription(SpModelABC):
             self.data_cleaning_errors.extend(errors_data_clean_local)
 
         # 3. If legend column exists, ensure values are integers (minimum 1) or empty
-        if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.df_data.columns):
+        if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.raw_data.columns):
             column_name_legend = self.DynamicColumn.COLUMN_LEGEND.name
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.df_data,
+                self.data_loader_model.raw_data,
                 self.filename,
                 [str(column_name_legend)],
                 min_value=1,
@@ -288,7 +288,7 @@ class SpDescription(SpModelABC):
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
         # If dataframe is empty, it doesn't make sense to continue
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()

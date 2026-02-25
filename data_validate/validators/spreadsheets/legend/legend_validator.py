@@ -17,7 +17,7 @@ from data_validate.helpers.common.processing.collections_processing import Colle
 
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.models import SpDescription, SpLegend, SpValue
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
 class ModelMappingLegend:
@@ -83,7 +83,7 @@ class ModelMappingLegend:
         return f"ModelMappingLegend:(column_sp_value={self.column_sp_value}, indicator_id={self.indicator_id}, legend_id={self.legend_id}, min_value={self.min_value}, max_value={self.max_value})"
 
 
-class SpLegendValidator(ValidatorModelABC):
+class SpLegendValidator(BaseValidator):
     """
     Validates Legend spreadsheet content and relationships.
 
@@ -120,7 +120,7 @@ class SpLegendValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -130,14 +130,14 @@ class SpLegendValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpLegend,
             **kwargs,
         )
@@ -149,7 +149,7 @@ class SpLegendValidator(ValidatorModelABC):
 
         # Get model properties once
         self.scenario_exists_file = self.model_sp_value.scenario_exists_file
-        self.scenarios_list = self.model_sp_value.scenarios_list
+        self.scenarios_list = self.model_sp_value.scenarios
 
         self.sp_name_legend = ""
         self.sp_name_description = ""
@@ -184,9 +184,9 @@ class SpLegendValidator(ValidatorModelABC):
 
         # Validate all required columns exist
         self.model_dataframes = {
-            self.sp_name_legend: self.model_sp_legend.data_loader_model.df_data.copy(),
-            self.sp_name_description: self.model_sp_description.data_loader_model.df_data.copy(),
-            self.sp_name_value: self.model_sp_value.data_loader_model.df_data.copy(),
+            self.sp_name_legend: self.model_sp_legend.data_loader_model.raw_data.copy(),
+            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data.copy(),
+            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data.copy(),
         }
 
     def validate_relation_indicators_in_legend(self) -> Tuple[List[str], List[str]]:
@@ -381,7 +381,7 @@ class SpLegendValidator(ValidatorModelABC):
         """
         errors, warnings = [], []
 
-        if self.model_sp_value.data_loader_model.df_data.empty:
+        if self.model_sp_value.data_loader_model.raw_data.empty:
             return errors, warnings
 
         min_lower_legend_default = self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
@@ -555,7 +555,7 @@ class SpLegendValidator(ValidatorModelABC):
             validations.append((self.validate_relation_indicators_in_legend, NamesEnum.LEG_REL.value))
         validations.append((self.validate_range_multiple_legend, NamesEnum.LEG_RANGE.value))
 
-        if self.model_sp_description.data_loader_model.df_data.empty:
+        if self.model_sp_description.data_loader_model.raw_data.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 

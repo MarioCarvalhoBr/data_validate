@@ -26,13 +26,13 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, df_data=df_data, read_success=True)
+        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
 
         assert model.input_folder == "/test/folder"
         assert model.path == mock_path
-        assert model.df_data.equals(df_data)
-        assert model.read_success is True
-        assert model.exists_file is True
+        assert model.raw_data.equals(df_data)
+        assert model.is_read_successful is True
+        assert model.does_file_exist is True
         assert model.name == "test_file"
         assert model.filename == "test_file.csv"
         assert model.extension == ".csv"
@@ -50,7 +50,7 @@ class TestDataLoaderModel:
         df_data = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
         df_data.columns = pd.MultiIndex.from_tuples([("A", "col1"), ("B", "col2")])
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, df_data=df_data, read_success=True)
+        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
 
         assert model.header_type == "double"
 
@@ -60,10 +60,10 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame({"col1": [1, 2]})
 
-        model = DataLoaderModel(input_folder="/test/folder", path=Path(string_path), df_data=df_data, read_success=True)
+        model = DataLoaderModel(input_folder="/test/folder", path=Path(string_path), raw_data=df_data, is_read_successful=True)
 
         assert model.path == Path(string_path)
-        assert model.exists_file is False  # String path doesn't have exists() method
+        assert model.does_file_exist is False  # String path doesn't have exists() method
 
     def test_initialization_with_failed_read(self, mocker) -> None:
         """Test DataLoaderModel initialization with failed read."""
@@ -75,10 +75,10 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame()
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, df_data=df_data, read_success=False)
+        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=False)
 
-        assert model.read_success is False
-        assert model.exists_file is False
+        assert model.is_read_successful is False
+        assert model.does_file_exist is False
 
     def test_string_representation(self, mocker) -> None:
         """Test string representation of DataLoaderModel."""
@@ -90,7 +90,7 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, df_data=df_data, read_success=True)
+        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
 
         str_repr = str(model)
 
@@ -100,8 +100,8 @@ class TestDataLoaderModel:
         assert "filename: test_file.csv" in str_repr
         assert "extension: .csv" in str_repr
         assert "header_type: single" in str_repr
-        assert "read_success: True" in str_repr
-        assert "exists_file: True" in str_repr
+        assert "is_read_successful: True" in str_repr
+        assert "does_file_exist: True" in str_repr
 
 
 class TestDataLoaderFacade:
@@ -157,8 +157,8 @@ class TestDataLoaderFacade:
         assert "file2" in data  # Missing file should be added as empty
         assert "qmls" in data
         assert isinstance(data["file1"], DataLoaderModel)
-        assert data["file1"].read_success is True
-        assert data["file2"].read_success is False  # Missing file
+        assert data["file1"].is_read_successful is True
+        assert data["file2"].is_read_successful is False  # Missing file
 
     def test_load_all_with_file_not_found_error(self, mocker) -> None:
         """Test load_all with FileNotFoundError."""
@@ -192,7 +192,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 1
         assert "Arquivo não encontrado no diretório" in errors[0]
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_with_unicode_decode_error(self, mocker) -> None:
         """Test load_all with UnicodeDecodeError."""
@@ -226,7 +226,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 1
         assert "Erro de codificação do arquivo" in errors[0]
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_with_parser_error(self, mocker) -> None:
         """Test load_all with pandas ParserError."""
@@ -260,7 +260,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 1
         assert "Erro na estrutura da planilha" in errors[0]
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_with_value_error(self, mocker) -> None:
         """Test load_all with ValueError."""
@@ -294,7 +294,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 1
         assert "Erro nos valores da planilha" in errors[0]
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_with_io_error(self, mocker) -> None:
         """Test load_all with IOError."""
@@ -328,7 +328,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 1
         assert "Erro de entrada/saída ao ler o arquivo" in errors[0]
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_with_general_exception(self, mocker) -> None:
         """Test load_all with general Exception."""
@@ -362,7 +362,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 1
         assert "Erro inesperado ao processar o arquivo" in errors[0]
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_with_qml_files(self, mocker) -> None:
         """Test load_all with QML files."""
@@ -429,7 +429,7 @@ class TestDataLoaderFacade:
 
         assert len(errors) == 0
         assert "file1" in data
-        assert data["file1"].read_success is True
+        assert data["file1"].is_read_successful is True
 
     def test_load_all_with_unknown_header_type(self, mocker) -> None:
         """Test load_all with unknown header type (should skip)."""
@@ -454,7 +454,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 0
         # file1 should be added as missing since it was skipped
         assert "file1" in data
-        assert data["file1"].read_success is False
+        assert data["file1"].is_read_successful is False
 
     def test_load_all_missing_files_handling(self, mocker) -> None:
         """Test load_all handles missing files correctly."""
@@ -479,7 +479,7 @@ class TestDataLoaderFacade:
         assert len(errors) == 0
         assert "file1" in data
         assert "file2" in data
-        assert data["file1"].read_success is False
-        assert data["file2"].read_success is False
+        assert data["file1"].is_read_successful is False
+        assert data["file2"].is_read_successful is False
         assert data["file1"].path == Path("file1")
         assert data["file2"].path == Path("file2")

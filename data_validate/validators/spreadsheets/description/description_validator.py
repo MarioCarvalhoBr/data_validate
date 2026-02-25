@@ -21,10 +21,10 @@ from data_validate.helpers.common.formatting.text_formatting_processing import T
 from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
 from data_validate.models import SpDescription
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class SpDescriptionValidator(ValidatorModelABC):
+class SpDescriptionValidator(BaseValidator):
     """
     Validates Description spreadsheet content and metadata.
 
@@ -43,7 +43,7 @@ class SpDescriptionValidator(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -53,14 +53,14 @@ class SpDescriptionValidator(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpDescription,
             **kwargs,
         )

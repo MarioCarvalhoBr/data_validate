@@ -14,10 +14,10 @@ from data_validate.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.report.model_report import ModelListReport
 from data_validate.models import SpDescription
-from data_validate.validators.spreadsheets.base.validator_model_abc import ValidatorModelABC
+from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
 
-class ValidatorStructureFiles(ValidatorModelABC):
+class FileStructureValidator(BaseValidator):
     """
     Validates the structure of files in the input folder.
 
@@ -42,7 +42,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        report_list: ModelListReport,
+        validation_reports: ModelListReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -52,14 +52,14 @@ class ValidatorStructureFiles(ValidatorModelABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        report_list : ModelListReport
+        validation_reports : ModelListReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
         """
         super().__init__(
             data_models_context=data_models_context,
-            report_list=report_list,
+            validation_reports=validation_reports,
             type_class=SpDescription,
             **kwargs,
         )
@@ -99,7 +99,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
         is_empty, message = self.context.fs_utils.check_directory_is_empty(self.context.data_args.data_file.input_folder)
         if is_empty:
             local_errors.append(
-                self.context.lm.text(
+                self.context.language_manager.text(
                     "validator_structure_error_empty_directory",
                     dir_path=self.context.data_args.data_file.input_folder,
                 )
@@ -131,14 +131,14 @@ class ValidatorStructureFiles(ValidatorModelABC):
             dir_path = os.path.join(self.context.data_args.data_file.input_folder, self.dir_files[0])
             is_dir, _ = self.context.fs_utils.check_directory_exists(dir_path)
             if is_dir:
-                local_errors.append(self.context.lm.text("validator_structure_error_files_not_in_folder"))
+                local_errors.append(self.context.language_manager.text("validator_structure_error_files_not_in_folder"))
                 return not local_errors, local_errors
 
         for file_name in self.dir_files:
             file_path = os.path.join(self.context.data_args.data_file.input_folder, file_name)
             is_file, _ = self.context.fs_utils.check_file_exists(file_path)
             if not is_file:
-                local_errors.append(self.context.lm.text("validator_structure_error_unexpected_folder").format(file_name=file_name))
+                local_errors.append(self.context.language_manager.text("validator_structure_error_unexpected_folder").format(file_name=file_name))
                 continue
 
             file_base, file_ext = os.path.splitext(file_name)
@@ -148,7 +148,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
             if file_base in optional_files and file_ext in optional_files[file_base]:
                 continue
 
-            local_errors.append(self.context.lm.text("validator_structure_error_unexpected_file").format(file_name=file_name))
+            local_errors.append(self.context.language_manager.text("validator_structure_error_unexpected_file").format(file_name=file_name))
 
         return not local_errors, local_errors
 
@@ -179,7 +179,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
                     file_found = True
                     break
             if not file_found:
-                local_errors.append(self.context.lm.text("validator_structure_error_missing_file").format(file_base=file_base))
+                local_errors.append(self.context.language_manager.text("validator_structure_error_missing_file").format(file_base=file_base))
         return not local_errors, local_errors
 
     def check_ignored_files_in_folder_root(self) -> Tuple[bool, List[str]]:
@@ -209,7 +209,7 @@ class ValidatorStructureFiles(ValidatorModelABC):
 
         for file_base, extensions in file_groups.items():
             if ".xlsx" in extensions and ".csv" in extensions:
-                local_errors.append(self.context.lm.text("validator_structure_error_conflicting_files").format(file_base=file_base))
+                local_errors.append(self.context.language_manager.text("validator_structure_error_conflicting_files").format(file_base=file_base))
 
         return not local_errors, local_errors
 

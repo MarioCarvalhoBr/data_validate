@@ -271,7 +271,7 @@ class TestCheckColumnNames:
         assert set(extra_columns) == set(expected_missing)
 
     @pytest.mark.parametrize(
-        "df_data,expected_cols,should_have_missing,should_have_extra",
+        "raw_data,expected_cols,should_have_missing,should_have_extra",
         [
             # Test case 1: Brazilian Portuguese column names
             (
@@ -302,14 +302,14 @@ class TestCheckColumnNames:
     )
     def test_check_column_names_with_domain_specific_data(
         self,
-        df_data: dict,
+        raw_data: dict,
         expected_cols: List[str],
         should_have_missing: bool,
         should_have_extra: bool,
     ) -> None:
         """Test with domain-specific column names (environmental/scientific data)."""
         # Arrange
-        df = pd.DataFrame(df_data)
+        df = pd.DataFrame(raw_data)
 
         # Act
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(df, expected_cols)

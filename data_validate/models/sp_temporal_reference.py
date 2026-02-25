@@ -101,7 +101,7 @@ class SpTemporalReference(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -122,19 +122,19 @@ class SpTemporalReference(SpModelABC):
             List[str]: List of data cleaning errors (unused return in this implementation).
         """
         # Verify if the scenarios list is empty and handle single-value constraint
-        if (not self.scenarios_list) and (len(self.data_loader_model.df_data) != 1):
+        if (not self.scenarios) and (len(self.data_loader_model.raw_data) != 1):
             self.data_cleaning_errors.append(
                 f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{SHEET.SP_NAME_SCENARIOS}' não existe ou está vazio."
             )
 
-            if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
+            if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.raw_data.columns:
+                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.raw_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
         else:
             # 1. Clean and validate the 'symbol' column (minimum 0)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
 
             df, errors_symbol = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.df_data, self.filename, [str(col_symbol)], min_value=0
+                self.data_loader_model.raw_data, self.filename, [str(col_symbol)], min_value=0
             )
             self.data_cleaning_errors.extend(errors_symbol)
 
@@ -151,7 +151,7 @@ class SpTemporalReference(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()

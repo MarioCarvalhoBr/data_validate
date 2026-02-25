@@ -93,16 +93,16 @@ class SpScenario(SpModelABC):
 
     def pre_processing(self):
         """Run pre-processing steps."""
-        if self.scenario_exists_file and not self.scenarios_list:
+        if self.scenario_exists_file and not self.scenarios:
             self.structural_errors.extend(
                 [f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."]
             )
 
         # Repeated values in the 'simbolo' column
-        if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.df_data.columns:
-            duplicated_symbols = self.data_loader_model.df_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(keep=False)
+        if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.raw_data.columns:
+            duplicated_symbols = self.data_loader_model.raw_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(keep=False)
             if duplicated_symbols.any():
-                duplicated_values = self.data_loader_model.df_data[duplicated_symbols][self.RequiredColumn.COLUMN_SYMBOL.name].unique()
+                duplicated_values = self.data_loader_model.raw_data[duplicated_symbols][self.RequiredColumn.COLUMN_SYMBOL.name].unique()
                 self.structural_errors.append(
                     f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]"
                 )
@@ -116,7 +116,7 @@ class SpScenario(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.df_data, list(self.RequiredColumn.ALL)
+            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -139,7 +139,7 @@ class SpScenario(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.exists_file:
+        if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()

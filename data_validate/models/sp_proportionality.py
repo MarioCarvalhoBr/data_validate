@@ -92,11 +92,11 @@ class SpProportionality(SpModelABC):
         """
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
-        unique_columns_level_1 = self.data_loader_model.df_data.columns.get_level_values(0).unique().tolist()
+        unique_columns_level_1 = self.data_loader_model.raw_data.columns.get_level_values(0).unique().tolist()
         unique_columns_level_1 = [col for col in unique_columns_level_1 if not col.lower().startswith("unnamed: 0_level_0")]
 
         __, level_1_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
-            unique_columns_level_1, self.scenarios_list
+            unique_columns_level_1, self.scenarios
         )
 
         if level_1_codes_not_matched_by_pattern:
@@ -104,11 +104,11 @@ class SpProportionality(SpModelABC):
                 f"{self.filename}, linha 1: Colunas de nível 1 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_1_codes_not_matched_by_pattern}"
             )
 
-        unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
+        unique_columns_level_2 = self.data_loader_model.raw_data.columns.get_level_values(1).unique().tolist()
         unique_columns_level_2 = [col for col in unique_columns_level_2 if col != self.RequiredColumn.COLUMN_ID.name]
 
         __, level_2_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
-            unique_columns_level_2, self.scenarios_list
+            unique_columns_level_2, self.scenarios
         )
 
         if level_2_codes_not_matched_by_pattern:
@@ -124,14 +124,14 @@ class SpProportionality(SpModelABC):
         Updates structural errors list.
         """
         if self.data_loader_model.header_type == "double":
-            unique_columns_level_1 = self.data_loader_model.df_data.columns.get_level_values(0).unique().tolist()
-            unique_columns_level_2 = self.data_loader_model.df_data.columns.get_level_values(1).unique().tolist()
+            unique_columns_level_1 = self.data_loader_model.raw_data.columns.get_level_values(0).unique().tolist()
+            unique_columns_level_2 = self.data_loader_model.raw_data.columns.get_level_values(1).unique().tolist()
 
             # Check extra columns in level 1 (do not ignore 'id')
             _, extras_level_1 = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
                 source_list=unique_columns_level_1,
                 strings_to_ignore=[],  # Do not ignore 'id' here
-                suffixes_for_matching=self.scenarios_list,
+                suffixes_for_matching=self.scenarios,
             )
             for extra_column in extras_level_1:
                 if not extra_column.lower().startswith("unnamed"):
@@ -141,7 +141,7 @@ class SpProportionality(SpModelABC):
             _, extras_level_2 = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
                 source_list=unique_columns_level_2,
                 strings_to_ignore=[self.RequiredColumn.COLUMN_ID.name],
-                suffixes_for_matching=self.scenarios_list,
+                suffixes_for_matching=self.scenarios,
             )
             for extra_column in extras_level_2:
                 if not extra_column.lower().startswith("unnamed"):
@@ -159,7 +159,7 @@ class SpProportionality(SpModelABC):
     def post_processing(self):
         """Run post-processing steps (currently empty)."""
         if self.structural_errors:
-            self.data_loader_model.df_data = pd.DataFrame()  # Clear DataFrame to avoid further processing
+            self.data_loader_model.raw_data = pd.DataFrame()  # Clear DataFrame to avoid further processing
             self.data_loader_model.header_type = "invalid"
 
     def run(self):
@@ -168,7 +168,7 @@ class SpProportionality(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.exists_file and not self.data_loader_model.df_data.empty and self.data_loader_model.header_type == "double":
+        if self.data_loader_model.does_file_exist and not self.data_loader_model.raw_data.empty and self.data_loader_model.header_type == "double":
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()
