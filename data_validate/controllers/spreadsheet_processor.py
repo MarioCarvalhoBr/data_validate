@@ -35,7 +35,7 @@ class SpreadsheetProcessor:
         raw_data_map (Dict[str, Any]): Raw data loaded from files via DataLoaderFacade.
         data_loader_facade (DataLoaderFacade): Facade handles reading/parsing input files.
         model_configurations (Dict[str, Any]): Shared arguments passed to model constructors.
-        data_models_context (DataModelsContext): Specialized context holding initialized data models.
+        data_models_context (DataModelContext): Specialized context holding initialized data models.
         initialized_models (List[SpModelABC]): List of instantiated spreadsheet models.
         target_model_classes (List[Type[SpModelABC]]): List of model classes to process.
         validation_reports (ValidationReport): Aggregator for validation errors and warnings.
@@ -70,7 +70,7 @@ class SpreadsheetProcessor:
         self.data_loader_facade = None
         self.model_configurations = None
 
-        self.data_models_context: controllers.DataModelsContext | None = None
+        self.data_models_context: controllers.DataModelContext | None = None
         self.initialized_models = []
         self.target_model_classes = [
             models.SpDescription,
@@ -182,7 +182,7 @@ class SpreadsheetProcessor:
         """
         Construct and execute the main validation pipeline.
 
-        Initializes the `DataModelsContext` with the configured models and runs
+        Initializes the `DataModelContext` with the configured models and runs
         a sequence of validators:
         1. **Structure**: File structure checks.
         2. **Spelling**: Spell checking on text fields.
@@ -192,7 +192,7 @@ class SpreadsheetProcessor:
         self.context.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_models_context = controllers.DataModelsContext(context=self.context, initialized_models=self.initialized_models)
+        self.data_models_context = controllers.DataModelContext(context=self.context, initialized_models=self.initialized_models)
 
         # RUN ALL VALIDATIONS PIPELINE
 

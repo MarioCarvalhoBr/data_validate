@@ -11,7 +11,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, List, Type, Tuple, Callable
 
 import pandas as pd
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 
@@ -28,7 +28,7 @@ class BaseValidator(ABC):
 
     Attributes
     ----------
-    _data_models_context : DataModelsContext
+    _data_models_context : DataModelContext
         Context containing all loaded spreadsheet models and configuration.
     _report_list : ValidationReport
         Aggregator for collecting and organizing validation results.
@@ -50,7 +50,7 @@ class BaseValidator(ABC):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         type_class: Type[SpModelABC],
         **kwargs: Dict[str, Any],
@@ -60,7 +60,7 @@ class BaseValidator(ABC):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all loaded spreadsheet models, configuration, and utilities.
         validation_reports : ValidationReport
             Report aggregator for collecting validation results.
@@ -78,7 +78,7 @@ class BaseValidator(ABC):
         self._data_model = self._data_models_context.get_instance_of(self._type_class)
         self._filename = self._data_model.filename if self._data_model else "Unknown"
         self._dataframe = self._data_model.data_loader_model.raw_data.copy() if self._data_model else pd.DataFrame({})
-        self.TITLES_INFO = self._data_models_context.config.get_verify_names()
+        self.TITLES_INFO = self._data_models_context.context.config.get_verify_names()
 
         # LIST OF ERRORS AND WARNINGS
         self._errors: List[str] = []

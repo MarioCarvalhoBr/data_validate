@@ -34,13 +34,13 @@ class GeneralContext:
 
     Attributes:
         data_args (DataArgs): Command-line arguments and runtime data configurations.
-        kwargs (Dict[str, Any]): Additional keyword arguments passed during initialization.
+        extra_config (Dict[str, Any]): Additional keyword arguments passed during initialization.
         language_manager (LanguageManager): Manager for handling internationalization and localized strings.
         config (ApplicationConfig): Central configuration object for application settings and constants.
-        fs_utils (FileSystemUtils): Utilities for file system operations.
+        file_system_utils (FileSystemUtils): Utilities for file system operations.
         logger_manager (LoggerManager): Manager responsible for configuring the logging system.
         logger (logging.Logger): The primary logger instance for the application.
-        validations_not_run (list): A list to track validations that were skipped or not executed.
+        skipped_validations (list): A list to track validations that were skipped or not executed.
     """
 
     def __init__(
@@ -65,12 +65,12 @@ class GeneralContext:
         """
         # Unpack the arguments
         self.data_args = data_args
-        self.kwargs = kwargs
+        self.extra_config = kwargs
 
         # Configure the Toolkit
         self.language_manager: LanguageManager = LanguageManager()
         self.config: ApplicationConfig = ApplicationConfig()
-        self.fs_utils: FileSystemUtils = FileSystemUtils()
+        self.file_system_utils: FileSystemUtils = FileSystemUtils()
         self.logger_manager = LoggerManager(
             log_folder="data/output/logs",
             console_logger="console_logger",
@@ -83,7 +83,7 @@ class GeneralContext:
         if not self.data_args.data_action.debug:
             self.logger.disabled = True
 
-        self.validations_not_run = []
+        self.skipped_validations = []
 
     def finalize(self):
         """
@@ -98,6 +98,6 @@ class GeneralContext:
         """
         # Remove log file if not in debug mode
         if not self.data_args.data_action.debug:
-            self.fs_utils.remove_file(self.logger_manager.log_file)
+            self.file_system_utils.remove_file(self.logger_manager.log_file)
         else:
             print("\nLog file created at:", self.logger_manager.log_file)

@@ -12,7 +12,7 @@ from typing import List, Tuple, Dict, Any
 from pandas import DataFrame
 
 from data_validate.config import NamesEnum
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
 
 from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
@@ -79,7 +79,7 @@ class SpProportionalityValidator(BaseValidator):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -88,7 +88,7 @@ class SpProportionalityValidator(BaseValidator):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all loaded spreadsheet models and configuration.
         validation_reports : ValidationReport
             Report aggregator for collecting validation results.
@@ -236,7 +236,7 @@ class SpProportionalityValidator(BaseValidator):
         global_count_excessive = 0
         global_first_line_excessive = 0
 
-        precision = self._data_models_context.config.PRECISION_DECIMAL_PLACE_TRUNCATE
+        precision = self._data_models_context.context.config.PRECISION_DECIMAL_PLACE_TRUNCATE
 
         for parent_id, subdataset in subdatasets.items():
             df_data = subdataset.iloc[:, 1:].copy()
@@ -279,7 +279,7 @@ class SpProportionalityValidator(BaseValidator):
                 row_sums,
                 parent_id,
                 self.sp_name_proportionality,
-                self._data_models_context.language_manager.current_language,
+                self._data_models_context.context.language_manager.current_language,
             )
             all_errors.extend(tolerance_errors)
             all_warnings.extend(tolerance_warnings)
@@ -677,7 +677,7 @@ class SpProportionalityValidator(BaseValidator):
 
         subdatasets = ProportionalityProcessing.build_subdatasets(self.model_dataframes[self.sp_name_proportionality], self.column_name_id)
 
-        errors, warnings = self._check_sum_equals_one(subdatasets, df_values, self._data_models_context.config.VALUE_DATA_UNAVAILABLE)
+        errors, warnings = self._check_sum_equals_one(subdatasets, df_values, self._data_models_context.context.config.VALUE_DATA_UNAVAILABLE)
 
         return errors, warnings
 

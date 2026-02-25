@@ -9,7 +9,7 @@ models including Description, Temporal Reference, and Scenario spreadsheets.
 from typing import List, Tuple, Dict, Any, Type, Union
 
 from data_validate.config import NamesEnum
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 from data_validate.models import (
@@ -45,7 +45,7 @@ class SpellCheckerValidator(BaseValidator):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -54,7 +54,7 @@ class SpellCheckerValidator(BaseValidator):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all loaded spreadsheet models.
         validation_reports : ValidationReport
             Report aggregator for collecting validation results.
@@ -69,7 +69,7 @@ class SpellCheckerValidator(BaseValidator):
         )
 
         self.dictionary: SpDictionary | None = self._data_models_context.get_instance_of(SpDictionary)
-        self.lang_dict_spell: str = self._data_models_context.data_args.data_file.locale
+        self.lang_dict_spell: str = self._data_models_context.context.data_args.data_file.locale
 
         self.list_words_user: List[str] = self.dictionary.words_to_ignore
 
@@ -192,7 +192,7 @@ class SpellCheckerValidator(BaseValidator):
         - All validation results are aggregated into reports via `build_reports()`
         """
         validations = []
-        if not self._data_models_context.data_args.data_action.no_spellchecker:
+        if not self._data_models_context.context.data_args.data_action.no_spellchecker:
             validations.append(
                 (
                     lambda: self.validate_spellchecker(SpDescription),

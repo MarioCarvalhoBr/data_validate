@@ -86,7 +86,7 @@ class ApplicationConfig:
                                     N&uacute;mero de Avisos: {{ warning_count }}
                                     N&uacute;mero de testes executados: {{ total_tests }}
                                     Testes n&atilde;o executados: {{ skipped_tests }}
-                                    Mostrar erros n&atilde;o executados: {{ display_tests_not_executed }}
+                                    Mostrar erros n&atilde;o executados: {{ display_skipped_tests }}
                                     Erros
                                     {{ errors }}
                                     Avisos

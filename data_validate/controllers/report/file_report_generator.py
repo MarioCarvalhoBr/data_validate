@@ -77,7 +77,7 @@ class FileReportGenerator:
         Uses the context's file system utils to create the directory if it
         doesn't already exist.
         """
-        self.context.fs_utils.create_directory(self.output_folder)
+        self.context.file_system_utils.create_directory(self.output_folder)
 
     def _validate_html_template(self) -> None:
         """
@@ -116,7 +116,7 @@ class FileReportGenerator:
         Args:
             report_list (ValidationReport): List of validation test reports.
         """
-        file_name = self.context.fs_utils.get_last_directory_name(path=self.input_folder)
+        file_name = self.context.file_system_utils.get_last_directory_name(path=self.input_folder)
         html_output_file = self.context.config.REPORT_OUTPUT_REPORT_HTML
 
         self.error_count = report_list.get_total_errors()
@@ -213,7 +213,7 @@ class FileReportGenerator:
             "text_display_user": self._get_optional_field_text("user", "Usu&aacute;rio"),
             "text_display_file": self._get_optional_field_text("file", "Arquivo submetido"),
             "skipped_tests": text_html_skipped_tests,
-            "display_tests_not_executed": "block" if skipped_tests else "none",
+            "display_skipped_tests": "block" if skipped_tests else "none",
         }
 
     def _get_optional_field_text(self, field_name: str, display_label: str) -> str:

@@ -9,7 +9,7 @@ reference year validation, and unique value constraints for temporal metadata.
 from typing import List, Tuple, Dict, Any
 
 from data_validate.config import NamesEnum
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.character_processing import CharacterProcessing
@@ -35,7 +35,7 @@ class SpTemporalReferenceValidator(BaseValidator):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -44,7 +44,7 @@ class SpTemporalReferenceValidator(BaseValidator):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all loaded spreadsheet models and configuration.
         validation_reports : ValidationReport
             Report aggregator for collecting validation results.
@@ -138,7 +138,7 @@ class SpTemporalReferenceValidator(BaseValidator):
 
         # Check if all years are greater than the current year
         for year in years:
-            if int(year) < self._data_models_context.config.CURRENT_YEAR:
+            if int(year) < self._data_models_context.context.config.CURRENT_YEAR:
                 errors.append(f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.")
 
         return errors, []

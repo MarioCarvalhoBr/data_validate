@@ -11,7 +11,7 @@ from typing import List, Tuple, Dict, Any
 import pandas as pd
 
 from data_validate.config import NamesEnum
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.helpers.common.validation.tree_processing import TreeProcessing
@@ -53,7 +53,7 @@ class SpCompositionTreeValidator(BaseValidator):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -62,7 +62,7 @@ class SpCompositionTreeValidator(BaseValidator):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all data models and configuration.
         validation_reports : ValidationReport
             Report list for validation results aggregation.

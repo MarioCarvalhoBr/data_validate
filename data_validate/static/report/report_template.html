@@ -235,12 +235,12 @@
             <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
         </div>
         <div class="card-body">
-            <strong class="text-danger">N&uacute;mero de Erros: {{ num_errors }}</strong><br>
-            <strong class="text-warning">N&uacute;mero de Avisos: {{ num_warnings }}</strong><br>
-            <strong class="text-green">N&uacute;mero de testes executados: {{ number_tests }}</strong><br>
-            <div class="info-header-left" id="tests_not_executed" style="display: {{ display_tests_not_executed }}">
+            <strong class="text-danger">N&uacute;mero de Erros: {{ error_count }}</strong><br>
+            <strong class="text-warning">N&uacute;mero de Avisos: {{ warning_count }}</strong><br>
+            <strong class="text-green">N&uacute;mero de testes executados: {{ total_tests }}</strong><br>
+            <div class="info-header-left" id="skipped_tests" style="display: {{ display_skipped_tests }}">
                 <strong>Testes n&atilde;o executados: </strong>
-                {{ tests_not_executed }}
+                {{ skipped_tests }}
             </div>
 
         </div>

@@ -11,7 +11,7 @@ import os
 from typing import List, Dict, Any, Tuple
 
 from data_validate.config import NamesEnum
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext, GeneralContext
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.models import SpDescription
 from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
@@ -29,7 +29,7 @@ class FileStructureValidator(BaseValidator):
 
     Attributes
     ----------
-    context : DataModelsContext
+    context : DataModelContext
         Context containing configuration, file system utilities, and data arguments.
     errors : List[str]
         Accumulated list of validation errors.
@@ -41,7 +41,7 @@ class FileStructureValidator(BaseValidator):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -50,7 +50,7 @@ class FileStructureValidator(BaseValidator):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all loaded spreadsheet models and configuration.
         validation_reports : ValidationReport
             Report aggregator for collecting validation results.
@@ -64,7 +64,7 @@ class FileStructureValidator(BaseValidator):
             **kwargs,
         )
 
-        self.context: DataModelsContext = data_models_context
+        self.context: GeneralContext = data_models_context.context
         self.errors: List[str] = []
         self.warnings: List[str] = []
         self.dir_files: List[str] = os.listdir(self.context.data_args.data_file.input_folder)
@@ -96,7 +96,7 @@ class FileStructureValidator(BaseValidator):
                 - List[str]: List of error messages (empty if directory not empty)
         """
         local_errors = []
-        is_empty, message = self.context.fs_utils.check_directory_is_empty(self.context.data_args.data_file.input_folder)
+        is_empty, message = self.context.file_system_utils.check_directory_is_empty(self.context.data_args.data_file.input_folder)
         if is_empty:
             local_errors.append(
                 self.context.language_manager.text(
@@ -129,14 +129,14 @@ class FileStructureValidator(BaseValidator):
 
         if len(self.dir_files) == 1:
             dir_path = os.path.join(self.context.data_args.data_file.input_folder, self.dir_files[0])
-            is_dir, _ = self.context.fs_utils.check_directory_exists(dir_path)
+            is_dir, _ = self.context.file_system_utils.check_directory_exists(dir_path)
             if is_dir:
                 local_errors.append(self.context.language_manager.text("validator_structure_error_files_not_in_folder"))
                 return not local_errors, local_errors
 
         for file_name in self.dir_files:
             file_path = os.path.join(self.context.data_args.data_file.input_folder, file_name)
-            is_file, _ = self.context.fs_utils.check_file_exists(file_path)
+            is_file, _ = self.context.file_system_utils.check_file_exists(file_path)
             if not is_file:
                 local_errors.append(self.context.language_manager.text("validator_structure_error_unexpected_folder").format(file_name=file_name))
                 continue
@@ -174,7 +174,7 @@ class FileStructureValidator(BaseValidator):
             file_found = False
             for ext in extensions:
                 file_path = os.path.join(self.context.data_args.data_file.input_folder, f"{file_base}{ext}")
-                is_file, _ = self.context.fs_utils.check_file_exists(file_path)
+                is_file, _ = self.context.file_system_utils.check_file_exists(file_path)
                 if is_file:
                     file_found = True
                     break

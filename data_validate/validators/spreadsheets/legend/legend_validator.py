@@ -11,7 +11,7 @@ from typing import List, Tuple, Dict, Any, Optional
 import pandas as pd
 
 from data_validate.config import NamesEnum
-from data_validate.controllers.context.data_context import DataModelsContext
+from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
 
@@ -119,7 +119,7 @@ class SpLegendValidator(BaseValidator):
 
     def __init__(
         self,
-        data_models_context: DataModelsContext,
+        data_models_context: DataModelContext,
         validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -128,7 +128,7 @@ class SpLegendValidator(BaseValidator):
 
         Args
         ----
-        data_models_context : DataModelsContext
+        data_models_context : DataModelContext
             Context containing all loaded spreadsheet models and configuration.
         validation_reports : ValidationReport
             Report aggregator for collecting validation results.
@@ -475,7 +475,7 @@ class SpLegendValidator(BaseValidator):
                     aux_data_mapping_legend.legend_id = key_legend
 
                     group_legend = group_legend[
-                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name] != self._data_models_context.config.LABEL_DATA_UNAVAILABLE
+                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name] != self._data_models_context.context.config.LABEL_DATA_UNAVAILABLE
                     ]
                     if not group_legend.empty:
                         group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name] = pd.to_numeric(
@@ -513,7 +513,7 @@ class SpLegendValidator(BaseValidator):
 
             for index, value_numeric in df_values_numeric[data_column_sp_value].items():
                 value_original = df_values[data_column_sp_value][index]
-                if value_original == self._data_models_context.config.VALUE_DATA_UNAVAILABLE or pd.isna(value_numeric):
+                if value_original == self._data_models_context.context.config.VALUE_DATA_UNAVAILABLE or pd.isna(value_numeric):
                     continue
 
                 if value_numeric < min_value or value_numeric > max_value:

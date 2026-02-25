@@ -1,33 +1,259 @@
+<!--
+  ~ Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+  -->
 
-                                <!DOCTYPE html>
-                                <html lang="pt-br">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                                    <title>Canoa Report</title>
-                                </head>
-                                <body>
-                                    <h1 style="color:#FF0000;">Relat&oacute;rio gerando com o template padr&atilde;o de erro</h1>
-                                    <p>Esse relat&oacute;rio foi gerado com o template padr&atilde;o de erro, pois o template personalizado n&atilde;o foi encontrado ou est&aacute; faltando vari&aacute;veis obrigat&oacute;rias.</p>
-                                    <p>Entre em contato com o administrador do sistema para corrigir o problema.</p>
-                                    <p>RELAT&Oacute;RIO</p>
-                                    Canoa
-                                    Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados
-                                    Informa&ccedil;&otilde;es: 
-                                    <strong>Usu&aacute;rio: <strong class='text-gray'>Usuário C</strong></strong><br>
-                                    <strong>Setor estrat&eacute;gico: <strong class='text-gray'>Setor A</strong></strong><br>
-                                    <strong>Protocolo: <strong class='text-gray'>Protocolo B</strong></strong><br>
-                                    
-                                    
-                                    
-                                    Resumo da validação
-                                    N&uacute;mero de Erros: 34
-                                    N&uacute;mero de Avisos: 1
-                                    N&uacute;mero de testes executados: 34
-                                    Testes n&atilde;o executados: <ul></ul>
-                                    Mostrar erros n&atilde;o executados: none
-                                    Erros
-                                    <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Canoa Report</title>
+
+    <style>
+        /* Microstrap 0.0.1 - A minimal CSS framework based on Bootstrap */
+        /* Estilo CSS minimalista baseado no design do Bootstrap: By Mário Carvalho */
+
+        /* START MY CUSTOM STYLES */
+        /* ---------------------------------------------------------- */
+
+        /* BODY */
+        body {
+            background-color: #EEEDEA; /* Cor de fundo do corpo */
+            color: #000000; /* Cor padrão do texto */
+        }
+
+        /* DIVS */
+        .container {
+            max-width: 100%;
+            margin-left: 0.10in;
+            margin-right: 0.10in;
+        }
+
+        /* CARDS */
+        .card {
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            box-shadow: 0 4px 6px #0000001A;
+
+            overflow: hidden;
+            margin: 5px auto;
+        }
+
+        .card-header {
+            padding: 0.75rem 1rem;
+            background-color: #007bff; /* Cor padrão da faixa */
+            color: white; /* Cor padrão do texto na faixa */
+        }
+
+        .card-body {
+            padding: 1rem;
+            background-color: #f8f9fa; /* Cor de fundo do corpo */
+            font-family: Arial, sans-serif;
+            font-weight: bold;
+        }
+
+        .card-title {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        .card-text {
+            margin-top: 0px;
+            font-size: 1rem;
+            color: #000000;
+        }
+
+        /* HEADER CENTER */
+        .info-header-center {
+            text-align: center; /* Centraliza os itens horizontalmente */
+            padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+        }
+
+        .info-header-center h1 {
+            margin: 0; /* Remove margem padrão do h1 */
+            font-size: 2rem; /* Tamanho da fonte */
+        }
+
+        .info-header-center h2 {
+            margin: 0; /* Remove margem padrão do h2 */
+            font-size: 1.5rem; /* Tamanho da fonte */
+            color: #343a40; /* Cor do texto */
+        }
+
+        .info-header-center strong {
+            font-weight: bold; /* Deixa o texto em negrito */
+        }
+
+        /* HEADER LEFT */
+        .info-header-left {
+            text-align: left; /* Centraliza os itens a esquerda */
+            padding: 0.25rem 0; /* Padding extremamente baixo (top e bottom) */
+        }
+
+        .info-header-left strong {
+            font-weight: bold; /* Deixa o texto em negrito */
+            margin: 0; /* Remove margem padrão do strong */
+            padding: 0; /* Remove padding padrão do strong */
+        }
+
+        .info-header-left li {
+            font-weight: bold; /* Deixa o texto em negrito */
+            margin: 0; /* Remove margem padrão do strong */
+            padding: 0; /* Remove padding padrão do strong */
+        }
+
+        /* TEXT COLORS */
+        .text-primary {
+            color: #0000FF;
+            font-weight: bold;
+        }
+
+        .text-secondary {
+            color: #007bff;
+        }
+
+        .text-danger {
+            color: #FF0000;
+        }
+
+        .text-danger-errors {
+            color: #FF0000;
+            font-weight: normal;
+            white-space: pre-wrap;
+        }
+
+        .text-warning {
+            color: #FFA500;
+        }
+
+        .text-orange-warning {
+            color: #FFA500;
+            font-weight: normal;
+            white-space: pre-wrap;
+        }
+
+        .text-green {
+            color: #008000;
+        }
+
+        .text-info {
+            color: #17a2b8;
+        }
+
+        .text-white {
+            color: #ffffff;
+        }
+
+        .text-black {
+            color: #000000;
+        }
+
+        .text-gray {
+            color: #343a40;
+        }
+
+        /* BACKGROUND COLORS */
+        .bg-primary {
+            background-color: #0000FF;
+        }
+
+        .bg-secondary {
+            background-color: #007bff;
+        }
+
+        .bg-danger {
+            background-color: #FF0000;
+        }
+
+        .bg-warning {
+            background-color: #FFA500;
+        }
+
+        .bg-success {
+            background-color: #008000;
+        }
+
+        .bg-info {
+            background-color: #17a2b8;
+        }
+
+        .bg-light {
+            background-color: #f8f9fa;
+        }
+
+        .bg-white {
+            background-color: #ffffff;
+        }
+
+        .bg-black {
+            background-color: #000000;
+        }
+
+        .bg-gray {
+            background-color: #343a40;
+        }
+
+        .preserve-spaces {
+            white-space: pre-wrap;
+        }
+
+        /* END MY CUSTOM STYLES */
+        /* ---------------------------------------------------------- */
+
+    </style>
+
+</head>
+<body>
+<!-- DIV PRINCIPAL -->
+<div class="container">
+
+    <!-- DIV HEADER -->
+    <div class="info-header-center">
+        <h1><strong>Canoa</strong></h1>
+        <h2 class="text-subtitle">Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
+    </div>
+
+    <!-- CARD DE INFORMAÇÕES -->
+    <div class="card">
+        <div class="card-header bg-secondary">
+            <h5 class="card-title text-white">Informa&ccedil;&otilde;es</h5>
+        </div>
+        <div class="card-body">
+            <strong>Usu&aacute;rio: <strong class='text-gray'>Usuário C</strong></strong><br>
+            <strong>Setor estrat&eacute;gico: <strong class='text-gray'>Setor A</strong></strong><br>
+            <strong>Protocolo: <strong class='text-gray'>Protocolo B</strong></strong><br>
+            
+            
+            
+        </div>
+    </div>
+
+    <!-- CARD DE RESUMO -->
+    <div class="card">
+        <div class="card-header bg-primary">
+            <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
+        </div>
+        <div class="card-body">
+            <strong class="text-danger">N&uacute;mero de Erros: 34</strong><br>
+            <strong class="text-warning">N&uacute;mero de Avisos: 1</strong><br>
+            <strong class="text-green">N&uacute;mero de testes executados: 34</strong><br>
+            <div class="info-header-left" id="skipped_tests" style="display: none">
+                <strong>Testes n&atilde;o executados: </strong>
+                <ul></ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- CARD DE ERROS -->
+    <div class="card">
+        <!-- Faixa do título -->
+        <div class="card-header bg-danger">
+            <h5 class="card-title text-white">Erros</h5>
+        </div>
+        <div class="card-body">
+            <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
 <br><span class='text-danger-errors' preserve-spaces>valores.xlsx, linha 1: Colunas fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): ['HTML-2030-P', 'PHP']</span>
 <br><span class='text-danger-errors' preserve-spaces>valores.xlsx: A coluna 'HTML-2030-P' não é esperada.</span>
 <br><span class='text-danger-errors' preserve-spaces>valores.xlsx: A coluna 'PHP' não é esperada.</span>
@@ -95,8 +321,17 @@
 <br><span class='text-danger-errors' preserve-spaces>valores.xlsx: Indicador folha '4' não possui dados associados.</span>
 <br><span class='text-primary'>Níveis dos indicadores filhos</span>
 <br><span class='text-danger-errors' preserve-spaces>descricao.xlsx: Indicadores filhos do pai 6 não estão no mesmo nível: [indicador 8 possui nível '5', indicador 9 possui nível '1'].</span>
-                                    Avisos
-                                    <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
+        </div>
+    </div>
+
+    <!-- CARD DE AVISOS -->
+    <div class="card">
+        <!-- Faixa do título -->
+        <div class="card-header bg-warning">
+            <h5 class="card-title text-white">Avisos</h5>
+        </div>
+        <div class="card-body">
+            <span class='text-primary'>Estrutura dos arquivos da pasta de entrada</span>
 <br><span class='text-primary'>Limpeza dos arquivos</span>
 <br><span class='text-primary'>Relações entre indicadores</span>
 <br><span class='text-primary'>Hierarquia como árvore</span>
@@ -131,6 +366,9 @@
 <br><span class='text-primary'>Indicadores em valores e proporcionalidades</span>
 <br><span class='text-primary'>Indicadores folhas sem dados associados</span>
 <br><span class='text-primary'>Níveis dos indicadores filhos</span>
-                                </body>
-                                </html>
-                                
+        </div>
+    </div>
+
+</div>
+</body>
+</html>
