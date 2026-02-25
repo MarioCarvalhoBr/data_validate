@@ -619,7 +619,7 @@
 </span><span id="BaseValidator-31"><a href="#BaseValidator-31"><span class="linenos"> 31</span></a><span class="sd">    ----------</span>
 </span><span id="BaseValidator-32"><a href="#BaseValidator-32"><span class="linenos"> 32</span></a><span class="sd">    _data_models_context : DataModelsContext</span>
 </span><span id="BaseValidator-33"><a href="#BaseValidator-33"><span class="linenos"> 33</span></a><span class="sd">        Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="BaseValidator-34"><a href="#BaseValidator-34"><span class="linenos"> 34</span></a><span class="sd">    _report_list : ModelListReport</span>
+</span><span id="BaseValidator-34"><a href="#BaseValidator-34"><span class="linenos"> 34</span></a><span class="sd">    _report_list : ValidationReport</span>
 </span><span id="BaseValidator-35"><a href="#BaseValidator-35"><span class="linenos"> 35</span></a><span class="sd">        Aggregator for collecting and organizing validation results.</span>
 </span><span id="BaseValidator-36"><a href="#BaseValidator-36"><span class="linenos"> 36</span></a><span class="sd">    _type_class : Type[SpModelABC]</span>
 </span><span id="BaseValidator-37"><a href="#BaseValidator-37"><span class="linenos"> 37</span></a><span class="sd">        The model class type this validator is responsible for validating.</span>
@@ -640,7 +640,7 @@
 </span><span id="BaseValidator-52"><a href="#BaseValidator-52"><span class="linenos"> 52</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="BaseValidator-53"><a href="#BaseValidator-53"><span class="linenos"> 53</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="BaseValidator-54"><a href="#BaseValidator-54"><span class="linenos"> 54</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="BaseValidator-55"><a href="#BaseValidator-55"><span class="linenos"> 55</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="BaseValidator-55"><a href="#BaseValidator-55"><span class="linenos"> 55</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="BaseValidator-56"><a href="#BaseValidator-56"><span class="linenos"> 56</span></a>        <span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SpModelABC</span><span class="p">],</span>
 </span><span id="BaseValidator-57"><a href="#BaseValidator-57"><span class="linenos"> 57</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="BaseValidator-58"><a href="#BaseValidator-58"><span class="linenos"> 58</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -651,7 +651,7 @@
 </span><span id="BaseValidator-63"><a href="#BaseValidator-63"><span class="linenos"> 63</span></a><span class="sd">        ----</span>
 </span><span id="BaseValidator-64"><a href="#BaseValidator-64"><span class="linenos"> 64</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="BaseValidator-65"><a href="#BaseValidator-65"><span class="linenos"> 65</span></a><span class="sd">            Context containing all loaded spreadsheet models, configuration, and utilities.</span>
-</span><span id="BaseValidator-66"><a href="#BaseValidator-66"><span class="linenos"> 66</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="BaseValidator-66"><a href="#BaseValidator-66"><span class="linenos"> 66</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="BaseValidator-67"><a href="#BaseValidator-67"><span class="linenos"> 67</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="BaseValidator-68"><a href="#BaseValidator-68"><span class="linenos"> 68</span></a><span class="sd">        type_class : Type[SpModelABC]</span>
 </span><span id="BaseValidator-69"><a href="#BaseValidator-69"><span class="linenos"> 69</span></a><span class="sd">            The specific model class type this validator will validate.</span>
@@ -935,7 +935,7 @@ checks, text length validation, and report generation.</p>
 
 <p>_data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-_report_list : ModelListReport
+_report_list : ValidationReport
     Aggregator for collecting and organizing validation results.
 _type_class : Type[SpModelABC]
     The model class type this validator is responsible for validating.
@@ -958,7 +958,7 @@ _warnings : List[str]
                                         <input id="BaseValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">BaseValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n"><a href="models.html#SpModelABC">data_validate.models.SpModelABC</a></span><span class="p">]</span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">BaseValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n"><a href="models.html#SpModelABC">data_validate.models.SpModelABC</a></span><span class="p">]</span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="BaseValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -967,7 +967,7 @@ _warnings : List[str]
             <div class="pdoc-code codehilite"><pre><span></span><span id="BaseValidator.__init__-52"><a href="#BaseValidator.__init__-52"><span class="linenos">52</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="BaseValidator.__init__-53"><a href="#BaseValidator.__init__-53"><span class="linenos">53</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="BaseValidator.__init__-54"><a href="#BaseValidator.__init__-54"><span class="linenos">54</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="BaseValidator.__init__-55"><a href="#BaseValidator.__init__-55"><span class="linenos">55</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="BaseValidator.__init__-55"><a href="#BaseValidator.__init__-55"><span class="linenos">55</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="BaseValidator.__init__-56"><a href="#BaseValidator.__init__-56"><span class="linenos">56</span></a>        <span class="n">type_class</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">SpModelABC</span><span class="p">],</span>
 </span><span id="BaseValidator.__init__-57"><a href="#BaseValidator.__init__-57"><span class="linenos">57</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="BaseValidator.__init__-58"><a href="#BaseValidator.__init__-58"><span class="linenos">58</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -978,7 +978,7 @@ _warnings : List[str]
 </span><span id="BaseValidator.__init__-63"><a href="#BaseValidator.__init__-63"><span class="linenos">63</span></a><span class="sd">        ----</span>
 </span><span id="BaseValidator.__init__-64"><a href="#BaseValidator.__init__-64"><span class="linenos">64</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="BaseValidator.__init__-65"><a href="#BaseValidator.__init__-65"><span class="linenos">65</span></a><span class="sd">            Context containing all loaded spreadsheet models, configuration, and utilities.</span>
-</span><span id="BaseValidator.__init__-66"><a href="#BaseValidator.__init__-66"><span class="linenos">66</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="BaseValidator.__init__-66"><a href="#BaseValidator.__init__-66"><span class="linenos">66</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="BaseValidator.__init__-67"><a href="#BaseValidator.__init__-67"><span class="linenos">67</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="BaseValidator.__init__-68"><a href="#BaseValidator.__init__-68"><span class="linenos">68</span></a><span class="sd">        type_class : Type[SpModelABC]</span>
 </span><span id="BaseValidator.__init__-69"><a href="#BaseValidator.__init__-69"><span class="linenos">69</span></a><span class="sd">            The specific model class type this validator will validate.</span>
@@ -1010,7 +1010,7 @@ _warnings : List[str]
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models, configuration, and utilities.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 type_class : Type[SpModelABC]
     The specific model class type this validator will validate.
@@ -1411,7 +1411,7 @@ and return the accumulated errors and warnings.</p>
 </span><span id="SpDescriptionValidator-44"><a href="#SpDescriptionValidator-44"><span class="linenos"> 44</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpDescriptionValidator-45"><a href="#SpDescriptionValidator-45"><span class="linenos"> 45</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpDescriptionValidator-46"><a href="#SpDescriptionValidator-46"><span class="linenos"> 46</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpDescriptionValidator-47"><a href="#SpDescriptionValidator-47"><span class="linenos"> 47</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpDescriptionValidator-47"><a href="#SpDescriptionValidator-47"><span class="linenos"> 47</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpDescriptionValidator-48"><a href="#SpDescriptionValidator-48"><span class="linenos"> 48</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpDescriptionValidator-49"><a href="#SpDescriptionValidator-49"><span class="linenos"> 49</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpDescriptionValidator-50"><a href="#SpDescriptionValidator-50"><span class="linenos"> 50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1421,7 +1421,7 @@ and return the accumulated errors and warnings.</p>
 </span><span id="SpDescriptionValidator-54"><a href="#SpDescriptionValidator-54"><span class="linenos"> 54</span></a><span class="sd">        ----</span>
 </span><span id="SpDescriptionValidator-55"><a href="#SpDescriptionValidator-55"><span class="linenos"> 55</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpDescriptionValidator-56"><a href="#SpDescriptionValidator-56"><span class="linenos"> 56</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpDescriptionValidator-57"><a href="#SpDescriptionValidator-57"><span class="linenos"> 57</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpDescriptionValidator-57"><a href="#SpDescriptionValidator-57"><span class="linenos"> 57</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpDescriptionValidator-58"><a href="#SpDescriptionValidator-58"><span class="linenos"> 58</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpDescriptionValidator-59"><a href="#SpDescriptionValidator-59"><span class="linenos"> 59</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpDescriptionValidator-60"><a href="#SpDescriptionValidator-60"><span class="linenos"> 60</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -1854,7 +1854,7 @@ and return the accumulated errors and warnings.</p>
                                         <input id="SpDescriptionValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpDescriptionValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpDescriptionValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpDescriptionValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -1863,7 +1863,7 @@ and return the accumulated errors and warnings.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpDescriptionValidator.__init__-44"><a href="#SpDescriptionValidator.__init__-44"><span class="linenos">44</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpDescriptionValidator.__init__-45"><a href="#SpDescriptionValidator.__init__-45"><span class="linenos">45</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpDescriptionValidator.__init__-46"><a href="#SpDescriptionValidator.__init__-46"><span class="linenos">46</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpDescriptionValidator.__init__-47"><a href="#SpDescriptionValidator.__init__-47"><span class="linenos">47</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpDescriptionValidator.__init__-47"><a href="#SpDescriptionValidator.__init__-47"><span class="linenos">47</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpDescriptionValidator.__init__-48"><a href="#SpDescriptionValidator.__init__-48"><span class="linenos">48</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpDescriptionValidator.__init__-49"><a href="#SpDescriptionValidator.__init__-49"><span class="linenos">49</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpDescriptionValidator.__init__-50"><a href="#SpDescriptionValidator.__init__-50"><span class="linenos">50</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1873,7 +1873,7 @@ and return the accumulated errors and warnings.</p>
 </span><span id="SpDescriptionValidator.__init__-54"><a href="#SpDescriptionValidator.__init__-54"><span class="linenos">54</span></a><span class="sd">        ----</span>
 </span><span id="SpDescriptionValidator.__init__-55"><a href="#SpDescriptionValidator.__init__-55"><span class="linenos">55</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpDescriptionValidator.__init__-56"><a href="#SpDescriptionValidator.__init__-56"><span class="linenos">56</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpDescriptionValidator.__init__-57"><a href="#SpDescriptionValidator.__init__-57"><span class="linenos">57</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpDescriptionValidator.__init__-57"><a href="#SpDescriptionValidator.__init__-57"><span class="linenos">57</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpDescriptionValidator.__init__-58"><a href="#SpDescriptionValidator.__init__-58"><span class="linenos">58</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpDescriptionValidator.__init__-59"><a href="#SpDescriptionValidator.__init__-59"><span class="linenos">59</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpDescriptionValidator.__init__-60"><a href="#SpDescriptionValidator.__init__-60"><span class="linenos">60</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -1895,7 +1895,7 @@ and return the accumulated errors and warnings.</p>
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -2669,7 +2669,7 @@ is conditionally included based on configuration flags.</p>
 </span><span id="SpValueValidator-65"><a href="#SpValueValidator-65"><span class="linenos"> 65</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpValueValidator-66"><a href="#SpValueValidator-66"><span class="linenos"> 66</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpValueValidator-67"><a href="#SpValueValidator-67"><span class="linenos"> 67</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpValueValidator-68"><a href="#SpValueValidator-68"><span class="linenos"> 68</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpValueValidator-68"><a href="#SpValueValidator-68"><span class="linenos"> 68</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpValueValidator-69"><a href="#SpValueValidator-69"><span class="linenos"> 69</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpValueValidator-70"><a href="#SpValueValidator-70"><span class="linenos"> 70</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpValueValidator-71"><a href="#SpValueValidator-71"><span class="linenos"> 71</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -2679,7 +2679,7 @@ is conditionally included based on configuration flags.</p>
 </span><span id="SpValueValidator-75"><a href="#SpValueValidator-75"><span class="linenos"> 75</span></a><span class="sd">        ----</span>
 </span><span id="SpValueValidator-76"><a href="#SpValueValidator-76"><span class="linenos"> 76</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpValueValidator-77"><a href="#SpValueValidator-77"><span class="linenos"> 77</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpValueValidator-78"><a href="#SpValueValidator-78"><span class="linenos"> 78</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpValueValidator-78"><a href="#SpValueValidator-78"><span class="linenos"> 78</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpValueValidator-79"><a href="#SpValueValidator-79"><span class="linenos"> 79</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpValueValidator-80"><a href="#SpValueValidator-80"><span class="linenos"> 80</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpValueValidator-81"><a href="#SpValueValidator-81"><span class="linenos"> 81</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -3089,7 +3089,7 @@ model_dataframes : Dict[str, pd.DataFrame]
                                         <input id="SpValueValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpValueValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpValueValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpValueValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -3098,7 +3098,7 @@ model_dataframes : Dict[str, pd.DataFrame]
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpValueValidator.__init__-65"><a href="#SpValueValidator.__init__-65"><span class="linenos"> 65</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpValueValidator.__init__-66"><a href="#SpValueValidator.__init__-66"><span class="linenos"> 66</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpValueValidator.__init__-67"><a href="#SpValueValidator.__init__-67"><span class="linenos"> 67</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpValueValidator.__init__-68"><a href="#SpValueValidator.__init__-68"><span class="linenos"> 68</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpValueValidator.__init__-68"><a href="#SpValueValidator.__init__-68"><span class="linenos"> 68</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpValueValidator.__init__-69"><a href="#SpValueValidator.__init__-69"><span class="linenos"> 69</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpValueValidator.__init__-70"><a href="#SpValueValidator.__init__-70"><span class="linenos"> 70</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpValueValidator.__init__-71"><a href="#SpValueValidator.__init__-71"><span class="linenos"> 71</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3108,7 +3108,7 @@ model_dataframes : Dict[str, pd.DataFrame]
 </span><span id="SpValueValidator.__init__-75"><a href="#SpValueValidator.__init__-75"><span class="linenos"> 75</span></a><span class="sd">        ----</span>
 </span><span id="SpValueValidator.__init__-76"><a href="#SpValueValidator.__init__-76"><span class="linenos"> 76</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpValueValidator.__init__-77"><a href="#SpValueValidator.__init__-77"><span class="linenos"> 77</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpValueValidator.__init__-78"><a href="#SpValueValidator.__init__-78"><span class="linenos"> 78</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpValueValidator.__init__-78"><a href="#SpValueValidator.__init__-78"><span class="linenos"> 78</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpValueValidator.__init__-79"><a href="#SpValueValidator.__init__-79"><span class="linenos"> 79</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpValueValidator.__init__-80"><a href="#SpValueValidator.__init__-80"><span class="linenos"> 80</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpValueValidator.__init__-81"><a href="#SpValueValidator.__init__-81"><span class="linenos"> 81</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -3151,7 +3151,7 @@ model_dataframes : Dict[str, pd.DataFrame]
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -3796,7 +3796,7 @@ Results are aggregated into reports via <code><a href="#SpValueValidator.build_r
 </span><span id="SpCompositionTreeValidator-55"><a href="#SpCompositionTreeValidator-55"><span class="linenos"> 55</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpCompositionTreeValidator-56"><a href="#SpCompositionTreeValidator-56"><span class="linenos"> 56</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpCompositionTreeValidator-57"><a href="#SpCompositionTreeValidator-57"><span class="linenos"> 57</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpCompositionTreeValidator-58"><a href="#SpCompositionTreeValidator-58"><span class="linenos"> 58</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpCompositionTreeValidator-58"><a href="#SpCompositionTreeValidator-58"><span class="linenos"> 58</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpCompositionTreeValidator-59"><a href="#SpCompositionTreeValidator-59"><span class="linenos"> 59</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpCompositionTreeValidator-60"><a href="#SpCompositionTreeValidator-60"><span class="linenos"> 60</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpCompositionTreeValidator-61"><a href="#SpCompositionTreeValidator-61"><span class="linenos"> 61</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -3806,7 +3806,7 @@ Results are aggregated into reports via <code><a href="#SpValueValidator.build_r
 </span><span id="SpCompositionTreeValidator-65"><a href="#SpCompositionTreeValidator-65"><span class="linenos"> 65</span></a><span class="sd">        ----</span>
 </span><span id="SpCompositionTreeValidator-66"><a href="#SpCompositionTreeValidator-66"><span class="linenos"> 66</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpCompositionTreeValidator-67"><a href="#SpCompositionTreeValidator-67"><span class="linenos"> 67</span></a><span class="sd">            Context containing all data models and configuration.</span>
-</span><span id="SpCompositionTreeValidator-68"><a href="#SpCompositionTreeValidator-68"><span class="linenos"> 68</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpCompositionTreeValidator-68"><a href="#SpCompositionTreeValidator-68"><span class="linenos"> 68</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpCompositionTreeValidator-69"><a href="#SpCompositionTreeValidator-69"><span class="linenos"> 69</span></a><span class="sd">            Report list for validation results aggregation.</span>
 </span><span id="SpCompositionTreeValidator-70"><a href="#SpCompositionTreeValidator-70"><span class="linenos"> 70</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpCompositionTreeValidator-71"><a href="#SpCompositionTreeValidator-71"><span class="linenos"> 71</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -4127,7 +4127,7 @@ model_dataframes : Dict[str, pd.DataFrame]
                                         <input id="SpCompositionTreeValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpCompositionTreeValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpCompositionTreeValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpCompositionTreeValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -4136,7 +4136,7 @@ model_dataframes : Dict[str, pd.DataFrame]
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpCompositionTreeValidator.__init__-55"><a href="#SpCompositionTreeValidator.__init__-55"><span class="linenos">55</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpCompositionTreeValidator.__init__-56"><a href="#SpCompositionTreeValidator.__init__-56"><span class="linenos">56</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpCompositionTreeValidator.__init__-57"><a href="#SpCompositionTreeValidator.__init__-57"><span class="linenos">57</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpCompositionTreeValidator.__init__-58"><a href="#SpCompositionTreeValidator.__init__-58"><span class="linenos">58</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpCompositionTreeValidator.__init__-58"><a href="#SpCompositionTreeValidator.__init__-58"><span class="linenos">58</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpCompositionTreeValidator.__init__-59"><a href="#SpCompositionTreeValidator.__init__-59"><span class="linenos">59</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpCompositionTreeValidator.__init__-60"><a href="#SpCompositionTreeValidator.__init__-60"><span class="linenos">60</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpCompositionTreeValidator.__init__-61"><a href="#SpCompositionTreeValidator.__init__-61"><span class="linenos">61</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4146,7 +4146,7 @@ model_dataframes : Dict[str, pd.DataFrame]
 </span><span id="SpCompositionTreeValidator.__init__-65"><a href="#SpCompositionTreeValidator.__init__-65"><span class="linenos">65</span></a><span class="sd">        ----</span>
 </span><span id="SpCompositionTreeValidator.__init__-66"><a href="#SpCompositionTreeValidator.__init__-66"><span class="linenos">66</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpCompositionTreeValidator.__init__-67"><a href="#SpCompositionTreeValidator.__init__-67"><span class="linenos">67</span></a><span class="sd">            Context containing all data models and configuration.</span>
-</span><span id="SpCompositionTreeValidator.__init__-68"><a href="#SpCompositionTreeValidator.__init__-68"><span class="linenos">68</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpCompositionTreeValidator.__init__-68"><a href="#SpCompositionTreeValidator.__init__-68"><span class="linenos">68</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpCompositionTreeValidator.__init__-69"><a href="#SpCompositionTreeValidator.__init__-69"><span class="linenos">69</span></a><span class="sd">            Report list for validation results aggregation.</span>
 </span><span id="SpCompositionTreeValidator.__init__-70"><a href="#SpCompositionTreeValidator.__init__-70"><span class="linenos">70</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpCompositionTreeValidator.__init__-71"><a href="#SpCompositionTreeValidator.__init__-71"><span class="linenos">71</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -4182,7 +4182,7 @@ model_dataframes : Dict[str, pd.DataFrame]
 
 <p>data_models_context : DataModelsContext
     Context containing all data models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report list for validation results aggregation.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -4623,7 +4623,7 @@ all validations are marked as not executed.</p>
 </span><span id="SpCompositionGraphValidator-78"><a href="#SpCompositionGraphValidator-78"><span class="linenos"> 78</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpCompositionGraphValidator-79"><a href="#SpCompositionGraphValidator-79"><span class="linenos"> 79</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpCompositionGraphValidator-80"><a href="#SpCompositionGraphValidator-80"><span class="linenos"> 80</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpCompositionGraphValidator-81"><a href="#SpCompositionGraphValidator-81"><span class="linenos"> 81</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpCompositionGraphValidator-81"><a href="#SpCompositionGraphValidator-81"><span class="linenos"> 81</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpCompositionGraphValidator-82"><a href="#SpCompositionGraphValidator-82"><span class="linenos"> 82</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpCompositionGraphValidator-83"><a href="#SpCompositionGraphValidator-83"><span class="linenos"> 83</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpCompositionGraphValidator-84"><a href="#SpCompositionGraphValidator-84"><span class="linenos"> 84</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -4633,7 +4633,7 @@ all validations are marked as not executed.</p>
 </span><span id="SpCompositionGraphValidator-88"><a href="#SpCompositionGraphValidator-88"><span class="linenos"> 88</span></a><span class="sd">        ----</span>
 </span><span id="SpCompositionGraphValidator-89"><a href="#SpCompositionGraphValidator-89"><span class="linenos"> 89</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpCompositionGraphValidator-90"><a href="#SpCompositionGraphValidator-90"><span class="linenos"> 90</span></a><span class="sd">            Context containing all data models and configuration.</span>
-</span><span id="SpCompositionGraphValidator-91"><a href="#SpCompositionGraphValidator-91"><span class="linenos"> 91</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpCompositionGraphValidator-91"><a href="#SpCompositionGraphValidator-91"><span class="linenos"> 91</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpCompositionGraphValidator-92"><a href="#SpCompositionGraphValidator-92"><span class="linenos"> 92</span></a><span class="sd">            Report list for validation results aggregation.</span>
 </span><span id="SpCompositionGraphValidator-93"><a href="#SpCompositionGraphValidator-93"><span class="linenos"> 93</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpCompositionGraphValidator-94"><a href="#SpCompositionGraphValidator-94"><span class="linenos"> 94</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -5144,7 +5144,7 @@ graph_processing : GraphProcessing | None
                                         <input id="SpCompositionGraphValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpCompositionGraphValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpCompositionGraphValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpCompositionGraphValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -5153,7 +5153,7 @@ graph_processing : GraphProcessing | None
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpCompositionGraphValidator.__init__-78"><a href="#SpCompositionGraphValidator.__init__-78"><span class="linenos"> 78</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpCompositionGraphValidator.__init__-79"><a href="#SpCompositionGraphValidator.__init__-79"><span class="linenos"> 79</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpCompositionGraphValidator.__init__-80"><a href="#SpCompositionGraphValidator.__init__-80"><span class="linenos"> 80</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpCompositionGraphValidator.__init__-81"><a href="#SpCompositionGraphValidator.__init__-81"><span class="linenos"> 81</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpCompositionGraphValidator.__init__-81"><a href="#SpCompositionGraphValidator.__init__-81"><span class="linenos"> 81</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpCompositionGraphValidator.__init__-82"><a href="#SpCompositionGraphValidator.__init__-82"><span class="linenos"> 82</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpCompositionGraphValidator.__init__-83"><a href="#SpCompositionGraphValidator.__init__-83"><span class="linenos"> 83</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpCompositionGraphValidator.__init__-84"><a href="#SpCompositionGraphValidator.__init__-84"><span class="linenos"> 84</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -5163,7 +5163,7 @@ graph_processing : GraphProcessing | None
 </span><span id="SpCompositionGraphValidator.__init__-88"><a href="#SpCompositionGraphValidator.__init__-88"><span class="linenos"> 88</span></a><span class="sd">        ----</span>
 </span><span id="SpCompositionGraphValidator.__init__-89"><a href="#SpCompositionGraphValidator.__init__-89"><span class="linenos"> 89</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpCompositionGraphValidator.__init__-90"><a href="#SpCompositionGraphValidator.__init__-90"><span class="linenos"> 90</span></a><span class="sd">            Context containing all data models and configuration.</span>
-</span><span id="SpCompositionGraphValidator.__init__-91"><a href="#SpCompositionGraphValidator.__init__-91"><span class="linenos"> 91</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpCompositionGraphValidator.__init__-91"><a href="#SpCompositionGraphValidator.__init__-91"><span class="linenos"> 91</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpCompositionGraphValidator.__init__-92"><a href="#SpCompositionGraphValidator.__init__-92"><span class="linenos"> 92</span></a><span class="sd">            Report list for validation results aggregation.</span>
 </span><span id="SpCompositionGraphValidator.__init__-93"><a href="#SpCompositionGraphValidator.__init__-93"><span class="linenos"> 93</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpCompositionGraphValidator.__init__-94"><a href="#SpCompositionGraphValidator.__init__-94"><span class="linenos"> 94</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -5210,7 +5210,7 @@ graph_processing : GraphProcessing | None
 
 <p>data_models_context : DataModelsContext
     Context containing all data models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report list for validation results aggregation.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -5957,7 +5957,7 @@ and leaf data associations.</p>
 </span><span id="SpTemporalReferenceValidator-37"><a href="#SpTemporalReferenceValidator-37"><span class="linenos"> 37</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpTemporalReferenceValidator-38"><a href="#SpTemporalReferenceValidator-38"><span class="linenos"> 38</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpTemporalReferenceValidator-39"><a href="#SpTemporalReferenceValidator-39"><span class="linenos"> 39</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpTemporalReferenceValidator-40"><a href="#SpTemporalReferenceValidator-40"><span class="linenos"> 40</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpTemporalReferenceValidator-40"><a href="#SpTemporalReferenceValidator-40"><span class="linenos"> 40</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpTemporalReferenceValidator-41"><a href="#SpTemporalReferenceValidator-41"><span class="linenos"> 41</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpTemporalReferenceValidator-42"><a href="#SpTemporalReferenceValidator-42"><span class="linenos"> 42</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpTemporalReferenceValidator-43"><a href="#SpTemporalReferenceValidator-43"><span class="linenos"> 43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -5967,7 +5967,7 @@ and leaf data associations.</p>
 </span><span id="SpTemporalReferenceValidator-47"><a href="#SpTemporalReferenceValidator-47"><span class="linenos"> 47</span></a><span class="sd">        ----</span>
 </span><span id="SpTemporalReferenceValidator-48"><a href="#SpTemporalReferenceValidator-48"><span class="linenos"> 48</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpTemporalReferenceValidator-49"><a href="#SpTemporalReferenceValidator-49"><span class="linenos"> 49</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpTemporalReferenceValidator-50"><a href="#SpTemporalReferenceValidator-50"><span class="linenos"> 50</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpTemporalReferenceValidator-50"><a href="#SpTemporalReferenceValidator-50"><span class="linenos"> 50</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpTemporalReferenceValidator-51"><a href="#SpTemporalReferenceValidator-51"><span class="linenos"> 51</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpTemporalReferenceValidator-52"><a href="#SpTemporalReferenceValidator-52"><span class="linenos"> 52</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpTemporalReferenceValidator-53"><a href="#SpTemporalReferenceValidator-53"><span class="linenos"> 53</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -6173,7 +6173,7 @@ existence checks and report generation capabilities.</p>
                                         <input id="SpTemporalReferenceValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpTemporalReferenceValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpTemporalReferenceValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpTemporalReferenceValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -6182,7 +6182,7 @@ existence checks and report generation capabilities.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpTemporalReferenceValidator.__init__-37"><a href="#SpTemporalReferenceValidator.__init__-37"><span class="linenos">37</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpTemporalReferenceValidator.__init__-38"><a href="#SpTemporalReferenceValidator.__init__-38"><span class="linenos">38</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpTemporalReferenceValidator.__init__-39"><a href="#SpTemporalReferenceValidator.__init__-39"><span class="linenos">39</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpTemporalReferenceValidator.__init__-40"><a href="#SpTemporalReferenceValidator.__init__-40"><span class="linenos">40</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpTemporalReferenceValidator.__init__-40"><a href="#SpTemporalReferenceValidator.__init__-40"><span class="linenos">40</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpTemporalReferenceValidator.__init__-41"><a href="#SpTemporalReferenceValidator.__init__-41"><span class="linenos">41</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpTemporalReferenceValidator.__init__-42"><a href="#SpTemporalReferenceValidator.__init__-42"><span class="linenos">42</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpTemporalReferenceValidator.__init__-43"><a href="#SpTemporalReferenceValidator.__init__-43"><span class="linenos">43</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -6192,7 +6192,7 @@ existence checks and report generation capabilities.</p>
 </span><span id="SpTemporalReferenceValidator.__init__-47"><a href="#SpTemporalReferenceValidator.__init__-47"><span class="linenos">47</span></a><span class="sd">        ----</span>
 </span><span id="SpTemporalReferenceValidator.__init__-48"><a href="#SpTemporalReferenceValidator.__init__-48"><span class="linenos">48</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpTemporalReferenceValidator.__init__-49"><a href="#SpTemporalReferenceValidator.__init__-49"><span class="linenos">49</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpTemporalReferenceValidator.__init__-50"><a href="#SpTemporalReferenceValidator.__init__-50"><span class="linenos">50</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpTemporalReferenceValidator.__init__-50"><a href="#SpTemporalReferenceValidator.__init__-50"><span class="linenos">50</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpTemporalReferenceValidator.__init__-51"><a href="#SpTemporalReferenceValidator.__init__-51"><span class="linenos">51</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpTemporalReferenceValidator.__init__-52"><a href="#SpTemporalReferenceValidator.__init__-52"><span class="linenos">52</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpTemporalReferenceValidator.__init__-53"><a href="#SpTemporalReferenceValidator.__init__-53"><span class="linenos">53</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -6215,7 +6215,7 @@ existence checks and report generation capabilities.</p>
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -6593,7 +6593,7 @@ Results are aggregated into reports via <code><a href="#SpTemporalReferenceValid
 </span><span id="SpProportionalityValidator-81"><a href="#SpProportionalityValidator-81"><span class="linenos"> 81</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpProportionalityValidator-82"><a href="#SpProportionalityValidator-82"><span class="linenos"> 82</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpProportionalityValidator-83"><a href="#SpProportionalityValidator-83"><span class="linenos"> 83</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpProportionalityValidator-84"><a href="#SpProportionalityValidator-84"><span class="linenos"> 84</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpProportionalityValidator-84"><a href="#SpProportionalityValidator-84"><span class="linenos"> 84</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpProportionalityValidator-85"><a href="#SpProportionalityValidator-85"><span class="linenos"> 85</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpProportionalityValidator-86"><a href="#SpProportionalityValidator-86"><span class="linenos"> 86</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpProportionalityValidator-87"><a href="#SpProportionalityValidator-87"><span class="linenos"> 87</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -6603,7 +6603,7 @@ Results are aggregated into reports via <code><a href="#SpTemporalReferenceValid
 </span><span id="SpProportionalityValidator-91"><a href="#SpProportionalityValidator-91"><span class="linenos"> 91</span></a><span class="sd">        ----</span>
 </span><span id="SpProportionalityValidator-92"><a href="#SpProportionalityValidator-92"><span class="linenos"> 92</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpProportionalityValidator-93"><a href="#SpProportionalityValidator-93"><span class="linenos"> 93</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpProportionalityValidator-94"><a href="#SpProportionalityValidator-94"><span class="linenos"> 94</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpProportionalityValidator-94"><a href="#SpProportionalityValidator-94"><span class="linenos"> 94</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpProportionalityValidator-95"><a href="#SpProportionalityValidator-95"><span class="linenos"> 95</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpProportionalityValidator-96"><a href="#SpProportionalityValidator-96"><span class="linenos"> 96</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpProportionalityValidator-97"><a href="#SpProportionalityValidator-97"><span class="linenos"> 97</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -7294,7 +7294,7 @@ model_dataframes : Dict[str, DataFrame]
                                         <input id="SpProportionalityValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpProportionalityValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpProportionalityValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpProportionalityValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -7303,7 +7303,7 @@ model_dataframes : Dict[str, DataFrame]
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpProportionalityValidator.__init__-81"><a href="#SpProportionalityValidator.__init__-81"><span class="linenos"> 81</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpProportionalityValidator.__init__-82"><a href="#SpProportionalityValidator.__init__-82"><span class="linenos"> 82</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpProportionalityValidator.__init__-83"><a href="#SpProportionalityValidator.__init__-83"><span class="linenos"> 83</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpProportionalityValidator.__init__-84"><a href="#SpProportionalityValidator.__init__-84"><span class="linenos"> 84</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpProportionalityValidator.__init__-84"><a href="#SpProportionalityValidator.__init__-84"><span class="linenos"> 84</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpProportionalityValidator.__init__-85"><a href="#SpProportionalityValidator.__init__-85"><span class="linenos"> 85</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpProportionalityValidator.__init__-86"><a href="#SpProportionalityValidator.__init__-86"><span class="linenos"> 86</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpProportionalityValidator.__init__-87"><a href="#SpProportionalityValidator.__init__-87"><span class="linenos"> 87</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -7313,7 +7313,7 @@ model_dataframes : Dict[str, DataFrame]
 </span><span id="SpProportionalityValidator.__init__-91"><a href="#SpProportionalityValidator.__init__-91"><span class="linenos"> 91</span></a><span class="sd">        ----</span>
 </span><span id="SpProportionalityValidator.__init__-92"><a href="#SpProportionalityValidator.__init__-92"><span class="linenos"> 92</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpProportionalityValidator.__init__-93"><a href="#SpProportionalityValidator.__init__-93"><span class="linenos"> 93</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpProportionalityValidator.__init__-94"><a href="#SpProportionalityValidator.__init__-94"><span class="linenos"> 94</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpProportionalityValidator.__init__-94"><a href="#SpProportionalityValidator.__init__-94"><span class="linenos"> 94</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpProportionalityValidator.__init__-95"><a href="#SpProportionalityValidator.__init__-95"><span class="linenos"> 95</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpProportionalityValidator.__init__-96"><a href="#SpProportionalityValidator.__init__-96"><span class="linenos"> 96</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpProportionalityValidator.__init__-97"><a href="#SpProportionalityValidator.__init__-97"><span class="linenos"> 97</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -7374,7 +7374,7 @@ model_dataframes : Dict[str, DataFrame]
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -8281,7 +8281,7 @@ levels) also exist in the value spreadsheet, and vice versa.</p>
 </span><span id="SpScenarioValidator-36"><a href="#SpScenarioValidator-36"><span class="linenos"> 36</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpScenarioValidator-37"><a href="#SpScenarioValidator-37"><span class="linenos"> 37</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpScenarioValidator-38"><a href="#SpScenarioValidator-38"><span class="linenos"> 38</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpScenarioValidator-39"><a href="#SpScenarioValidator-39"><span class="linenos"> 39</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpScenarioValidator-39"><a href="#SpScenarioValidator-39"><span class="linenos"> 39</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpScenarioValidator-40"><a href="#SpScenarioValidator-40"><span class="linenos"> 40</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpScenarioValidator-41"><a href="#SpScenarioValidator-41"><span class="linenos"> 41</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpScenarioValidator-42"><a href="#SpScenarioValidator-42"><span class="linenos"> 42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -8291,7 +8291,7 @@ levels) also exist in the value spreadsheet, and vice versa.</p>
 </span><span id="SpScenarioValidator-46"><a href="#SpScenarioValidator-46"><span class="linenos"> 46</span></a><span class="sd">        ----</span>
 </span><span id="SpScenarioValidator-47"><a href="#SpScenarioValidator-47"><span class="linenos"> 47</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpScenarioValidator-48"><a href="#SpScenarioValidator-48"><span class="linenos"> 48</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpScenarioValidator-49"><a href="#SpScenarioValidator-49"><span class="linenos"> 49</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpScenarioValidator-49"><a href="#SpScenarioValidator-49"><span class="linenos"> 49</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpScenarioValidator-50"><a href="#SpScenarioValidator-50"><span class="linenos"> 50</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpScenarioValidator-51"><a href="#SpScenarioValidator-51"><span class="linenos"> 51</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpScenarioValidator-52"><a href="#SpScenarioValidator-52"><span class="linenos"> 52</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -8453,7 +8453,7 @@ existence checks and report generation capabilities.</p>
                                         <input id="SpScenarioValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpScenarioValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpScenarioValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpScenarioValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -8462,7 +8462,7 @@ existence checks and report generation capabilities.</p>
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpScenarioValidator.__init__-36"><a href="#SpScenarioValidator.__init__-36"><span class="linenos">36</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpScenarioValidator.__init__-37"><a href="#SpScenarioValidator.__init__-37"><span class="linenos">37</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpScenarioValidator.__init__-38"><a href="#SpScenarioValidator.__init__-38"><span class="linenos">38</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpScenarioValidator.__init__-39"><a href="#SpScenarioValidator.__init__-39"><span class="linenos">39</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpScenarioValidator.__init__-39"><a href="#SpScenarioValidator.__init__-39"><span class="linenos">39</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpScenarioValidator.__init__-40"><a href="#SpScenarioValidator.__init__-40"><span class="linenos">40</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpScenarioValidator.__init__-41"><a href="#SpScenarioValidator.__init__-41"><span class="linenos">41</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpScenarioValidator.__init__-42"><a href="#SpScenarioValidator.__init__-42"><span class="linenos">42</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -8472,7 +8472,7 @@ existence checks and report generation capabilities.</p>
 </span><span id="SpScenarioValidator.__init__-46"><a href="#SpScenarioValidator.__init__-46"><span class="linenos">46</span></a><span class="sd">        ----</span>
 </span><span id="SpScenarioValidator.__init__-47"><a href="#SpScenarioValidator.__init__-47"><span class="linenos">47</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpScenarioValidator.__init__-48"><a href="#SpScenarioValidator.__init__-48"><span class="linenos">48</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpScenarioValidator.__init__-49"><a href="#SpScenarioValidator.__init__-49"><span class="linenos">49</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpScenarioValidator.__init__-49"><a href="#SpScenarioValidator.__init__-49"><span class="linenos">49</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpScenarioValidator.__init__-50"><a href="#SpScenarioValidator.__init__-50"><span class="linenos">50</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpScenarioValidator.__init__-51"><a href="#SpScenarioValidator.__init__-51"><span class="linenos">51</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpScenarioValidator.__init__-52"><a href="#SpScenarioValidator.__init__-52"><span class="linenos">52</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -8495,7 +8495,7 @@ existence checks and report generation capabilities.</p>
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -8782,7 +8782,7 @@ Results are aggregated into reports via <code><a href="#SpScenarioValidator.buil
 </span><span id="SpLegendValidator-121"><a href="#SpLegendValidator-121"><span class="linenos">121</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpLegendValidator-122"><a href="#SpLegendValidator-122"><span class="linenos">122</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpLegendValidator-123"><a href="#SpLegendValidator-123"><span class="linenos">123</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpLegendValidator-124"><a href="#SpLegendValidator-124"><span class="linenos">124</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpLegendValidator-124"><a href="#SpLegendValidator-124"><span class="linenos">124</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpLegendValidator-125"><a href="#SpLegendValidator-125"><span class="linenos">125</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpLegendValidator-126"><a href="#SpLegendValidator-126"><span class="linenos">126</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpLegendValidator-127"><a href="#SpLegendValidator-127"><span class="linenos">127</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -8792,7 +8792,7 @@ Results are aggregated into reports via <code><a href="#SpScenarioValidator.buil
 </span><span id="SpLegendValidator-131"><a href="#SpLegendValidator-131"><span class="linenos">131</span></a><span class="sd">        ----</span>
 </span><span id="SpLegendValidator-132"><a href="#SpLegendValidator-132"><span class="linenos">132</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpLegendValidator-133"><a href="#SpLegendValidator-133"><span class="linenos">133</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpLegendValidator-134"><a href="#SpLegendValidator-134"><span class="linenos">134</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpLegendValidator-134"><a href="#SpLegendValidator-134"><span class="linenos">134</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpLegendValidator-135"><a href="#SpLegendValidator-135"><span class="linenos">135</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpLegendValidator-136"><a href="#SpLegendValidator-136"><span class="linenos">136</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpLegendValidator-137"><a href="#SpLegendValidator-137"><span class="linenos">137</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -9268,7 +9268,7 @@ model_dataframes : Dict[str, pd.DataFrame]
                                         <input id="SpLegendValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpLegendValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpLegendValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpLegendValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -9277,7 +9277,7 @@ model_dataframes : Dict[str, pd.DataFrame]
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpLegendValidator.__init__-121"><a href="#SpLegendValidator.__init__-121"><span class="linenos">121</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpLegendValidator.__init__-122"><a href="#SpLegendValidator.__init__-122"><span class="linenos">122</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpLegendValidator.__init__-123"><a href="#SpLegendValidator.__init__-123"><span class="linenos">123</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpLegendValidator.__init__-124"><a href="#SpLegendValidator.__init__-124"><span class="linenos">124</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpLegendValidator.__init__-124"><a href="#SpLegendValidator.__init__-124"><span class="linenos">124</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpLegendValidator.__init__-125"><a href="#SpLegendValidator.__init__-125"><span class="linenos">125</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpLegendValidator.__init__-126"><a href="#SpLegendValidator.__init__-126"><span class="linenos">126</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpLegendValidator.__init__-127"><a href="#SpLegendValidator.__init__-127"><span class="linenos">127</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -9287,7 +9287,7 @@ model_dataframes : Dict[str, pd.DataFrame]
 </span><span id="SpLegendValidator.__init__-131"><a href="#SpLegendValidator.__init__-131"><span class="linenos">131</span></a><span class="sd">        ----</span>
 </span><span id="SpLegendValidator.__init__-132"><a href="#SpLegendValidator.__init__-132"><span class="linenos">132</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpLegendValidator.__init__-133"><a href="#SpLegendValidator.__init__-133"><span class="linenos">133</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="SpLegendValidator.__init__-134"><a href="#SpLegendValidator.__init__-134"><span class="linenos">134</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpLegendValidator.__init__-134"><a href="#SpLegendValidator.__init__-134"><span class="linenos">134</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpLegendValidator.__init__-135"><a href="#SpLegendValidator.__init__-135"><span class="linenos">135</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpLegendValidator.__init__-136"><a href="#SpLegendValidator.__init__-136"><span class="linenos">136</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpLegendValidator.__init__-137"><a href="#SpLegendValidator.__init__-137"><span class="linenos">137</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -9330,7 +9330,7 @@ model_dataframes : Dict[str, pd.DataFrame]
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -9985,7 +9985,7 @@ based on data availability and sanity check status.</p>
 </span><span id="SpellCheckerValidator-47"><a href="#SpellCheckerValidator-47"><span class="linenos"> 47</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpellCheckerValidator-48"><a href="#SpellCheckerValidator-48"><span class="linenos"> 48</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpellCheckerValidator-49"><a href="#SpellCheckerValidator-49"><span class="linenos"> 49</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpellCheckerValidator-50"><a href="#SpellCheckerValidator-50"><span class="linenos"> 50</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpellCheckerValidator-50"><a href="#SpellCheckerValidator-50"><span class="linenos"> 50</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpellCheckerValidator-51"><a href="#SpellCheckerValidator-51"><span class="linenos"> 51</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpellCheckerValidator-52"><a href="#SpellCheckerValidator-52"><span class="linenos"> 52</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpellCheckerValidator-53"><a href="#SpellCheckerValidator-53"><span class="linenos"> 53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -9995,7 +9995,7 @@ based on data availability and sanity check status.</p>
 </span><span id="SpellCheckerValidator-57"><a href="#SpellCheckerValidator-57"><span class="linenos"> 57</span></a><span class="sd">        ----</span>
 </span><span id="SpellCheckerValidator-58"><a href="#SpellCheckerValidator-58"><span class="linenos"> 58</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpellCheckerValidator-59"><a href="#SpellCheckerValidator-59"><span class="linenos"> 59</span></a><span class="sd">            Context containing all loaded spreadsheet models.</span>
-</span><span id="SpellCheckerValidator-60"><a href="#SpellCheckerValidator-60"><span class="linenos"> 60</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpellCheckerValidator-60"><a href="#SpellCheckerValidator-60"><span class="linenos"> 60</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpellCheckerValidator-61"><a href="#SpellCheckerValidator-61"><span class="linenos"> 61</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpellCheckerValidator-62"><a href="#SpellCheckerValidator-62"><span class="linenos"> 62</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpellCheckerValidator-63"><a href="#SpellCheckerValidator-63"><span class="linenos"> 63</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -10187,7 +10187,7 @@ model_columns_map : Dict[Type[Union[SpDescription, SpTemporalReference, SpScenar
                                         <input id="SpellCheckerValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">SpellCheckerValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">SpellCheckerValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="SpellCheckerValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -10196,7 +10196,7 @@ model_columns_map : Dict[Type[Union[SpDescription, SpTemporalReference, SpScenar
             <div class="pdoc-code codehilite"><pre><span></span><span id="SpellCheckerValidator.__init__-47"><a href="#SpellCheckerValidator.__init__-47"><span class="linenos">47</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="SpellCheckerValidator.__init__-48"><a href="#SpellCheckerValidator.__init__-48"><span class="linenos">48</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="SpellCheckerValidator.__init__-49"><a href="#SpellCheckerValidator.__init__-49"><span class="linenos">49</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="SpellCheckerValidator.__init__-50"><a href="#SpellCheckerValidator.__init__-50"><span class="linenos">50</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="SpellCheckerValidator.__init__-50"><a href="#SpellCheckerValidator.__init__-50"><span class="linenos">50</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="SpellCheckerValidator.__init__-51"><a href="#SpellCheckerValidator.__init__-51"><span class="linenos">51</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="SpellCheckerValidator.__init__-52"><a href="#SpellCheckerValidator.__init__-52"><span class="linenos">52</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="SpellCheckerValidator.__init__-53"><a href="#SpellCheckerValidator.__init__-53"><span class="linenos">53</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -10206,7 +10206,7 @@ model_columns_map : Dict[Type[Union[SpDescription, SpTemporalReference, SpScenar
 </span><span id="SpellCheckerValidator.__init__-57"><a href="#SpellCheckerValidator.__init__-57"><span class="linenos">57</span></a><span class="sd">        ----</span>
 </span><span id="SpellCheckerValidator.__init__-58"><a href="#SpellCheckerValidator.__init__-58"><span class="linenos">58</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="SpellCheckerValidator.__init__-59"><a href="#SpellCheckerValidator.__init__-59"><span class="linenos">59</span></a><span class="sd">            Context containing all loaded spreadsheet models.</span>
-</span><span id="SpellCheckerValidator.__init__-60"><a href="#SpellCheckerValidator.__init__-60"><span class="linenos">60</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="SpellCheckerValidator.__init__-60"><a href="#SpellCheckerValidator.__init__-60"><span class="linenos">60</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="SpellCheckerValidator.__init__-61"><a href="#SpellCheckerValidator.__init__-61"><span class="linenos">61</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="SpellCheckerValidator.__init__-62"><a href="#SpellCheckerValidator.__init__-62"><span class="linenos">62</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="SpellCheckerValidator.__init__-63"><a href="#SpellCheckerValidator.__init__-63"><span class="linenos">63</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -10251,7 +10251,7 @@ model_columns_map : Dict[Type[Union[SpDescription, SpTemporalReference, SpScenar
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>
@@ -10543,7 +10543,7 @@ and optionally Scenario models if they exist and spell checking is enabled.</p>
 </span><span id="FileStructureValidator-43"><a href="#FileStructureValidator-43"><span class="linenos"> 43</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="FileStructureValidator-44"><a href="#FileStructureValidator-44"><span class="linenos"> 44</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="FileStructureValidator-45"><a href="#FileStructureValidator-45"><span class="linenos"> 45</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="FileStructureValidator-46"><a href="#FileStructureValidator-46"><span class="linenos"> 46</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="FileStructureValidator-46"><a href="#FileStructureValidator-46"><span class="linenos"> 46</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="FileStructureValidator-47"><a href="#FileStructureValidator-47"><span class="linenos"> 47</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="FileStructureValidator-48"><a href="#FileStructureValidator-48"><span class="linenos"> 48</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="FileStructureValidator-49"><a href="#FileStructureValidator-49"><span class="linenos"> 49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -10553,7 +10553,7 @@ and optionally Scenario models if they exist and spell checking is enabled.</p>
 </span><span id="FileStructureValidator-53"><a href="#FileStructureValidator-53"><span class="linenos"> 53</span></a><span class="sd">        ----</span>
 </span><span id="FileStructureValidator-54"><a href="#FileStructureValidator-54"><span class="linenos"> 54</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="FileStructureValidator-55"><a href="#FileStructureValidator-55"><span class="linenos"> 55</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="FileStructureValidator-56"><a href="#FileStructureValidator-56"><span class="linenos"> 56</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="FileStructureValidator-56"><a href="#FileStructureValidator-56"><span class="linenos"> 56</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="FileStructureValidator-57"><a href="#FileStructureValidator-57"><span class="linenos"> 57</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="FileStructureValidator-58"><a href="#FileStructureValidator-58"><span class="linenos"> 58</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="FileStructureValidator-59"><a href="#FileStructureValidator-59"><span class="linenos"> 59</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -10805,7 +10805,7 @@ dir_files : List[str]
                                         <input id="FileStructureValidator.__init__-view-source" class="view-source-toggle-state" type="checkbox" aria-hidden="true" tabindex="-1">
 <div class="attr function">
             
-        <span class="name">FileStructureValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ModelListReport">data_validate.controllers.ModelListReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
+        <span class="name">FileStructureValidator</span><span class="signature pdoc-code multiline">(<span class="param">	<span class="n">data_models_context</span><span class="p">:</span> <span class="n"><a href="controllers.html#DataModelsContext">data_validate.controllers.DataModelsContext</a></span>,</span><span class="param">	<span class="n">validation_reports</span><span class="p">:</span> <span class="n"><a href="controllers.html#ValidationReport">data_validate.controllers.ValidationReport</a></span>,</span><span class="param">	<span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span></span>)</span>
 
                 <label class="view-source-button" for="FileStructureValidator.__init__-view-source"><span>View Source</span></label>
 
@@ -10814,7 +10814,7 @@ dir_files : List[str]
             <div class="pdoc-code codehilite"><pre><span></span><span id="FileStructureValidator.__init__-43"><a href="#FileStructureValidator.__init__-43"><span class="linenos">43</span></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
 </span><span id="FileStructureValidator.__init__-44"><a href="#FileStructureValidator.__init__-44"><span class="linenos">44</span></a>        <span class="bp">self</span><span class="p">,</span>
 </span><span id="FileStructureValidator.__init__-45"><a href="#FileStructureValidator.__init__-45"><span class="linenos">45</span></a>        <span class="n">data_models_context</span><span class="p">:</span> <span class="n">DataModelsContext</span><span class="p">,</span>
-</span><span id="FileStructureValidator.__init__-46"><a href="#FileStructureValidator.__init__-46"><span class="linenos">46</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ModelListReport</span><span class="p">,</span>
+</span><span id="FileStructureValidator.__init__-46"><a href="#FileStructureValidator.__init__-46"><span class="linenos">46</span></a>        <span class="n">validation_reports</span><span class="p">:</span> <span class="n">ValidationReport</span><span class="p">,</span>
 </span><span id="FileStructureValidator.__init__-47"><a href="#FileStructureValidator.__init__-47"><span class="linenos">47</span></a>        <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
 </span><span id="FileStructureValidator.__init__-48"><a href="#FileStructureValidator.__init__-48"><span class="linenos">48</span></a>    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 </span><span id="FileStructureValidator.__init__-49"><a href="#FileStructureValidator.__init__-49"><span class="linenos">49</span></a><span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -10824,7 +10824,7 @@ dir_files : List[str]
 </span><span id="FileStructureValidator.__init__-53"><a href="#FileStructureValidator.__init__-53"><span class="linenos">53</span></a><span class="sd">        ----</span>
 </span><span id="FileStructureValidator.__init__-54"><a href="#FileStructureValidator.__init__-54"><span class="linenos">54</span></a><span class="sd">        data_models_context : DataModelsContext</span>
 </span><span id="FileStructureValidator.__init__-55"><a href="#FileStructureValidator.__init__-55"><span class="linenos">55</span></a><span class="sd">            Context containing all loaded spreadsheet models and configuration.</span>
-</span><span id="FileStructureValidator.__init__-56"><a href="#FileStructureValidator.__init__-56"><span class="linenos">56</span></a><span class="sd">        validation_reports : ModelListReport</span>
+</span><span id="FileStructureValidator.__init__-56"><a href="#FileStructureValidator.__init__-56"><span class="linenos">56</span></a><span class="sd">        validation_reports : ValidationReport</span>
 </span><span id="FileStructureValidator.__init__-57"><a href="#FileStructureValidator.__init__-57"><span class="linenos">57</span></a><span class="sd">            Report aggregator for collecting validation results.</span>
 </span><span id="FileStructureValidator.__init__-58"><a href="#FileStructureValidator.__init__-58"><span class="linenos">58</span></a><span class="sd">        **kwargs : Dict[str, Any]</span>
 </span><span id="FileStructureValidator.__init__-59"><a href="#FileStructureValidator.__init__-59"><span class="linenos">59</span></a><span class="sd">            Additional keyword arguments passed to parent validator.</span>
@@ -10852,7 +10852,7 @@ dir_files : List[str]
 
 <p>data_models_context : DataModelsContext
     Context containing all loaded spreadsheet models and configuration.
-validation_reports : ModelListReport
+validation_reports : ValidationReport
     Report aggregator for collecting validation results.
 **kwargs : Dict[str, Any]
     Additional keyword arguments passed to parent validator.</p>

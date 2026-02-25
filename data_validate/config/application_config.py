@@ -82,10 +82,10 @@ class ApplicationConfig:
                                     {{ text_display_version_and_os_info }}
                                     {{ text_display_file }}
                                     Resumo da validação
-                                    N&uacute;mero de Erros: {{ num_errors }}
-                                    N&uacute;mero de Avisos: {{ num_warnings }}
-                                    N&uacute;mero de testes executados: {{ number_tests }}
-                                    Testes n&atilde;o executados: {{ tests_not_executed }}
+                                    N&uacute;mero de Erros: {{ error_count }}
+                                    N&uacute;mero de Avisos: {{ warning_count }}
+                                    N&uacute;mero de testes executados: {{ total_tests }}
+                                    Testes n&atilde;o executados: {{ skipped_tests }}
                                     Mostrar erros n&atilde;o executados: {{ display_tests_not_executed }}
                                     Erros
                                     {{ errors }}

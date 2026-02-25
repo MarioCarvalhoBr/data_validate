@@ -12,7 +12,7 @@ from typing import Dict, Any, List, Type, Tuple, Callable
 
 import pandas as pd
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 
 from data_validate.models.sp_model_abc import SpModelABC
@@ -30,7 +30,7 @@ class BaseValidator(ABC):
     ----------
     _data_models_context : DataModelsContext
         Context containing all loaded spreadsheet models and configuration.
-    _report_list : ModelListReport
+    _report_list : ValidationReport
         Aggregator for collecting and organizing validation results.
     _type_class : Type[SpModelABC]
         The model class type this validator is responsible for validating.
@@ -51,7 +51,7 @@ class BaseValidator(ABC):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        validation_reports: ModelListReport,
+        validation_reports: ValidationReport,
         type_class: Type[SpModelABC],
         **kwargs: Dict[str, Any],
     ) -> None:
@@ -62,7 +62,7 @@ class BaseValidator(ABC):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models, configuration, and utilities.
-        validation_reports : ModelListReport
+        validation_reports : ValidationReport
             Report aggregator for collecting validation results.
         type_class : Type[SpModelABC]
             The specific model class type this validator will validate.

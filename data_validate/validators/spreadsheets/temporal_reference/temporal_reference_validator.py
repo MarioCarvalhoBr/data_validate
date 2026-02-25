@@ -10,7 +10,7 @@ from typing import List, Tuple, Dict, Any
 
 from data_validate.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
@@ -36,7 +36,7 @@ class SpTemporalReferenceValidator(BaseValidator):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        validation_reports: ModelListReport,
+        validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -46,7 +46,7 @@ class SpTemporalReferenceValidator(BaseValidator):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        validation_reports : ModelListReport
+        validation_reports : ValidationReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.

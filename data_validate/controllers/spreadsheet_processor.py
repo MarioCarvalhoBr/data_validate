@@ -38,7 +38,7 @@ class SpreadsheetProcessor:
         data_models_context (DataModelsContext): Specialized context holding initialized data models.
         initialized_models (List[SpModelABC]): List of instantiated spreadsheet models.
         target_model_classes (List[Type[SpModelABC]]): List of model classes to process.
-        validation_reports (ModelListReport): Aggregator for validation errors and warnings.
+        validation_reports (ValidationReport): Aggregator for validation errors and warnings.
     """
 
     def __init__(self, context: controllers.GeneralContext):
@@ -82,7 +82,7 @@ class SpreadsheetProcessor:
             models.SpLegend,
             models.SpDictionary,
         ]
-        self.validation_reports = controllers.ModelListReport(context=self.context)
+        self.validation_reports = controllers.ValidationReport(context=self.context)
 
         # Running the main processing function
         self.context.logger.info(data_validate.__welcome__)
@@ -218,7 +218,7 @@ class SpreadsheetProcessor:
         """
         Generate final validation reports.
 
-        Compiles all collected errors and warnings into `ModelListReport`,
+        Compiles all collected errors and warnings into `ValidationReport`,
         logs debug information (if enabled), calculates summary statistics,
         and triggers the generation of HTML/PDF reports via `FileReportGenerator`.
         """
@@ -229,7 +229,7 @@ class SpreadsheetProcessor:
             self.context.logger.info("------ Resultados da verificação dos testes ------")
 
             for report in self.validation_reports:
-                self.context.logger.info(f"Report: {report.name_test}")
+                self.context.logger.info(f"Report: {report.test_name}")
                 self.context.logger.error(f"  Errors: {len(report.errors)}")
                 for error in report.errors:
                     self.context.logger.error(f"    - {error}")

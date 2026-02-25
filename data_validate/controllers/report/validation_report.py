@@ -12,7 +12,7 @@ from data_validate.controllers import GeneralContext
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
-class ModelItemReport:
+class TestReportItem:
     """
     Data model for a single validation report item.
 
@@ -20,22 +20,22 @@ class ModelItemReport:
     lists of errors and warnings encountered.
 
     Attributes:
-        name_test (str): The identifier of the test or validation.
+        test_name (str): The identifier of the test or validation.
         errors (List[str]): List of error messages associated with the test.
         warnings (List[str]): List of warning messages associated with the test.
         was_executed (bool): Flag indicating if the validation was executed.
     """
 
-    def __init__(self, name_test: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None):
+    def __init__(self, test_name: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None):
         """
-        Initialize a ModelItemReport.
+        Initialize a TestReportItem.
 
         Args:
-            name_test (str): The name/identifier of the test.
+            test_name (str): The name/identifier of the test.
             errors (Optional[List[str]]): Initial list of error messages. Defaults to None.
             warnings (Optional[List[str]]): Initial list of warning messages. Defaults to None.
         """
-        self.name_test = name_test
+        self.test_name = test_name
         self.errors = errors if errors is not None else []
         self.warnings = warnings if warnings is not None else []
         self.was_executed = True
@@ -77,7 +77,7 @@ class ModelItemReport:
         return bool(self.warnings)
 
 
-class ModelListReport:
+class ValidationReport:
     """
     Data model for a collection of validation reports, accessible by test name.
 
@@ -86,19 +86,19 @@ class ModelListReport:
 
     Attributes:
         context (Optional[GeneralContext]): Application context for localization and utils.
-        reports (dict[str, ModelItemReport]): Dictionary of reports indexed by their test name.
+        reports (dict[str, TestReportItem]): Dictionary of reports indexed by their test name.
     """
 
-    def __init__(self, context: Optional["GeneralContext"] = None, reports: Optional[List[ModelItemReport]] = None):
+    def __init__(self, context: Optional["GeneralContext"] = None, reports: Optional[List[TestReportItem]] = None):
         """
-        Initialize a ModelListReport.
+        Initialize a ValidationReport.
 
         Args:
             context (Optional[GeneralContext]): DI context. Defaults to None.
-            reports (Optional[List[ModelItemReport]]): Initial list of reports. Defaults to None.
+            reports (Optional[List[TestReportItem]]): Initial list of reports. Defaults to None.
         """
         self.context = context
-        self.reports: dict[str, ModelItemReport] = {}
+        self.reports: dict[str, TestReportItem] = {}
         if reports:
             for report in reports:
                 self.add_report(report)
@@ -115,17 +115,17 @@ class ModelListReport:
         if name_test in self.reports:
             self.reports[name_test].was_executed = False
         else:
-            self.reports[name_test] = ModelItemReport(name_test)
+            self.reports[name_test] = TestReportItem(name_test)
             self.reports[name_test].was_executed = False
 
-    def add_report(self, report: ModelItemReport) -> None:
+    def add_report(self, report: TestReportItem) -> None:
         """
         Add a full report object to the collection.
 
         Args:
-            report (ModelItemReport): The report instance to add.
+            report (TestReportItem): The report instance to add.
         """
-        self.reports[report.name_test] = report
+        self.reports[report.test_name] = report
 
     def add_by_name(self, name_test: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None) -> None:
         """
@@ -136,7 +136,7 @@ class ModelListReport:
             errors (Optional[List[str]]): List of errors. Defaults to None.
             warnings (Optional[List[str]]): List of warnings. Defaults to None.
         """
-        self.reports[name_test] = ModelItemReport(name_test, errors, warnings)
+        self.reports[name_test] = TestReportItem(name_test, errors, warnings)
 
     def list_all_names(self) -> List[str]:
         """
@@ -164,7 +164,7 @@ class ModelListReport:
         else:
             self.add_by_name(name_test, errors, warnings)
 
-    def global_num_errors(self) -> int:
+    def get_total_errors(self) -> int:
         """
         Calculate total number of errors across all reports.
 
@@ -173,7 +173,7 @@ class ModelListReport:
         """
         return sum(len(report.errors) for report in self.reports.values())
 
-    def global_num_warnings(self) -> int:
+    def get_total_warnings(self) -> int:
         """
         Calculate total number of warnings across all reports.
 
@@ -182,7 +182,7 @@ class ModelListReport:
         """
         return sum(len(report.warnings) for report in self.reports.values())
 
-    def flatten(self, n_messages: int, locale: str = "pt_BR") -> "ModelListReport":
+    def flatten(self, n_messages: int, locale: str = "pt_BR") -> "ValidationReport":
         """
         Create a new ModelListReport with truncated error/warning lists.
 
@@ -194,18 +194,18 @@ class ModelListReport:
             locale (str): Locale for message formatting. Defaults to "pt_BR".
 
         Returns:
-            ModelListReport: A new flattened report instance.
+            ValidationReport: A new flattened report instance.
         """
         flattened_reports = []
         for report in self.reports.values():
-            flattened_report = ModelItemReport(
-                name_test=report.name_test,
+            flattened_report = TestReportItem(
+                test_name=report.test_name,
                 errors=report.errors[:n_messages],
                 warnings=report.warnings[:n_messages],
             )
             if len(report.errors) > n_messages:
-                count_omitted_errors = NumberFormattingProcessing.format_number_brazilian(len(report.errors) - n_messages, locale)
-                flattened_report.add_error(self.context.language_manager.text("model_report_msg_errors_omitted", count=count_omitted_errors))
+                omitted_errors_count = NumberFormattingProcessing.format_number_brazilian(len(report.errors) - n_messages, locale)
+                flattened_report.add_error(self.context.language_manager.text("model_report_msg_errors_omitted", count=omitted_errors_count))
 
             if len(report.warnings) > n_messages:
                 count_omitted_warnings = NumberFormattingProcessing.format_number_brazilian(len(report.warnings) - n_messages, locale)
@@ -217,9 +217,9 @@ class ModelListReport:
                 )
 
             flattened_reports.append(flattened_report)
-        return ModelListReport(context=self.context, reports=flattened_reports)
+        return ValidationReport(context=self.context, reports=flattened_reports)
 
-    def __getitem__(self, name: str) -> ModelItemReport:
+    def __getitem__(self, name: str) -> TestReportItem:
         """
         Retrieve a report by name.
 
@@ -227,16 +227,16 @@ class ModelListReport:
             name (str): The name of the test.
 
         Returns:
-            ModelItemReport: The requested report object.
+            TestReportItem: The requested report object.
         """
         return self.reports[name]
 
-    def __iter__(self) -> Iterator[ModelItemReport]:
+    def __iter__(self) -> Iterator[TestReportItem]:
         """
         Iterate over the reports.
 
         Returns:
-            Iterator[ModelItemReport]: Iterator over Report objects.
+            Iterator[TestReportItem]: Iterator over Report objects.
         """
         return iter(self.reports.values())
 

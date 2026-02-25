@@ -2,13 +2,13 @@
 from data_validate.controllers.context.data_context import DataModelsContext
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.controllers.spreadsheet_processor import SpreadsheetProcessor
-from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.controllers.report.file_report_generator import FileReportGenerator
 
 __all__ = [
     "DataModelsContext",
     "GeneralContext",
-    "ModelListReport",
+    "ValidationReport",
     "FileReportGenerator",
     "SpreadsheetProcessor",
 ]

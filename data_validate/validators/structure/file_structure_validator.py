@@ -12,7 +12,7 @@ from typing import List, Dict, Any, Tuple
 
 from data_validate.config import NamesEnum
 from data_validate.controllers.context.data_context import DataModelsContext
-from data_validate.controllers.report.model_report import ModelListReport
+from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.models import SpDescription
 from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
@@ -42,7 +42,7 @@ class FileStructureValidator(BaseValidator):
     def __init__(
         self,
         data_models_context: DataModelsContext,
-        validation_reports: ModelListReport,
+        validation_reports: ValidationReport,
         **kwargs: Dict[str, Any],
     ) -> None:
         """
@@ -52,7 +52,7 @@ class FileStructureValidator(BaseValidator):
         ----
         data_models_context : DataModelsContext
             Context containing all loaded spreadsheet models and configuration.
-        validation_reports : ModelListReport
+        validation_reports : ValidationReport
             Report aggregator for collecting validation results.
         **kwargs : Dict[str, Any]
             Additional keyword arguments passed to parent validator.
