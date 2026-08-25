@@ -57,7 +57,7 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Proposed fix: locale becomes an explicit constructor argument threaded through the context
   (no file persistence at all); if persistence is desired, use `platformdirs.user_config_dir`.
 - Tests: run with `--locale en_US` from a temp CWD and assert English messages.
-- Related: ARC-002, BUG-027, TOOL-008
+- Related: ARC-002, BUG-023, TOOL-008
 
 ### BUG-005 · `ValidationReport.flatten` crashes when `context` is `None`
 - Priority: P1 · Effort: S · Status: open
@@ -238,3 +238,14 @@ Every fix here must land with a regression test under `tests/` that fails before
   `self.errors` which `build_reports` then extends into `self._errors`; wrapping each check in a
   one-element list is noise.
 - Proposed fix: return locals; drop the duplicate state.
+
+### BUG-027 · `SpellCheckerValidator._prepare_statement` is never called
+- Priority: P2 · Effort: S · Status: open
+- Where: `validators/spell/spellchecker_validator.py:158-171,94` (`__init__` calls `self.run()` directly,
+  unlike the other validators that call `_prepare_statement()` first)
+- Problem: `SpellChecker.errors_dictionary` (missing hunspell dictionary, unreadable
+  `extra-words.dic`, enchant initialisation failure) is never copied into the report; a broken spell
+  backend silently produces zero spelling warnings and the run looks clean.
+- Proposed fix: call `_prepare_statement()` before `run()` (or, in the rules engine, surface backend
+  initialisation failures as `SPELL-*` issues); regression test with a mocked broken dictionary.
+- Related: SEC-004, ARC-015, spec `.specs/business-rules/spelling.md`

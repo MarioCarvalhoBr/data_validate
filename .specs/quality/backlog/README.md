@@ -53,6 +53,6 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 |---|---|---|
 | P0 | 7 | XSS in HTML report (SEC-001), shared mutable class state (BUG-002, ARC-002), work-in-constructors (ARC-001), no tests for validators (TST-001), no e2e safety net (TST-002), shared list mutation (BUG-001) |
 | P1 | 28 | locale global state (BUG-004), string-based error model (ARC-004), i18n incomplete (ARC-005), iterrows hot paths (PERF-001), CI non-blocking lint (TOOL-001), exit-code contract (SEC-008) |
-| P2 | 42 | see files |
+| P2 | 43 | see files |
 | P3 | 12 | see files |
-| **Total** | **89** | |
+| **Total** | **90** | |
