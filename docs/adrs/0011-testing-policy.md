@@ -13,7 +13,7 @@ under `tests/unit/helpers/`, running in ~3.3 s at 55.97 % total line coverage â€
 `legend_validator.py` 11.7 %, `value_validator.py` 14.5 %, `composition_tree_validator.py` 16.5 %,
 `spreadsheet_processor.py` 16.9 %, `description_validator.py` 18.7 %,
 `file_structure_validator.py` 20 %, `file_report_generator.py` 23.8 %,
-`spellchecker_validator.py` 25.5 %, `validation_report.py` 34.4 %). In other words, the ~35
+`spellchecker_validator.py` 25.5 %, `validation_report.py` 34.4 %). In other words, the 34
 business rules that are the entire reason this tool exists have essentially no automated
 verification (TST-001) â€” every existing test targets `helpers/`, none reach `models/`, `validators/`,
 `controllers/`, or the CLI entry point. There is also no end-to-end safety net at all (TST-002):
@@ -51,7 +51,7 @@ parsing, CSV/XLSX round-trips); `pytest-benchmark` backs a perf regression thres
 ## Consequences
 
 ### Positive
-- Every future change to the ~35 business rules gets a real test, closing the single largest
+- Every future change to the 34 verification categories gets a real test, closing the single largest
   coverage gap the audit found (TST-001) rather than leaving the tool's core purpose untested
   indefinitely.
 - The coverage ratchet makes "coverage never goes down" an enforced fact instead of an aspiration,

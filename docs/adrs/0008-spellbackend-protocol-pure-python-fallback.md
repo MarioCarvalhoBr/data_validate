@@ -94,7 +94,7 @@ otherwise an offline CLI tool.
 ### Drop `pyenchant`/hunspell entirely, ship only the pure-Python backend
 Rejected: hunspell's pt-BR/en-US dictionaries are materially more complete than what
 `symspellpy`/`pyspellchecker` ship out of the box, and this is a currently-working feature (spelling
-validation is one of the ~35 protocol checks); removing the higher-quality backend to simplify
+validation is one of the 34 verification categories); removing the higher-quality backend to simplify
 packaging would be a real accuracy regression for INPE staff reviewing reports, not just a
 technical simplification — hence "protocol with two implementations, best available chosen
 automatically" rather than a single fallback-only implementation.

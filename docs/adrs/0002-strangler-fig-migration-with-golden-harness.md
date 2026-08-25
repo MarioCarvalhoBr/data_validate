@@ -71,7 +71,7 @@ before the corresponding old module is deleted.
 ### Big-bang rewrite
 Rejected: the validator is a dependency of a live platform (AdaptaBrasil) with no feature-flagging
 or staged rollout mechanism on the CLI side; a full rewrite merged in one step has no rollback path
-if a subtle business-rule regression (e.g. in the ~35 protocol checks) reaches production, and the
+if a subtle business-rule regression (e.g. in the 34 verification categories) reaches production, and the
 current 55.97 % coverage / 0 % on core validators gives no confidence a rewrite would be
 behaviourally equivalent without an explicit comparison mechanism.
 
