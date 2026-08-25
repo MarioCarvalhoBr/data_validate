@@ -70,6 +70,10 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   `scripts/prepare_metadata.sh:33`, `scripts/prepare_pyproject.sh:42`
 - Problem: hooks stage **every** file in the working tree (local data, credentials, scratch files)
   and rewrite source files (`serial`, version) on each commit.
+- Evidence: on 2026-08-25 a docs-only commit (9 new files under `.specs/`) came out with 22 files —
+  the hooks bumped `serial` 732→733, regenerated 7 PDF reports, both badges, `README.md` and
+  `docs/`; the commit had to be redone with `--no-verify`. Until this item is fixed, commit with
+  `--no-verify` or run `pre-commit uninstall`.
 - Proposed fix: replace with standard hooks (ruff, ruff-format, mypy, bandit, check-yaml,
   detect-private-key, `poetry check`); never `git add` inside hooks; version bump only in release
   workflow.
