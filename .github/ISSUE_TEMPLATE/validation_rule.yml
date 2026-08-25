@@ -1,0 +1,73 @@
+name: Validation rule
+description: Propose a new or changed business-rule check (structural or content) for a spreadsheet.
+title: "rule: <short summary>"
+labels: ["validation-rule"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        See `.claude/skills/validation-rule-authoring/` and `.specs/business-rules/README.md` for
+        the ID convention and the full authoring workflow.
+
+  - type: dropdown
+    id: sheet
+    attributes:
+      label: Sheet
+      description: Which spreadsheet does this rule apply to?
+      options:
+        - descricao
+        - composicao
+        - valores
+        - referencia_temporal
+        - proporcionalidades
+        - cenarios
+        - legenda
+        - dicionario
+        - file-structure (folder/file level, not a single sheet)
+    validations:
+      required: true
+
+  - type: textarea
+    id: statement
+    attributes:
+      label: Rule statement
+      description: State the rule precisely — what must be true for the data to pass.
+      placeholder: "Every code in the 'codigo' column of composicao must exist in descricao."
+    validations:
+      required: true
+
+  - type: input
+    id: protocol_section
+    attributes:
+      label: Protocol section
+      description: Section/page of `assets/protocolo-v-1.13.pdf` this rule comes from, or "not in protocol" if it's a new proposal.
+      placeholder: "Section 4.2, p. 17"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - error (blocks the bundle from being accepted)
+        - warning (reported but does not block)
+    validations:
+      required: true
+
+  - type: textarea
+    id: example_rows
+    attributes:
+      label: Example rows
+      description: A minimal set of rows (valid and invalid) that illustrate the rule, as they would appear in the sheet.
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Related backlog item, existing rule it overlaps with, edge cases to test.
+    validations:
+      required: false

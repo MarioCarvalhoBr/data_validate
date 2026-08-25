@@ -22,7 +22,6 @@ requires-python = ">=3.12, !=3.14.1, <4.0"
 dependencies = [
     "pandas (>=3.0.1,<4.0.0)",
     "chardet (>=5.2.0,<6.0.0)",
-    "pandas-stubs (>=3.0.0.260204,<4.0.0)",
     "pyenchant (>=3.3.0,<4.0.0)",
     "pdfkit (>=1.0.0,<2.0.0)",
     "babel (>=2.18.0,<3.0.0)",
@@ -50,17 +49,103 @@ packages = [{include = "data_validate"}]
 canoa-data-validate = "data_validate.main:main"
 
 [tool.poetry.group.dev.dependencies]
-pytest ="^9.0.2"
+pytest = "^9.0.2"
 coverage = "^7.13.4"
 pytest-cov = "^7.0.0"
-flake8 = "^7.3.0"
-black = "^26.1.0"
 pre-commit = "^4.5.1"
 pdoc = "^16.0.0"
-flake8-html = "^0.4.3"
 genbadge = {extras = ["all"], version = "^1.1.3"}
 pytest-mock = "^3.15.1"
 ruff = "^0.15.2"
+mypy = "^2.3.1"
+bandit = "^1.9.4"
+pip-audit = "^2.10.1"
+pytest-xdist = "^3.8.0"
+hypothesis = "^6.165.10"
+pytest-benchmark = "^5.3.0"
+pandas-stubs = "^3.0.0.260204"
+twine = "^7.0.0"
+types-chardet = "^5.0.4.6"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["data_validate", "tests"]
+
+[tool.ruff.lint]
+# Rule families enabled project-wide: pyflakes/pycodestyle, isort, bugbear, pyupgrade,
+# flake8-simplify, pandas-vet, pylint, flake8-bandit, pep8-naming, ruff-native rules,
+# flake8-comprehensions, flake8-use-pathlib, flake8-return.
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "PD", "PL", "S", "N", "RUF", "C4", "PTH", "RET"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test conventions that are intentional everywhere under tests/, including future tests/e2e/.
+"tests/**" = [
+    "S101",     # assert is the pytest idiom for check failures
+    "PLR2004",  # inline magic values in assertions are self-explanatory in a test
+    "PLR0913",  # fixtures naturally take many parameters
+]
+# Legacy baseline for the existing test tree (Phase D does not touch test files) —
+# shrink per backlog phase as tests/unit is migrated/rewritten.
+"tests/unit/**" = [
+    "E501", "I001", "PLC0415", "PTH108", "PTH110", "PTH112", "PTH118", "PTH119", "PTH123",
+    "RET504", "RUF059", "S108", "SIM117", "SIM300", "UP006", "UP024", "UP035", "UP045",
+]
+"tests/__init__.py" = ["E501"]
+"tests/conftest.py" = ["E501"]
+# Legacy baseline — shrink per backlog phase. Phase D does not modify production code; these
+# codes reflect the current state of data_validate/** as inventoried by `ruff check` and are
+# removed module-by-module as each one is migrated (see .specs/quality/backlog/08-migration-roadmap.md).
+"data_validate/**/*.py" = [
+    "B007", "B027", "B905",
+    "C401", "C403", "C408", "C414", "C416",
+    "E501",
+    "I001",
+    "PD002", "PD003", "PD004", "PD008", "PD011",
+    "PLC0206", "PLC0415",
+    "PLR0402", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PLR2004", "PLR5501", "PLW2901",
+    "PTH100", "PTH103", "PTH107", "PTH110", "PTH111", "PTH112", "PTH113", "PTH118", "PTH119",
+    "PTH120", "PTH122", "PTH123", "PTH208",
+    "RET504", "RET505",
+    "RUF005", "RUF010", "RUF012", "RUF013", "RUF022", "RUF048", "RUF059",
+    "S101", "S110", "S701",
+    "SIM102", "SIM105", "SIM114", "SIM118", "SIM201", "SIM210", "SIM910",
+    "UP006", "UP007", "UP015", "UP024", "UP031", "UP035", "UP045",
+    "W291",
+]
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+warn_unreachable = true
+plugins = []
+
+[[tool.mypy.overrides]]
+# Legacy pipeline: not yet typed. Ignored wholesale until each module is migrated
+# (see .specs/quality/backlog/08-migration-roadmap.md); ratchet removes entries over time.
+module = ["data_validate.*"]
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = ["tests.e2e.*", "tools.*"]
+strict = true
+
+[tool.bandit]
+exclude_dirs = ["tests", "tools/legacy"]
+# Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —
+# not a silent mask — and is removed once the linked item is closed.
+skips = [
+    "B101",  # assert used deliberately in a few legacy invariant checks (e.g. metadata_info.py)
+             # until BUG-017 replaces them with explicit exceptions.
+    "B701",  # Jinja2 Environment without autoescape in file_report_generator.py — tracked as
+             # SEC-001 (P0, stored XSS), fixed in migration Phase 4 (ReportModel + autoescaped
+             # templates). Not disabled lightly: SEC-001 is the top item of the security backlog.
+    "B110",  # try/except/pass in dictionary_manager.py cleanup — tracked as SEC-007, fixed in
+             # migration Phase 5 (session-scoped temp dir replaces __del__-based cleanup).
+]
 
 [tool.coverage.run]
 source = ["data_validate"]
@@ -92,12 +177,10 @@ exclude_lines = [
     "class .*\\bProtocol\\):",
     "@\\(abc\\\\.\\)?abstractmethod",
     "def __init_subclass__",
-    "pass",
-    "continue",
-    "break",
 ]
 show_missing = true
 precision = 2
+fail_under = 54  # measured 54.99 % on 2026-08-25 after dropping pass/continue/break exclusions; tools/coverage_ratchet.py raises it
 
 [tool.coverage.html]
 directory = "dev-reports/htmlcov"
@@ -105,34 +188,21 @@ title = "Data Validate Coverage Report"
 
 [tool.pytest.ini_options]
 pythonpath = "."
-addopts = "--cov=data_validate --cov-report=term-missing --cov-report=html:dev-reports/htmlcov --cov-report=xml:dev-reports/coverage.xml --cov-fail-under=50 --junitxml=dev-reports/junit/junit.xml -v --tb=short"
+addopts = "-v --tb=short"
 testpaths = ["tests"]
 python_files = "test_*.py"
 python_classes = "Test*"
 python_functions = "test_*"
+xfail_strict = true
+markers = [
+    "unit: fast, isolated unit tests (default suite)",
+    "integration: tests exercising more than one collaborator without external processes",
+    "e2e: end-to-end tests that run the CLI against data/input/* fixtures",
+    "slow: tests that are expensive enough to skip from the default fast loop",
+    "requires_enchant: tests that need a working pyenchant/hunspell installation",
+    "requires_pdf: tests that need wkhtmltopdf installed",
+]
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning"
 ]
-
-[tool.black]
-# Define o comprimento máximo da linha. O padrão é 88.
-# Um valor comum e mais permissivo é 99 ou 119.
-# Vamos usar 99 como um bom ponto de partida.
-line-length = 150
-
-# Opcional, mas recomendado: exclui diretórios que não devem ser formatados.
-# Usa o mesmo formato do .gitignore.
-exclude = '''
-/(
-    \.git
-  | \.hg
-  | \.mypy_cache
-  | \.tox
-  | \.venv
-  | _build
-  | buck-out
-  | build
-  | dist
-)/
-'''

@@ -1,32 +1,58 @@
+# Pre-commit hooks for data_validate.
+#
+# Rules (see .specs/quality/backlog/06-tooling-ci.md TOOL-002 and 02-security.md SEC-006):
+#   - No hook runs the application pipeline.
+#   - No hook stages files (`git add`) — that stayed the developer's decision after 2026-08-25's
+#     incident, where the previous hooks bumped a serial, regenerated reports/docs/badges and
+#     staged everything, turning a 9-file docs commit into a 22-file one.
+#   - No hook rewrites source files silently; `ruff --fix`/`ruff format` only touch files that are
+#     already staged for commit, and their changes are visible in `git diff` before the commit
+#     completes (pre-commit re-stages only the exact hunks it modified, never unrelated files).
 repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=1024"]
+      - id: detect-private-key
+      - id: no-commit-to-branch
+        args: ["--branch", "main"]
 
-    - repo: local
-      hooks:
-        - id: prepare-metadata
-          name: prepare metadata
-          entry: bash scripts/prepare_metadata.sh
-          language: system
-          always_run: true
-          pass_filenames: false
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.16.4
+    hooks:
+      - id: ruff-check
+        args: ["--fix"]
+      - id: ruff-format
 
-        - id: generate-logs-coverage-badge
-          name: generate logs coverage badge
-          entry: bash scripts/generate_logs_coverage_badge.sh
-          language: system
-          always_run: true
-          pass_filenames: false
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v2.3.1
+    hooks:
+      - id: mypy
+        args: ["--config-file=pyproject.toml"]
+        files: ^(tools/|tests/e2e/)
+        additional_dependencies: []
 
-        - id: generate-readme
-          name: generate README
-          entry: bash scripts/generate_readme.sh
-          language: system
-          always_run: true
-          pass_filenames: false
+  - repo: https://github.com/PyCQA/bandit
+    rev: "1.9.4"
+    hooks:
+      - id: bandit
+        args: ["-c", "pyproject.toml"]
+        additional_dependencies: ["bandit[toml]"]
 
-        - id: generate-docs
-          name: generate docs
-          entry: bash scripts/generate_docs.sh
-          language: system
-          always_run: true
-          pass_filenames: false
+  - repo: https://github.com/python-poetry/poetry
+    rev: "2.4.1"
+    hooks:
+      - id: poetry-check
+        args: ["--lock"]
 
+  - repo: https://github.com/compilerla/conventional-pre-commit
+    rev: v4.4.0
+    hooks:
+      - id: conventional-pre-commit
+        stages: [commit-msg]

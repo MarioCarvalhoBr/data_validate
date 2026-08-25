@@ -1,0 +1,64 @@
+name: Bug report
+description: Something in the validator behaves incorrectly.
+title: "bug: <short summary>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please include enough detail to reproduce it — the validator
+        processes spreadsheets it does not control, so exact input matters.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+    validations:
+      required: true
+
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      description: Exact CLI command and, if possible, a minimal spreadsheet bundle that triggers it.
+      placeholder: |
+        poetry run canoa-data-validate --input_folder data/input/example/ --output_folder /tmp/out/ ...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: Output of `canoa-data-validate --version`, or the commit SHA if running from source.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - Linux
+        - Windows
+        - macOS
+        - Other (describe below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant output / stack trace
+      render: shell
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Anything else that helps — related backlog item, when it started happening, workarounds tried.
+    validations:
+      required: false

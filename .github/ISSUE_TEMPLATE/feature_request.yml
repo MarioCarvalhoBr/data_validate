@@ -1,0 +1,41 @@
+name: Feature request
+description: Propose a new capability or improvement that is not a validation rule.
+title: "feat: <short summary>"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For a new spreadsheet validation rule, use the "Validation rule" template instead — it
+        asks for the protocol details a rule needs.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: The gap in today's validator, CLI, report, or developer experience.
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: What you'd like to see. Include CLI flags, report changes, or API shape if relevant.
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+    validations:
+      required: false
+
+  - type: textarea
+    id: extra
+    attributes:
+      label: Additional context
+      description: Links to related backlog items, ADRs, or platform requirements.
+    validations:
+      required: false
