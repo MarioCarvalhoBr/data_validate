@@ -50,7 +50,7 @@ PERF-007, TST-001, TST-006, TST-010, DOC-002, DOC-003
    reference → value → scenario → legend → proportionality → spell), vectorising as they move; each
    rule gets unit tests + a golden case; messages move to the catalog (pt_BR and en_US).
 3. Delete `validators/`, `helpers/common/validation/` once empty.
-Gate: goldens unchanged (message text identical); all 35 `NamesEnum` rules mapped to rule IDs in
+Gate: goldens unchanged (message text identical); all 34 `NamesEnum` rules mapped to rule IDs in
 `.specs/business-rules/`; coverage ≥ 85 %.
 
 ## Phase 4 — Reporting & i18n completion

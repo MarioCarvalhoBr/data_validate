@@ -52,7 +52,7 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 
 ## Map `NamesEnum` → verification title key → rule IDs
 
-`data_validate/config/names_enum.py` (35 members). Titles are resolved through the i18n catalog
+`data_validate/config/names_enum.py` (34 members). Titles are resolved through the i18n catalog
 (`static/locales/<locale>/messages.json`), and every title is pre-registered in the report by
 `SpreadsheetProcessor._prepare_statement`, so unused members still appear as empty sections.
 

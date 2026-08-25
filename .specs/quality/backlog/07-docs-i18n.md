@@ -12,7 +12,7 @@
 
 ### DOC-002 · Business rules exist only in code and a PDF
 - Priority: P1 · Effort: L · Status: open
-- Where: `assets/protocolo-v-1.13.pdf`, `config/names_enum.py` (35 verification names), validators.
+- Where: `assets/protocolo-v-1.13.pdf`, `config/names_enum.py` (34 verification names), validators.
 - Proposed fix: `.specs/business-rules/` — one file per sheet with a table `rule_id · NamesEnum key ·
   severity · description · protocol section · implemented by · tested by`; rule IDs
   (`DESC-001`, `COMP-003`, …) become the `Issue.rule_id` (ARC-004) and the test IDs.

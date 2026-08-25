@@ -87,7 +87,7 @@ addressing the missing semantics (skipped-with-reason, crash isolation) the proj
 identified as needed.
 
 ### Adopt a general-purpose DAG workflow engine (e.g. an Airflow-style scheduler)
-Rejected: the rule set is small (~35 checks today, `NamesEnum`), single-process, and re-run from
+Rejected: the rule set is small (~34 checks today, `NamesEnum`), single-process, and re-run from
 scratch on every CLI invocation — a workflow engine's persistence, retries, and scheduling machinery
 solve problems this batch validator doesn't have, at the cost of a heavy new dependency and
 operational surface (a scheduler UI, a metadata database) with no user for it.

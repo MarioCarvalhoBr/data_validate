@@ -9,7 +9,7 @@ points back here; this file does not repeat that one beyond a pointer.
 
 A multilingual spreadsheet validator for the AdaptaBrasil climate-adaptation
 platform (INPE). It reads a bundle of `.csv`/`.xlsx` sheets describing
-climate indicators, applies ~35 structural and business-rule checks defined
+climate indicators, applies 34 structural and business-rule checks defined
 by Protocol v1.13, and produces an HTML/PDF report plus a JSON summary on
 stdout that the platform consumes. The codebase is mid-migration to a new,
 cleaner architecture (strangler fig) — see `.specs/quality/backlog/` and
