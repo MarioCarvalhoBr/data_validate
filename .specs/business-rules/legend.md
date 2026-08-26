@@ -198,4 +198,4 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - **G-21 grey for DI** and **max 11 slices / 5–7 advised**: not validated.
 - **G-22 legend ≤ data minimum**: protocol demands the smallest `minimo` be ≤ the indicator's minimum; code reports out-of-range values (LEG-015) — equivalent in effect, different wording.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

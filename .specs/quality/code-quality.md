@@ -53,4 +53,4 @@ that module.
 - Exceptions for failures, `Issue`s for findings; never `(bool, str)` tuples.
 - Functions ≤ ~40 lines, ≤ 5 parameters (else a dataclass), early returns.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

@@ -105,4 +105,4 @@ missing (`BaseValidator.set_not_executed` is a no-op — backlog ARC-008); the t
 No rule has a dedicated unit test today (backlog TST-001). Helper functions used by rules are
 covered under `tests/unit/helpers/**`; those are cited per rule as "helper covered by …".
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

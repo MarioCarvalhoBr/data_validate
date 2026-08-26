@@ -35,6 +35,29 @@ malformed or adversarial — treat it accordingly.
   justified, documented suppression) before a change is considered done;
   new dependencies get a one-line justification in the PR/commit.
 
+## Hooks are defence in depth
+
+`.claude/hooks/guard-bash.sh` and the `permissions.deny`/`allow` globs in
+`.claude/settings.json` are string/token matchers over a shell command line.
+They cannot reason about what an interpreter does with a string handed to
+it — `python -c "..."`, `poetry run python -c "..."`, a script read from a
+file, a base64-decoded payload — so treat them as a speed bump against
+mistakes and obviously destructive one-liners, never as proof that a
+session cannot exfiltrate a secret or rewrite history. The controls that
+actually hold that line are:
+
+- **No credentials in the environment/`.env`**: nothing that grants push,
+  publish, or cloud access is ever exported into the shell this session
+  runs in; `.env*` is git-ignored and denied from `Read`.
+- **`persist-credentials: false`** on every `actions/checkout` step in CI
+  (`.github/workflows/*.yml`), so a compromised job step can't reuse the
+  checkout's token to push or open PRs.
+- **Branch protection on `main`**: required reviews and status checks, no
+  direct pushes — enforced by GitHub, not by anything running locally.
+- **Human review of the diff before push**: the human runs `git push`
+  (Claude never does, and the hook blocks it), and reviews what a commit
+  actually contains before that push happens.
+
 ## Never do
 
 - Never disable autoescape to make a template render "prettier" HTML.

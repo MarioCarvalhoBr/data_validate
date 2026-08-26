@@ -94,4 +94,4 @@ before it can safely delete old code (ADR-0002).
 - Related ADRs: ADR-0002 (golden harness), ADR-0010 (shared CI gate)
 
 ---
-Last synced with code: a4f76c7
+Last synced with code: 09279f4

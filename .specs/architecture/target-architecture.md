@@ -242,4 +242,4 @@ def validate(folder: Path, options: Options) -> ValidationResult:
   are a `future/ideas.md` item).
 - No change to the report's visual identity during Phases 1–3 (goldens must stay identical).
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

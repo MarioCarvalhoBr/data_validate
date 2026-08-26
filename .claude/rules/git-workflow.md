@@ -17,7 +17,7 @@
   bug-fix commit.
 - Never `git push`. This session prepares and commits locally; the human
   pushes.
-- Never `git add .` or `git add -A`. Stage explicit paths so an
+- Never `git add .` or `git add -A`. Always `git add -- <explicit paths>` so an
   accidental/generated file never rides along in a commit.
 
 ## Pull requests
@@ -31,7 +31,7 @@
 ## Never do
 
 - Never push, force-push, or push to `main` directly.
-- Never `git add .` / `git add -A`.
+- Never `git add .` / `git add -A`. Always `git add -- <explicit paths>`.
 - Never amend a commit that has already been reviewed or discussed as a
   fixed point — add a new commit instead unless the user explicitly asks
   for an amend.

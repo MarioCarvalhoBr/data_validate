@@ -50,4 +50,4 @@ No optimisation lands without a before/after number from the harness.
 - Benchmarks are compared against `dev-reports/bench/baseline.json`; a regression > 20 % fails CI
   unless the PR updates the baseline with a justification.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

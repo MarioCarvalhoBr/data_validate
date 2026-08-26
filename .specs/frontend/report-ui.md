@@ -50,4 +50,4 @@ CSS: inline "Microstrap" (Bootstrap-like minimal framework by Mário Carvalho) w
 Same HTML; renderer adds `@media print` rules. Page size Letter (current) — configurable via
 `--pdf-page-size` in target. Fonts: system sans-serif; no downloads.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

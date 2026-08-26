@@ -69,4 +69,4 @@ every model as `scenarios` (`SpModelABC.VAR_CONSTS.SCENARIOS`); the loader sets
 - **G-18 default symbols `O`/`P`**: the protocol defines defaults when the file is absent; the code treats "no file" as "no scenarios" (both the `cenario` column and scenario columns become invalid). Confirm the intended behaviour with the protocol owners.
 - `LB_SCEN` title is registered but never emitted (gap G-08).
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

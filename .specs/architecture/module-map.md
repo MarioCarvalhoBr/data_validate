@@ -125,4 +125,4 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | `dictionaries/hunspell/*.{aff,dic}`, `extra-words.dic` | Spell dictionaries | kept |
 | `templates/README.TEMPLATE.md` | README generator template | removed (ADR-0009) |
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

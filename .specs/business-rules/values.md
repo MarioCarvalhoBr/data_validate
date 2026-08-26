@@ -75,4 +75,4 @@ Purpose: one row per spatial feature (`id`), one column per indicator/time/scena
 - **G-13 `id` completeness**: "Nesta coluna deverão ter todos os objetos descritos no shapefile ou … todos os municípios brasileiros" cannot be checked without the spatial layer; uniqueness of `id` is also not checked.
 - **G-14 normalised range**: the [0,1] expectation is enforced only through the legend range rule (LEG-015) with default bounds 0–1.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

@@ -48,4 +48,4 @@ Compatibility promises during Phases 1–3: HTML byte-identical for the golden f
 `--no-time --no-version`); stdout JSON line unchanged. Phase 4 re-baselines goldens once (sorted
 issues, escaped HTML) with a reviewed diff.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

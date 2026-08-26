@@ -31,4 +31,4 @@
 - `../api/report-format.md`, `../frontend/report-ui.md`, `../architecture/error-model.md`
 - Backlog: SEC-001, SEC-002, ARC-016, BUG-010
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

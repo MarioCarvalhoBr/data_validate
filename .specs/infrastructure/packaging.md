@@ -50,4 +50,4 @@ pipx run --spec dist/*.whl canoa-data-validate --version
 
 Artefacts are produced by CI (`build` job) and published only by `release.yml`.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

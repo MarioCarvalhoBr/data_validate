@@ -30,6 +30,10 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   (SEC-001) becomes SSRF/local-file read inside the renderer.
 - Proposed fix: make PDF optional (`--pdf`), render with WeasyPrint (pure Python + pango) or a
   headless Chromium via Playwright in CI only; keep HTML as the primary artefact.
+- Interim: `pip-audit`'s only remaining finding, `pdfkit` PYSEC-2026-2860 (alias
+  GHSA-9g3x-6x24-vf9f, no fixed version exists), is explicitly `--ignore-vuln`'d in
+  `make security` and CI (comment points back here) so the gate stays honest instead of either
+  failing forever or silently suppressing the whole tool — closing this item removes the ignore.
 - Related: TOOL-008
 
 ### SEC-003 · Unbounded input sizes (zip-bomb / memory exhaustion)
@@ -56,16 +60,34 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: ARC-011
 
 ### SEC-005 · Supply-chain and CI hygiene
-- Priority: P2 · Effort: S · Status: open
-- Where: `.github/workflows/linux-lint-ubuntu-24-04.yml:29,33` (`poetry add ruff` mutates the lock in
-  CI; `continue-on-error: true`), `Makefile:16-17,21-23` (`rm -rf poetry.lock` before install/update),
-  no `pip-audit`, no `bandit`, no CodeQL, no `dependabot.yml` for pip.
-- Proposed fix: lock committed and respected (`poetry install --sync`), `pip-audit` + `bandit -r
-  data_validate` + CodeQL jobs, Dependabot for pip and GitHub Actions, pin actions by SHA.
+- Priority: P2 · Effort: S · Status: done
+- Where: `Makefile` (`security`/`security-offline` targets), `.github/workflows/ci.yml` (`security`
+  job), `.github/workflows/codeql.yml`, `.github/dependabot.yml`, `pyproject.toml` (`[tool.bandit]`),
+  `.claude/hooks/guard-bash.sh`, `.claude/settings.json`.
+- Problem (historical): `poetry add ruff` mutated the lock in CI with `continue-on-error: true`, no
+  `pip-audit`, no `bandit`, no CodeQL, no `dependabot.yml` for pip; known CVEs in pdfkit, pillow,
+  click, idna, pygments, pytest, requests, setuptools, urllib3 were unaddressed; the Bash-tool guard
+  hook used a small regex denylist that a wrapped/piped/subshelled command could slip past.
+- Fix: lock committed and respected (`poetry install --sync`); `bandit -c pyproject.toml -r
+  data_validate tools` and `pip-audit --strict` both run clean in `make security` and CI's
+  `security` job; `pdfkit` (PYSEC-2026-2860 / GHSA-9g3x-6x24-vf9f, no fixed version) is explicitly
+  `--ignore-vuln`'d with a comment pointing at SEC-002 (the WeasyPrint migration that removes it);
+  `pillow`, `click`, `idna`, `pygments`, `pytest`, `requests`, `setuptools`, `urllib3`, `certifi`
+  updated via `poetry update` (lockfile only, no `pyproject.toml` constraint changes needed);
+  `.github/workflows/codeql.yml` added (Python, push/PR to `main` + weekly schedule); Dependabot
+  already covered pip + actions; all actions pinned by full commit SHA with a version comment;
+  every `actions/checkout` step across `ci.yml`/`release.yml`/`docs.yml`/`codeql.yml` sets
+  `persist-credentials: false`; `.claude/hooks/guard-bash.sh` rewritten as a fail-closed Python
+  decision engine (segments on `&&`/`||`/`;`/`|`/newlines, recurses into `bash -c`/`sh -c`/`eval`/
+  `$(...)`/backticks/`xargs`, resolves `rm -r` targets against the repo root) with a 44-case
+  `--self-test`; `.claude/settings.json` denies `git -C *`, `git remote *`,
+  `git checkout -- .`/`git restore .`, `git branch -D *`, `find * -delete*`, `gh pr merge*`,
+  `gh release*`, `curl * | *`, `wget *`, `chmod -R 777*`, and only allows `git add -- *` (never a
+  bare `git add *`); `.gitignore` covers `.env*`, not just `.env`.
 - Related: TOOL-001
 
 ### SEC-006 · Pre-commit hooks run the pipeline and `git add .`
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `.pre-commit-config.yaml`, `scripts/generate_logs_coverage_badge.sh:27,36`,
   `scripts/prepare_metadata.sh:33`, `scripts/prepare_pyproject.sh:42`
 - Problem: hooks stage **every** file in the working tree (local data, credentials, scratch files)
@@ -77,6 +99,7 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Proposed fix: replace with standard hooks (ruff, ruff-format, mypy, bandit, check-yaml,
   detect-private-key, `poetry check`); never `git add` inside hooks; version bump only in release
   workflow.
+- Done: hooks replaced; `pre-commit uninstall` executed on 2026-08-25
 - Related: TOOL-002
 
 ### SEC-007 · Global environment mutation and predictable temp files

@@ -16,7 +16,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import subprocess
+import subprocess  # nosec B404 - see justification on the subprocess.run() call below
 import sys
 import time
 from dataclasses import dataclass
@@ -24,6 +24,8 @@ from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _JSON_SUMMARY_RE = re.compile(r"<(\{.*\})>", re.DOTALL)
+# Same value as `tests/e2e/test_golden.py::_SUBPROCESS_TIMEOUT_SECONDS`.
+_SUBPROCESS_TIMEOUT_SECONDS = 600
 
 
 @dataclass(frozen=True)
@@ -82,7 +84,13 @@ def _parse_summary(stdout: str) -> tuple[int | None, int | None, int | None]:
         return None, None, None
 
 
-def run_fixture(input_dir: Path, output_dir: Path, fixture: str, locale: str) -> FixtureRun:
+def run_fixture(
+    input_dir: Path,
+    output_dir: Path,
+    fixture: str,
+    locale: str,
+    timeout: float = _SUBPROCESS_TIMEOUT_SECONDS,
+) -> FixtureRun:
     """Run the CLI once against a single fixture folder.
 
     Args:
@@ -90,6 +98,9 @@ def run_fixture(input_dir: Path, output_dir: Path, fixture: str, locale: str) ->
         output_dir: Root folder to write each fixture's report into.
         fixture: Name of the fixture subfolder to run.
         locale: Locale passed to the CLI (`pt_BR` or `en_US`).
+        timeout: Maximum seconds to wait for the CLI process before raising
+            `subprocess.TimeoutExpired` (default: same as
+            `tests/e2e/test_golden.py`, 600 s).
 
     Returns:
         FixtureRun: The outcome of the run.
@@ -119,7 +130,9 @@ def run_fixture(input_dir: Path, output_dir: Path, fixture: str, locale: str) ->
     start = time.monotonic()
     # The command list is built entirely from this function's own arguments/constants, never
     # from unsanitised external input, so the subprocess-injection risk S603 flags does not apply.
-    result = subprocess.run(command, cwd=_REPO_ROOT, capture_output=True, text=True, check=False)  # noqa: S603
+    result = subprocess.run(  # noqa: S603 # nosec B603
+        command, cwd=_REPO_ROOT, capture_output=True, text=True, timeout=timeout, check=False
+    )
     duration = time.monotonic() - start
 
     errors, warnings, tests = _parse_summary(result.stdout)
@@ -186,6 +199,16 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="NAME",
         help="Specific fixture folder names to run (default: every folder under --input).",
     )
+    parser.add_argument(
+        "--timeout",
+        type=float,
+        default=_SUBPROCESS_TIMEOUT_SECONDS,
+        help=(
+            "Maximum seconds to wait for each fixture's CLI process before raising "
+            f"subprocess.TimeoutExpired (default: {_SUBPROCESS_TIMEOUT_SECONDS}, same as "
+            "tests/e2e/test_golden.py)."
+        ),
+    )
     return parser
 
 
@@ -211,13 +234,18 @@ def main(argv: list[str] | None = None) -> int:
         print(f"no fixtures found under {input_dir}", file=sys.stderr)
         return 1
 
-    runs = [run_fixture(input_dir, output_dir, fixture, args.locale) for fixture in fixtures]
+    runs = [run_fixture(input_dir, output_dir, fixture, args.locale, timeout=args.timeout) for fixture in fixtures]
     _print_summary_table(runs)
 
-    failed = [run for run in runs if run.exit_code != 0]
+    # The `data_validate` CLI always exits 0 today, even when validation errors are found
+    # (SEC-008 — no non-zero exit code on failure yet). Until that lands, `run.exit_code != 0`
+    # alone cannot detect a failed run, so a fixture also counts as failed when its parsed JSON
+    # summary reports a non-zero `errors` count (or the summary could not be parsed at all).
+    failed = [run for run in runs if run.exit_code != 0 or run.errors is None or run.errors > 0]
     if failed:
         failed_names = ", ".join(run.fixture for run in failed)
-        print(f"\n{len(failed)} fixture(s) exited non-zero: {failed_names}", file=sys.stderr)
+        print(f"\n{len(failed)} fixture(s) failed (non-zero exit or validation errors):", file=sys.stderr)
+        print(f"  {failed_names}", file=sys.stderr)
         return 1
     return 0
 

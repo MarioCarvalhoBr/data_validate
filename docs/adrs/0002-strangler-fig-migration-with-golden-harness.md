@@ -96,4 +96,4 @@ data outside of CI, which the golden-harness-on-checked-in-fixtures approach avo
 - Related ADRs: ADR-0001, ADR-0011 (testing policy), ADR-0004, ADR-0006
 
 ---
-Last synced with code: a4f76c7
+Last synced with code: 09279f4

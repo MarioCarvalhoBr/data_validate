@@ -72,4 +72,4 @@ during normalisation/rule execution, never by hand in rules.
 | Non-numeric cell in integer column | FC error + row dropped in every re-clean | `Normalizer` emits `STRUCT-010` once; `invalid` mask lets rules ignore the cell |
 | Rule raises | caught, rendered as "Exception validation …" | `engine.rule_crashed` + exit code 2 |
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

@@ -30,4 +30,4 @@
 `poetry.lock` + pinned actions + `tools/harness/generate_fixture.py --seed` make CI and
 benchmarks reproducible across machines.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

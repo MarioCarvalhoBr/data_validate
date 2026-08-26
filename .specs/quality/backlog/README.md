@@ -13,8 +13,7 @@ under `tests/`, and closed by updating the item status here and the matching spe
 | Metric | Value |
 |---|---|
 | Tests | 878 passing in ~3.3 s, **all** under `tests/unit/helpers/` |
-| Line coverage | **55.97 %** total; `main.py` 0 %, `middleware/bootstrap.py` 0 %, validators 10–35 %, `spreadsheet_processor.py` 16.9 %, `file_report_generator.py` 23.8 % |
-| Coverage gate | `--cov-fail-under=50` (docs still say 4 %) |
+| Line coverage | **55.97 %** measured with the legacy coverage exclusions (`pass`/`continue`/`break` excluded); **54.99 %** under the current configuration, which is the ratchet baseline in `tools/coverage_baseline.txt`; the gate is `fail_under = 54` in `pyproject.toml` and `--cov-fail-under=54` in the Makefile |
 | Lint | `ruff check .` clean (default rule set only, line length not enforced by ruff) |
 | Type checking | none (no mypy/pyright configured) |
 | Security tooling | none (no bandit / pip-audit / CodeQL) |
@@ -49,10 +48,12 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 
 ## Priority summary
 
-| Priority | Count | Highlights |
-|---|---|---|
-| P0 | 7 | XSS in HTML report (SEC-001), shared mutable class state (BUG-002, ARC-002), work-in-constructors (ARC-001), no tests for validators (TST-001), no e2e safety net (TST-002), shared list mutation (BUG-001) |
-| P1 | 28 | locale global state (BUG-004), string-based error model (ARC-004), i18n incomplete (ARC-005), iterrows hot paths (PERF-001), CI non-blocking lint (TOOL-001), exit-code contract (SEC-008) |
-| P2 | 43 | see files |
-| P3 | 12 | see files |
-| **Total** | **90** | |
+| Priority | Count | Done | Highlights |
+|---|---|---|---|
+| P0 | 7 | 1 | XSS in HTML report (SEC-001), shared mutable class state (BUG-002, ARC-002), work-in-constructors (ARC-001), no tests for validators (TST-001), no e2e safety net (TST-002), shared list mutation (BUG-001) |
+| P1 | 28 | 6 | locale global state (BUG-004), string-based error model (ARC-004), i18n incomplete (ARC-005), iterrows hot paths (PERF-001), CI non-blocking lint (TOOL-001), exit-code contract (SEC-008) |
+| P2 | 43 | 4 | see files |
+| P3 | 12 | 0 | see files |
+| **Total** | **90** | **11** | |
+
+Status snapshot: 2026-08-25 — 11 done, 4 in-progress, 75 open

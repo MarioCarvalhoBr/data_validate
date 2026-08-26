@@ -1,1 +1,10 @@
 * @MarioCarvalhoBr
+
+# Security-sensitive paths: CI/CD workflows, agent permissions/hooks, and the
+# dependency manifest/lock all get an explicit owner review, not just the
+# blanket rule above (SEC-005).
+/.github/ @MarioCarvalhoBr
+/.claude/settings.json @MarioCarvalhoBr
+/.claude/hooks/ @MarioCarvalhoBr
+/pyproject.toml @MarioCarvalhoBr
+/poetry.lock @MarioCarvalhoBr

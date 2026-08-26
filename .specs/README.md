@@ -61,4 +61,4 @@ flowchart LR
 - New conventions agreed in conversation become a rule in `.claude/rules/` or a section here in
   the same commit.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

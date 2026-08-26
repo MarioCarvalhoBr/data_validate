@@ -6,13 +6,16 @@
       "Bash(poetry run pytest*)", "Bash(poetry run ruff*)", "Bash(poetry run mypy*)",
       "Bash(poetry run bandit*)", "Bash(poetry run pip-audit*)", "Bash(poetry run canoa-data-validate*)",
       "Bash(poetry run python*)", "Bash(poetry install*)", "Bash(poetry lock*)", "Bash(poetry build*)",
-      "Bash(make *)", "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git add *)",
+      "Bash(make *)", "Bash(git status*)", "Bash(git diff*)", "Bash(git log*)", "Bash(git add -- *)",
       "Bash(git commit*)", "Bash(git switch*)", "Bash(git checkout -b*)", "Bash(git branch*)",
       "Bash(git stash*)", "Bash(ls*)", "Bash(tree*)", "Bash(cat*)", "Bash(wc*)", "Bash(python -m json.tool*)"
     ],
     "deny": [
       "Bash(git push*)", "Bash(git reset --hard*)", "Bash(git clean*)", "Bash(rm -rf /*)",
-      "Bash(poetry publish*)", "Bash(twine*)", "Read(./.env)", "Read(./**/.env*)"
+      "Bash(poetry publish*)", "Bash(twine*)", "Read(./.env)", "Read(./**/.env*)",
+      "Bash(git -C *)", "Bash(git remote *)", "Bash(git checkout -- .)", "Bash(git restore .)",
+      "Bash(git branch -D *)", "Bash(find * -delete*)", "Bash(gh pr merge*)", "Bash(gh release*)",
+      "Bash(curl * | *)", "Bash(wget *)", "Bash(chmod -R 777*)"
     ]
   },
   "hooks": {

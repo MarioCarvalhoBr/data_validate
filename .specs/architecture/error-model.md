@@ -101,4 +101,4 @@ backward compatibility with the platform parser; new keys are additive.
 
 Which severity each rule uses is fixed in `business-rules/` and must not be decided ad hoc in code.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

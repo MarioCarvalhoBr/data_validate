@@ -66,9 +66,9 @@ Extensions `.csv` (separator `|`) or `.xlsx`; the same stem must not exist in bo
 ## Current state (v0.7.65b732)
 
 - Python 3.12, Poetry, pandas 3, networkx, pyenchant, jinja2, babel, calamine, pdfkit.
-- 878 unit tests (all under `tests/unit/helpers/`), 55.97 % line coverage.
+- 878 unit tests (all under `tests/unit/helpers/`), 54.99 % line coverage (measured with the current configuration; 55.97 % with legacy exclusions).
 - 34 verification categories (`config/names_enum.py`), messages hard-coded in pt-BR.
-- Known debt: `quality/backlog/` (89 items). Migration plan: `quality/backlog/08-migration-roadmap.md`.
+- Known debt: `quality/backlog/` (90 items). Migration plan: `quality/backlog/08-migration-roadmap.md`.
 
 ## Where next
 
@@ -77,4 +77,4 @@ Extensions `.csv` (separator `|`) or `.xlsx`; the same stem must not exist in bo
 - What must be true → `business-rules/`
 - What to do next → `quality/backlog/README.md`
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

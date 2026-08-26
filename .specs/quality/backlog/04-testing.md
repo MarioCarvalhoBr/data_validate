@@ -19,7 +19,7 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration
-- Priority: P0 · Effort: M · Status: open
+- Priority: P0 · Effort: M · Status: done
 - Where: fixtures already exist — `data/input/data_ground_truth_01` (must produce 0 errors) and
   `data/input/data_errors_{01,09,11,13,14,15}`; reports committed under `data/output/**` are de-facto
   goldens but nothing asserts on them.
@@ -27,21 +27,26 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   `--no-time --no-version` and compares a normalised JSON (`{rule_id: {errors: [...], warnings: [...]}}`)
   against `tests/e2e/golden/<fixture>.json`; `make harness-update` regenerates goldens with a diff
   review. This is the first thing to build — every refactor is then measured against it.
+- Done: tests/e2e golden harness (09279f4); messages sorted within sections because `value_validator.py` emits set-ordered messages — see `tests/e2e/golden/CHANGELOG.md`
 - Related: 08-migration-roadmap Phase 0
 
 ### TST-003 · Empty `conftest.py`, no shared fixtures, tests touch the real filesystem
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: in-progress
 - Where: `tests/conftest.py`, `LanguageManager` writes `<repo>/.config/store.locale` during tests,
   `LoggerManager` creates `data/output/logs`.
 - Proposed fix: fixtures `app_context`, `sheet_bundle` (builder from dict → typed frames),
   `catalog` (fake translator returning keys), `tmp_input_folder`, `freeze_clock`; autouse fixture
   that isolates CWD in `tmp_path`.
+- Done: conftest fixtures added; `tmp_cwd` is opt-in because legacy unit tests depend on CWD; autouse isolation waits for BUG-004/BUG-021
 
 ### TST-004 · Coverage gate too low and not ratcheted
-- Priority: P1 · Effort: S · Status: open
+- Priority: P1 · Effort: S · Status: done
 - Where: `pyproject.toml` `--cov-fail-under=50`; TESTING.md says 4 %.
 - Proposed fix: ratchet script (`tools/coverage_ratchet.py`) that fails if coverage drops below the
-  last committed value; targets 70 % (Phase 1), 85 % (Phase 3), 90 %+ (Phase 5); branch coverage on.
+  last committed value; targets 70 % (Phase 1), 85 % (Phase 3), 90 %+ (Phase 5); branch coverage:
+  pending (`[tool.coverage.run] branch = true` not yet enabled — enable when the ratchet baseline is
+  re-measured).
+- Done: ratchet `tools/coverage_ratchet.py`, baseline 54.99, gate 54
 
 ### TST-005 · No property-based, mutation or benchmark tests
 - Priority: P1 · Effort: M · Status: open
@@ -64,9 +69,11 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   `requires_pdf` and skip when absent; pure-Python spell fallback (ARC-015) removes the need.
 
 ### TST-008 · Test execution ergonomics
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: in-progress
 - Proposed fix: `pytest-xdist` (`-n auto`), markers `unit/integration/e2e/slow`, `make test-unit`,
   `make test-e2e`, `--durations=10`, `-p no:cacheprovider` in CI.
+- Done: pytest-xdist, markers, `make test-unit`/`test-e2e`
+- Remaining: `--durations=10` and `-p no:cacheprovider` in CI are not wired up yet.
 
 ### TST-009 · Dead test copies in `local_data/`
 - Priority: P3 · Effort: S · Status: open

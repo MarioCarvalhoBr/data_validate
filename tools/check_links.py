@@ -12,6 +12,10 @@ Scans every `*.md` file in the repository (excluding `.venv`, `local_data`, `dev
 - A relative file target resolves to an existing path.
 - A `#anchor` on a Markdown target matches a heading in that file, GitHub-slugified.
 
+A small set of individual files can also be excluded by exact repo-relative path (see
+`_DEFAULT_EXCLUDED_FILES`) for known, accepted-debt breakage in legacy files that are not worth
+editing — pass additional paths with `--exclude-file`.
+
 Used by the final verification checklist (see `local_data/prompt-master.md`, section 8, Phase G)
 and can be run standalone as `python tools/check_links.py`.
 """
@@ -26,6 +30,12 @@ from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _EXCLUDED_DIR_NAMES = {".venv", "local_data", "dev-reports", "node_modules", ".git"}
+# Individual files excluded by exact repo-relative path, regardless of directory. Default: the
+# legacy README generator's input template, retired by ADR-0009 (README.md is now hand-written)
+# and slated for physical deletion in Phase 5 under ARC-010's package-layout cleanup. Its stale
+# `#-features` anchor is known, accepted debt in a file nobody should be editing further, not a
+# regression this checker should keep failing the build on.
+_DEFAULT_EXCLUDED_FILES = frozenset({"data_validate/static/templates/README.TEMPLATE.md"})
 _LINK_RE = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*$", re.MULTILINE)
 _SCHEME_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
@@ -62,16 +72,42 @@ def _is_excluded(path: Path) -> bool:
     return any(part in _EXCLUDED_DIR_NAMES for part in path.parts)
 
 
-def _discover_markdown_files(root: Path) -> list[Path]:
-    """Find every `*.md` file under `root`, excluding generated/vendor directories.
+def _is_excluded_file(path: Path, root: Path, excluded_files: frozenset[str]) -> bool:
+    """Check whether a file's path (relative to `root`) is an individually excluded file.
+
+    Args:
+        path: The Markdown file path to check.
+        root: The directory `path` was discovered under, used to compute the relative path
+            excluded files are matched against.
+        excluded_files: Repo-relative POSIX paths (e.g.
+            `"data_validate/static/templates/README.TEMPLATE.md"`) to exclude.
+
+    Returns:
+        bool: True if `path` should be skipped.
+    """
+    try:
+        relative = path.relative_to(root).as_posix()
+    except ValueError:
+        relative = path.as_posix()
+    return relative in excluded_files
+
+
+def _discover_markdown_files(root: Path, *, excluded_files: frozenset[str] = _DEFAULT_EXCLUDED_FILES) -> list[Path]:
+    """Find every `*.md` file under `root`, excluding generated/vendor directories and files.
 
     Args:
         root: Directory to scan recursively.
+        excluded_files: Repo-relative POSIX paths to exclude outright (default:
+            `_DEFAULT_EXCLUDED_FILES`).
 
     Returns:
         list[Path]: Sorted list of Markdown file paths.
     """
-    return sorted(path for path in root.rglob("*.md") if not _is_excluded(path))
+    return sorted(
+        path
+        for path in root.rglob("*.md")
+        if not _is_excluded(path) and not _is_excluded_file(path, root, excluded_files)
+    )
 
 
 def _slugify_heading(text: str) -> str:
@@ -173,6 +209,17 @@ def build_parser() -> argparse.ArgumentParser:
         default=_REPO_ROOT,
         help="Directory to scan for *.md files (default: repository root).",
     )
+    parser.add_argument(
+        "--exclude-file",
+        dest="exclude_files",
+        nargs="*",
+        default=[],
+        metavar="PATH",
+        help=(
+            "Additional file(s) to exclude, as paths relative to --root, on top of the default "
+            f"exclusion list ({sorted(_DEFAULT_EXCLUDED_FILES)})."
+        ),
+    )
     return parser
 
 
@@ -187,8 +234,9 @@ def main(argv: list[str] | None = None) -> int:
     """
     args = build_parser().parse_args(argv)
     root: Path = args.root.resolve()
+    excluded_files = _DEFAULT_EXCLUDED_FILES | frozenset(args.exclude_files)
 
-    markdown_files = _discover_markdown_files(root)
+    markdown_files = _discover_markdown_files(root, excluded_files=excluded_files)
     all_broken = [broken for path in markdown_files for broken in _check_file(path, root)]
 
     if not all_broken:

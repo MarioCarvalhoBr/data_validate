@@ -48,11 +48,12 @@ typecheck: ## Run mypy (data_validate is legacy-exempt; tools/ and tests/e2e/ ar
 	$(MYPY) $$targets
 
 security: ## Run bandit and pip-audit (pip-audit needs network access)
-	$(BANDIT) -c pyproject.toml -r $(PATH_SRC)
-	poetry run pip-audit
+	$(BANDIT) -c pyproject.toml -r $(PATH_SRC) tools
+	# pdfkit: no upstream fix, replaced by WeasyPrint in Phase 4 (SEC-002)
+	poetry run pip-audit --ignore-vuln PYSEC-2026-2860 --ignore-vuln GHSA-9g3x-6x24-vf9f
 
 security-offline: ## Run bandit only (no network required; use when pip-audit is unavailable offline)
-	$(BANDIT) -c pyproject.toml -r $(PATH_SRC)
+	$(BANDIT) -c pyproject.toml -r $(PATH_SRC) tools
 
 test-unit: ## Run unit tests in parallel
 	$(PYTEST) tests/unit -n auto -m "not e2e"

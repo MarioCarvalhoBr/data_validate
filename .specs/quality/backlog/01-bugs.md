@@ -156,6 +156,7 @@ Every fix here must land with a regression test under `tests/` that fails before
   `validator_structure_error_unexpected_folder`; both catalogs contain `welcome` ("Calculadora
   Simples"), `menu_title`, `add_option`, … from a calculator demo.
 - Proposed fix: parity test in `tests/unit/i18n/test_catalog_parity.py`; purge junk keys.
+- Evidence: tools/i18n_check.py (2026-08-25) confirms the 4 missing en_US keys
 - Related: DOC-003
 
 ### BUG-017 · `MetadataInfo` uses `assert` for validation and prints at import

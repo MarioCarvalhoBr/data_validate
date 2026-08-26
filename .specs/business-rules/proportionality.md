@@ -139,4 +139,4 @@ by `helpers/common/validation/proportionality_processing.py::ProportionalityProc
 - **G-24 first two columns are spatial**: protocol says the first two columns are the spatial representation (§3.2); code expects a single `id` sub-column and ignores `unnamed` level-0.
 - Non-normalised exceptions ("podem existir exceções") have no opt-out flag.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

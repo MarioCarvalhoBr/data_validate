@@ -74,4 +74,4 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - **G-16 single observed time**: "atualmente suporta apenas uma referência temporal para dados observados" — the code assumes row 1 is the present time but does not verify that only one symbol is ≤ current year.
 - CR/LF and line-break checks exist for `descricao` (DESC-008) but `LB_TEMP` is never emitted (gap G-08).
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

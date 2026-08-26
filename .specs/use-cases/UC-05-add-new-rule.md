@@ -33,4 +33,4 @@
 - `../business-rules/README.md`, `.claude/skills/validation-rule-authoring/SKILL.md`
 - Backlog: DOC-002, ARC-017
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

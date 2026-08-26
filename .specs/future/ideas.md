@@ -13,4 +13,4 @@
 | Localised protocol PDF ↔ rule cross-reference | Link each report message to the protocol section | `protocol_section` in business-rules tables | Rendered as tooltip/footnote |
 | Schema export | Emit JSON Schema / CSV template for each sheet from `SheetSpec` | `specs/sheets.py` (Phase 1) | Helps analysts start from a valid template |
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

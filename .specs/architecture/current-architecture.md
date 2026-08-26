@@ -142,4 +142,4 @@ class-level column definitions (BUG-002). This is the main obstacle to testing a
 | `<output>/<input-name>_report.html`, `.pdf` | every run | — |
 | `<package>/static/dictionaries/<lang>.dic|.exc` | spell-check with user words | BUG-022 |
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

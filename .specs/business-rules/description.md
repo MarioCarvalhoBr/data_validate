@@ -203,4 +203,4 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - **G-10 `relacao`** domain {1, −1}, **`ordem`** sibling sequence, **`meta`** format, **`nome_completo` ≥ `nome_simples` length**: not validated.
 - **G-11 global uniqueness of names**: protocol says two indicators may not share `nome_simples`/`nome_completo`; code checks uniqueness per level-2 subtree only (COMP-004).
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

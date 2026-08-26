@@ -132,4 +132,4 @@ Two validators consume this sheet: `SpCompositionGraphValidator` (networkx `DiGr
 - **G-12 root semantics**: protocol says level-1 indicators have a parent of level 0; the graph validator instead requires node `"1"` to exist and be the root, while the tree validator fabricates code `0`. Unify in the `SheetSpec` (ADR-0003).
 - COMP-002/COMP-007 duplicate the same check under two titles.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

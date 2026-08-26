@@ -88,4 +88,4 @@ length > 1 are treated as acronyms and skipped.
 - **G-27 case-sensitive dictionary words**: protocol says dictionary words match exactly, case-sensitively; enchant's `add()` behaviour for capitalised forms is not verified by tests.
 - SPELL-001 errors are silently dropped (see rule notes).
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

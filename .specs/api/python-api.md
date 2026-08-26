@@ -61,4 +61,4 @@ for rule in list_rules():        # RuleInfo(rule_id, category, severity, require
 that can be passed to `validate_frames(frames, options)` — the same function the pipeline calls
 after loading — so rule tests never touch the filesystem.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

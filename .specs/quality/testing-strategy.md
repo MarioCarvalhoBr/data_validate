@@ -52,9 +52,7 @@ WeasyPrint). Tests with these markers skip with a clear reason when the backend 
 
 ## Coverage
 
-- Baseline 55.97 % (2026-08-25). `tools/coverage_ratchet.py` stores the last accepted value
-  in `dev-reports/coverage-baseline.txt` (committed as `.coverage-baseline`) and fails CI if the
-  new run is lower.
+- Baseline 54.99 % (measured with the current configuration, ratchet baseline in `tools/coverage_baseline.txt`); measured as 55.97 % with the legacy coverage exclusions (`pass`/`continue`/`break` excluded). Gate is `fail_under = 54` in `pyproject.toml` and `--cov-fail-under=54` in the Makefile.
 - Targets: 70 % end of Phase 1, 85 % end of Phase 3, ≥ 90 % at 1.0.0.
 - New modules: ≥ 95 % lines and branches; every bug fix ships a regression test named after
   the backlog ID (`test_bug_006_missing_id_column_does_not_raise`).
@@ -79,4 +77,4 @@ missing column (→ skipped), empty sheet, `DI` values, with/without scenarios. 
 Jobs `test` (matrix ubuntu-24.04/windows-2022 × 3.12/3.13, `pytest -n auto --cov`, Codecov,
 junit artefact) and `e2e` (Linux, system deps installed). See `../infrastructure/ci-cd.md`.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

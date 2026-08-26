@@ -170,4 +170,4 @@ Loading facts (`helpers/tools/data_loader/**`):
 - **G-03 decimal comma**: the protocol mandates comma as decimal separator in CSV; code accepts both `,` and `.` everywhere (lenient, undocumented).
 - **G-04 `.qml`**: still scanned (`Config.extensions`) though removed from the protocol in v1.11.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

@@ -3,8 +3,8 @@
 """
 Global pytest configuration and fixtures.
 
-The `tmp_cwd` fixture below is opt-in (marker `isolated_cwd`), not
-autouse. An autouse `monkeypatch.chdir(tmp_path)` was tried first, as
+The `tmp_cwd` fixture below is opt-in — request it explicitly in a test's
+signature — not autouse. An autouse `monkeypatch.chdir(tmp_path)` was tried first, as
 suggested by the harness spec, but several existing unit tests under
 `tests/unit/` construct `LoggerManager`/`FileSystemUtils` instances that
 resolve relative paths (e.g. default log/output folders) against the
@@ -64,12 +64,12 @@ def fixture_folder(repo_root: Path) -> Callable[[str], Path]:
 def tmp_cwd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Change the process's working directory to an isolated temp directory.
 
-    Opt-in via `@pytest.mark.isolated_cwd` (request the fixture explicitly
-    in the test signature) rather than autouse — see the module docstring
-    for why: several `tests/unit/**` tests are sensitive to the working
-    directory and this run may not edit `tests/unit/**`. New tests that
-    would otherwise write `.config/` or `data/output/logs/` under the repo
-    root should request this fixture explicitly.
+    Opt-in: request the `tmp_cwd` fixture explicitly in a test's signature
+    rather than autouse — see the module docstring for why: several
+    `tests/unit/**` tests are sensitive to the working directory and this
+    run may not edit `tests/unit/**`. New tests that would otherwise write
+    `.config/` or `data/output/logs/` under the repo root should request
+    this fixture explicitly.
 
     Args:
         tmp_path: pytest's built-in per-test temporary directory.

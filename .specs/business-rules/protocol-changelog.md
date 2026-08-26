@@ -65,4 +65,4 @@ version). The validator does not yet declare which protocol version it implement
 | G-27 | spelling | case-sensitive dictionary matching unverified | add tests |
 | — | spelling | dictionary initialisation errors silently dropped (`_prepare_statement` never called) | bug fix + test |
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

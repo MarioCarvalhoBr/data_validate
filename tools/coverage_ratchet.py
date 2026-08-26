@@ -15,7 +15,7 @@ from __future__ import annotations
 
 import argparse
 import sys
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # nosec B405 - see justification on the ET.parse() call below
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -43,7 +43,7 @@ def _read_line_rate_percent(coverage_xml: Path) -> float:
     # coverage.xml is a build artefact this repo's own `make coverage` just generated locally, not
     # externally-sourced/untrusted data, so the stdlib parser's XXE risk (S314) does not apply here;
     # `defusedxml` is not a project dependency, and adding one is out of scope for this script.
-    root = ET.parse(coverage_xml).getroot()  # noqa: S314
+    root = ET.parse(coverage_xml).getroot()  # noqa: S314 # nosec B314
     line_rate = root.get("line-rate")
     if line_rate is None:
         raise ValueError(f"no line-rate attribute found on the root element of {coverage_xml}")

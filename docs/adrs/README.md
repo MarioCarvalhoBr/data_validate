@@ -20,7 +20,7 @@ building toward), `Accepted` (implemented and in force today), `Rejected`, `Depr
 | [0006](0006-rule-registry-with-prerequisites.md) | Rule registry with declared prerequisites; skipped-with-reason semantics | Proposed | 2026-08-25 |
 | [0007](0007-report-rendering-jinja2-autoescape-weasyprint.md) | Report rendering with Jinja2 autoescape; PDF optional via WeasyPrint (drop wkhtmltopdf) | Proposed | 2026-08-25 |
 | [0008](0008-spellbackend-protocol-pure-python-fallback.md) | Spell-check behind a `SpellBackend` protocol with a pure-Python fallback | Proposed | 2026-08-25 |
-| [0009](0009-readme-hand-written-retire-generator.md) | README maintained by hand; retire the template generator | Proposed | 2026-08-25 |
+| [0009](0009-readme-hand-written-retire-generator.md) | README maintained by hand; retire the template generator | Accepted (partially implemented) | 2026-08-25 |
 | [0010](0010-tooling-baseline.md) | Tooling baseline: Poetry, ruff (lint+format), mypy strict-by-default for new code, bandit, pip-audit, pre-commit | Accepted | 2026-08-25 |
 | [0011](0011-testing-policy.md) | Testing policy: pytest + pytest-mock only, coverage ratchet, goldens | Accepted | 2026-08-25 |
 | [0012](0012-multi-agent-development-workflow.md) | Multi-agent development workflow (orchestrator + specialised subagents) governed by `.claude/rules/` | Accepted | 2026-08-25 |

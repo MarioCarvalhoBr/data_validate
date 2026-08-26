@@ -1,6 +1,8 @@
 # ADR-0009: README maintained by hand; retire the template generator
 
-- Status: Proposed
+- Status: Accepted (partially implemented) — `README.md` has been hand-written since 4b801ae and
+  the Makefile's `readme` target has been removed; `generate_readme.py` and
+  `README.TEMPLATE.md` were deleted in Phase 5 (ARC-010).
 - Date: 2026-08-25
 - Deciders: Mário de Araújo Carvalho (INPE) with the AI orchestrator
 

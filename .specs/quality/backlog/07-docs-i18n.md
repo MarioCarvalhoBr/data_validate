@@ -1,7 +1,7 @@
 # 07 · Documentation & internationalisation
 
 ### DOC-001 · Root documents are outdated and partly generated
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: done
 - Where: `README.md` (27 kB generated from `static/templates/README.TEMPLATE.md`, badge version
   hard-coded), `HOW_IT_WORKS.md` (mentions `controllers/processor.py`, `ModelListReport`),
   `TESTING.md` (threshold 4 % vs 50 %), `.github/copilot-instructions.md` (4 % / 100 % contradiction,
@@ -9,13 +9,15 @@
 - Proposed fix: rewrite README (concise, accurate, links into `.specs/`), turn HOW_IT_WORKS/TESTING
   into short pointers to `.specs/architecture` and `.specs/quality`, delete copilot-instructions in
   favour of `AGENTS.md`/`CLAUDE.md`, keep the template generator only if README stays templated.
+- Done: (4b801ae); note `tools/check_links.py` found a broken anchor `#-features` in `data_validate/static/templates/README.TEMPLATE.md` (generator retired by ADR-0009; file removed in Phase 5)
 
 ### DOC-002 · Business rules exist only in code and a PDF
-- Priority: P1 · Effort: L · Status: open
+- Priority: P1 · Effort: L · Status: done
 - Where: `assets/protocolo-v-1.13.pdf`, `config/names_enum.py` (34 verification names), validators.
 - Proposed fix: `.specs/business-rules/` — one file per sheet with a table `rule_id · NamesEnum key ·
   severity · description · protocol section · implemented by · tested by`; rule IDs
   (`DESC-001`, `COMP-003`, …) become the `Issue.rule_id` (ARC-004) and the test IDs.
+- Done: (c67f983: `.specs/business-rules/` with 81 rules and 27 protocol/code gaps; note the `desc_simples` trailing-period contradiction G-07 as an open decision)
 
 ### DOC-003 · i18n catalog quality
 - Priority: P1 · Effort: M · Status: open
@@ -35,10 +37,11 @@
   CI to Pages.
 
 ### DOC-005 · Changelog
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `CHANGELOG.md` has `[0.7.XX] - 2026-02-20` placeholder and duplicated bullets.
 - Proposed fix: Keep-a-Changelog with an `Unreleased` section maintained per PR; automation in the
   release workflow (TOOL-005).
+- Done: CHANGELOG rewritten, Unreleased section
 
 ### DOC-006 · Protocol versioning
 - Priority: P2 · Effort: S · Status: open

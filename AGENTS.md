@@ -62,8 +62,10 @@ tools/           dev scripts (harness runner, i18n check, coverage ratchet)
 - `pytest` + `pytest-mock` exclusively — `unittest.mock` is forbidden.
 - Test tree mirrors `data_validate/`; class `Test<Unit>`, function
   `test_<unit>_<scenario>`.
-- **Coverage gate is 50 % today and rises by ratchet** (currently enforced
-  at 55.97 % — do not lower it). Any brand-new module needs ≥ 95 % coverage
+- **Coverage gate is a ratchet**: `fail_under = 54` in `pyproject.toml` and
+  `--cov-fail-under=54` in the Makefile; measured 54.99 % under the current
+  configuration (55.97 % under the legacy exclusions); ratchet baseline in
+  `tools/coverage_baseline.txt`. Any brand-new module needs ≥ 95 % coverage
   before merge. (The old `copilot-instructions.md` claimed "100 % mandatory
   for new files" and a "4 %" gate; both were stale — this section is the
   corrected figure.)

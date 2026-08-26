@@ -44,4 +44,4 @@ Removed: black, flake8, flake8-html.
 2. Add to the right group/extra with a caret range; commit the lock.
 3. Update this inventory and `packaging.md` if system deps change.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

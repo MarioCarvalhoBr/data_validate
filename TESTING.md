@@ -31,10 +31,6 @@ identical goldens.
 
 ## Coverage
 
-The repo-wide gate is a **ratchet**, currently `fail_under = 54` in `pyproject.toml`
-(measured 54.99–55.97 % on 2026-08-25), raised over time by `tools/coverage_ratchet.py` and
-never lowered — this replaces the outdated "4 %" figure that appeared in earlier docs. Any
-brand-new module needs **≥ 95 %** line coverage before merge, and every bug fix ships a
-regression test.
+The repo-wide gate is a **ratchet**: 54.99 % measured with the current configuration (55.97 % measured with the legacy coverage exclusions `pass`/`continue`/`break` excluded); the gate is `fail_under = 54` in `pyproject.toml` and `--cov-fail-under=54` in the Makefile. The ratchet is raised over time by `tools/coverage_ratchet.py` and never lowered — this replaces the outdated "4 %" figure that appeared in earlier docs. Any brand-new module needs **≥ 95 %** line coverage before merge, and every bug fix ships a regression test.
 
 Full strategy, fixtures and the test pyramid: [`.specs/quality/testing-strategy.md`](.specs/quality/testing-strategy.md).

@@ -37,4 +37,4 @@
 - CLI: `../api/cli-contract.md`
 - Backlog: SEC-008, ARC-011, BUG-004
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

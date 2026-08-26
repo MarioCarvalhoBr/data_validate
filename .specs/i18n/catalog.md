@@ -71,4 +71,4 @@ message per key (no nested `message` object). A migration script converts the cu
 pt_BR is authored first (protocol language); en_US must be complete before a release. Reviewers
 for en_US listed in `CODEOWNERS` for `i18n/locales/en_US.json`.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

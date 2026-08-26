@@ -22,4 +22,4 @@
 Each use case follows `../templates/use-case.md`: goal, preconditions, main flow, alternative
 flows, postconditions, related rules/backlog.
 
-Last synced with code: 3dcfdb1
+Last synced with code: 09279f4

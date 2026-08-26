@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   business rules for all 8 sheets with stable rule IDs, use cases, testing/security/performance/
   code-quality strategy, infrastructure and i18n specs, and future/deprecation notes.
 - `.specs/quality/backlog/` — a 90-item, prioritised audit of the current codebase (bugs,
-  security, architecture, testing, performance, tooling/CI, docs/i18n) and an 6-phase migration
+  security, architecture, testing, performance, tooling/CI, docs/i18n) and a 6-phase migration
   roadmap (`08-migration-roadmap.md`).
 - `docs/adrs/` — 14 architecture decision records covering the migration strategy, the
   `SheetSpec`/`Issue`/`Rule` model, the CLI contract, report rendering, spell-check backend,
