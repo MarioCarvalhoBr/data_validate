@@ -1,0 +1,191 @@
+{
+  "exit_code": 0,
+  "fixture": "data_errors_13",
+  "json_summary": {
+    "data_validate": {
+      "report": {
+        "errors": 4,
+        "tests": 34,
+        "warnings": 1
+      },
+      "version": "<version>"
+    }
+  },
+  "section_order": [
+    "Estrutura dos arquivos da pasta de entrada",
+    "Limpeza dos arquivos",
+    "Relações entre indicadores",
+    "Hierarquia como árvore",
+    "Níveis de indicadores",
+    "Unicidade dos códigos",
+    "Códigos HTML nas descrições simples",
+    "Títulos únicos",
+    "Códigos sequenciais",
+    "Campos vazios",
+    "Padrão para nomes dos indicadores",
+    "Títulos com mais de 40 caracteres",
+    "Descrições simples com mais de 150 caracteres",
+    "Pontuações obrigatórias e proibidas em descrições",
+    "Pontuações obrigatórias e proibidas em cenários",
+    "Pontuações obrigatórias e proibidas em referência temporal",
+    "Relações de valores únicos em cenários",
+    "Relações de valores únicos em referência temporal",
+    "Relações de combinações de valores",
+    "Valores indisponíveis e inválidos",
+    "Quebra de linha para descrição",
+    "Quebra de linha para cenários",
+    "Quebra de linha para referência temporal",
+    "Anos em referência temporal",
+    "Intervalo dos dados da legenda",
+    "Sobreposição de valores na legenda",
+    "Relações de indicadores em legendas",
+    "Propriedades de soma nos fatores influenciadores",
+    "Indicadores repetidos em proporcionalidades",
+    "Relações de indicadores em proporcionalidades",
+    "Indicadores em valores e proporcionalidades",
+    "Indicadores folhas sem dados associados",
+    "Níveis dos indicadores filhos"
+  ],
+  "sections": {
+    "Anos em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Campos vazios": {
+      "errors": [],
+      "warnings": []
+    },
+    "Códigos HTML nas descrições simples": {
+      "errors": [],
+      "warnings": []
+    },
+    "Códigos sequenciais": {
+      "errors": [],
+      "warnings": []
+    },
+    "Descrições simples com mais de 150 caracteres": {
+      "errors": [],
+      "warnings": []
+    },
+    "Estrutura dos arquivos da pasta de entrada": {
+      "errors": [],
+      "warnings": []
+    },
+    "Hierarquia como árvore": {
+      "errors": [],
+      "warnings": []
+    },
+    "Indicadores em valores e proporcionalidades": {
+      "errors": [],
+      "warnings": []
+    },
+    "Indicadores folhas sem dados associados": {
+      "errors": [],
+      "warnings": []
+    },
+    "Indicadores repetidos em proporcionalidades": {
+      "errors": [],
+      "warnings": []
+    },
+    "Intervalo dos dados da legenda": {
+      "errors": [],
+      "warnings": []
+    },
+    "Limpeza dos arquivos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Níveis de indicadores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Níveis dos indicadores filhos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Padrão para nomes dos indicadores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Pontuações obrigatórias e proibidas em cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Pontuações obrigatórias e proibidas em descrições": {
+      "errors": [],
+      "warnings": []
+    },
+    "Pontuações obrigatórias e proibidas em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Propriedades de soma nos fatores influenciadores": {
+      "errors": [
+        "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).",
+        "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100049' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).",
+        "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '8-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '8-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível).",
+        "proporcionalidades.xlsx: A soma de fatores influenciadores para o ID '1100056' no pai '9-2015' é 0 (zero). Na planilha valores.xlsx, existe(m) valor(es) para os filhos do indicador '9-2015', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+      ],
+      "warnings": []
+    },
+    "Quebra de linha para cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Quebra de linha para descrição": {
+      "errors": [],
+      "warnings": []
+    },
+    "Quebra de linha para referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de combinações de valores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de indicadores em legendas": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de indicadores em proporcionalidades": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de valores únicos em cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de valores únicos em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações entre indicadores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Sobreposição de valores na legenda": {
+      "errors": [],
+      "warnings": []
+    },
+    "Títulos com mais de 40 caracteres": {
+      "errors": [],
+      "warnings": []
+    },
+    "Títulos únicos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Unicidade dos códigos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Valores indisponíveis e inválidos": {
+      "errors": [],
+      "warnings": [
+        "valores.xlsx: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas 2 e 20."
+      ]
+    }
+  },
+  "spell_skipped": true
+}

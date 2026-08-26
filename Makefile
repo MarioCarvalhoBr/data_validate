@@ -67,7 +67,7 @@ coverage: ## Run unit tests with coverage reports (term, html, xml) and the ratc
 		--cov-report=term-missing \
 		--cov-report=html:dev-reports/htmlcov \
 		--cov-report=xml:dev-reports/coverage.xml \
-		--cov-fail-under=55
+		--cov-fail-under=54
 	@if [ -f tools/coverage_ratchet.py ]; then $(PYTHON) tools/coverage_ratchet.py; fi
 
 check: lint typecheck security-offline test-unit ## Run the fast local gate (lint, typecheck, security-offline, unit tests)

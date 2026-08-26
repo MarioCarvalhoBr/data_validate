@@ -1,0 +1,301 @@
+{
+  "exit_code": 0,
+  "fixture": "data_errors_01",
+  "json_summary": {
+    "data_validate": {
+      "report": {
+        "errors": 65,
+        "tests": 34,
+        "warnings": 36
+      },
+      "version": "<version>"
+    }
+  },
+  "section_order": [
+    "Estrutura dos arquivos da pasta de entrada",
+    "Limpeza dos arquivos",
+    "Relações entre indicadores",
+    "Hierarquia como árvore",
+    "Níveis de indicadores",
+    "Unicidade dos códigos",
+    "Códigos HTML nas descrições simples",
+    "Títulos únicos",
+    "Códigos sequenciais",
+    "Campos vazios",
+    "Padrão para nomes dos indicadores",
+    "Títulos com mais de 40 caracteres",
+    "Descrições simples com mais de 150 caracteres",
+    "Pontuações obrigatórias e proibidas em descrições",
+    "Pontuações obrigatórias e proibidas em cenários",
+    "Pontuações obrigatórias e proibidas em referência temporal",
+    "Relações de valores únicos em cenários",
+    "Relações de valores únicos em referência temporal",
+    "Relações de combinações de valores",
+    "Valores indisponíveis e inválidos",
+    "Quebra de linha para descrição",
+    "Quebra de linha para cenários",
+    "Quebra de linha para referência temporal",
+    "Anos em referência temporal",
+    "Intervalo dos dados da legenda",
+    "Sobreposição de valores na legenda",
+    "Relações de indicadores em legendas",
+    "Propriedades de soma nos fatores influenciadores",
+    "Indicadores repetidos em proporcionalidades",
+    "Relações de indicadores em proporcionalidades",
+    "Indicadores em valores e proporcionalidades",
+    "Indicadores folhas sem dados associados",
+    "Níveis dos indicadores filhos"
+  ],
+  "sections": {
+    "Anos em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Campos vazios": {
+      "errors": [
+        "descricao.xlsx, linha 13: Nenhum item da coluna 'nome_simples' pode ser vazio."
+      ],
+      "warnings": []
+    },
+    "Códigos HTML nas descrições simples": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx, linha 2: Coluna 'desc_simples' não pode conter código HTML.",
+        "descricao.xlsx, linha 3: Coluna 'desc_simples' não pode conter código HTML.",
+        "descricao.xlsx, linha 4: Coluna 'desc_simples' não pode conter código HTML."
+      ]
+    },
+    "Códigos sequenciais": {
+      "errors": [
+        "descricao.xlsx: A verificação foi abortada porque a coluna 'codigo' contém valores não numéricos."
+      ],
+      "warnings": []
+    },
+    "Descrições simples com mais de 150 caracteres": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx, linha 9: O texto da coluna \"desc_simples\" excede o limite de 150 caracteres (encontrado: 184)."
+      ]
+    },
+    "Estrutura dos arquivos da pasta de entrada": {
+      "errors": [
+        "cenarios.xlsx: Valores duplicados encontrados na coluna 'simbolo': [O]",
+        "descricao.xlsx: Coluna 'legenda' esperada mas não foi encontrada.",
+        "legenda.xlsx: Coluna 'codigo' esperada mas não foi encontrada.",
+        "legenda.xlsx: Coluna 'cor' esperada mas não foi encontrada.",
+        "legenda.xlsx: Coluna 'label' esperada mas não foi encontrada.",
+        "legenda.xlsx: Coluna 'maximo' esperada mas não foi encontrada.",
+        "legenda.xlsx: Coluna 'minimo' esperada mas não foi encontrada.",
+        "legenda.xlsx: Coluna 'ordem' esperada mas não foi encontrada.",
+        "legenda.xlsx: Erro inesperado ao processar o arquivo. Detalhes: Cannot detect file format ()",
+        "valores.xlsx, linha 1: Colunas fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): ['5000-2080-M']",
+        "valores.xlsx: A coluna '5000-2080-M' não é esperada."
+      ],
+      "warnings": []
+    },
+    "Hierarquia como árvore": {
+      "errors": [
+        "composicao.xlsx: Ciclo encontrado: [5000 -> 5001 -> 5000]."
+      ],
+      "warnings": []
+    },
+    "Indicadores em valores e proporcionalidades": {
+      "errors": [
+        "proporcionalidades.xlsx: Códigos dos indicadores ausentes em valores.xlsx: ['5008-2010', '5009-2010', '5010-2010', '5021-2010', '5022-2010', '5023-2010', '5024-2010', '5025-2010', '5026-2010', '5027-2010', '5028-2010', '5029-2010', '5030-2010', '5031-2010'].",
+        "valores.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: ['5000-2015', '5000-2030-P', '5000-2050-O', '5000-2050-P', '5000-2080-M', '5001-2015', '5002-2015', '5003-2015', '5003-2030-O', '5003-2030-P', '5003-2050-O', '5003-2050-P', '5004-2015', '5005-2015', '5006-2015', '5007-2015', '5008-2015', '5009-2015', '5010-2015', '5011-2015', '5012-2015', '5013-2015', '5014-2015', '5015-2017', '5016-2017', '5017-2017', '5018-2017']."
+      ],
+      "warnings": []
+    },
+    "Indicadores folhas sem dados associados": {
+      "errors": [
+        "proporcionalidades.xlsx: Indicador folha '5002' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '5003' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '5006' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '5007' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '5010' não possui dados associados."
+      ],
+      "warnings": []
+    },
+    "Indicadores repetidos em proporcionalidades": {
+      "errors": [],
+      "warnings": []
+    },
+    "Intervalo dos dados da legenda": {
+      "errors": [],
+      "warnings": []
+    },
+    "Limpeza dos arquivos": {
+      "errors": [
+        "composicao.xlsx, linha 13: A coluna 'codigo_filho' contém um valor inválido: O valor '0' é menor que 1.",
+        "composicao.xlsx, linha 14: A coluna 'codigo_filho' contém um valor inválido: O valor '-89' é menor que 1.",
+        "composicao.xlsx, linha 14: A coluna 'codigo_pai' contém um valor inválido: O valor '-88' é menor que 1.",
+        "composicao.xlsx, linha 16: A coluna 'codigo_filho' contém um valor inválido: O valor 'GNU' não é um número.",
+        "composicao.xlsx, linha 16: A coluna 'codigo_pai' contém um valor inválido: O valor 'MSDOS' não é um número.",
+        "descricao.xlsx, linha 12: A coluna 'codigo' contém um valor inválido: O valor 'MYSQL' não é um número.",
+        "descricao.xlsx, linha 12: A coluna 'nivel' contém um valor inválido: O valor 'PHP' não é um número.",
+        "descricao.xlsx, linha 13: A coluna 'codigo' contém um valor inválido: O valor '-88' é menor que 1.",
+        "descricao.xlsx, linha 4: A coluna 'nivel' contém um valor inválido: O valor '3.1' não é um número inteiro.",
+        "descricao.xlsx, linha 5: A coluna 'nivel' contém um valor inválido: O valor '-1' é menor que 1.",
+        "referencia_temporal.xlsx, linha 5: A coluna 'simbolo' contém um valor inválido: O valor '2050B' não é um número."
+      ],
+      "warnings": []
+    },
+    "Níveis de indicadores": {
+      "errors": [
+        "descricao.xlsx, linha 12: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.",
+        "descricao.xlsx, linha 4: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.",
+        "descricao.xlsx, linha 5: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0."
+      ],
+      "warnings": []
+    },
+    "Níveis dos indicadores filhos": {
+      "errors": [
+        "composicao.xlsx: Código filho -89 não encontrado na descrição.",
+        "composicao.xlsx: Código pai 5022 não encontrado na descrição.",
+        "composicao.xlsx: Código pai 5033 não encontrado na descrição.",
+        "composicao.xlsx: Código pai 55 não encontrado na descrição.",
+        "composicao.xlsx: Código pai 77 não encontrado na descrição.",
+        "composicao.xlsx: Código pai MSDOS não encontrado na descrição.",
+        "descricao.xlsx: Indicadores filhos do pai 5000 não estão no mesmo nível: [indicador 5001 possui nível '3.1', indicador 5002 possui nível '-1', indicador 5003 possui nível '3'].",
+        "descricao.xlsx: Indicadores filhos do pai 5001 não estão no mesmo nível: [indicador 5004 possui nível '4', indicador 5000 possui nível '2']."
+      ],
+      "warnings": []
+    },
+    "Padrão para nomes dos indicadores": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx, linha 2: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Impactos para segurança alimentar'. Encontrado: 'Impactos para Segurança Alimentar'.",
+        "descricao.xlsx, linha 2: Valor da coluna 'nome_simples' fora do padrão. Esperado: 'Segurança alimentar.'. Encontrado: 'Segurança Alimentar.'.",
+        "descricao.xlsx, linha 3: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de risco de impacto para seca'. Encontrado: 'Índice de Risco de Impacto para Seca'.",
+        "descricao.xlsx, linha 4: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de risco de impacto para seca'. Encontrado: 'Índice de Risco de Impacto para Seca'.",
+        "descricao.xlsx, linha 5: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de exposição.'. Encontrado: 'Índice de Exposição.'.",
+        "descricao.xlsx, linha 6: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de ameaça climática'. Encontrado: 'Índice de Ameaça Climática'.",
+        "descricao.xlsx, linha 6: Valor da coluna 'nome_simples' fora do padrão. Esperado: 'Ameaça climática'. Encontrado: 'Ameaça Climática'.",
+        "descricao.xlsx, linha 7: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de sensibilidade'. Encontrado: 'Índice de Sensibilidade'.",
+        "descricao.xlsx, linha 8: Valor da coluna 'nome_completo' fora do padrão. Esperado: 'Índice de capacidade adaptativa'. Encontrado: 'Índice de Capacidade Adaptativa'."
+      ]
+    },
+    "Pontuações obrigatórias e proibidas em cenários": {
+      "errors": [],
+      "warnings": [
+        "cenarios.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto.",
+        "cenarios.xlsx, linha 3: O valor da coluna 'nome' não deve terminar com pontuação."
+      ]
+    },
+    "Pontuações obrigatórias e proibidas em descrições": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx, linha 2: O valor da coluna 'desc_completa' deve terminar com ponto.",
+        "descricao.xlsx, linha 2: O valor da coluna 'nome_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 3: O valor da coluna 'desc_simples' deve terminar com ponto.",
+        "descricao.xlsx, linha 5: O valor da coluna 'nome_completo' não deve terminar com pontuação."
+      ]
+    },
+    "Pontuações obrigatórias e proibidas em referência temporal": {
+      "errors": [],
+      "warnings": [
+        "referencia_temporal.xlsx, linha 3: O valor da coluna 'descricao' deve terminar com ponto."
+      ]
+    },
+    "Propriedades de soma nos fatores influenciadores": {
+      "errors": [
+        "proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5008-2010 é 1,548, e não 1.",
+        "proporcionalidades.xlsx, linha 3: A soma dos valores para o indicador pai 5010-2010 é 0,462, e não 1.",
+        "proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5010-2010 é 0,902, e não 1.",
+        "proporcionalidades.xlsx, linha 5: O valor não é um número válido e nem DI (Dado Indisponível) para o indicador pai '5010-2010'.",
+        "proporcionalidades.xlsx, linha 6: A soma dos valores para o indicador pai 5010-2010 é 0,902, e não 1."
+      ],
+      "warnings": [
+        "proporcionalidades.xlsx, linha 4: A soma dos valores para o indicador pai 5008-2010 é 0,999, e não 1.",
+        "proporcionalidades.xlsx, linha 4: Existe 1 valor com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais.",
+        "proporcionalidades.xlsx, linha 5: A soma dos valores para o indicador pai 5008-2010 é 1,001, e não 1."
+      ]
+    },
+    "Quebra de linha para cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Quebra de linha para descrição": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx: A verificação foi abortada para a coluna obrigatória 'legenda' que está ausente."
+      ]
+    },
+    "Quebra de linha para referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de combinações de valores": {
+      "errors": [
+        "valores.xlsx: A coluna '5000-2030-O' é obrigatória.",
+        "valores.xlsx: A coluna '5000-2080-M' é desnecessária."
+      ],
+      "warnings": []
+    },
+    "Relações de indicadores em legendas": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de indicadores em proporcionalidades": {
+      "errors": [
+        "proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.",
+        "proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.",
+        "proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx."
+      ],
+      "warnings": []
+    },
+    "Relações de valores únicos em cenários": {
+      "errors": [
+        "cenarios.xlsx: A coluna 'nome' não deve conter valores repetidos.",
+        "cenarios.xlsx: A coluna 'simbolo' não deve conter valores repetidos."
+      ],
+      "warnings": []
+    },
+    "Relações de valores únicos em referência temporal": {
+      "errors": [
+        "referencia_temporal.xlsx: A coluna 'nome' não deve conter valores repetidos."
+      ],
+      "warnings": []
+    },
+    "Relações entre indicadores": {
+      "errors": [
+        "composicao.xlsx: Ciclo encontrado: [5000 -> 5001, 5001 -> 5000].",
+        "composicao.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [55, 77, 5010, 5022, 5033].",
+        "composicao.xlsx: Indicadores desconectados encontrados: [5033 -> 5010].",
+        "descricao.xlsx: Códigos dos indicadores ausentes em composicao.xlsx: [5005].",
+        "descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [5000, 5001, 5002, 5003, 5004, 5005, 5006, 5007].",
+        "proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5021, 5022, 5023, 5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031].",
+        "valores.xlsx: Colunas inválidas: ['5000-2080-M'].",
+        "valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5011, 5012, 5013, 5014, 5015, 5016, 5017, 5018]."
+      ],
+      "warnings": []
+    },
+    "Sobreposição de valores na legenda": {
+      "errors": [],
+      "warnings": []
+    },
+    "Títulos com mais de 40 caracteres": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx, linha 10: O texto da coluna \"nome_simples\" excede o limite de 40 caracteres (encontrado: 43)."
+      ]
+    },
+    "Títulos únicos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Unicidade dos códigos": {
+      "errors": [
+        "descricao.xlsx: A coluna 'codigo' contém códigos duplicados: [5007]."
+      ],
+      "warnings": []
+    },
+    "Valores indisponíveis e inválidos": {
+      "errors": [],
+      "warnings": [
+        "valores.xlsx: Existem 383 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas 2 e 20."
+      ]
+    }
+  },
+  "spell_skipped": true
+}

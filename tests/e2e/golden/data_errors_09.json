@@ -1,0 +1,212 @@
+{
+  "exit_code": 0,
+  "fixture": "data_errors_09",
+  "json_summary": {
+    "data_validate": {
+      "report": {
+        "errors": 20,
+        "tests": 34,
+        "warnings": 1
+      },
+      "version": "<version>"
+    }
+  },
+  "section_order": [
+    "Estrutura dos arquivos da pasta de entrada",
+    "Limpeza dos arquivos",
+    "Relações entre indicadores",
+    "Hierarquia como árvore",
+    "Níveis de indicadores",
+    "Unicidade dos códigos",
+    "Códigos HTML nas descrições simples",
+    "Títulos únicos",
+    "Códigos sequenciais",
+    "Campos vazios",
+    "Padrão para nomes dos indicadores",
+    "Títulos com mais de 40 caracteres",
+    "Descrições simples com mais de 150 caracteres",
+    "Pontuações obrigatórias e proibidas em descrições",
+    "Pontuações obrigatórias e proibidas em cenários",
+    "Pontuações obrigatórias e proibidas em referência temporal",
+    "Relações de valores únicos em cenários",
+    "Relações de valores únicos em referência temporal",
+    "Relações de combinações de valores",
+    "Valores indisponíveis e inválidos",
+    "Quebra de linha para descrição",
+    "Quebra de linha para cenários",
+    "Quebra de linha para referência temporal",
+    "Anos em referência temporal",
+    "Intervalo dos dados da legenda",
+    "Sobreposição de valores na legenda",
+    "Relações de indicadores em legendas",
+    "Propriedades de soma nos fatores influenciadores",
+    "Indicadores repetidos em proporcionalidades",
+    "Relações de indicadores em proporcionalidades",
+    "Indicadores em valores e proporcionalidades",
+    "Indicadores folhas sem dados associados",
+    "Níveis dos indicadores filhos"
+  ],
+  "sections": {
+    "Anos em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Campos vazios": {
+      "errors": [],
+      "warnings": []
+    },
+    "Códigos HTML nas descrições simples": {
+      "errors": [],
+      "warnings": []
+    },
+    "Códigos sequenciais": {
+      "errors": [],
+      "warnings": []
+    },
+    "Descrições simples com mais de 150 caracteres": {
+      "errors": [],
+      "warnings": []
+    },
+    "Estrutura dos arquivos da pasta de entrada": {
+      "errors": [],
+      "warnings": []
+    },
+    "Hierarquia como árvore": {
+      "errors": [
+        "composicao.xlsx, linha 3: O indicador 2 (nível 2) não pode ser pai do indicador 3 (nível 2). Atualize os níveis no arquivo de descrição.",
+        "composicao.xlsx, linha 4: O indicador 2 (nível 2) não pode ser pai do indicador 1 (nível 1). Atualize os níveis no arquivo de descrição.",
+        "composicao.xlsx, linha 6: O indicador 3 (nível 2) não pode ser pai do indicador 6 (nível 2). Atualize os níveis no arquivo de descrição.",
+        "composicao.xlsx: Ciclo encontrado: [1 -> 2 -> 1]."
+      ],
+      "warnings": []
+    },
+    "Indicadores em valores e proporcionalidades": {
+      "errors": [
+        "proporcionalidades.xlsx: Códigos dos indicadores ausentes em valores.xlsx: ['5008-2010', '5009-2010', '5010-2010', '5021-2010', '5022-2010', '5023-2010', '5024-2010', '5025-2010', '5026-2010', '5027-2010', '5028-2010', '5029-2010', '5030-2010', '5031-2010'].",
+        "valores.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: ['2-2015', '2-2030-O', '2-2030-P', '2-2050-O', '2-2050-P', '3-2015', '4-2015', '5-2015', '5-2030-O', '5-2030-P', '5-2050-O', '5-2050-P', '6-2015', '7-2015', '8-2015', '9-2015']."
+      ],
+      "warnings": []
+    },
+    "Indicadores folhas sem dados associados": {
+      "errors": [
+        "proporcionalidades.xlsx: Indicador folha '5' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '7' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '8' não possui dados associados.",
+        "proporcionalidades.xlsx: Indicador folha '9' não possui dados associados."
+      ],
+      "warnings": []
+    },
+    "Indicadores repetidos em proporcionalidades": {
+      "errors": [],
+      "warnings": []
+    },
+    "Intervalo dos dados da legenda": {
+      "errors": [],
+      "warnings": []
+    },
+    "Limpeza dos arquivos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Níveis de indicadores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Níveis dos indicadores filhos": {
+      "errors": [
+        "descricao.xlsx: Indicadores filhos do pai 2 não estão no mesmo nível: [indicador 3 possui nível '2', indicador 1 possui nível '1', indicador 5 possui nível '3'].",
+        "descricao.xlsx: Indicadores filhos do pai 3 não estão no mesmo nível: [indicador 6 possui nível '2', indicador 7 possui nível '4']."
+      ],
+      "warnings": []
+    },
+    "Padrão para nomes dos indicadores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Pontuações obrigatórias e proibidas em cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Pontuações obrigatórias e proibidas em descrições": {
+      "errors": [],
+      "warnings": []
+    },
+    "Pontuações obrigatórias e proibidas em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Propriedades de soma nos fatores influenciadores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Quebra de linha para cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Quebra de linha para descrição": {
+      "errors": [],
+      "warnings": []
+    },
+    "Quebra de linha para referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de combinações de valores": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de indicadores em legendas": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de indicadores em proporcionalidades": {
+      "errors": [
+        "proporcionalidades.xlsx: O indicador pai '5008' (em '5008-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.",
+        "proporcionalidades.xlsx: O indicador pai '5009' (em '5009-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx.",
+        "proporcionalidades.xlsx: O indicador pai '5010' (em '5010-2010') não está presente na coluna 'codigo_pai' da planilha composicao.xlsx."
+      ],
+      "warnings": []
+    },
+    "Relações de valores únicos em cenários": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações de valores únicos em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Relações entre indicadores": {
+      "errors": [
+        "composicao.xlsx: Ciclo encontrado: [1 -> 2, 2 -> 1].",
+        "descricao.xlsx: Códigos dos indicadores ausentes em composicao.xlsx: [4].",
+        "descricao.xlsx: Códigos dos indicadores ausentes em proporcionalidades.xlsx: [2, 4, 5, 7, 8, 9].",
+        "proporcionalidades.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [5008, 5009, 5010, 5021, 5022, 5023, 5024, 5025, 5026, 5027, 5028, 5029, 5030, 5031].",
+        "valores.xlsx: Códigos dos indicadores ausentes em descricao.xlsx: [3, 6]."
+      ],
+      "warnings": []
+    },
+    "Sobreposição de valores na legenda": {
+      "errors": [],
+      "warnings": []
+    },
+    "Títulos com mais de 40 caracteres": {
+      "errors": [],
+      "warnings": []
+    },
+    "Títulos únicos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Unicidade dos códigos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Valores indisponíveis e inválidos": {
+      "errors": [],
+      "warnings": [
+        "valores.xlsx: Existem 209 valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas 2 e 20."
+      ]
+    }
+  },
+  "spell_skipped": true
+}
