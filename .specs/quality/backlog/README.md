@@ -48,12 +48,12 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 
 ## Priority summary
 
-| Priority | Count | Done | Highlights |
+| Priority | Count | Status | Highlights |
 |---|---|---|---|
-| P0 | 7 | 2 done, 5 open — remaining: SEC-001, TST-001, ARC-001, ARC-002, BUG-002 |
-| P1 | 28 | 11 done, 3 in-progress, 14 open |
-| P2 | 43 | 16 done, 1 in-progress, 26 open |
-| P3 | 13 | 4 done, 1 wont-fix, 8 open |
-| **Total** | **91** | **33 done, 4 in-progress, 1 wont-fix, 53 open** |
+| P0 | 7 | 2 done, 5 open | remaining: SEC-001, TST-001, ARC-001, ARC-002, BUG-002 |
+| P1 | 28 | 11 done, 3 in-progress, 14 open | |
+| P2 | 43 | 16 done, 1 in-progress, 26 open | |
+| P3 | 13 | 4 done, 1 wont-fix, 8 open | |
+| **Total** | **91** | **33 done, 4 in-progress, 1 wont-fix, 53 open** | |
 
 Status snapshot: 2026-09-12 — 33 done, 4 in-progress, 1 wont-fix, 53 open (of 91 items incl. TOOL-011).
