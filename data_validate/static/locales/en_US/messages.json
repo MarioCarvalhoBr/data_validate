@@ -1,60 +1,9 @@
 {
-  "choose_language": {
-    "message": "Choose your language ({languages}): "
-  },
   "invalid_language": {
     "message": "Invalid language selected. Using {default_lang} as default."
   },
   "lang_load_error": {
     "message": "Error loading language '{lang}'. Using default '{default_lang}'."
-  },
-  "welcome": {
-    "message": "--- Simple Calculator ---"
-  },
-  "menu_title": {
-    "message": "\nChoose an operation:"
-  },
-  "add_option": {
-    "message": "1. Add (+)"
-  },
-  "subtract_option": {
-    "message": "2. Subtract (-)"
-  },
-  "multiply_option": {
-    "message": "3. Multiply (*)"
-  },
-  "divide_option": {
-    "message": "4. Divide (/)"
-  },
-  "exit_option": {
-    "message": "5. Exit"
-  },
-  "enter_choice": {
-    "message": "Enter your choice (1/2/3/4/5): "
-  },
-  "enter_num1": {
-    "message": "Enter the first number: "
-  },
-  "enter_num2": {
-    "message": "Enter the second number: "
-  },
-  "result": {
-    "message": "Result: {result}"
-  },
-  "invalid_option": {
-    "message": "Invalid option. Please try again."
-  },
-  "invalid_input": {
-    "message": "Invalid input. Please enter numbers only."
-  },
-  "zero_division": {
-    "message": "Error: Cannot divide by zero."
-  },
-  "goodbye": {
-    "message": "Exiting calculator. Goodbye!"
-  },
-  "error_unexpected": {
-    "message": "An unexpected error occurred: {error}"
   },
   "fs_utils_error_file_path_empty": {
     "message": "The file path is empty."
@@ -95,20 +44,29 @@
   "fs_utils_error_dir_check_fail": {
     "message": "Error checking directory existence: {error}"
   },
-  "lorem_ipsum": {
-        "message": "There is no one who likes pain, who seeks it out and wants to have it, simply because it is pain!"
-  },
   "model_report_msg_errors_omitted": {
     "message": "There are {count} more errors similar to the previous ones that were omitted."
   },
   "model_report_msg_warnings_omitted": {
     "message": "There are {count} more warnings similar to the previous ones that were omitted."
   },
+  "fs_utils_error_dir_empty": {
+    "message": "The directory '{dir_path}' is empty."
+  },
+  "validator_structure_error_files_not_in_folder": {
+    "message": "Files cannot be inside a folder. They must be zipped directly."
+  },
+  "validator_structure_error_unexpected_folder": {
+    "message": "The folder '{file_name}' is not expected."
+  },
   "validator_structure_error_unexpected_file": {
     "message": "The file '{file_name}' is not expected."
   },
-  "fs_utils_error_dir_empty": {
-    "message": "The directory '{dir_path}' is empty."
+  "validator_structure_error_missing_file": {
+    "message": "{file_base}: The expected file was not found. Use .csv or .xlsx as extensions."
+  },
+  "validator_structure_error_conflicting_files": {
+    "message": "{file_base}: There is both a .csv and an .xlsx file with the same name. The .csv file will be used."
   },
   "validator_structure_error_empty_directory": {
     "message": "The directory '{dir_path}' is empty. Please add the required files."

@@ -1,60 +1,9 @@
 {
-  "choose_language": {
-    "message": "Escolha seu idioma ({languages}): "
-  },
   "invalid_language": {
     "message": "Idioma inválido selecionado. Usando {default_lang} como padrão."
   },
   "lang_load_error": {
     "message": "Erro ao carregar idioma '{lang}'. Usando padrão '{default_lang}'."
-  },
-  "welcome": {
-    "message": "--- Calculadora Simples ---"
-  },
-  "menu_title": {
-    "message": "\nEscolha uma operação:"
-  },
-  "add_option": {
-    "message": "1. Somar (+)"
-  },
-  "subtract_option": {
-    "message": "2. Subtrair (-)"
-  },
-  "multiply_option": {
-    "message": "3. Multiplicar (*)"
-  },
-  "divide_option": {
-    "message": "4. Dividir (/)"
-  },
-  "exit_option": {
-    "message": "5. Sair"
-  },
-  "enter_choice": {
-    "message": "Digite sua escolha (1/2/3/4/5): "
-  },
-  "enter_num1": {
-    "message": "Digite o primeiro número: "
-  },
-  "enter_num2": {
-    "message": "Digite o segundo número: "
-  },
-  "result": {
-    "message": "Resultado: {result}"
-  },
-  "invalid_option": {
-    "message": "Opção inválida. Por favor, tente novamente."
-  },
-  "invalid_input": {
-    "message": "Entrada inválida. Por favor, digite apenas números."
-  },
-  "zero_division": {
-    "message": "Erro: Não é possível dividir por zero."
-  },
-  "goodbye": {
-    "message": "Saindo da calculadora. Adeus!"
-  },
-  "error_unexpected": {
-    "message": "Ocorreu um erro inesperado: {error}"
   },
   "fs_utils_error_file_path_empty": {
     "message": "O caminho do arquivo está vazio."
@@ -94,9 +43,6 @@
   },
   "fs_utils_error_dir_check_fail": {
     "message": "Erro ao verificar a existência do diretório: {error}"
-  },
-  "lorem_ipsum": {
-    "message": "Não há quem goste de dor, que a procure e a queira ter, simplesmente porque é dor!"
   },
   "model_report_msg_errors_omitted": {
     "message": "Existem mais {count} erros similares aos anteriores que foram omitidos."
