@@ -2,6 +2,7 @@
 from data_validate.helpers.tools.data_loader.api.facade import (
     DataLoaderFacade,
     DataLoaderModel,
+    LoadResult,
 )
 from data_validate.helpers.tools.locale.language_manager import LanguageManager
 from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
@@ -9,6 +10,7 @@ from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 __all__ = [
     "DataLoaderFacade",
     "DataLoaderModel",
+    "LoadResult",
     "LanguageManager",
     "SpellChecker",
 ]

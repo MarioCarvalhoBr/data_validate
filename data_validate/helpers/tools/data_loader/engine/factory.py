@@ -3,6 +3,10 @@
 # File: data_loader/factory.py
 """
 Factory Method para instanciar leitores adequados.
+
+BUG-015: `.qml` was removed from the registry along with `QMLReader` (ADR-0003) -- no evidence
+was found that the protocol needs it, and nothing in `data_validate/` consumed the QML content the
+old reader produced.
 """
 
 from pathlib import Path
@@ -10,7 +14,6 @@ from pathlib import Path
 from ..common.exceptions import ReaderNotFoundError
 from ..readers.csv_reader import CSVReader
 from ..readers.excel_reader import ExcelReader
-from ..readers.qml_reader import QMLReader
 from ..strategies.header import HeaderStrategy
 
 
@@ -18,13 +21,28 @@ class ReaderFactory:
     _registry = {
         ".csv": CSVReader,
         ".xlsx": ExcelReader,
-        ".qml": QMLReader,
     }
 
     @classmethod
-    def get_reader(cls, file_path: Path, header_strategy: HeaderStrategy):
+    def get_reader(cls, file_path: Path, header_strategy: HeaderStrategy, sep: str = "|"):
+        """Build the reader for `file_path`'s extension.
+
+        Args:
+            file_path: Path whose suffix selects the reader.
+            header_strategy: Header-row strategy passed through to the reader.
+            sep: CSV field separator (BUG-018: comes from the caller's `SheetSpec`, never guessed
+                from the file stem); ignored by readers that don't need it (e.g. `ExcelReader`).
+
+        Returns:
+            The constructed reader instance.
+
+        Raises:
+            ReaderNotFoundError: When no reader is registered for `file_path`'s extension.
+        """
         ext = file_path.suffix.lower()
         reader_cls = cls._registry.get(ext)
         if not reader_cls:
             raise ReaderNotFoundError(f"Nenhum leitor para extensão '{ext}'")
+        if reader_cls is CSVReader:
+            return reader_cls(file_path, header_strategy, sep=sep)
         return reader_cls(file_path, header_strategy)

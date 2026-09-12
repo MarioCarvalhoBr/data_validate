@@ -2,14 +2,23 @@
 """Consistency proof for the `SheetSpec` registry (ARC-003).
 
 Every test in this module asserts that `data_validate.specs.SHEET_SPECS` agrees with one of
-the three legacy sources it is meant to supersede (ADR-0003): `SpreadsheetInfo`, the data-loader
-`Config`, and each `models/sp_*.py`'s `RequiredColumn`/`OptionalColumn`/`DynamicColumn`/
-`PluralColumn`. A failure here means the registry has drifted from a source it should mirror.
+the legacy sources it supersedes (ADR-0003): `SpreadsheetInfo` and each `models/sp_*.py`'s
+`RequiredColumn`/`OptionalColumn`/`DynamicColumn`/`PluralColumn`. A failure here means the registry
+has drifted from a source it should mirror.
+
+BUG-018/ARC-003 (Phase 2 loader migration): the third legacy source this module used to compare
+against, `data_loader.common.config.Config`, is deleted -- `SHEET_SPECS` is now the sole input the
+loader (`FileScanner`, `DataLoaderFacade`) reads for header layout, CSV separator and the
+required flag, so there is nothing left to prove consistent with it.
+`TestSheetSpecsMatchDataLoaderConfig` is deleted along with `Config`; its former assertions
+(header layout, separator, required flag) are pinned as fixed expected values in
+`TestSheetSpecsPinnedLoaderFacts` below instead.
 """
 
 from __future__ import annotations
 
 import dataclasses
+from typing import ClassVar
 
 import pytest
 
@@ -30,7 +39,6 @@ from data_validate.models import (
 )
 
 from data_validate.config.spreadsheet_info import SpreadsheetInfo
-from data_validate.helpers.tools.data_loader.common.config import Config
 from data_validate.specs.sheet_specs import (
     ALLOWED_EXTENSIONS,
     SHEET_SPECS,
@@ -76,29 +84,42 @@ class TestSheetSpecsMatchSpreadsheetInfo:
         assert list(ALLOWED_EXTENSIONS) == info.ALLOWED_EXTENSIONS
 
 
-class TestSheetSpecsMatchDataLoaderConfig:
-    """`SHEET_SPECS` header layout and CSV separator must mirror the data-loader `Config`."""
+class TestSheetSpecsPinnedLoaderFacts:
+    """Pinned header layout/separator/required values the loader now reads only from `SHEET_SPECS`.
+
+    These are the exact values `TestSheetSpecsMatchDataLoaderConfig` used to prove against the now
+    -deleted `data_loader.common.config.Config` (BUG-018/ARC-003); pinning them here still catches
+    an accidental drift, just without a second source to compare against.
+    """
+
+    _EXPECTED: ClassVar[dict[str, tuple[bool, HeaderLayout, str]]] = {
+        "descricao": (True, HeaderLayout.SINGLE, "|"),
+        "composicao": (True, HeaderLayout.SINGLE, "|"),
+        "valores": (True, HeaderLayout.SINGLE, "|"),
+        "referencia_temporal": (True, HeaderLayout.SINGLE, "|"),
+        "proporcionalidades": (False, HeaderLayout.DOUBLE, "|"),
+        "cenarios": (False, HeaderLayout.SINGLE, "|"),
+        "legenda": (False, HeaderLayout.SINGLE, "|"),
+        "dicionario": (False, HeaderLayout.SINGLE, "|"),
+    }
 
     @pytest.mark.parametrize("sheet_name", list(SHEET_SPECS))
-    def test_header_layout_matches_config(self, sheet_name):
-        config = Config()
-        _, header_type, _ = config.file_specs[sheet_name]
+    def test_header_layout_matches_pinned_value(self, sheet_name):
+        _, expected_header, _ = self._EXPECTED[sheet_name]
 
-        assert SHEET_SPECS[sheet_name].header is HeaderLayout(header_type)
-
-    @pytest.mark.parametrize("sheet_name", list(SHEET_SPECS))
-    def test_csv_separator_matches_config(self, sheet_name):
-        config = Config()
-        _, _, separator = config.file_specs[sheet_name]
-
-        assert SHEET_SPECS[sheet_name].csv_separator == separator
+        assert SHEET_SPECS[sheet_name].header is expected_header
 
     @pytest.mark.parametrize("sheet_name", list(SHEET_SPECS))
-    def test_required_flag_matches_config(self, sheet_name):
-        config = Config()
-        required, _, _ = config.file_specs[sheet_name]
+    def test_csv_separator_matches_pinned_value(self, sheet_name):
+        _, _, expected_separator = self._EXPECTED[sheet_name]
 
-        assert SHEET_SPECS[sheet_name].required is required
+        assert SHEET_SPECS[sheet_name].csv_separator == expected_separator
+
+    @pytest.mark.parametrize("sheet_name", list(SHEET_SPECS))
+    def test_required_flag_matches_pinned_value(self, sheet_name):
+        expected_required, _, _ = self._EXPECTED[sheet_name]
+
+        assert SHEET_SPECS[sheet_name].required is expected_required
 
 
 class TestSheetSpecsMatchModelColumns:

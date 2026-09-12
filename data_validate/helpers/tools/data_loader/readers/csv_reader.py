@@ -2,7 +2,13 @@
 
 # File: data_loader/readers/csv_reader.py
 """
-Lê CSV com pandas, corrige cabeçalho duplo e separador custom.
+Lê CSV com pandas, corrige cabeçalho duplo e separador explícito.
+
+BUG-018: the separator is received as an explicit constructor parameter (`sep`), sourced by the
+caller (`DataLoaderFacade`) from the sheet's `SheetSpec.csv_separator` -- this reader no longer
+imports any config module or guesses a separator from the file's stem; a sheet with no known spec
+simply cannot reach this reader with a wrong separator, because the facade only calls it for names
+present in `SHEET_SPECS`.
 
 BUG-029: reads with `skip_blank_lines=False`. Pandas' own blank-line detection strips whitespace
 before checking a line is blank, so with the pandas default (`skip_blank_lines=True`) a row whose
@@ -22,7 +28,6 @@ import numpy as np
 import pandas as pd
 
 from .base_reader import BaseReader
-from ..common.config import Config
 from ..strategies.header import DoubleHeaderStrategy
 
 
@@ -51,13 +56,22 @@ def _drop_trailing_blank_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 
 class CSVReader(BaseReader):
+    def __init__(self, file_path, header_strategy, sep: str = "|"):
+        """Initialize the reader.
+
+        Args:
+            file_path: Path to the CSV file to read.
+            header_strategy: Header-row strategy (`SingleHeaderStrategy`/`DoubleHeaderStrategy`).
+            sep: Field separator, explicit per BUG-018 (defaults to the protocol's `|`).
+        """
+        super().__init__(file_path, header_strategy)
+        self.sep = sep
+
     def _read_file(self):
         header = self.header_strategy.get_header(self.file_path)
-        base = self.file_path.stem
-        _, _, sep = Config().file_specs.get(base, (None, None, None))
-
-        sep = sep or ","
-        df = pd.read_csv(self.file_path, header=header, sep=sep, low_memory=False, dtype=str, skip_blank_lines=False)
+        df = pd.read_csv(
+            self.file_path, header=header, sep=self.sep, low_memory=False, dtype=str, skip_blank_lines=False
+        )
         if isinstance(self.header_strategy, DoubleHeaderStrategy):
             lvl0 = df.columns.get_level_values(0)
             lvl1 = df.columns.get_level_values(1)

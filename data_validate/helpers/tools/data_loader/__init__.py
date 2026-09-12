@@ -3,14 +3,12 @@
 Pacote principal que expõe a API de alto nível.
 """
 
-from .api.facade import DataLoaderFacade, DataLoaderModel
-from .common.config import Config
-from .common.exceptions import MissingFileError, ReaderNotFoundError
+from .api.facade import DataLoaderFacade, DataLoaderModel, LoadResult
+from .common.exceptions import ReaderNotFoundError
 
 __all__ = [
     "DataLoaderFacade",
-    "Config",
-    "MissingFileError",
-    "ReaderNotFoundError",
     "DataLoaderModel",
+    "LoadResult",
+    "ReaderNotFoundError",
 ]

@@ -128,7 +128,8 @@ class SpreadsheetProcessor:
                 self.context.config.MAX_SHEET_COLUMNS,
             ),
         )
-        self.raw_data_map, load_errors = self.data_loader_facade.load_all
+        load_result = self.data_loader_facade.load()
+        self.raw_data_map, load_errors = load_result.models, load_result.errors
         self.validation_reports.extend(self.validation_titles[config.NamesEnum.FS.value], errors=load_errors)
 
         # Verify scenarios and legend existence

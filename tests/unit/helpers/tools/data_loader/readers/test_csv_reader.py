@@ -3,6 +3,10 @@ Unit tests for csv_reader.py module.
 
 This module tests the CSVReader class functionality including
 CSV file reading, header processing, and separator handling.
+
+BUG-018: `CSVReader` no longer reads the deleted `data_loader.common.config.Config` singleton to
+guess a separator from the file stem; every test below passes `sep` explicitly to the constructor,
+mirroring how `DataLoaderFacade` derives it from the sheet's `SheetSpec.csv_separator`.
 """
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
@@ -28,21 +32,30 @@ class TestCSVReader:
         assert reader.file_path == file_path
         assert reader.header_strategy == header_strategy
 
+    def test_initialization_defaults_separator_to_protocol_pipe(self, mocker) -> None:
+        """Without an explicit `sep`, the reader defaults to the protocol's `|` (BUG-018)."""
+        reader = CSVReader(Path("test.csv"), mocker.MagicMock())
+
+        assert reader.sep == "|"
+
+    def test_initialization_stores_explicit_separator(self, mocker) -> None:
+        """An explicit `sep` (as the facade passes from `SheetSpec.csv_separator`) is stored."""
+        reader = CSVReader(Path("test.csv"), mocker.MagicMock(), sep=";")
+
+        assert reader.sep == ";"
+
     def test_read_file_single_header(self, mocker) -> None:
         """Test reading CSV file with single header strategy."""
         # Mock dependencies
         mock_strategy = mocker.MagicMock()
         mock_strategy.get_header.return_value = 0
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "single", ",")}
 
         # Mock pandas read_csv
         expected_df = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
         mocker.patch("pandas.read_csv", return_value=expected_df)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=",")
 
         result = reader._read_file()
 
@@ -54,18 +67,15 @@ class TestCSVReader:
         # Mock dependencies
         mock_strategy = mocker.MagicMock(spec=DoubleHeaderStrategy)
         mock_strategy.get_header.return_value = [0, 1]
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "double", ",")}
 
         # Create DataFrame with MultiIndex columns
         df_data = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
         df_data.columns = pd.MultiIndex.from_tuples([("Unnamed: 0_level_0", "col1"), ("", "col2")])
 
         mocker.patch("pandas.read_csv", return_value=df_data)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=",")
 
         result = reader._read_file()
 
@@ -79,15 +89,12 @@ class TestCSVReader:
         # Mock dependencies
         mock_strategy = mocker.MagicMock()
         mock_strategy.get_header.return_value = 0
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "single", ";")}
 
         expected_df = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
         mock_read_csv = mocker.patch("pandas.read_csv", return_value=expected_df)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=";")
 
         reader._read_file()
 
@@ -101,62 +108,34 @@ class TestCSVReader:
         # Mock dependencies
         mock_strategy = mocker.MagicMock()
         mock_strategy.get_header.return_value = 0
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "single", None)}
 
         expected_df = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
         mock_read_csv = mocker.patch("pandas.read_csv", return_value=expected_df)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
         reader = CSVReader(file_path, mock_strategy)
 
         reader._read_file()
 
-        # Check that pandas.read_csv was called with default separator
+        # Check that pandas.read_csv was called with the default (protocol) separator
         mock_read_csv.assert_called_once()
         call_args = mock_read_csv.call_args
-        assert call_args[1]["sep"] == ","
-
-    def test_read_file_no_file_specs(self, mocker) -> None:
-        """Test reading CSV file when file is not in file_specs."""
-        # Mock dependencies
-        mock_strategy = mocker.MagicMock()
-        mock_strategy.get_header.return_value = 0
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {}  # Empty file_specs
-
-        expected_df = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
-        mock_read_csv = mocker.patch("pandas.read_csv", return_value=expected_df)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
-
-        file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
-
-        reader._read_file()
-
-        # Check that pandas.read_csv was called with default separator
-        mock_read_csv.assert_called_once()
-        call_args = mock_read_csv.call_args
-        assert call_args[1]["sep"] == ","
+        assert call_args[1]["sep"] == "|"
 
     def test_read_file_double_header_fills_unnamed_columns(self, mocker) -> None:
         """Test that double header strategy fills unnamed columns correctly."""
         # Mock dependencies
         mock_strategy = mocker.MagicMock(spec=DoubleHeaderStrategy)
         mock_strategy.get_header.return_value = [0, 1]
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "double", ",")}
 
         # Create DataFrame with MultiIndex columns containing unnamed columns
         df_data = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"], "col3": ["x", "y"]})
         df_data.columns = pd.MultiIndex.from_tuples([("Group1", "col1"), ("Unnamed: 1_level_0", "col2"), ("", "col3")])
 
         mocker.patch("pandas.read_csv", return_value=df_data)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=",")
 
         result = reader._read_file()
 
@@ -171,18 +150,15 @@ class TestCSVReader:
         # Mock dependencies
         mock_strategy = mocker.MagicMock(spec=DoubleHeaderStrategy)
         mock_strategy.get_header.return_value = [0, 1]
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "double", ",")}
 
         # Create DataFrame with MultiIndex columns where first column is empty string
         df_data = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
         df_data.columns = pd.MultiIndex.from_tuples([("", "col1"), ("Group1", "col2")])
 
         mocker.patch("pandas.read_csv", return_value=df_data)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=",")
 
         result = reader._read_file()
 
@@ -195,18 +171,15 @@ class TestCSVReader:
         # Mock dependencies
         mock_strategy = mocker.MagicMock(spec=DoubleHeaderStrategy)
         mock_strategy.get_header.return_value = [0, 1]
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "double", ",")}
 
         # Create DataFrame with MultiIndex columns where first column is empty string
         df_data = pd.DataFrame({"col1": ["1", "2"], "col2": ["a", "b"]})
         df_data.columns = pd.MultiIndex.from_tuples([("", "col1"), ("Group1", "col2")])
 
         mocker.patch("pandas.read_csv", return_value=df_data)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=",")
 
         result = reader._read_file()
 
@@ -219,21 +192,36 @@ class TestCSVReader:
         # Mock dependencies
         mock_strategy = mocker.MagicMock()
         mock_strategy.get_header.return_value = 0
-        mock_config = mocker.MagicMock()
-        mock_config.file_specs = {"test": ("required", "single", ";")}
 
         expected_df = pd.DataFrame({"col1": ["1", "2"]})
         mock_read_csv = mocker.patch("pandas.read_csv", return_value=expected_df)
-        mocker.patch("data_validate.helpers.tools.data_loader.readers.csv_reader.Config", return_value=mock_config)
 
         file_path = Path("test.csv")
-        reader = CSVReader(file_path, mock_strategy)
+        reader = CSVReader(file_path, mock_strategy, sep=";")
 
         reader._read_file()
 
         # Check that pandas.read_csv was called with correct parameters
         mock_read_csv.assert_called_once_with(
             file_path, header=0, sep=";", low_memory=False, dtype=str, skip_blank_lines=False
+        )
+
+    def test_read_file_descricao_uses_pipe_separator_from_spec(self, mocker) -> None:
+        """`descricao` (per `SHEET_SPECS`) is read with `|`, sourced from the facade, not guessed."""
+        from data_validate.specs.sheet_specs import SHEET_SPECS
+
+        mock_strategy = mocker.MagicMock()
+        mock_strategy.get_header.return_value = 0
+        expected_df = pd.DataFrame({"codigo": ["1"]})
+        mock_read_csv = mocker.patch("pandas.read_csv", return_value=expected_df)
+
+        spec = SHEET_SPECS["descricao"]
+        reader = CSVReader(Path("descricao.csv"), mock_strategy, sep=spec.csv_separator)
+        reader._read_file()
+
+        assert spec.csv_separator == "|"
+        mock_read_csv.assert_called_once_with(
+            Path("descricao.csv"), header=0, sep="|", low_memory=False, dtype=str, skip_blank_lines=False
         )
 
 

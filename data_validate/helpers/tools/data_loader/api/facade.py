@@ -4,7 +4,18 @@
 """
 Facade para importar todos os arquivos esperados de forma simples.
 
-SEC-003: `DataLoaderFacade.load_all` enforces a maximum file size (checked via `Path.stat()`
+ARC-009/ARC-003: `DataLoaderFacade.load()` is a real method (no I/O in a property) that returns a
+`LoadResult`; header layout, CSV separator and the required/optional flag all come from
+`data_validate.specs.sheet_specs.SHEET_SPECS`, the single source of truth (ADR-0003) -- the facade
+no longer imports the deleted `data_loader.common.config.Config` singleton. `load_all` is kept as a
+thin, deprecated property (`DeprecationWarning`) for one release, returning the same
+`(models, errors)` tuple shape callers already unpack.
+
+BUG-015: the `"qmls"` key is gone from the returned mapping -- grep across `data_validate/` found
+no consumer reading `raw_data_map["qmls"]` (`QMLReader`/`.qml` scanning were removed in the same
+slice, see `engine/scanner.py` and `engine/factory.py`).
+
+SEC-003: `DataLoaderFacade.load()` enforces a maximum file size (checked via `Path.stat()`
 before a file is read) and a maximum sheet shape (rows/columns, checked after a file is read) as a
 denial-of-service guard against zip-bomb-style or accidental huge input. Both limits are injected
 through the constructor (`limits`) — the canonical values live on
@@ -16,14 +27,18 @@ User-facing violation messages go through an injected `translate` callable (fall
 `.claude/rules/i18n.md`.
 """
 
+from __future__ import annotations
+
+import warnings
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
 
 from data_validate.i18n.catalog import MessageCatalog, default_catalog_dir
+from data_validate.specs.sheet_specs import HeaderLayout, SHEET_SPECS
 
-from ..common.config import Config
 from ..engine.factory import ReaderFactory
 from ..engine.scanner import FileScanner
 from ..strategies.header import SingleHeaderStrategy, DoubleHeaderStrategy
@@ -99,9 +114,24 @@ class DataLoaderModel:
         )
 
 
+@dataclass(frozen=True)
+class LoadResult:
+    """Outcome of `DataLoaderFacade.load()`.
+
+    Attributes:
+        models: Sheet name -> `DataLoaderModel`, one entry per sheet declared in `SHEET_SPECS`
+            (present even when the file was absent or failed to read, mirroring `load_all`'s
+            historical "missing sheets fill in as empty" behaviour).
+        errors: User-facing (translated) messages for read failures and SEC-003 size violations.
+    """
+
+    models: dict[str, DataLoaderModel]
+    errors: list[str]
+
+
 class DataLoaderFacade:
     """
-    en_US: Loads all files and returns a dict of base_name→object (DataFrame or text).
+    en_US: Loads all files declared in `SHEET_SPECS` and returns a `LoadResult`.
 
     SEC-003: enforces `MAX_INPUT_FILE_BYTES`/`MAX_SHEET_ROWS`/`MAX_SHEET_COLUMNS`-style limits
     (see module docstring) while loading, reporting a violation as an FS-category error and
@@ -129,7 +159,6 @@ class DataLoaderFacade:
         """
         self.input_dir = Path(input_dir)
         self.scanner = FileScanner(self.input_dir)
-        self.config = Config()
         self._translate = translate or MessageCatalog("pt_BR", default_catalog_dir()).text
         max_file_bytes, max_sheet_rows, max_sheet_columns = limits or (
             _DEFAULT_MAX_FILE_BYTES,
@@ -140,22 +169,21 @@ class DataLoaderFacade:
         self._max_sheet_rows = max_sheet_rows
         self._max_sheet_columns = max_sheet_columns
 
-    @property
-    def load_all(self):
-        errors = []
-        files_map, qml_files, missing_files = self.scanner.scan()
+    def load(self) -> LoadResult:
+        """Load every sheet declared in `SHEET_SPECS` from `self.input_dir`.
 
-        data = {}
+        Returns:
+            LoadResult: one `DataLoaderModel` per declared sheet name, plus any read/size-limit
+            error messages collected along the way.
+        """
+        errors: list[str] = []
+        files_map, _ignored, _missing_files = self.scanner.scan()
+
+        data: dict[str, DataLoaderModel] = {}
         for name, path in files_map.items():
-            _, header_type, _ = self.config.file_specs[name]
-            if header_type == "single":
-                strat = SingleHeaderStrategy()
-            elif header_type == "double":
-                strat = DoubleHeaderStrategy()
-            else:
-                # qml will not pass through here
-                continue
-            reader = ReaderFactory.get_reader(path, strat)
+            spec = SHEET_SPECS[name]
+            strategy = DoubleHeaderStrategy() if spec.header is HeaderLayout.DOUBLE else SingleHeaderStrategy()
+            reader = ReaderFactory.get_reader(path, strategy, sep=spec.csv_separator)
 
             # Configure DataModel
             df_local = None
@@ -215,11 +243,8 @@ class DataLoaderFacade:
 
             data[name] = data_model
 
-        # Add raw QMLs
-        data["qmls"] = [ReaderFactory.get_reader(q, SingleHeaderStrategy()).read() for q in qml_files]
-
         # Add missing or non-required files as empty
-        for name, (req, _, _) in self.config.file_specs.items():
+        for name in SHEET_SPECS:
             if name not in data:
                 data[name] = DataLoaderModel(
                     input_folder=str(self.input_dir),
@@ -228,4 +253,23 @@ class DataLoaderFacade:
                     is_read_successful=False,
                 )
 
-        return data, errors
+        return LoadResult(models=data, errors=errors)
+
+    @property
+    def load_all(self) -> tuple[dict[str, DataLoaderModel], list[str]]:
+        """Deprecated alias for `load()`, kept for one release.
+
+        Returns:
+            The `(models, errors)` tuple that `load_all` historically returned.
+
+        Warns:
+            DeprecationWarning: always, on every access.
+        """
+        warnings.warn(
+            "DataLoaderFacade.load_all is deprecated; call DataLoaderFacade.load() and read "
+            ".models/.errors off the returned LoadResult instead.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        result = self.load()
+        return result.models, result.errors

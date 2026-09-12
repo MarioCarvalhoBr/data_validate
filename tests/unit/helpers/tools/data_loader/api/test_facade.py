@@ -3,6 +3,13 @@ Unit tests for facade.py module.
 
 This module tests the DataLoaderModel and DataLoaderFacade classes functionality
 including data model creation, file loading, error handling, and facade operations.
+
+ARC-009/BUG-018/BUG-015: `DataLoaderFacade` no longer reads the deleted
+`data_loader.common.config.Config` singleton; header layout and CSV separator come from
+`data_validate.specs.sheet_specs.SHEET_SPECS`, patched per test via `mocker.patch(
+"...facade.SHEET_SPECS", ...)` instead of mocking a `Config` instance. `load()` is the real method
+under test; `load_all` is covered separately as a deprecated, warning-emitting alias. The `"qmls"`
+key and its QML-specific tests are deleted along with `.qml` support (BUG-015).
 """
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
@@ -11,7 +18,22 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade
+from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade, LoadResult
+from data_validate.specs.sheet_specs import ColumnKind, ColumnSpec, HeaderLayout, SheetSpec
+
+FACADE_MODULE = "data_validate.helpers.tools.data_loader.api.facade"
+
+
+def _fake_spec(name: str, header: HeaderLayout, csv_separator: str = "|", required: bool = True) -> SheetSpec:
+    """Build a minimal `SheetSpec` fixture for facade tests."""
+    return SheetSpec(
+        name=name,
+        required=required,
+        header=header,
+        columns=(ColumnSpec(name="id", dtype="int", kind=ColumnKind.REQUIRED),),
+        description="Fixture sheet for facade tests.",
+        csv_separator=csv_separator,
+    )
 
 
 class TestDataLoaderModel:
@@ -123,426 +145,305 @@ class TestDataLoaderFacade:
 
     def test_initialization(self, mocker) -> None:
         """Test DataLoaderFacade initialization."""
-        mocker.patch("data_validate.helpers.tools.data_loader.api.facade.FileScanner")
-        mocker.patch("data_validate.helpers.tools.data_loader.api.facade.Config")
+        mocker.patch(f"{FACADE_MODULE}.FileScanner")
 
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
 
         assert facade.input_dir == Path("/test/input")
         assert facade.scanner is not None
-        assert facade.config is not None
 
-    def test_load_all_success(self, mocker) -> None:
-        """Test successful loading of all files."""
-        # Mock dependencies
+    def test_load_returns_load_result(self, mocker) -> None:
+        """`load()` returns a `LoadResult`, reads every declared sheet and fills in missing ones."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = (
-            {"file1": Path("/test/file1.csv")},  # files_map
-            [Path("/test/file1.qml")],  # qml_files
-            [],  # missing_files
-        )
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {
+            "file1": _fake_spec("file1", HeaderLayout.SINGLE),
+            "file2": _fake_spec("file2", HeaderLayout.DOUBLE),
+        }
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv"), "file2": ("required", "double", "xlsx")}
-
-        # Setup reader mock
         mock_reader.read.return_value = pd.DataFrame({"col1": [1, 2]})
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup strategy mock
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.DoubleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 0
-        assert "file1" in data
-        assert "file2" in data  # Missing file should be added as empty
-        assert "qmls" in data
-        assert isinstance(data["file1"], DataLoaderModel)
-        assert data["file1"].is_read_successful is True
-        assert data["file2"].is_read_successful is False  # Missing file
+        assert isinstance(result, LoadResult)
+        assert result.errors == []
+        assert "file1" in result.models
+        assert "file2" in result.models  # Missing file added as empty
+        assert "qmls" not in result.models  # BUG-015: no QML concept left
+        assert isinstance(result.models["file1"], DataLoaderModel)
+        assert result.models["file1"].is_read_successful is True
+        assert result.models["file2"].is_read_successful is False  # Missing file
 
-    def test_load_all_with_file_not_found_error(self, mocker) -> None:
-        """Test load_all with FileNotFoundError."""
-        # Mock dependencies
+    def test_load_uses_separator_from_spec(self, mocker) -> None:
+        """`ReaderFactory.get_reader` is called with the sheet's own `csv_separator` (BUG-018)."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE, csv_separator=";")}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
         mock_reader = mocker.MagicMock()
+        mock_reader.read.return_value = pd.DataFrame({"col1": [1, 2]})
+        mock_get_reader = mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
+
+        facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
+        facade.scanner = mock_scanner
+
+        facade.load()
+
+        _, kwargs = mock_get_reader.call_args
+        assert kwargs["sep"] == ";"
+
+    def test_load_descricao_real_spec_uses_pipe_separator(self, mocker) -> None:
+        """The real `descricao` entry of `SHEET_SPECS` declares `|` (BUG-018 regression guard)."""
+        from data_validate.specs.sheet_specs import SHEET_SPECS
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"descricao": Path("/test/descricao.csv")}, {}, [])
+
+        mock_reader = mocker.MagicMock()
+        mock_reader.read.return_value = pd.DataFrame({"codigo": [1]})
+        mock_get_reader = mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
+
+        facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
+        facade.scanner = mock_scanner
+
+        facade.load()
+
+        assert SHEET_SPECS["descricao"].csv_separator == "|"
+        _, kwargs = mock_get_reader.call_args
+        assert kwargs["sep"] == "|"
+
+    def test_load_uses_double_header_strategy_from_spec(self, mocker) -> None:
+        """A sheet declared with `HeaderLayout.DOUBLE` gets a `DoubleHeaderStrategy`."""
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.xlsx")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.DOUBLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
         mock_strategy = mocker.MagicMock()
+        mocker.patch(f"{FACADE_MODULE}.DoubleHeaderStrategy", return_value=mock_strategy)
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
+        mock_reader = mocker.MagicMock()
+        mock_reader.read.return_value = pd.DataFrame({"col1": [1, 2]})
+        mock_get_reader = mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
+        facade.scanner = mock_scanner
 
-        # Setup reader to raise FileNotFoundError
+        result = facade.load()
+
+        assert result.errors == []
+        assert result.models["file1"].is_read_successful is True
+        mock_get_reader.assert_called_once_with(Path("/test/file1.xlsx"), mock_strategy, sep="|")
+
+    def test_load_with_file_not_found_error(self, mocker) -> None:
+        """Test load with FileNotFoundError."""
+        mock_scanner = mocker.MagicMock()
+        mock_reader = mocker.MagicMock()
+
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
         mock_reader.read.side_effect = FileNotFoundError("File not found")
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert "Arquivo não encontrado no diretório" in errors[0]
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert "Arquivo não encontrado no diretório" in result.errors[0]
+        assert "file1" in result.models
+        assert result.models["file1"].is_read_successful is False
 
-    def test_load_all_with_unicode_decode_error(self, mocker) -> None:
-        """Test load_all with UnicodeDecodeError."""
-        # Mock dependencies
+    def test_load_with_unicode_decode_error(self, mocker) -> None:
+        """Test load with UnicodeDecodeError."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
-
-        # Setup reader to raise UnicodeDecodeError
         mock_reader.read.side_effect = UnicodeDecodeError("utf-8", b"", 0, 1, "invalid start byte")
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert "Erro de codificação do arquivo" in errors[0]
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert "Erro de codificação do arquivo" in result.errors[0]
+        assert "file1" in result.models
+        assert result.models["file1"].is_read_successful is False
 
-    def test_load_all_with_parser_error(self, mocker) -> None:
-        """Test load_all with pandas ParserError."""
-        # Mock dependencies
+    def test_load_with_parser_error(self, mocker) -> None:
+        """Test load with pandas ParserError."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
-
-        # Setup reader to raise ParserError
         mock_reader.read.side_effect = pd.errors.ParserError("Error tokenizing data")
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert "Erro na estrutura da planilha" in errors[0]
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert "Erro na estrutura da planilha" in result.errors[0]
+        assert "file1" in result.models
+        assert result.models["file1"].is_read_successful is False
 
-    def test_load_all_with_value_error(self, mocker) -> None:
-        """Test load_all with ValueError."""
-        # Mock dependencies
+    def test_load_with_value_error(self, mocker) -> None:
+        """Test load with ValueError."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
-
-        # Setup reader to raise ValueError
         mock_reader.read.side_effect = ValueError("Invalid value")
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert "Erro nos valores da planilha" in errors[0]
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert "Erro nos valores da planilha" in result.errors[0]
+        assert "file1" in result.models
+        assert result.models["file1"].is_read_successful is False
 
-    def test_load_all_with_io_error(self, mocker) -> None:
-        """Test load_all with IOError."""
-        # Mock dependencies
+    def test_load_with_io_error(self, mocker) -> None:
+        """Test load with IOError."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
-
-        # Setup reader to raise IOError
         mock_reader.read.side_effect = IOError("Permission denied")
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert "Erro de entrada/saída ao ler o arquivo" in errors[0]
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert "Erro de entrada/saída ao ler o arquivo" in result.errors[0]
+        assert "file1" in result.models
+        assert result.models["file1"].is_read_successful is False
 
-    def test_load_all_with_general_exception(self, mocker) -> None:
-        """Test load_all with general Exception."""
-        # Mock dependencies
+    def test_load_with_general_exception(self, mocker) -> None:
+        """Test load with general Exception."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
-
-        # Setup reader to raise general Exception
         mock_reader.read.side_effect = Exception("Unexpected error")
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert "Erro inesperado ao processar o arquivo" in errors[0]
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert "Erro inesperado ao processar o arquivo" in result.errors[0]
+        assert "file1" in result.models
+        assert result.models["file1"].is_read_successful is False
 
-    def test_load_all_with_qml_files(self, mocker) -> None:
-        """Test load_all with QML files."""
-        # Mock dependencies
+    def test_load_missing_files_handling(self, mocker) -> None:
+        """Test load handles missing files correctly."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
-        mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = (
-            {"file1": Path("/test/file1.csv")},
-            [Path("/test/file1.qml"), Path("/test/file2.qml")],
-            [],
-        )  # qml_files
+        mock_scanner.scan.return_value = ({}, {}, [])  # No files found
+        fake_specs = {
+            "file1": _fake_spec("file1", HeaderLayout.SINGLE, required=True),
+            "file2": _fake_spec("file2", HeaderLayout.DOUBLE, required=False),
+        }
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
-
-        # Setup reader mock
-        mock_reader.read.return_value = pd.DataFrame({"col1": [1, 2]})
-
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 0
-        assert "qmls" in data
-        assert len(data["qmls"]) == 2
-        assert all(isinstance(qml, pd.DataFrame) for qml in data["qmls"])
+        assert result.errors == []
+        assert "file1" in result.models
+        assert "file2" in result.models
+        assert result.models["file1"].is_read_successful is False
+        assert result.models["file2"].is_read_successful is False
+        assert result.models["file1"].path == Path("file1")
+        assert result.models["file2"].path == Path("file2")
 
-    def test_load_all_with_double_header_strategy(self, mocker) -> None:
-        """Test load_all with double header strategy."""
-        # Mock dependencies
+
+class TestDataLoaderFacadeLoadAllDeprecation:
+    """`load_all` stays available for one release, but only as a deprecated wrapper (ARC-009)."""
+
+    @pytest.fixture(autouse=True)
+    def _mock_small_file_stat(self, mocker) -> None:
+        mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=10))
+
+    def test_load_all_emits_deprecation_warning(self, mocker) -> None:
+        """Accessing `load_all` warns `DeprecationWarning` naming the replacement."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
-        mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.xlsx")}, [], [])
-
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "double", "xlsx")}
-
-        # Setup reader mock
-        mock_reader.read.return_value = pd.DataFrame({"col1": [1, 2]})
-
-        # Setup mocks
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.DoubleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
-
-        # Create facade
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        # Test load_all
-        data, errors = facade.load_all
+        with pytest.warns(DeprecationWarning, match="load_all is deprecated"):
+            _ = facade.load_all
 
-        assert len(errors) == 0
-        assert "file1" in data
+    def test_load_all_returns_models_and_errors_tuple(self, mocker) -> None:
+        """`load_all` still returns the historical `(models, errors)` tuple shape."""
+        mock_scanner = mocker.MagicMock()
+        mock_reader = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        mock_reader.read.return_value = pd.DataFrame({"col1": [1, 2]})
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
+
+        facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
+        facade.scanner = mock_scanner
+
+        with pytest.warns(DeprecationWarning):
+            data, errors = facade.load_all
+
+        assert errors == []
+        assert isinstance(data, dict)
         assert data["file1"].is_read_successful is True
-
-    def test_load_all_with_unknown_header_type(self, mocker) -> None:
-        """Test load_all with unknown header type (should skip)."""
-        # Mock dependencies
-        mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
-
-        # Setup scanner mock
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.qml")}, [], [])
-
-        # Setup config mock with unknown header type
-        mock_config.file_specs = {"file1": ("required", "unknown", "qml")}
-
-        # Create facade
-        facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
-        facade.scanner = mock_scanner
-        facade.config = mock_config
-
-        # Test load_all
-        data, errors = facade.load_all
-
-        assert len(errors) == 0
-        # file1 should be added as missing since it was skipped
-        assert "file1" in data
-        assert data["file1"].is_read_successful is False
-
-    def test_load_all_missing_files_handling(self, mocker) -> None:
-        """Test load_all handles missing files correctly."""
-        # Mock dependencies
-        mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
-
-        # Setup scanner mock with no files found
-        mock_scanner.scan.return_value = ({}, [], [])  # No files found
-
-        # Setup config mock
-        mock_config.file_specs = {"file1": ("required", "single", "csv"), "file2": ("optional", "double", "xlsx")}
-
-        # Create facade
-        facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
-        facade.scanner = mock_scanner
-        facade.config = mock_config
-
-        # Test load_all
-        data, errors = facade.load_all
-
-        assert len(errors) == 0
-        assert "file1" in data
-        assert "file2" in data
-        assert data["file1"].is_read_successful is False
-        assert data["file2"].is_read_successful is False
-        assert data["file1"].path == Path("file1")
-        assert data["file2"].path == Path("file2")
 
 
 class TestDataLoaderFacadeSizeLimits:
-    """SEC-003: `DataLoaderFacade.load_all` enforces file-size and sheet-shape limits."""
+    """SEC-003: `DataLoaderFacade.load()` enforces file-size and sheet-shape limits."""
 
     def test_default_construction_uses_pt_br_message_catalog_fallback(self) -> None:
         """`translate=None` falls back to a real `pt_BR` `MessageCatalog`, not a bare string."""
@@ -569,171 +470,135 @@ class TestDataLoaderFacadeSizeLimits:
             return f"<{key}>"
 
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
         mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=10 * 1024 * 1024 * 1024))
 
         facade = DataLoaderFacade("/test/input", translate=_record_translate, limits=(1, 1_000_000, 5_000))
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert errors == ["<loader_error_file_too_large>"]
+        assert result.errors == ["<loader_error_file_too_large>"]
         assert recorded_calls[0][0] == "loader_error_file_too_large"
         assert recorded_calls[0][1]["filename"] == "file1.csv"
-        assert data["file1"].is_read_successful is False
+        assert result.models["file1"].is_read_successful is False
 
     def test_file_exceeding_max_bytes_is_not_read_and_reports_error(self, mocker) -> None:
         """A file above `limits[0]` is never handed to the reader; the error names the file."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
         mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=1024))
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
         facade = DataLoaderFacade(
             "/test/input", translate=lambda key, **params: key.format(**params), limits=(100, 1_000_000, 5_000)
         )
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert errors[0] == "loader_error_file_too_large"
+        assert len(result.errors) == 1
+        assert result.errors[0] == "loader_error_file_too_large"
         mock_reader.read.assert_not_called()
-        assert data["file1"].is_read_successful is False
-        assert data["file1"].raw_data.empty
+        assert result.models["file1"].is_read_successful is False
+        assert result.models["file1"].raw_data.empty
 
     def test_file_within_max_bytes_is_read_normally(self, mocker) -> None:
         """A file at or below the byte limit is read as usual (no false positive)."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
         mock_reader.read.return_value = pd.DataFrame({"col1": ["1", "2"]})
 
         mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=100))
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key, limits=(100, 1_000_000, 5_000))
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert errors == []
-        assert data["file1"].is_read_successful is True
+        assert result.errors == []
+        assert result.models["file1"].is_read_successful is True
         mock_reader.read.assert_called_once()
 
     def test_sheet_exceeding_max_rows_is_dropped_and_reports_error(self, mocker) -> None:
         """A frame read successfully but with too many rows is treated as unread."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
         mock_reader.read.return_value = pd.DataFrame({"col1": ["1", "2", "3"]})
 
         mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=10))
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
         facade = DataLoaderFacade(
             "/test/input", translate=lambda key, **params: key.format(**params), limits=(1_000_000, 2, 5_000)
         )
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert errors[0] == "loader_error_sheet_too_big"
-        assert data["file1"].is_read_successful is False
-        assert data["file1"].raw_data.empty
+        assert len(result.errors) == 1
+        assert result.errors[0] == "loader_error_sheet_too_big"
+        assert result.models["file1"].is_read_successful is False
+        assert result.models["file1"].raw_data.empty
 
     def test_sheet_exceeding_max_columns_is_dropped_and_reports_error(self, mocker) -> None:
         """A frame read successfully but with too many columns is treated as unread."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
         mock_reader.read.return_value = pd.DataFrame({"a": ["1"], "b": ["2"], "c": ["3"]})
 
         mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=10))
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
         facade = DataLoaderFacade(
             "/test/input", translate=lambda key, **params: key.format(**params), limits=(1_000_000, 1_000_000, 2)
         )
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert len(errors) == 1
-        assert errors[0] == "loader_error_sheet_too_big"
-        assert data["file1"].is_read_successful is False
+        assert len(result.errors) == 1
+        assert result.errors[0] == "loader_error_sheet_too_big"
+        assert result.models["file1"].is_read_successful is False
 
     def test_sheet_within_limits_is_read_normally(self, mocker) -> None:
         """A frame within both the row and column limits is read as usual (no false positive)."""
         mock_scanner = mocker.MagicMock()
-        mock_config = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
-        mock_strategy = mocker.MagicMock()
 
-        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, [], [])
-        mock_config.file_specs = {"file1": ("required", "single", "csv")}
+        mock_scanner.scan.return_value = ({"file1": Path("/test/file1.csv")}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
         mock_reader.read.return_value = pd.DataFrame({"col1": ["1", "2"]})
 
         mocker.patch.object(Path, "stat", return_value=mocker.MagicMock(st_size=10))
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.SingleHeaderStrategy", return_value=mock_strategy
-        )
-        mocker.patch(
-            "data_validate.helpers.tools.data_loader.api.facade.ReaderFactory.get_reader", return_value=mock_reader
-        )
+        mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key, limits=(1_000_000, 100, 100))
         facade.scanner = mock_scanner
-        facade.config = mock_config
 
-        data, errors = facade.load_all
+        result = facade.load()
 
-        assert errors == []
-        assert data["file1"].is_read_successful is True
+        assert result.errors == []
+        assert result.models["file1"].is_read_successful is True
