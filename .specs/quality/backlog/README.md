@@ -51,13 +51,18 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
-| P0 | 7 | 2 done, 5 open | remaining: SEC-001, TST-001, ARC-001, ARC-002, BUG-002 |
-| P1 | 28 | 12 done, 3 in-progress, 13 open | |
+| P0 | 7 | 3 done, 4 open | remaining: SEC-001, TST-001, ARC-001, ARC-002 |
+| P1 | 28 | 13 done, 5 in-progress, 10 open | |
 | P2 | 43 | 17 done, 4 in-progress, 22 open | |
 | P3 | 13 | 4 done, 1 wont-fix, 8 open | |
-| **Total** | **91** | **35 done, 7 in-progress, 1 wont-fix, 48 open** | |
+| **Total** | **91** | **37 done, 9 in-progress, 1 wont-fix, 44 open** | |
 
 Status snapshot: 2026-09-12 — 35 done, 7 in-progress, 1 wont-fix, 48 open (of 91 items incl.
 TOOL-011). This slice moved SEC-008 and PERF-004 to done, and ARC-011/ARC-012/TOOL-008 to
 in-progress (see `03-architecture.md`, `02-security.md`, `05-performance.md`,
 `06-tooling-ci.md`, `08-migration-roadmap.md`).
+
+Status snapshot: 2026-09-12 (Phase 2c models slice) — 37 done, 9 in-progress, 1 wont-fix, 44
+open. This slice moved BUG-002 and BUG-003 to done, and ARC-007 and PERF-003 to in-progress
+(see `01-bugs.md`, `03-architecture.md`, `05-performance.md`, `08-migration-roadmap.md`).
+BUG-014 was reviewed but left open (finding recorded in `01-bugs.md`).

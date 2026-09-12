@@ -63,20 +63,25 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 
 ### Models (`data_validate/models/`)
 
-All inherit `SpModelABC` (`sp_model_abc.py`): `__init__` stores context/data model/kwargs, then
-`initialize()` (dedupe scenarios, empty-file error, `|` check, unnamed-column check) and the
-subclass `__init__` calls `run()` → `pre_processing() → expected_structure_columns() →
-data_cleaning() [→ post_processing()]` when the file exists. Results go to `structural_errors/
-warnings` and `data_cleaning_errors/warnings`. Column definitions are nested classes of
-`pd.Series` (`RequiredColumn`, `OptionalColumn`, `DynamicColumn`, `PluralColumn`).
+All inherit `SpModelABC` (`sp_model_abc.py`): `__init__` stores context/data model/kwargs, sets
+`self.frame` (this instance's own working frame, aliasing `data_model.raw_data` until a subclass
+reassigns it via a non-mutating op) and `self.cleaned` (this instance's own cleaned-column
+store), then `initialize()` (dedupe scenarios, empty-file error, `|` check, unnamed-column
+check) and the subclass `__init__` calls `run()` → `pre_processing() →
+expected_structure_columns() → data_cleaning() [→ post_processing()]` when the file exists.
+Results go to `structural_errors/warnings` and `data_cleaning_errors/warnings`. Column
+*definitions* remain nested classes of `pd.Series` (`RequiredColumn`, `OptionalColumn`,
+`DynamicColumn`, `PluralColumn`) — pure name/dtype placeholders, never reassigned (BUG-002,
+fixed); cleaned *data* lives on the instance (`self.cleaned[column_name]`, read via
+`cleaned_column(name)`).
 
 | Model | Sheet | Specific behaviour | Smells |
 |---|---|---|---|
-| `SpDescription` | `descricao` | Dynamic `cenario`/`legenda` columns depend on scenario/legend files; injects `relacao=1`, `unidade=""`; cleans `codigo`, `nivel` (min 1), `cenario` (min −1), `legenda` (min 1, empty allowed) and **stores cleaned Series on the class** | BUG-002, BUG-003 |
-| `SpComposition` | `composicao` | Cleans `codigo_pai`, `codigo_filho` (min 1) into class attributes | BUG-002 |
+| `SpDescription` | `descricao` | Dynamic `cenario`/`legenda` columns depend on scenario/legend files; drops/injects `relacao=1`, `unidade=""` on `self.frame` (BUG-003, fixed); cleans `codigo`, `nivel` (min 1), `cenario` (min −1), `legenda` (min 1, empty allowed) into `self.cleaned` (BUG-002, fixed) | — |
+| `SpComposition` | `composicao` | Cleans `codigo_pai`, `codigo_filho` (min 1) into `self.cleaned` (BUG-002, fixed) | — |
 | `SpValue` | `valores` | Columns must match `^\d+-\d{4}(-SCENARIO)?$`; `id` required | BUG-013 |
-| `SpTemporalReference` | `referencia_temporal` | Without scenarios the sheet must have exactly one row; cleans `simbolo` (min 0) into class attribute | BUG-002 |
-| `SpProportionality` | `proporcionalidades` | Double header; level-0 and level-1 pattern checks; on structural error blanks the frame and sets `header_type="invalid"` | ARC-009 |
+| `SpTemporalReference` | `referencia_temporal` | Without scenarios the sheet must have exactly one row; cleans `simbolo` (min 0) into `self.cleaned` (BUG-002, fixed) | — |
+| `SpProportionality` | `proporcionalidades` | Double header; level-0 and level-1 pattern checks; on structural error empties `self.frame` and sets `self.header_layout_invalid = True` (BUG-003, fixed — `data_loader_model.raw_data`/`.header_type` are no longer touched) | ARC-009 |
 | `SpScenario` | `cenarios` | Duplicate `simbolo` detection | — |
 | `SpLegend` | `legenda` | `data_cleaning` runs `LegendProcessing` per legend code (sequence, dtypes, labels, colour, decimals, min/max continuity, order) only if `is_sanity_check_passed` | — |
 | `SpDictionary` | `dicionario` | Reads first column as `words_to_ignore` | — |
@@ -84,7 +89,8 @@ warnings` and `data_cleaning_errors/warnings`. Column definitions are nested cla
 ### Validators (`data_validate/validators/`)
 
 All inherit `BaseValidator` (`spreadsheets/base/base_validator.py`): resolve the model from
-`DataModelContext`, copy its frame, compute `TITLES_INFO = config.get_verify_names()`, then
+`DataModelContext`, copy its `frame` (`self._data_model.frame.copy()`, not
+`data_loader_model.raw_data` — BUG-003, fixed), compute `TITLES_INFO = config.get_verify_names()`, then
 `run()` builds a list of `(callable, NamesEnum.value)` and `build_reports()` executes each,
 extending `ValidationReport` and catching **any** exception into an error message.
 
@@ -95,7 +101,7 @@ extending `ValidationReport` and catching **any** exception into an error messag
 | `SpDescriptionValidator` | `HTML_DESC, SC, CO_UN, INP, IL, MAND_PUNC_DESC, EF, LB_DESC, SIMP_DESC_N, TITLES_N` | PERF-001 |
 | `SpCompositionGraphValidator` | `IR` (codes in description), `IR` (cycles, disconnected), `UT` (unique titles per subtree, root `"1"`), `LEAF_NO_DATA` | BUG-019 |
 | `SpCompositionTreeValidator` | `TH` (level hierarchy + cycles via `TreeProcessing`), `CHILD_LVL` | PERF-001 |
-| `SpTemporalReferenceValidator` | `MAND_PUNC_TEMP, YEARS_TEMP, UVR_TEMP` | BUG-002, BUG-007 |
+| `SpTemporalReferenceValidator` | `MAND_PUNC_TEMP, YEARS_TEMP, UVR_TEMP` | BUG-007 |
 | `SpProportionalityValidator` | `IR, REP_IND_PROP, IND_VAL_PROP, IR_PROP, SUM_PROP` | BUG-006 |
 | `SpValueValidator` | `IR, VAL_COMB, UNAV_INV` | BUG-001, BUG-014 |
 | `SpScenarioValidator` | `MAND_PUNC_SCEN, UVR_SCEN` | — |
@@ -121,20 +127,32 @@ static-method namespaces (ARC-007).
 | Spell-check | `SpellChecker → DictionaryManager (enchant Broker, ENCHANT_CONFIG_DIR = static/dictionaries)`, `SpellCheckerController`, `TextProcessor`, `DataFrameProcessor` | ARC-015, BUG-022 |
 | Errors as data | `list[str]` of pre-formatted messages everywhere | ARC-004 |
 
-## Data ownership and mutation
+## Data ownership and mutation (BUG-002/BUG-003 fixed)
 
 ```mermaid
 flowchart LR
-  F[(files)] --> L[DataLoaderModel.raw_data<br/>one DataFrame per sheet]
-  L -->|mutated by SpDescription.pre_processing| L
-  L -->|copied per validator| V1[BaseValidator._dataframe]
-  L --> V2[validator.model_dataframes references]
-  M[Sp* class attributes<br/>RequiredColumn.COLUMN_* Series] -->|overwritten by data_cleaning| M
-  M --> TR[SpTemporalReferenceValidator reads class attribute]
+  F[(files)] --> L[DataLoaderModel.raw_data<br/>one DataFrame per sheet, never mutated after load]
+  L --> FR[Sp*.frame<br/>per-instance working copy]
+  FR -->|SpDescription.pre_processing drops/injects via .drop/.assign, reassigning self.frame| FR
+  FR -->|SpProportionality.post_processing empties self.frame,<br/>sets self.header_layout_invalid| FR
+  FR -->|copied per validator| V1[BaseValidator._dataframe]
+  FR --> V2[validator.model_dataframes references]
+  C[Sp*.cleaned dict<br/>per-instance] -->|populated by data_cleaning| C
+  C --> CC[model.cleaned_column&#40;name&#41; accessor]
+  M[Sp* RequiredColumn/DynamicColumn Series<br/>pure name/dtype placeholders] -.never reassigned.-> M
 ```
 
-The same `raw_data` object is shared by all validators; models mutate it (BUG-003) and overwrite
-class-level column definitions (BUG-002). This is the main obstacle to testing and parallelism.
+Every model owns its own `self.frame` (working copy, starts out aliasing `raw_data`) and
+`self.cleaned` (dict of cleaned `pd.Series` by column name); `data_loader_model.raw_data` is
+never written after load, and the `RequiredColumn`/`OptionalColumn`/`DynamicColumn` nested
+classes stay pure column *definitions* — no `setattr`/reassignment on them. Validators read a
+model's working data through `model.frame`/`BaseValidator._dataframe` and its cleaned columns
+through `model.cleaned_column(name)`, never through a class attribute. This removes the
+cross-instance/cross-run state leak (BUG-002) and the shared-object mutation (BUG-003) that used
+to make two models/validators built from different input in the same process interfere with each
+other; the remaining obstacle to testing and parallelism is ARC-001 (work still happens in
+constructors) and ARC-007 (models still both validate and clean, "Processing" classes are still
+procedural namespaces).
 
 ## Files and folders written at runtime
 

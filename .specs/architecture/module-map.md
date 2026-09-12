@@ -88,12 +88,12 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 
 | Module | Sheet | Tests | Destination | Backlog |
 |---|---|---|---|---|
-| `sp_model_abc.py` | base | none | `specs/` (implemented, consumers pending) + `normalizing/` | ARC-001, ARC-007 |
-| `sp_description.py` | `descricao` | none | `specs/sheet_specs.py::SHEET_SPECS["descricao"]` (implemented, consumers pending), `normalizing/` | BUG-002, BUG-003 |
-| `sp_composition.py` | `composicao` | none | idem | BUG-002 |
+| `sp_model_abc.py` | base | `tests/unit/models/test_model_isolation.py` | `specs/` (implemented, consumers pending) + `normalizing/` | ARC-001, ARC-007 |
+| `sp_description.py` | `descricao` | `test_column_declarations.py`, `test_model_isolation.py` | `specs/sheet_specs.py::SHEET_SPECS["descricao"]` (implemented, consumers pending), `normalizing/` | ARC-007 |
+| `sp_composition.py` | `composicao` | `test_model_isolation.py` | idem | ARC-007 |
 | `sp_value.py` | `valores` | none | idem | BUG-013 |
-| `sp_temporal_reference.py` | `referencia_temporal` | none | idem | BUG-002 |
-| `sp_proportionality.py` | `proporcionalidades` | none | idem | ARC-009 |
+| `sp_temporal_reference.py` | `referencia_temporal` | `test_column_declarations.py`, `test_model_isolation.py` | idem | ARC-007 |
+| `sp_proportionality.py` | `proporcionalidades` | `test_model_isolation.py` | idem | ARC-009 (in-progress — `header_type` mutation resolved) |
 | `sp_scenario.py` | `cenarios` | none | idem | — |
 | `sp_legend.py` | `legenda` | none | idem + `rules/legend/` | — |
 | `sp_dictionary.py` | `dicionario` | none | `spell/` | — |

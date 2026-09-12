@@ -30,7 +30,7 @@ Every fix here must land with a regression test under `tests/` that fails before
   `.copy()` of a shared attribute), so it does not share the same bug and was left untouched.
 
 ### BUG-002 · Models overwrite class-level `RequiredColumn` Series (global mutable state)
-- Priority: P0 · Effort: M · Status: open
+- Priority: P0 · Effort: M · Status: done
 - Where: `models/sp_description.py:251,263,277`, `models/sp_composition.py:142`,
   `models/sp_temporal_reference.py:131,142`; consumer `validators/spreadsheets/temporal_reference/temporal_reference_validator.py:136`
   (`SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.iloc[1:]` reads the **class** attribute).
@@ -43,6 +43,89 @@ Every fix here must land with a regression test under `tests/` that fails before
   (`self.cleaned["codigo"]`) or in a typed `DataFrame` owned by the model.
 - Tests: instantiate two models with different data in one process and assert isolation.
 - Related: ARC-002, ARC-007, PERF-003
+- Done: `SpModelABC.__init__` (`models/sp_model_abc.py`) now sets `self.cleaned: dict[str,
+  pd.Series] = {}` and exposes `cleaned_column(name) -> pd.Series` (returns
+  `self.cleaned.get(name, pd.Series(dtype="object"))`). `SpDescription.data_cleaning`,
+  `SpComposition.data_cleaning`, and `SpTemporalReference.data_cleaning` no longer
+  `setattr(self.RequiredColumn, ...)`/reassign a `DynamicColumn`/`RequiredColumn` class
+  attribute — every cleaned column (`codigo`, `nivel`, `cenario`, `legenda`,
+  `codigo_pai`, `codigo_filho`, `simbolo`) is stored in `self.cleaned[column_name]` instead. The
+  `RequiredColumn`/`OptionalColumn`/`DynamicColumn` nested classes are now pure name/dtype
+  *declarations*, never reassigned by any model. The only two call sites in `validators/` that
+  actually read a model's *data* through a `RequiredColumn`/`DynamicColumn` attribute (as opposed
+  to reading `.name`, a static string, which was always safe) are migrated to
+  `model.cleaned_column(name)`: `description_validator.py::validate_sequential_codes`/
+  `validate_unique_codes` (`self._data_model.cleaned_column("codigo")`, was
+  `self._data_model.RequiredColumn.COLUMN_CODE`), and
+  `compostion_graph_validator.py::validate_relation_indicators_in_composition`
+  (`self.model_sp_description.cleaned_column("codigo")`,
+  `self.model_sp_composition.cleaned_column("codigo_pai"/"codigo_filho")`, was
+  `.RequiredColumn.COLUMN_CODE`/`COLUMN_PARENT_CODE`/`COLUMN_CHILD_CODE`).
+  `temporal_reference_validator.py::validate_reference_years` already read
+  `self._dataframe[column_name_symbol]` since BUG-007 and is untouched. Every other
+  `RequiredColumn`/`DynamicColumn` read across `validators/` and `controllers/` is a `.name`
+  access on the placeholder Series (a static string, grep-confirmed) and needed no change.
+  Regression tests: `tests/unit/models/test_model_isolation.py` (new, 100 % coverage) —
+  `TestSpDescriptionInstanceIsolation`/`TestSpCompositionInstanceIsolation`/
+  `TestSpTemporalReferenceInstanceIsolation` build two model instances from different frames in
+  one process and assert (a) the class-level `RequiredColumn` placeholder stays the pristine,
+  empty declaration after both runs, and (b) each instance's `cleaned_column(...)` reflects only
+  its own data. Full unit suite green (1282 passed), e2e golden harness 7/7 twice with an empty
+  `git status --short tests/e2e/golden` diff.
+
+### BUG-003 · `SpDescription.pre_processing` mutates the shared raw DataFrame
+- Priority: P1 · Effort: M · Status: done
+- Where: `models/sp_description.py:178,187,193,195`
+- Problem: drops `cenario`/`legenda` and injects `relacao=1`, `unidade=""` into
+  `data_loader_model.raw_data`, the same object every validator later reads. Injected columns then
+  show up in `EXPECTED_COLUMNS` and are scanned by `validate_cr_lf_characters`
+  (`description_validator.py:352`); the extra-column warning logic sees a different frame than the
+  file the user sent.
+- Proposed fix: treat `raw_data` as immutable; derive a `normalized` frame on the model and expose
+  defaults through accessors, not by writing columns.
+- Tests: assert `raw_data` is unchanged after model construction.
+- Related: ARC-007
+- Done: `SpModelABC.__init__` now sets `self.frame: pd.DataFrame = data_model.raw_data` — the
+  same object initially (cheap, no copy), but every model that needs to drop/inject a column
+  reassigns `self.frame` via a non-mutating operation (`self.frame = self.frame.drop(...)`,
+  `self.frame = self.frame.assign(**{col: value})`) instead of writing into
+  `data_loader_model.raw_data`/`self.frame` in place. `SpDescription.pre_processing`/
+  `expected_structure_columns`/`data_cleaning` now read and reassign `self.frame` exclusively;
+  `data_loader_model.raw_data` is never written by `SpDescription` again.
+  `SpProportionality.post_processing` now sets `self.frame = pd.DataFrame()` and a new instance
+  flag `self.header_layout_invalid = True` on a structural error, instead of overwriting
+  `data_loader_model.raw_data`/`.header_type` (also shared with every other model/validator);
+  `DataLoaderModel.header_type` is never mutated after load (confirmed by grep — no remaining
+  write to `.header_type` anywhere in `data_validate/`). `BaseValidator.__init__` now builds
+  `self._dataframe` from `self._data_model.frame.copy()` (was `.data_loader_model.raw_data.copy()`),
+  so every validator keeps seeing `SpDescription`'s injected `relacao`/`unidade` defaults and
+  `SpProportionality`'s empty-on-invalid frame — both previously relied on the raw-data mutation.
+  `SpellCheckerValidator.validate_spellchecker` was switched the same way. Every
+  `<model>.data_loader_model.raw_data` read in `validators/` that stood in for "this sheet's
+  current working data" (as opposed to the pre-model `raw_data_map` reads in
+  `spreadsheet_processor.py`, which run before any `Sp*` model exists) was audited and switched to
+  `<model>.frame`: `compostion_graph_validator.py` (`model_dataframes` dict, 3 `.raw_data.empty`/
+  `is_read_successful` guards), `composition_tree_validator.py` (`model_dataframes` dict — this
+  validator's own `global_required_columns` requires `descricao.relacao`, which only exists on
+  `.frame`, so this read was previously *silently correct by accident* of the old mutation; a
+  frame-vs-raw audit here specifically was necessary for byte-identical goldens), `value_validator.py`
+  (`model_dataframes` dict, including the `cenario` column `SpDescription` may drop/inject),
+  `proportionality_validator.py` (`model_dataframes` dict, including the entry that must reflect
+  `SpProportionality`'s invalidated frame), `legend_validator.py` (`model_dataframes` dict + two
+  `.empty` guards). Every existing `mocker.MagicMock()`-based validator test that stubbed
+  `model.data_loader_model.raw_data` was updated to mirror the same dataframe onto `model.frame`
+  (both attributes read by production code depending on the call site). Regression tests:
+  `tests/unit/models/test_model_isolation.py::TestSpDescriptionRawDataImmutability` (raw_data
+  byte-identical to the original input after construction via `pd.testing.assert_frame_equal`;
+  injected `relacao`/`unidade` visible on `model.frame`, absent from `raw_data`) and
+  `TestSpProportionalityFrameInvalidation` (a structural error empties `model.frame` and sets
+  `header_layout_invalid`, while `raw_data` and `data_loader_model.header_type` stay untouched).
+  Full unit suite green (1282 passed), `make check` green, e2e golden harness 7/7 twice with an
+  empty `git status --short tests/e2e/golden` diff. PERF-002 note: `BaseValidator.__init__` and
+  `legend_validator.py::_prepare_statement` still `.copy()` their frame defensively — left in
+  place per this item's own instruction ("keep the `.copy()` for safety"); PERF-002 itself stays
+  open (CoW already protects; the remaining copies are a separate, deliberate call, not this
+  bug).
 
 ### BUG-003 · `SpDescription.pre_processing` mutates the shared raw DataFrame
 - Priority: P1 · Effort: M · Status: open
@@ -263,6 +346,20 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Proposed fix: compare against the cleaned integer column produced once by the model.
 - Tests: description with `nivel` = `"1.0"`.
 - Related: PERF-003
+- Finding (Phase 2c review, not implemented this slice): reviewed adding a
+  `DataFrameProcessing.numeric_mask(series, value)` helper (`pd.to_numeric(series,
+  errors="coerce") == value`) to replace every `== "1"`/`!= "1"`/`== "2"`/`!= "2"` site named
+  above. All ~13 call sites compare against a *locally re-cleaned or still-raw* `nivel`/
+  `codigo_pai` column, not a model's `cleaned_column(...)` (BUG-002's per-instance store) — so
+  this is a pure string-vs-numeric-comparison fix, unrelated to BUG-002/BUG-003's frame/cleaned
+  ownership. Not implemented in this slice: 13 call sites across 3 validators plus
+  `description_processing.py`, several combined into compound boolean masks
+  (`(level != "1") & (level != "2")`), is a wide enough blast radius that verifying golden
+  safety per-site individually was judged disproportionate to bundle into the same change as
+  BUG-002/BUG-003 without dedicated review; flipping `"1.0"` to also match would change output
+  for any bundle carrying that representation, which needs its own test-first slice per
+  `.claude/rules/testing.md` (a fresh failing test with `nivel = "1.0"`, per this item's own
+  "Tests" line) rather than a bundled, uncovered change. Left open for a dedicated BUG-014 slice.
 
 ### BUG-015 · Data loader mixes types and silently prefers CSV over XLSX
 - Priority: P2 · Effort: M · Status: done

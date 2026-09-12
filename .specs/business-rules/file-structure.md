@@ -176,7 +176,7 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Target message key: `rule.STRUCT-012.warning`
 - Implemented by: same as STRUCT-011
 - Covered by tests: same as STRUCT-011
-- Notes / known defects: for `descricao`, `relacao`/`unidade` are injected before this check (BUG-003), so they never appear as extra.
+- Notes / known defects: for `descricao`, `relacao`/`unidade` are injected onto `SpDescription.frame` before this check (BUG-003, fixed — the injection target moved off the shared `raw_data`, behaviour unchanged), so they never appear as extra.
 
 ### STRUCT-015 · Oversized files and sheets are rejected (SEC-003)
 - Severity: error

@@ -18,7 +18,7 @@ zero global state. Each item below names the current smell, where it lives, and 
 
 ### ARC-002 · Global mutable state
 - Priority: P0 · Effort: L · Status: open
-- Where: class-level Series mutation (BUG-002); module singletons `SHEET`
+- Where: class-level Series mutation (BUG-002, fixed — see the "Done" note below); module singletons `SHEET`
   (`config/spreadsheet_info.py:53`), `METADATA` (`config/metadata_info.py:152`), `config = Config()`
   + `SingletonMeta` (`data_loader/common/config.py`); locale persisted in `.config/store.locale`
   (BUG-004); `os.environ` mutation (BUG-022); `LanguageManager()` instantiated independently in
@@ -35,10 +35,12 @@ zero global state. Each item below names the current smell, where it lives, and 
   `FileSystemUtils(language_manager=...)` (both gained an optional constructor parameter; each still
   defaults to building its own when not given, for any remaining standalone caller). `DataArgs` no
   longer builds an unused `LanguageManager` of its own. Still open / not touched by this slice:
-  class-level Series mutation (BUG-002), the `SHEET` (`config/spreadsheet_info.py`), `METADATA`
-  (`config/metadata_info.py`), and `Config`/`SingletonMeta` (`data_loader/common/config.py`) module
-  singletons, and `os.environ` mutation (BUG-022) — all remain global mutable state for a future
-  slice of this item.
+  the `SHEET` (`config/spreadsheet_info.py`), `METADATA` (`config/metadata_info.py`), and
+  `Config`/`SingletonMeta` (`data_loader/common/config.py`) module singletons, and `os.environ`
+  mutation (BUG-022) — all remain global mutable state for a future slice of this item.
+- Done (Phase 2c slice, BUG-002): class-level `RequiredColumn`/`OptionalColumn`/`DynamicColumn`
+  Series mutation is fixed — see BUG-002's "Done" entry in `01-bugs.md` for the full detail
+  (`SpModelABC.cleaned`/`cleaned_column()` replace `setattr` on the class).
 
 ### ARC-003 · Three competing sources of truth for sheet definitions
 - Priority: P1 · Effort: M · Status: in-progress
@@ -117,12 +119,23 @@ zero global state. Each item below names the current smell, where it lives, and 
   `SheetBundle["descricao"]` lookup by key.
 
 ### ARC-007 · Models validate, clean and mutate; "Processing" classes are procedural namespaces
-- Priority: P1 · Effort: L · Status: open
+- Priority: P1 · Effort: L · Status: in-progress
 - Where: `models/sp_*.py` (structure checks + cleaning + raw mutation), `helpers/common/**` classes
   with only `@staticmethod` and an empty `__init__` (`dataframe_processing.py:22`,
   `character_processing.py:23`, …), overlap between `helpers/common/validation/*` and `validators/*`.
 - Target: `SheetModel` = immutable typed frame + spec; cleaning happens once in a `Normalizer`;
   rules live in `rules/<sheet>/<rule_id>.py` as functions; helpers become plain modules.
+- Done (partial — Phase 2c, BUG-002/BUG-003): models no longer mutate class-level column
+  declarations or the shared `DataLoaderModel.raw_data`. `SpModelABC` now owns `self.frame`
+  (per-instance working frame) and `self.cleaned` (per-instance cleaned-column store,
+  `cleaned_column(name)`); `SpDescription`/`SpProportionality` reassign `self.frame` via
+  non-mutating ops (`.drop()`, `.assign()`) instead of writing into `raw_data`;
+  `SpDescription`/`SpComposition`/`SpTemporalReference` store cleaned columns in `self.cleaned`
+  instead of `setattr`-ing a class attribute. Still open (this slice did not touch): models still
+  both validate structure *and* clean data in the same `run()` (no `Normalizer` extraction yet);
+  `helpers/common/**` "Processing" classes are still `@staticmethod`-only namespaces; no rule
+  lives under `rules/<sheet>/<rule_id>.py` yet — that extraction is Phase 3+ of the migration
+  roadmap.
 
 ### ARC-008 · Validator base class carries dead code and triplicated helpers
 - Priority: P1 · Effort: S · Status: open
@@ -149,11 +162,15 @@ zero global state. Each item below names the current smell, where it lives, and 
   key is gone (BUG-015 — nothing in `data_validate/` consumed it). Header layout and CSV separator
   now come from `SHEET_SPECS` (`HeaderLayout`, `SheetSpec.csv_separator`) instead of the deleted
   `Config` singleton, closing the "mixed result types"/"guessed separator" half of this item.
-  Remaining open: `DataLoaderModel.header_type` is still mutated to `"invalid"` by
-  `models/sp_proportionality.py:163` (noted, not fixed — belongs to BUG-002's Phase 2c
-  `ColumnSpec`/model-mutation cleanup, out of this slice's scope); `DataLoaderModel` itself keeps
-  its current name/attributes (a rename to `LoadedSheet`-shaped value object is ARC-013's naming
-  pass, Phase 5).
+  Remaining open: `DataLoaderModel` itself keeps its current name/attributes (a rename to
+  `LoadedSheet`-shaped value object is ARC-013's naming pass, Phase 5).
+- Done (BUG-002/BUG-003 Phase 2c slice): the "`DataLoaderModel.header_type` mutated to
+  `\"invalid\"`" half of this item is now fixed — `SpProportionality.post_processing` sets
+  `self.header_layout_invalid = True` (a new instance attribute) instead, and
+  `DataLoaderModel.header_type` is never written after `DataLoaderFacade.load()` sets it
+  (grep-confirmed zero remaining writers). Consumers that used to infer proportionality validity
+  from the shared `raw_data`/`header_type` now read `model.frame`/`model.header_layout_invalid`
+  instead (see BUG-003's "Done" entry in `01-bugs.md`).
 
 ### ARC-010 · Package layout mixes tooling, demos and runtime
 - Priority: P2 · Effort: S · Status: open

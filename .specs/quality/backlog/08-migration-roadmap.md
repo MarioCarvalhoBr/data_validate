@@ -37,8 +37,9 @@ the full `AppContext`): `Bootstrap` and `.config/store.locale` are deleted, `Gen
 builds one `LanguageManager` from `data_args.data_file.locale` and injects it into
 `ApplicationConfig`/`FileSystemUtils`, and `data/output/logs` is only created in debug mode with
 handlers closed in `finalize()`. ARC-002 partial (locale-related global state closed; module
-singletons `SHEET`/`METADATA`/`Config` and class-level `RequiredColumn` mutation remain, tracked
-under BUG-002/Phase 2). Already done in earlier slices (not part of this change):
+singletons `SHEET`/`METADATA`/`Config` remain; class-level `RequiredColumn` mutation was tracked
+under BUG-002/Phase 2 and is now fixed — see the Phase 2c bullet below). Already done in earlier
+slices (not part of this change):
 BUG-001/005/008/009/010/011/017. Still open, remaining for Phase 1: `SheetSpec` consumer migration
 (item 1, modelled per ARC-003 but no consumer migrated yet), `Issue`/`MessageCatalog` wiring into
 the legacy pipeline (item 2 — `i18n/catalog.py`/`specs/issues.py` exist as models but no validator
@@ -70,9 +71,21 @@ Gate: goldens unchanged; benchmark baseline recorded (PERF-009).
   and CSV separator from `specs/sheet_specs.py::SHEET_SPECS` instead of the deleted
   `data_loader.common.config.Config`; `.qml` support (`QMLReader`, `.qml` scanning) is deleted
   entirely (ADR-0003). `SpreadsheetProcessor._read_data` calls `load()`. Still open for a later
-  Phase 2 slice: item 2 (`Normalizer`/`SheetFrame`), item 3 (`STRUCT-*` rules), `DataLoaderModel`
-  header_type mutation by `sp_proportionality.py` (BUG-002/Phase 2c), and `DataLoaderModel`'s own
-  naming (ARC-013, Phase 5).
+  Phase 2 slice: item 2 (`Normalizer`/`SheetFrame`), item 3 (`STRUCT-*` rules), and
+  `DataLoaderModel`'s own naming (ARC-013, Phase 5).
+- Done (Phase 2c, models slice — BUG-002, BUG-003, ARC-007 partial, ARC-009 header_type note):
+  `SpModelABC` gains `self.frame` (per-instance working frame) and `self.cleaned` +
+  `cleaned_column(name)` (per-instance cleaned-column store); `SpDescription`/`SpComposition`/
+  `SpTemporalReference` no longer `setattr` a class-level `RequiredColumn`/`DynamicColumn` Series
+  (BUG-002); `SpDescription`/`SpProportionality` no longer write into the shared
+  `DataLoaderModel.raw_data`/`.header_type` (BUG-003) — `SpProportionality.post_processing` now
+  empties `self.frame` and sets `self.header_layout_invalid` instead of mutating
+  `data_loader_model.header_type` to `"invalid"`, closing the header_type-mutation half of
+  ARC-009 noted in the previous bullet. Every validator that read a model's data through
+  `data_loader_model.raw_data`/a `RequiredColumn` class attribute now reads
+  `model.frame`/`model.cleaned_column(name)` instead. BUG-014 and PERF-002/003/005 remain open
+  (see `01-bugs.md`/`05-performance.md`); item 2 (`Normalizer`/`SheetFrame`) and item 3
+  (`STRUCT-*` rules) are still not started.
 
 ## Phase 3 — Rules engine
 Closes: ARC-001, ARC-005, ARC-008, ARC-017, BUG-006, BUG-007, BUG-019, BUG-025, BUG-026, PERF-001,

@@ -22,7 +22,9 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Target message key: `rule.CLEAN-005.error`
 - Implemented by: `models/sp_temporal_reference.py::SpTemporalReference.data_cleaning` → `DataCleaningProcessing.clean_dataframe_integers`
 - Covered by tests: helper covered by `tests/unit/helpers/common/processing/test_data_cleaning.py`
-- Notes / known defects: four-digit format not enforced here (only via the value column pattern); BUG-002.
+- Notes / known defects: four-digit format not enforced here (only via the value column
+  pattern). BUG-002 fixed — cleaned `simbolo` data is stored per-instance in `self.cleaned`,
+  read via `cleaned_column("simbolo")`, not overwritten on the class.
 
 ### CLEAN-006 · Without scenarios the table must have exactly one row
 - Severity: error
@@ -55,7 +57,7 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Target message key: `rule.TEMP-002.error`
 - Implemented by: `temporal_reference_validator.py::SpTemporalReferenceValidator.validate_reference_years`; year from `ApplicationConfig.CURRENT_YEAR`
 - Covered by tests: `tests/unit/validators/spreadsheets/temporal_reference/test_temporal_reference_validator.py`
-- Notes / known defects: fixed BUG-007 — the rule now reads `self._dataframe[column_name_symbol]` (the validator's own raw-data copy) instead of the model's class-level `RequiredColumn.COLUMN_SYMBOL` Series, and validates each symbol with `NumberFormattingProcessing.check_cell_integer`/`parse_numeric` before comparing years, silently skipping non-numeric symbols (already reported as data-cleaning errors by the model) instead of raising `ValueError` inside `int(year)`. BUG-002 (class-level `RequiredColumn` Series as global mutable state) remains open for the model itself — only this rule's read of it was removed; import-time clock (BUG-011) is unrelated and still open. "Future" is still `>= current year` (a symbol equal to the current year passes).
+- Notes / known defects: fixed BUG-007 — the rule now reads `self._dataframe[column_name_symbol]` (the validator's own copy of the model's `frame`) instead of the model's class-level `RequiredColumn.COLUMN_SYMBOL` Series, and validates each symbol with `NumberFormattingProcessing.check_cell_integer`/`parse_numeric` before comparing years, silently skipping non-numeric symbols (already reported as data-cleaning errors by the model) instead of raising `ValueError` inside `int(year)`. BUG-002 (class-level `RequiredColumn` Series as global mutable state) is now fixed for the model itself too (`self.cleaned["simbolo"]`/`cleaned_column()`), though this rule still intentionally reads `self._dataframe` rather than the cleaned column (unchanged by this slice); import-time clock (BUG-011) is unrelated and still open. "Future" is still `>= current year` (a symbol equal to the current year passes).
 
 ### TEMP-003 · `nome` and `simbolo` must be unique
 - Severity: error

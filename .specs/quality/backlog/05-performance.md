@@ -28,9 +28,16 @@ harness (PERF-009); never optimise without a number.
   entire frame just to search for `|`).
 - Proposed fix: immutable-by-convention frames (pandas 3 Copy-on-Write is on by default); copy only
   when mutating; search `|` only in object/string columns.
+- Note (BUG-002/BUG-003 Phase 2c slice): `SpModelABC.frame` now gives every model an
+  instance-owned, CoW-cheap working frame (aliases `data_loader_model.raw_data` until a subclass
+  reassigns it via `.drop()`/`.assign()`, never mutates in place) — the underlying mechanism this
+  item's "immutable-by-convention frames" fix needs already exists. `base_validator.py:80` and
+  `legend_validator.py`'s three `.copy()` calls were deliberately *kept* in this slice (only their
+  source switched from `data_loader_model.raw_data` to `self._data_model.frame`) per this item's
+  own instruction to defer the copy removal; this item stays open for that follow-up.
 
 ### PERF-003 · The same columns are cleaned repeatedly
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: in-progress
 - Where: `DataCleaningProcessing.clean_dataframe_integers` is called for `descricao.codigo` in
   `sp_description.py`, `compostion_graph_validator.py:379`, `composition_tree_validator.py:179`,
   `legend_validator.py:246,419`, `proportionality_validator.py:352`, `value_validator.py:199,299`
@@ -38,6 +45,29 @@ harness (PERF-009); never optimise without a number.
 - Proposed fix: normalise once per sheet into typed nullable columns (`Int64`, `Float64`,
   `string[pyarrow]`) with an `invalid_mask` per column; rules read the typed frame.
 - Related: BUG-002, BUG-014
+- Reviewed (BUG-002/BUG-003 Phase 2c slice — "reuse `model.cleaned_column(...)` where a
+  validator re-cleans with the same parameters as the model" candidates). Now that BUG-002 gives
+  every model a `cleaned_column(name)` accessor, every remaining local
+  `clean_dataframe_integers`/`clean_column_integer` call site in `validators/` was re-examined
+  against the model's own cleaning parameters:
+
+  | Call site | Column(s) | Local params | Model's own params | Decision |
+  |---|---|---|---|---|
+  | `compostion_graph_validator.py::_prepare_statement` (parent) | `codigo_pai` | `min_value=0` | `min_value=1` (`SpComposition`) | Keep local — parameters differ (admits the virtual root `0`) |
+  | `compostion_graph_validator.py::_prepare_statement` (child) | `codigo_filho` | `min_value=1`, cleaned *after* the parent step on the already-parent-filtered frame | `min_value=1` (`SpComposition`) | Keep local — same `min_value`, but the local pipeline needs parent+child cleaned together on one index-aligned frame (`GraphProcessing` reads both columns off the same, sequentially-filtered `df_composition`); swapping in `cleaned_column("codigo_filho")` would mix two independently-filtered Series with different row sets |
+  | `compostion_graph_validator.py::validate_unique_titles_with_graph` | `codigo` | `min_value=1` | `min_value=1` (`SpDescription`) | Keep local — same `min_value`, but the result is used as a column *inside* `df_description` (subtree filtering + title-uniqueness columns), and `clean_dataframe_integers` also *drops* invalid rows; reusing `cleaned_column("codigo")` would require re-deriving which rows of `df_description` survived cleaning, not just swapping a Series |
+  | `value_validator.py::validate_relation_indicators_in_values` | `codigo` | default `min_value=0` (not passed) | `min_value=1` (`SpDescription`) | Keep local — parameters differ |
+  | `value_validator.py::validate_value_combination_relation` | `codigo`, `nivel`, (`cenario` if scenarios exist) | default `min_value=0` for all three | `min_value=1`/`1`/`-1` respectively (`SpDescription`) | Keep local — parameters differ |
+  | `value_validator.py::validate_value_combination_relation` | `simbolo` | default `min_value=0` | `min_value=0` (`SpTemporalReference`), but only when scenarios exist/row count ≠ 1 — the "single row, no scenarios" branch takes `.iloc[0:1]` with **no** integer validation at all | Keep local — same nominal `min_value`, but the model's `cleaned_column("simbolo")` is not always validated (see BUG-002's `SpTemporalReference` note); the validator's own always-validates |
+  | `legend_validator.py` (×2, `codigo`) | `codigo` | `min_value=1` (matches) | `min_value=1` (`SpDescription`) | Keep local — same `min_value`, but the result feeds `.groupby`/`.dropna` pipelines built on the locally-cleaned+filtered frame, not a bare Series |
+
+  No call site was changed: every one either uses different cleaning parameters than the model,
+  or depends on `clean_dataframe_integers`'s row-dropping/index-alignment semantics that a bare
+  `cleaned_column(...)` Series (cleaned independently, no row alignment guarantee with the local
+  frame) cannot safely replace without a larger refactor of the call site's surrounding pipeline.
+  This item stays in-progress: the `cleaned_column()` accessor this optimisation needs now exists
+  (BUG-002), but applying it safely to any of the sites above is follow-up work, not a drive-by
+  change bundled with BUG-002/BUG-003.
 
 ### PERF-004 · Repeated translation / config work
 - Priority: P2 · Effort: S · Status: done

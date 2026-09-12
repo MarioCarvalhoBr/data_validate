@@ -25,7 +25,8 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 
 `EXPECTED_COLUMNS` is computed at runtime: required + `cenario` (if `cenarios` file exists) +
 `legenda` (if `legenda` file exists) + whichever optional columns are present
-(`SpDescription.pre_processing`). Pre-processing also mutates the shared frame (BUG-003).
+(`SpDescription.pre_processing`). Pre-processing drops/injects columns on `self.frame`, this
+instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-003, fixed).
 
 ## Rules
 
@@ -47,7 +48,7 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - Statement: after cleaning, `codigo` must equal `1, 2, …, n` in file order; if any value is non-numeric the check is aborted with an error; a first code ≠ 1 is reported separately.
 - Current message (pt-BR): `{filename}: A verificação foi abortada porque a coluna 'codigo' contém valores não numéricos.` · `{filename}: A coluna 'codigo' deve começar em 1.` · `{filename}: A coluna 'codigo' deve conter valores inteiros e sequenciais (1, 2, 3, ...).`
 - Target message key: `rule.DESC-002.error`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_sequential_codes` (reads the class-level cleaned Series — BUG-002)
+- Implemented by: `description_validator.py::SpDescriptionValidator.validate_sequential_codes` (reads the model's own cleaned data via `SpModelABC.cleaned_column("codigo")` — BUG-002, fixed)
 - Covered by tests: none — TST-001
 - Notes / known defects: the protocol's extra requirement "ordered by level, no lower-level code between higher-level codes" is not checked (gap G-06).
 
@@ -60,7 +61,7 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - Target message key: `rule.DESC-003.error`
 - Implemented by: `description_validator.py::SpDescriptionValidator.validate_unique_codes`
 - Covered by tests: none — TST-001
-- Notes / known defects: BUG-002.
+- Notes / known defects: none (BUG-002 fixed — reads `cleaned_column("codigo")`).
 
 ### DESC-004 · Names follow ABNT capitalisation and have no stray whitespace
 - Severity: warning
@@ -115,7 +116,8 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - Target message key: `rule.DESC-008.warning`
 - Implemented by: `description_validator.py::SpDescriptionValidator.validate_cr_lf_characters` → `character_processing.py::CharacterProcessing.check_special_characters_cr_lf`
 - Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
-- Notes / known defects: `EXPECTED_COLUMNS` includes injected `relacao`/`unidade` (BUG-003).
+- Notes / known defects: `EXPECTED_COLUMNS` includes injected `relacao`/`unidade` — intentional
+  (see the `frame`-vs-`raw_data` note above; BUG-003 fixed, behaviour unchanged).
 
 ### DESC-009 · Simple description ≤ 150 characters
 - Severity: warning
@@ -148,7 +150,8 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - Target message key: `rule.DESC-011.error`
 - Implemented by: `models/sp_description.py::SpDescription.pre_processing`
 - Covered by tests: none — TST-001
-- Notes / known defects: mutates the shared frame (BUG-003).
+- Notes / known defects: none (BUG-003 fixed — mutates this instance's own `self.frame`, not
+  the shared `DataLoaderModel.raw_data`).
 
 ### DESC-012 · `legenda` column requires the legend file
 - Severity: error
@@ -159,7 +162,7 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - Target message key: `rule.DESC-012.error`
 - Implemented by: `models/sp_description.py::SpDescription.pre_processing`
 - Covered by tests: none — TST-001
-- Notes / known defects: BUG-003.
+- Notes / known defects: none (BUG-003 fixed, see DESC-011).
 
 ### CLEAN-001 · `codigo` and `nivel` must be integers ≥ 1
 - Severity: error
@@ -170,7 +173,9 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - Target message key: `rule.CLEAN-001.error`
 - Implemented by: `models/sp_description.py::SpDescription.data_cleaning` → `helpers/common/processing/data_cleaning_processing.py::DataCleaningProcessing.clean_dataframe_integers`
 - Covered by tests: helper covered by `tests/unit/helpers/common/processing/test_data_cleaning.py`
-- Notes / known defects: cleaned Series stored on the class (BUG-002); repeated by several validators (PERF-003).
+- Notes / known defects: none (BUG-002 fixed — cleaned data stored per-instance in
+  `self.cleaned`, read via `cleaned_column()`); still repeated by several validators (PERF-003,
+  open — see `.specs/quality/backlog/05-performance.md`).
 
 ### CLEAN-002 · `cenario` must be an integer ≥ −1
 - Severity: error
@@ -208,8 +213,9 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - **`fontes` removed** (v1.16): the column no longer exists in the protocol; the code still
   requires it, so a v1.16-compliant bundle fails DESC-011's missing-column check → PROTO-001
   (accept silently as deprecated when present; stop requiring).
-- **`relacao` removed** (v1.15): the code still injects `relacao=1` (see BUG-003) and the
-  composition tree validator lists it as required → PROTO-002.
+- **`relacao` removed** (v1.15): the code still injects `relacao=1` onto `SpDescription.frame`
+  (BUG-003, fixed — the injection itself is unchanged, only its target moved off the shared
+  `raw_data`) and the composition tree validator lists it as required → PROTO-002.
 - **`categoria`** (since v1.13) is still required by the protocol with domain
   `social|economico|ambiental|climatico`; today it only triggers an unexpected-column warning →
   PROTO-004 / planned DESC-013 (staged: warning on absence first, error after the Phase 4

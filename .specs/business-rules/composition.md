@@ -26,7 +26,8 @@ Two validators consume this sheet: `SpCompositionGraphValidator` (networkx `DiGr
 - Target message key: `rule.CLEAN-004.error`
 - Implemented by: `models/sp_composition.py::SpComposition.data_cleaning`
 - Covered by tests: helper covered by `tests/unit/helpers/common/processing/test_data_cleaning.py`
-- Notes / known defects: BUG-002 (class attribute mutation).
+- Notes / known defects: none (BUG-002 fixed — cleaned data stored per-instance in
+  `self.cleaned`, read via `cleaned_column()`, not `setattr` on the class).
 
 ### COMP-001 · Composition codes and description codes must match
 - Severity: error
