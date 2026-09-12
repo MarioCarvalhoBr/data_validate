@@ -189,3 +189,17 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   removed from §2.3; the version history says the information now lives in the legend.
 - Proposed fix: e-mail/issue to the protocol authors; when v1.17 lands, update the delta table.
   No code change.
+
+### PROTO-018 · Add `spatial_data_validated` boolean to the JSON summary
+- Priority: P1 (sequenced in Phase 6, immediately after PROTO-013) · Effort: S · Status: open
+- Source: maintainer instruction 2026-09-12 (platform contract change).
+- Statement: the stdout summary fragment and the `--json` file gain a mandatory boolean
+  `spatial_data_validated` inside the `data_validate` object: `true` only when
+  `spd_data.json` was provided, loaded and TERR-001/TERR-002 produced zero errors;
+  `false` in every other case (absent, malformed, or errors). Field always present.
+- Where: `controllers/report/file_report_generator.py::_print_json_summary` (and the
+  `--json` writer), `.specs/api/cli-contract.md` JSON schema, `tests/e2e/test_golden.py`
+  summary parser, goldens (reviewed re-baseline: summaries gain the new field).
+- Tests: unit tests for all three states; golden fixtures with registry present-valid,
+  present-invalid, absent.
+- Related: PROTO-013, TERR-001, TERR-002, SEC-008

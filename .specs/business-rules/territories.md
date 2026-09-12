@@ -67,3 +67,23 @@ loading error for `spd_data.json` and both TERR rules are skipped — never a cr
 registry ids are a registry defect (server-side) and reported as a warning.
 
 Last synced with code: 344fef7
+
+## JSON summary flag: `spatial_data_validated`
+
+Maintainer requirement (2026-09-12): the machine-readable stdout summary
+(`<{"data_validate": {...}}>`) gains a boolean field named `spatial_data_validated`
+(the English name chosen for "dados_espaciais_validados"):
+
+- `true` — `spd_data.json` was provided, loaded successfully, the TERR verification ran
+  and produced **zero errors** (every `valores.id` and `proporcionalidades.id` found in
+  the registry).
+- `false` — every other case: file absent, file malformed/unreadable, or TERR errors found.
+
+Interpretation note: "passado e validado" is read as "provided AND validation passed";
+if the maintainer instead means merely "provided and the check executed", flip the
+malformed/errors cases — confirm before implementing PROTO-018. The field sits inside
+the `data_validate` object next to `report` (`{"data_validate": {"version": ...,
+"spatial_data_validated": false, "report": {...}}}`) and is ALWAYS present so the
+platform can rely on its shape. The `--json` file output carries the same field.
+Implementation: PROTO-018 (Phase 6, after PROTO-013). Contract change must be mirrored
+in `.specs/api/cli-contract.md` (JSON schema) and the golden harness summary parser.
