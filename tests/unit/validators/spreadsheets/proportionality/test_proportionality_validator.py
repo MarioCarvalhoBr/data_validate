@@ -210,3 +210,26 @@ class TestSpProportionalityValidator:
 
         assert isinstance(errors, list)
         assert isinstance(warnings, list)
+
+
+class TestSpProportionalityValidatorBug014LevelComparison:
+    """Regression tests for BUG-014: level comparisons relying on exact string "1"."""
+
+    def test_validate_relation_indicators_in_proportionality_recognizes_float_formatted_level_one(self, mocker):
+        """A level 1 indicator stored as `nivel = "1.0"` must still be stripped out of
+        the codes extracted from the proportionality sheet's own columns.
+
+        Before the fix, `df_description[self.column_name_level] == "1"` (used to
+        build `codes_level_to_remove`) fails to match `"1.0"`, so indicator 5008's
+        code is not removed from the codes read off the proportionality columns; it
+        then mismatches against `set_valid_codes_description` (which correctly
+        excludes level 1 indicators via `DescriptionProcessing`), producing a false
+        "code present in proportionalidades.csv but missing in descricao.csv" error.
+        """
+        description_frame = pd.DataFrame({"codigo": [5008, 5021], "nivel": ["1.0", "2"]})
+        validator = _build_validator(mocker)
+        validator.model_dataframes[validator.sp_name_description] = description_frame
+
+        errors, __ = validator.validate_relation_indicators_in_proportionality()
+
+        assert not any("5008" in error for error in errors)

@@ -16,6 +16,7 @@ from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
 
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.models import SpDescription, SpLegend, SpValue
 from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
 
@@ -266,7 +267,9 @@ class SpLegendValidator(BaseValidator):
 
         legends_id_in_description = (
             df_description_clean[
-                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "1")
+                DataFrameProcessing.numeric_not_equals_mask(
+                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name], 1
+                )
                 & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
                 & (
                     pd.to_numeric(
@@ -305,16 +308,20 @@ class SpLegendValidator(BaseValidator):
         # 1. All codes that are level 1 - Cannot have legends: if they do, error
 
         codes_indicators_level_one = (
-            df_description_clean[df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == "1"][
-                SpDescription.RequiredColumn.COLUMN_CODE.name
-            ]
+            df_description_clean[
+                DataFrameProcessing.numeric_equals_mask(
+                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name], 1
+                )
+            ][SpDescription.RequiredColumn.COLUMN_CODE.name]
             .astype(str)
             .tolist()
         )
 
         legends_id_in_description_level_one = (
             df_description_clean[
-                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == "1")
+                DataFrameProcessing.numeric_equals_mask(
+                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name], 1
+                )
                 & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
             ][SpDescription.DynamicColumn.COLUMN_LEGEND.name]
             .unique()
@@ -328,20 +335,20 @@ class SpLegendValidator(BaseValidator):
             )
 
         # 3. All codes that are not level 1 and not level 2 - Must have a legend reference: if not, error
+        level_column = df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name]
+        is_other_level_mask = DataFrameProcessing.numeric_not_equals_mask(
+            level_column, 1
+        ) & DataFrameProcessing.numeric_not_equals_mask(level_column, 2)
+
         codes_indicators_other_levels = (
-            df_description_clean[
-                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "1")
-                & (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "2")
-            ][SpDescription.RequiredColumn.COLUMN_CODE.name]
+            df_description_clean[is_other_level_mask][SpDescription.RequiredColumn.COLUMN_CODE.name]
             .astype(str)
             .tolist()
         )
 
         codes_with_legend_other_levels = (
             df_description_clean[
-                (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "1")
-                & (df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] != "2")
-                & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
+                is_other_level_mask & (df_description_clean[SpDescription.DynamicColumn.COLUMN_LEGEND.name].notna())
             ][SpDescription.RequiredColumn.COLUMN_CODE.name]
             .astype(str)
             .tolist()
@@ -439,9 +446,11 @@ class SpLegendValidator(BaseValidator):
             ].astype("Int64")
 
         codes_indicators_level_one = (
-            df_description_clean[df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name] == "1"][
-                SpDescription.RequiredColumn.COLUMN_CODE.name
-            ]
+            df_description_clean[
+                DataFrameProcessing.numeric_equals_mask(
+                    df_description_clean[SpDescription.RequiredColumn.COLUMN_LEVEL.name], 1
+                )
+            ][SpDescription.RequiredColumn.COLUMN_CODE.name]
             .astype(str)
             .tolist()
         )

@@ -42,7 +42,9 @@ class DataFrameProcessing:
             if isinstance(dataframe.columns, pd.MultiIndex):
                 for col_tuple in dataframe.columns:
                     if "|" in str(col_tuple[0]):
-                        errors.append(f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'.")
+                        errors.append(
+                            f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'."
+                        )
 
                     if len(col_tuple) > 1 and "|" in str(col_tuple[1]):
                         errors.append(
@@ -63,7 +65,9 @@ class DataFrameProcessing:
                     col_display_name = str(column) if not isinstance(column, tuple) else ".".join(map(str, column))
 
                     for row_idx in error_indices:
-                        errors.append(f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'.")
+                        errors.append(
+                            f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'."
+                        )
 
         except Exception as e:
             errors.append(f"{file_name}: Erro ao processar a checagem de barra vertical: {str(e)}")
@@ -71,7 +75,9 @@ class DataFrameProcessing:
         return not bool(errors), errors
 
     @staticmethod
-    def check_dataframe_column_names(dataframe: pd.DataFrame, expected_columns: List[str]) -> Tuple[List[str], List[str]]:
+    def check_dataframe_column_names(
+        dataframe: pd.DataFrame, expected_columns: List[str]
+    ) -> Tuple[List[str], List[str]]:
         """
         Checks for missing and extra columns in a DataFrame compared to the expected columns.
 
@@ -182,7 +188,9 @@ class DataFrameProcessing:
         return warnings
 
     @staticmethod
-    def check_dataframe_unique_values(dataframe: pd.DataFrame, file_name: str, columns_uniques: List[str]) -> Tuple[bool, List[str]]:
+    def check_dataframe_unique_values(
+        dataframe: pd.DataFrame, file_name: str, columns_uniques: List[str]
+    ) -> Tuple[bool, List[str]]:
         """Check for unique values in specified columns.
 
         Args:
@@ -235,7 +243,48 @@ class DataFrameProcessing:
         return True, ""
 
     @staticmethod
-    def check_dataframe_text_length(dataframe: pd.DataFrame, file_name: str, column: str, max_length: int) -> Tuple[bool, List[str]]:
+    def numeric_equals_mask(series: pd.Series, value: int) -> pd.Series:
+        """Compare a column against an integer, tolerant of string formatting.
+
+        Business columns such as ``nivel`` or ``codigo_pai`` are frequently loaded
+        as `str` (or `object`); a cell written as `"1.0"`, `" 1"` or `"01"` fails an
+        exact `series == "1"` comparison even though it represents the same number.
+        This helper coerces `series` with `pd.to_numeric(errors="coerce")` before
+        comparing, so every one of those representations matches `value`
+        (BUG-014).
+
+        Args:
+            series: Column to compare; may hold strings, ints, or floats.
+            value: Integer to compare each (coerced) cell against.
+
+        Returns:
+            Boolean mask, `True` where the cell equals `value` numerically. A
+            cell that cannot be parsed as a number (including a missing/`NaN`
+            cell) never matches: it evaluates to `False`.
+        """
+        return pd.to_numeric(series, errors="coerce") == value
+
+    @staticmethod
+    def numeric_not_equals_mask(series: pd.Series, value: int) -> pd.Series:
+        """Inverse of :meth:`numeric_equals_mask`.
+
+        Args:
+            series: Column to compare; may hold strings, ints, or floats.
+            value: Integer to compare each (coerced) cell against.
+
+        Returns:
+            Boolean mask, `True` where the cell does not equal `value`
+            numerically. A cell that cannot be parsed as a number (including a
+            missing/`NaN` cell) always matches here (`True`), mirroring the
+            historical `series != "1"`-style string comparison, where a
+            non-matching or missing cell also counted as "not equal".
+        """
+        return ~DataFrameProcessing.numeric_equals_mask(series, value)
+
+    @staticmethod
+    def check_dataframe_text_length(
+        dataframe: pd.DataFrame, file_name: str, column: str, max_length: int
+    ) -> Tuple[bool, List[str]]:
         """Validate text length in a specific column.
 
         Args:

@@ -87,7 +87,9 @@ class TestCheckColumnNames:
     ) -> None:
         """Test check_column_names with various column combinations using simple DataFrame."""
         # Act
-        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(simple_dataframe, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
+            simple_dataframe, expected_columns
+        )
 
         # Assert
         assert missing_columns == expected_missing, f"Expected missing: {expected_missing}, got: {missing_columns}"
@@ -115,7 +117,9 @@ class TestCheckColumnNames:
     ) -> None:
         """Test check_column_names with empty DataFrame scenarios."""
         # Act
-        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(empty_dataframe, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
+            empty_dataframe, expected_columns
+        )
 
         # Assert
         assert missing_columns == expected_missing
@@ -128,7 +132,9 @@ class TestCheckColumnNames:
         expected_columns = ["id", "nome"]
 
         # Act
-        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(dataframe_with_unnamed_columns, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
+            dataframe_with_unnamed_columns, expected_columns
+        )
 
         # Assert
         assert missing_columns == []
@@ -168,7 +174,9 @@ class TestCheckColumnNames:
         expected_columns = ["id", "nome", "valor"]  # lowercase
 
         # Act
-        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(dataframe_with_mixed_case_columns, expected_columns)
+        missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
+            dataframe_with_mixed_case_columns, expected_columns
+        )
 
         # Assert
         assert missing_columns == ["id", "nome", "valor"]
@@ -417,3 +425,62 @@ class TestCheckColumnNamesEdgeCases:
         # Compare data more appropriately
         assert list(df["id"]) == original_data["id"], "ID column data should not be modified"
         assert list(df["nome"]) == original_data["nome"], "Nome column data should not be modified"
+
+
+class TestNumericEqualsMask:
+    """Regression tests for BUG-014: level/code comparisons tolerant of numeric formatting."""
+
+    @pytest.mark.parametrize(
+        "cell_value, expected_equals",
+        [
+            ("1", True),
+            ("1.0", True),
+            (" 1", True),
+            ("01", True),
+            (1, True),
+            (1.0, True),
+            ("2", False),
+            ("2.0", False),
+            ("abc", False),
+            (None, False),
+            (float("nan"), False),
+        ],
+    )
+    def test_numeric_equals_mask_matches_any_formatting_of_the_same_integer(self, cell_value, expected_equals) -> None:
+        """`"1.0"`, `" 1"` and `"01"` must all match `1`, unlike a literal `== "1"`."""
+        series = pd.Series([cell_value])
+
+        mask = DataFrameProcessing.numeric_equals_mask(series, 1)
+
+        assert bool(mask.iloc[0]) is expected_equals
+
+    @pytest.mark.parametrize(
+        "cell_value, expected_not_equals",
+        [
+            ("1", False),
+            ("1.0", False),
+            (" 1", False),
+            ("01", False),
+            ("2", True),
+            ("abc", True),
+            (None, True),
+            (float("nan"), True),
+        ],
+    )
+    def test_numeric_not_equals_mask_is_the_inverse_of_equals(self, cell_value, expected_not_equals) -> None:
+        """A cell that cannot be parsed as numeric (including `NaN`) counts as "not equal",
+        mirroring the historical `series != "1"` string-comparison behaviour."""
+        series = pd.Series([cell_value])
+
+        mask = DataFrameProcessing.numeric_not_equals_mask(series, 1)
+
+        assert bool(mask.iloc[0]) is expected_not_equals
+
+    def test_numeric_equals_mask_returns_boolean_series_aligned_with_input_index(self) -> None:
+        """The returned mask must be usable directly as a boolean indexer."""
+        series = pd.Series(["1.0", "2", "1"], index=[10, 20, 30])
+
+        mask = DataFrameProcessing.numeric_equals_mask(series, 1)
+
+        assert mask.tolist() == [True, False, True]
+        assert mask.index.tolist() == [10, 20, 30]

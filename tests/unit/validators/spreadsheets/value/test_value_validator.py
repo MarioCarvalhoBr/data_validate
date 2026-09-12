@@ -113,3 +113,65 @@ class TestSpValueValidator:
         second_result = validator.validate_value_combination_relation()
 
         assert first_result == second_result
+
+
+class TestSpValueValidatorBug014LevelComparison:
+    """Regression tests for BUG-014: level comparisons relying on exact string "1"."""
+
+    def test_validate_relation_indicators_in_values_recognizes_float_formatted_level_one(self, mocker):
+        """A level 1 indicator stored as `nivel = "1.0"` must still be excluded from
+        the "must exist in valores.csv" comparison.
+
+        Before the fix, `df_description[level_column_name] == "1"` (used to build
+        `level_one_codes`) and `df_description[level_column_name] != "1"` (used to
+        build `filtered_description_df`) both fail to match `"1.0"`, so indicator
+        5008 is wrongly treated as a non-level-1 indicator and reported as missing
+        from `valores.csv`, even though level 1 indicators are not required to have
+        a value column.
+        """
+        # Description has one indicator, level 1, stored as a float-formatted string;
+        # the value sheet has no column for it, which is legal for a level 1 indicator.
+        value_model = mocker.MagicMock()
+        value_model.filename = "valores.csv"
+        value_raw_data = pd.DataFrame({"id": [1]})
+        value_model.data_loader_model.raw_data = value_raw_data
+        value_model.frame = value_raw_data
+        value_model.scenario_exists_file = False
+        value_model.scenarios = []
+
+        description_model = mocker.MagicMock()
+        description_model.filename = "descricao.csv"
+        description_raw_data = pd.DataFrame({"codigo": [5008], "nivel": ["1.0"], "cenario": [0]})
+        description_model.data_loader_model.raw_data = description_raw_data
+        description_model.frame = description_raw_data
+
+        temporal_reference_model = mocker.MagicMock()
+        temporal_reference_model.filename = "referencia_temporal.csv"
+        temporal_reference_raw_data = pd.DataFrame({"simbolo": [2020]})
+        temporal_reference_model.data_loader_model.raw_data = temporal_reference_raw_data
+        temporal_reference_model.frame = temporal_reference_raw_data
+
+        scenario_model = mocker.MagicMock()
+        scenario_model.filename = "cenarios.csv"
+        scenario_raw_data = pd.DataFrame({"simbolo": ["O"]})
+        scenario_model.data_loader_model.raw_data = scenario_raw_data
+        scenario_model.frame = scenario_raw_data
+
+        models_by_class = {
+            SpValue: value_model,
+            SpDescription: description_model,
+            SpTemporalReference: temporal_reference_model,
+            SpScenario: scenario_model,
+        }
+
+        data_models_context = mocker.MagicMock()
+        data_models_context.get_instance_of.side_effect = lambda model_class: models_by_class[model_class]
+        data_models_context.context.config.get_verify_names.return_value = {
+            member.value: member.value for member in NamesEnum
+        }
+
+        validator = SpValueValidator(data_models_context=data_models_context, validation_reports=ValidationReport())
+
+        errors, __ = validator.validate_relation_indicators_in_values()
+
+        assert not any("5008" in error for error in errors)

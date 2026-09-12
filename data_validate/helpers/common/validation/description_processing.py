@@ -12,6 +12,7 @@ from typing import Set
 from pandas import DataFrame
 
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 
 
 class DescriptionProcessing:
@@ -47,10 +48,17 @@ class DescriptionProcessing:
             Set of valid code strings
         """
         df_description = df_description.copy()
-        df_description = df_description[df_description[column_name_level] != "1"]
+        df_description = df_description[
+            DataFrameProcessing.numeric_not_equals_mask(df_description[column_name_level], 1)
+        ]
 
         if column_name_scenario in df_description.columns:
-            df_description = df_description[~((df_description[column_name_level] == "2") & (df_description[column_name_scenario] == "0"))]
+            df_description = df_description[
+                ~(
+                    DataFrameProcessing.numeric_equals_mask(df_description[column_name_level], 2)
+                    & (df_description[column_name_scenario] == "0")
+                )
+            ]
 
         codes_cleaned = set(df_description[column_name_code].astype(str))
         valid_codes = set()

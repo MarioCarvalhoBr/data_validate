@@ -17,6 +17,7 @@ from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.generation.combinations_processing import CombinationsProcessing
 from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.value_processing import ValueProcessing
 from data_validate.models import SpDescription, SpTemporalReference, SpScenario, SpValue
 from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
@@ -205,7 +206,11 @@ class SpValueValidator(BaseValidator):
         )
 
         level_one_codes = (
-            df_description[df_description[level_column_name] == "1"][code_column_name].astype(str).tolist()
+            df_description[DataFrameProcessing.numeric_equals_mask(df_description[level_column_name], 1)][
+                code_column_name
+            ]
+            .astype(str)
+            .tolist()
         )
 
         # Process value columns
@@ -224,13 +229,15 @@ class SpValueValidator(BaseValidator):
 
         # Get filtered description codes using generic function
         # Remove level 1 indicators
-        filtered_description_df = df_description[df_description[level_column_name] != "1"].copy()
+        filtered_description_df = df_description[
+            DataFrameProcessing.numeric_not_equals_mask(df_description[level_column_name], 1)
+        ].copy()
 
         # Remove level 2 indicators with scenario 0 if scenario column exists
         if self.exists_scenario and scenario_column_name in filtered_description_df.columns:
             filtered_description_df = filtered_description_df[
                 ~(
-                    (filtered_description_df[level_column_name] == "2")
+                    DataFrameProcessing.numeric_equals_mask(filtered_description_df[level_column_name], 2)
                     & (filtered_description_df[scenario_column_name] == "0")
                 )
             ]

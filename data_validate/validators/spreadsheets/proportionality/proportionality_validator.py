@@ -18,6 +18,7 @@ from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
 
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
+from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.proportionality_processing import ProportionalityProcessing
 from data_validate.helpers.common.validation.description_processing import DescriptionProcessing
 
@@ -364,7 +365,11 @@ class SpProportionalityValidator(BaseValidator):
 
         # List of codes at level 1 to remove
         codes_level_to_remove = (
-            df_description[df_description[self.column_name_level] == "1"][self.column_name_code].astype(str).tolist()
+            df_description[DataFrameProcessing.numeric_equals_mask(df_description[self.column_name_level], 1)][
+                self.column_name_code
+            ]
+            .astype(str)
+            .tolist()
         )
         set_valid_codes_description = DescriptionProcessing.get_valids_codes_from_description(
             self.model_dataframes[self.sp_name_description],
@@ -602,7 +607,9 @@ class SpProportionalityValidator(BaseValidator):
         )
 
         # Filter composition to remove level 1 parents
-        df_composition = df_composition[df_composition[self.column_name_parent] != "1"]
+        df_composition = df_composition[
+            DataFrameProcessing.numeric_not_equals_mask(df_composition[self.column_name_parent], 1)
+        ]
 
         dict_grouped_composition = {}
         for __, row in df_composition.iterrows():
