@@ -133,6 +133,14 @@ ignore_errors = true
 module = ["tests.e2e.*", "tools.*"]
 strict = true
 
+[[tool.mypy.overrides]]
+# ARC-003: the SheetSpec registry is new, migrated code — hold it to the strict bar the
+# blanket `data_validate.*` override above waives for the legacy pipeline. Must stay last so
+# it wins over the blanket override for this one module.
+module = ["data_validate.specs.*"]
+ignore_errors = false
+strict = true
+
 [tool.bandit]
 exclude_dirs = ["tests", "tools/legacy"]
 # Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —
