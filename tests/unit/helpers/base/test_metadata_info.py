@@ -39,10 +39,14 @@ class TestMetadataInfo:
         assert metadata.__author_email__ == "test@example.com"
         assert metadata.__url__ == "https://github.com/test/repo.git"
 
-    def test_init_with_package_not_found(self, mocker) -> None:
+    def test_init_with_package_not_found(self, mocker, capsys) -> None:
         """Test initialization when package is not found."""
-        mocker.patch("importlib.metadata.metadata", side_effect=importlib.metadata.PackageNotFoundError("Package not found"))
-        mocker.patch("importlib.metadata.version", side_effect=importlib.metadata.PackageNotFoundError("Package not found"))
+        mocker.patch(
+            "importlib.metadata.metadata", side_effect=importlib.metadata.PackageNotFoundError("Package not found")
+        )
+        mocker.patch(
+            "importlib.metadata.version", side_effect=importlib.metadata.PackageNotFoundError("Package not found")
+        )
 
         metadata = MetadataInfo()
 
@@ -54,47 +58,48 @@ class TestMetadataInfo:
         assert metadata.__author_email__ == "DEFAULT EMAIL: mariodearaujocarvalho@gmail.com"
         assert metadata.__url__ == "DEFAULT URL: https://github.com/AdaptaBrasil/data_validate.git"
 
+        # BUG-017: no print() side effect when the package is not installed.
+        captured = capsys.readouterr()
+        assert captured.out == ""
+
     def test_make_version_final(self) -> None:
         """Test _make_version method with final release level."""
-        version = MetadataInfo._make_version(1, 2, 3, "final", 0, 0)
+        version = MetadataInfo._make_version(1, 2, 3, release_level="final", serial=0, dev=0)
         assert version == "1.2.3"
 
     def test_make_version_beta(self) -> None:
         """Test _make_version method with beta release level."""
-        version = MetadataInfo._make_version(1, 2, 3, "beta", 5, 0)
+        version = MetadataInfo._make_version(1, 2, 3, release_level="beta", serial=5, dev=0)
         assert version == "1.2.3b5"
 
     def test_make_version_alpha(self) -> None:
         """Test _make_version method with alpha release level."""
-        version = MetadataInfo._make_version(1, 2, 3, "alpha", 2, 0)
+        version = MetadataInfo._make_version(1, 2, 3, release_level="alpha", serial=2, dev=0)
         assert version == "1.2.3a2"
 
     def test_make_version_candidate(self) -> None:
         """Test _make_version method with candidate release level."""
-        version = MetadataInfo._make_version(1, 2, 3, "candidate", 1, 0)
+        version = MetadataInfo._make_version(1, 2, 3, release_level="candidate", serial=1, dev=0)
         assert version == "1.2.3rc1"
 
     def test_make_version_with_dev(self) -> None:
         """Test _make_version method with dev status."""
-        version = MetadataInfo._make_version(1, 2, 3, "beta", 5, 10)
+        version = MetadataInfo._make_version(1, 2, 3, release_level="beta", serial=5, dev=10)
         assert version == "1.2.3b5.dev10"
 
     def test_make_version_invalid_release_level(self) -> None:
-        """Test _make_version method with invalid release level."""
-        with pytest.raises(AssertionError):
-            MetadataInfo._make_version(1, 2, 3, "invalid", 0, 0)
+        """Test _make_version method with invalid release level.
 
-    def test_make_url(self) -> None:
-        """Test _make_url method."""
-        url = MetadataInfo._make_url(1, 2, 3, "beta", 5, 10)
-        expected_url = "https://data_validate.readthedocs.io/en/1.2.3b5.dev10"
-        assert url == expected_url
+        BUG-017: `assert` is stripped under `python -O`, so it must raise a real
+        exception instead. This pins the fix by asserting the exception type is
+        `ValueError`, not `AssertionError` (regression test for BUG-017).
+        """
+        with pytest.raises(ValueError, match="invalid release_level"):
+            MetadataInfo._make_version(1, 2, 3, release_level="invalid", serial=0, dev=0)
 
-    def test_make_url_final_version(self) -> None:
-        """Test _make_url method with final version."""
-        url = MetadataInfo._make_url(1, 2, 3, "final", 0, 0)
-        expected_url = "https://data_validate.readthedocs.io/en/1.2.3"
-        assert url == expected_url
+    def test_make_url_removed(self) -> None:
+        """Test that the dead `_make_url` static method was removed (BUG-017)."""
+        assert not hasattr(MetadataInfo, "_make_url")
 
     def test_metadata_global_instance(self) -> None:
         """Test that METADATA global instance is created."""
@@ -106,7 +111,9 @@ class TestMetadataInfo:
     def test_version_parsing_with_short_version(self, mocker) -> None:
         """Test version parsing with short version string."""
         mocker.patch("importlib.metadata.version", return_value="1.0")
-        mocker.patch("importlib.metadata.metadata", return_value=mocker.MagicMock(get=lambda k, d: d, get_all=lambda k, d: []))
+        mocker.patch(
+            "importlib.metadata.metadata", return_value=mocker.MagicMock(get=lambda k, d: d, get_all=lambda k, d: [])
+        )
 
         metadata = MetadataInfo()
         # Should handle short version gracefully
@@ -115,7 +122,9 @@ class TestMetadataInfo:
     def test_version_parsing_with_single_digit(self, mocker) -> None:
         """Test version parsing with single digit version."""
         mocker.patch("importlib.metadata.version", return_value="1")
-        mocker.patch("importlib.metadata.metadata", return_value=mocker.MagicMock(get=lambda k, d: d, get_all=lambda k, d: []))
+        mocker.patch(
+            "importlib.metadata.metadata", return_value=mocker.MagicMock(get=lambda k, d: d, get_all=lambda k, d: [])
+        )
 
         metadata = MetadataInfo()
         # Should handle single digit version gracefully

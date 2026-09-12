@@ -27,16 +27,15 @@ where it matters, and listed again for convenience):
   ``compostion_graph_validator.py``) independently clean the *same* column with ``min_value=0``
   before building the tree. This registry records the model's value (``1``); the ``0``/``1``
   mismatch is a pre-existing bug, tracked as a backlog note (see ``03-architecture.md``).
-- ``referencia_temporal.nome`` and ``cenarios.nome``: both models declare this column
-  ``dtype="int64"`` even though the column holds a human-readable name (BUG-013). This registry
-  mirrors the model's declared dtype (``"int"``) rather than the value the column actually holds,
-  because that is what the legacy source says today; fixing the underlying dtype is BUG-013's
-  job, not this registry's.
-- ``descricao.legenda`` (a ``DynamicColumn``): declared ``dtype="str"`` in
-  ``SpDescription.DynamicColumn`` but cleaned as an integer (``DataCleaningProcessing.
-  clean_dataframe_integers(..., min_value=1, allow_empty=True)``) in
-  ``SpDescription.data_cleaning``. This registry records the dtype actually enforced (``"int"``)
-  and notes the declared-vs-enforced mismatch here.
+- ``referencia_temporal.nome`` and ``cenarios.nome``: both models used to declare this column
+  ``dtype="int64"`` even though the column holds a human-readable name. **Resolved by BUG-013**:
+  both models now declare ``dtype="str"``, and this registry mirrors that corrected value.
+- ``descricao.legenda`` (a ``DynamicColumn``): used to be declared ``dtype="str"`` in
+  ``SpDescription.DynamicColumn`` while cleaned as an integer (``DataCleaningProcessing.
+  clean_dataframe_integers(..., min_value=1, allow_empty=True)``) in ``SpDescription.
+  data_cleaning``. **Resolved by BUG-013**: the model now declares ``dtype="Int64"`` (pandas'
+  nullable integer dtype), matching the enforced cleaning; this registry's ``"int"`` +
+  ``allow_empty=True`` already recorded the enforced value and needed no change.
 
 ``.qml`` is dropped from ``ALLOWED_EXTENSIONS`` per ADR-0003: no evidence was found that the
 protocol needs it, so it is not reintroduced; if that assumption is wrong, the question belongs in
@@ -156,9 +155,9 @@ _DESCRICAO = SheetSpec(
         ColumnSpec(name="unidade", dtype="str", kind=ColumnKind.OPTIONAL),
         ColumnSpec(name="relacao", dtype="int", kind=ColumnKind.OPTIONAL),
         ColumnSpec(name="ordem", dtype="int", kind=ColumnKind.OPTIONAL),
-        # Declared "str" in SpDescription.DynamicColumn, but SpDescription.data_cleaning cleans it
-        # as an integer (min 1, empty allowed) — see module docstring's divergence note.
         ColumnSpec(name="cenario", dtype="int", kind=ColumnKind.DYNAMIC, min_value=-1),
+        # Declared dtype="Int64" (nullable int) in SpDescription.DynamicColumn, cleaned as an
+        # integer (min 1, empty allowed) — resolved BUG-013 divergence, see module docstring.
         ColumnSpec(name="legenda", dtype="int", kind=ColumnKind.DYNAMIC, min_value=1, allow_empty=True),
     ),
     plural_name_pairs=(
@@ -195,9 +194,9 @@ _REFERENCIA_TEMPORAL = SheetSpec(
     header=HeaderLayout.SINGLE,
     description="Years (symbols) used in value columns.",
     columns=(
-        # Declared dtype="int64" in the model even though this column holds a name (BUG-013);
-        # mirrored here as-is — see module docstring's divergence note.
-        ColumnSpec(name="nome", dtype="int", kind=ColumnKind.REQUIRED),
+        # Declared dtype="int64" in the model even though this column holds a name — resolved
+        # by BUG-013 (model now declares dtype="str"); see module docstring's divergence note.
+        ColumnSpec(name="nome", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="descricao", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="simbolo", dtype="int", kind=ColumnKind.REQUIRED, min_value=0),
     ),
@@ -217,8 +216,9 @@ _CENARIOS = SheetSpec(
     header=HeaderLayout.SINGLE,
     description="Scenario symbols (e.g. O, P).",
     columns=(
-        # Same BUG-013 dtype mismatch as referencia_temporal.nome — see module docstring.
-        ColumnSpec(name="nome", dtype="int", kind=ColumnKind.REQUIRED),
+        # Same BUG-013 dtype mismatch as referencia_temporal.nome, resolved the same way —
+        # see module docstring.
+        ColumnSpec(name="nome", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="descricao", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="simbolo", dtype="int", kind=ColumnKind.REQUIRED),
     ),

@@ -141,13 +141,19 @@ module = ["data_validate.specs.*"]
 ignore_errors = false
 strict = true
 
+[[tool.mypy.overrides]]
+# ARC-004: the Issue/MessageCatalog model is new, migrated code — same strict bar as
+# `data_validate.specs.*` above, for the same reason. Must stay last so it wins over the
+# blanket `data_validate.*` override for this one module.
+module = ["data_validate.i18n.*"]
+ignore_errors = false
+strict = true
+
 [tool.bandit]
 exclude_dirs = ["tests", "tools/legacy"]
 # Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —
 # not a silent mask — and is removed once the linked item is closed.
 skips = [
-    "B101",  # assert used deliberately in a few legacy invariant checks (e.g. metadata_info.py)
-             # until BUG-017 replaces them with explicit exceptions.
     "B701",  # Jinja2 Environment without autoescape in file_report_generator.py — tracked as
              # SEC-001 (P0, stored XSS), fixed in migration Phase 4 (ReportModel + autoescaped
              # templates). Not disabled lightly: SEC-001 is the top item of the security backlog.

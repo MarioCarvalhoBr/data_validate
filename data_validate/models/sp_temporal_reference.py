@@ -58,13 +58,13 @@ class SpTemporalReference(SpModelABC):
         Definitions of required columns for the Temporal Reference spreadsheet.
 
         Attributes:
-            COLUMN_NAME (Series): Column definition for the name.
+            COLUMN_NAME (Series): Column definition for the name (string).
             COLUMN_DESCRIPTION (Series): Column definition for the description.
             COLUMN_SYMBOL (Series): Column definition for the symbol (integer).
             ALL (List[str]): List of all required column names.
         """
 
-        COLUMN_NAME = pd.Series(dtype="int64", name="nome")
+        COLUMN_NAME = pd.Series(dtype="str", name="nome")
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
@@ -128,7 +128,9 @@ class SpTemporalReference(SpModelABC):
             )
 
             if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.raw_data.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.raw_data[self.RequiredColumn.COLUMN_SYMBOL.name].iloc[0:1]
+                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.raw_data[
+                    self.RequiredColumn.COLUMN_SYMBOL.name
+                ].iloc[0:1]
         else:
             # 1. Clean and validate the 'symbol' column (minimum 0)
             col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name

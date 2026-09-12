@@ -48,13 +48,30 @@ zero global state. Each item below names the current smell, where it lives, and 
   actually read from today.
 
 ### ARC-004 · Errors are pre-formatted Portuguese strings
-- Priority: P1 · Effort: L · Status: open
+- Priority: P1 · Effort: L · Status: in-progress
 - Where: everywhere (`f"{self._filename}, linha {idx + 2}: ..."`) — validators, models, helpers;
   `ValidationReport` stores `List[str]`.
 - Problem: no severity/rule/location metadata; cannot sort, deduplicate, translate, export JSON,
   count per column, or link back to the protocol rule. Blocks i18n and any UI beyond HTML.
 - Target: `Issue(rule_id, severity, sheet, row, column, message_key, params)` + `MessageCatalog`
   rendering per locale; `ValidationResult` with grouping; renderers for console/JSON/HTML/PDF.
+- Done (model): `data_validate/specs/issues.py` declares `Severity` (`StrEnum`), the frozen/slotted
+  `Issue` dataclass (`rule_id` validated against
+  `^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN)-\d{3}$`, `params` frozen into a
+  `MappingProxyType`, plus a `category` field for the legacy `NamesEnum` adapter), and
+  `ValidationResult` (`errors`/`warnings`/`error_count`/`warning_count`, `by_category()`,
+  `truncated(limit)` mirroring `ValidationReport.flatten`'s per-category/per-severity limit
+  without emitting the omitted-count message itself, and `omitted_counts(limit)` for the
+  renderer to do that). `data_validate/i18n/catalog.py` declares `MessageCatalog` (locale +
+  explicit `catalog_dir`, no `store.locale` side effects), `default_catalog_dir()`, and
+  `CatalogNotFoundError`/`CatalogInvalidError`; `text()` copies `LanguageManager.text`'s exact
+  fallback strings so behaviour is unchanged, and `render(issue)` renders an `Issue` directly.
+  100 % coverage on both new modules
+  (`tests/unit/specs/test_issues.py`, `tests/unit/i18n/test_message_catalog.py`); mypy strict via
+  a new `data_validate.i18n.*` override in `pyproject.toml` (alongside the existing
+  `data_validate.specs.*` one). Neither module is wired into the legacy pipeline yet — no
+  validator/model/`ValidationReport` call site was touched — that is Phase 3 (see ADR-0004's
+  "Phase 1 render identical strings" note and `08-migration-roadmap.md`).
 
 ### ARC-005 · i18n is inconsistent (≈95 % of messages hard-coded in pt-BR)
 - Priority: P1 · Effort: L · Status: open

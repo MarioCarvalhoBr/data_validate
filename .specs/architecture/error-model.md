@@ -108,4 +108,18 @@ backward compatibility with the platform parser; new keys are additive.
 
 Which severity each rule uses is fixed in `business-rules/` and must not be decided ad hoc in code.
 
+## Implementation status
+
+ARC-004 (model only, Phase 1 step 2): `data_validate/specs/issues.py` implements `Severity` and
+`Issue` as sketched above (`Issue` additionally validates `rule_id` against the stable rule-ID
+pattern and carries a `category: str | None` field for the Phase 1-2 legacy-`NamesEnum` adapter,
+not yet present in the sketch), plus a simplified `ValidationResult` — `issues: tuple[Issue, ...]`
+with `errors`/`warnings`/`error_count`/`warning_count`, `by_category()`, `truncated(limit)` and
+`omitted_counts(limit)` — rather than the `outcomes`/`load_issues`/`started_at`/`duration_ms` shape
+sketched above, which belongs to `RuleOutcome`/the engine (ADR-0006) and lands with Phase 3.
+`data_validate/i18n/catalog.py` implements `MessageCatalog.text`/`render` and
+`default_catalog_dir()`. Nothing here is wired into the legacy pipeline yet: no validator, model,
+or `ValidationReport` call site was changed. `RuleOutcome`, the full `ValidationResult` sketched
+above, and the report-model grouping/truncation/JSON rendering steps remain open (Phase 3-4).
+
 Last synced with code: 09279f4

@@ -165,11 +165,24 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Related: ARC-011
 
 ### BUG-011 · `DATE_NOW` / `CURRENT_YEAR` evaluated at import time
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `config/application_config.py:44-46`
 - Problem: class attributes computed once per interpreter; long-lived processes and tests get a stale
   timestamp; the "future year" rule (`temporal_reference_validator.py:141`) depends on it.
 - Proposed fix: inject a `Clock` (callable returning `datetime`) into the context.
+- Done: `CURRENT_YEAR`/`DATE_NOW` are now per-instance attributes computed in
+  `ApplicationConfig.__init__(self, clock: Callable[[], datetime] | None = None)` from an
+  injectable `self._clock` (defaults to `datetime.now`), instead of class attributes evaluated
+  once at import time. Every consumer (`file_report_generator.py`,
+  `temporal_reference_validator.py`) already reads `CURRENT_YEAR`/`DATE_NOW` through a
+  `config`/`context.config` **instance**, never the class, so no consumer changed. Regression
+  tests: `tests/unit/config/test_application_config.py` — two instances built with different
+  fake clocks report different `CURRENT_YEAR`/`DATE_NOW` (fails on pre-fix code with
+  `TypeError: unexpected keyword argument 'clock'`, since the old class attributes could not be
+  influenced by any instance-level clock), default construction still matches
+  `datetime.now().year`, and `get_verify_names()` still returns all 34 `NamesEnum` titles with a
+  mocked `LanguageManager` (documents the `TITLES_N`/`SIMP_DESC_N` `value=` interpolation). New
+  test module coverage of `config/application_config.py`: 100 %.
 
 ### BUG-012 · `LanguageEnum.DEFAULT_LANGUAGE` is an enum alias
 - Priority: P3 · Effort: S · Status: wont-fix
@@ -190,11 +203,30 @@ Every fix here must land with a regression test under `tests/` that fails before
   revisited alongside every call site at once.
 
 ### BUG-013 · Wrong dtypes / names in column definitions
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `models/sp_scenario.py:66`, `models/sp_temporal_reference.py:67` (`COLUMN_NAME` declared
   `int64` for a text column), `models/sp_value.py:57-61` (docstring says `COLUMN_CODE`, code defines
   `COLUMN_ID`).
 - Proposed fix: fix with the `ColumnSpec` refactor (BUG-002).
+- Done: the three declaration mismatches this item names are fixed. `SpScenario.RequiredColumn.
+  COLUMN_NAME` and `SpTemporalReference.RequiredColumn.COLUMN_NAME` now declare
+  `pd.Series(dtype="str", name="nome")` instead of `dtype="int64"` (grep confirms no code path
+  reads `.dtype` on either attribute — only `.name` is read, by `scenario_validator.py`,
+  `temporal_reference_validator.py`, and `spellchecker_validator.py` — so behaviour is unchanged).
+  `sp_value.py`'s docstring now says `COLUMN_ID` instead of the stale `COLUMN_CODE`. Also fixed in
+  the same slice: `SpDescription.DynamicColumn.COLUMN_LEGEND` declared `dtype="str"` while
+  `SpDescription.data_cleaning` cleans it as an integer (min 1, empty allowed) — now declared
+  `dtype="Int64"` (pandas' nullable integer dtype), matching the enforced cleaning and the
+  placeholder `pd.Series(dtype="Int64")` `legend_validator.py:427` already used for the same
+  column. `specs/sheet_specs.py`'s two matching divergence notes (module docstring and the inline
+  `referencia_temporal`/`cenarios`/`descricao.legenda` `ColumnSpec` comments) are updated to record
+  the mismatches as resolved; `referencia_temporal.nome`/`cenarios.nome` `ColumnSpec.dtype` changed
+  from `"int"` to `"str"` to match. Regression tests:
+  `tests/unit/models/test_column_declarations.py` (new module, 100 % coverage) pins the corrected
+  dtypes/name for all four attributes and that `SpValue.RequiredColumn` has no `COLUMN_CODE`
+  attribute. Remaining structural part (the placeholder `pd.Series`-as-column-declaration pattern
+  itself, and moving these declarations into `ColumnSpec`) is BUG-002's job in Phase 2, not this
+  item's.
 
 ### BUG-014 · Level comparisons rely on exact string `"1"` / `"2"`
 - Priority: P2 · Effort: M · Status: open
@@ -238,12 +270,22 @@ Every fix here must land with a regression test under `tests/` that fails before
   `verification_name_*` unused-key heuristic warning remaining.
 
 ### BUG-017 · `MetadataInfo` uses `assert` for validation and prints at import
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `config/metadata_info.py:74,117,126-149`
 - Problem: `assert` is stripped under `python -O`; `print()` side effect at import when the package
   is not installed; `_make_url` is dead code; version becomes `0.0.0b732` in editable/uninstalled
   mode.
 - Proposed fix: `importlib.metadata.version()` with a clean fallback; drop hand-maintained `serial`.
+- Done: `_make_version` now raises `ValueError(f"invalid release_level: {release_level!r}")` instead
+  of `assert`; the `print()` on `PackageNotFoundError` was replaced by
+  `logging.getLogger(__name__).debug(...)` so importing the module with the package uninstalled is
+  silent; the dead `_make_url` static method was removed. The `bandit` `B101` skip in
+  `pyproject.toml` was removed (confirmed zero remaining `assert` statements in `data_validate/`).
+  Version composition (`serial = 732`, beta suffix, `0.0.0b732` in editable mode) is unchanged —
+  that remains TOOL-005's scope. Tests:
+  `tests/unit/helpers/base/test_metadata_info.py::TestMetadataInfo::test_make_version_invalid_release_level`,
+  `::test_make_url_removed`, `::test_init_with_package_not_found` (now asserts empty stdout via
+  `capsys`).
 - Related: TOOL-005
 
 ### BUG-018 · CSV reader depends on the file *stem* to find the separator

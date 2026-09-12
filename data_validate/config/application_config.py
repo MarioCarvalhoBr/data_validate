@@ -8,6 +8,7 @@ for managing application-wide settings such as limits, date formats, and report 
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
+from collections.abc import Callable
 from datetime import datetime
 from types import MappingProxyType
 
@@ -40,12 +41,6 @@ class ApplicationConfig:
     SIMPLE_DESCRIPTIONS_OVER_N_CHARS = 150
     """int: Maximum number of characters allowed for simple description fields."""
 
-    # DATE AND TIME
-    CURRENT_YEAR = datetime.now().year
-    """int: The current year."""
-    DATE_NOW = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-    """str: The current date and time formatted as 'dd/mm/yyyy HH:MM:SS'."""
-
     # VALUE AND LEGEND
     LABEL_DATA_UNAVAILABLE = "Dado indisponível"
     """str: Label used for unavailable data in reports."""
@@ -74,7 +69,7 @@ class ApplicationConfig:
                                     <p>RELAT&Oacute;RIO</p>
                                     {{ name }}
                                     Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados
-                                    Informa&ccedil;&otilde;es: 
+                                    Informa&ccedil;&otilde;es:
                                     {{ text_display_user }}
                                     {{ text_display_sector }}
                                     {{ text_display_protocol }}
@@ -96,12 +91,27 @@ class ApplicationConfig:
                                 """
     """str: Default HTML template for reports when the custom template cannot be loaded."""
 
-    def __init__(self):
+    def __init__(self, clock: Callable[[], datetime] | None = None):
         """
         Initializes the ApplicationConfig instance.
 
-        Sets up the LanguageManager for handling localized strings throughout the application.
+        Sets up the LanguageManager for handling localized strings throughout the application,
+        and computes `CURRENT_YEAR`/`DATE_NOW` from the given (or default) clock at construction
+        time, instead of once at import time (BUG-011).
+
+        Args:
+            clock (Callable[[], datetime] | None): Zero-argument callable returning the current
+                `datetime`, used to compute `CURRENT_YEAR` and `DATE_NOW`. Defaults to
+                `datetime.now` when not provided; injectable for testing/determinism.
         """
+        self._clock = clock or datetime.now
+
+        # DATE AND TIME
+        self.CURRENT_YEAR = self._clock().year
+        """int: The current year."""
+        self.DATE_NOW = self._clock().strftime("%d/%m/%Y %H:%M:%S")
+        """str: The current date and time formatted as 'dd/mm/yyyy HH:MM:SS'."""
+
         self.language_manager: LanguageManager = LanguageManager()
         self.spreadsheet_info = SpreadsheetInfo()
         self.names_enum = NamesEnum

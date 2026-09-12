@@ -125,4 +125,16 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | `dictionaries/hunspell/*.{aff,dic}`, `extra-words.dic` | Spell dictionaries | kept |
 | `templates/README.TEMPLATE.md` | README generator template | removed (ADR-0009) |
 
+## `specs/` and `i18n/` (target modules implemented ahead of their consumers)
+
+These already live at their target-architecture path (`specs/`, `i18n/`) rather than a legacy
+path with a "Destination" column, so they get their own table: what exists, and what still reads
+from the legacy source instead.
+
+| Module | Responsibility | Key symbols | Tests | Backlog |
+|---|---|---|---|---|
+| `specs/sheet_specs.py` | Single source of truth for sheet/column shape | `SHEET_SPECS`, `SheetSpec`, `ColumnSpec` | `specs/test_sheet_specs.py` | ARC-003 (implemented, consumers pending) |
+| `specs/issues.py` | Structured validation finding + result grouping/truncation | `Issue`, `Severity`, `ValidationResult` | `specs/test_issues.py` (100 % coverage) | ARC-004 (model implemented, not wired into any validator/model/`ValidationReport` yet — Phase 3) |
+| `i18n/catalog.py` | Locale-scoped message lookup and `Issue` rendering | `MessageCatalog`, `default_catalog_dir`, `CatalogNotFoundError`, `CatalogInvalidError` | `i18n/test_message_catalog.py` (100 % coverage) | ARC-004 (implemented; `helpers/tools/locale/language_manager.py::LanguageManager` remains the module every current call site actually uses) |
+
 Last synced with code: 09279f4

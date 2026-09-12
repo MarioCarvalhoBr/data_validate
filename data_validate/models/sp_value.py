@@ -54,7 +54,7 @@ class SpValue(SpModelABC):
         Definitions of required columns for the Value spreadsheet.
 
         Attributes:
-            COLUMN_CODE (Series): Column definition for the code (integer).
+            COLUMN_ID (Series): Column definition for the territory id (integer).
             ALL (List[str]): List of all required column names.
         """
 
@@ -91,7 +91,9 @@ class SpValue(SpModelABC):
         # Remove ID self.RequiredColumn.COLUMN_ID.name
         unique_columns = [col for col in unique_columns if col != self.RequiredColumn.COLUMN_ID.name]
 
-        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(unique_columns, self.scenarios)
+        __, codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
+            unique_columns, self.scenarios
+        )
 
         if codes_not_matched_by_pattern:
             self.structural_errors.append(

@@ -7,7 +7,7 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 
 | Column | Kind | Type after cleaning | Constraints | Source in code |
 |---|---|---|---|---|
-| `nome` | required | str (declared `int64` in code — BUG-013) | short display name, unique | `models/sp_temporal_reference.py::RequiredColumn.COLUMN_NAME` |
+| `nome` | required | str | short display name, unique | `models/sp_temporal_reference.py::RequiredColumn.COLUMN_NAME` |
 | `descricao` | required | str | ends with `.`; spell-checked | `RequiredColumn.COLUMN_DESCRIPTION` |
 | `simbolo` | required | int ≥ 0 (code) / four numeric chars (protocol) | used as `<ano>` in value columns; unique; first row = present time | `RequiredColumn.COLUMN_SYMBOL` |
 

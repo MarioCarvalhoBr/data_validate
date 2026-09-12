@@ -9,7 +9,7 @@ header. Optional — when absent the sector has no scenarios and `descricao` mus
 
 | Column | Kind | Type | Constraints | Source in code |
 |---|---|---|---|---|
-| `nome` | required | str (declared `int64` — BUG-013) | short, no trailing `.`, unique; spell-checked | `models/sp_scenario.py::RequiredColumn.COLUMN_NAME` |
+| `nome` | required | str | short, no trailing `.`, unique; spell-checked | `models/sp_scenario.py::RequiredColumn.COLUMN_NAME` |
 | `descricao` | required | str | ends with `.`; spell-checked | `RequiredColumn.COLUMN_DESCRIPTION` |
 | `simbolo` | required | str | letters and digits only (protocol v1.10); unique; used as `<cenario>` suffix | `RequiredColumn.COLUMN_SYMBOL` |
 

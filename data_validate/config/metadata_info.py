@@ -1,9 +1,12 @@
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 import importlib.metadata
+import logging
 from typing import Final
 
 from data_validate.helpers.base.constant_base import ConstantBase
+
+logger = logging.getLogger(__name__)
 
 
 class MetadataInfo(ConstantBase):
@@ -33,7 +36,7 @@ class MetadataInfo(ConstantBase):
         Initialize MetadataInfo with package metadata.
 
         Attempts to load metadata from `importlib.metadata`. If the package is not
-        installed, warnings are printed and default values are used.
+        installed, a debug log entry is recorded and default values are used.
         Finalizes initialization to make attributes immutable.
         """
         super().__init__()
@@ -71,7 +74,7 @@ class MetadataInfo(ConstantBase):
             self.__url__ = project_urls.get("Repository", "URL não encontrada")
 
         except importlib.metadata.PackageNotFoundError:
-            print(f'Warning: Package "{dist_name}" not found. Using default metadata values.')
+            logger.debug('Package "%s" not found. Using default metadata values.', dist_name)
 
         # CONFIGURE VAR FOR VERSION: MAJOR, MINOR, MICRO
         map_versions = list(map(int, self.__version__.split(".")))
@@ -80,7 +83,9 @@ class MetadataInfo(ConstantBase):
         micro_version: Final = map_versions[2] if len(map_versions) > 2 else 0
 
         # Finally, create the full version string
-        self.__version__ = MetadataInfo._make_version(major_version, minor_version, micro_version, release_level, serial, status_dev)
+        self.__version__ = MetadataInfo._make_version(
+            major_version, minor_version, micro_version, release_level=release_level, serial=serial, dev=status_dev
+        )
 
         # CONFIGURE URL, STATUS AND WELCOME MESSAGE
         self.__maintainer_email__ = self.__author_email__
@@ -94,6 +99,7 @@ class MetadataInfo(ConstantBase):
         major: int,
         minor: int,
         micro: int,
+        *,
         release_level: str = "final",
         serial: int = 0,
         dev: int = 0,
@@ -114,7 +120,8 @@ class MetadataInfo(ConstantBase):
         Returns:
             str: The formatted version string.
         """
-        assert release_level in ["alpha", "beta", "candidate", "final"]
+        if release_level not in ("alpha", "beta", "candidate", "final"):
+            raise ValueError(f"invalid release_level: {release_level!r}")
         version = "%d.%d.%d" % (major, minor, micro)
         if release_level != "final":
             short = {"alpha": "a", "beta": "b", "candidate": "rc"}[release_level]
@@ -122,31 +129,6 @@ class MetadataInfo(ConstantBase):
         if dev != 0:
             version += f".dev{dev}"
         return version
-
-    @staticmethod
-    def _make_url(
-        major: int,
-        minor: int,
-        micro: int,
-        release_level: str,
-        serial: int = 0,
-        dev: int = 0,
-    ) -> str:
-        """
-        Generate the documentation URL for this specific version.
-
-        Args:
-            major (int): Major version number.
-            minor (int): Minor version number.
-            micro (int): Micro version number.
-            release_level (str): Release level.
-            serial (int, optional): Serial number. Defaults to 0.
-            dev (int, optional): Development number. Defaults to 0.
-
-        Returns:
-            str: URL pointing to the documentation for this version.
-        """
-        return "https://data_validate.readthedocs.io/en/" + MetadataInfo._make_version(major, minor, micro, release_level, serial, dev)
 
 
 METADATA = MetadataInfo()

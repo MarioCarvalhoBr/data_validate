@@ -57,13 +57,13 @@ class SpScenario(SpModelABC):
         Definitions of required columns for the Scenario spreadsheet.
 
         Attributes:
-            COLUMN_NAME (Series): Column definition for the scenario name (integer).
+            COLUMN_NAME (Series): Column definition for the scenario name (string).
             COLUMN_DESCRIPTION (Series): Column definition for the scenario description (string).
             COLUMN_SYMBOL (Series): Column definition for the scenario symbol (integer).
             ALL (List[str]): List of all required column names.
         """
 
-        COLUMN_NAME = pd.Series(dtype="int64", name="nome")
+        COLUMN_NAME = pd.Series(dtype="str", name="nome")
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
@@ -95,14 +95,20 @@ class SpScenario(SpModelABC):
         """Run pre-processing steps."""
         if self.scenario_exists_file and not self.scenarios:
             self.structural_errors.extend(
-                [f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."]
+                [
+                    f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."
+                ]
             )
 
         # Repeated values in the 'simbolo' column
         if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.raw_data.columns:
-            duplicated_symbols = self.data_loader_model.raw_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(keep=False)
+            duplicated_symbols = self.data_loader_model.raw_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(
+                keep=False
+            )
             if duplicated_symbols.any():
-                duplicated_values = self.data_loader_model.raw_data[duplicated_symbols][self.RequiredColumn.COLUMN_SYMBOL.name].unique()
+                duplicated_values = self.data_loader_model.raw_data[duplicated_symbols][
+                    self.RequiredColumn.COLUMN_SYMBOL.name
+                ].unique()
                 self.structural_errors.append(
                     f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]"
                 )

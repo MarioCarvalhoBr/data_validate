@@ -52,6 +52,10 @@
 - Proposed fix: single version in `pyproject.toml`; `importlib.metadata.version("canoa_data_validate")`;
   bumps via `poetry version` in the release workflow (or `poetry-dynamic-versioning` from git tags);
   `CHANGELOG.md` maintained by `release-please` or `towncrier` fragments.
+- Note: BUG-017 (done) already replaced the `assert release_level in [...]` with a `ValueError` and
+  removed the `print()` on `PackageNotFoundError` in `_make_version`/`MetadataInfo.__init__`. This
+  item's remaining scope is only the version-composition overhaul (hand-maintained `serial`, shell
+  scripts, `0.0.0b732` in editable/uninstalled mode) — unchanged.
 - Related: BUG-017
 
 ### TOOL-006 · Generated artefacts committed
