@@ -60,6 +60,17 @@ zero global state. Each item below names the current smell, where it lives, and 
   that is Phases 2-3 of the migration roadmap; `SpreadsheetInfo`, `Config.file_specs`, and each
   model's `RequiredColumn`/`OptionalColumn`/`DynamicColumn` remain the sources those consumers
   actually read from today.
+- Done (consumers: loader): the data-loader consumer is migrated (BUG-015/BUG-018/ARC-009). Both
+  `FileScanner` (expected stems, allowed extensions) and `DataLoaderFacade.load()` (header layout,
+  CSV separator, required flag for backfilling missing sheets) now read exclusively from
+  `SHEET_SPECS`/`ALLOWED_EXTENSIONS`; `helpers/tools/data_loader/common/config.py`'s `Config`/
+  `SingletonMeta` singleton is deleted, closing the second of the three sources this item names.
+  `models/sp_*.py`'s `RequiredColumn`/`OptionalColumn`/`DynamicColumn` (the third source) and
+  `config/spreadsheet_info.py::SpreadsheetInfo` (the first) are unchanged — still open for a later
+  slice (Phase 3). `tests/unit/specs/test_sheet_specs.py`'s `TestSheetSpecsMatchDataLoaderConfig`
+  class (which proved `SHEET_SPECS` against the now-deleted `Config`) is replaced by
+  `TestSheetSpecsPinnedLoaderFacts`, pinning the same header-layout/separator/required values as
+  fixed expectations instead of comparing against a second source.
 
 ### ARC-004 · Errors are pre-formatted Portuguese strings
 - Priority: P1 · Effort: L · Status: in-progress
@@ -123,12 +134,26 @@ zero global state. Each item below names the current smell, where it lives, and 
   prerequisites once and marks rules *skipped* with a reason (feature the placeholder wanted).
 
 ### ARC-009 · Data loader: property with side effects, mixed result types
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: in-progress
 - Where: `helpers/tools/data_loader/api/facade.py:91-151` (`@property load_all` performs I/O and
   returns a tuple), `DataLoaderModel.header_type` mutated to `"invalid"` by
   `models/sp_proportionality.py:163`, `data["qmls"]` list (BUG-015).
 - Target: `SheetLoader.load(folder) -> LoadResult`; readers return `LoadedSheet(frame, meta)`;
   header layout comes from `SheetSpec`.
+- Done: `DataLoaderFacade.load() -> LoadResult` is a real method (no I/O in a property);
+  `LoadResult` (`models: dict[str, DataLoaderModel]`, `errors: list[str]`) lives in
+  `helpers/tools/data_loader/api/facade.py`. `load_all` is kept for one release as a thin
+  `@property` that emits `DeprecationWarning` (`stacklevel=2`) and returns
+  `(result.models, result.errors)` for existing callers; `SpreadsheetProcessor._read_data` was
+  migrated to call `load()` directly and read `.models`/`.errors` off the `LoadResult`. The `"qmls"`
+  key is gone (BUG-015 — nothing in `data_validate/` consumed it). Header layout and CSV separator
+  now come from `SHEET_SPECS` (`HeaderLayout`, `SheetSpec.csv_separator`) instead of the deleted
+  `Config` singleton, closing the "mixed result types"/"guessed separator" half of this item.
+  Remaining open: `DataLoaderModel.header_type` is still mutated to `"invalid"` by
+  `models/sp_proportionality.py:163` (noted, not fixed — belongs to BUG-002's Phase 2c
+  `ColumnSpec`/model-mutation cleanup, out of this slice's scope); `DataLoaderModel` itself keeps
+  its current name/attributes (a rename to `LoadedSheet`-shaped value object is ARC-013's naming
+  pass, Phase 5).
 
 ### ARC-010 · Package layout mixes tooling, demos and runtime
 - Priority: P2 · Effort: S · Status: open

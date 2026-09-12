@@ -201,13 +201,14 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 | `controllers/report/file_report_generator.py` | `reporting/html.py`, `reporting/pdf.py`, `reporting/json.py`, `reporting/console.py` | autoescape; PDF optional |
 | `config/application_config.py` | `app/options.py` + `specs/limits.py` | constants become options/limits; `DATE_NOW` → `Clock` |
 | `config/names_enum.py` | `rules/categories.py` | category order preserved for report compatibility |
-| `config/spreadsheet_info.py`, `helpers/tools/data_loader/common/config.py` | `specs/sheet_specs.py` | **Implemented** (ARC-003): `SHEET_SPECS` registry exists and is proven consistent with both legacy sources by `tests/unit/specs/test_sheet_specs.py`; consumers (loader, models, file-structure validator) not yet migrated — pending Phases 2-3 |
+| `config/spreadsheet_info.py` | `specs/sheet_specs.py` | **Partially implemented** (ARC-003): `SHEET_SPECS` registry exists; the loader consumer (`FileScanner`, `DataLoaderFacade`) is migrated to read from it, but `SpreadsheetInfo` itself and the model/file-structure-validator consumers are not yet — pending Phase 3 |
+| `helpers/tools/data_loader/common/config.py` | `specs/sheet_specs.py` | **Done** (BUG-018/ARC-003): `Config`/`SingletonMeta` deleted; `FileScanner`/`DataLoaderFacade` read header layout, CSV separator and required flag straight from `SHEET_SPECS` |
 | `config/metadata_info.py` | `util/version.py` | `importlib.metadata` only |
-| `helpers/tools/data_loader/api/facade.py` | `loading/loader.py` | `LoadResult` |
-| `helpers/tools/data_loader/engine/{scanner,factory}.py` | `loading/scan.py`, `loading/readers/__init__.py` | conflict policy from spec |
-| `helpers/tools/data_loader/readers/{csv,excel}_reader.py` | `loading/readers/{csv,xlsx}.py` | size limits, pyarrow strings |
-| `helpers/tools/data_loader/readers/qml_reader.py` | — (deleted unless protocol requires QML) | `future/open-questions.md` |
-| `helpers/tools/data_loader/strategies/header.py` | `specs/SheetSpec.header` | — |
+| `helpers/tools/data_loader/api/facade.py` | `loading/loader.py` | **Done** (ARC-009): `DataLoaderFacade.load() -> LoadResult` is a real method; `load_all` is a deprecated one-release property shim |
+| `helpers/tools/data_loader/engine/{scanner,factory}.py` | `loading/scan.py`, `loading/readers/__init__.py` | **Done**: conflict policy (CSV wins, loser recorded in `ignored`) documented and implemented in `FileScanner.scan()`; `ReaderFactory` derives no config, takes `sep` explicitly |
+| `helpers/tools/data_loader/readers/{csv,excel}_reader.py` | `loading/readers/{csv,xlsx}.py` | **Partially done**: `CSVReader` takes an explicit `sep`; SEC-003 size limits already enforced by the facade; pyarrow strings still pending |
+| `helpers/tools/data_loader/readers/qml_reader.py` | — (deleted) | **Done** (BUG-015/ADR-0003): no evidence the protocol needs `.qml`; deleted along with `.qml` scanning |
+| `helpers/tools/data_loader/strategies/header.py` | `specs/SheetSpec.header` | Unchanged module; already selected via `SheetSpec.header` at the call site (`DataLoaderFacade.load()`) |
 | `helpers/tools/locale/{language_manager,language_enum}.py` | `i18n/catalog.py`, `i18n/locale.py` | no file persistence |
 | `helpers/base/file_system_utils.py` | `util/paths.py` | exceptions instead of tuples |
 | `helpers/base/logger_manager.py` | `util/logging.py` | `dictConfig`, handlers closed |

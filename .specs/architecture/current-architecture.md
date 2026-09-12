@@ -52,13 +52,14 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 
 | Component | File | Responsibility | Smells |
 |---|---|---|---|
-| `DataLoaderFacade.load_all` (property) | `helpers/tools/data_loader/api/facade.py` | Scan folder, pick reader + header strategy per stem, read into `DataLoaderModel`, collect read errors, fill missing sheets with empty models, add `data["qmls"]` | ARC-009, BUG-015 |
-| `DataLoaderModel` | same file | `path`, `raw_data`, `is_read_successful`, `does_file_exist`, `header_type` | ARC-009 |
-| `FileScanner.scan` | `.../engine/scanner.py` | Finds known stems; CSV silently wins over XLSX | BUG-015 |
-| `ReaderFactory` | `.../engine/factory.py` | `.csv → CSVReader`, `.xlsx → ExcelReader`, `.qml → QMLReader` | — |
-| `CSVReader`, `ExcelReader`, `QMLReader` | `.../readers/*.py` | `read_csv(sep from Config, dtype=str)` with MultiIndex forward-fill; `read_excel(engine="calamine", dtype=str)`; `read_text()` | BUG-018, SEC-003 |
-| `SingleHeaderStrategy`, `DoubleHeaderStrategy` | `.../strategies/header.py` | `header=0` or `[0, 1]` | — |
-| `Config` (singleton) | `.../common/config.py` | `file_specs = {stem: (required, "single"/"double", "|")}`, extensions incl. `.qml` | ARC-003 |
+| `DataLoaderFacade.load()` (method) | `helpers/tools/data_loader/api/facade.py` | Scan folder, pick reader + header strategy per stem (from `SHEET_SPECS`), read into `DataLoaderModel`, collect read errors, fill missing sheets with empty models, return `LoadResult(models, errors)` | ARC-009 (in-progress) |
+| `DataLoaderFacade.load_all` (property) | same file | Deprecated one-release shim: warns `DeprecationWarning`, returns `(result.models, result.errors)` | ARC-009 |
+| `LoadResult` | same file | Frozen dataclass: `models: dict[str, DataLoaderModel]`, `errors: list[str]` | — |
+| `DataLoaderModel` | same file | `path`, `raw_data`, `is_read_successful`, `does_file_exist`, `header_type` | ARC-009, ARC-013 (naming) |
+| `FileScanner.scan` | `.../engine/scanner.py` | Finds stems declared in `SHEET_SPECS`/`ALLOWED_EXTENSIONS`; CSV wins over XLSX (documented policy), returns `(found, ignored, missing)` | — |
+| `ReaderFactory` | `.../engine/factory.py` | `.csv → CSVReader(sep=...)`, `.xlsx → ExcelReader` | — |
+| `CSVReader`, `ExcelReader` | `.../readers/*.py` | `read_csv(sep from constructor param, dtype=str)` with MultiIndex forward-fill; `read_excel(engine="calamine", dtype=str)` | SEC-003 |
+| `SingleHeaderStrategy`, `DoubleHeaderStrategy` | `.../strategies/header.py` | `header=0` or `[0, 1]`, selected from `SheetSpec.header` | — |
 
 ### Models (`data_validate/models/`)
 

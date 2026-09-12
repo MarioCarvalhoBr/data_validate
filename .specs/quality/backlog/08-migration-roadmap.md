@@ -64,6 +64,15 @@ PERF-003, PERF-005, SEC-003
    in **one pass**; models become thin wrappers (or disappear).
 3. Structural checks (columns, unnamed, `|`) become rules `STRUCT-*`.
 Gate: goldens unchanged; benchmark baseline recorded (PERF-009).
+- Done (Phase 2b, loader-only slice — BUG-015, BUG-018, ARC-009 partial, ARC-003 consumer step):
+  `DataLoaderFacade.load() -> LoadResult` (`load_all` kept one release as a deprecated property
+  shim); `FileScanner`/`ReaderFactory`/`CSVReader` derive expected stems, extensions, header layout
+  and CSV separator from `specs/sheet_specs.py::SHEET_SPECS` instead of the deleted
+  `data_loader.common.config.Config`; `.qml` support (`QMLReader`, `.qml` scanning) is deleted
+  entirely (ADR-0003). `SpreadsheetProcessor._read_data` calls `load()`. Still open for a later
+  Phase 2 slice: item 2 (`Normalizer`/`SheetFrame`), item 3 (`STRUCT-*` rules), `DataLoaderModel`
+  header_type mutation by `sp_proportionality.py` (BUG-002/Phase 2c), and `DataLoaderModel`'s own
+  naming (ARC-013, Phase 5).
 
 ## Phase 3 — Rules engine
 Closes: ARC-001, ARC-005, ARC-008, ARC-017, BUG-006, BUG-007, BUG-019, BUG-025, BUG-026, PERF-001,

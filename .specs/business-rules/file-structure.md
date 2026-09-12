@@ -16,16 +16,21 @@ every sheet before business rules run. Protocol §2 (p.3).
 | `legenda` | no | `.xlsx`, `.csv` | single | `\|` | `SpLegend` |
 | `dicionario` | no | `.xlsx`, `.csv` | single | `\|` | `SpDictionary` |
 
-Sources: `config/spreadsheet_info.py::SpreadsheetInfo` (names, extensions, expected/optional),
-`helpers/tools/data_loader/common/config.py::Config.file_specs` (required flag, header type,
-separator; also lists `.qml`, which is scanned but unused — backlog BUG-015, ARC-003).
+Sources: `config/spreadsheet_info.py::SpreadsheetInfo` (names, extensions, expected/optional) and
+`data_validate/specs/sheet_specs.py::SHEET_SPECS` (required flag, header type, separator — the
+loader's actual source since BUG-018/ARC-003; the former second source,
+`helpers/tools/data_loader/common/config.py::Config`, including its stray `.qml` entry, is
+deleted).
 
 Loading facts (`helpers/tools/data_loader/**`):
-- All cells are read as `str` (`dtype=str`); Excel via `calamine`, CSV via `pd.read_csv(sep="|")`.
+- All cells are read as `str` (`dtype=str`); Excel via `calamine`, CSV via `pd.read_csv(sep="|")`
+  (the separator is `SHEET_SPECS[name].csv_separator`, passed explicitly to `CSVReader`, not
+  guessed from the file stem — BUG-018).
 - Double header CSV: level-0 labels are forward-filled over `Unnamed:*`/empty cells
   (`readers/csv_reader.py`), mirroring merged cells in Excel.
-- When both `.csv` and `.xlsx` exist, the scanner keeps the `.csv` silently while STRUCT-006 reports
-  the conflict as an error.
+- When both `.csv` and `.xlsx` exist, `FileScanner.scan()` keeps the `.csv` and records the losing
+  path in its `ignored` result (not silently dropped, though nothing downstream consumes it yet)
+  while STRUCT-006 independently reports the conflict as an error.
 - A file that fails to load is represented as an empty frame with `is_read_successful=False`; the
   four required and four optional names always exist in the loaded map.
 - SEC-003: a file above `ApplicationConfig.MAX_INPUT_FILE_BYTES` (100 MB) is never read; a sheet
@@ -77,7 +82,9 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Target message key: `rule.STRUCT-004.error`
 - Implemented by: `file_structure_validator.py::FileStructureValidator.check_not_expected_files_in_folder_root`
 - Covered by tests: none — TST-001
-- Notes / known defects: the loader still scans `.qml` files (BUG-015).
+- Notes / known defects: none — the loader no longer scans `.qml` files at all (BUG-015 done); a
+  `.qml` file in the input folder is simply not picked up by `FileScanner`, and this rule still
+  reports it as an unexpected file via the general directory listing.
 
 ### STRUCT-005 · Required files must exist
 - Severity: error
@@ -99,7 +106,10 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Target message key: `rule.STRUCT-006.error`
 - Implemented by: `file_structure_validator.py::FileStructureValidator.check_ignored_files_in_folder_root`
 - Covered by tests: none — TST-001
-- Notes / known defects: the message itself states the CSV is used, consistent with the scanner's silent preference (BUG-015); key missing from `en_US` (BUG-016).
+- Notes / known defects: the message itself states the CSV is used, consistent with
+  `FileScanner`'s documented CSV-over-XLSX preference (BUG-015 done — the policy is now explicit
+  in `engine/scanner.py`'s docstring and the losing path is returned as `ignored`, not silently
+  dropped); key missing from `en_US` (BUG-016).
 
 ### STRUCT-007 · Files must be readable
 - Severity: error
@@ -108,7 +118,8 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Statement: each discovered file must be parsed by pandas; failures are reported per exception type (not found, encoding, parser/merged cells, value/type, I/O, unexpected) and the sheet is treated as empty and unread.
 - Current message (pt-BR): `{path.name}: Arquivo não encontrado no diretório. Detalhes: {e} ({type(e)})` · `{path.name}: Erro de codificação do arquivo. Verifique se está em UTF-8. Detalhes: …` · `{path.name}: Erro na estrutura da planilha. Verifique se há células mescladas ou formato inválido. Detalhes: …` · `{path.name}: Erro nos valores da planilha. Verifique se os tipos de dados estão corretos. Detalhes: …` · `{path.name}: Erro de entrada/saída ao ler o arquivo. Verifique se ele não está aberto em outro programa. Detalhes: …` · `{path.name}: Erro inesperado ao processar o arquivo. Detalhes: …`
 - Target message key: `rule.STRUCT-007.error` (one key per cause: `.not_found`, `.encoding`, `.parser`, `.value`, `.io`, `.unexpected`)
-- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load_all`
+- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()` (the
+  deprecated `load_all` property wraps the same logic for one release, ARC-009)
 - Covered by tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py`
 - Notes / known defects: raw exception text is leaked to the user; encoding is never proactively detected (`FileSystemUtils.detect_encoding` unused) — gap G-01.
 
@@ -182,7 +193,7 @@ Loading facts (`helpers/tools/data_loader/**`):
   linhas x {columns} colunas > {max_rows} linhas x {max_columns} colunas) e não será lida.`
   (present in both locales)
 - Target message key: `rule.STRUCT-015.error` (`.file_too_large`, `.sheet_too_big`)
-- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load_all` — limits are
+- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()` — limits are
   injected through the constructor (`limits` tuple) by `controllers/spreadsheet_processor.py::
   SpreadsheetProcessor._read_data`, which reads the canonical values off
   `config/application_config.py::ApplicationConfig`; the loading layer never imports `config`
@@ -198,7 +209,9 @@ Loading facts (`helpers/tools/data_loader/**`):
 - **G-01 UTF-8 encoding**: the protocol requires UTF-8 and the FAQ names a dedicated message; the code only reacts to `UnicodeDecodeError` (STRUCT-007). Proposal: STRUCT-013 encoding detection via `chardet` before parsing.
 - **G-02 `|` in CSV**: impossible to detect after `pd.read_csv(sep="|")`; would need a pre-parse scan of raw text.
 - **G-03 decimal comma**: the protocol mandates comma as decimal separator in CSV; code accepts both `,` and `.` everywhere (lenient, undocumented).
-- **G-04 `.qml`**: still scanned (`Config.extensions`) though removed from the protocol in v1.11.
+- **G-04 `.qml`** (resolved, BUG-015/ADR-0003): was still scanned (`Config.extensions`) though
+  removed from the protocol in v1.11; `.qml` scanning, `QMLReader` and the `Config` singleton are
+  now deleted — a `.qml` file is no longer read at all, only ever reported as unexpected (STRUCT-004).
 
 ## Protocol v1.16 update (2026-09-12)
 

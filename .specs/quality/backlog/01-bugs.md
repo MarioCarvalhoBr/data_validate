@@ -265,7 +265,7 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Related: PERF-003
 
 ### BUG-015 · Data loader mixes types and silently prefers CSV over XLSX
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Where: `helpers/tools/data_loader/api/facade.py:139` (`data["qmls"]` is a `list` inside a dict of
   `DataLoaderModel`), `engine/scanner.py:27-33` (CSV wins silently while
   `FileStructureValidator.check_ignored_files_in_folder_root` reports the same situation as an error),
@@ -273,6 +273,22 @@ Every fix here must land with a regression test under `tests/` that fails before
   although `SpreadsheetInfo.ALLOWED_EXTENSIONS` excludes it).
 - Proposed fix: `LoadResult` dataclass (`models: dict[str, LoadedSheet]`, `extras`, `issues`);
   one policy for conflicts; drop QML unless the protocol requires it.
+- Done: `.qml` support removed entirely (ADR-0003) — `readers/qml_reader.py` and its test module are
+  deleted, `.qml` dropped from `ReaderFactory._registry`, and `FileScanner` only scans
+  `ALLOWED_EXTENSIONS` (`.csv`, `.xlsx`) from `data_validate.specs.sheet_specs`; `.qml` files in the
+  input folder are simply not loaded (`FileStructureValidator` already flags them as unexpected, and
+  the golden harness proves that behaviour is unchanged). The CSV-over-XLSX conflict policy is now
+  explicit and documented in `engine/scanner.py`'s docstring: `FileScanner.scan()` returns
+  `(found, ignored, missing)` — the losing path of a conflict is recorded in `ignored` instead of
+  silently dropped, though nothing downstream consumes `ignored` yet (`FileStructureValidator`
+  still independently detects and reports the same conflict as STRUCT-006, unchanged). `DataLoaderFacade`
+  gained a real `load() -> LoadResult` method (`LoadResult(models, errors)`, see ARC-009); the
+  `"qmls"` key is gone from the returned mapping (grep across `data_validate/` found no consumer of
+  `raw_data_map["qmls"]`). Tests: `tests/unit/helpers/tools/data_loader/engine/test_scanner.py`,
+  `tests/unit/helpers/tools/data_loader/engine/test_factory.py`,
+  `tests/unit/helpers/tools/data_loader/api/test_facade.py`. Full unit suite green (1272 passed),
+  `make check` green, e2e golden harness 7/7 twice with an empty `git status --short
+  tests/e2e/golden` diff.
 
 ### BUG-016 · `en_US` catalog missing keys + leftover demo keys
 - Priority: P2 · Effort: S · Status: done
@@ -313,13 +329,28 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Related: TOOL-005
 
 ### BUG-018 · CSV reader depends on the file *stem* to find the separator
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `helpers/tools/data_loader/readers/csv_reader.py:19-22,33-35`
 - Problem: separator comes from `Config().file_specs.get(stem)`; any unknown stem falls back to
   `","` although the protocol uses `|`. `filled0[0] = lvl0[0] or "Unnamed: 0_level_0"` is an
   undocumented special case.
 - Proposed fix: pass `sep` and header strategy explicitly from the sheet spec; sniff with
   `csv.Sniffer` as fallback and report.
+- Done: `CSVReader.__init__` now takes an explicit `sep: str = "|"` constructor parameter instead
+  of reading the deleted `data_loader.common.config.Config` singleton by file stem;
+  `ReaderFactory.get_reader(file_path, header_strategy, sep="|")` passes it through only to
+  `CSVReader` (ignored by `ExcelReader`, which has no separator). `DataLoaderFacade.load()` computes
+  `sep` from `SHEET_SPECS[name].csv_separator` (every sheet declares `"|"` today — no user-visible
+  behaviour change) instead of guessing from the stem, so an unrecognised stem can no longer reach
+  the reader with a wrong `","` fallback (the facade only calls readers for names present in
+  `SHEET_SPECS`). The `filled0[0] = lvl0[0] or "Unnamed: 0_level_0"` special case is untouched (out
+  of this item's scope — still an undocumented fallback, now only documented via the module
+  docstring's cross-reference). `csv.Sniffer`-based fallback detection was judged unnecessary: with
+  `sep` always explicit from `SheetSpec`, there is no "unknown stem" path left to sniff. Tests:
+  `tests/unit/helpers/tools/data_loader/readers/test_csv_reader.py`,
+  `tests/unit/helpers/tools/data_loader/engine/test_factory.py`,
+  `tests/unit/helpers/tools/data_loader/api/test_facade.py`.
+- Related: ARC-003 (consumer migration)
 
 ### BUG-019 · Duplicate work and hard-coded root in the graph validator
 - Priority: P2 · Effort: S · Status: open

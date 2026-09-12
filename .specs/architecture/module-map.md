@@ -66,16 +66,14 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
-| `data_loader/api/facade.py` | Load all sheets | `DataLoaderFacade`, `DataLoaderModel` | `tools/data_loader/api/test_facade.py` | `loading/loader.py` | ARC-009, BUG-015 |
-| `data_loader/engine/scanner.py` | Folder scan | `FileScanner` | `tools/data_loader/engine/test_scanner.py` | `loading/scan.py` | BUG-015 |
-| `data_loader/engine/factory.py` | Reader by extension | `ReaderFactory` | `tools/data_loader/engine/test_factory.py` | `loading/readers/__init__.py` | — |
+| `data_loader/api/facade.py` | Load all sheets | `DataLoaderFacade` (`.load()` → `LoadResult`, deprecated `.load_all` shim), `DataLoaderModel`, `LoadResult` | `tools/data_loader/api/test_facade.py` | `loading/loader.py` | ARC-009 (in-progress) |
+| `data_loader/engine/scanner.py` | Folder scan, spec-driven | `FileScanner` (reads `SHEET_SPECS`/`ALLOWED_EXTENSIONS`) | `tools/data_loader/engine/test_scanner.py` | `loading/scan.py` | — (BUG-015 done) |
+| `data_loader/engine/factory.py` | Reader by extension | `ReaderFactory` (`.csv`/`.xlsx` only, explicit `sep`) | `tools/data_loader/engine/test_factory.py` | `loading/readers/__init__.py` | — |
 | `data_loader/readers/base_reader.py` | Template method | `BaseReader` | `tools/data_loader/readers/test_base_reader.py` | `loading/readers/base.py` | — |
-| `data_loader/readers/csv_reader.py` | CSV with `\|`, MultiIndex fill | `CSVReader` | `readers/test_csv_reader.py` | `loading/readers/csv.py` | BUG-018 |
+| `data_loader/readers/csv_reader.py` | CSV with explicit `sep`, MultiIndex fill | `CSVReader` (`sep` constructor param) | `readers/test_csv_reader.py` | `loading/readers/csv.py` | — (BUG-018 done) |
 | `data_loader/readers/excel_reader.py` | XLSX via calamine | `ExcelReader` | `readers/test_excel_reader.py` | `loading/readers/xlsx.py` | SEC-003 |
-| `data_loader/readers/qml_reader.py` | Raw text | `QMLReader` | `readers/test_qml_reader.py` | deleted (open question) | BUG-015 |
 | `data_loader/strategies/header.py` | Header rows | `SingleHeaderStrategy`, `DoubleHeaderStrategy` | `strategies/test_header.py` | `SheetSpec.header` | — |
-| `data_loader/common/config.py` | Singleton file specs | `Config`, `SingletonMeta` | none | `specs/sheet_specs.py` (implemented, consumers pending) | ARC-003 |
-| `data_loader/common/exceptions.py` | `MissingFileError`, `ReaderNotFoundError` | — | none | `loading/errors.py` | — |
+| `data_loader/common/exceptions.py` | `ReaderNotFoundError` | — | none | `loading/errors.py` | — |
 | `locale/language_manager.py` | Explicit-`locale` constructor (no file I/O), catalog loading, `text()` | `LanguageManager` | `tools/locale/test_language_manager.py` | `i18n/catalog.py` | — (BUG-004 done) |
 | `locale/language_enum.py` | Supported languages | `LanguageEnum` | `tools/locale/test_language_enum.py` | `i18n/locale.py` | BUG-012 |
 | `readme/generate_readme.py` | README from template | — | none | deleted (ADR-0009) | ARC-010 |
