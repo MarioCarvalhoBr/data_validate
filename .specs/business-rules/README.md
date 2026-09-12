@@ -39,7 +39,7 @@ backlog `09-protocol-v116.md` (`PROTO-*` items).
 | `LEG-` | `legenda` rules and legend relations | `FC`, `LEG_REL`, `LEG_RANGE` |
 | `PROP-` | `proporcionalidades` rules | `FS`, `IR`, `REP_IND_PROP`, `IND_VAL_PROP`, `IR_PROP`, `SUM_PROP` |
 | `SPELL-` | Spell-check | `SPELL` |
-| `TERR-` | Territory registry `spd_data.json` ↔ `valores`/`proporcionalidades` ids | new title (planned — PROTO-013) |
+| `TERR-` | Territory registry `spd_data.json` ↔ `valores`/`proporcionalidades` ids | dedicated new category `TERR` (`verification_name_territory_registry`), errors only, skipped when the file is absent (planned — PROTO-013, sequenced after backlog 01–07) |
 
 Target message keys follow `rule.<RULE-ID>.<error|warning>` (see `.specs/i18n/catalog.md`).
 

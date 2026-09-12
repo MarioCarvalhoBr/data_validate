@@ -1,9 +1,18 @@
 # Territories — optional server registry `spd_data.json`
 
-Source: **maintainer decision, 2026-09-12** (authoritative), example file
+Source: **maintainer decisions, 2026-09-12** (authoritative), example file
 `local_data/ULTIMA_IMPLEMENTACAO/spd_data.json`. The Canoa **server** generates this file and may
-pass it alongside the bundle; it is **optional by design** — when absent, the TERR rules are
-skipped (recorded as skipped-with-reason in the target engine, ADR-0006).
+pass it alongside the bundle. Three decisions define the semantics:
+
+1. **Own verification category** — the territory check is a first-class verification with its own
+   report title (a new `NamesEnum`-style member, working name `TERR` /
+   `verification_name_territory_registry`) and its own title + message keys in **both** locale
+   catalogs. It is never folded into an existing category.
+2. **Triggered only when `spd_data.json` is present** in the input folder. When the file is
+   absent, the verification appears in the report as **skipped / not executed** — never as an
+   error, never silently missing (skipped-with-reason in the target engine, ADR-0006).
+3. **Findings are always errors** (`Severity.ERROR`), never warnings: a `valores` or
+   `proporcionalidades` id that does not exist in the registry is an error.
 
 Protocol basis: v1.16 §2.6 (p.11) requires the `id` column of `valores` to reference the spatial
 representation ("deverão ter todos os objetos descritos no shapefile ou, no caso de dados para
@@ -27,19 +36,21 @@ rules below check the spreadsheets' ids are a **subset** of the registry; full *
 ## Rules
 
 ### TERR-001 · Every `valores.id` exists in the territory registry
-- Severity: error
-- NamesEnum: to be assigned when implemented (new verification title; register in both catalogs)
+- Severity: error (maintainer decision — never a warning)
+- NamesEnum: new dedicated member `TERR` (`verification_name_territory_registry`) — own report
+  category, title registered in both catalogs
 - Protocol: v1.16 §2.6 p.11 (relationship); artefact by maintainer decision 2026-09-12
 - Statement: when `spd_data.json` is present, every value in the `id` column of `valores` must
   equal the `id` of some entry in the registry's `values` list. Unknown ids are reported per id
-  with the row number. When the file is absent, the rule is skipped.
+  with the row number. When the file is absent, the whole `TERR` verification is reported as
+  skipped / not executed.
 - Current message (pt-BR): none — new rule; key `rule.TERR-001.error` in both catalogs
 - Implemented by: none yet (PROTO-013)
 - Covered by tests: none yet — unit + golden fixtures with and without the file
 
 ### TERR-002 · Every `proporcionalidades.id` exists in the territory registry
-- Severity: error
-- NamesEnum: same title as TERR-001
+- Severity: error (maintainer decision — never a warning)
+- NamesEnum: same dedicated `TERR` category as TERR-001
 - Protocol: v1.16 §2.7 pp.12–13 (the first columns carry the spatial representation); artefact by
   maintainer decision 2026-09-12
 - Statement: when `spd_data.json` is present, every value in the `id` column (level-2 header) of
