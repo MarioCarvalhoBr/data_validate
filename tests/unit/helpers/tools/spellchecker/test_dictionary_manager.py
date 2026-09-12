@@ -8,11 +8,40 @@ dictionary initialization, validation, word loading, and cleanup operations.
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 import os
-import tempfile
 from pathlib import Path
 
+import pytest
 
 from data_validate.helpers.tools.spellchecker.dictionary_manager import DictionaryManager
+
+
+def _real_pt_br_dictionary_available() -> bool:
+    """Probe whether the bundled pt_BR hunspell dictionary can be loaded for real.
+
+    Mirrors the probe in `tests/e2e/test_golden.py`: some environments have the
+    `enchant` Python package installed without the native libenchant/hunspell
+    backend, so even the dictionary bundled under
+    `static/dictionaries/hunspell` cannot be opened there.
+
+    Returns:
+        bool: True when a real `DictionaryManager("pt_BR")` can validate its
+            dictionary without errors.
+    """
+    try:
+        manager = DictionaryManager("pt_BR")
+        errors = manager.validate_dictionary()
+        manager.clean_temporary_files()
+        return not errors
+    except Exception:
+        return False
+
+
+_REAL_ENCHANT_AVAILABLE = _real_pt_br_dictionary_available()
+
+requires_real_enchant = pytest.mark.skipif(
+    not _REAL_ENCHANT_AVAILABLE,
+    reason="pyenchant/hunspell native backend unavailable in this environment",
+)
 
 
 class TestDictionaryManager:
@@ -31,22 +60,47 @@ class TestDictionaryManager:
         assert manager._errors == []
         assert isinstance(manager.path_dictionary, Path)
 
-    def test_setup_paths(self, mocker) -> None:
-        """Test path setup and environment variable configuration."""
-        # Clear os.environ before creating manager
-        original_env = os.environ.copy()
-        os.environ.clear()
+    def test_initialization_does_not_mutate_environment(self, mocker) -> None:
+        """Constructing a DictionaryManager must not touch `ENCHANT_CONFIG_DIR` (SEC-007).
 
+        The old `_setup_paths` set the environment variable for the whole
+        process as soon as the manager was built; the fix scopes that
+        mutation to the individual calls that actually need it
+        (`validate_dictionary`/`initialize_dictionary`) and restores the
+        previous value afterwards, so construction alone must be a no-op on
+        `os.environ`.
+        """
+        mock_broker = mocker.MagicMock()
+        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+
+        before = os.environ.copy()
+        DictionaryManager("pt_BR")
+
+        assert os.environ == before
+
+    def test_enchant_config_dir_scope_restores_previous_value(self, mocker) -> None:
+        """`_enchant_config_dir_scope` must restore a pre-existing `ENCHANT_CONFIG_DIR`."""
+        manager = DictionaryManager("pt_BR")
+        mocker.patch.object(manager, "_ensure_enchant_session_dir", return_value=Path("/tmp/fake-session-dir"))
+
+        os.environ["ENCHANT_CONFIG_DIR"] = "/some/previous/value"
         try:
-            manager = DictionaryManager("pt_BR")
-
-            # Check that ENCHANT_CONFIG_DIR is set
-            assert "ENCHANT_CONFIG_DIR" in os.environ
-            assert str(manager.path_dictionary) == os.environ["ENCHANT_CONFIG_DIR"]
+            with manager._enchant_config_dir_scope():
+                assert os.environ["ENCHANT_CONFIG_DIR"] == "/tmp/fake-session-dir"
+            assert os.environ["ENCHANT_CONFIG_DIR"] == "/some/previous/value"
         finally:
-            # Restore original environment
-            os.environ.clear()
-            os.environ.update(original_env)
+            os.environ.pop("ENCHANT_CONFIG_DIR", None)
+
+    def test_enchant_config_dir_scope_restores_absence(self, mocker) -> None:
+        """`_enchant_config_dir_scope` must remove the variable if it was unset before."""
+        manager = DictionaryManager("pt_BR")
+        mocker.patch.object(manager, "_ensure_enchant_session_dir", return_value=Path("/tmp/fake-session-dir"))
+
+        os.environ.pop("ENCHANT_CONFIG_DIR", None)
+        with manager._enchant_config_dir_scope():
+            assert os.environ["ENCHANT_CONFIG_DIR"] == "/tmp/fake-session-dir"
+
+        assert "ENCHANT_CONFIG_DIR" not in os.environ
 
     def test_validate_dictionary_exists(self, mocker) -> None:
         """Test dictionary validation when dictionary exists."""
@@ -102,8 +156,10 @@ class TestDictionaryManager:
         assert result == mock_dictionary
         assert manager.dictionary == mock_dictionary
         mock_broker.request_dict.assert_called_once_with("pt_BR")
-        mock_dictionary.add.assert_any_call("word1")
-        mock_dictionary.add.assert_any_call("word2")
+        # Session-only words (BUG-022): never persisted with `add()`.
+        mock_dictionary.add_to_session.assert_any_call("word1")
+        mock_dictionary.add_to_session.assert_any_call("word2")
+        mock_dictionary.add.assert_not_called()
 
     def test_initialize_dictionary_with_comment_words(self, mocker) -> None:
         """Test dictionary initialization with comment words (starting with #)."""
@@ -120,10 +176,10 @@ class TestDictionaryManager:
         manager.initialize_dictionary(["word1", "#comment", "word2"])
 
         # Should only add non-comment words
-        mock_dictionary.add.assert_any_call("word1")
-        mock_dictionary.add.assert_any_call("word2")
+        mock_dictionary.add_to_session.assert_any_call("word1")
+        mock_dictionary.add_to_session.assert_any_call("word2")
         # Should not add comment word - check that it wasn't called with comment
-        calls = mock_dictionary.add.call_args_list
+        calls = mock_dictionary.add_to_session.call_args_list
         comment_calls = [call for call in calls if call[0][0] == "#comment"]
         assert len(comment_calls) == 0
 
@@ -142,10 +198,10 @@ class TestDictionaryManager:
         manager.initialize_dictionary(["word1", "", "word2"])
 
         # Should only add non-empty words
-        mock_dictionary.add.assert_any_call("word1")
-        mock_dictionary.add.assert_any_call("word2")
+        mock_dictionary.add_to_session.assert_any_call("word1")
+        mock_dictionary.add_to_session.assert_any_call("word2")
         # Should not add empty word - check that it wasn't called with empty string
-        calls = mock_dictionary.add.call_args_list
+        calls = mock_dictionary.add_to_session.call_args_list
         empty_calls = [call for call in calls if call[0][0] == ""]
         assert len(empty_calls) == 0
 
@@ -199,16 +255,17 @@ class TestDictionaryManager:
 
         manager._load_extra_words()
 
-        # Should add non-comment, non-empty words
-        mock_dictionary.add.assert_any_call("word1")
-        mock_dictionary.add.assert_any_call("word2")
-        mock_dictionary.add.assert_any_call("word3")
+        # Should add non-comment, non-empty words to the session word list only.
+        mock_dictionary.add_to_session.assert_any_call("word1")
+        mock_dictionary.add_to_session.assert_any_call("word2")
+        mock_dictionary.add_to_session.assert_any_call("word3")
         # Should not add comment or empty lines - check that they weren't called
-        calls = mock_dictionary.add.call_args_list
+        calls = mock_dictionary.add_to_session.call_args_list
         comment_calls = [call for call in calls if call[0][0] == "#comment"]
         empty_calls = [call for call in calls if call[0][0] == ""]
         assert len(comment_calls) == 0
         assert len(empty_calls) == 0
+        mock_dictionary.add.assert_not_called()
 
     def test_load_extra_words_file_not_exists(self, mocker) -> None:
         """Test loading extra words when file does not exist."""
@@ -222,7 +279,7 @@ class TestDictionaryManager:
 
         assert len(manager._errors) == 1
         assert "Arquivo extra-words.dic não encontrado" in manager._errors[0]
-        mock_dictionary.add.assert_not_called()
+        mock_dictionary.add_to_session.assert_not_called()
 
     def test_load_extra_words_file_read_error(self, mocker) -> None:
         """Test loading extra words when file read fails."""
@@ -238,8 +295,13 @@ class TestDictionaryManager:
         assert len(manager._errors) == 1
         assert "Aviso: Não foi possível carregar palavras extras: File read error" in manager._errors[0]
 
-    def test_clean_temporary_files_success(self, mocker) -> None:
-        """Test successful cleanup of temporary files."""
+    def test_clean_temporary_files_releases_dictionary_and_broker(self, mocker) -> None:
+        """Test that cleanup drops the dictionary/broker references.
+
+        Replaces the old `test_clean_temporary_files_success`: there are no
+        `.dic`/`.exc` files to delete any more (BUG-022, SEC-007), so this
+        only asserts the reference-dropping half of the old behaviour.
+        """
         mock_dictionary = mocker.MagicMock()
         mock_broker = mocker.MagicMock()
 
@@ -247,19 +309,28 @@ class TestDictionaryManager:
         manager.dictionary = mock_dictionary
         manager.broker = mock_broker
 
-        # Mock file operations
-        mock_path = mocker.MagicMock()
-        mock_path.exists.return_value = True
-        mock_path.unlink.return_value = None
-
-        mocker.patch.object(Path, "__new__", return_value=mock_path)
         manager.clean_temporary_files()
 
-        # Should cleanup dictionary and broker
         assert manager.dictionary is None
         assert manager.broker is None
-        # Should attempt to remove temporary files
-        assert mock_path.unlink.call_count >= 2  # .dic and .exc files
+
+    def test_clean_temporary_files_removes_session_directory(self, mocker) -> None:
+        """Test that cleanup discards the session-scoped Enchant config directory.
+
+        Replaces the old file-deletion assertions: instead of removing
+        predictable `.dic`/`.exc` files from the package directory, cleanup
+        now removes the whole ephemeral session directory Enchant was
+        pointed at (SEC-007).
+        """
+        manager = DictionaryManager("pt_BR")
+        session_dir = manager._ensure_enchant_session_dir()
+
+        assert session_dir.exists()
+
+        manager.clean_temporary_files()
+
+        assert not session_dir.exists()
+        assert manager._enchant_session_dir is None
 
     def test_clean_temporary_files_dictionary_cleanup_error(self, mocker) -> None:
         """Test cleanup when dictionary cleanup fails."""
@@ -277,39 +348,13 @@ class TestDictionaryManager:
         assert len(manager._errors) == 1
         assert "Warning: Could not cleanup Enchant resources: Cleanup error" in manager._errors[0]
 
-    def test_clean_temporary_files_file_removal_error(self, mocker) -> None:
-        """Test cleanup when file removal fails."""
-        mock_dictionary = mocker.MagicMock()
-        mock_broker = mocker.MagicMock()
-
+    def test_clean_temporary_files_without_session_directory_is_a_no_op(self) -> None:
+        """Test that cleanup tolerates a manager that never created a session directory."""
         manager = DictionaryManager("pt_BR")
-        manager.dictionary = mock_dictionary
-        manager.broker = mock_broker
 
-        # Mock file operations to raise exception
-        mock_path = mocker.MagicMock()
-        mock_path.exists.return_value = True
-        mock_path.unlink.side_effect = OSError("Permission denied")
-
-        mocker.patch.object(Path, "__new__", return_value=mock_path)
         manager.clean_temporary_files()
 
-        # Should handle file removal error gracefully
-        assert len(manager._errors) == 2  # One for each file
-        assert "Warning: Could not remove temporary file" in manager._errors[0]
-
-    def test_destructor_cleanup(self, mocker) -> None:
-        """Test that destructor calls cleanup."""
-        manager = DictionaryManager("pt_BR")
-
-        # Create a proper mock for the method
-        mock_cleanup = mocker.patch.object(manager, "clean_temporary_files")
-
-        # Call __del__ directly to test it
-        manager.__del__()
-
-        # Verify cleanup was called
-        mock_cleanup.assert_called_once()
+        assert manager._enchant_session_dir is None
 
 
 class TestDictionaryManagerEdgeCases:
@@ -360,7 +405,7 @@ class TestDictionaryManagerEdgeCases:
         result = manager.initialize_dictionary(large_word_list)
 
         assert result == mock_dictionary
-        assert mock_dictionary.add.call_count == 10000
+        assert mock_dictionary.add_to_session.call_count == 10000
 
     def test_load_extra_words_empty_file(self, mocker) -> None:
         """Test loading extra words from empty file."""
@@ -377,7 +422,7 @@ class TestDictionaryManagerEdgeCases:
         manager._load_extra_words()
 
         # Should not add any words
-        mock_dictionary.add.assert_not_called()
+        mock_dictionary.add_to_session.assert_not_called()
 
     def test_load_extra_words_file_with_only_comments(self, mocker) -> None:
         """Test loading extra words from file with only comments."""
@@ -396,21 +441,7 @@ class TestDictionaryManagerEdgeCases:
         manager._load_extra_words()
 
         # Should not add any words
-        mock_dictionary.add.assert_not_called()
-
-    def test_clean_temporary_files_no_files_exist(self, mocker) -> None:
-        """Test cleanup when no temporary files exist."""
-        manager = DictionaryManager("pt_BR")
-
-        # Mock file operations - files don't exist
-        mock_path = mocker.MagicMock()
-        mock_path.exists.return_value = False
-
-        mocker.patch.object(Path, "__new__", return_value=mock_path)
-        manager.clean_temporary_files()
-
-        # Should not attempt to remove files
-        mock_path.unlink.assert_not_called()
+        mock_dictionary.add_to_session.assert_not_called()
 
     def test_multiple_initialization_attempts(self, mocker) -> None:
         """Test multiple dictionary initialization attempts."""
@@ -457,22 +488,83 @@ class TestDictionaryManagerIntegration:
         assert result == mock_dictionary
 
         # Step 3: Cleanup
-        mocker.patch.object(Path, "__new__", return_value=mocker.MagicMock())
         manager.clean_temporary_files()
 
         assert manager.dictionary is None
         assert manager.broker is None
+        assert manager._enchant_session_dir is None
 
-    def test_path_handling_with_real_paths(self, mocker) -> None:
-        """Test path handling with real path operations."""
-        with tempfile.TemporaryDirectory() as temp_dir:
-            # Mock the path to point to our temp directory
-            temp_path = Path(temp_dir)
+    def test_path_handling_with_real_paths(self) -> None:
+        """Test that `path_dictionary` resolves to the real bundled dictionaries folder."""
+        manager = DictionaryManager("pt_BR")
 
-            mocker.patch.object(Path, "resolve", return_value=temp_path)
-            mocker.patch.object(Path, "parents", return_value=[temp_path, temp_path, temp_path, temp_path])
-            mocker.patch.object(Path, "__truediv__", return_value=temp_path / "static" / "dictionaries")
-            DictionaryManager("pt_BR")
+        assert manager.path_dictionary.name == "dictionaries"
+        assert manager.path_dictionary.is_dir()
+        assert (manager.path_dictionary / "hunspell").is_dir()
+        # Construction alone must not touch the environment (SEC-007).
+        assert "ENCHANT_CONFIG_DIR" not in os.environ or manager._enchant_session_dir is None
 
-            # Should set up paths correctly
-            assert "ENCHANT_CONFIG_DIR" in os.environ
+
+class TestDictionaryManagerRealEnchant:
+    """Regression tests against the real Enchant/hunspell backend (SEC-007, BUG-022).
+
+    These prove the bundled `pt_BR` dictionary still resolves through the
+    session-scoped `ENCHANT_CONFIG_DIR`, that session words are usable
+    without ever touching disk, and that two managers in the same process
+    are fully isolated from each other. They are skipped (not failed) when
+    the native libenchant/hunspell backend is unavailable.
+    """
+
+    @pytest.mark.requires_enchant
+    @requires_real_enchant
+    def test_session_word_is_checkable(self) -> None:
+        manager = DictionaryManager("pt_BR")
+        try:
+            dictionary = manager.initialize_dictionary(["palavraz"])
+            assert dictionary is not None
+            assert dictionary.check("palavraz") is True
+        finally:
+            manager.clean_temporary_files()
+
+    @pytest.mark.requires_enchant
+    @requires_real_enchant
+    def test_environment_is_unchanged_after_full_lifecycle(self) -> None:
+        before = os.environ.copy()
+
+        manager = DictionaryManager("pt_BR")
+        manager.initialize_dictionary(["palavraz"])
+        manager.validate_dictionary()
+        manager.clean_temporary_files()
+
+        assert os.environ == before
+
+    @pytest.mark.requires_enchant
+    @requires_real_enchant
+    def test_no_file_created_under_package_dictionaries_directory(self) -> None:
+        manager = DictionaryManager("pt_BR")
+        before_listing = sorted(p.name for p in manager.path_dictionary.iterdir())
+
+        manager.initialize_dictionary(["palavraz"])
+        manager.validate_dictionary()
+        manager.clean_temporary_files()
+
+        after_listing = sorted(p.name for p in manager.path_dictionary.iterdir())
+        assert after_listing == before_listing
+
+    @pytest.mark.requires_enchant
+    @requires_real_enchant
+    def test_two_managers_do_not_interfere(self) -> None:
+        manager_one = DictionaryManager("pt_BR")
+        manager_two = DictionaryManager("pt_BR")
+        try:
+            dictionary_one = manager_one.initialize_dictionary(["palavraumexclusivo"])
+            dictionary_two = manager_two.initialize_dictionary(["outrapalavraz"])
+
+            assert dictionary_one.check("palavraumexclusivo") is True
+            assert dictionary_two.check("palavraumexclusivo") is False
+
+            assert dictionary_two.check("outrapalavraz") is True
+            assert dictionary_one.check("outrapalavraz") is False
+        finally:
+            manager_one.clean_temporary_files()
+            manager_two.clean_temporary_files()
