@@ -211,13 +211,16 @@ class TestSpellCheckerControllerEdgeCases:
         mock_dictionary.check.return_value = True
         spellchecker_controller.dictionary = mock_dictionary
 
-        # Create very long text
+        # Create very long text (a single repeated word)
         long_text = "word " * 1000
 
         errors = spellchecker_controller.find_spelling_errors(long_text)
 
         assert errors == []
-        assert mock_dictionary.check.call_count == 1000
+        # PERF-006: the word-level cache means the dictionary is consulted
+        # once per unique word, not once per occurrence (would be 1000
+        # without the cache).
+        assert mock_dictionary.check.call_count == 1
 
     def test_find_spelling_errors_unicode_text(self, spellchecker_controller, mocker) -> None:
         """Test spelling error detection with Unicode text."""
@@ -359,4 +362,122 @@ class TestSpellCheckerControllerIntegration:
 
         # All texts should be processed without issues
         assert all_warnings == []
-        assert mock_dictionary.check.call_count == 6  # 2 words per text * 3 texts
+        # PERF-006: "Test" repeats between "Test Text" and "Another Test",
+        # so the word-level cache means it is only checked once — 5 unique
+        # words (Hello, World, Test, Text, Another), not 6 occurrences.
+        assert mock_dictionary.check.call_count == 5
+
+
+class TestSpellCheckerControllerCaching:
+    """PERF-006 regression tests: word-level check-call caching."""
+
+    @pytest.fixture
+    def mock_dictionary_manager(self, mocker):
+        """Create a mock DictionaryManager for testing."""
+        return mocker.MagicMock(spec=DictionaryManager)
+
+    @pytest.fixture
+    def spellchecker_controller(self, mock_dictionary_manager) -> SpellCheckerController:
+        """Create SpellCheckerController instance for testing."""
+        return SpellCheckerController(mock_dictionary_manager)
+
+    def test_find_spelling_errors_calls_dictionary_once_per_unique_word(self, spellchecker_controller, mocker) -> None:
+        """A counting fake in place of enchant's Dict shows one call per unique word.
+
+        Before PERF-006 this counted one call per occurrence (4 calls for
+        4 repetitions of "dado"); the cache brings it down to one call per
+        unique word.
+        """
+
+        class CountingFakeDict:
+            def __init__(self) -> None:
+                self.calls = 0
+
+            def check(self, word: str) -> bool:
+                self.calls += 1
+                return True
+
+        counting_dict = CountingFakeDict()
+        spellchecker_controller.dictionary = counting_dict
+
+        spellchecker_controller.find_spelling_errors("dado dado disponivel dado")
+
+        assert counting_dict.calls == 2  # only "dado" and "disponivel" are unique
+
+    def test_find_spelling_errors_cache_persists_across_calls(self, spellchecker_controller, mocker) -> None:
+        """The word cache is not cleared between calls within the same controller instance."""
+        mock_dictionary = mocker.MagicMock()
+        mock_dictionary.check.return_value = True
+        spellchecker_controller.dictionary = mock_dictionary
+
+        spellchecker_controller.find_spelling_errors("Hello World")
+        spellchecker_controller.find_spelling_errors("Hello Test")
+
+        # "Hello" is cached after the first call; only "World" and "Test" are new
+        assert mock_dictionary.check.call_count == 3
+        assert spellchecker_controller._check_cache == {"Hello": True, "World": True, "Test": True}
+
+    def test_find_spelling_errors_cache_records_misspelled_words_too(self, spellchecker_controller, mocker) -> None:
+        """The cache stores both hits and misses, so a repeated misspelling is still cached."""
+        mock_dictionary = mocker.MagicMock()
+        mock_dictionary.check.side_effect = lambda word: word != "Wrld"
+        spellchecker_controller.dictionary = mock_dictionary
+
+        errors = spellchecker_controller.find_spelling_errors("Wrld Wrld Wrld")
+
+        assert errors == ["Wrld", "Wrld", "Wrld"]
+        mock_dictionary.check.assert_called_once_with("Wrld")
+
+
+class TestSpellCheckerControllerQualityEvaluation:
+    """Tests for the `evaluate_text_quality`/`format_quality_warnings` split (PERF-006)."""
+
+    @pytest.fixture
+    def mock_dictionary_manager(self, mocker):
+        """Create a mock DictionaryManager for testing."""
+        return mocker.MagicMock(spec=DictionaryManager)
+
+    @pytest.fixture
+    def spellchecker_controller(self, mock_dictionary_manager) -> SpellCheckerController:
+        """Create SpellCheckerController instance for testing."""
+        return SpellCheckerController(mock_dictionary_manager)
+
+    def test_evaluate_text_quality_returns_signals_only(self, spellchecker_controller, mocker) -> None:
+        """`evaluate_text_quality` is row-independent: no column/row/sheet arguments."""
+        mock_dictionary = mocker.MagicMock()
+        mock_dictionary.check.side_effect = lambda word: word != "Wrld"
+        spellchecker_controller.dictionary = mock_dictionary
+
+        has_multiple_spaces, spelling_errors = spellchecker_controller.evaluate_text_quality("Hello  Wrld")
+
+        assert has_multiple_spaces is True
+        assert spelling_errors == ["Wrld"]
+
+    def test_format_quality_warnings_builds_row_specific_messages(self, spellchecker_controller) -> None:
+        """`format_quality_warnings` renders precomputed signals for a specific row."""
+        warnings = spellchecker_controller.format_quality_warnings(True, ["Wrld"], "column1", 2, "Sheet1")
+
+        assert len(warnings) == 2
+        assert "linha 4" in warnings[0]  # row_index + 2
+        assert "Wrld" in warnings[1]
+
+    def test_format_quality_warnings_no_issues_returns_empty_list(self, spellchecker_controller) -> None:
+        """`format_quality_warnings` returns no messages when both signals are clean."""
+        warnings = spellchecker_controller.format_quality_warnings(False, [], "column1", 0, "Sheet1")
+
+        assert warnings == []
+
+    def test_check_text_quality_matches_evaluate_and_format_composition(self, spellchecker_controller, mocker) -> None:
+        """`check_text_quality` is equivalent to evaluate_text_quality + format_quality_warnings."""
+        mock_dictionary = mocker.MagicMock()
+        mock_dictionary.check.side_effect = lambda word: word != "Wrld"
+        spellchecker_controller.dictionary = mock_dictionary
+
+        composed = spellchecker_controller.check_text_quality("Hello  Wrld", "column1", 1, "Sheet1")
+
+        has_multiple_spaces, spelling_errors = spellchecker_controller.evaluate_text_quality("Hello  Wrld")
+        expected = spellchecker_controller.format_quality_warnings(
+            has_multiple_spaces, spelling_errors, "column1", 1, "Sheet1"
+        )
+
+        assert composed == expected

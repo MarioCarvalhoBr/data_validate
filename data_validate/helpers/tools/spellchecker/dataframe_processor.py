@@ -23,7 +23,9 @@ class DataFrameProcessor:
 
         warnings = []
         if missing_columns:
-            warnings.append(f"{file_name}: A verificação de ortografia foi abortada " f"para as colunas: {list(missing_columns)}.")
+            warnings.append(
+                f"{file_name}: A verificação de ortografia foi abortada para as colunas: {list(missing_columns)}."
+            )
 
         valid_columns = list(target_columns & existing_columns)
         return valid_columns, warnings
@@ -38,10 +40,21 @@ class DataFrameProcessor:
             if not mask.any():
                 continue
 
-            # Process each valid row
-            for idx in df[mask].index:
-                text = str(df.loc[idx, column])
-                text_warnings = self.spell_checker.check_text_quality(text, column, idx, sheet_name)
+            # Evaluate each unique text only once (PERF-006): quality signals
+            # (multiple spaces, spelling errors) depend only on the text
+            # content, not on the row it came from, so duplicate texts are
+            # only sent to the spell checker/dictionary once per column.
+            texts = df.loc[mask, column].astype(str)
+            quality_by_text = {text: self.spell_checker.evaluate_text_quality(text) for text in texts.unique()}
+
+            # Iterate rows in the original order, looking up each row's
+            # precomputed result, so warnings keep the same per-row messages
+            # and ordering as before the dedup.
+            for idx, text in texts.items():
+                has_multiple_spaces, spelling_errors = quality_by_text[text]
+                text_warnings = self.spell_checker.format_quality_warnings(
+                    has_multiple_spaces, spelling_errors, column, idx, sheet_name
+                )
                 warnings.extend(text_warnings)
 
         return warnings
