@@ -127,11 +127,33 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: TOOL-002
 
 ### SEC-007 · Global environment mutation and predictable temp files
-- Priority: P2 · Effort: S · Status: open
-- Where: `helpers/tools/spellchecker/dictionary_manager.py:41,139-147`
-- Problem: `ENCHANT_CONFIG_DIR` set for the whole process; personal word lists written to a
+- Priority: P2 · Effort: S · Status: done
+- Where: `helpers/tools/spellchecker/dictionary_manager.py`
+- Problem (fixed): `ENCHANT_CONFIG_DIR` set for the whole process; personal word lists written to a
   predictable path inside the package; deleted in `__del__`.
-- Proposed fix: session-scoped `tempfile.TemporaryDirectory()` per run; `add_to_session`.
+- Fix shipped: `enchant.Broker.set_param` is a documented no-op with the Enchant C library >= 2.0
+  (this project links 2.3.3), and every `Broker`/`Dict` call re-reads `ENCHANT_CONFIG_DIR` from the
+  process environment at call time rather than caching it — so a per-broker parameter is not
+  available and the environment variable is the only lever. `DictionaryManager` now creates one
+  `tempfile.TemporaryDirectory()` per manager instance (lazily, on first
+  `validate_dictionary`/`initialize_dictionary` call), symlinks the bundled `static/dictionaries/
+  hunspell` folder into it, and only ever points `ENCHANT_CONFIG_DIR` at that throwaway directory —
+  never at the package directory. The mutation is scoped by
+  `DictionaryManager._enchant_config_dir_scope()`, a context manager that snapshots the previous
+  value (or its absence) and restores it in a `finally` block around each broker/dict call, so the
+  process environment is left exactly as it was found once the call returns. `clean_temporary_files`
+  discards the whole temporary directory (`TemporaryDirectory.cleanup()`) instead of deleting
+  predictable `.dic`/`.exc` files by name. `__del__` was removed — there is no on-disk personal
+  dictionary left to clean up if a caller forgets to call `clean_temporary_files` (the OS/CPython's
+  own `tempfile` finalizer reclaims the directory regardless). Regression tests:
+  `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py` —
+  `test_initialization_does_not_mutate_environment`,
+  `test_enchant_config_dir_scope_restores_previous_value`,
+  `test_enchant_config_dir_scope_restores_absence` (mocked Broker, no real enchant needed), and
+  `TestDictionaryManagerRealEnchant` (`test_environment_is_unchanged_after_full_lifecycle`,
+  `test_no_file_created_under_package_dictionaries_directory`,
+  `test_two_managers_do_not_interfere`), skipped cleanly when the native libenchant/hunspell backend
+  is unavailable.
 - Related: BUG-022
 
 ### SEC-008 · Exit code and stdout contract

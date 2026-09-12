@@ -544,14 +544,30 @@ Every fix here must land with a regression test under `tests/` that fails before
   under `<output_folder>/logs`; `finalize()` leaves `logger.handlers == []` in both modes).
 
 ### BUG-022 · Spellchecker writes personal dictionaries inside the package directory
-- Priority: P2 · Effort: M · Status: open
-- Where: `helpers/tools/spellchecker/dictionary_manager.py:41,80-81,101,139-147`
-- Problem: sets `os.environ["ENCHANT_CONFIG_DIR"]` globally, adds user words with
+- Priority: P2 · Effort: M · Status: done
+- Where: `helpers/tools/spellchecker/dictionary_manager.py`
+- Problem (fixed): set `os.environ["ENCHANT_CONFIG_DIR"]` globally, added user words with
   `dictionary.add()` (persisted by enchant to `<package>/static/dictionaries/pt_BR.dic|.exc`), then
-  deletes those files in `__del__`. Fails on read-only installs, races between concurrent runs, and
-  words from one spreadsheet can leak into another run if cleanup fails.
-- Proposed fix: use `dictionary.add_to_session()` (session-only) or a `DictWithPWL` pointing to a
-  temp dir; no environment mutation.
+  deleted those files in `__del__`. Failed on read-only installs, raced between concurrent runs, and
+  words from one spreadsheet could leak into another run if cleanup failed. Note: opening the
+  dictionary at all (even with zero `add()` calls) was enough to make Enchant create the empty
+  `.dic`/`.exc` PWL files — `add()` vs `add_to_session()` alone does not stop the file creation,
+  because Enchant auto-manages a default personal word list rooted at `ENCHANT_CONFIG_DIR` as soon
+  as a dictionary is requested.
+- Fix shipped: `dictionary.add()` → `dictionary.add_to_session()` everywhere a user/extra word is
+  added (`initialize_dictionary`, `_load_extra_words`), so a word is only ever known to the
+  in-process session, never written to a personal word list file. Combined with SEC-007's
+  session-scoped `ENCHANT_CONFIG_DIR` (a symlinked temp directory, not the package directory), no
+  file is created under `static/dictionaries` at any point — not even the automatic PWL Enchant
+  would otherwise create merely from `request_dict`. `clean_temporary_files` was rewritten to drop
+  the broker/dictionary references and discard the temp directory; the old file-deletion loop
+  (`Path.unlink()` on `<lang>.dic`/`<lang>.exc`) and `__del__` were both removed — there is no
+  on-disk personal dictionary left to clean up. Verified with two real, un-mocked `pyenchant`
+  managers running the bundled `pt_BR` dictionary concurrently in one process
+  (`test_two_managers_do_not_interfere`): each manager's session words are invisible to the other.
+  Regression tests: `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py` (see SEC-007
+  for the full list; `TestDictionaryManagerRealEnchant.test_session_word_is_checkable` and
+  `test_no_file_created_under_package_dictionaries_directory` are the ones specific to this item).
 
 ### BUG-023 · Spell dictionary language taken from CLI arg, UI language from file
 - Priority: P2 · Effort: S · Status: done

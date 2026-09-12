@@ -47,8 +47,12 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Statement: the input directory must contain at least one entry.
 - Current message (pt-BR): catalog key `validator_structure_error_empty_directory` — `O diretório '{dir_path}' está vazio. Por favor, adicione os arquivos necessários.` (present in both locales)
 - Target message key: `rule.STRUCT-001.error`
-- Implemented by: `validators/structure/file_structure_validator.py::FileStructureValidator.check_empty_directory` (uses `FileSystemUtils.check_directory_is_empty`)
-- Covered by tests: none — TST-001 (helper covered by `tests/unit/helpers/base/test_file_system_utils.py`)
+- Implemented by: `rules/structure.py::check_input_directory_not_empty` (ARC-017 Phase 3b port; the
+  deleted `validators/structure/file_structure_validator.py::FileStructureValidator.
+  check_empty_directory` is the legacy predecessor)
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckInputDirectoryNotEmpty` (helper
+  it used to call, `FileSystemUtils.check_directory_is_empty`, is unused by the port and remains
+  covered by `tests/unit/helpers/base/test_file_system_utils.py`)
 - Notes / known defects: one of the few rules already using the i18n catalog.
 
 ### STRUCT-002 · Files must be in the root, not inside a single subfolder
@@ -56,22 +60,30 @@ Loading facts (`helpers/tools/data_loader/**`):
 - NamesEnum: FS
 - Protocol: §2 p.3 ("entregues em uma única pasta")
 - Statement: if the input directory contains exactly one entry and it is a directory, the bundle was zipped with an extra folder level; abort structural checks with this error.
-- Current message (pt-BR): key `validator_structure_error_files_not_in_folder` — `Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.` (pt_BR only)
+- Current message (pt-BR): key `validator_structure_error_files_not_in_folder` — `Os arquivos não podem estar dentro de uma pasta. Eles devem ser zipados diretamente.` (present in both locales)
 - Target message key: `rule.STRUCT-002.error`
-- Implemented by: `file_structure_validator.py::FileStructureValidator.check_not_expected_files_in_folder_root` (first branch)
-- Covered by tests: none — TST-001
-- Notes / known defects: key missing from `en_US` (BUG-016).
+- Implemented by: `rules/structure.py::check_files_not_zipped_inside_a_folder` (ARC-017 Phase 3b
+  port of the deleted `FileStructureValidator.check_not_expected_files_in_folder_root`'s first
+  branch); `rules/structure.py::_is_zipped_with_extra_folder` is the shared gate STRUCT-003/
+  STRUCT-004 also consult so the single subfolder entry is reported once, not three times
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckFilesNotZippedInsideAFolder`
+- Notes / known defects: the "missing from `en_US`" note (BUG-016) was stale — both locales already
+  carry this key.
 
 ### STRUCT-003 · No unexpected folders in the root
 - Severity: error
 - NamesEnum: FS
 - Protocol: §2 p.3
 - Statement: every entry in the input directory must be a regular file; directories are reported.
-- Current message (pt-BR): key `validator_structure_error_unexpected_folder` — `A pasta '{file_name}' não é esperada.` (pt_BR only)
+- Current message (pt-BR): key `validator_structure_error_unexpected_folder` — `A pasta '{file_name}' não é esperada.` (present in both locales)
 - Target message key: `rule.STRUCT-003.error`
-- Implemented by: `file_structure_validator.py::FileStructureValidator.check_not_expected_files_in_folder_root`
-- Covered by tests: none — TST-001
-- Notes / known defects: `.format()` is applied on the already-formatted catalog text; key missing from `en_US` (BUG-016).
+- Implemented by: `rules/structure.py::check_no_unexpected_folders` (ARC-017 Phase 3b port of the
+  deleted `FileStructureValidator.check_not_expected_files_in_folder_root`)
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckNoUnexpectedFolders`
+- Notes / known defects: the legacy `.format()`-on-an-unformatted-template call is gone — the port
+  renders through a single `ctx.translate(message_key, **params)` call, byte-identical output
+  (verified by the e2e golden harness); the "missing from `en_US`" note (BUG-016) was stale — both
+  locales already carry this key.
 
 ### STRUCT-004 · No unexpected files in the root
 - Severity: error
@@ -80,36 +92,46 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Statement: every file must be `<base>.<ext>` with `<base>` in the expected or optional set and `<ext>` in `{.csv, .xlsx}`; anything else (e.g. `Descricao.xlsx`, `legenda.qml`, `arquivo_aleatorio.xlsx`) is an error. Matching is case-sensitive.
 - Current message (pt-BR): key `validator_structure_error_unexpected_file` — `O arquivo '{file_name}' não é esperado.` (present in both locales)
 - Target message key: `rule.STRUCT-004.error`
-- Implemented by: `file_structure_validator.py::FileStructureValidator.check_not_expected_files_in_folder_root`
-- Covered by tests: none — TST-001
+- Implemented by: `rules/structure.py::check_no_unexpected_files` (ARC-017 Phase 3b port of the
+  deleted `FileStructureValidator.check_not_expected_files_in_folder_root`; the expected/optional
+  stem set now comes from `data_validate.specs.sheet_specs.SHEET_SPECS`/`ALLOWED_EXTENSIONS`, not
+  `SpreadsheetInfo.EXPECTED_FILES`/`OPTIONAL_FILES` — both sources agree today, see ADR-0003)
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckNoUnexpectedFiles`
 - Notes / known defects: none — the loader no longer scans `.qml` files at all (BUG-015 done); a
   `.qml` file in the input folder is simply not picked up by `FileScanner`, and this rule still
-  reports it as an unexpected file via the general directory listing.
+  reports it as an unexpected file via the directory listing.
 
 ### STRUCT-005 · Required files must exist
 - Severity: error
 - NamesEnum: FS
 - Protocol: §2 p.3 (items 2.2, 2.3, 2.4, 2.6 are not marked optional)
 - Statement: `descricao`, `composicao`, `valores`, `referencia_temporal` must each exist with one of the allowed extensions.
-- Current message (pt-BR): key `validator_structure_error_missing_file` — `{file_base}: O arquivo esperado não foi encontrado. Use .csv ou .xlsx como extensões.` (pt_BR only)
+- Current message (pt-BR): key `validator_structure_error_missing_file` — `{file_base}: O arquivo esperado não foi encontrado. Use .csv ou .xlsx como extensões.` (present in both locales)
 - Target message key: `rule.STRUCT-005.error`
-- Implemented by: `file_structure_validator.py::FileStructureValidator.check_expected_files_in_folder_root`
-- Covered by tests: none — TST-001
-- Notes / known defects: key missing from `en_US` (BUG-016).
+- Implemented by: `rules/structure.py::check_required_files_present` (ARC-017 Phase 3b port of the
+  deleted `FileStructureValidator.check_expected_files_in_folder_root`; iterates
+  `data_validate.specs.sheet_specs.SHEET_SPECS`, filtered to `required`, in the same
+  descricao/composicao/valores/referencia_temporal declaration order as the legacy
+  `SpreadsheetInfo.EXPECTED_FILES` dict)
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckRequiredFilesPresent`
+- Notes / known defects: the "missing from `en_US`" note (BUG-016) was stale — both locales already
+  carry this key.
 
 ### STRUCT-006 · A sheet must not be delivered in both CSV and XLSX
 - Severity: error
 - NamesEnum: FS
 - Protocol: not in protocol — implemented behaviour
 - Statement: for every base name, at most one of `.csv`/`.xlsx` may exist.
-- Current message (pt-BR): key `validator_structure_error_conflicting_files` — `{file_base}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.` (pt_BR only)
+- Current message (pt-BR): key `validator_structure_error_conflicting_files` — `{file_base}: Existe um arquivo .csv e um arquivo .xlsx com o mesmo nome. Será considerado o arquivo .csv.` (present in both locales)
 - Target message key: `rule.STRUCT-006.error`
-- Implemented by: `file_structure_validator.py::FileStructureValidator.check_ignored_files_in_folder_root`
-- Covered by tests: none — TST-001
+- Implemented by: `rules/structure.py::check_no_csv_xlsx_conflict` (ARC-017 Phase 3b port of the
+  deleted `FileStructureValidator.check_ignored_files_in_folder_root`)
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckNoCsvXlsxConflict`
 - Notes / known defects: the message itself states the CSV is used, consistent with
   `FileScanner`'s documented CSV-over-XLSX preference (BUG-015 done — the policy is now explicit
   in `engine/scanner.py`'s docstring and the losing path is returned as `ignored`, not silently
-  dropped); key missing from `en_US` (BUG-016).
+  dropped); the "missing from `en_US`" note (BUG-016) was stale — both locales already carry this
+  key.
 
 ### STRUCT-007 · Files must be readable
 - Severity: error
@@ -223,4 +245,5 @@ Loading facts (`helpers/tools/data_loader/**`):
 - UTF-8 proactive check (G-01) remains pending as STRUCT-013 (PROTO-007); the v1.16 FAQ keeps the
   exact expected message.
 
-Last synced with code: 344fef7
+Last synced with code: f1e88af (ARC-017 Phase 3b: STRUCT-001…006 ported to `rules/structure.py`;
+`validators/structure/file_structure_validator.py` deleted)

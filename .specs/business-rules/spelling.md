@@ -13,10 +13,18 @@ Skippable with `--no-spellchecker` (listed as "not executed" in the report).
 | `cenarios` (only when scenarios exist) | `nome`, `descricao` | same |
 | `dicionario` | `palavra` — first column, one word per row, `#`-prefixed lines ignored | `models/sp_dictionary.py::SpDictionary.pre_processing` |
 
-Dictionary stack (`helpers/tools/spellchecker/**`): pyenchant `Broker` with
-`ENCHANT_CONFIG_DIR = data_validate/static/dictionaries` (hunspell `pt_BR`/`en_US` `.dic/.aff`),
-plus `extra-words.dic` (project words such as `AdaptaBrasil`, `multiescalar/B`) and the user words
-from `dicionario`, all added through `dictionary.add()` (persisted personal word list — BUG-022).
+Dictionary stack (`helpers/tools/spellchecker/**`): pyenchant `Broker` reading the bundled hunspell
+`pt_BR`/`en_US` `.dic/.aff` files (`static/dictionaries/hunspell`), plus `extra-words.dic` (project
+words such as `AdaptaBrasil`, `multiescalar/B`) and the user words from `dicionario`. Since
+`Broker.set_param` is a no-op with Enchant C library >= 2.0 (fixed SEC-007/BUG-022,
+`dictionary_manager.py::DictionaryManager`), `ENCHANT_CONFIG_DIR` is the only way to point Enchant
+at the bundled dictionaries; it is scoped to a per-manager `tempfile.TemporaryDirectory()`
+(symlinking the real `hunspell/` folder into it) via `DictionaryManager._enchant_config_dir_scope()`,
+which restores the previous env value (or its absence) in a `finally` block after each
+`validate_dictionary`/`initialize_dictionary` call — the variable is never left mutated for the rest
+of the process. Extra/user words are added with `dictionary.add_to_session()`, not `dictionary.add()`,
+so nothing is ever persisted to a `.dic`/`.exc` personal-word-list file — not under the package
+directory, not even under the ephemeral temp directory once `clean_temporary_files()` discards it.
 Language = `--locale` value (BUG-023).
 
 Text sanitisation before checking (`text_processor.py::TextProcessor.sanitize_text`), in order:
@@ -87,4 +95,4 @@ length > 1 are treated as acronyms and skipped.
 - **G-26 coverage of textual columns**: only 7 columns across 3 sheets are checked.
 - **G-27 case-sensitive dictionary words**: protocol says dictionary words match exactly, case-sensitively; enchant's `add()` behaviour for capitalised forms is not verified by tests.
 
-Last synced with code: f0ee400 (working tree includes the uncommitted BUG-027 fix)
+Last synced with code: f1e88af (working tree includes the uncommitted SEC-007/BUG-022 fix)

@@ -21,6 +21,15 @@ zero global state. Each item below names the current smell, where it lives, and 
   open: no `models/sp_*.py`/`validators/**` constructor was touched by this slice; every model and
   validator still runs its pipeline from `__init__` exactly as described above. Porting a
   validator to a `Rule` module (closing this item for that validator) is the next slice.
+- Note (Phase 3b slice, ARC-017): the first validator is ported —
+  `validators/structure/file_structure_validator.py::FileStructureValidator` is deleted; its four
+  checks are now `rules/structure.py`'s six pure `check_*` functions (`STRUCT-001`…`STRUCT-006`),
+  run by `SpreadsheetProcessor._run_structure_rules` via `Engine(STRUCTURE_REGISTRY).run(ctx)`. No
+  constructor work at all for this validator any more — `_run_structure_rules` only builds a
+  `RuleContext` and calls `Engine.run`/`extend_report_from_outcomes`. Still open: every other
+  validator (spelling, description, composition, temporal reference, proportionality, value,
+  scenario, legend) still runs its pipeline from `__init__` unchanged; each is its own future
+  slice.
 
 ### ARC-002 · Global mutable state
 - Priority: P0 · Effort: L · Status: open
@@ -108,11 +117,19 @@ zero global state. Each item below names the current smell, where it lives, and 
 
 ### ARC-005 · i18n is inconsistent (≈95 % of messages hard-coded in pt-BR)
 - Priority: P1 · Effort: L · Status: open
-- Where: only `FileSystemUtils` and `FileStructureValidator` use `language_manager.text()`; all other
-  messages are f-strings (models, validators, `helpers/common/**`, `spellchecker/**`,
-  `file_report_generator.py` labels, `spreadsheet_processor.py:98`).
+- Where: only `FileSystemUtils` and (until ARC-017 Phase 3b) `FileStructureValidator` used
+  `language_manager.text()`; all other messages are f-strings (models, validators,
+  `helpers/common/**`, `spellchecker/**`, `file_report_generator.py` labels,
+  `spreadsheet_processor.py:98`).
 - Target: every message is a catalog key (ARC-004); parity test between locales; report template
   localised.
+- Note (Phase 3b slice, ARC-017): `FileStructureValidator` is deleted; its six ported rules
+  (`rules/structure.py`) render every message through a single `ctx.translate(message_key,
+  **params)` call — the `validator_structure_error_*` keys are unchanged (both locales already
+  carried every one; the "missing from `en_US`" BUG-016 notes on STRUCT-002/003/005/006 were
+  stale, corrected in `.specs/business-rules/file-structure.md`), and the legacy
+  `.text(key).format(**kwargs)` double-call for STRUCT-003/004 collapsed into the single-call
+  form with no output change (verified byte-identical by the e2e golden harness).
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
@@ -284,4 +301,18 @@ zero global state. Each item below names the current smell, where it lives, and 
   under `rules/<sheet>/<RULE-ID>.py` yet, `controllers/spreadsheet_processor.py` still
   hand-orders the legacy validators unchanged, and parallel execution (PERF-007) is not
   implemented — the per-rule execution loop is shaped for a future pool but runs sequentially.
+- Done (first validator port, Phase 3b): `rules/structure.py` declares `STRUCTURE_REGISTRY`
+  (`STRUCT-001`…`STRUCT-006`, one `check_*` function per id, registered in the legacy check
+  order — no `depends_on` needed since the one order-sensitive case, STRUCT-002's zipped-subfolder
+  short-circuit, is handled inside STRUCT-003/STRUCT-004's own bodies via a shared
+  `_is_zipped_with_extra_folder` gate, not via engine skip semantics). `rules/legacy_adapter.py::
+  extend_report_from_outcomes` renders `Engine.run(...)`'s outcomes into the legacy
+  `ValidationReport` and is written to be reused by every later validator port.
+  `SpreadsheetProcessor._build_pipeline` no longer constructs `FileStructureValidator` — it calls
+  `SpreadsheetProcessor._run_structure_rules` (new, independently unit-tested), and
+  `validators/structure/file_structure_validator.py` is deleted. 100% line coverage on both new
+  modules (`tests/unit/rules/test_structure.py`, `test_legacy_adapter.py`), mypy-strict clean,
+  e2e golden harness 7/7 twice, byte-identical. `legacy_adapter.py` imports `ValidationReport`
+  under `TYPE_CHECKING` only — a runtime import would cycle back through
+  `controllers/__init__.py` → `spreadsheet_processor.py` → `rules`.
 - Related: PERF-007

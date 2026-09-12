@@ -16,6 +16,14 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
 - Proposed fix: one test module per rule with table-driven cases (valid, each failure mode, edge:
   empty sheet, missing column, `DI`, scenario/no-scenario); requires ARC-001 to construct validators
   without running them, otherwise test through the pipeline with in-memory frames.
+- Done (structure): `FileStructureValidator` (20 % coverage, 0 dedicated rule tests) is deleted;
+  its six ported STRUCT-001…006 rules (`rules/structure.py`) are 100 % covered by
+  `tests/unit/rules/test_structure.py` (table-driven: pass, every failure mode, the STRUCT-002
+  short-circuit, boundary cases), and `SpreadsheetProcessor._run_structure_rules` is independently
+  unit-tested in `tests/unit/controllers/test_spreadsheet_processor.py`. First validator closed
+  under this item; the rest of the list (proportionality, composition, legend, value, composition
+  tree, `spreadsheet_processor.py`, description, spellchecker, `file_report_generator.py`,
+  `validation_report.py`, models) is still open.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration
