@@ -10,7 +10,7 @@ Defined in `helpers/base/data_args.py::DataArgs._create_parser` with `allow_abbr
 | Flag | Type / default | Notes |
 |---|---|---|
 | `--input_folder PATH` | required | Must be an existing directory (`DataFile._validate_arguments`) |
-| `--output_folder PATH` | default `output_data/` | Basename must not contain `.` (BUG-009); created if missing |
+| `--output_folder PATH` | default `output_data/` | Any path is accepted, including a basename containing `.` (e.g. `run.2026-08`, `v1.2`); rejected only when the path already exists as a regular file (fixed by BUG-009); created if missing |
 | `--locale`, `-l` | `pt_BR` \| `en_US`, default `pt_BR` | Persisted to `.config/store.locale` by `Bootstrap` (BUG-004) |
 | `--no-spellchecker` | flag | Skips `SpellCheckerValidator`; listed as skipped in the report |
 | `--no-warning-titles-length` | flag | Skips `TITLES_N`; listed as skipped |
@@ -30,8 +30,9 @@ Outputs:
   stderr message if `wkhtmltopdf` is missing).
 - stdout: welcome banner (printed at import), `HTML report created at: …`, `PDF report created
   at: …`, then a line `<{"data_validate": {"version": "0.7.65b732", "report": {"errors": E,
-  "warnings": W, "tests": 35}}}>` (built with `str(dict).replace("'", '"')` — BUG-010), then
-  `Tempo total de execução: N segundos` unless `--no-time`.
+  "warnings": W, "tests": 35}}}>` (built with `json.dumps(summary, ensure_ascii=False)`, so it
+  stays valid JSON even when a value contains a quote or non-ASCII character — fixed by BUG-010),
+  then `Tempo total de execução: N segundos` unless `--no-time`.
 - Exit code: always `0` (SEC-008).
 
 ## Target contract

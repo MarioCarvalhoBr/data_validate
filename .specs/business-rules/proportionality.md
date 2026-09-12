@@ -75,8 +75,8 @@ by `helpers/common/validation/proportionality_processing.py::ProportionalityProc
 - Current message (pt-BR): `{proporcionalidades}: Códigos dos indicadores ausentes em {valores}: [..].` · `{valores}: Códigos dos indicadores ausentes em {proporcionalidades}: [..].`
 - Target message key: `rule.PROP-005.error`
 - Implemented by: `proportionality_validator.py::SpProportionalityValidator.validate_relation_indicators_in_value_and_proportionality`
-- Covered by tests: none — TST-001
-- Notes / known defects: `list.remove("id")` raises when absent (BUG-006).
+- Covered by tests: `tests/unit/validators/spreadsheets/proportionality/test_proportionality_validator.py`
+- Notes / known defects: fixed BUG-006 — the level-2/`valores` column lists are now built with a list comprehension (`[c for c in cols if c != self.column_name_id]`) instead of `list.remove("id")`, so a missing `id` no longer raises `ValueError` past the column-existence guard.
 
 ### PROP-006 · Parent/child pairs must agree with `composicao`
 - Severity: error

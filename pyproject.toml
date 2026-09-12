@@ -188,7 +188,7 @@ exclude_lines = [
 ]
 show_missing = true
 precision = 2
-fail_under = 54  # measured 54.99 % on 2026-08-25 after dropping pass/continue/break exclusions; tools/coverage_ratchet.py raises it
+fail_under = 65  # hard floor, ratchet baseline in tools/coverage_baseline.txt leads (68.05 % on 2026-09-12)
 
 [tool.coverage.html]
 directory = "dev-reports/htmlcov"

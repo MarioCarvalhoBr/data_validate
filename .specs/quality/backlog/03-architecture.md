@@ -27,13 +27,25 @@ zero global state. Each item below names the current smell, where it lives, and 
   config; no module-level instances with side effects.
 
 ### ARC-003 · Three competing sources of truth for sheet definitions
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: in-progress
 - Where: `config/spreadsheet_info.py` (names, extensions, expected/optional),
   `helpers/tools/data_loader/common/config.py` (required flag, header type, separator, `.qml`),
   `models/sp_*.py::INFO.SP_NAME` + `RequiredColumn/OptionalColumn/DynamicColumn`.
 - Target: a single `SheetSpec` registry (`specs/sheets.py`): name, required, header layout, csv
   separator, column specs, business-rule IDs. Everything else derives from it (loader, models,
   file-structure validator, docs).
+- Done (step 1): `data_validate/specs/sheet_specs.py` now declares `SHEET_SPECS` (`ColumnSpec`,
+  `SheetSpec`, `ColumnKind`, `HeaderLayout`), proven consistent with all three legacy sources by
+  `tests/unit/specs/test_sheet_specs.py` (100 % coverage of the new module). Divergences found
+  between the legacy sources during this proof (documented in `sheet_specs.py`'s module
+  docstring, not yet fixed): `composicao.codigo_pai` is cleaned with `min_value=1` by the model
+  but with `min_value=0` by both composition tree/graph validators; `referencia_temporal.nome`
+  and `cenarios.nome` are declared `dtype="int64"` for a name column (BUG-013); `descricao`'s
+  dynamic `legenda` column is declared `dtype="str"` but cleaned as an integer. No consumer
+  (loader, models, `FileStructureValidator`) has been migrated to read from `SHEET_SPECS` yet —
+  that is Phases 2-3 of the migration roadmap; `SpreadsheetInfo`, `Config.file_specs`, and each
+  model's `RequiredColumn`/`OptionalColumn`/`DynamicColumn` remain the sources those consumers
+  actually read from today.
 
 ### ARC-004 · Errors are pre-formatted Portuguese strings
 - Priority: P1 · Effort: L · Status: open
@@ -118,8 +130,9 @@ zero global state. Each item below names the current smell, where it lives, and 
 ### ARC-013 · Naming
 - Priority: P2 · Effort: S · Status: open
 - Where: `DataModelABC` in `data_args.py:19` (it is an args class), nested `INFO(ConstantBase)` per
-  model, `VAR_CONSTS`/`DEFINITIONS` (`sp_model_abc.py:37-63`), `TestReportItem`, `ModelMappingLegend`,
-  `SpreadsheetProcessor` vs `Processing` helpers, typos (BUG-024).
+  model, `VAR_CONSTS`/`DEFINITIONS` (`sp_model_abc.py:37-63`), `ModelMappingLegend`,
+  `SpreadsheetProcessor` vs `Processing` helpers, typos (BUG-024). `TestReportItem` was renamed to
+  `ReportItem` (BUG-020, done).
 - Target: naming guide in `.claude/rules/coding-standards.md`; rename during migration with
   deprecation shims.
 

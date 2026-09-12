@@ -4,14 +4,21 @@
 
 - Every finding is a `str` created where it is detected (validators, models, helpers, readers).
 - `ValidationReport` (`controllers/report/validation_report.py`) keeps
-  `dict[title, TestReportItem(errors: list[str], warnings: list[str], was_executed: bool)]` in
-  `NamesEnum` order, pre-populated by `SpreadsheetProcessor._prepare_statement`.
+  `dict[title, ReportItem(errors: list[str], warnings: list[str], was_executed: bool)]` in
+  `NamesEnum` order, pre-populated by `SpreadsheetProcessor._prepare_statement`. `ReportItem` is
+  the BUG-020 rename of the former `TestReportItem` (a deprecated `TestReportItem = ReportItem`
+  alias remains for one release, with `__test__ = False` so pytest never collects either name).
 - `flatten(n_messages=20, locale)` copies the first 20 errors/warnings of each bucket and appends
   `model_report_msg_errors_omitted` / `model_report_msg_warnings_omitted` with the omitted count
-  formatted by `babel` (`format_number_brazilian`).
+  formatted by `babel` (`format_number_brazilian`). If truncation is actually needed and
+  `ValidationReport.context` is `None`, `flatten` raises `ValueError` instead of dereferencing
+  `None.language_manager` (BUG-005); a report with no truncation needed still works with no
+  context.
 - `FileReportGenerator` counts totals **before** flattening, renders the flattened lists, and
   prints `<{"data_validate": {"version": v, "report": {"errors": E, "warnings": W, "tests": T}}}>`
-  where `T = len(report_list)` (number of buckets, currently 35 regardless of execution).
+  (built with `json.dumps(summary, ensure_ascii=False)`, valid JSON even if a value contains a
+  quote or non-ASCII character — BUG-010) where `T = len(report_list)` (number of buckets,
+  currently 35 regardless of execution).
 - `was_executed` is never set to `False` (the `set_not_executed` placeholder is a no-op), so
   "skipped tests" in the report only reflect `--no-spellchecker` and `--no-warning-titles-length`.
 

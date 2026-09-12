@@ -106,8 +106,8 @@ static-method namespaces (ARC-007).
 
 | Component | File | Responsibility | Smells |
 |---|---|---|---|
-| `TestReportItem`, `ValidationReport` | `controllers/report/validation_report.py` | Ordered dict of `test_name → (errors, warnings, was_executed)`; `flatten(n)` truncates and adds the "omitted" message | BUG-005, BUG-020 |
-| `FileReportGenerator` | `controllers/report/file_report_generator.py` | Loads `static/report/report_template.html` (regex-validated against the fallback), builds HTML strings for errors/warnings, renders Jinja2 **without autoescape**, writes `<input-folder-name>_report.html`, converts to PDF with `pdfkit`, prints `<{json}>` | SEC-001, SEC-002, BUG-010 |
+| `ReportItem`, `ValidationReport` | `controllers/report/validation_report.py` | Ordered dict of `test_name → (errors, warnings, was_executed)`; `flatten(n)` truncates and adds the "omitted" message; raises `ValueError` instead of dereferencing a `None` context when truncation is needed (BUG-005, fixed); `ReportItem` is the BUG-020 rename of the former `TestReportItem` (kept as a deprecated alias, `__test__ = False`) | none |
+| `FileReportGenerator` | `controllers/report/file_report_generator.py` | Loads `static/report/report_template.html` (regex-validated against the fallback), builds HTML strings for errors/warnings, renders Jinja2 **without autoescape**, writes `<input-folder-name>_report.html`, converts to PDF with `pdfkit`, prints `<{json}>` built with `json.dumps(..., ensure_ascii=False)` (BUG-010, fixed) | SEC-001, SEC-002 |
 
 ### Cross-cutting
 

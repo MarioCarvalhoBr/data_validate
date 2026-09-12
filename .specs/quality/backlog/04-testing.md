@@ -78,9 +78,10 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   keep the cache.
 
 ### TST-009 · Dead test copies in `local_data/`
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `local_data/test_legend_processing.py`, `local_data/old_legend_processing.py`
 - Proposed fix: delete (gitignored anyway); nothing in `local_data` is a source of truth.
+- Done: files deleted on 2026-09-12 (they were untracked; no commit needed beyond this status).
 
 ### TST-010 · Test data builders for the protocol
 - Priority: P1 · Effort: M · Status: open

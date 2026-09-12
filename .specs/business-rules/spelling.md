@@ -35,7 +35,7 @@ length > 1 are treated as acronyms and skipped.
 - Target message key: `rule.SPELL-001.error`
 - Implemented by: `helpers/tools/spellchecker/dictionary_manager.py::DictionaryManager.validate_dictionary`, `initialize_dictionary`, `_load_extra_words`; collected in `SpellChecker.errors_dictionary`
 - Covered by tests: `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py`, `test_spellchecker.py`
-- Notes / known defects: **never reported** — `SpellCheckerValidator._prepare_statement` (which copies `errors_dictionary` into the report) is defined but never called from `__init__` (unlike every other validator). With a missing dictionary every `dictionary.check` raises inside SPELL-005 instead. New backlog candidate.
+- Notes / known defects: fixed (BUG-027, done) — `SpellCheckerValidator.__init__` now calls `_prepare_statement()` before `run()`, like every other validator; `_prepare_statement` extends `self._errors` with `SpellChecker.errors_dictionary` and also pushes those messages into the report under the SPELL/Ortografia title, so a missing dictionary or `extra-words.dic` failure is now visible instead of silently dropped.
 
 ### SPELL-002 · Columns to check must exist
 - Severity: warning
@@ -86,6 +86,5 @@ length > 1 are treated as acronyms and skipped.
 - **G-25 `#…#` ignore delimiter** (v1.7): not implemented; `#` is stripped as punctuation so the word is still checked.
 - **G-26 coverage of textual columns**: only 7 columns across 3 sheets are checked.
 - **G-27 case-sensitive dictionary words**: protocol says dictionary words match exactly, case-sensitively; enchant's `add()` behaviour for capitalised forms is not verified by tests.
-- SPELL-001 errors are silently dropped (see rule notes).
 
-Last synced with code: 09279f4
+Last synced with code: f0ee400 (working tree includes the uncommitted BUG-027 fix)

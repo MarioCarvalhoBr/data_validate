@@ -54,8 +54,8 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Current message (pt-BR): `{filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.`
 - Target message key: `rule.TEMP-002.error`
 - Implemented by: `temporal_reference_validator.py::SpTemporalReferenceValidator.validate_reference_years`; year from `ApplicationConfig.CURRENT_YEAR`
-- Covered by tests: none — TST-001
-- Notes / known defects: reads the class-level Series mutated by the model (BUG-002); `int(year)` on raw text (BUG-007); import-time clock (BUG-011). "Future" is `>= current year` (a symbol equal to the current year passes).
+- Covered by tests: `tests/unit/validators/spreadsheets/temporal_reference/test_temporal_reference_validator.py`
+- Notes / known defects: fixed BUG-007 — the rule now reads `self._dataframe[column_name_symbol]` (the validator's own raw-data copy) instead of the model's class-level `RequiredColumn.COLUMN_SYMBOL` Series, and validates each symbol with `NumberFormattingProcessing.check_cell_integer`/`parse_numeric` before comparing years, silently skipping non-numeric symbols (already reported as data-cleaning errors by the model) instead of raising `ValueError` inside `int(year)`. BUG-002 (class-level `RequiredColumn` Series as global mutable state) remains open for the model itself — only this rule's read of it was removed; import-time clock (BUG-011) is unrelated and still open. "Future" is still `>= current year` (a symbol equal to the current year passes).
 
 ### TEMP-003 · `nome` and `simbolo` must be unique
 - Severity: error

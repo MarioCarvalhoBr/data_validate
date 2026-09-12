@@ -201,7 +201,7 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 | `controllers/report/file_report_generator.py` | `reporting/html.py`, `reporting/pdf.py`, `reporting/json.py`, `reporting/console.py` | autoescape; PDF optional |
 | `config/application_config.py` | `app/options.py` + `specs/limits.py` | constants become options/limits; `DATE_NOW` → `Clock` |
 | `config/names_enum.py` | `rules/categories.py` | category order preserved for report compatibility |
-| `config/spreadsheet_info.py`, `helpers/tools/data_loader/common/config.py` | `specs/sheets.py` | single registry |
+| `config/spreadsheet_info.py`, `helpers/tools/data_loader/common/config.py` | `specs/sheet_specs.py` | **Implemented** (ARC-003): `SHEET_SPECS` registry exists and is proven consistent with both legacy sources by `tests/unit/specs/test_sheet_specs.py`; consumers (loader, models, file-structure validator) not yet migrated — pending Phases 2-3 |
 | `config/metadata_info.py` | `util/version.py` | `importlib.metadata` only |
 | `helpers/tools/data_loader/api/facade.py` | `loading/loader.py` | `LoadResult` |
 | `helpers/tools/data_loader/engine/{scanner,factory}.py` | `loading/scan.py`, `loading/readers/__init__.py` | conflict policy from spec |
@@ -228,7 +228,7 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 | `helpers/common/validation/value_processing.py` | `rules/values/*.py` | vectorised |
 | `helpers/tools/spellchecker/*` | `spell/` | `SpellBackend` |
 | `helpers/tools/readme/generate_readme.py` | — (deleted, ADR-0009) | — |
-| `models/sp_model_abc.py`, `models/sp_*.py` | `specs/sheets.py` (definitions) + `normalizing/` (cleaning) + `rules/structure/` (checks) | models disappear as classes |
+| `models/sp_model_abc.py`, `models/sp_*.py` | `specs/sheet_specs.py` (definitions) + `normalizing/` (cleaning) + `rules/structure/` (checks) | models disappear as classes; column/dtype definitions already mirrored into `specs/sheet_specs.py` (ARC-003), models still own cleaning/behaviour |
 | `validators/structure/file_structure_validator.py` | `rules/structure/STRUCT-00x.py` | — |
 | `validators/spell/spellchecker_validator.py` | `rules/spelling/SPELL-00x.py` | — |
 | `validators/spreadsheets/base/base_validator.py` | `rules/engine.py` | prerequisites centralised |

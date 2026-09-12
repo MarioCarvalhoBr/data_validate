@@ -9,7 +9,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 |---|---|---|---|---|---|
 | `application_config.py` | Constants, fallback HTML template, localised verification titles | `ApplicationConfig`, `get_verify_names` | none (83 % incidental) | `app/options.py`, `specs/limits.py` | BUG-011, PERF-004 |
 | `names_enum.py` | 34 verification keys | `NamesEnum` | none (100 % incidental) | `rules/categories.py` | — |
-| `spreadsheet_info.py` | Sheet stems, extensions, required/optional | `SpreadsheetInfo`, `SHEET` | none | `specs/sheets.py` | ARC-003 |
+| `spreadsheet_info.py` | Sheet stems, extensions, required/optional | `SpreadsheetInfo`, `SHEET` | none | `specs/sheet_specs.py` (implemented, consumers pending) | ARC-003 |
 | `metadata_info.py` | Version string, welcome banner | `MetadataInfo`, `METADATA` | `helpers/base/test_metadata_info.py` | `util/version.py` | BUG-017, TOOL-005 |
 
 ## `controllers/`
@@ -19,8 +19,8 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | `spreadsheet_processor.py` | Orchestrates load → models → validators → report | `SpreadsheetProcessor` | none | `app/pipeline.py` | ARC-001, ARC-017 |
 | `context/general_context.py` | DI container: args, i18n, config, fs, logger | `GeneralContext` | none | `app/context.py` | ARC-006, BUG-021 |
 | `context/data_model_context.py` | Model registry for validators | `DataModelContext.get_instance_of` | none | `rules/context.py` | ARC-006 |
-| `report/validation_report.py` | Buckets of error/warning strings, truncation | `TestReportItem`, `ValidationReport` | none | `app/result.py`, `reporting/model.py` | BUG-005, BUG-020 |
-| `report/file_report_generator.py` | HTML/PDF/JSON output | `FileReportGenerator` | none | `reporting/{html,pdf,json,console}.py` | SEC-001, SEC-002, BUG-010 |
+| `report/validation_report.py` | Buckets of error/warning strings, truncation | `ReportItem`, `ValidationReport` | `tests/unit/controllers/report/test_validation_report.py` | `app/result.py`, `reporting/model.py` | none |
+| `report/file_report_generator.py` | HTML/PDF/JSON output | `FileReportGenerator` | `tests/unit/controllers/report/test_file_report_generator.py` | `reporting/{html,pdf,json,console}.py` | SEC-001, SEC-002 |
 
 ## `middleware/`
 
@@ -74,7 +74,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | `data_loader/readers/excel_reader.py` | XLSX via calamine | `ExcelReader` | `readers/test_excel_reader.py` | `loading/readers/xlsx.py` | SEC-003 |
 | `data_loader/readers/qml_reader.py` | Raw text | `QMLReader` | `readers/test_qml_reader.py` | deleted (open question) | BUG-015 |
 | `data_loader/strategies/header.py` | Header rows | `SingleHeaderStrategy`, `DoubleHeaderStrategy` | `strategies/test_header.py` | `SheetSpec.header` | — |
-| `data_loader/common/config.py` | Singleton file specs | `Config`, `SingletonMeta` | none | `specs/sheets.py` | ARC-003 |
+| `data_loader/common/config.py` | Singleton file specs | `Config`, `SingletonMeta` | none | `specs/sheet_specs.py` (implemented, consumers pending) | ARC-003 |
 | `data_loader/common/exceptions.py` | `MissingFileError`, `ReaderNotFoundError` | — | none | `loading/errors.py` | — |
 | `locale/language_manager.py` | Catalog loading, `text()` | `LanguageManager` | `tools/locale/test_language_manager.py` | `i18n/catalog.py` | BUG-004 |
 | `locale/language_enum.py` | Supported languages | `LanguageEnum` | `tools/locale/test_language_enum.py` | `i18n/locale.py` | BUG-012 |
@@ -90,8 +90,8 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 
 | Module | Sheet | Tests | Destination | Backlog |
 |---|---|---|---|---|
-| `sp_model_abc.py` | base | none | `specs/` + `normalizing/` | ARC-001, ARC-007 |
-| `sp_description.py` | `descricao` | none | `specs/sheets.py::DESCRICAO`, `normalizing/` | BUG-002, BUG-003 |
+| `sp_model_abc.py` | base | none | `specs/` (implemented, consumers pending) + `normalizing/` | ARC-001, ARC-007 |
+| `sp_description.py` | `descricao` | none | `specs/sheet_specs.py::SHEET_SPECS["descricao"]` (implemented, consumers pending), `normalizing/` | BUG-002, BUG-003 |
 | `sp_composition.py` | `composicao` | none | idem | BUG-002 |
 | `sp_value.py` | `valores` | none | idem | BUG-013 |
 | `sp_temporal_reference.py` | `referencia_temporal` | none | idem | BUG-002 |

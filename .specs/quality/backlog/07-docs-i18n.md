@@ -27,6 +27,13 @@
 - Proposed fix: key convention `<area>.<rule_id>.<kind>` (e.g. `rule.DESC-004.error`), one JSON per
   locale generated/validated by `tools/i18n_check.py` (parity, unused, placeholders), CI job.
 - Related: BUG-016
+- Done (partial, via BUG-016): parity restored (`en_US` no longer missing the 4
+  `validator_structure_error_*` keys) and the 18 unused calculator-demo keys purged from both
+  catalogs; `tests/unit/i18n/test_catalog_parity.py` now guards key-set, placeholder, and
+  `{"message": str}`-shape parity in CI. Still open: the `<area>.<rule_id>.<kind>` naming
+  convention/migration, the mixed-prefix cleanup (`fs_utils_*`, `validator_structure_*`,
+  `verification_name_*`, `model_report_*`), and moving hard-coded pt-BR strings into the catalog
+  (ARC-005) — this item stays `open`.
 
 ### DOC-004 · API docs
 - Priority: P2 · Effort: S · Status: open

@@ -13,14 +13,14 @@
 - Everything else (models, validators, helpers, spell-check, report labels) uses hard-coded
   pt-BR f-strings (ARC-005).
 
-### Inventory issues (BUG-016)
+### Inventory issues (BUG-016 — parity and junk keys fixed)
 
 | Issue | Detail |
 |---|---|
-| Parity | en_US lacks `validator_structure_error_conflicting_files`, `validator_structure_error_files_not_in_folder`, `validator_structure_error_missing_file`, `validator_structure_error_unexpected_folder` |
-| Junk | Both files contain calculator-demo keys (`welcome`, `menu_title`, `add_option`, `subtract_option`, …) |
-| Naming | Mixed prefixes (`fs_utils_*`, `validator_structure_*`, `verification_name_*`, `model_report_*`) with no documented convention |
-| Placeholders | Not documented per key; no test that both locales use the same placeholder set |
+| Parity (fixed) | `en_US` now has `validator_structure_error_conflicting_files`, `validator_structure_error_files_not_in_folder`, `validator_structure_error_missing_file`, `validator_structure_error_unexpected_folder`; `tests/unit/i18n/test_catalog_parity.py` guards key-set, placeholder, and shape parity going forward |
+| Junk (fixed) | The 18 unused calculator-demo keys (`welcome`, `menu_title`, `add_option`, `subtract_option`, `multiply_option`, `divide_option`, `exit_option`, `enter_choice`, `enter_num1`, `enter_num2`, `result`, `invalid_option`, `invalid_input`, `zero_division`, `goodbye`, `error_unexpected`, `lorem_ipsum`, `choose_language`) were removed from both catalogs; `invalid_language`/`lang_load_error` were kept (used by `LanguageManager`) |
+| Naming | Mixed prefixes (`fs_utils_*`, `validator_structure_*`, `verification_name_*`, `model_report_*`) with no documented convention — still pending, see DOC-003 |
+| Placeholders | Now covered per key by `tests/unit/i18n/test_catalog_parity.py`, which asserts the same named `str.format` fields across locales for every key |
 
 ## Target
 
