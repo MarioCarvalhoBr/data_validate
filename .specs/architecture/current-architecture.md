@@ -13,7 +13,7 @@ flowchart TD
   E --> E1[_prepare_statement: one empty report per NamesEnum]
   E1 --> E2[_read_data: DataLoaderFacade.load_all]
   E2 --> E3[_configure: instantiate 8 Sp* models]
-  E3 --> E4[_build_pipeline: DataModelContext + rules engine STRUCT-* + 9 validators]
+  E3 --> E4[_build_pipeline: DataModelContext + rules engine STRUCT-*/DESC-* + 8 validators]
   E4 --> E5[_report: FileReportGenerator.build_report]
   E5 --> F[HTML + PDF in output folder<br/>JSON fragment on stdout]
   A --> G[GeneralContext.finalize<br/>closes/detaches every file-logger handler;<br/>prints the log path only when --debug]
@@ -30,7 +30,7 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 | 0 | `_prepare_statement` | `ValidationReport.add_by_name` for every `NamesEnum` title (fixed order in the report) | all |
 | 1 | `_read_data` | `DataLoaderFacade(input_folder).load_all` → `raw_data_map: dict[str, DataLoaderModel]` + load errors; extracts `scenarios` from `cenarios.simbolo`; builds `model_configurations` (`scenario_exists_file`, `scenario_read_success`, `scenarios`, `legend_exists_file`, `legend_read_success`) | FS |
 | 2 | `_configure` | For each class in `target_model_classes` (`SpDescription, SpComposition, SpValue, SpTemporalReference, SpProportionality, SpScenario, SpLegend, SpDictionary`) instantiate the model (which runs `initialize()` + `run()` in `__init__`), then copy `structural_errors/warnings` → FS and `data_cleaning_errors/warnings` → FC | FS, FC |
-| 3 | `_build_pipeline` | `DataModelContext(context, initialized_models)`; first calls `_run_structure_rules` (ARC-017 Phase 3b: builds a `RuleContext`, runs `Engine(STRUCTURE_REGISTRY).run(...)`, renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes` — no constructor-runs-pipeline involved), then instantiates the remaining validators in this order (each still runs in `__init__`): `SpellCheckerValidator`, `SpDescriptionValidator`, `SpCompositionGraphValidator`, `SpCompositionTreeValidator`, `SpTemporalReferenceValidator`, `SpProportionalityValidator`, `SpValueValidator`, `SpScenarioValidator`, `SpLegendValidator` | per `NamesEnum` |
+| 3 | `_build_pipeline` | `DataModelContext(context, initialized_models)`; builds one shared `RuleContext` (`_build_rule_context`), then calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)` (ARC-017 Phase 3b) where `_run_structure_rules` used to run standalone, then `SpellCheckerValidator`, then `_run_rule_registries([DESCRIPTION_REGISTRY], ctx)` (ARC-017 Phase 3 Port 2, replacing the deleted `SpDescriptionValidator`) — each `_run_rule_registries` call builds `Engine(registry).run(ctx)` and renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes`, no constructor-runs-pipeline involved — then instantiates the remaining validators in this order (each still runs in `__init__`): `SpCompositionGraphValidator`, `SpCompositionTreeValidator`, `SpTemporalReferenceValidator`, `SpProportionalityValidator`, `SpValueValidator`, `SpScenarioValidator`, `SpLegendValidator` | per `NamesEnum` |
 | 4 | `_report` | debug dump to logger; `FileReportGenerator(context).build_report(validation_reports)` | — |
 
 ## Components
@@ -96,9 +96,9 @@ extending `ValidationReport` and catching **any** exception into an error messag
 
 | Validator | Rules (method → NamesEnum) | Smells |
 |---|---|---|
-| ~~`FileStructureValidator`~~ | **deleted (ARC-017 Phase 3b)** — its four checks (empty dir, unexpected files/folders, missing required, csv/xlsx conflict) are now `rules/structure.py`'s six `STRUCT-001`…`STRUCT-006` pure functions, run by `SpreadsheetProcessor._run_structure_rules → FS` | BUG-026 (resolved by the port: no instance state left to duplicate) |
+| ~~`FileStructureValidator`~~ | **deleted (ARC-017 Phase 3b)** — its four checks (empty dir, unexpected files/folders, missing required, csv/xlsx conflict) are now `rules/structure.py`'s six `STRUCT-001`…`STRUCT-006` pure functions, run by `SpreadsheetProcessor._run_rule_registries([STRUCTURE_REGISTRY], ctx) → FS` | BUG-026 (resolved by the port: no instance state left to duplicate) |
 | `SpellCheckerValidator` | `validate_spellchecker(SpDescription/SpTemporalReference/SpScenario) → SPELL` via `SpellChecker` (pyenchant) | BUG-022, BUG-023 |
-| `SpDescriptionValidator` | `HTML_DESC, SC, CO_UN, INP, IL, MAND_PUNC_DESC, EF, LB_DESC, SIMP_DESC_N, TITLES_N` | PERF-001 |
+| ~~`SpDescriptionValidator`~~ | **deleted (ARC-017 Phase 3 Port 2)** — its nine checks are now `rules/description.py`'s ten `DESC-001`…`DESC-010` pure functions (`HTML_DESC, SC, CO_UN, INP, IL, MAND_PUNC_DESC, EF, LB_DESC, SIMP_DESC_N, TITLES_N`), run by `SpreadsheetProcessor._run_rule_registries([DESCRIPTION_REGISTRY], ctx)` | PERF-001 (resolved by the port: no `iterrows()` left in this validator) |
 | `SpCompositionGraphValidator` | `IR` (codes in description), `IR` (cycles, disconnected), `UT` (unique titles per subtree, root `"1"`), `LEAF_NO_DATA` | BUG-019 |
 | `SpCompositionTreeValidator` | `TH` (level hierarchy + cycles via `TreeProcessing`), `CHILD_LVL` | PERF-001 |
 | `SpTemporalReferenceValidator` | `MAND_PUNC_TEMP, YEARS_TEMP, UVR_TEMP` | BUG-007 |
@@ -126,7 +126,7 @@ static-method namespaces (ARC-007).
 | Logging | `LoggerManager` (console + file, colour formatter); a file handler is only created in debug mode, under `<output_folder>/logs`; `finalize()` closes every handler (BUG-021 fixed) | — |
 | Spell-check | `SpellChecker → DictionaryManager (enchant Broker, ENCHANT_CONFIG_DIR = static/dictionaries)`, `SpellCheckerController`, `TextProcessor`, `DataFrameProcessor` | ARC-015, BUG-022 |
 | Errors as data | `list[str]` of pre-formatted messages everywhere | ARC-004 |
-| Rules engine | `data_validate/rules/` (`RuleContext`, `RuleRegistry`, `Engine`) is live and wired for one validator so far: `SpreadsheetProcessor._run_structure_rules` runs `STRUCTURE_REGISTRY` and renders it into `ValidationReport` via `rules.legacy_adapter.extend_report_from_outcomes` — see `module-map.md`'s `rules/` section for the full table | ARC-017 (in progress, one of ten validators ported) |
+| Rules engine | `data_validate/rules/` (`RuleContext`, `RuleRegistry`, `Engine`) is live and wired for two validators so far: `SpreadsheetProcessor._run_rule_registries` runs `STRUCTURE_REGISTRY` and `DESCRIPTION_REGISTRY` (one shared `RuleContext`, built once by `_build_rule_context`) and renders each into `ValidationReport` via `rules.legacy_adapter.extend_report_from_outcomes` — see `module-map.md`'s `rules/` section for the full table | ARC-017 (in progress, two of ten validators ported) |
 
 ## Data ownership and mutation (BUG-002/BUG-003 fixed)
 
@@ -166,4 +166,4 @@ procedural namespaces).
 `./.config/store.locale` and `data/output/logs/` created unconditionally relative to the CWD (BUG-004,
 BUG-021) are both removed as of this slice — see `.specs/future/deprecations.md`.
 
-Last synced with code: f1e88af
+Last synced with code: cf5ddaa

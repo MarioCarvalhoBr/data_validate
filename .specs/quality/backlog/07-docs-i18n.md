@@ -34,6 +34,19 @@
   convention/migration, the mixed-prefix cleanup (`fs_utils_*`, `validator_structure_*`,
   `verification_name_*`, `model_report_*`), and moving hard-coded pt-BR strings into the catalog
   (ARC-005) — this item stays `open`.
+- Note (Phase 3 Port 2 slice, ARC-017): the `rule.<rule-id>.<kind>` naming convention (the
+  `rule.` variant of this item's proposed `<area>.<rule_id>.<kind>`, already used by
+  `.specs/business-rules/README.md`'s "Target message keys follow `rule.<RULE-ID>.<error|
+  warning>`" line) is now in actual use, not just documented: DESC-001…010 (`rules/
+  description.py`) added 16 keys — one `rule.description.missing_required_column` shared by
+  every rule's "required column is missing" abort case (one message template, several rules and
+  severities), and one-or-more `rule.DESC-0XX.<slug>` keys per rule for each distinct message
+  template that rule emits (e.g. DESC-002's `non_numeric`/`must_start_at_one`/
+  `must_be_sequential`; DESC-008's `end`/`start`/`anywhere`). Every key added to both
+  `pt_BR`/`en_US` in the same change, pt-BR text copied verbatim from the deleted
+  `description_validator.py`'s f-strings. This item stays `open` — every other domain
+  (composition, values, temporal reference, scenarios, legend, proportionality) still hard-codes
+  its messages.
 
 ### DOC-004 · API docs
 - Priority: P2 · Effort: S · Status: open

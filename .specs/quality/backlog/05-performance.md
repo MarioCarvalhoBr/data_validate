@@ -6,8 +6,7 @@ harness (PERF-009); never optimise without a number.
 
 ### PERF-001 · Row-by-row `iterrows()` / cell loops in hot paths
 - Priority: P1 · Effort: M · Status: open
-- Where: `validators/spreadsheets/description/description_validator.py:89,254`,
-  `helpers/common/validation/tree_processing.py:37,73,75,117`,
+- Where: `helpers/common/validation/tree_processing.py:37,73,75,117`,
   `helpers/common/validation/graph_processing.py:57`,
   `validators/spreadsheets/composition/composition_tree_validator.py:242,253`,
   `validators/spreadsheets/proportionality/proportionality_validator.py:584`,
@@ -18,6 +17,15 @@ harness (PERF-009); never optimise without a number.
   `helpers/tools/spellchecker/dataframe_processor.py:42-45`.
 - Proposed fix: vectorised masks (`pd.to_numeric(errors="coerce")`, `str.contains`, `isin`,
   `merge`), `nx.from_pandas_edgelist`, `groupby` aggregations; produce issues from mask indices.
+- Done (description slice, ARC-017 Phase 3 Port 2): the two `description_validator.py` sites
+  (`validate_html_in_descriptions:89`'s `for index, row in self._dataframe.iterrows(): re.search(...)`
+  and `validate_indicator_levels:254`'s per-cell `NumberFormattingProcessing.check_cell_integer`
+  loop) are gone — the file was deleted along with the rest of `SpDescriptionValidator` when
+  DESC-001…010 moved onto the rules engine (`rules/description.py::check_html_in_simple_
+  description` uses `Series.str.contains(r"<.*?>", regex=True, na=False)`;
+  `check_indicator_levels` uses a `pd.to_numeric` mask reproducing `check_cell_integer`'s
+  comma-decimal/integer/min-value semantics, per `.claude/skills/pandas-vectorization/SKILL.md`
+  patterns 1/2). Regression/behaviour coverage: `tests/unit/rules/test_description.py`.
 
 ### PERF-002 · Defensive full-frame copies everywhere
 - Priority: P1 · Effort: S · Status: open
@@ -91,10 +99,27 @@ harness (PERF-009); never optimise without a number.
 - Related: SEC-003
 
 ### PERF-006 · Spell-check calls enchant per token without caching
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `helpers/tools/spellchecker/spellchecker_controller.py:26-35`, `dataframe_processor.py:42-45`
 - Proposed fix: deduplicate texts (`Series.unique()`), tokenise once, `lru_cache` on
   `dictionary.check`; typical sheets have < 5 k unique words.
+- Done: `SpellCheckerController` gained an explicit `self._check_cache: dict[str, bool]`
+  consulted/populated in `find_spelling_errors` (not `functools.lru_cache` — the dictionary
+  instance is per-run session state, not a pure function to memoise) plus a
+  `evaluate_text_quality(text) -> (has_multiple_spaces, spelling_errors)` /
+  `format_quality_warnings(...)` split so the row-independent signals are cacheable while
+  `check_text_quality`'s row-specific message formatting is unchanged. `DataFrameProcessor
+  .process_dataframe` now calls `evaluate_text_quality` once per `Series.unique()` text per
+  column and maps the cached result back to every row via `format_quality_warnings`, keeping
+  today's per-row messages, "linha N" numbering, and ordering identical. Measured with a
+  counting fake replacing `enchant.Dict.check` over a synthetic 2 000-row × 2-column frame of
+  repeated pt-BR sentences (4 unique texts): 46 000 → 41 `Dict.check` calls (~1122×), wall time
+  0.1692 s → 0.0041 s (~41×) for `check_spelling_text`/`process_dataframe`. Regression tests:
+  `tests/unit/helpers/tools/spellchecker/test_spellchecker_controller.py::TestSpellCheckerControllerCaching`
+  (counting-fake call-count assertions) and
+  `tests/unit/helpers/tools/spellchecker/test_dataframe_processor.py::TestDataFrameProcessorDeduplication`
+  (dedup call counts + a real-controller test proving per-row "linha N" messages and order are
+  unchanged for duplicate/multi-space texts).
 
 ### PERF-007 · No real parallelism where it matters
 - Priority: P2 · Effort: L · Status: open

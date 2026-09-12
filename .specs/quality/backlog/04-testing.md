@@ -24,6 +24,17 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   under this item; the rest of the list (proportionality, composition, legend, value, composition
   tree, `spreadsheet_processor.py`, description, spellchecker, `file_report_generator.py`,
   `validation_report.py`, models) is still open.
+- Done (description): `SpDescriptionValidator`/`description_validator.py` (18.7 % coverage, 0
+  dedicated rule tests) is deleted; its ten ported DESC-001…010 rules (`rules/description.py`)
+  are 95.24 % covered by `tests/unit/rules/test_description.py` (table-driven per rule: valid
+  case, every failure mode, missing-required-column abort, the DESC-010
+  `--no-warning-titles-length` skip, the engine-level empty-sheet skip for the whole registry);
+  the generalised `SpreadsheetProcessor._run_rule_registries`/`_build_rule_context` (replacing
+  the single-registry `_run_structure_rules`) is independently unit-tested in
+  `tests/unit/controllers/test_spreadsheet_processor.py`. Second validator closed under this
+  item; the rest of the list (proportionality, composition, legend, value, composition tree,
+  `spreadsheet_processor.py`'s remaining validator-construction lines, spellchecker,
+  `file_report_generator.py`, `validation_report.py`, models) is still open.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration

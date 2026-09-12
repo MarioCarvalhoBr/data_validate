@@ -105,7 +105,7 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 | `spreadsheets/base/base_validator.py` | none | `rules/engine.py` | ARC-008 |
 | ~~`structure/file_structure_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3b) — `rules/structure.py`** | BUG-026 (its "no duplicate errors/warnings instance state" concern no longer applies: each check is a pure function, no instance to duplicate state on) |
 | `spell/spellchecker_validator.py` | none | `rules/spelling/SPELL-00x.py` | BUG-023 |
-| `spreadsheets/description/description_validator.py` | none | `rules/description/DESC-0xx.py` | PERF-001 |
+| ~~`spreadsheets/description/description_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 2) — `rules/description.py`** | PERF-001 (its two `iterrows()` sites are gone, see `05-performance.md`) |
 | `spreadsheets/composition/compostion_graph_validator.py` | none | `rules/composition/COMP-0xx.py` | BUG-019, BUG-024 |
 | `spreadsheets/composition/composition_tree_validator.py` | none | `rules/composition/COMP-0xx.py` | PERF-001 |
 | `spreadsheets/temporal_reference/temporal_reference_validator.py` | none | `rules/temporal/TEMP-0xx.py` | BUG-007 |
@@ -138,11 +138,12 @@ from the legacy source instead.
 ## `rules/` (new package, Phase 3a engine core + Phase 3b first port — ARC-017, ARC-001, ARC-008)
 
 Brand new at its target-architecture path (no legacy predecessor to map the registry/engine core
-from): ADR-0006's engine, plus (Phase 3b) the first ported validator, `structure.py`, and the
-reusable legacy-report adapter, `legacy_adapter.py`. `structure.py` deviates from the target
-architecture's aspirational "one `Rule` per module under `rules/<sheet>/<RULE-ID>.py`" (ADR-0006)
-by declaring all six `STRUCT-*` rules in one flat module — the sheet-level `rules/<sheet>/`
-subpackage split is deferred to whichever later port first needs it.
+from): ADR-0006's engine, plus (Phase 3b/Phase 3 Port 2) the first two ported validators,
+`structure.py` and `description.py`, and the reusable legacy-report adapter, `legacy_adapter.py`.
+Both deviate from the target architecture's aspirational "one `Rule` per module under
+`rules/<sheet>/<RULE-ID>.py`" (ADR-0006) by declaring every rule for their sheet in one flat
+module — the sheet-level `rules/<sheet>/` subpackage split is deferred to whichever later port
+first needs it.
 
 | Module | Responsibility | Key symbols | Tests | Backlog |
 |---|---|---|---|---|
@@ -150,6 +151,7 @@ subpackage split is deferred to whichever later port first needs it.
 | `registry.py` | Declares one rule (prerequisites + check function); resolves execution order | `RuleSpec`, `RuleRegistry` (`register`, `get`, `topological_order`, `@rule(...)` decorator), `RegistryCycleError` | `rules/test_registry.py` (100 % coverage) | ARC-017, ARC-008 |
 | `engine.py` | Runs a registry over a context: skipped-with-reason, crash isolation, issue flattening | `Engine`, `RuleOutcome`, `RuleStatus`, `SkipReason`, `EngineResult` | `rules/test_engine.py` (100 % coverage) | ARC-017, ARC-001, ARC-008 |
 | `structure.py` | STRUCT-001…006: input-folder structural checks, ported from `FileStructureValidator` | `STRUCTURE_REGISTRY`, `check_input_directory_not_empty`, `check_files_not_zipped_inside_a_folder`, `check_no_unexpected_folders`, `check_no_unexpected_files`, `check_required_files_present`, `check_no_csv_xlsx_conflict` | `rules/test_structure.py` (100 % coverage) | ARC-017, ARC-001, ARC-005, TST-001 |
+| `description.py` | DESC-001…010: `descricao` content checks, ported from `SpDescriptionValidator` | `DESCRIPTION_REGISTRY`, `check_html_in_simple_description`, `check_sequential_codes`, `check_unique_codes`, `check_name_capitalization`, `check_indicator_levels`, `check_punctuation`, `check_empty_strings`, `check_no_cr_lf_characters`, `check_simple_description_length`, `check_title_length` | `rules/test_description.py` (95.24 % coverage) | ARC-017, ARC-001, ARC-005, PERF-001, TST-001 |
 | `legacy_adapter.py` | Renders `Engine.run(...)`'s outcomes into the legacy `ValidationReport`, reused by every later port | `extend_report_from_outcomes` | `rules/test_legacy_adapter.py` (100 % coverage) | ARC-017 |
 
-Last synced with code: f1e88af
+Last synced with code: cf5ddaa

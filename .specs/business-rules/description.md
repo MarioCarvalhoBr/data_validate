@@ -35,11 +35,11 @@ instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-0
 - NamesEnum: HTML_DESC (`verification_name_html_codes_in_descriptions`)
 - Protocol: §2.3 p.7 (only `desc_completa` may contain HTML)
 - Statement: `desc_simples` must not match `<.*?>`.
-- Current message (pt-BR): `{filename}, linha {index + 2}: Coluna 'desc_simples' não pode conter código HTML.` · missing column → error `{filename}: A verificação foi abortada para a coluna obrigatória 'desc_simples' que está ausente.`
-- Target message key: `rule.DESC-001.warning`
-- Implemented by: `validators/spreadsheets/description/description_validator.py::SpDescriptionValidator.validate_html_in_descriptions`
-- Covered by tests: none — TST-001
-- Notes / known defects: `iterrows` (PERF-001).
+- Current message (pt-BR): `{filename}, linha {row}: Coluna 'desc_simples' não pode conter código HTML.` · missing column → error, shared `rule.description.missing_required_column` text: `{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente.`
+- Target message key: `rule.DESC-001.warning` (missing column: `rule.description.missing_required_column`, `Severity.ERROR`)
+- Implemented by: `rules/description.py::check_html_in_simple_description` (vectorised: `Series.str.contains(r"<.*?>", regex=True, na=False)` — PERF-001, done)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckHtmlInSimpleDescription`
+- Notes / known defects: none — the `iterrows()` loop this rule used to run (PERF-001) is gone.
 
 ### DESC-002 · Codes must be sequential from 1
 - Severity: error
@@ -47,9 +47,9 @@ instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-0
 - Protocol: §2.3 p.5–6 ("ordem crescente e sequencial (1, 2, 3, 4…)")
 - Statement: after cleaning, `codigo` must equal `1, 2, …, n` in file order; if any value is non-numeric the check is aborted with an error; a first code ≠ 1 is reported separately.
 - Current message (pt-BR): `{filename}: A verificação foi abortada porque a coluna 'codigo' contém valores não numéricos.` · `{filename}: A coluna 'codigo' deve começar em 1.` · `{filename}: A coluna 'codigo' deve conter valores inteiros e sequenciais (1, 2, 3, ...).`
-- Target message key: `rule.DESC-002.error`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_sequential_codes` (reads the model's own cleaned data via `SpModelABC.cleaned_column("codigo")` — BUG-002, fixed)
-- Covered by tests: none — TST-001
+- Target message key: `rule.DESC-002.non_numeric` / `rule.DESC-002.must_start_at_one` / `rule.DESC-002.must_be_sequential` (missing column: `rule.description.missing_required_column`, `Severity.ERROR`)
+- Implemented by: `rules/description.py::check_sequential_codes` (reads `ctx.cleaned["descricao"]["codigo"]`, populated by `SpDescription.data_cleaning` — BUG-002, fixed)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckSequentialCodes`
 - Notes / known defects: the protocol's extra requirement "ordered by level, no lower-level code between higher-level codes" is not checked (gap G-06).
 
 ### DESC-003 · Codes must be unique
@@ -58,20 +58,20 @@ instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-0
 - Protocol: §2.3 p.5 ("um valor único para cada índice ou indicador")
 - Statement: no duplicated values in cleaned `codigo`.
 - Current message (pt-BR): `{filename}: A coluna 'codigo' contém códigos duplicados: {duplicated_codes}.`
-- Target message key: `rule.DESC-003.error`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_unique_codes`
-- Covered by tests: none — TST-001
-- Notes / known defects: none (BUG-002 fixed — reads `cleaned_column("codigo")`).
+- Target message key: `rule.DESC-003.error` (missing column: `rule.description.missing_required_column`, `Severity.ERROR`)
+- Implemented by: `rules/description.py::check_unique_codes`
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckUniqueCodes`
+- Notes / known defects: none (BUG-002 fixed — reads `ctx.cleaned["descricao"]["codigo"]`).
 
 ### DESC-004 · Names follow ABNT capitalisation and have no stray whitespace
 - Severity: warning
 - NamesEnum: INP (`verification_name_indicator_name_pattern`)
 - Protocol: §2.3 p.6 ("apenas o primeiro caractere da primeira palavra em maiúsculo (com a exceção de acrônimos)")
 - Statement: for `nome_simples` and `nome_completo`, the expected text is: strip, remove CR/LF, first word capitalised, remaining words lower-case, all-uppercase tokens of length > 1 kept as acronyms. Any difference (including double spaces shown as `(EXTRA_SPACE)`, CR as `(CR)`, LF as `(LF)`) is reported with expected vs found.
-- Current message (pt-BR): `{filename}, linha {idx + 2}: Valor da coluna '{column}' fora do padrão. Esperado: '{expected_text}'. Encontrado: '{original_text}'.` · missing column → warning with the abort text
-- Target message key: `rule.DESC-004.warning`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_text_capitalization` using `helpers/common/formatting/text_formatting_processing.py::TextFormattingProcessing.capitalize_text_keep_acronyms`
-- Covered by tests: helper covered by `tests/unit/helpers/common/formatting/test_text_formatting.py`
+- Current message (pt-BR): `{filename}, linha {row}: Valor da coluna '{column}' fora do padrão. Esperado: '{expected_text}'. Encontrado: '{original_text}'.` · missing column → warning with the shared abort text
+- Target message key: `rule.DESC-004.warning` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
+- Implemented by: `rules/description.py::check_name_capitalization` using `helpers/common/formatting/text_formatting_processing.py::TextFormattingProcessing.capitalize_text_keep_acronyms`
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckNameCapitalization`; helper also covered by `tests/unit/helpers/common/formatting/test_text_formatting.py`
 - Notes / known defects: proper nouns inside names (e.g. "Brasil") are flagged as warnings by design.
 
 ### DESC-005 · Level must be an integer ≥ 1
@@ -79,11 +79,11 @@ instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-0
 - NamesEnum: IL (`verification_name_indicator_levels`)
 - Protocol: §2.3 p.6 ("Os níveis são valores inteiros a partir de 1")
 - Statement: every `nivel` cell parses as an integer ≥ 1.
-- Current message (pt-BR): `{filename}, linha {index + 2}: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.`
-- Target message key: `rule.DESC-005.error`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_indicator_levels` (`NumberFormattingProcessing.check_cell_integer`)
-- Covered by tests: helper covered by `tests/unit/helpers/common/formatting/test_number_formatting.py`
-- Notes / known defects: duplicates CLEAN-001 (same rows reported under `FC`).
+- Current message (pt-BR): `{filename}, linha {row}: O nível do indicador na coluna 'nivel' deve ser um número inteiro maior que 0.`
+- Target message key: `rule.DESC-005.error` (missing column: `rule.description.missing_required_column`, `Severity.ERROR`)
+- Implemented by: `rules/description.py::check_indicator_levels` (vectorised: `pd.to_numeric` mask over a comma-to-dot-normalised column, reproducing `NumberFormattingProcessing.check_cell_integer(min_value=1)`'s semantics exactly, including comma decimals like `"1,0"` — PERF-001, done)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckIndicatorLevels`; helper also covered by `tests/unit/helpers/common/formatting/test_number_formatting.py`
+- Notes / known defects: duplicates CLEAN-001 (same rows reported under `FC`); the `iterrows()` loop this rule used to run (PERF-001) is gone.
 
 **Cross-sheet consumer note (BUG-014, fixed):** the shared helper
 `helpers/common/validation/description_processing.py::DescriptionProcessing.get_valids_codes_from_description`
@@ -99,10 +99,10 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - NamesEnum: MAND_PUNC_DESC (`verification_name_mandatory_and_prohibited_punctuation_in_descriptions`)
 - Protocol: §2.3 p.7 — **partially contradicts**: protocol says `desc_simples` must *not* end with a special character such as `.`, while `desc_completa` must end with `.`
 - Statement (as implemented): `nome_simples`, `nome_completo` must not end with one of `, . ; : ! ?`; `desc_simples` and `desc_completa` must end with `.`.
-- Current message (pt-BR): `{file_name}, linha {idx + 2}: O valor da coluna '{column}' não deve terminar com pontuação.` · `{file_name}, linha {idx + 2}: O valor da coluna '{column}' deve terminar com ponto.`
-- Target message key: `rule.DESC-006.warning`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_punctuation` → `helpers/common/validation/character_processing.py::CharacterProcessing.check_characters_punctuation_rules`
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
+- Current message (pt-BR): `{filename}, linha {row}: O valor da coluna '{column}' não deve terminar com pontuação.` · `{filename}, linha {row}: O valor da coluna '{column}' deve terminar com ponto.`
+- Target message key: `rule.DESC-006.no_punctuation` / `rule.DESC-006.must_end_with_dot` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
+- Implemented by: `rules/description.py::check_punctuation` — no longer calls `helpers/common/validation/character_processing.py::CharacterProcessing.check_characters_punctuation_rules` (that helper still builds its own hardcoded pt-BR strings and is out of this port's scope; it remains in use by `scenario_validator.py`/`temporal_reference_validator.py`), reimplemented with the same `.str[-1].isin(...)`/`.str.endswith(".")` masks
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckPunctuation`; the still-used helper is covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
 - Notes / known defects: gap G-07 — decide with the protocol owners whether `desc_simples` must or must not end with `.`; goldens currently encode the code's behaviour.
 
 ### DESC-007 · Names and descriptions must not be empty
@@ -110,10 +110,10 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - NamesEnum: EF (`verification_name_empty_fields`)
 - Protocol: §2.3 (all four are mandatory content)
 - Statement: `nome_simples`, `nome_completo`, `desc_simples`, `desc_completa` must be non-null and non-empty in every row.
-- Current message (pt-BR): `{filename}, linha {index + 2}: Nenhum item da coluna '{column}' pode ser vazio.`
-- Target message key: `rule.DESC-007.error`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_empty_strings`
-- Covered by tests: none — TST-001
+- Current message (pt-BR): `{filename}, linha {row}: Nenhum item da coluna '{column}' pode ser vazio.`
+- Target message key: `rule.DESC-007.error` (missing column: `rule.description.missing_required_column`, `Severity.ERROR`)
+- Implemented by: `rules/description.py::check_empty_strings`
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckEmptyStrings`
 - Notes / known defects: whitespace-only cells are not treated as empty.
 
 ### DESC-008 · No CR/LF characters
@@ -121,10 +121,10 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - NamesEnum: LB_DESC (`verification_name_line_break_in_description`)
 - Protocol: §6 p.17 (explained error "caracter inválido (LF) no final do texto")
 - Statement: for every expected column, text must not start or end with CR (`\x0d`) or LF (`\x0a`); additionally `nome_simples`/`nome_completo` must not contain CR/LF anywhere (position reported, 1-based).
-- Current message (pt-BR): `{file_name}, linha {idx + 2}: O texto da coluna '{column}' possui um caracter inválido (CR|LF) no final do texto. Remova o último caractere do texto.` · `… no início do texto. Remova o primeiro caractere do texto.` · `{file_name}, linha {idx + 2}: O texto da coluna '{column}' possui um caracter inválido ({CR|LF}) na posição {pos}. Remova o caractere do texto.`
-- Target message key: `rule.DESC-008.warning`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_cr_lf_characters` → `character_processing.py::CharacterProcessing.check_special_characters_cr_lf`
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
+- Current message (pt-BR): `{filename}, linha {row}: O texto da coluna '{column}' possui um caracter inválido ({char_type}) no final do texto. Remova o último caractere do texto.` · `… no início do texto. Remova o primeiro caractere do texto.` · `{filename}, linha {row}: O texto da coluna '{column}' possui um caracter inválido ({char_type}) na posição {position}. Remova o caractere do texto.`
+- Target message key: `rule.DESC-008.end` / `rule.DESC-008.start` / `rule.DESC-008.anywhere` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
+- Implemented by: `rules/description.py::check_no_cr_lf_characters` — no longer calls `character_processing.py::CharacterProcessing.check_special_characters_cr_lf` (out of this port's scope, still used by `scenario_validator.py`/`temporal_reference_validator.py`), reimplemented with the same `.str.endswith`/`.str.startswith`/`re.finditer` shape; `columns_start_end` is `ctx.options["expected_columns"]`, the caller-supplied `SpDescription.EXPECTED_COLUMNS` for this run
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckNoCrLfCharacters`; the still-used helper is covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
 - Notes / known defects: `EXPECTED_COLUMNS` includes injected `relacao`/`unidade` — intentional
   (see the `frame`-vs-`raw_data` note above; BUG-003 fixed, behaviour unchanged).
 
@@ -133,22 +133,22 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - NamesEnum: SIMP_DESC_N (`verification_name_simple_descriptions_over_n_chars`, value = 150)
 - Protocol: §2.3 p.6 ("no máximo 150 caracteres, incluindo os espaços em branco")
 - Statement: `len(desc_simples) ≤ 150`.
-- Current message (pt-BR): `{file_name}, linha {idx + 2}: O texto da coluna "desc_simples" excede o limite de 150 caracteres (encontrado: {actual_length}).`
-- Target message key: `rule.DESC-009.warning`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_simple_description_length` → `BaseValidator._check_text_length` → `DataFrameProcessing.check_dataframe_text_length`; limit `SpDescription.CONSTANTS.MAX_SIMPLE_DESC_LENGTH` (duplicated in `ApplicationConfig.SIMPLE_DESCRIPTIONS_OVER_N_CHARS`)
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_column_validation.py`
-- Notes / known defects: two sources for the constant (ARC-003).
+- Current message (pt-BR): `{filename}, linha {row}: O texto da coluna "desc_simples" excede o limite de 150 caracteres (encontrado: {actual_length}).`
+- Target message key: `rule.DESC-009.warning` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
+- Implemented by: `rules/description.py::check_simple_description_length`; limit read from `ctx.options["simple_desc_max_length"]` (`SpreadsheetProcessor._build_rule_context`, sourced from `ApplicationConfig.SIMPLE_DESCRIPTIONS_OVER_N_CHARS` — the rule no longer reads `SpDescription.CONSTANTS.MAX_SIMPLE_DESC_LENGTH` directly, since `rules` must not depend on `models`, `.claude/rules/architecture-boundaries.md`)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckSimpleDescriptionLength`
+- Notes / known defects: two sources for the constant (ARC-003) — unchanged by this port.
 
 ### DESC-010 · Simple name ≤ 40 characters
 - Severity: warning (skippable with `--no-warning-titles-length`)
 - NamesEnum: TITLES_N (`verification_name_titles_over_n_chars`, value = 40)
 - Protocol: not in protocol — implemented behaviour (protocol says "deverá ser testado na plataforma pela equipe do INPE")
 - Statement: `len(nome_simples) ≤ 40`.
-- Current message (pt-BR): `{file_name}, linha {idx + 2}: O texto da coluna "nome_simples" excede o limite de 40 caracteres (encontrado: {actual_length}).`
-- Target message key: `rule.DESC-010.warning`
-- Implemented by: `description_validator.py::SpDescriptionValidator.validate_title_length`; limit `SpDescription.CONSTANTS.MAX_TITLE_LENGTH` / `ApplicationConfig.TITLE_OVER_N_CHARS`
-- Covered by tests: none — TST-001
-- Notes / known defects: when skipped the report lists the title under "not executed".
+- Current message (pt-BR): `{filename}, linha {row}: O texto da coluna "nome_simples" excede o limite de 40 caracteres (encontrado: {actual_length}).`
+- Target message key: `rule.DESC-010.warning` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
+- Implemented by: `rules/description.py::check_title_length`, returns `[]` immediately when `ctx.options["no_warning_titles_length"]` is set; limit read from `ctx.options["title_max_length"]` (sourced from `ApplicationConfig.TITLE_OVER_N_CHARS`)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckTitleLength`
+- Notes / known defects: when skipped the report lists the title under "not executed" (`FileReportGenerator`, independent of this rule).
 
 ### DESC-011 · `cenario` column requires the scenarios file
 - Severity: error
@@ -235,4 +235,4 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
   DESC-017 (`ordem` sibling sequence), DESC-019 (`nome_completo` ≥ `nome_simples` length);
   DESC-016 (`relacao` domain) is retired unimplemented — the column is gone.
 
-Last synced with code: 344fef7
+Last synced with code: cf5ddaa

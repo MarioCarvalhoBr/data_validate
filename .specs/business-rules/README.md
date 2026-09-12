@@ -115,9 +115,10 @@ missing (`BaseValidator.set_not_executed` is a no-op — backlog ARC-008); the t
 ## Test coverage summary
 
 STRUCT-001…006 (file-structure.md) have dedicated unit tests under `tests/unit/rules/
-test_structure.py`, the first rules ported onto the `rules` engine (ARC-017 Phase 3b) — see
-`.specs/quality/backlog/04-testing.md`'s TST-001 entry. Every other rule still has no dedicated
-unit test (backlog TST-001). Helper functions used by rules are covered under
-`tests/unit/helpers/**`; those are cited per rule as "helper covered by …".
+test_structure.py`, the first rules ported onto the `rules` engine (ARC-017 Phase 3b). DESC-001…010
+(description.md) have dedicated table-driven unit tests under `tests/unit/rules/test_description.py`
+(ARC-017 Phase 3 Port 2) — see `.specs/quality/backlog/04-testing.md`'s TST-001 entry for both.
+Every other rule still has no dedicated unit test (backlog TST-001). Helper functions used by
+rules are covered under `tests/unit/helpers/**`; those are cited per rule as "helper covered by …".
 
-Last synced with code: f1e88af
+Last synced with code: cf5ddaa

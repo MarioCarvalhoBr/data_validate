@@ -30,6 +30,16 @@ zero global state. Each item below names the current smell, where it lives, and 
   validator (spelling, description, composition, temporal reference, proportionality, value,
   scenario, legend) still runs its pipeline from `__init__` unchanged; each is its own future
   slice.
+- Note (Phase 3 Port 2 slice, ARC-017): the second validator is ported —
+  `validators/spreadsheets/description/description_validator.py::SpDescriptionValidator` is
+  deleted; its nine checks are now `rules/description.py`'s ten pure `check_*` functions
+  (`DESC-001`…`DESC-010`). `_run_structure_rules` was generalised into
+  `SpreadsheetProcessor._run_rule_registries(registries, ctx)` + `_build_rule_context()`, so both
+  `STRUCTURE_REGISTRY` and `DESCRIPTION_REGISTRY` run through the same
+  `Engine(...).run(ctx)`/`extend_report_from_outcomes(...)` call shape, against one shared
+  `RuleContext` built once per pipeline run. No constructor work at all for this validator any
+  more. Still open: spelling, composition, temporal reference, proportionality, value, scenario,
+  legend.
 
 ### ARC-002 · Global mutable state
 - Priority: P0 · Effort: L · Status: open
@@ -130,6 +140,15 @@ zero global state. Each item below names the current smell, where it lives, and 
   stale, corrected in `.specs/business-rules/file-structure.md`), and the legacy
   `.text(key).format(**kwargs)` double-call for STRUCT-003/004 collapsed into the single-call
   form with no output change (verified byte-identical by the e2e golden harness).
+- Note (Phase 3 Port 2 slice, ARC-017): `SpDescriptionValidator` (description_validator.py) is
+  deleted; its ten ported rules (`rules/description.py`, DESC-001…010) render every message
+  through `ctx.translate(message_key, **params)` — 16 new catalog keys added to both
+  `static/locales/{pt_BR,en_US}/messages.json` (one `rule.description.missing_required_column`
+  shared by every rule's "required column is missing" abort case, plus one-or-more
+  `rule.DESC-0XX.<slug>` keys per rule for its distinct message templates — e.g. DESC-002 has
+  three: `non_numeric`/`must_start_at_one`/`must_be_sequential`), all pt-BR values copied
+  verbatim from the legacy f-strings (verified byte-identical by the e2e golden harness run
+  twice).
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
