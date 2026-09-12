@@ -13,8 +13,8 @@ commit SHA with a version comment. Every `actions/checkout` step sets `persist-c
 | `lint` | ubuntu-24.04 | `poetry install --only dev`, `ruff check .`, `ruff format --check .` | blocking |
 | `typecheck` | ubuntu-24.04 | `mypy` | blocking |
 | `security` | ubuntu-24.04 | `make security`: `bandit -c pyproject.toml -r data_validate tools`, `pip-audit --strict --ignore-vuln PYSEC-2026-2860 --ignore-vuln GHSA-9g3x-6x24-vf9f` (pdfkit, no fixed version — tracked SEC-002) | blocking (any other audit finding fails the job; new ignores need a justification comment) |
-| `test` | matrix `ubuntu-24.04`, `windows-2022` × Python `3.12`, `3.13` | Poetry cache; Linux `apt-get install enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf`; `pytest -n auto --cov --cov-report=xml --junitxml`; Codecov upload (`fail_ci_if_error: false`); junit artefact; coverage ratchet | blocking |
-| `e2e` | ubuntu-24.04 | system deps; `make test-e2e` | blocking |
+| `test` | matrix `ubuntu-24.04`, `windows-2022` × Python `3.12`, `3.13` | Poetry cache; Linux `apt-get install enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf`; `pytest -n auto --cov --cov-report=xml --junitxml --durations=10 -p no:cacheprovider`; Codecov upload (`fail_ci_if_error: false`); junit artefact; coverage ratchet | blocking |
+| `e2e` | ubuntu-24.04 | system deps; `make test-e2e PYTEST_CI_FLAGS="--durations=10 -p no:cacheprovider"` | blocking |
 | `build` | ubuntu-24.04 | `poetry build`, `twine check dist/*`, upload artefact | blocking |
 
 ### `codeql.yml` — on push/PR to `main` and weekly (Mon 03:17 UTC)

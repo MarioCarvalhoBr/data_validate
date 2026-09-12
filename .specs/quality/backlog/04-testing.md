@@ -69,11 +69,13 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   `requires_pdf` and skip when absent; pure-Python spell fallback (ARC-015) removes the need.
 
 ### TST-008 · Test execution ergonomics
-- Priority: P2 · Effort: S · Status: in-progress
+- Priority: P2 · Effort: S · Status: done
 - Proposed fix: `pytest-xdist` (`-n auto`), markers `unit/integration/e2e/slow`, `make test-unit`,
   `make test-e2e`, `--durations=10`, `-p no:cacheprovider` in CI.
-- Done: pytest-xdist, markers, `make test-unit`/`test-e2e`
-- Remaining: `--durations=10` and `-p no:cacheprovider` in CI are not wired up yet.
+- Done: pytest-xdist, markers, `make test-unit`/`test-e2e`; CI now wires `--durations=10
+  -p no:cacheprovider` via a direct flag on the `test` job's pytest call and via the
+  `PYTEST_CI_FLAGS` Makefile variable (empty by default, set by the `e2e` job) so local runs
+  keep the cache.
 
 ### TST-009 · Dead test copies in `local_data/`
 - Priority: P3 · Effort: S · Status: open

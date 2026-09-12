@@ -4,6 +4,8 @@
 # Variables
 PATH_SRC = data_validate
 FIXTURE ?= data_ground_truth_01
+# CI passes --durations=10 -p no:cacheprovider here; left empty locally to keep the cache and quiet output.
+PYTEST_CI_FLAGS ?=
 
 PYTHON  = poetry run python
 PYTEST  = poetry run pytest
@@ -56,10 +58,10 @@ security-offline: ## Run bandit only (no network required; use when pip-audit is
 	$(BANDIT) -c pyproject.toml -r $(PATH_SRC) tools
 
 test-unit: ## Run unit tests in parallel
-	$(PYTEST) tests/unit -n auto -m "not e2e"
+	$(PYTEST) tests/unit -n auto -m "not e2e" $(PYTEST_CI_FLAGS)
 
 test-e2e: ## Run the golden end-to-end harness
-	$(PYTEST) tests/e2e -m e2e -q
+	$(PYTEST) tests/e2e -m e2e -q $(PYTEST_CI_FLAGS)
 
 test: test-unit test-e2e ## Run unit and end-to-end tests
 
@@ -68,7 +70,7 @@ coverage: ## Run unit tests with coverage reports (term, html, xml) and the ratc
 		--cov-report=term-missing \
 		--cov-report=html:dev-reports/htmlcov \
 		--cov-report=xml:dev-reports/coverage.xml \
-		--cov-fail-under=54
+		--cov-fail-under=54 $(PYTEST_CI_FLAGS)
 	@if [ -f tools/coverage_ratchet.py ]; then $(PYTHON) tools/coverage_ratchet.py; fi
 
 check: lint typecheck security-offline test-unit ## Run the fast local gate (lint, typecheck, security-offline, unit tests)

@@ -94,6 +94,7 @@ jobs:
           poetry run pytest tests/unit -n auto -m "not e2e"
           --cov=data_validate --cov-report=xml:dev-reports/coverage.xml
           --junitxml=dev-reports/junit/junit.xml
+          --durations=10 -p no:cacheprovider
       - name: Upload coverage to Codecov
         if: matrix.os == 'ubuntu-24.04' && matrix.python-version == '3.12'
         uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
@@ -129,7 +130,7 @@ jobs:
           python-version: "3.12"
           cache: poetry
       - run: poetry install --sync
-      - run: make test-e2e
+      - run: make test-e2e PYTEST_CI_FLAGS="--durations=10 -p no:cacheprovider"
 
   build:
     name: Build package
