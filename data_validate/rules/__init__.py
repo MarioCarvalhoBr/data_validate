@@ -20,12 +20,14 @@ call site outside `tests/unit/rules/` and the reusable seam every later validato
 from __future__ import annotations
 
 from data_validate.rules.context import RuleContext
+from data_validate.rules.description import DESCRIPTION_REGISTRY
 from data_validate.rules.engine import Engine, EngineResult, RuleOutcome, RuleStatus, SkipReason
 from data_validate.rules.legacy_adapter import extend_report_from_outcomes
 from data_validate.rules.registry import RegistryCycleError, RuleRegistry, RuleSpec
 from data_validate.rules.structure import STRUCTURE_REGISTRY
 
 __all__ = [
+    "DESCRIPTION_REGISTRY",
     "Engine",
     "EngineResult",
     "RegistryCycleError",

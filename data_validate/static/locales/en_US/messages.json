@@ -77,6 +77,54 @@
   "loader_error_sheet_too_big": {
     "message": "{filename}: The sheet exceeds the maximum allowed size ({rows} rows x {columns} columns > {max_rows} rows x {max_columns} columns) and will not be read."
   },
+  "rule.description.missing_required_column": {
+    "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
+  },
+  "rule.DESC-001.warning": {
+    "message": "{filename}, line {row}: Column '{column}' must not contain HTML code."
+  },
+  "rule.DESC-002.non_numeric": {
+    "message": "{filename}: The check was aborted because column '{column}' contains non-numeric values."
+  },
+  "rule.DESC-002.must_start_at_one": {
+    "message": "{filename}: Column '{column}' must start at 1."
+  },
+  "rule.DESC-002.must_be_sequential": {
+    "message": "{filename}: Column '{column}' must contain sequential integer values (1, 2, 3, ...)."
+  },
+  "rule.DESC-003.error": {
+    "message": "{filename}: Column '{column}' contains duplicate codes: {duplicated_codes}."
+  },
+  "rule.DESC-004.warning": {
+    "message": "{filename}, line {row}: Value in column '{column}' does not match the expected pattern. Expected: '{expected_text}'. Found: '{original_text}'."
+  },
+  "rule.DESC-005.error": {
+    "message": "{filename}, line {row}: The indicator level in column '{column}' must be an integer greater than 0."
+  },
+  "rule.DESC-006.no_punctuation": {
+    "message": "{filename}, line {row}: The value in column '{column}' must not end with punctuation."
+  },
+  "rule.DESC-006.must_end_with_dot": {
+    "message": "{filename}, line {row}: The value in column '{column}' must end with a period."
+  },
+  "rule.DESC-007.error": {
+    "message": "{filename}, line {row}: No item in column '{column}' may be empty."
+  },
+  "rule.DESC-008.end": {
+    "message": "{filename}, line {row}: The text in column '{column}' has an invalid character ({char_type}) at the end of the text. Remove the last character of the text."
+  },
+  "rule.DESC-008.start": {
+    "message": "{filename}, line {row}: The text in column '{column}' has an invalid character ({char_type}) at the beginning of the text. Remove the first character of the text."
+  },
+  "rule.DESC-008.anywhere": {
+    "message": "{filename}, line {row}: The text in column '{column}' has an invalid character ({char_type}) at position {position}. Remove the character from the text."
+  },
+  "rule.DESC-009.warning": {
+    "message": "{filename}, line {row}: The text in column \"{column}\" exceeds the limit of {max_length} characters (found: {actual_length})."
+  },
+  "rule.DESC-010.warning": {
+    "message": "{filename}, line {row}: The text in column \"{column}\" exceeds the limit of {max_length} characters (found: {actual_length})."
+  },
   "verification_name_file_structure": {
     "message": "Structure of the input folder files"
   },

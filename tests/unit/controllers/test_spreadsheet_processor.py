@@ -1,17 +1,23 @@
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 """
-Unit tests for `SpreadsheetProcessor._read_data`/`_run_structure_rules` (ARC-009 loader-consumer
-migration; ARC-017 Phase 3b rules-engine port).
+Unit tests for `SpreadsheetProcessor._read_data`/`_run_rule_registries` (ARC-009 loader-consumer
+migration; ARC-017 Phase 3b/Phase 3 Port 2 rules-engine port).
 
 BUG-018/ARC-009: `_read_data` now calls `DataLoaderFacade.load()` (returning a `LoadResult`)
 instead of the deprecated `load_all` property. `SpreadsheetProcessor.__init__` runs the whole
 pipeline as a side effect (ARC-001, a pre-existing debt this test does not attempt to fix), so
-`_read_data`/`_run_structure_rules` are exercised in isolation on a bare instance built via
+`_read_data`/`_run_rule_registries` are exercised in isolation on a bare instance built via
 `__new__`, with only the attributes each method itself reads pre-populated.
+
+`_run_structure_rules` (a single-registry, folder-listing-only helper) was generalised into
+`_run_rule_registries(registries, ctx)` when the description rules were ported (ARC-017 Phase 3
+Port 2): `TestRunStructureRulesUsesTheEngine` below now builds a `RuleContext` directly (the same
+way `tests/unit/rules/test_structure.py` does) and calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)`.
 """
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from pathlib import Path
 
 import pandas as pd
@@ -25,6 +31,7 @@ from data_validate.controllers.spreadsheet_processor import SpreadsheetProcessor
 from data_validate import config, models
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, LoadResult
+from data_validate.rules import RuleContext, STRUCTURE_REGISTRY
 
 
 def _fake_raw_data_map() -> dict[str, DataLoaderModel]:
@@ -111,7 +118,7 @@ class TestReadDataUsesLoad:
 
 
 class TestRunStructureRulesUsesTheEngine:
-    """`_run_structure_rules` runs `STRUCTURE_REGISTRY` and renders findings into the FS report."""
+    """`_run_rule_registries([STRUCTURE_REGISTRY], ctx)` renders findings into the FS report."""
 
     def _build_processor_for(self, mocker, input_folder: Path) -> SpreadsheetProcessor:
         processor = SpreadsheetProcessor.__new__(SpreadsheetProcessor)
@@ -127,13 +134,28 @@ class TestRunStructureRulesUsesTheEngine:
         processor.language_manager.text = mocker.MagicMock(side_effect=lambda key, **kwargs: key)
         return processor
 
+    @staticmethod
+    def _structure_context(input_folder: Path) -> RuleContext:
+        """Build a minimal, structure-only `RuleContext` (no sheets/cleaned data needed)."""
+        return RuleContext(
+            sheets={},
+            cleaned={},
+            options={
+                "input_folder": input_folder,
+                "dir_entries": tuple(sorted(entry.name for entry in input_folder.iterdir())),
+                "scenarios": [],
+            },
+            translate=lambda key, **params: key,
+            clock=lambda: datetime(2026, 1, 1, tzinfo=UTC),
+        )
+
     def test_an_unexpected_file_is_rendered_into_the_fs_report(self, mocker, tmp_path: Path) -> None:
         for stem in ("descricao", "composicao", "valores", "referencia_temporal"):
             (tmp_path / f"{stem}.csv").touch()
         (tmp_path / "arquivo_aleatorio.xlsx").touch()
 
         processor = self._build_processor_for(mocker, tmp_path)
-        processor._run_structure_rules()
+        processor._run_rule_registries([STRUCTURE_REGISTRY], self._structure_context(tmp_path))
 
         fs_title = processor.validation_titles[config.NamesEnum.FS.value]
         assert "validator_structure_error_unexpected_file" in processor.validation_reports[fs_title].errors
@@ -143,14 +165,14 @@ class TestRunStructureRulesUsesTheEngine:
             (tmp_path / f"{stem}.csv").touch()
 
         processor = self._build_processor_for(mocker, tmp_path)
-        processor._run_structure_rules()
+        processor._run_rule_registries([STRUCTURE_REGISTRY], self._structure_context(tmp_path))
 
         fs_title = processor.validation_titles[config.NamesEnum.FS.value]
         assert processor.validation_reports[fs_title].errors == []
 
     def test_an_empty_input_folder_reports_empty_directory_and_missing_files(self, mocker, tmp_path: Path) -> None:
         processor = self._build_processor_for(mocker, tmp_path)
-        processor._run_structure_rules()
+        processor._run_rule_registries([STRUCTURE_REGISTRY], self._structure_context(tmp_path))
 
         fs_title = processor.validation_titles[config.NamesEnum.FS.value]
         errors = processor.validation_reports[fs_title].errors

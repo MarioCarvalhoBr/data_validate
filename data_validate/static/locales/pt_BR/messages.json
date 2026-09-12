@@ -77,6 +77,54 @@
   "loader_error_sheet_too_big": {
     "message": "{filename}: A planilha excede o tamanho máximo permitido ({rows} linhas x {columns} colunas > {max_rows} linhas x {max_columns} colunas) e não será lida."
   },
+  "rule.description.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.DESC-001.warning": {
+    "message": "{filename}, linha {row}: Coluna '{column}' não pode conter código HTML."
+  },
+  "rule.DESC-002.non_numeric": {
+    "message": "{filename}: A verificação foi abortada porque a coluna '{column}' contém valores não numéricos."
+  },
+  "rule.DESC-002.must_start_at_one": {
+    "message": "{filename}: A coluna '{column}' deve começar em 1."
+  },
+  "rule.DESC-002.must_be_sequential": {
+    "message": "{filename}: A coluna '{column}' deve conter valores inteiros e sequenciais (1, 2, 3, ...)."
+  },
+  "rule.DESC-003.error": {
+    "message": "{filename}: A coluna '{column}' contém códigos duplicados: {duplicated_codes}."
+  },
+  "rule.DESC-004.warning": {
+    "message": "{filename}, linha {row}: Valor da coluna '{column}' fora do padrão. Esperado: '{expected_text}'. Encontrado: '{original_text}'."
+  },
+  "rule.DESC-005.error": {
+    "message": "{filename}, linha {row}: O nível do indicador na coluna '{column}' deve ser um número inteiro maior que 0."
+  },
+  "rule.DESC-006.no_punctuation": {
+    "message": "{filename}, linha {row}: O valor da coluna '{column}' não deve terminar com pontuação."
+  },
+  "rule.DESC-006.must_end_with_dot": {
+    "message": "{filename}, linha {row}: O valor da coluna '{column}' deve terminar com ponto."
+  },
+  "rule.DESC-007.error": {
+    "message": "{filename}, linha {row}: Nenhum item da coluna '{column}' pode ser vazio."
+  },
+  "rule.DESC-008.end": {
+    "message": "{filename}, linha {row}: O texto da coluna '{column}' possui um caracter inválido ({char_type}) no final do texto. Remova o último caractere do texto."
+  },
+  "rule.DESC-008.start": {
+    "message": "{filename}, linha {row}: O texto da coluna '{column}' possui um caracter inválido ({char_type}) no início do texto. Remova o primeiro caractere do texto."
+  },
+  "rule.DESC-008.anywhere": {
+    "message": "{filename}, linha {row}: O texto da coluna '{column}' possui um caracter inválido ({char_type}) na posição {position}. Remova o caractere do texto."
+  },
+  "rule.DESC-009.warning": {
+    "message": "{filename}, linha {row}: O texto da coluna \"{column}\" excede o limite de {max_length} caracteres (encontrado: {actual_length})."
+  },
+  "rule.DESC-010.warning": {
+    "message": "{filename}, linha {row}: O texto da coluna \"{column}\" excede o limite de {max_length} caracteres (encontrado: {actual_length})."
+  },
    "verification_name_file_structure": {
     "message": "Estrutura dos arquivos da pasta de entrada"
   },

@@ -9,9 +9,6 @@ from data_validate.validators.spreadsheets.composition import (
     SpCompositionTreeValidator,
     SpCompositionGraphValidator,
 )
-from data_validate.validators.spreadsheets.description.description_validator import (
-    SpDescriptionValidator,
-)
 from data_validate.validators.spreadsheets.legend.legend_validator import (
     SpLegendValidator,
 )
@@ -31,7 +28,6 @@ from data_validate.validators.spreadsheets.value.value_validator import (
 __all__ = [
     # Package spreadsheets
     "BaseValidator",
-    "SpDescriptionValidator",
     "SpValueValidator",
     "SpCompositionTreeValidator",
     "SpCompositionGraphValidator",

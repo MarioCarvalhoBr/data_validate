@@ -18,7 +18,14 @@ import data_validate.controllers as controllers
 import data_validate.helpers.tools as tools
 import data_validate.models as models
 import data_validate.validators as validators
-from data_validate.rules import Engine, RuleContext, STRUCTURE_REGISTRY, extend_report_from_outcomes
+from data_validate.rules import (
+    DESCRIPTION_REGISTRY,
+    Engine,
+    RuleContext,
+    RuleRegistry,
+    STRUCTURE_REGISTRY,
+    extend_report_from_outcomes,
+)
 
 
 class SpreadsheetProcessor:
@@ -203,34 +210,60 @@ class SpreadsheetProcessor:
                 warnings=model_instance.data_cleaning_warnings,
             )
 
-    def _run_structure_rules(self) -> None:
+    def _build_rule_context(self) -> RuleContext:
         """
-        Run the STRUCT-00x rule engine over the input folder (ARC-017 Phase 3b port).
+        Build the single, shared `RuleContext` every rule registry in this pipeline reads from.
 
-        Replaces the deleted `validators.FileStructureValidator` construction: builds an
-        immutable `RuleContext` from a fresh listing of the input folder, runs
-        `data_validate.rules.STRUCTURE_REGISTRY` through the shared `Engine`, then renders every
-        outcome's issues into `self.validation_reports` via `extend_report_from_outcomes` (see
-        `data_validate/rules/structure.py`, `data_validate/rules/legacy_adapter.py`).
+        Assembles it from data already available once `_configure()` has run: every initialized
+        model's own working frame (`model.frame`, BUG-002/BUG-003-safe) and cleaned columns
+        (`model.cleaned`), keyed by sheet name; plus the input-folder listing, scenarios, and the
+        CLI flags/limits a description-domain rule needs (ARC-017 Phase 3 Port 2). Reused,
+        unchanged, by every `_run_rule_registries` call in `_build_pipeline` — one `RuleContext`
+        per run, not one per registry.
+
+        Returns:
+            RuleContext: The shared context for this run.
         """
-        structure_context = RuleContext(
-            sheets={},
-            cleaned={},
+        description_model = self.data_models_context.get_instance_of(models.SpDescription)
+
+        return RuleContext(
+            sheets={model.CONSTANTS.SP_NAME: model.frame for model in self.initialized_models},
+            cleaned={model.CONSTANTS.SP_NAME: dict(model.cleaned) for model in self.initialized_models},
             options={
                 "input_folder": Path(self.input_folder),
                 "dir_entries": os.listdir(self.input_folder),
                 "scenarios": self.scenarios,
+                "filenames": {model.CONSTANTS.SP_NAME: model.filename for model in self.initialized_models},
+                "no_warning_titles_length": self.context.data_args.data_action.no_warning_titles_length,
+                "expected_columns": tuple(description_model.EXPECTED_COLUMNS) if description_model else (),
+                "title_max_length": self.context.config.TITLE_OVER_N_CHARS,
+                "simple_desc_max_length": self.context.config.SIMPLE_DESCRIPTIONS_OVER_N_CHARS,
             },
             translate=self.language_manager.text,
             clock=datetime.now,
         )
-        structure_result = Engine(STRUCTURE_REGISTRY).run(structure_context)
-        extend_report_from_outcomes(
-            structure_result.outcomes,
-            translate=self.language_manager.text,
-            report=self.validation_reports,
-            titles=self.validation_titles,
-        )
+
+    def _run_rule_registries(self, registries: list[RuleRegistry], ctx: RuleContext) -> None:
+        """
+        Run one or more rule registries over the shared `ctx` and render their issues.
+
+        Generalises the former `_run_structure_rules` (ARC-017 Phase 3b) so every later
+        validator port (description, composition, ...) reuses the same call shape instead of
+        each writing its own `Engine(...).run(...)` + `extend_report_from_outcomes(...)` pair.
+
+        Args:
+            registries: The rule registries to execute, in order; each is run independently
+                (an `Engine` per registry), but all against the same `ctx`.
+            ctx: The shared `RuleContext` built by `_build_rule_context`.
+        """
+        for registry in registries:
+            result = Engine(registry).run(ctx)
+            extend_report_from_outcomes(
+                result.outcomes,
+                translate=self.language_manager.text,
+                report=self.validation_reports,
+                titles=self.validation_titles,
+            )
 
     def _build_pipeline(self) -> None:
         """
@@ -250,20 +283,22 @@ class SpreadsheetProcessor:
             context=self.context, initialized_models=self.initialized_models
         )
 
+        # One shared, immutable RuleContext for every rule registry this pipeline runs.
+        rule_context = self._build_rule_context()
+
         # RUN ALL VALIDATIONS PIPELINE
 
         # 1. Validate the structure of the data (ARC-017 Phase 3b: ported to the rules engine)
-        self._run_structure_rules()
+        self._run_rule_registries([STRUCTURE_REGISTRY], rule_context)
 
         # 2. Validate the spelling of the data
         validators.SpellCheckerValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
 
-        # 3. Validate spreadsheet data mandatory
-        validators.SpDescriptionValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        # 3. Validate spreadsheet data mandatory (description: ARC-017 Phase 3 Port 2, ported to
+        # the rules engine, replacing the deleted `validators.SpDescriptionValidator`)
+        self._run_rule_registries([DESCRIPTION_REGISTRY], rule_context)
         validators.SpCompositionGraphValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
