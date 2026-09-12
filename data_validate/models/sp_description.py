@@ -172,41 +172,35 @@ class SpDescription(SpModelABC):
         local_expected_columns = list(self.RequiredColumn.ALL)
 
         # 1.0. Handling dynamic columns: scenarios
-        if (not self.scenario_read_success) and (
-            self.DynamicColumn.COLUMN_SCENARIO.name in self.data_loader_model.raw_data.columns
-        ):
+        if (not self.scenario_read_success) and (self.DynamicColumn.COLUMN_SCENARIO.name in self.frame.columns):
             self.structural_errors.append(
                 f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_SCENARIO.name}' não pode existir se o arquivo '{SHEET.SP_NAME_SCENARIOS}' não estiver configurado ou não existir."
             )
-            self.data_loader_model.raw_data = self.data_loader_model.raw_data.drop(
-                columns=[self.DynamicColumn.COLUMN_SCENARIO.name]
-            )
+            # BUG-003: reassign `self.frame` to the (new) frame `.drop` returns instead of
+            # writing into `self.data_loader_model.raw_data`, which every other model and
+            # validator also reads.
+            self.frame = self.frame.drop(columns=[self.DynamicColumn.COLUMN_SCENARIO.name])
         elif self.scenario_exists_file:
             local_expected_columns.append(str(self.DynamicColumn.COLUMN_SCENARIO.name))
 
         # 1.1 Handling dynamic columns: legend
-        if (not self.legend_read_success) and (
-            self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.raw_data.columns
-        ):
+        if (not self.legend_read_success) and (self.DynamicColumn.COLUMN_LEGEND.name in self.frame.columns):
             self.structural_errors.append(
                 f"{self.filename}: A coluna '{self.DynamicColumn.COLUMN_LEGEND.name}' não pode existir se o arquivo de legenda não estiver configurado ou não existir."
             )
-            self.data_loader_model.raw_data = self.data_loader_model.raw_data.drop(
-                columns=[self.DynamicColumn.COLUMN_LEGEND.name]
-            )
+            self.frame = self.frame.drop(columns=[self.DynamicColumn.COLUMN_LEGEND.name])
         elif self.legend_exists_file:
             local_expected_columns.append(str(self.DynamicColumn.COLUMN_LEGEND.name))
 
-        # 2. Handling optional columns
-        if self.OptionalColumn.COLUMN_RELATION.name not in self.data_loader_model.raw_data.columns:
-            self.data_loader_model.raw_data[self.OptionalColumn.COLUMN_RELATION.name] = 1
-        if self.OptionalColumn.COLUMN_UNIT.name not in self.data_loader_model.raw_data.columns:
-            self.data_loader_model.raw_data[self.OptionalColumn.COLUMN_UNIT.name] = ""
+        # 2. Handling optional columns. `.assign` returns a new frame rather than mutating
+        # `self.frame`/`raw_data` in place (BUG-003).
+        if self.OptionalColumn.COLUMN_RELATION.name not in self.frame.columns:
+            self.frame = self.frame.assign(**{self.OptionalColumn.COLUMN_RELATION.name: 1})
+        if self.OptionalColumn.COLUMN_UNIT.name not in self.frame.columns:
+            self.frame = self.frame.assign(**{self.OptionalColumn.COLUMN_UNIT.name: ""})
 
         for opt_column_name in self.OptionalColumn.ALL:
-            if (opt_column_name in self.data_loader_model.raw_data.columns) and (
-                opt_column_name not in local_expected_columns
-            ):
+            if (opt_column_name in self.frame.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
         self.EXPECTED_COLUMNS = local_expected_columns
 
@@ -219,7 +213,7 @@ class SpDescription(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.raw_data, self.EXPECTED_COLUMNS
+            self.frame, self.EXPECTED_COLUMNS
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -242,16 +236,12 @@ class SpDescription(SpModelABC):
         Returns:
             List[str]: List of data cleaning errors (unused return in this implementation).
         """
-        # 1. Create mapping of column names to their corresponding class attributes code (min 1) and level (min 1)
-        column_attribute_mapping = {
-            self.RequiredColumn.COLUMN_CODE.name: "COLUMN_CODE",
-            self.RequiredColumn.COLUMN_LEVEL.name: "COLUMN_LEVEL",
-        }
-
-        # Clean and validate required columns (minimum value: 1)
-        for column_name in column_attribute_mapping.keys():
+        # 1. Clean and validate required columns (minimum value: 1); store the cleaned data on
+        # this instance (BUG-002) instead of overwriting the class-level `RequiredColumn`
+        # placeholder Series that every instance/run in the process shares.
+        for column_name in (self.RequiredColumn.COLUMN_CODE.name, self.RequiredColumn.COLUMN_LEVEL.name):
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.raw_data,
+                self.frame,
                 self.filename,
                 [str(column_name)],
                 min_value=1,
@@ -259,37 +249,33 @@ class SpDescription(SpModelABC):
             self.data_cleaning_errors.extend(errors_data_clean_local)
 
             if column_name in dataframe_cleaned.columns:
-                # Use setattr to dynamically set the attribute
-                attribute_name = column_attribute_mapping[column_name]
-                setattr(self.RequiredColumn, attribute_name, dataframe_cleaned[column_name])
+                self.cleaned[column_name] = dataframe_cleaned[column_name]
 
         # 2. If scenarios exist, clean and validate 'cenario' column (minimum -1)
         if self.scenarios:
             column_name_scenario = self.DynamicColumn.COLUMN_SCENARIO.name
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.raw_data,
+                self.frame,
                 self.filename,
                 [str(column_name_scenario)],
                 min_value=-1,
             )
             if column_name_scenario in dataframe_cleaned.columns:
-                self.DynamicColumn.COLUMN_SCENARIO = dataframe_cleaned[column_name_scenario]
+                self.cleaned[column_name_scenario] = dataframe_cleaned[column_name_scenario]
             self.data_cleaning_errors.extend(errors_data_clean_local)
 
         # 3. If legend column exists, ensure values are integers (minimum 1) or empty
-        if self.legend_exists_file and (
-            self.DynamicColumn.COLUMN_LEGEND.name in self.data_loader_model.raw_data.columns
-        ):
+        if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.frame.columns):
             column_name_legend = self.DynamicColumn.COLUMN_LEGEND.name
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.raw_data,
+                self.frame,
                 self.filename,
                 [str(column_name_legend)],
                 min_value=1,
                 allow_empty=True,
             )
             if column_name_legend in dataframe_cleaned.columns:
-                self.DynamicColumn.COLUMN_LEGEND = dataframe_cleaned[column_name_legend]
+                self.cleaned[column_name_legend] = dataframe_cleaned[column_name_legend]
             self.data_cleaning_errors.extend(errors_data_clean_local)
 
     def post_processing(self):

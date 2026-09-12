@@ -82,6 +82,12 @@ class SpProportionality(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
+        # BUG-003: set once a structural error invalidates the sheet's header layout
+        # (`post_processing`); replaces mutating `data_loader_model.header_type` to
+        # `"invalid"`, which every other model/validator sharing that same
+        # `DataLoaderModel` instance would also observe.
+        self.header_layout_invalid: bool = False
+
         self.run()
 
     def pre_processing(self):
@@ -92,8 +98,10 @@ class SpProportionality(SpModelABC):
         """
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
-        unique_columns_level_1 = self.data_loader_model.raw_data.columns.get_level_values(0).unique().tolist()
-        unique_columns_level_1 = [col for col in unique_columns_level_1 if not col.lower().startswith("unnamed: 0_level_0")]
+        unique_columns_level_1 = self.frame.columns.get_level_values(0).unique().tolist()
+        unique_columns_level_1 = [
+            col for col in unique_columns_level_1 if not col.lower().startswith("unnamed: 0_level_0")
+        ]
 
         __, level_1_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
             unique_columns_level_1, self.scenarios
@@ -104,7 +112,7 @@ class SpProportionality(SpModelABC):
                 f"{self.filename}, linha 1: Colunas de nível 1 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_1_codes_not_matched_by_pattern}"
             )
 
-        unique_columns_level_2 = self.data_loader_model.raw_data.columns.get_level_values(1).unique().tolist()
+        unique_columns_level_2 = self.frame.columns.get_level_values(1).unique().tolist()
         unique_columns_level_2 = [col for col in unique_columns_level_2 if col != self.RequiredColumn.COLUMN_ID.name]
 
         __, level_2_codes_not_matched_by_pattern = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
@@ -124,8 +132,8 @@ class SpProportionality(SpModelABC):
         Updates structural errors list.
         """
         if self.data_loader_model.header_type == "double":
-            unique_columns_level_1 = self.data_loader_model.raw_data.columns.get_level_values(0).unique().tolist()
-            unique_columns_level_2 = self.data_loader_model.raw_data.columns.get_level_values(1).unique().tolist()
+            unique_columns_level_1 = self.frame.columns.get_level_values(0).unique().tolist()
+            unique_columns_level_2 = self.frame.columns.get_level_values(1).unique().tolist()
 
             # Check extra columns in level 1 (do not ignore 'id')
             _, extras_level_1 = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
@@ -135,7 +143,9 @@ class SpProportionality(SpModelABC):
             )
             for extra_column in extras_level_1:
                 if not extra_column.lower().startswith("unnamed"):
-                    self.structural_errors.append(f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada.")
+                    self.structural_errors.append(
+                        f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada."
+                    )
 
             # Check extra columns in level 2 (ignore 'id')
             _, extras_level_2 = CollectionsProcessing.extract_numeric_ids_and_unmatched_strings_from_list(
@@ -145,22 +155,36 @@ class SpProportionality(SpModelABC):
             )
             for extra_column in extras_level_2:
                 if not extra_column.lower().startswith("unnamed"):
-                    self.structural_errors.append(f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada.")
+                    self.structural_errors.append(
+                        f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada."
+                    )
 
             # Check for missing expected columns in level 2
             for col in self.EXPECTED_COLUMNS:
                 if col not in unique_columns_level_2:
-                    self.structural_errors.append(f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada.")
+                    self.structural_errors.append(
+                        f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada."
+                    )
 
     def data_cleaning(self, *args, **kwargs):
         """Run data cleaning steps (currently empty)."""
         pass
 
     def post_processing(self):
-        """Run post-processing steps (currently empty)."""
+        """
+        Invalidate this instance's working frame when the header layout is structurally broken.
+
+        BUG-003: reassigns `self.frame` to a fresh empty `DataFrame` and sets
+        `self.header_layout_invalid` instead of writing `pd.DataFrame()` into
+        `data_loader_model.raw_data` and `"invalid"` into `data_loader_model.header_type` —
+        both shared with every other model/validator that reads the same `DataLoaderModel`.
+        Consumers that used to check `data_loader_model.raw_data.empty` /
+        `header_type == "invalid"` for this sheet must check `model.frame.empty` /
+        `model.header_layout_invalid` instead.
+        """
         if self.structural_errors:
-            self.data_loader_model.raw_data = pd.DataFrame()  # Clear DataFrame to avoid further processing
-            self.data_loader_model.header_type = "invalid"
+            self.frame = pd.DataFrame()
+            self.header_layout_invalid = True
 
     def run(self):
         """
@@ -168,7 +192,11 @@ class SpProportionality(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
-        if self.data_loader_model.does_file_exist and not self.data_loader_model.raw_data.empty and self.data_loader_model.header_type == "double":
+        if (
+            self.data_loader_model.does_file_exist
+            and not self.data_loader_model.raw_data.empty
+            and self.data_loader_model.header_type == "double"
+        ):
             self.pre_processing()
             self.expected_structure_columns()
             self.data_cleaning()

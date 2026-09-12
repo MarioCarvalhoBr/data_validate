@@ -169,12 +169,14 @@ class SpCompositionGraphValidator(BaseValidator):
             self.sp_name_value: [SpValue.RequiredColumn.COLUMN_ID.name],
         }
 
-        # Set dataframes
+        # Set dataframes. BUG-003: read each model's own working frame (`.frame`), not the
+        # shared `DataLoaderModel.raw_data` — `SpDescription` injects default columns onto
+        # `.frame` and `SpProportionality` invalidates `.frame` on a structural error.
         self.model_dataframes = {
-            self.sp_name_composition: self.model_sp_composition.data_loader_model.raw_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
-            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data,
-            self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.raw_data,
+            self.sp_name_composition: self.model_sp_composition.frame,
+            self.sp_name_description: self.model_sp_description.frame,
+            self.sp_name_value: self.model_sp_value.frame,
+            self.sp_name_proportionality: self.model_sp_proportionality.frame,
         }
 
         # Setup graph processing if composition data is available
@@ -246,17 +248,25 @@ class SpCompositionGraphValidator(BaseValidator):
         if column_errors:
             return column_errors, warnings
 
-        # Extract valid description codes
-        list_codes = self.model_sp_description.RequiredColumn.COLUMN_CODE.astype(str).to_list()
-        valid_description_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(id_values_list=list(set(list_codes)))
+        # Extract valid description codes. BUG-002: read this instance's own cleaned data
+        # through `cleaned_column`, not the class-level `RequiredColumn` placeholder that
+        # `setattr` used to overwrite for every instance/run in the process.
+        list_codes = self.model_sp_description.cleaned_column(self.column_name_code).astype(str).to_list()
+        valid_description_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(
+            id_values_list=list(set(list_codes))
+        )
 
         # Extract valid composition parent
-        list_parents = self.model_sp_composition.RequiredColumn.COLUMN_PARENT_CODE.astype(str).to_list()
-        valid_compositions_parent_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(id_values_list=list(set(list_parents)))
+        list_parents = self.model_sp_composition.cleaned_column(self.column_name_parent).astype(str).to_list()
+        valid_compositions_parent_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(
+            id_values_list=list(set(list_parents))
+        )
 
         # Extract valid composition child codes
-        list_childs = self.model_sp_composition.RequiredColumn.COLUMN_CHILD_CODE.astype(str).to_list()
-        valid_compositions_childs_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(id_values_list=list(set(list_childs)))
+        list_childs = self.model_sp_composition.cleaned_column(self.column_name_child).astype(str).to_list()
+        valid_compositions_childs_codes, _ = CollectionsProcessing.extract_numeric_integer_ids_from_list(
+            id_values_list=list(set(list_childs))
+        )
 
         # Compare codes between description and values
         comparison_errors = CollectionsProcessing.find_differences_in_two_set_with_message(
@@ -315,7 +325,11 @@ class SpCompositionGraphValidator(BaseValidator):
             for i, grafo in enumerate(graphs_disconnected):
                 text_disconnected = "[" + self.graph_processing.generate_graph_report(grafo) + "]"
                 list_graphs_disconnected.append(text_disconnected)
-            errors.append(f"{self.sp_name_composition}: Indicadores desconectados encontrados: " + ", ".join(list_graphs_disconnected) + ".")
+            errors.append(
+                f"{self.sp_name_composition}: Indicadores desconectados encontrados: "
+                + ", ".join(list_graphs_disconnected)
+                + "."
+            )
 
         return errors, warnings
 
@@ -456,7 +470,7 @@ class SpCompositionGraphValidator(BaseValidator):
         errors: List[str] = []
         warnings: List[str] = []
 
-        if self.model_sp_value.data_loader_model.raw_data.empty:
+        if self.model_sp_value.frame.empty:
             self.set_not_executed(
                 [
                     (
@@ -473,7 +487,10 @@ class SpCompositionGraphValidator(BaseValidator):
             self.sp_name_value: self.global_required_columns[self.sp_name_value],
         }
 
-        if self.model_sp_proportionality.data_loader_model.is_read_successful and not self.model_sp_proportionality.data_loader_model.raw_data.empty:
+        if (
+            self.model_sp_proportionality.data_loader_model.is_read_successful
+            and not self.model_sp_proportionality.frame.empty
+        ):
             local_required_columns[self.sp_name_proportionality] = [SpProportionality.RequiredColumn.COLUMN_ID.name]
 
         column_errors = self.check_columns_in_models_dataframes(local_required_columns, self.model_dataframes)
@@ -510,7 +527,9 @@ class SpCompositionGraphValidator(BaseValidator):
             # Check if all leaf codes are present in level_one_columns
             for leaf in leafs:
                 if leaf not in all_columns:
-                    errors.append(f"{self.sp_name_proportionality}: Indicador folha '{leaf}' não possui dados associados.")
+                    errors.append(
+                        f"{self.sp_name_proportionality}: Indicador folha '{leaf}' não possui dados associados."
+                    )
         return errors, warnings
 
     def run(self) -> Tuple[List[str], List[str]]:
@@ -539,7 +558,7 @@ class SpCompositionGraphValidator(BaseValidator):
             (self.validate_associated_indicators_leafs, NamesEnum.LEAF_NO_DATA.value),
         ]
 
-        if self.model_sp_composition.data_loader_model.raw_data.empty:
+        if self.model_sp_composition.frame.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 

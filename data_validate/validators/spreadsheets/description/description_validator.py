@@ -118,11 +118,13 @@ class SpDescriptionValidator(BaseValidator):
 
         # Load the original codes and cleaned codes
         original_codes = pd.to_numeric(self._dataframe[column], errors="coerce")
-        codes_cleaned = self._data_model.RequiredColumn.COLUMN_CODE
+        codes_cleaned = self._data_model.cleaned_column(column)
 
         # 1. Check if the column has only integers
         if original_codes.size != codes_cleaned.size:
-            errors.append(f"{self._filename}: A verificação foi abortada porque a coluna '{column}' contém valores não numéricos.")
+            errors.append(
+                f"{self._filename}: A verificação foi abortada porque a coluna '{column}' contém valores não numéricos."
+            )
             return errors, []
 
         # 2. Check if the first code is 1
@@ -131,7 +133,9 @@ class SpDescriptionValidator(BaseValidator):
 
         # 3. Check if the codes are sequential and starting from 1
         if not codes_cleaned.equals(pd.Series(range(1, len(codes_cleaned) + 1))):
-            errors.append(f"{self._filename}: A coluna '{column}' deve conter valores inteiros e sequenciais (1, 2, 3, ...).")
+            errors.append(
+                f"{self._filename}: A coluna '{column}' deve conter valores inteiros e sequenciais (1, 2, 3, ...)."
+            )
 
         return errors, []
 
@@ -155,7 +159,7 @@ class SpDescriptionValidator(BaseValidator):
         if not exists_column:
             return [msg_error_column], []
 
-        codes_cleaned = self._data_model.RequiredColumn.COLUMN_CODE
+        codes_cleaned = self._data_model.cleaned_column(column)
         duplicated_codes = codes_cleaned[codes_cleaned.duplicated()].tolist()
 
         if duplicated_codes:
@@ -330,7 +334,9 @@ class SpDescriptionValidator(BaseValidator):
             empty_rows = self._dataframe[self._dataframe[column].isna() | (self._dataframe[column] == "")].index
             if not empty_rows.empty:
                 for index in empty_rows:
-                    errors.append(f"{self._filename}, linha {index + 2}: Nenhum item da coluna '{column}' pode ser vazio.")
+                    errors.append(
+                        f"{self._filename}, linha {index + 2}: Nenhum item da coluna '{column}' pode ser vazio."
+                    )
         return errors, []
 
     def validate_cr_lf_characters(self) -> Tuple[List[str], List[str]]:

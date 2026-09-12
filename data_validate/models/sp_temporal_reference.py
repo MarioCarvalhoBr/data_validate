@@ -101,7 +101,7 @@ class SpTemporalReference(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
+            self.frame, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -121,27 +121,26 @@ class SpTemporalReference(SpModelABC):
         Returns:
             List[str]: List of data cleaning errors (unused return in this implementation).
         """
-        # Verify if the scenarios list is empty and handle single-value constraint
-        if (not self.scenarios) and (len(self.data_loader_model.raw_data) != 1):
+        # Verify if the scenarios list is empty and handle single-value constraint. The
+        # cleaned 'symbol' column is stored on this instance (BUG-002), not overwritten on
+        # the class-level `RequiredColumn` placeholder Series shared by every instance/run.
+        column_name_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
+        if (not self.scenarios) and (len(self.frame) != 1):
             self.data_cleaning_errors.append(
                 f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{SHEET.SP_NAME_SCENARIOS}' não existe ou está vazio."
             )
 
-            if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.raw_data.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = self.data_loader_model.raw_data[
-                    self.RequiredColumn.COLUMN_SYMBOL.name
-                ].iloc[0:1]
+            if column_name_symbol in self.frame.columns:
+                self.cleaned[column_name_symbol] = self.frame[column_name_symbol].iloc[0:1]
         else:
             # 1. Clean and validate the 'symbol' column (minimum 0)
-            col_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
-
             df, errors_symbol = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.raw_data, self.filename, [str(col_symbol)], min_value=0
+                self.frame, self.filename, [str(column_name_symbol)], min_value=0
             )
             self.data_cleaning_errors.extend(errors_symbol)
 
-            if self.RequiredColumn.COLUMN_SYMBOL.name in df.columns:
-                self.RequiredColumn.COLUMN_SYMBOL = df[self.RequiredColumn.COLUMN_SYMBOL.name]
+            if column_name_symbol in df.columns:
+                self.cleaned[column_name_symbol] = df[column_name_symbol]
 
     def post_processing(self):
         """Run post-processing steps (currently empty)."""

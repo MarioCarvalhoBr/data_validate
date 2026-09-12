@@ -27,7 +27,11 @@ def _build_data_models_context(mocker):
     """
     dictionary_model = mocker.MagicMock()
     dictionary_model.filename = "dicionario.csv"
-    dictionary_model.data_loader_model.raw_data = pd.DataFrame({"palavra": []})
+    dictionary_raw_data = pd.DataFrame({"palavra": []})
+    dictionary_model.data_loader_model.raw_data = dictionary_raw_data
+    # `BaseValidator`/`validate_spellchecker` read the model's own working frame
+    # (`.frame`), not `data_loader_model.raw_data` (BUG-003, see `SpModelABC.frame`).
+    dictionary_model.frame = dictionary_raw_data
     dictionary_model.words_to_ignore = []
     dictionary_model.scenarios = []
 

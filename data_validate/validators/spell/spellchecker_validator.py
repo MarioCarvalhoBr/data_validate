@@ -126,7 +126,7 @@ class SpellCheckerValidator(BaseValidator):
 
         # Configure local instances
         self._data_model = self._data_models_context.get_instance_of(model_class)
-        self._dataframe = self._data_model.data_loader_model.raw_data.copy()
+        self._dataframe = self._data_model.frame.copy()
         self._filename = self._data_model.filename
 
         if self._dataframe.empty:

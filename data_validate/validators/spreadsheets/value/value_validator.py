@@ -140,14 +140,14 @@ class SpValueValidator(BaseValidator):
             self.sp_name_scenario: ([SpScenario.RequiredColumn.COLUMN_SYMBOL.name] if self.exists_scenario else []),
         }
 
-        # Validate all required columns exist
+        # Validate all required columns exist. BUG-003: read each model's own working frame
+        # (`.frame`), not the shared `DataLoaderModel.raw_data` — `SpDescription` may drop
+        # or inject the `cenario` column onto `.frame` only.
         self.model_dataframes = {
-            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
-            self.sp_name_temporal_reference: self.model_sp_temporal_reference.data_loader_model.raw_data,
-            self.sp_name_scenario: (
-                self.model_sp_scenario.data_loader_model.raw_data if self.exists_scenario else pd.DataFrame()
-            ),
+            self.sp_name_value: self.model_sp_value.frame,
+            self.sp_name_description: self.model_sp_description.frame,
+            self.sp_name_temporal_reference: self.model_sp_temporal_reference.frame,
+            self.sp_name_scenario: (self.model_sp_scenario.frame if self.exists_scenario else pd.DataFrame()),
         }
 
     def validate_relation_indicators_in_values(self) -> Tuple[List[str], List[str]]:

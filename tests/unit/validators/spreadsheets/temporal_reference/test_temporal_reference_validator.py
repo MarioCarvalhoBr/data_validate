@@ -35,13 +35,17 @@ def _build_data_models_context(mocker, *, symbols: list, current_year: int = 202
     """
     temporal_reference_model = mocker.MagicMock()
     temporal_reference_model.filename = "referencia_temporal.csv"
-    temporal_reference_model.data_loader_model.raw_data = pd.DataFrame(
+    temporal_reference_raw_data = pd.DataFrame(
         {
             "nome": [f"ano_{i}" for i in range(len(symbols))],
             "descricao": [f"Descrição {i}." for i in range(len(symbols))],
             "simbolo": symbols,
         }
     )
+    temporal_reference_model.data_loader_model.raw_data = temporal_reference_raw_data
+    # `BaseValidator` reads the model's own working frame (`.frame`), not
+    # `data_loader_model.raw_data`, since BUG-003 (see `SpModelABC.frame`).
+    temporal_reference_model.frame = temporal_reference_raw_data
 
     models_by_class = {SpTemporalReference: temporal_reference_model}
 

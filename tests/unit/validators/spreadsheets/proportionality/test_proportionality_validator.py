@@ -86,25 +86,36 @@ def _build_data_models_context(
         `Sp*` model class to a minimal mock carrying the raw dataframes
         `SpProportionalityValidator` needs.
     """
+    # `BaseValidator` and `SpProportionalityValidator._prepare_statement` read each model's
+    # own working frame (`.frame`), not `data_loader_model.raw_data` (BUG-003, see
+    # `SpModelABC.frame`); mirror the same dataframe onto both attributes.
     proportionality_model = mocker.MagicMock()
     proportionality_model.filename = "proporcionalidades.csv"
-    proportionality_model.data_loader_model.raw_data = (
+    proportionality_frame = (
         proportionality_raw_data if proportionality_raw_data is not None else _proportionality_raw_data()
     )
+    proportionality_model.data_loader_model.raw_data = proportionality_frame
+    proportionality_model.frame = proportionality_frame
 
     description_model = mocker.MagicMock()
     description_model.filename = "descricao.csv"
-    description_model.data_loader_model.raw_data = pd.DataFrame({"codigo": [5008, 5021], "nivel": [1, 2]})
+    description_frame = pd.DataFrame({"codigo": [5008, 5021], "nivel": [1, 2]})
+    description_model.data_loader_model.raw_data = description_frame
+    description_model.frame = description_frame
 
     value_model = mocker.MagicMock()
     value_model.filename = "valores.csv"
-    value_model.data_loader_model.raw_data = value_raw_data if value_raw_data is not None else _value_raw_data()
+    value_frame = value_raw_data if value_raw_data is not None else _value_raw_data()
+    value_model.data_loader_model.raw_data = value_frame
+    value_model.frame = value_frame
     value_model.scenario_exists_file = False
     value_model.scenarios = []
 
     composition_model = mocker.MagicMock()
     composition_model.filename = "composicao.csv"
-    composition_model.data_loader_model.raw_data = pd.DataFrame({"codigo_pai": [5008], "codigo_filho": [5021]})
+    composition_frame = pd.DataFrame({"codigo_pai": [5008], "codigo_filho": [5021]})
+    composition_model.data_loader_model.raw_data = composition_frame
+    composition_model.frame = composition_frame
 
     models_by_class = {
         SpProportionality: proportionality_model,

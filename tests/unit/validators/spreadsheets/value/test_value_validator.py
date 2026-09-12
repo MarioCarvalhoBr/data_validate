@@ -26,23 +26,34 @@ def _build_data_models_context(mocker):
         `Sp*` model class to a minimal mock carrying the raw dataframes
         `SpValueValidator` needs.
     """
+    # `BaseValidator` and `SpValueValidator._prepare_statement` read each model's own
+    # working frame (`.frame`), not `data_loader_model.raw_data` (BUG-003, see
+    # `SpModelABC.frame`); mirror the same dataframe onto both attributes.
     value_model = mocker.MagicMock()
     value_model.filename = "valores.csv"
-    value_model.data_loader_model.raw_data = pd.DataFrame({"id": [1], "1-2020": [10.5]})
+    value_raw_data = pd.DataFrame({"id": [1], "1-2020": [10.5]})
+    value_model.data_loader_model.raw_data = value_raw_data
+    value_model.frame = value_raw_data
     value_model.scenario_exists_file = True
     value_model.scenarios = ["O"]
 
     description_model = mocker.MagicMock()
     description_model.filename = "descricao.csv"
-    description_model.data_loader_model.raw_data = pd.DataFrame({"codigo": [1], "nivel": [2], "cenario": [0]})
+    description_raw_data = pd.DataFrame({"codigo": [1], "nivel": [2], "cenario": [0]})
+    description_model.data_loader_model.raw_data = description_raw_data
+    description_model.frame = description_raw_data
 
     temporal_reference_model = mocker.MagicMock()
     temporal_reference_model.filename = "referencia_temporal.csv"
-    temporal_reference_model.data_loader_model.raw_data = pd.DataFrame({"simbolo": [2020]})
+    temporal_reference_raw_data = pd.DataFrame({"simbolo": [2020]})
+    temporal_reference_model.data_loader_model.raw_data = temporal_reference_raw_data
+    temporal_reference_model.frame = temporal_reference_raw_data
 
     scenario_model = mocker.MagicMock()
     scenario_model.filename = "cenarios.csv"
-    scenario_model.data_loader_model.raw_data = pd.DataFrame({"simbolo": ["O"]})
+    scenario_raw_data = pd.DataFrame({"simbolo": ["O"]})
+    scenario_model.data_loader_model.raw_data = scenario_raw_data
+    scenario_model.frame = scenario_raw_data
 
     models_by_class = {
         SpValue: value_model,

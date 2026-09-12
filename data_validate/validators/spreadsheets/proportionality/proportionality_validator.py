@@ -187,12 +187,15 @@ class SpProportionalityValidator(BaseValidator):
             ],
         }
 
-        # Validate all required columns exist
+        # Validate all required columns exist. BUG-003: read each model's own working frame
+        # (`.frame`), not the shared `DataLoaderModel.raw_data` — `SpProportionality`
+        # invalidates `.frame` (not `raw_data`) on a structural error, and `SpDescription`
+        # injects/drops columns onto `.frame` only.
         self.model_dataframes = {
-            self.sp_name_proportionality: self.model_sp_proportionality.data_loader_model.raw_data,
-            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data,
-            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data,
-            self.sp_name_composition: self.model_sp_composition.data_loader_model.raw_data,
+            self.sp_name_proportionality: self.model_sp_proportionality.frame,
+            self.sp_name_description: self.model_sp_description.frame,
+            self.sp_name_value: self.model_sp_value.frame,
+            self.sp_name_composition: self.model_sp_composition.frame,
         }
 
     def _check_sum_equals_one(

@@ -100,7 +100,7 @@ class SpComposition(SpModelABC):
         """
         # Check missing columns, expected columns, and extra columns
         missing_columns, extra_columns = DataFrameProcessing.check_dataframe_column_names(
-            self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
+            self.frame, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
             self.filename, missing_columns, extra_columns
@@ -120,16 +120,12 @@ class SpComposition(SpModelABC):
         Returns:
             List[str]: List of data cleaning errors (unused return in this implementation).
         """
-        # 1. Create mapping of column names to their corresponding class attributes 'parent_code' (min 1) and 'child_code' (min 1)
-        column_attribute_mapping = {
-            self.RequiredColumn.COLUMN_PARENT_CODE.name: "COLUMN_PARENT_CODE",
-            self.RequiredColumn.COLUMN_CHILD_CODE.name: "COLUMN_CHILD_CODE",
-        }
-
-        # Clean and validate required columns (minimum value: 1)
-        for column_name in column_attribute_mapping.keys():
+        # Clean and validate required columns (minimum value: 1); store the cleaned data on
+        # this instance (BUG-002) instead of overwriting the class-level `RequiredColumn`
+        # placeholder Series that every instance/run in the process shares.
+        for column_name in (self.RequiredColumn.COLUMN_PARENT_CODE.name, self.RequiredColumn.COLUMN_CHILD_CODE.name):
             df, errors = DataCleaningProcessing.clean_dataframe_integers(
-                self.data_loader_model.raw_data,
+                self.frame,
                 self.filename,
                 [str(column_name)],
                 min_value=1,
@@ -137,9 +133,7 @@ class SpComposition(SpModelABC):
             self.data_cleaning_errors.extend(errors)
 
             if column_name in df.columns:
-                # Use setattr to dynamically set the attribute
-                attribute_name = column_attribute_mapping[column_name]
-                setattr(self.RequiredColumn, attribute_name, df[column_name])
+                self.cleaned[column_name] = df[column_name]
 
     def post_processing(self):
         """Run post-processing steps (currently empty)."""

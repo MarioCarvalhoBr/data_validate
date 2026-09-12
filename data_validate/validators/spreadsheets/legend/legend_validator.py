@@ -182,11 +182,13 @@ class SpLegendValidator(BaseValidator):
         self.sp_name_description = self.model_sp_description.filename
         self.sp_name_value = self.model_sp_value.filename
 
-        # Validate all required columns exist
+        # Validate all required columns exist. BUG-003: read each model's own working frame
+        # (`.frame`), not the shared `DataLoaderModel.raw_data` — `SpDescription` may drop
+        # or inject the `legenda` column onto `.frame` only.
         self.model_dataframes = {
-            self.sp_name_legend: self.model_sp_legend.data_loader_model.raw_data.copy(),
-            self.sp_name_description: self.model_sp_description.data_loader_model.raw_data.copy(),
-            self.sp_name_value: self.model_sp_value.data_loader_model.raw_data.copy(),
+            self.sp_name_legend: self.model_sp_legend.frame.copy(),
+            self.sp_name_description: self.model_sp_description.frame.copy(),
+            self.sp_name_value: self.model_sp_value.frame.copy(),
         }
 
     def validate_relation_indicators_in_legend(self) -> Tuple[List[str], List[str]]:
@@ -291,7 +293,9 @@ class SpLegendValidator(BaseValidator):
         missing_in_a = {int(x) for x in missing_in_a if str(x).isdigit()}
 
         if missing_in_b:
-            errors.append(f"{self.sp_name_description}: Códigos de legenda ausentes em {self.sp_name_legend}: {sorted(list(missing_in_b))}.")
+            errors.append(
+                f"{self.sp_name_description}: Códigos de legenda ausentes em {self.sp_name_legend}: {sorted(list(missing_in_b))}."
+            )
 
         if missing_in_a:
             warnings.append(
@@ -381,7 +385,7 @@ class SpLegendValidator(BaseValidator):
         """
         errors, warnings = [], []
 
-        if self.model_sp_value.data_loader_model.raw_data.empty:
+        if self.model_sp_value.frame.empty:
             return errors, warnings
 
         min_lower_legend_default = self.model_sp_legend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT
@@ -446,7 +450,9 @@ class SpLegendValidator(BaseValidator):
             allowed_scenario_suffixes=self.scenarios_list,
         )
 
-        groups_legends = pd.DataFrame({str(SpLegend.RequiredColumn.COLUMN_CODE.name): []}).groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
+        groups_legends = pd.DataFrame({str(SpLegend.RequiredColumn.COLUMN_CODE.name): []}).groupby(
+            str(SpLegend.RequiredColumn.COLUMN_CODE.name)
+        )
         if self.model_sp_legend.is_sanity_check_passed:
             groups_legends = df_legend.groupby(str(SpLegend.RequiredColumn.COLUMN_CODE.name))
 
@@ -469,13 +475,16 @@ class SpLegendValidator(BaseValidator):
                 aux_data_mapping_legend.indicator_id = aux_indicator_id
 
                 key_legend = row_description.iloc[0][SpDescription.DynamicColumn.COLUMN_LEGEND.name]
-                group_legend = groups_legends.get_group(str(key_legend)) if str(key_legend) in groups_legends.groups else None
+                group_legend = (
+                    groups_legends.get_group(str(key_legend)) if str(key_legend) in groups_legends.groups else None
+                )
 
                 if group_legend is not None:
                     aux_data_mapping_legend.legend_id = key_legend
 
                     group_legend = group_legend[
-                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name] != self._data_models_context.context.config.LABEL_DATA_UNAVAILABLE
+                        group_legend[SpLegend.RequiredColumn.COLUMN_LABEL.name]
+                        != self._data_models_context.context.config.LABEL_DATA_UNAVAILABLE
                     ]
                     if not group_legend.empty:
                         group_legend[SpLegend.RequiredColumn.COLUMN_MINIMUM.name] = pd.to_numeric(
@@ -513,11 +522,12 @@ class SpLegendValidator(BaseValidator):
 
             for index, value_numeric in df_values_numeric[data_column_sp_value].items():
                 value_original = df_values[data_column_sp_value][index]
-                if value_original == self._data_models_context.context.config.VALUE_DATA_UNAVAILABLE or pd.isna(value_numeric):
+                if value_original == self._data_models_context.context.config.VALUE_DATA_UNAVAILABLE or pd.isna(
+                    value_numeric
+                ):
                     continue
 
                 if value_numeric < min_value or value_numeric > max_value:
-
                     text_code_legend = "padrão"
                     if mapping_legends[data_column_sp_value].legend_id is not None:
                         text_code_legend = f"de código '{mapping_legends[data_column_sp_value].legend_id}'"
@@ -555,7 +565,7 @@ class SpLegendValidator(BaseValidator):
             validations.append((self.validate_relation_indicators_in_legend, NamesEnum.LEG_REL.value))
         validations.append((self.validate_range_multiple_legend, NamesEnum.LEG_RANGE.value))
 
-        if self.model_sp_description.data_loader_model.raw_data.empty:
+        if self.model_sp_description.frame.empty:
             self.set_not_executed(validations)
             return self._errors, self._warnings
 

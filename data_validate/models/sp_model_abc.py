@@ -10,6 +10,8 @@ and processing required by all specific spreadsheet implementations.
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any
 
+import pandas as pd
+
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
@@ -89,6 +91,18 @@ class SpModelABC(ABC):
         # UNPACKING DATA ARGS
         self.filename: str = self.data_loader_model.filename
 
+        # BUG-002/BUG-003: `self.frame` is this instance's own working copy of the loaded
+        # data. It starts out aliasing `data_model.raw_data` (no copy, CoW-cheap); a model
+        # that needs to drop/inject columns must reassign `self.frame` via a non-mutating
+        # operation (`.drop(...)`, `.assign(...)`) instead of writing into
+        # `data_model.raw_data` in place, so `data_model.raw_data` is never mutated after
+        # load and stays shared-safe across every model/validator that reads it.
+        # `self.cleaned` holds this instance's own cleaned columns (keyed by column name),
+        # replacing the old `setattr(self.RequiredColumn, ...)` pattern that overwrote a
+        # class-level `pd.Series` shared by every instance/run in the process (BUG-002).
+        self.frame: pd.DataFrame = self.data_loader_model.raw_data
+        self.cleaned: Dict[str, pd.Series] = {}
+
         self.legend_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_EXISTS_FILE, False)
         self.legend_read_success: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_READ_SUCCESS, False)
 
@@ -129,12 +143,37 @@ class SpModelABC(ABC):
             self.structural_errors.append(f"{self.filename}: O arquivo enviado está vazio.")
 
         # CHECK 1: Vertical Bar Check
-        _, errors_vertical_bar = DataFrameProcessing.check_dataframe_vertical_bar(self.data_loader_model.raw_data, self.filename)
+        _, errors_vertical_bar = DataFrameProcessing.check_dataframe_vertical_bar(
+            self.data_loader_model.raw_data, self.filename
+        )
         self.structural_errors.extend(errors_vertical_bar)
 
         # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
-        _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(self.data_loader_model.raw_data, self.filename)
+        _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(
+            self.data_loader_model.raw_data, self.filename
+        )
         self.structural_errors.extend(errors_unnamed_columns)
+
+    def cleaned_column(self, name: str) -> pd.Series:
+        """
+        Return this instance's own cleaned data for one column.
+
+        Replaces reading a model's `RequiredColumn`/`DynamicColumn` class attribute as if
+        it held the current run's cleaned data (BUG-002): that attribute is a shared,
+        class-level placeholder, so a previous instance's `setattr` would leak into every
+        later instance/run in the same process. `data_cleaning` implementations populate
+        `self.cleaned[name]` with the cleaned `pd.Series` for that column; callers ask for
+        it through this accessor instead of the class attribute.
+
+        Args:
+            name (str): The column name (e.g. ``"codigo"``), not the class attribute name.
+
+        Returns:
+            pd.Series: The cleaned column data, or an empty `object`-dtype `pd.Series` when
+            `data_cleaning` has not populated that column (e.g. the column was missing or
+            the model never ran).
+        """
+        return self.cleaned.get(name, pd.Series(dtype="object"))
 
     @property
     def is_sanity_check_passed(self) -> bool:
@@ -146,7 +185,9 @@ class SpModelABC(ABC):
         """
         exists_errors_legend = self.structural_errors or self.data_cleaning_errors
         exists_file_errors_legend = (
-            not self.data_loader_model.does_file_exist or self.data_loader_model.raw_data.empty or not self.data_loader_model.is_read_successful
+            not self.data_loader_model.does_file_exist
+            or self.data_loader_model.raw_data.empty
+            or not self.data_loader_model.is_read_successful
         )
         value = True
         if exists_errors_legend or exists_file_errors_legend:

@@ -44,7 +44,11 @@ def _build_data_models_context(
     """
     description_model = mocker.MagicMock()
     description_model.filename = "descricao.csv"
-    description_model.data_loader_model.raw_data = pd.DataFrame({"codigo": [1]})
+    description_raw_data = pd.DataFrame({"codigo": [1]})
+    description_model.data_loader_model.raw_data = description_raw_data
+    # `BaseValidator` reads the model's own working frame (`.frame`), not
+    # `data_loader_model.raw_data` (BUG-003, see `SpModelABC.frame`).
+    description_model.frame = description_raw_data
 
     data_models_context = mocker.MagicMock()
     data_models_context.get_instance_of.return_value = description_model

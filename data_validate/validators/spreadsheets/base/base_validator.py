@@ -77,7 +77,11 @@ class BaseValidator(ABC):
         # UNPACK DATA
         self._data_model = self._data_models_context.get_instance_of(self._type_class)
         self._filename = self._data_model.filename if self._data_model else "Unknown"
-        self._dataframe = self._data_model.data_loader_model.raw_data.copy() if self._data_model else pd.DataFrame({})
+        # BUG-003: read the model's own working frame (`self.frame`), never
+        # `data_loader_model.raw_data` directly — models such as `SpDescription` inject
+        # default columns and `SpProportionality` invalidates its frame onto `self.frame`,
+        # not onto the shared `DataLoaderModel.raw_data`.
+        self._dataframe = self._data_model.frame.copy() if self._data_model else pd.DataFrame({})
         self.TITLES_INFO = self._data_models_context.context.config.get_verify_names()
 
         # LIST OF ERRORS AND WARNINGS
