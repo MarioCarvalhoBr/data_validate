@@ -149,6 +149,14 @@ module = ["data_validate.i18n.*"]
 ignore_errors = false
 strict = true
 
+[[tool.mypy.overrides]]
+# ARC-017/ARC-001/ARC-008 (ADR-0006): the rule registry/engine core is new, migrated code — same
+# strict bar as `data_validate.specs.*`/`data_validate.i18n.*` above. Must stay last so it wins
+# over the blanket `data_validate.*` override for this one module.
+module = ["data_validate.rules.*"]
+ignore_errors = false
+strict = true
+
 [tool.bandit]
 exclude_dirs = ["tests", "tools/legacy"]
 # Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —
