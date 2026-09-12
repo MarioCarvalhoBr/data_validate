@@ -3,7 +3,7 @@ name: spreadsheet-protocol
 description: Use whenever you need the exact shape of an AdaptaBrasil data bundle — which sheets exist, their required/optional/dynamic columns, column name patterns, level semantics, the DI marker, legend/proportionality math, or the CSV format. Domain reference for anyone writing or reviewing a validation rule.
 ---
 
-# The AdaptaBrasil spreadsheet protocol (v1.13)
+# The AdaptaBrasil spreadsheet protocol (v1.16)
 
 A bundle is one folder containing up to 8 files, each `.csv` (separator `|`) or `.xlsx`. Sheet
 base names are fixed (from `data_validate/helpers/tools/data_loader/common/config.py`):
@@ -135,6 +135,6 @@ URLs and values in `fontes` columns are ignored by the spell checker.
 - Numeric precision: 2 decimal places for `valores`/`legenda`, 3 decimal places for
   `proporcionalidades`.
 
-For the authoritative text behind any of these rules, consult `assets/protocolo-v-1.13.pdf` via
+For the authoritative text behind any of these rules, consult `assets/protocolo-v-1.16.pdf` (current; v1.13 is the historical baseline) via
 the `protocol-expert` agent, and cross-check `.specs/business-rules/<sheet>.md` for the current
 rule-ID ↔ code ↔ test mapping.

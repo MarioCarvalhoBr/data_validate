@@ -170,4 +170,14 @@ Loading facts (`helpers/tools/data_loader/**`):
 - **G-03 decimal comma**: the protocol mandates comma as decimal separator in CSV; code accepts both `,` and `.` everywhere (lenient, undocumented).
 - **G-04 `.qml`**: still scanned (`Config.extensions`) though removed from the protocol in v1.11.
 
-Last synced with code: 09279f4
+## Protocol v1.16 update (2026-09-12)
+
+- **Single-worksheet xlsx** (v1.14): each `.xlsx` must contain exactly one worksheet; the calamine
+  reader currently loads the first sheet silently → planned STRUCT-014 (PROTO-003).
+- **Optional `spd_data.json`** (maintainer decision 2026-09-12, see
+  [territories.md](territories.md)): the server-generated territory registry may accompany the
+  bundle; STRUCT-004 must whitelist it instead of reporting "arquivo não esperado" → PROTO-013.
+- UTF-8 proactive check (G-01) remains pending as STRUCT-013 (PROTO-007); the v1.16 FAQ keeps the
+  exact expected message.
+
+Last synced with code: 344fef7

@@ -32,6 +32,7 @@ under `tests/`, and closed by updating the item status here and the matching spe
 | [06-tooling-ci.md](06-tooling-ci.md) | Build, CI/CD, packaging, pre-commit |
 | [07-docs-i18n.md](07-docs-i18n.md) | Documentation and internationalisation |
 | [08-migration-roadmap.md](08-migration-roadmap.md) | Phased plan that orders the items above |
+| [09-protocol-v116.md](09-protocol-v116.md) | Protocol v1.16 alignment (PROTO-001…017, incl. the optional `spd_data.json` territory registry) |
 
 ## Item format
 
@@ -51,9 +52,12 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
 | P0 | 7 | 2 done, 5 open | remaining: SEC-001, TST-001, ARC-001, ARC-002, BUG-002 |
-| P1 | 28 | 11 done, 3 in-progress, 14 open | |
-| P2 | 43 | 16 done, 1 in-progress, 26 open | |
+| P1 | 28 | 12 done, 3 in-progress, 13 open | |
+| P2 | 43 | 17 done, 4 in-progress, 22 open | |
 | P3 | 13 | 4 done, 1 wont-fix, 8 open | |
-| **Total** | **91** | **33 done, 4 in-progress, 1 wont-fix, 53 open** | |
+| **Total** | **91** | **35 done, 7 in-progress, 1 wont-fix, 48 open** | |
 
-Status snapshot: 2026-09-12 — 33 done, 4 in-progress, 1 wont-fix, 53 open (of 91 items incl. TOOL-011).
+Status snapshot: 2026-09-12 — 35 done, 7 in-progress, 1 wont-fix, 48 open (of 91 items incl.
+TOOL-011). This slice moved SEC-008 and PERF-004 to done, and ARC-011/ARC-012/TOOL-008 to
+in-progress (see `03-architecture.md`, `02-security.md`, `05-performance.md`,
+`06-tooling-ci.md`, `08-migration-roadmap.md`).

@@ -1,10 +1,13 @@
 # Business rules — index and conventions
 
-Source documents: `assets/protocolo-v-1.13.pdf` ("Especificação de Requisitos e Formatos para
-Entrega de Setores Estratégicos para o AdaptaBrasil MCTI", v1.13, 2025-08-05) and the current
-implementation (`data_validate/`). Each sheet has its own file; every check the code performs today
-is listed as a rule with a stable ID, so that protocol → spec → code → test → message stays
-traceable during the migration (backlog ARC-004, DOC-002).
+Source documents: `assets/protocolo-v-1.16.pdf` ("Especificação de Requisitos e Formatos para
+Entrega de Setores Estratégicos para o AdaptaBrasil MCTI", **v1.16, 2026-08-21** — current;
+`assets/protocolo-v-1.13.pdf` is the historical baseline these files were first traced against)
+and the current implementation (`data_validate/`). Each sheet has its own file; every check the
+code performs today is listed as a rule with a stable ID, so that protocol → spec → code → test →
+message stays traceable during the migration (backlog ARC-004, DOC-002). The v1.13 → v1.16 delta
+and the code changes it requires live in [protocol-changelog.md](protocol-changelog.md) and in
+backlog `09-protocol-v116.md` (`PROTO-*` items).
 
 | File | Sheet / scope |
 |---|---|
@@ -17,6 +20,7 @@ traceable during the migration (backlog ARC-004, DOC-002).
 | [legend.md](legend.md) | `legenda` and legend ↔ description ↔ values relations |
 | [proportionality.md](proportionality.md) | `proporcionalidades` |
 | [spelling.md](spelling.md) | Spell-check across sheets, `dicionario` |
+| [territories.md](territories.md) | Optional server registry `spd_data.json` (maintainer decision 2026-09-12) |
 | [protocol-changelog.md](protocol-changelog.md) | Protocol versions and protocol ↔ code gaps |
 
 ## Rule ID convention
@@ -35,8 +39,16 @@ traceable during the migration (backlog ARC-004, DOC-002).
 | `LEG-` | `legenda` rules and legend relations | `FC`, `LEG_REL`, `LEG_RANGE` |
 | `PROP-` | `proporcionalidades` rules | `FS`, `IR`, `REP_IND_PROP`, `IND_VAL_PROP`, `IR_PROP`, `SUM_PROP` |
 | `SPELL-` | Spell-check | `SPELL` |
+| `TERR-` | Territory registry `spd_data.json` ↔ `valores`/`proporcionalidades` ids | new title (planned — PROTO-013) |
 
 Target message keys follow `rule.<RULE-ID>.<error|warning>` (see `.specs/i18n/catalog.md`).
+
+Planned IDs reserved by the v1.16 alignment and the gap list (not yet implemented): STRUCT-013
+(UTF-8, G-01), STRUCT-014 (single-worksheet xlsx, PROTO-003), DESC-013 (categoria, PROTO-004),
+DESC-014 (codes ordered by level), DESC-015 (cenario domain/propagation), DESC-017 (ordem
+sequence), DESC-018 (meta format — parked), DESC-019 (nome_completo length), DESC-016 (retired
+unimplemented — `relacao` removed by protocol v1.15), SCEN-005 (symbol charset/length), TEMP-004,
+TEMP-005, LEG-016 (>11 slices), VAL-006 (id uniqueness), TERR-001, TERR-002.
 
 ## Severity
 

@@ -139,4 +139,14 @@ by `helpers/common/validation/proportionality_processing.py::ProportionalityProc
 - **G-24 first two columns are spatial**: protocol says the first two columns are the spatial representation (§3.2); code expects a single `id` sub-column and ignores `unnamed` level-0.
 - Non-normalised exceptions ("podem existir exceções") have no opt-out flag.
 
-Last synced with code: 09279f4
+## Protocol v1.16 update (2026-09-12)
+
+- **Territory registry**: when the optional server file `spd_data.json` is present, every
+  `proporcionalidades.id` must exist in it — TERR-002 in [territories.md](territories.md)
+  (PROTO-013).
+- §2.7 keeps "a soma … deve ser um, mas podem existir exceções quando os dados não estão
+  normalizados" — PROP-010 is stricter than the protocol; severity decision filed as PROTO-015.
+- p.13 uses the singular "proporcionalidade.xlsx" once; §2 (p.3) keeps the plural file name — the
+  plural remains authoritative.
+
+Last synced with code: 344fef7

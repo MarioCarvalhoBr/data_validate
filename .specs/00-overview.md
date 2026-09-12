@@ -6,7 +6,7 @@
 the spreadsheet validator of the **AdaptaBrasil** platform, developed by INPE (Instituto Nacional
 de Pesquisas Espaciais). Sector teams (health, biodiversity, water, …) deliver a bundle of
 spreadsheets describing climate-adaptation indicators; the validator checks the bundle against the
-*Protocolo v1.13* and produces an HTML/PDF report plus a machine-readable summary that the
+*Protocolo v1.16* and produces an HTML/PDF report plus a machine-readable summary that the
 platform's ingestion pipeline consumes.
 
 ## Scope
@@ -61,7 +61,7 @@ Extensions `.csv` (separator `|`) or `.xlsx`; the same stem must not exist in bo
 | Proportionality | Weights of children indicators that must sum to 1 per parent and territory |
 | Golden | Frozen expected output of a fixture bundle used to detect regressions |
 | Rule ID | Stable identifier of one business rule (`DESC-004`) |
-| Protocol | The formal specification (`assets/protocolo-v-1.13.pdf`) |
+| Protocol | The formal specification (`assets/protocolo-v-1.16.pdf`; v1.13 and v1.0 kept as historical references) |
 
 ## Current state (v0.7.65b732)
 

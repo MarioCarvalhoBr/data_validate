@@ -12,7 +12,7 @@
 validator of the **AdaptaBrasil** climate-adaptation platform, developed by INPE (Instituto
 Nacional de Pesquisas Espaciais). Sector data teams (health, biodiversity, water, …) submit a
 bundle of spreadsheets describing climate-adaptation indicators; Data Validate checks that
-bundle against *Protocolo v1.13* — structure, hierarchy, codes, value patterns, legends,
+bundle against *Protocolo v1.16* — structure, hierarchy, codes, value patterns, legends,
 proportionality sums, temporal references, scenarios, and pt-BR/en-US spelling — and produces an
 HTML/PDF report plus a machine-readable JSON summary that the platform's ingestion pipeline
 consumes.
@@ -59,7 +59,7 @@ canoa-data-validate \
   --output_folder data/output/data_ground_truth_01 \
   --locale pt_BR \
   --sector "Biodiversidade" \
-  --protocol "Protocolo v1.13" \
+  --protocol "Protocolo v1.16" \
   --user "Researcher Name" \
   --debug
 ```

@@ -454,3 +454,30 @@ Every fix here must land with a regression test under `tests/` that fails before
   `poetry run pytest tests/e2e -q --no-cov -m e2e` is green. Regression tests:
   `tests/unit/validators/spell/test_spellchecker_validator.py`.
 - Related: SEC-004, ARC-015, spec `.specs/business-rules/spelling.md`
+
+### BUG-028 · `to_decimal_truncated` skips truncation for scientific-notation floats
+- Priority: P1 · Effort: S · Status: open
+- Where: `data_validate/helpers/common/formatting/number_formatting_processing.py:31` (splits on a
+  literal `"."`), consumer `helpers/common/validation/proportionality_processing.py:177`
+- Problem: `str(1e-05) == "1e-05"` has no dot, so the value bypasses truncation entirely:
+  `to_decimal_truncated(1e-05, "DI", 0)` returns `Decimal('0.00001')` instead of `Decimal('0')`.
+  A very small proportionality weight silently escapes the 3-decimal precision rule and can shift
+  sum-to-1 results.
+- Evidence: strict xfail `tests/unit/helpers/common/formatting/test_number_formatting_properties.py::TestToDecimalTruncated::test_to_decimal_truncated_scientific_notation_bug_candidate`
+  (found by hypothesis, TST-005).
+- Proposed fix: quantize with `Decimal` (`Decimal(s).quantize(Decimal(10) ** -precision, rounding=ROUND_DOWN)`)
+  instead of string surgery; flip the xfail to a passing test.
+- Related: PROP-* sum rules, PERF-003
+
+### BUG-029 · `CSVReader` silently drops whitespace-only rows in single-column sheets
+- Priority: P3 · Effort: S · Status: open
+- Where: `data_validate/helpers/tools/data_loader/readers/csv_reader.py` (pandas default
+  `skip_blank_lines=True`)
+- Problem: in a single-column CSV a row whose sole cell is whitespace collides with blank-line
+  skipping and disappears (`(1,1)` frame round-trips to `(0,1)`); row numbers reported to the user
+  shift. Real bundles have ≥ 2 columns so impact is low, but `dicionario.csv` is single-column.
+- Evidence: strict xfail `tests/unit/helpers/tools/data_loader/readers/test_csv_roundtrip_properties.py::TestCSVReaderSingleColumnBlankLineBugCandidate::test_single_column_whitespace_row_is_dropped`
+  (found by hypothesis, TST-005).
+- Proposed fix: `skip_blank_lines=False` in the reader (or in the Phase 2 `SheetLoader`) plus an
+  explicit empty-row policy; flip the xfail.
+- Related: BUG-015, ARC-009

@@ -43,8 +43,18 @@ BUG-001/005/008/009/010/011/017. Still open, remaining for Phase 1: `SheetSpec` 
 (item 1, modelled per ARC-003 but no consumer migrated yet), `Issue`/`MessageCatalog` wiring into
 the legacy pipeline (item 2 — `i18n/catalog.py`/`specs/issues.py` exist as models but no validator
 uses them yet), the rest of `AppContext` beyond locale/logger (item 3), and the new `cli.py` (item 4,
-ADR-0005) — ARC-003/004/006/011/012/SEC-008/PERF-004/TOOL-005/TOOL-008, see
-`01-bugs.md`/`03-architecture.md` for each item's detail.
+ADR-0005) — ARC-003/004/006/TOOL-005, see `01-bugs.md`/`03-architecture.md` for each item's detail.
+Status (2026-09-12, later slice): Done — SEC-008, PERF-004 (2 items). In-progress — ARC-011,
+ARC-012, TOOL-008 (3 items; still part of item 4/ADR-0005): `helpers/base/data_args.py` gained
+explicit `-i/--input`/`-o/--output` aliases, deprecated two-dash aliases (`--i`/`--o`/`--l`/`--d`,
+warn on stderr), `allow_abbrev=False`, `--json PATH`, `--fail-on {error,warning,never}`, and an
+offline `--version`; `main.py`'s `main()` now returns an `int` ending in `sys.exit(main())` with
+exit codes `0`/`1`/`2` per `.specs/api/cli-contract.md`, and the welcome banner moved off stdout
+(import time) onto stderr (`main()`). Still open for these three items: `--format`, `--rules`/
+`--skip-rules`, `--max-file-size`/`--max-rows`, `--parallel`, `--verbose`/`--quiet`,
+`--list-rules`, a separate `cli.py`/`AppContext` module, deprecating `--input_folder`/
+`--output_folder` themselves, and the rest of ARC-012's `print()` sites
+(`file_report_generator.py`, `general_context.py:103`, `spreadsheet_processor.py:98`).
 
 ## Phase 2 — Loading & normalisation
 Closes: BUG-002, BUG-003, BUG-013, BUG-014, BUG-015, BUG-018, ARC-007 (models), ARC-009, PERF-002,
@@ -90,3 +100,10 @@ Gate: 1.0.0 release candidate.
 3. Subagent implements with TDD; `make check` locally.
 4. `/review` (code-reviewer + security-auditor) → fix → `/spec-sync` → commit (Conventional Commits,
    reference the ID) → mark item `done` here.
+
+## Phase 6 — Protocol v1.16 and territory registry (scheduled last)
+Closes: PROTO-001…PROTO-017 (see `09-protocol-v116.md`), including TERR-001/TERR-002
+(`spd_data.json` optional server-generated registry — own verification category, error severity,
+skipped when the file is absent). Per the maintainer's instruction (2026-09-12), this phase runs
+only AFTER every item in files 01–07 is done or wont-fix. PROTO-001/002 (fontes/relacao column
+removal) are breaking for v1.16 bundles and lead the phase.

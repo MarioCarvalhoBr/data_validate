@@ -1,7 +1,7 @@
 # CLAUDE.md
 
 **Data Validate** (`canoa_data_validate`, codename *Canoa*) validates AdaptaBrasil
-climate-indicator spreadsheets against Protocol v1.13, and is being migrated to a
+climate-indicator spreadsheets against Protocol v1.16, and is being migrated to a
 new, elegant/scalable/fast/organised source tree while keeping the CLI/report/JSON
 contract with the platform green at every step. Read `.specs/00-overview.md` first.
 

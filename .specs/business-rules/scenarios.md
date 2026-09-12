@@ -69,4 +69,12 @@ every model as `scenarios` (`SpModelABC.VAR_CONSTS.SCENARIOS`); the loader sets
 - **G-18 default symbols `O`/`P`**: the protocol defines defaults when the file is absent; the code treats "no file" as "no scenarios" (both the `cenario` column and scenario columns become invalid). Confirm the intended behaviour with the protocol owners.
 - `LB_SCEN` title is registered but never emitted (gap G-08).
 
-Last synced with code: 09279f4
+## Protocol v1.16 update (2026-09-12)
+
+- `simbolo` is explicitly "**Um único caractere**", letters and digits only (§2.1 p.4). No
+  version-history entry marks this as new, so it is treated as a clarification of G-17 → planned
+  SCEN-005 (PROTO-006): length 1 + `isalnum()`.
+- New explicit note: sheet row order = display order in the platform; the first row is the default
+  scenario (documentation only, nothing to validate).
+
+Last synced with code: 344fef7

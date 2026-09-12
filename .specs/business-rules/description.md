@@ -203,4 +203,21 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 - **G-10 `relacao`** domain {1, −1}, **`ordem`** sibling sequence, **`meta`** format, **`nome_completo` ≥ `nome_simples` length**: not validated.
 - **G-11 global uniqueness of names**: protocol says two indicators may not share `nome_simples`/`nome_completo`; code checks uniqueness per level-2 subtree only (COMP-004).
 
-Last synced with code: 09279f4
+## Protocol v1.16 update (2026-09-12)
+
+- **`fontes` removed** (v1.16): the column no longer exists in the protocol; the code still
+  requires it, so a v1.16-compliant bundle fails DESC-011's missing-column check → PROTO-001
+  (accept silently as deprecated when present; stop requiring).
+- **`relacao` removed** (v1.15): the code still injects `relacao=1` (see BUG-003) and the
+  composition tree validator lists it as required → PROTO-002.
+- **`categoria`** (since v1.13) is still required by the protocol with domain
+  `social|economico|ambiental|climatico`; today it only triggers an unexpected-column warning →
+  PROTO-004 / planned DESC-013 (staged: warning on absence first, error after the Phase 4
+  re-baseline).
+- **`desc_simples` trailing period**: v1.16 repeats v1.13's prohibition; DESC-006 still requires
+  the period for this column → PROTO-005 flips it (G-07).
+- Also reserved: DESC-014 (codes ordered by level), DESC-015 (`cenario` ∈ {0,1} + propagation),
+  DESC-017 (`ordem` sibling sequence), DESC-019 (`nome_completo` ≥ `nome_simples` length);
+  DESC-016 (`relacao` domain) is retired unimplemented — the column is gone.
+
+Last synced with code: 344fef7

@@ -1,15 +1,34 @@
 # Protocol versions and protocol ↔ code gaps
 
 Protocol: "Especificação de Requisitos e Formatos para Entrega de Setores Estratégicos para o
-AdaptaBrasil MCTI" (`assets/protocolo-v-1.13.pdf`; `assets/protocolo-1.0.pdf` is the first
-version). The validator does not yet declare which protocol version it implements
-(backlog DOC-006); this table records what each version changed and whether the code follows it.
+AdaptaBrasil MCTI" — **current version 1.16, 2026-08-21** (`assets/protocolo-v-1.16.pdf`;
+`assets/protocolo-v-1.13.pdf` and `assets/protocolo-1.0.pdf` are kept as historical references).
+The validator does not yet declare which protocol version it implements (backlog DOC-006); this
+table records what each version changed and whether the code follows it. The rule files in this
+directory were originally traced against v1.13; v1.16 deltas are recorded below and in each
+affected file under "Protocol v1.16 update", and the code changes they require are backlog items
+`PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 
-## Version history (protocol §7, p.18–20)
+## v1.13 → v1.16 delta (announced by the user on 2026-09-12)
+
+| Change | Protocol | Affected rules | Code status |
+|---|---|---|---|
+| Each `.xlsx` file must contain exactly one worksheet | §2 p.3 (v1.14) | planned STRUCT-014 | **needs-change** — calamine reads the first sheet silently, extra sheets undetected (PROTO-003) |
+| `relacao` column removed from `descricao` ("esta informação já esta na legenda") | §2.3 (v1.15 history) | DESC-011/12 column set, COMP tree prerequisites | **needs-change** — code injects `relacao=1` and lists it among expected/required columns (PROTO-002) |
+| `fontes` column removed from `descricao` ("não é usada") | §2.3 (v1.16 history) | DESC-011 required-column set, SPELL exception | **needs-change (breaking)** — `fontes` is a required column today, so a v1.16-compliant bundle fails validation (PROTO-001) |
+| `categoria` domain restated (social, economico, ambiental, climatico) | §2.3 p.8 | planned DESC-013 | unchanged since v1.13 — still **not implemented** (G-05, PROTO-004); today it triggers an unexpected-column warning |
+| Scenario `simbolo` explicitly "Um único caractere", letters/digits | §2.1 p.4 | planned SCEN-005 | clarification of G-17 (PROTO-006) |
+| §2.6 still explains value orientation via `relacao` although §2.3 removed it | §2.6 p.12 vs §2.3 | — | **protocol internal inconsistency** (new gap G-28) — report to the protocol owners |
+| `#…#` spell-ignore delimiter absent from the v1.16 FAQ | §"6)" p.16–17 | SPELL | G-25 downgraded to historical; confirm with owners before implementing |
+
+## Version history (protocol §7; v1.16 pp.17–19)
 
 | Version | Date | Change | Code status |
 |---|---|---|---|
-| 1.13 | 2025-08-05 | New `categoria` column in `descricao` | **not implemented** (G-05) |
+| 1.16 | 2026-08-21 | `fontes` removed from `descricao` | **needs-change** (PROTO-001) |
+| 1.15 | 2026-08-11 | Editorial fixes; `relacao` removed from `descricao` | **needs-change** (PROTO-002) |
+| 1.14 | 2025-10-02 | Each xlsx file must have exactly one worksheet | **not implemented** (PROTO-003) |
+| 1.13 | 2025-08-05 | New `categoria` column in `descricao` | **not implemented** (G-05, PROTO-004) |
 | 1.12 | 2025-07-22 | Better description of the `legenda` column in `descricao` | n/a (documentation) |
 | 1.11 | 2025-05-23 | Legends only through the optional `legenda.xlsx` (QML dropped) | implemented; `.qml` still scanned by the loader (G-04) |
 | 1.10 | 2025-03-21 | Scenario `simbolo` letters/digits only; optional `dicionario.xlsx` | dictionary implemented; charset **not validated** (G-17) |
@@ -26,7 +45,7 @@ version). The validator does not yet declare which protocol version it implement
 
 ## How to version the protocol in the tool (target)
 
-1. `PROTOCOL_VERSION = "1.13"` constant in the sheet-spec registry; printed by `--version` and in
+1. `PROTOCOL_VERSION = "1.16"` constant in the sheet-spec registry; printed by `--version` and in
    the report header.
 2. Each rule carries `since: <protocol version>` and, when removed, `until:`.
 3. A protocol bump is an ADR + an entry here + updates to the rule files + golden re-baseline with
@@ -60,9 +79,15 @@ version). The validator does not yet declare which protocol version it implement
 | G-22 | legend | legend must cover data min/max | equivalent to LEG-015; document |
 | G-23 | proportionality | blank cells treated as valid | align with protocol (error) |
 | G-24 | proportionality | first two spatial columns vs single `id` | clarify |
-| G-25 | spelling | `#…#` ignore delimiter | implement in `TextProcessor` |
+| G-25 | spelling | `#…#` ignore delimiter (v1.7) | absent from the v1.16 FAQ — treat as historical; confirm with owners before implementing |
 | G-26 | spelling | not all textual columns are checked | extend `model_columns_map` |
 | G-27 | spelling | case-sensitive dictionary matching unverified | add tests |
-| — | spelling | dictionary initialisation errors silently dropped (`_prepare_statement` never called) | bug fix + test |
+| G-28 | values/description | §2.6 (v1.16) still references the `relacao` column removed by v1.15 | report the inconsistency to the protocol owners; until resolved, treat value orientation as legend-defined |
+| ~~—~~ | spelling | dictionary initialisation errors silently dropped | **resolved** — BUG-027 fixed (`_prepare_statement` now runs and reports) |
 
-Last synced with code: 09279f4
+Gap status after v1.16 (2026-09-12): G-05 and G-07 are confirmed unchanged by v1.16 (the protocol
+still requires `categoria` and still forbids a trailing period in `desc_simples`); G-10 shrinks —
+the `relacao ∈ {1,−1}` sub-gap disappears because the column itself was removed (PROTO-002);
+G-25 is downgraded to historical.
+
+Last synced with code: 344fef7

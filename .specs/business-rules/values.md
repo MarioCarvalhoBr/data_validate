@@ -77,4 +77,13 @@ Purpose: one row per spatial feature (`id`), one column per indicator/time/scena
 - **G-13 `id` completeness**: "Nesta coluna deverão ter todos os objetos descritos no shapefile ou … todos os municípios brasileiros" cannot be checked without the spatial layer; uniqueness of `id` is also not checked.
 - **G-14 normalised range**: the [0,1] expectation is enforced only through the legend range rule (LEG-015) with default bounds 0–1.
 
-Last synced with code: 09279f4
+## Protocol v1.16 update (2026-09-12)
+
+- **Gap G-28**: §2.6 (p.12) still explains value orientation via the `relacao` column that v1.15
+  removed from `descricao`; per the v1.15 history the information now lives in the legend. Until
+  the owners fix the text, value orientation is treated as legend-defined (PROTO-016).
+- **Territory registry**: when the optional server file `spd_data.json` is present, every
+  `valores.id` must exist in it — TERR-001 in [territories.md](territories.md) (PROTO-013).
+  `id` uniqueness becomes VAL-006 (PROTO-017).
+
+Last synced with code: 344fef7
