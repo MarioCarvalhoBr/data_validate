@@ -40,11 +40,16 @@ harness (PERF-009); never optimise without a number.
 - Related: BUG-002, BUG-014
 
 ### PERF-004 · Repeated translation / config work
-- Priority: P2 · Effort: S · Status: open
-- Where: `ApplicationConfig.get_verify_names()` called in `base_validator.py:81` (per validator) and
-  `file_report_generator.py:130-132` (twice more) → 35 catalog lookups each; `LanguageManager` JSON
-  loaded in 4–5 places per run (ARC-002).
-- Proposed fix: compute titles once in the context; `functools.cached_property`.
+- Priority: P2 · Effort: S · Status: done
+- Where: `ApplicationConfig.get_verify_names()` (called in `base_validator.py:81` per validator and
+  `file_report_generator.py:130-132` twice more) → previously 34 catalog lookups on *every* call;
+  `LanguageManager` JSON loaded in 4–5 places per run (ARC-002, unrelated, still open).
+- Fix shipped: `get_verify_names()` computes the `MappingProxyType` once and caches it on
+  `self._verify_names_cache`; every call after the first returns the cached mapping with zero
+  additional `LanguageManager.text()` calls. Regression test:
+  `tests/unit/config/test_application_config.py::TestApplicationConfigClock::test_get_verify_names_caches_after_first_call`
+  asserts exactly 34 total `text()` calls across two `get_verify_names()` invocations (would be 68
+  without the cache).
 
 ### PERF-005 · Memory: everything loaded as Python `str` objects
 - Priority: P2 · Effort: M · Status: open

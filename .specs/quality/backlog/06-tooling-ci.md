@@ -75,11 +75,16 @@
 - Done: (d1ae7c1)
 
 ### TOOL-008 · Installed-package experience
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: in-progress
 - Where: `main.py:8` prints at import; `.config` lookups (BUG-004); enchant temp files inside the
   package (BUG-022); `wkhtmltopdf` hard requirement (SEC-002); `static/` must be shipped (OK today).
-- Proposed fix: `canoa-data-validate --version` works offline; no writes inside the package; optional
-  extras `[pdf]`, `[spell]`.
+- Done: `canoa-data-validate --version` works fully offline (reads only the already-imported
+  `METADATA` singleton, no file/network I/O) and exits 0 with no writes anywhere, including inside
+  the package (ARC-011/SEC-008); `main.py:8`'s import-time print is gone (ARC-012); `.config`
+  lookups were already removed by BUG-004 (prior slice).
+- Still open: enchant temp files inside the package (BUG-022), `wkhtmltopdf` hard requirement
+  (SEC-002), and the optional `[pdf]`/`[spell]` extras in `pyproject.toml` that would let
+  `pip install canoa_data_validate` work without those system dependencies at all.
 
 ### TOOL-009 · Scripts
 - Priority: P3 · Effort: S · Status: open

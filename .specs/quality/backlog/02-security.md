@@ -111,13 +111,21 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: BUG-022
 
 ### SEC-008 · Exit code and stdout contract
-- Priority: P1 · Effort: S · Status: open
-- Where: `main.py`, `controllers/report/file_report_generator.py:239-263`
-- Problem: process exits 0 even when validation fails or crashes; machine contract is a `<{...}>`
-  fragment on stdout mixed with progress prints (`main.py:8` prints at *import*).
-- Proposed fix: exit 0 = no errors, 1 = validation errors, 2 = runtime failure; `--json <path>`
-  writes the summary; nothing else on stdout unless `--verbose`.
-- Related: ARC-011, BUG-010
+- Priority: P1 · Effort: S · Status: done
+- Where: `main.py`, `helpers/base/data_args.py`, `controllers/report/file_report_generator.py:239-263`
+- Problem (fixed): process exited 0 even when validation failed or crashed; machine contract was a
+  `<{...}>` fragment on stdout mixed with progress prints (`main.py:8` printed at *import*).
+- Fix shipped: `main()` returns an `int`, `main.py` ends with `sys.exit(main())`; exit `0` = no
+  issue at/above `--fail-on`, `1` = an issue at/above `--fail-on` (default `error`; `--fail-on
+  never` restores the old always-0), `2` = an unexpected runtime failure — one broad
+  `except Exception` around `DataArgs`/`GeneralContext`/`SpreadsheetProcessor` construction prints
+  `Fatal error: <exc>` to stderr and returns 2. `--json PATH` writes the same summary object as the
+  stdout fragment. The import-time banner (`main.py:8`) moved into `main()`, on stderr (ARC-012).
+- Not in scope for this fix (pre-existing, unchanged): `FileReportGenerator.build_report`'s own
+  broad `except Exception` around HTML/PDF generation still swallows a report-rendering failure
+  and prints to stderr instead of propagating it into the new exit-code-2 path; a `--verbose`
+  flag to further quiet stdout/stderr is not implemented (see ARC-011's "still open" list).
+- Related: ARC-011, ARC-012, BUG-010
 
 ### SEC-009 · Sensitive artefacts tracked in git
 - Priority: P3 · Effort: S · Status: open

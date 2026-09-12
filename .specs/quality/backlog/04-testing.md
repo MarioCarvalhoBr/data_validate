@@ -49,10 +49,27 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
 - Done: ratchet `tools/coverage_ratchet.py`, baseline 54.99, gate 54
 
 ### TST-005 · No property-based, mutation or benchmark tests
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: in-progress
 - Proposed fix: `hypothesis` for `NumberFormattingProcessing`, `CollectionsProcessing` patterns,
   CSV/XLSX readers (round-trip), legend interval logic; `mutmut` on `rules/`; `pytest-benchmark` on a
   synthetic 10k×50 `valores` sheet.
+- Done (hypothesis): `tests/unit/helpers/common/formatting/test_number_formatting_properties.py`
+  (`check_cell_integer` textual-representation acceptance/rejection, `to_decimal_truncated`
+  totality/idempotency, `check_n_decimals_places` bound, `parse_numeric` round-trip),
+  `tests/unit/helpers/common/processing/test_collections_properties.py`
+  (`categorize_strings_by_id_pattern_from_list` id/year/scenario-suffix matching incl. regex-special
+  suffixes, matched+unmatched partition invariant, `extract_numeric_ids_and_unmatched_strings_from_list`
+  id/matched-subset agreement), `tests/unit/helpers/common/validation/test_legend_properties.py`
+  (`validate_min_max_values` continuity/ordering over generated `Decimal`-built legend groups),
+  `tests/unit/helpers/tools/data_loader/readers/test_csv_roundtrip_properties.py` (`CSVReader`
+  round-trip for single-header `|`-separated string frames, with the empty-string/NA-sentinel
+  normalisation documented explicitly). Found and documented (not fixed) two bug candidates as
+  `xfail(strict=True)`: (1) `to_decimal_truncated` skips truncation entirely for values whose
+  `str()` uses scientific notation with no literal `.` (e.g. `1e-05`), because it only truncates by
+  splitting on `"."`; (2) `CSVReader` silently drops a row in a single-column CSV (no `|` on the
+  line) when that row's sole cell is whitespace-only, colliding with pandas' default
+  `skip_blank_lines=True`. `mutmut` on `rules/` and the 10k×50 `pytest-benchmark` remain — see
+  PERF-009.
 - Related: PERF-009
 
 ### TST-006 · Assertions bound to Portuguese message text

@@ -881,3 +881,129 @@ class TestDataArgsIntegration:
 
                 assert data_args1.data_report.sector == "Sector1"
                 assert data_args2.data_report.sector == "Sector2"
+
+
+class TestDataArgsCliContract:
+    """ARC-011 regression tests: explicit aliases, `allow_abbrev=False`, `--json`/`--fail-on`/`--version`.
+
+    Unlike the classes above, these tests exercise the real `argparse` parser
+    (via `sys.argv`, not a mocked `parse_args`), since the behaviour under
+    test is the parser's own flag/alias/abbreviation handling.
+    """
+
+    @pytest.fixture
+    def temp_input_dir(self) -> Generator[str, None, None]:
+        """Create temporary input directory for testing."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            yield temp_dir
+
+    def test_short_input_output_aliases_are_accepted(self, temp_input_dir: str, mocker) -> None:
+        """`-i`/`-o` are the new short aliases for `--input_folder`/`--output_folder`."""
+        mocker.patch("sys.argv", ["prog", "-i", temp_input_dir, "-o", "/tmp/out"])
+
+        data_args = DataArgs(allow_abbrev=False)
+
+        assert data_args.data_file.input_folder == temp_input_dir
+        assert data_args.data_file.output_folder == "/tmp/out"
+
+    def test_long_input_output_aliases_are_accepted(self, temp_input_dir: str, mocker) -> None:
+        """`--input`/`--output` are the new long aliases for `--input_folder`/`--output_folder`."""
+        mocker.patch("sys.argv", ["prog", "--input", temp_input_dir, "--output", "/tmp/out2"])
+
+        data_args = DataArgs(allow_abbrev=False)
+
+        assert data_args.data_file.input_folder == temp_input_dir
+        assert data_args.data_file.output_folder == "/tmp/out2"
+
+    def test_legacy_input_folder_flag_still_works(self, temp_input_dir: str, mocker) -> None:
+        """`--input_folder`/`--output_folder` keep working unchanged."""
+        mocker.patch("sys.argv", ["prog", "--input_folder", temp_input_dir])
+
+        data_args = DataArgs(allow_abbrev=False)
+
+        assert data_args.data_file.input_folder == temp_input_dir
+
+    @pytest.mark.parametrize(
+        "flag,replacement",
+        [
+            ("--i", "-i/--input"),
+            ("--o", "-o/--output"),
+            ("--l", "-l/--locale"),
+            ("--d", "--debug"),
+        ],
+    )
+    def test_deprecated_two_dash_alias_prints_warning(
+        self, flag: str, replacement: str, temp_input_dir: str, mocker, capsys
+    ) -> None:
+        """`--i`/`--o`/`--l`/`--d` only worked before via `allow_abbrev=True` prefix matching.
+
+        Now declared explicitly, they still work but print a single
+        deprecation warning naming their replacement (ARC-011).
+        """
+        argv = ["prog", "--input_folder", temp_input_dir]
+        if flag == "--l":
+            argv += [flag, "en_US"]
+        elif flag == "--d":
+            argv += [flag]
+        else:
+            argv += [flag, temp_input_dir]
+        mocker.patch("sys.argv", argv)
+
+        DataArgs(allow_abbrev=False)
+
+        captured = capsys.readouterr()
+        assert f"'{flag}' is deprecated" in captured.err
+        assert replacement in captured.err
+
+    def test_allow_abbrev_false_rejects_prefix_abbreviation(self, temp_input_dir: str, mocker) -> None:
+        """`--input_fol` only ever worked via `allow_abbrev=True` prefix matching (ARC-011)."""
+        mocker.patch("sys.argv", ["prog", "--input_fol", temp_input_dir])
+
+        with pytest.raises(SystemExit):
+            DataArgs(allow_abbrev=False)
+
+    def test_missing_input_folder_raises_system_exit(self, mocker) -> None:
+        """Input is still required, even though it is now spread across three aliases."""
+        mocker.patch("sys.argv", ["prog"])
+
+        with pytest.raises(SystemExit):
+            DataArgs(allow_abbrev=False)
+
+    def test_json_and_fail_on_defaults(self, temp_input_dir: str, mocker) -> None:
+        """`--json`/`--fail-on` default to `None`/`"error"` when not given."""
+        mocker.patch("sys.argv", ["prog", "--input_folder", temp_input_dir])
+
+        data_args = DataArgs(allow_abbrev=False)
+
+        assert data_args.json_path is None
+        assert data_args.fail_on == "error"
+
+    def test_json_and_fail_on_flags_are_parsed(self, temp_input_dir: str, mocker) -> None:
+        """`--json PATH` and `--fail-on {error,warning,never}` are parsed onto `DataArgs`."""
+        mocker.patch(
+            "sys.argv",
+            ["prog", "--input_folder", temp_input_dir, "--json", "/tmp/summary.json", "--fail-on", "warning"],
+        )
+
+        data_args = DataArgs(allow_abbrev=False)
+
+        assert data_args.json_path == "/tmp/summary.json"
+        assert data_args.fail_on == "warning"
+
+    def test_invalid_fail_on_value_raises_system_exit(self, temp_input_dir: str, mocker) -> None:
+        """`--fail-on` is constrained to its three documented choices."""
+        mocker.patch("sys.argv", ["prog", "--input_folder", temp_input_dir, "--fail-on", "bogus"])
+
+        with pytest.raises(SystemExit):
+            DataArgs(allow_abbrev=False)
+
+    def test_version_flag_exits_zero_and_prints_version(self, mocker, capsys) -> None:
+        """`--version` prints and exits 0 without requiring `--input_folder` (TOOL-008)."""
+        mocker.patch("sys.argv", ["prog", "--version"])
+
+        with pytest.raises(SystemExit) as excinfo:
+            DataArgs(allow_abbrev=False)
+
+        assert excinfo.value.code == 0
+        captured = capsys.readouterr()
+        assert captured.out.strip() != ""

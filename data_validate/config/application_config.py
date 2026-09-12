@@ -122,6 +122,7 @@ class ApplicationConfig:
         self.language_manager: LanguageManager = language_manager or LanguageManager()
         self.spreadsheet_info = SpreadsheetInfo()
         self.names_enum = NamesEnum
+        self._verify_names_cache: MappingProxyType | None = None
 
     def get_verify_names(self):
         """
@@ -132,10 +133,18 @@ class ApplicationConfig:
         like `TITLES_N` and `SIMP_DESC_N`, it formats the message with dynamic values
         from configuration constants.
 
+        The result is computed once and cached on the instance (PERF-004): this method
+        is called once per validator (`BaseValidator.__init__`) plus twice more in
+        `FileReportGenerator`, so without caching every run repeats the same 34 catalog
+        lookups a dozen-plus times.
+
         Returns:
             MappingProxyType: A read-only dictionary mapping verification keys (from `NamesEnum`)
             to their localized text descriptions.
         """
+        if self._verify_names_cache is not None:
+            return self._verify_names_cache
+
         keys = [element for element in NamesEnum]
         values = [
             (
@@ -152,4 +161,5 @@ class ApplicationConfig:
             )
             for element in keys
         ]
-        return MappingProxyType(dict(zip([e.value for e in keys], values)))
+        self._verify_names_cache = MappingProxyType(dict(zip([e.value for e in keys], values)))
+        return self._verify_names_cache

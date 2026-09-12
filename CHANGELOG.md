@@ -45,8 +45,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `Makefile` targets: `setup`, `lint`, `format`, `typecheck`, `security`/`security-offline`,
   `test-unit`, `test-e2e`, `test`, `coverage`, `check`, `harness-update`, `bench`, `profile`,
   `run`/`run-all`, `i18n-check`, replacing the previous `black`/`test-fast`/`test-short` set.
+- CLI (ARC-011/SEC-008/TOOL-008): `-i/--input` and `-o/--output` as new short/long aliases for
+  `--input_folder`/`--output_folder` (kept working unchanged); `--json PATH` writes the same JSON
+  summary object as the stdout `<{...}>` fragment to a file; `--fail-on {error,warning,never}`
+  (default `error`) governs the exit code; `--version` prints the version and exits 0 offline,
+  with no writes. `--i`/`--o`/`--l`/`--d` (the two-dash abbreviations that only ever worked via
+  `allow_abbrev=True` prefix matching) are now explicit, deprecated aliases: they still work, but
+  print a one-line deprecation warning to stderr naming their replacement.
 
 ### Changed
+- **CLI exit code (SEC-008, breaking for scripts that assumed "always 0")**: `canoa-data-validate`
+  now exits `0` when no issue at/above `--fail-on` was found, `1` when one was, and `2` on an
+  unexpected runtime failure (bad arguments, unreadable input, a crash inside the pipeline) —
+  instead of always exiting `0`. Pass `--fail-on never` to restore the previous always-0 behaviour.
+- The startup banner (`main.py`, previously printed at `import data_validate` time) now prints
+  once, from inside `main()`, to stderr instead of stdout (ARC-012) — stdout keeps carrying only
+  the machine-readable `<{...}>` JSON summary line.
+- `argparse` now runs with `allow_abbrev=False`: undeclared prefix abbreviations (e.g.
+  `--input_fol`) are rejected; use the explicit `--input_folder`/`-i`/`--input` flags instead.
 - `pyproject.toml`: removed `black` and `flake8`/`flake8-html` from the dev dependency group in
   favour of `ruff format`; `[tool.coverage.report]` `fail_under` raised from the historical
   4 %/50 % figures to **54** (ratcheted upward by `tools/coverage_ratchet.py`, never lowered);

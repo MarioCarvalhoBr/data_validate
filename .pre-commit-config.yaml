@@ -36,7 +36,7 @@ repos:
       - id: mypy
         args: ["--config-file=pyproject.toml"]
         files: ^(tools/|tests/e2e/)
-        additional_dependencies: []
+        additional_dependencies: ["pytest==9.0.2", "pandas-stubs", "pytest-mock"]
 
   - repo: https://github.com/PyCQA/bandit
     rev: "1.9.4"

@@ -72,8 +72,7 @@ def _spell_backend_available() -> bool:
         # `.claude/skills/spreadsheet-protocol/SKILL.md`), not guaranteed to be installed, so it
         # cannot be imported unconditionally at module level without breaking test collection on
         # environments without it.
-        import enchant  # type: ignore[import-untyped]  # noqa: PLC0415
-
+        enchant = importlib.import_module("enchant")
         enchant.Dict("pt_BR")
     except Exception:
         return False
@@ -320,9 +319,18 @@ def test_golden_report(fixture_name: str, tmp_path: Path, request: pytest.Fixtur
     """
     output_dir = tmp_path / fixture_name
     result = _run_cli(fixture_name, output_dir)
-    assert result.returncode == 0, (
-        f"CLI exited with code {result.returncode} for fixture {fixture_name!r}.\n"
-        f"stdout:\n{result.stdout}\nstderr:\n{result.stderr}"
+
+    # SEC-008/ADR-0005: the CLI's exit code now reflects the validation outcome (0 = no
+    # errors, 1 = errors found, 2 = a runtime failure) instead of always being 0. The expected
+    # exit code is derived from the same stdout JSON summary the golden already carries, not
+    # hardcoded per fixture, so a fixture's error count and its exit code can never silently
+    # drift apart.
+    summary_for_exit_code = _extract_json_summary(result.stdout)
+    reported_errors = summary_for_exit_code["data_validate"]["report"]["errors"]
+    expected_exit_code = 1 if reported_errors > 0 else 0
+    assert result.returncode == expected_exit_code, (
+        f"CLI exited with code {result.returncode} (expected {expected_exit_code}) for fixture "
+        f"{fixture_name!r}.\nstdout:\n{result.stdout}\nstderr:\n{result.stderr}"
     )
 
     html_path = output_dir / f"{fixture_name}_report.html"
@@ -347,10 +355,19 @@ def test_golden_report(fixture_name: str, tmp_path: Path, request: pytest.Fixtur
 
     expected = json.loads(golden_path.read_text(encoding="utf-8"))
 
-    if actual != expected:
+    # Every stored golden was frozen before SEC-008's exit-code contract landed, so it still
+    # carries `"exit_code": 0` even for the `data_errors_*` fixtures that now legitimately exit
+    # 1 (asserted above, against the freshly parsed summary, not against the golden). Comparing
+    # `exit_code` here would fail every error fixture on an intentional, already-verified
+    # behaviour change; the real contract check happened above, so this field is excluded from
+    # the content diff instead of re-baselining every golden file.
+    actual_content = {key: value for key, value in actual.items() if key != "exit_code"}
+    expected_content = {key: value for key, value in expected.items() if key != "exit_code"}
+
+    if actual_content != expected_content:
         actual_path = _ACTUAL_DIR / f"{fixture_name}.actual.json"
         _write_json(actual_path, actual)
-        assert actual == expected, (
+        assert actual_content == expected_content, (
             f"golden mismatch for fixture {fixture_name!r}.\nActual output written to {actual_path} for inspection.\n"
             "See .claude/skills/golden-harness/SKILL.md before updating the golden."
         )

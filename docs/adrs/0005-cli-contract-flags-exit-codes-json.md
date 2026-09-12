@@ -1,10 +1,27 @@
 # ADR-0005: CLI contract: explicit flags, exit codes, JSON output; deprecate abbreviations and `.config/store.locale`
 
-- Status: Proposed (locale/`Bootstrap` removal implemented ahead of the rest — see status update below)
+- Status: Partially implemented (locale/`Bootstrap` removal, and now the flags/exit-code/JSON
+  slice below; `cli.py`/`AppContext`, `--format`, `--rules`, `--list-rules` remain open — see
+  status update below)
 - Date: 2026-08-25
 - Deciders: Mário de Araújo Carvalho (INPE) with the AI orchestrator
 
-## Status update (2026-09-12)
+## Status update (2026-09-12, second slice)
+
+The flags/exit-code/JSON slice of this ADR is implemented directly in `helpers/base/data_args.py`
+and `main.py` (no separate `cli.py`/`AppContext` yet — that split is left to a later phase):
+`allow_abbrev=False`; `-i/--input`/`-o/--output` as new aliases of `--input_folder`/
+`--output_folder` (kept, not deprecated, in this slice); `--i`/`--o`/`--l`/`--d` declared as
+explicit, deprecated two-dash aliases that print a stderr warning naming their replacement;
+`--json PATH`, `--fail-on {error,warning,never}`, and an offline `--version` added; exit codes
+standardised (`0`/`1`/`2` per `.specs/api/cli-contract.md`) with `main()` returning an `int` and
+`main.py` ending in `sys.exit(main())`; the welcome banner moved from `import`-time (mixed onto
+stdout) to inside `main()` on stderr. Still open: `cli.py`/`AppContext` as a distinct module,
+`--format`, `--rules`/`--skip-rules`, `--max-file-size`/`--max-rows`, `--parallel`,
+`--verbose`/`--quiet`, `--list-rules`, and deprecating `--input_folder`/`--output_folder`
+themselves — tracked under ARC-011/ARC-012 in `.specs/quality/backlog/03-architecture.md`.
+
+## Status update (2026-09-12, first slice)
 
 The locale slice of this ADR is implemented, ahead of the full `cli.py`/`AppContext` rewrite:
 `middleware/bootstrap.py` (`Bootstrap`) and the whole `middleware` package are deleted;
@@ -12,11 +29,7 @@ The locale slice of this ADR is implemented, ahead of the full `cli.py`/`AppCont
 explicit `locale: str | None` argument on `LanguageManager.__init__` (falls back to
 `LanguageEnum.DEFAULT_LANGUAGE.value` when `None`/unsupported, no file I/O either way);
 `GeneralContext` builds the one `LanguageManager` instance for a run from
-`data_args.data_file.locale` and injects it into `ApplicationConfig` and `FileSystemUtils`. The rest
-of this ADR (`cli.py`, `-i/-o/-l` short flags with `allow_abbrev=False`, `--json`, `--format`,
-`--fail-on`, standardised exit codes, moving the import-time banner behind `--verbose`) remains
-open and unimplemented — tracked under ARC-011/ARC-012/SEC-008 in
-`.specs/quality/backlog/03-architecture.md`.
+`data_args.data_file.locale` and injects it into `ApplicationConfig` and `FileSystemUtils`.
 
 ## Context
 
@@ -123,4 +136,4 @@ of it.
 - Related ADRs: ADR-0004 (JSON summary carries `Issue` data), ADR-0014 (locale/catalog)
 
 ---
-Last synced with code: a4f76c7
+Last synced with code: 344fef7 (ARC-011/SEC-008/PERF-004/ARC-012 slice, uncommitted at spec-sync time)

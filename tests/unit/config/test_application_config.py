@@ -76,6 +76,30 @@ class TestApplicationConfigClock:
         other_key = NamesEnum.FS.value
         assert verify_names[other_key] == f"{other_key}:None"
 
+    def test_get_verify_names_caches_after_first_call(self, mocker) -> None:
+        """PERF-004: a second `get_verify_names()` call must not re-hit the catalog.
+
+        `base_validator.py` calls `get_verify_names()` once per validator and
+        `FileReportGenerator` calls it twice more per run, so without caching
+        the same 34 lookups repeat on every call. Calling it twice here must
+        still only cost 34 `LanguageManager.text` calls in total (not 68).
+        """
+        mock_language_manager_cls = mocker.patch(
+            "data_validate.config.application_config.LanguageManager",
+        )
+        mock_language_manager = mock_language_manager_cls.return_value
+        mock_language_manager.text.side_effect = lambda key, value=None: f"{key}:{value}"
+
+        config = ApplicationConfig(clock=lambda: datetime(2024, 1, 1))
+
+        first_result = config.get_verify_names()
+        assert mock_language_manager.text.call_count == 34
+
+        second_result = config.get_verify_names()
+        assert mock_language_manager.text.call_count == 34
+
+        assert second_result is first_result
+
 
 class TestApplicationConfigLanguageManagerInjection:
     """Regression tests for ARC-002/BUG-004/BUG-023: a single injected `LanguageManager`."""

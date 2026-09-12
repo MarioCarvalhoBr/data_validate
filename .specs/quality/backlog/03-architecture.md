@@ -141,29 +141,40 @@ zero global state. Each item below names the current smell, where it lives, and 
   tooling under `tools/`; docs generated in CI.
 
 ### ARC-011 · CLI contract
-- Priority: P2 · Effort: M · Status: open
-- Where: `helpers/base/data_args.py:256-303` (documented flags `--i/--o/--l` exist only through
-  `allow_abbrev=True`; `--d` in `scripts/run_main_pipeline.bat`), no `--version`, no `--json`, exit
-  code always 0, stdout mixes progress and the `<{...}>` fragment (`main.py:8` prints at import).
-- Target: explicit aliases (`-i/--input`, `-o/--output`, `-l/--locale`), `--json PATH`,
-  `--format html,pdf,json`, `--fail-on warning|error`, `--version`, `--rules`, `--list-rules`; exit
-  codes documented in `.specs/api/cli-contract.md`. Keep old spellings as deprecated aliases for one
-  minor release.
-- Related: SEC-008, BUG-010
+- Priority: P2 · Effort: M · Status: in-progress
+- Where: `helpers/base/data_args.py` (was `:256-303`; documented flags `--i/--o/--l` existed only
+  through `allow_abbrev=True`; `--d` in `scripts/run_main_pipeline.bat`), `main.py`.
+- Done (this slice): `allow_abbrev=False`; explicit aliases `-i/--input`/`-o/--output` (kept
+  `--input_folder`/`--output_folder` as first-class, not deprecated — see decision note below);
+  `--i`/`--o`/`--l`/`--d` declared as explicit, deprecated two-dash aliases (stderr warning naming
+  the replacement on use); `--json PATH`; `--fail-on {error,warning,never}`; offline `--version`;
+  exit codes standardised (SEC-008, see there). Documented in `.specs/api/cli-contract.md`.
+- Still open (left to a later phase, judged out of this slice's scope): `--format
+  html,pdf,json,console`, `--rules`/`--skip-rules`, `--max-file-size`/`--max-rows`, `--parallel`,
+  `--verbose`/`--quiet`, `--list-rules`, a separate `cli.py`/`AppContext` module, and deprecating
+  `--input_folder`/`--output_folder` themselves. Decision: `--input_folder`/`--output_folder` were
+  *not* deprecated in this slice (unlike `.specs/api/cli-contract.md`'s original target table)
+  because the platform's actual invocation of those two flags is still the primary integration
+  point and deprecating them belongs with a coordinated platform-side migration, not a
+  drive-by change alongside the exit-code fix — tracked as the "still open" row above.
+- Related: SEC-008, BUG-010, ARC-012
 
 ### ARC-012 · `print()` for user output alongside logging
-- Priority: P2 · Effort: S · Status: open
-- Where: `main.py:8`, `spreadsheet_processor.py:98`, `general_context.py:103`,
-  `file_report_generator.py:153,263,335,340,361,368`, `language_manager.py:38,50,61-65`,
-  `bootstrap.py:76-81`, `metadata_info.py:74`.
+- Priority: P2 · Effort: S · Status: in-progress
+- Where: `main.py:8` (was; now `main.py`'s `main()`), `spreadsheet_processor.py:98`,
+  `general_context.py:103`, `file_report_generator.py:153,263,335,340,361,368`,
+  `language_manager.py:38,50,61-65`, `bootstrap.py:76-81`, `metadata_info.py:74`.
 - Target: `rich`/`logging` console handler with levels; stdout reserved for machine output.
-- Partial (BUG-004 side effect): `bootstrap.py` no longer exists (the whole `middleware` package
-  was deleted), so its `print()`s are gone with it — not converted, moot. `language_manager.py`'s
-  internal `print()`s (`_load_translations`, `set_language`) are replaced with
-  `logging.getLogger(__name__).warning(...)`/`.error(...)` calls, message text preserved verbatim.
-  `general_context.py:103`'s debug-mode `print("\nLog file created at:", ...)` is intentionally kept
-  as a `print()` for now (still open, tracked here) — only the file-persisted-locale prints were in
-  scope for this slice.
+- Done (this slice): the welcome banner (`main.py:8`) no longer prints at `import data_validate`
+  time; it prints once from inside `main()`, to stderr instead of stdout (ARC-011/SEC-008).
+- Partial (BUG-004 side effect, prior slice): `bootstrap.py` no longer exists (the whole
+  `middleware` package was deleted), so its `print()`s are gone with it — not converted, moot.
+  `language_manager.py`'s internal `print()`s (`_load_translations`, `set_language`) are replaced
+  with `logging.getLogger(__name__).warning(...)`/`.error(...)` calls, message text preserved
+  verbatim. `general_context.py:103`'s debug-mode `print("\nLog file created at:", ...)`,
+  `spreadsheet_processor.py:98`'s "Tempo total de execução" print, and every `print()` in
+  `file_report_generator.py` are intentionally kept as `print()` for now (still open, tracked
+  here) — only the banner was in scope for this slice.
 
 ### ARC-013 · Naming
 - Priority: P2 · Effort: S · Status: open

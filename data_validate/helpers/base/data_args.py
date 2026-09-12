@@ -11,7 +11,40 @@ This module defines classes for managing command-line arguments related to:
 
 import argparse
 import os
+import sys
 from abc import ABC, abstractmethod
+
+
+def _make_deprecated_alias_action(replacement: str) -> type[argparse.Action]:
+    """Build an `argparse.Action` for a legacy, two-dash short flag (ARC-011).
+
+    Flags like `--i`/`--o`/`--l`/`--d` only ever worked because
+    `allow_abbrev=True` let argparse prefix-match them onto the long option
+    names; now that `allow_abbrev` can be `False`, they are declared
+    explicitly, sharing the same destination as their modern replacement, so
+    they keep working for one deprecation window. Using one of them prints a
+    single warning line to stderr (developer-facing, plain English) naming
+    the replacement, then behaves exactly like the replacement flag.
+
+    Args:
+        replacement: Human-readable name of the flag(s) that replace this alias.
+
+    Returns:
+        type[argparse.Action]: A concrete `argparse.Action` subclass.
+    """
+
+    class _DeprecatedAliasAction(argparse.Action):
+        """Stores a value under the replacement's destination, with a warning."""
+
+        def __call__(self, parser, namespace, values, option_string=None):
+            print(
+                f"Warning: '{option_string}' is deprecated; use '{replacement}' instead.",
+                file=sys.stderr,
+            )
+            value = self.const if self.nargs == 0 else values
+            setattr(namespace, self.dest, value)
+
+    return _DeprecatedAliasAction
 
 
 class DataModelABC(ABC):
@@ -224,6 +257,8 @@ class DataArgs:
         data_action (DataAction): Instance handling execution flags.
         data_report (DataReport): Instance handling report metadata.
         allow_abbrev (bool): Whether to allow argument abbreviation in argparse.
+        json_path (str | None): Path to write the JSON validation summary to, or None.
+        fail_on (str): Exit-code policy: "error" (default), "warning", or "never".
     """
 
     def __init__(self, allow_abbrev=True):
@@ -238,6 +273,8 @@ class DataArgs:
         self.data_action = None
         self.data_report = None
         self.allow_abbrev = allow_abbrev
+        self.json_path: str | None = None
+        self.fail_on: str = "error"
 
         # Run the argument parser
         self.run()
@@ -252,15 +289,32 @@ class DataArgs:
         Returns:
             argparse.ArgumentParser: The configured argument parser.
         """
+        # Local import: `metadata_info` (via `data_validate.config`) transitively imports
+        # `helpers.base.constant_base`, which would re-enter `helpers/base/__init__.py`
+        # (which imports this very module) if this were a top-level import — a circular
+        # import. Deferring it to call time (after the package has finished loading) avoids it.
+        from data_validate.config.metadata_info import METADATA
+
         parser = argparse.ArgumentParser(
             description="Adapta Parser - Processes the program arguments.",
             allow_abbrev=self.allow_abbrev,
         )
 
         # Arguments for DataFile
-        parser.add_argument("--input_folder", type=str, required=True, help="Path to the input folder.")
         parser.add_argument(
+            "-i",
+            "--input",
+            "--input_folder",
+            dest="input_folder",
+            type=str,
+            default=None,
+            help="Path to the input folder.",
+        )
+        parser.add_argument(
+            "-o",
+            "--output",
             "--output_folder",
+            dest="output_folder",
             default="output_data/",
             type=str,
             help="Path to the output folder.",
@@ -272,6 +326,30 @@ class DataArgs:
             choices=["pt_BR", "en_US"],
             default="pt_BR",
             help="Sets the locale (pt_BR or en_US).",
+        )
+
+        # Deprecated two-dash short aliases (ARC-011) — see `_make_deprecated_alias_action`.
+        parser.add_argument(
+            "--i",
+            dest="input_folder",
+            action=_make_deprecated_alias_action("-i/--input"),
+            default=argparse.SUPPRESS,
+            help=argparse.SUPPRESS,
+        )
+        parser.add_argument(
+            "--o",
+            dest="output_folder",
+            action=_make_deprecated_alias_action("-o/--output"),
+            default=argparse.SUPPRESS,
+            help=argparse.SUPPRESS,
+        )
+        parser.add_argument(
+            "--l",
+            dest="locale",
+            choices=["pt_BR", "en_US"],
+            action=_make_deprecated_alias_action("-l/--locale"),
+            default=argparse.SUPPRESS,
+            help=argparse.SUPPRESS,
         )
 
         # Arguments for DataAction
@@ -292,12 +370,44 @@ class DataArgs:
             help="Hides the script version in the final report.",
         )
         parser.add_argument("--debug", action="store_true", help="Runs the program in debug mode.")
+        parser.add_argument(
+            "--d",
+            dest="debug",
+            nargs=0,
+            const=True,
+            action=_make_deprecated_alias_action("--debug"),
+            default=argparse.SUPPRESS,
+            help=argparse.SUPPRESS,
+        )
 
         # Arguments for DataReport
         parser.add_argument("--sector", type=str, default=None, help="Name of the strategic sector.")
         parser.add_argument("--protocol", type=str, default=None, help="Name of the protocol.")
         parser.add_argument("--user", type=str, default=None, help="Name of the user.")
         parser.add_argument("--file", type=str, default=None, help="Name of the file to be analyzed.")
+
+        # CLI-contract flags (ARC-011/SEC-008): JSON summary file and exit-code policy.
+        parser.add_argument(
+            "--json",
+            dest="json_path",
+            type=str,
+            default=None,
+            metavar="PATH",
+            help="Write the JSON validation summary to PATH as pretty JSON (UTF-8).",
+        )
+        parser.add_argument(
+            "--fail-on",
+            dest="fail_on",
+            choices=["error", "warning", "never"],
+            default="error",
+            help="Exit code policy: fail on validation errors (default), on any warning, or never.",
+        )
+        parser.add_argument(
+            "--version",
+            action="version",
+            version=f"%(prog)s {METADATA.__version__}",
+            help="Show the program's version number and exit.",
+        )
 
         return parser
 
@@ -352,12 +462,20 @@ class DataArgs:
         1. Creates the parser.
         2. Parses arguments from sys.argv.
         3. Initializes `DataFile`, `DataAction`, and `DataReport` with parsed values.
+
+        Raises:
+            SystemExit: Via `parser.error()` when none of `--input_folder`/`--input`/`-i`
+                was given (input is required, but shared across three aliases, so it
+                cannot be declared `required=True` on a single `argparse` action).
         """
         # Create argument parser
         parser = self._create_parser()
 
         # Parse arguments
         args = parser.parse_args()
+
+        if not args.input_folder:
+            parser.error("the following arguments are required: --input_folder/--input/-i")
 
         # Set attributes: DataFile, DataAction, DataReport
         self.data_file = DataFile(args.input_folder, args.output_folder, args.locale)
@@ -369,3 +487,5 @@ class DataArgs:
             args.debug,
         )
         self.data_report = DataReport(args.sector, args.protocol, args.user, args.file)
+        self.json_path = args.json_path
+        self.fail_on = args.fail_on

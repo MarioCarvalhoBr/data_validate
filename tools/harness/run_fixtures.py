@@ -237,14 +237,28 @@ def main(argv: list[str] | None = None) -> int:
     runs = [run_fixture(input_dir, output_dir, fixture, args.locale, timeout=args.timeout) for fixture in fixtures]
     _print_summary_table(runs)
 
-    # The `data_validate` CLI always exits 0 today, even when validation errors are found
-    # (SEC-008 — no non-zero exit code on failure yet). Until that lands, `run.exit_code != 0`
-    # alone cannot detect a failed run, so a fixture also counts as failed when its parsed JSON
-    # summary reports a non-zero `errors` count (or the summary could not be parsed at all).
-    failed = [run for run in runs if run.exit_code != 0 or run.errors is None or run.errors > 0]
+    # SEC-008: the CLI's exit code is now the documented contract (0 = no errors, 1 =
+    # validation errors found, 2 = a runtime failure — `.specs/api/cli-contract.md`), so it is
+    # trusted directly instead of being reconstructed from the parsed JSON summary. The parsed
+    # summary is kept only as a cross-check: it flags (without failing the run on its own) a
+    # fixture whose exit code disagrees with its own reported error count, which would signal a
+    # regression in the CLI's exit-code contract itself.
+    failed = [run for run in runs if run.exit_code != 0]
+    inconsistent = [
+        run
+        for run in runs
+        if run.errors is not None and run.exit_code in (0, 1) and (run.errors > 0) != (run.exit_code == 1)
+    ]
+    if inconsistent:
+        inconsistent_names = ", ".join(run.fixture for run in inconsistent)
+        print(
+            f"\nwarning: exit code disagrees with reported error count for: {inconsistent_names}",
+            file=sys.stderr,
+        )
+
     if failed:
         failed_names = ", ".join(run.fixture for run in failed)
-        print(f"\n{len(failed)} fixture(s) failed (non-zero exit or validation errors):", file=sys.stderr)
+        print(f"\n{len(failed)} fixture(s) failed (non-zero exit code):", file=sys.stderr)
         print(f"  {failed_names}", file=sys.stderr)
         return 1
     return 0
