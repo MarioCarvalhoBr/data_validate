@@ -4,11 +4,10 @@ Module for bootstrapping application configuration and environment settings.
 
 This module defines the `Bootstrap` class, which handles initial setup tasks
 such as locale configuration and environment validation before the main
-application logic executes. It supports concurrent execution of setup tasks.
+application logic executes.
 """
 
 import os
-from concurrent.futures import ThreadPoolExecutor
 
 from data_validate.helpers.base.data_args import DataArgs
 from data_validate.helpers.tools.locale.language_enum import LanguageEnum
@@ -19,8 +18,7 @@ class Bootstrap:
     Application bootstrap manager for initial configuration.
 
     Handles environment setup tasks, specifically locale management validation
-    and persistence. It uses thread pooling to execute independent setup tasks
-    concurrently during initialization.
+    and persistence.
 
     Attributes:
         config_dir (str): Path to the user's configuration directory.
@@ -85,26 +83,21 @@ class Bootstrap:
 
     def run(self, args: DataArgs):
         """
-        Execute bootstrap tasks concurrently using thread pool.
+        Execute bootstrap tasks.
 
-        Runs independent initialization tasks (like locale setup) in parallel
-        threads to speed up startup.
+        Runs the initialization tasks (currently, locale setup) directly —
+        there is only one task, so no thread pool is needed.
 
         Args:
             args (DataArgs): Parsed command-line arguments containing configuration.
 
         Raises:
-            TypeError: If `args` is not an instance of `DataArgs`.
             ValueError: If `args` is None.
+            TypeError: If `args` is not an instance of `DataArgs`.
         """
-        if not isinstance(args, DataArgs):
-            raise TypeError("The 'args' parameter must be an instance of the DataArgs class.")
         if args is None:
             raise ValueError("The 'args' parameter cannot be None.")
+        if not isinstance(args, DataArgs):
+            raise TypeError("The 'args' parameter must be an instance of the DataArgs class.")
 
-        with ThreadPoolExecutor() as executor:
-            tasks = [
-                executor.submit(self._check_and_set_locale, args.data_file.locale),
-            ]
-            for task in tasks:
-                task.result()  # Wait for each task to complete
+        self._check_and_set_locale(args.data_file.locale)

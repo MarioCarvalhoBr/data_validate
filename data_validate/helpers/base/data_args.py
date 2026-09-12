@@ -76,16 +76,20 @@ class DataFile(DataModelABC):
         """
         Validate the file-related arguments.
 
-        Checks if the input folder exists and if the output folder name is valid
-        (cannot be a file name, must be a directory path).
+        Checks if the input folder exists and if the output folder path is
+        usable as a directory: any path is accepted, including ones whose
+        basename contains a dot (e.g. `run.2026-08`, `v1.2`), except a path
+        that already exists as a regular file, which can never become a
+        directory.
 
         Raises:
-            ValueError: If the input folder does not exist or the output folder name is invalid.
+            ValueError: If the input folder does not exist or the output folder path
+                already exists as a regular file.
         """
         if not os.path.isdir(self.input_folder):
             raise ValueError(f"Input folder does not exist: {self.input_folder}")
 
-        if os.path.splitext(os.path.basename(self.output_folder))[1] != "" or "." in os.path.basename(self.output_folder):
+        if os.path.isfile(self.output_folder):
             raise ValueError(f"Output folder name is invalid: {self.output_folder}")
 
     def run(self):

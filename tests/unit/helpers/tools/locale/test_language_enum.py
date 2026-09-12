@@ -179,3 +179,21 @@ class TestLanguageEnumIntegration:
         assert process_language(LanguageEnum.PT_BR) == "Processing pt_BR"
         assert process_language(LanguageEnum.EN_US) == "Processing en_US"
         assert process_language(LanguageEnum.DEFAULT_LANGUAGE) == "Processing pt_BR"
+
+
+class TestLanguageEnumBug012DeliberateAlias:
+    """Regression tests pinning BUG-012's deliberate `DEFAULT_LANGUAGE` alias.
+
+    `DEFAULT_LANGUAGE` is intentionally kept as an `Enum` alias of `PT_BR`
+    (see the class docstring in `language_enum.py`); BUG-012 is marked
+    won't-fix in `.specs/quality/backlog/01-bugs.md` and this test exists to
+    catch an accidental behaviour change if the alias is ever touched.
+    """
+
+    def test_default_language_is_identical_to_pt_br(self) -> None:
+        """`DEFAULT_LANGUAGE` must be the exact same enum member as `PT_BR`."""
+        assert LanguageEnum.DEFAULT_LANGUAGE is LanguageEnum.PT_BR
+
+    def test_list_supported_languages_has_exactly_two_entries(self) -> None:
+        """The alias must not introduce a third, spurious supported language."""
+        assert LanguageEnum.list_supported_languages() == ["pt_BR", "en_US"]

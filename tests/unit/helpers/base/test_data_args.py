@@ -97,18 +97,31 @@ class TestDataFile:
             DataFile(input_folder=invalid_input, output_folder=temp_output_dir, locale="en_US")
 
     def test_init_with_invalid_output_folder_extension(self, temp_input_dir: str) -> None:
-        """Test DataFile initialization with output folder having file extension."""
-        invalid_output = "/path/to/output.txt"
+        """Test DataFile initialization with an output folder path that is an existing file.
+
+        BUG-009: the output-folder check rejects a path only when it already
+        exists as a regular file, not merely because its basename looks like
+        a filename with an extension.
+        """
+        invalid_output = os.path.join(temp_input_dir, "output.txt")
+        with open(invalid_output, "w", encoding="utf-8") as f:
+            f.write("content")
 
         with pytest.raises(ValueError, match="Output folder name is invalid"):
             DataFile(input_folder=temp_input_dir, output_folder=invalid_output, locale="pt_BR")
 
     def test_init_with_output_folder_containing_dots(self, temp_input_dir: str) -> None:
-        """Test DataFile initialization with output folder containing dots."""
-        invalid_output = "/path/to/out.put"
+        """Test DataFile initialization with a non-existent output folder containing dots.
 
-        with pytest.raises(ValueError, match="Output folder name is invalid"):
-            DataFile(input_folder=temp_input_dir, output_folder=invalid_output, locale="pt_BR")
+        BUG-009: folder names such as `out.put` (or `run.2026-08`, `v1.2`)
+        must be accepted; a dot in the basename is not, by itself, a reason
+        to reject an output folder.
+        """
+        output_with_dots = "/path/to/out.put"
+
+        data_file = DataFile(input_folder=temp_input_dir, output_folder=output_with_dots, locale="pt_BR")
+
+        assert data_file.output_folder == output_with_dots
 
     def test_validate_arguments_called_during_init(self, temp_input_dir: str, mocker) -> None:
         """Test that _validate_arguments is called during initialization."""
@@ -128,12 +141,48 @@ class TestDataFile:
         mock_validate.assert_called_once()
 
 
+class TestDataFileOutputFolderDots:
+    """Regression tests for BUG-009: output folder names containing a dot."""
+
+    @pytest.fixture
+    def temp_input_dir(self) -> Generator[str, None, None]:
+        """Create temporary input directory for testing."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            yield temp_dir
+
+    @pytest.mark.parametrize(
+        "dotted_output_folder",
+        [
+            "run.2026-08",
+            "v1.2",
+            "/path/to/run.2026-08",
+            "/path/to/v1.2",
+        ],
+    )
+    def test_output_folder_with_dot_is_accepted(self, dotted_output_folder: str, temp_input_dir: str) -> None:
+        """A non-existent output folder path containing a dot must be accepted."""
+        data_file = DataFile(input_folder=temp_input_dir, output_folder=dotted_output_folder, locale="pt_BR")
+
+        assert data_file.output_folder == dotted_output_folder
+
+    def test_output_folder_that_is_an_existing_file_is_rejected(self, temp_input_dir: str) -> None:
+        """An output folder path that already exists as a regular file must be rejected."""
+        existing_file = os.path.join(temp_input_dir, "already_a_file.txt")
+        with open(existing_file, "w", encoding="utf-8") as f:
+            f.write("content")
+
+        with pytest.raises(ValueError, match="Output folder name is invalid"):
+            DataFile(input_folder=temp_input_dir, output_folder=existing_file, locale="pt_BR")
+
+
 class TestDataAction:
     """Test suite for DataAction class."""
 
     def test_init_with_all_boolean_values(self) -> None:
         """Test DataAction initialization with all boolean values."""
-        data_action = DataAction(no_spellchecker=True, no_warning_titles_length=False, no_time=True, no_version=False, debug=True)
+        data_action = DataAction(
+            no_spellchecker=True, no_warning_titles_length=False, no_time=True, no_version=False, debug=True
+        )
 
         assert data_action.no_spellchecker is True
         assert data_action.no_warning_titles_length is False
@@ -144,12 +193,16 @@ class TestDataAction:
     def test_init_with_none_values_raises_error(self) -> None:
         """Test DataAction initialization with None values raises validation error."""
         with pytest.raises(ValueError, match="no_spellchecker must be a boolean value"):
-            DataAction(no_spellchecker=None, no_warning_titles_length=False, no_time=False, no_version=False, debug=False)
+            DataAction(
+                no_spellchecker=None, no_warning_titles_length=False, no_time=False, no_version=False, debug=False
+            )
 
     def test_validate_arguments_with_invalid_no_spellchecker(self) -> None:
         """Test validation error when no_spellchecker is not boolean."""
         with pytest.raises(ValueError, match="no_spellchecker must be a boolean value"):
-            DataAction(no_spellchecker="invalid", no_warning_titles_length=True, no_time=True, no_version=True, debug=True)
+            DataAction(
+                no_spellchecker="invalid", no_warning_titles_length=True, no_time=True, no_version=True, debug=True
+            )
 
     def test_validate_arguments_with_invalid_no_warning_titles_length(self) -> None:
         """Test validation error when no_warning_titles_length is not boolean."""
@@ -446,7 +499,9 @@ class TestDataArgsDataDrivenTests:
             (False, False),
         ],
     )
-    def test_allow_abbrev_parameter(self, allow_abbrev: bool, expected_abbrev: bool, temp_input_dir: str, mocker) -> None:
+    def test_allow_abbrev_parameter(
+        self, allow_abbrev: bool, expected_abbrev: bool, temp_input_dir: str, mocker
+    ) -> None:
         """Test DataArgs with different allow_abbrev settings."""
         # Setup mocks
         mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
@@ -479,7 +534,9 @@ class TestDataArgsDataDrivenTests:
             ("en_US", "en_US"),
         ],
     )
-    def test_locale_parameter_variations(self, locale_value: str, expected_locale: str, temp_input_dir: str, mocker) -> None:
+    def test_locale_parameter_variations(
+        self, locale_value: str, expected_locale: str, temp_input_dir: str, mocker
+    ) -> None:
         """Test DataArgs with different locale values."""
         # Setup mocks
         mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
@@ -509,20 +566,58 @@ class TestDataArgsDataDrivenTests:
         "boolean_flags,expected_values",
         [
             (
-                {"no_spellchecker": True, "no_warning_titles_length": False, "no_time": True, "no_version": False, "debug": True},
-                {"no_spellchecker": True, "no_warning_titles_length": False, "no_time": True, "no_version": False, "debug": True},
+                {
+                    "no_spellchecker": True,
+                    "no_warning_titles_length": False,
+                    "no_time": True,
+                    "no_version": False,
+                    "debug": True,
+                },
+                {
+                    "no_spellchecker": True,
+                    "no_warning_titles_length": False,
+                    "no_time": True,
+                    "no_version": False,
+                    "debug": True,
+                },
             ),
             (
-                {"no_spellchecker": False, "no_warning_titles_length": True, "no_time": False, "no_version": True, "debug": False},
-                {"no_spellchecker": False, "no_warning_titles_length": True, "no_time": False, "no_version": True, "debug": False},
+                {
+                    "no_spellchecker": False,
+                    "no_warning_titles_length": True,
+                    "no_time": False,
+                    "no_version": True,
+                    "debug": False,
+                },
+                {
+                    "no_spellchecker": False,
+                    "no_warning_titles_length": True,
+                    "no_time": False,
+                    "no_version": True,
+                    "debug": False,
+                },
             ),
             (
-                {"no_spellchecker": True, "no_warning_titles_length": True, "no_time": True, "no_version": True, "debug": True},
-                {"no_spellchecker": True, "no_warning_titles_length": True, "no_time": True, "no_version": True, "debug": True},
+                {
+                    "no_spellchecker": True,
+                    "no_warning_titles_length": True,
+                    "no_time": True,
+                    "no_version": True,
+                    "debug": True,
+                },
+                {
+                    "no_spellchecker": True,
+                    "no_warning_titles_length": True,
+                    "no_time": True,
+                    "no_version": True,
+                    "debug": True,
+                },
             ),
         ],
     )
-    def test_boolean_flags_combinations(self, boolean_flags: Dict[str, bool], expected_values: Dict[str, bool], temp_input_dir: str, mocker) -> None:
+    def test_boolean_flags_combinations(
+        self, boolean_flags: Dict[str, bool], expected_values: Dict[str, bool], temp_input_dir: str, mocker
+    ) -> None:
         """Test DataArgs with different combinations of boolean flags."""
         # Setup mocks
         mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
@@ -627,22 +722,37 @@ class TestDataArgsEdgeCases:
     def test_data_action_invalid_type_validation(self, invalid_type_value: Any, expected_error: str) -> None:
         """Test DataAction validation with various invalid types."""
         with pytest.raises(ValueError, match=expected_error):
-            DataAction(no_spellchecker=invalid_type_value, no_warning_titles_length=True, no_time=True, no_version=True, debug=True)
+            DataAction(
+                no_spellchecker=invalid_type_value,
+                no_warning_titles_length=True,
+                no_time=True,
+                no_version=True,
+                debug=True,
+            )
 
     @pytest.mark.parametrize(
-        "invalid_folder_name",
+        "file_name",
         [
-            "/path/to/file.txt",
-            "/path/to/file.xlsx",
-            "/path/to/config.json",
-            "/path/to/data.csv",
-            "/path/to/script.py",
+            "file.txt",
+            "file.xlsx",
+            "config.json",
+            "data.csv",
+            "script.py",
         ],
     )
-    def test_data_file_invalid_output_folder_names(self, invalid_folder_name: str, temp_input_dir: str) -> None:
-        """Test DataFile validation with various invalid output folder names."""
+    def test_data_file_invalid_output_folder_names(self, file_name: str, temp_input_dir: str) -> None:
+        """Test DataFile validation rejects output folders that are existing files.
+
+        BUG-009: a path is only invalid as an output folder when it already
+        exists as a regular file; these fixtures create such a file before
+        asserting rejection.
+        """
+        existing_file = os.path.join(temp_input_dir, file_name)
+        with open(existing_file, "w", encoding="utf-8") as f:
+            f.write("content")
+
         with pytest.raises(ValueError, match="Output folder name is invalid"):
-            DataFile(input_folder=temp_input_dir, output_folder=invalid_folder_name, locale="pt_BR")
+            DataFile(input_folder=temp_input_dir, output_folder=existing_file, locale="pt_BR")
 
 
 class TestDataArgsIntegration:

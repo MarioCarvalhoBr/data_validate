@@ -29,6 +29,13 @@ class LanguageEnum(enum.Enum):
     Attributes:
         PT_BR (str): Represents the Brazilian Portuguese language code ('pt_BR').
         EN_US (str): Represents the American English language code ('en_US').
+        DEFAULT_LANGUAGE (str): Deliberate alias of `PT_BR` (same value, `"pt_BR"`).
+            `enum.Enum` deduplicates members with equal values, so
+            `DEFAULT_LANGUAGE is PT_BR` and iterating `LanguageEnum` yields only
+            two members; this lets call sites write `LanguageEnum.DEFAULT_LANGUAGE.value`
+            without needing a separate constant. See BUG-012 in
+            `.specs/quality/backlog/01-bugs.md` (won't-fix: pinned by tests,
+            folds into the ARC-002/BUG-004 locale refactor instead).
     """
 
     PT_BR = "pt_BR"
