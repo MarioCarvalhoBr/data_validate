@@ -71,6 +71,12 @@
   "validator_structure_error_empty_directory": {
     "message": "The directory '{dir_path}' is empty. Please add the required files."
   },
+  "loader_error_file_too_large": {
+    "message": "{filename}: The file exceeds the maximum allowed size ({size_mb} MB > {limit_mb} MB) and will not be read."
+  },
+  "loader_error_sheet_too_big": {
+    "message": "{filename}: The sheet exceeds the maximum allowed size ({rows} rows x {columns} columns > {max_rows} rows x {max_columns} columns) and will not be read."
+  },
   "verification_name_file_structure": {
     "message": "Structure of the input folder files"
   },

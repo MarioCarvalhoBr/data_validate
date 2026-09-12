@@ -119,24 +119,44 @@ class SpreadsheetProcessor:
         self.context.logger.info("Data reading and preprocessing...")
 
         # 0 ETL: Extract, Transform, Load
-        self.data_loader_facade = tools.DataLoaderFacade(self.input_folder)
+        self.data_loader_facade = tools.DataLoaderFacade(
+            self.input_folder,
+            translate=self.language_manager.text,
+            limits=(
+                self.context.config.MAX_INPUT_FILE_BYTES,
+                self.context.config.MAX_SHEET_ROWS,
+                self.context.config.MAX_SHEET_COLUMNS,
+            ),
+        )
         self.raw_data_map, load_errors = self.data_loader_facade.load_all
         self.validation_reports.extend(self.validation_titles[config.NamesEnum.FS.value], errors=load_errors)
 
         # Verify scenarios and legend existence
         if self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].is_read_successful and (
-            models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name in self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].raw_data.columns
+            models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name
+            in self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].raw_data.columns
         ):
             self.scenarios = (
-                self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].raw_data[models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name].unique().tolist()
+                self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME]
+                .raw_data[models.SpScenario.RequiredColumn.COLUMN_SYMBOL.name]
+                .unique()
+                .tolist()
             )
         # Setup model_configurations for model initialization
         self.model_configurations = {
-            models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].does_file_exist,
-            models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].is_read_successful,
+            models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.raw_data_map[
+                models.SpScenario.CONSTANTS.SP_NAME
+            ].does_file_exist,
+            models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.raw_data_map[
+                models.SpScenario.CONSTANTS.SP_NAME
+            ].is_read_successful,
             models.SpModelABC.VAR_CONSTS.SCENARIOS: self.scenarios,
-            models.SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.raw_data_map[models.SpLegend.CONSTANTS.SP_NAME].does_file_exist,
-            models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.raw_data_map[models.SpLegend.CONSTANTS.SP_NAME].is_read_successful,
+            models.SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.raw_data_map[
+                models.SpLegend.CONSTANTS.SP_NAME
+            ].does_file_exist,
+            models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.raw_data_map[
+                models.SpLegend.CONSTANTS.SP_NAME
+            ].is_read_successful,
         }
 
     def _configure(self) -> None:
@@ -192,27 +212,49 @@ class SpreadsheetProcessor:
         self.context.logger.info("Building validation pipeline...")
 
         # Create the DataContext with the initialized models
-        self.data_models_context = controllers.DataModelContext(context=self.context, initialized_models=self.initialized_models)
+        self.data_models_context = controllers.DataModelContext(
+            context=self.context, initialized_models=self.initialized_models
+        )
 
         # RUN ALL VALIDATIONS PIPELINE
 
         # 1. Validate the structure of the data
-        validators.FileStructureValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
+        validators.FileStructureValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
 
         # 2. Validate the spelling of the data
-        validators.SpellCheckerValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
+        validators.SpellCheckerValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
 
         # 3. Validate spreadsheet data mandatory
-        validators.SpDescriptionValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
-        validators.SpCompositionGraphValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
-        validators.SpCompositionTreeValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
-        validators.SpTemporalReferenceValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
+        validators.SpDescriptionValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
+        validators.SpCompositionGraphValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
+        validators.SpCompositionTreeValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
+        validators.SpTemporalReferenceValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
 
         # 4. Validate spreadsheet data optional
-        validators.SpProportionalityValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
-        validators.SpValueValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
-        validators.SpScenarioValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
-        validators.SpLegendValidator(data_models_context=self.data_models_context, validation_reports=self.validation_reports)
+        validators.SpProportionalityValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
+        validators.SpValueValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
+        validators.SpScenarioValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
+        validators.SpLegendValidator(
+            data_models_context=self.data_models_context, validation_reports=self.validation_reports
+        )
 
     def _report(self) -> None:
         """

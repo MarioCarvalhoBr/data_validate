@@ -71,6 +71,12 @@
   "validator_structure_error_empty_directory": {
     "message": "O diretório '{dir_path}' está vazio. Por favor, adicione os arquivos necessários."
   },
+  "loader_error_file_too_large": {
+    "message": "{filename}: O arquivo excede o tamanho máximo permitido ({size_mb} MB > {limit_mb} MB) e não será lido."
+  },
+  "loader_error_sheet_too_big": {
+    "message": "{filename}: A planilha excede o tamanho máximo permitido ({rows} linhas x {columns} colunas > {max_rows} linhas x {max_columns} colunas) e não será lida."
+  },
    "verification_name_file_structure": {
     "message": "Estrutura dos arquivos da pasta de entrada"
   },

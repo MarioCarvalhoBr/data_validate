@@ -20,7 +20,6 @@ separate, explicit test documents the empty-string-becomes-NaN behaviour.
 from pathlib import Path
 
 import pandas as pd
-import pytest
 from hypothesis import HealthCheck, given, settings, strategies as st
 
 from data_validate.helpers.tools.data_loader.readers.csv_reader import CSVReader
@@ -124,32 +123,57 @@ class TestCSVReaderNaNNormalisation:
         assert result.loc[1, "a"] == " "
 
 
+class TestCSVReaderTrailingBlankLineNormalisation:
+    """BUG-029 trade-off: `skip_blank_lines=False` makes a genuinely empty line (0 characters)
+    round-trip as an all-NaN row instead of being skipped. `CSVReader` trims that back out, but
+    only at the *end* of the frame -- an interior blank line is preserved.
+    """
+
+    def test_trailing_empty_line_does_not_become_an_extra_row(self, tmp_path: Path) -> None:
+        """A genuinely empty trailing line is dropped, not turned into an all-NaN row."""
+        csv_path = tmp_path / "descricao.csv"
+        csv_path.write_text("a|b\nfoo|1\nbar|2\n\n", encoding="utf-8")
+
+        result = CSVReader(csv_path, SingleHeaderStrategy()).read()
+
+        assert result.shape == (2, 2)
+        assert result["a"].tolist() == ["foo", "bar"]
+
+    def test_multiple_trailing_empty_lines_are_all_dropped(self, tmp_path: Path) -> None:
+        """More than one trailing blank line is fully trimmed, not just the last one."""
+        csv_path = tmp_path / "descricao.csv"
+        csv_path.write_text("a|b\nfoo|1\n\n\n", encoding="utf-8")
+
+        result = CSVReader(csv_path, SingleHeaderStrategy()).read()
+
+        assert result.shape == (1, 2)
+
+    def test_interior_blank_line_is_preserved(self, tmp_path: Path) -> None:
+        """A blank line in the middle of the file is kept as an all-NaN row, not trimmed."""
+        csv_path = tmp_path / "descricao.csv"
+        csv_path.write_text("a|b\nfoo|1\n\nbar|2\n", encoding="utf-8")
+
+        result = CSVReader(csv_path, SingleHeaderStrategy()).read()
+
+        assert result.shape == (3, 2)
+        assert pd.isna(result.loc[1, "a"])
+        assert pd.isna(result.loc[1, "b"])
+        assert result.loc[2, "a"] == "bar"
+
+
 class TestCSVReaderSingleColumnBlankLineBugCandidate:
-    """BUG candidate found while probing the round-trip property (TST-005).
+    """Former BUG candidate found while probing the round-trip property (TST-005), now fixed
+    (BUG-029).
 
     In a single-column CSV (no `|` on the line at all), a row whose sole cell is a
     whitespace-only string is indistinguishable, to pandas' `skip_blank_lines=True`
-    default, from a genuinely blank line -- so the row is silently dropped on read,
-    even though `CSVReader` always passes `dtype=str` and never asks for blank lines
-    to be skipped explicitly. Multi-column rows are unaffected (the `|` separator(s)
-    make the line non-blank). Real bundle sheets (`descricao`, `composicao`, ...)
-    always have >= 2 columns, so production impact is likely low, but the reader
-    has no size/shape invariant guarding against silent row loss.
+    default, from a genuinely blank line -- so the row was silently dropped on read.
+    `CSVReader` now reads with `skip_blank_lines=False`, so the row survives. Multi-column
+    rows were never affected (the `|` separator(s) make the line non-blank).
     """
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BUG candidate (TST-005 property finding): CSVReader silently drops a row "
-            "in a single-column CSV when that row's only cell is whitespace-only, "
-            "because pandas' read_csv default skip_blank_lines=True treats a line with "
-            "no separator and only whitespace as blank. "
-            'Repro: pd.DataFrame({"0": [" "]}).to_csv(path, sep="|", index=False) then '
-            "CSVReader(path, SingleHeaderStrategy()).read() returns shape (0, 1), not (1, 1)."
-        ),
-    )
-    def test_single_column_whitespace_row_is_dropped(self, tmp_path: Path) -> None:
-        """A single-column frame with a whitespace-only row loses that row on read."""
+    def test_single_column_whitespace_row_is_kept(self, tmp_path: Path) -> None:
+        """A single-column frame with a whitespace-only row round-trips (BUG-029 fixed)."""
         dataframe = pd.DataFrame({"0": [" "]})
         csv_path = tmp_path / "descricao.csv"
         dataframe.to_csv(csv_path, sep="|", index=False)
@@ -157,3 +181,4 @@ class TestCSVReaderSingleColumnBlankLineBugCandidate:
         result = CSVReader(csv_path, SingleHeaderStrategy()).read()
 
         assert result.shape == dataframe.shape
+        assert result.iloc[0, 0] == " "

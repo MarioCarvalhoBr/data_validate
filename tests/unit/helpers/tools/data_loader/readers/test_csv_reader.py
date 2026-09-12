@@ -7,10 +7,11 @@ CSV file reading, header processing, and separator handling.
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
+import numpy as np
 import pandas as pd
 from pathlib import Path
 
-from data_validate.helpers.tools.data_loader.readers.csv_reader import CSVReader
+from data_validate.helpers.tools.data_loader.readers.csv_reader import CSVReader, _drop_trailing_blank_rows
 from data_validate.helpers.tools.data_loader.strategies.header import DoubleHeaderStrategy
 
 
@@ -231,4 +232,60 @@ class TestCSVReader:
         reader._read_file()
 
         # Check that pandas.read_csv was called with correct parameters
-        mock_read_csv.assert_called_once_with(file_path, header=0, sep=";", low_memory=False, dtype=str)
+        mock_read_csv.assert_called_once_with(
+            file_path, header=0, sep=";", low_memory=False, dtype=str, skip_blank_lines=False
+        )
+
+
+class TestDropTrailingBlankRows:
+    """Unit tests for the BUG-029 trailing-blank-row trimming helper."""
+
+    def test_empty_frame_is_returned_unchanged(self) -> None:
+        """An already-empty frame is returned as-is."""
+        df = pd.DataFrame()
+
+        result = _drop_trailing_blank_rows(df)
+
+        assert result is df
+
+    def test_frame_with_no_blank_rows_is_unchanged(self) -> None:
+        """A frame with no fully-NaN row at all is returned unchanged."""
+        df = pd.DataFrame({"a": ["x", "y"], "b": ["1", "2"]})
+
+        result = _drop_trailing_blank_rows(df)
+
+        pd.testing.assert_frame_equal(result, df)
+
+    def test_trailing_blank_rows_are_dropped(self) -> None:
+        """One or more fully-NaN rows at the end are trimmed."""
+        df = pd.DataFrame({"a": ["x", "y", np.nan, np.nan], "b": ["1", "2", np.nan, np.nan]})
+
+        result = _drop_trailing_blank_rows(df)
+
+        assert result.shape == (2, 2)
+        assert result["a"].tolist() == ["x", "y"]
+
+    def test_interior_blank_row_is_preserved(self) -> None:
+        """A fully-NaN row that is not at the end is left untouched."""
+        df = pd.DataFrame({"a": ["x", np.nan, "y"], "b": ["1", np.nan, "2"]})
+
+        result = _drop_trailing_blank_rows(df)
+
+        assert result.shape == (3, 2)
+        assert pd.isna(result.loc[1, "a"])
+
+    def test_all_blank_frame_becomes_empty(self) -> None:
+        """A frame that is fully blank end to end is trimmed down to zero rows."""
+        df = pd.DataFrame({"a": [np.nan, np.nan], "b": [np.nan, np.nan]})
+
+        result = _drop_trailing_blank_rows(df)
+
+        assert result.shape == (0, 2)
+
+    def test_partially_blank_trailing_row_is_kept(self) -> None:
+        """A trailing row with at least one non-NaN cell is not dropped."""
+        df = pd.DataFrame({"a": ["x", "y"], "b": ["1", np.nan]})
+
+        result = _drop_trailing_blank_rows(df)
+
+        assert result.shape == (2, 2)

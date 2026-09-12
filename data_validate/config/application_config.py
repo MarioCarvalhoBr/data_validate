@@ -35,6 +35,18 @@ class ApplicationConfig:
     PRECISION_DECIMAL_PLACE_TRUNCATE = 3
     """int: The number of decimal places to truncate numbers to."""
 
+    # INPUT SIZE LIMITS (SEC-003)
+    MAX_INPUT_FILE_BYTES = 100 * 1024 * 1024
+    """int: Maximum allowed size, in bytes, of a single input spreadsheet file (100 MB). A
+    generous DoS guard against zip-bomb-style or accidental huge uploads exhausting memory —
+    not a business rule. A file above this size is not read at all; see SEC-003."""
+    MAX_SHEET_ROWS = 1_000_000
+    """int: Maximum allowed number of rows in a loaded sheet, checked after reading. Same DoS-guard
+    rationale as `MAX_INPUT_FILE_BYTES`; see SEC-003."""
+    MAX_SHEET_COLUMNS = 5_000
+    """int: Maximum allowed number of columns in a loaded sheet, checked after reading. Same
+    DoS-guard rationale as `MAX_INPUT_FILE_BYTES`; see SEC-003."""
+
     # DESCRIPTION LIMITS
     TITLE_OVER_N_CHARS = 40
     """int: Maximum number of characters allowed for titles."""
