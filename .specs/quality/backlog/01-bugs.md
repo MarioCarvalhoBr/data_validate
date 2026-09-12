@@ -456,7 +456,7 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Related: SEC-004, ARC-015, spec `.specs/business-rules/spelling.md`
 
 ### BUG-028 · `to_decimal_truncated` skips truncation for scientific-notation floats
-- Priority: P1 · Effort: S · Status: open
+- Priority: P1 · Effort: S · Status: done
 - Where: `data_validate/helpers/common/formatting/number_formatting_processing.py:31` (splits on a
   literal `"."`), consumer `helpers/common/validation/proportionality_processing.py:177`
 - Problem: `str(1e-05) == "1e-05"` has no dot, so the value bypasses truncation entirely:
@@ -467,10 +467,27 @@ Every fix here must land with a regression test under `tests/` that fails before
   (found by hypothesis, TST-005).
 - Proposed fix: quantize with `Decimal` (`Decimal(s).quantize(Decimal(10) ** -precision, rounding=ROUND_DOWN)`)
   instead of string surgery; flip the xfail to a passing test.
+- Done: `to_decimal_truncated` now parses `Decimal(str(value).replace(",", "."))` and quantizes with
+  `value_dec.quantize(Decimal(1).scaleb(-precision), rounding=ROUND_DOWN)` inside the existing
+  try/except (`InvalidOperation`/`ValueError` → `Decimal("0")`), instead of splitting the string
+  representation on a literal `"."`. `ROUND_DOWN` truncates toward zero, matching the prior
+  "keep first N decimals" semantics for both positive and negative values (verified:
+  `to_decimal_truncated(-0.129, "DI", 2) == Decimal('-0.12')`, same as the old string-slicing
+  behaviour). Scientific-notation floats are now truncated correctly
+  (`to_decimal_truncated(1e-05, "DI", 0) == Decimal('0')`); huge exponents (`1e+20`) quantize without
+  raising and stay integral. `check_n_decimals_places` was verified to already handle scientific
+  notation correctly (`Decimal("1e-05").as_tuple().exponent == -5`) — no change needed there. The
+  strict xfail `test_to_decimal_truncated_scientific_notation_bug_candidate` now passes (marker
+  removed) and a new `test_to_decimal_truncated_deterministic_cases` covers scientific notation,
+  negative truncation, `Decimal` inputs, and huge exponents; `test_number_formatting.py` gained a
+  matching table-driven `test_to_decimal_truncated`. Full unit suite green (1253 passed, 1 unrelated
+  xfail from BUG-029), `make check` green, and the 7/7 e2e golden harness is unchanged
+  (`git status --short tests/e2e/golden` empty) — no fixture carries a scientific-notation
+  proportionality weight small enough to be affected.
 - Related: PROP-* sum rules, PERF-003
 
 ### BUG-029 · `CSVReader` silently drops whitespace-only rows in single-column sheets
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `data_validate/helpers/tools/data_loader/readers/csv_reader.py` (pandas default
   `skip_blank_lines=True`)
 - Problem: in a single-column CSV a row whose sole cell is whitespace collides with blank-line
@@ -480,4 +497,25 @@ Every fix here must land with a regression test under `tests/` that fails before
   (found by hypothesis, TST-005).
 - Proposed fix: `skip_blank_lines=False` in the reader (or in the Phase 2 `SheetLoader`) plus an
   explicit empty-row policy; flip the xfail.
+- Done: `CSVReader._read_file` now reads with `skip_blank_lines=False`, so a whitespace-only cell in
+  a single-column sheet (not itself an NA sentinel) survives instead of colliding with pandas' own
+  blank-line detection (which strips whitespace before deciding a line is blank). The former xfail
+  is now a plain passing test (`test_single_column_whitespace_row_is_kept`, class renamed to
+  document the fix). Trade-off handled explicitly: turning off `skip_blank_lines` also makes a
+  *genuinely* empty line (0 characters, e.g. a trailing newline at EOF) round-trip as an all-NaN
+  row instead of being skipped — `_read_file` now pipes its result through a new
+  `_drop_trailing_blank_rows` helper that trims only a **contiguous run of fully-NaN rows at the
+  end** of the frame; an interior fully-NaN row (a blank line in the middle of a file) is left
+  untouched, and any trailing row with at least one non-NaN cell (including a whitespace-only one)
+  is never dropped. Documented in the module docstring. Checked against the e2e golden fixtures
+  (`data/input/**`): every fixture bundle is `.xlsx` only, none are `.csv`, so this change has no
+  effect on any golden — `make test-e2e` stays 7/7 and `git status --short tests/e2e/golden` is
+  empty. Tests: `tests/unit/helpers/tools/data_loader/readers/test_csv_reader.py::
+  TestDropTrailingBlankRows` (unit tests for the trimming helper: empty frame, no-blank-rows,
+  trailing-only, interior-preserved, all-blank, partially-blank-trailing-row-kept),
+  `tests/unit/helpers/tools/data_loader/readers/test_csv_roundtrip_properties.py::
+  TestCSVReaderTrailingBlankLineNormalisation` (trailing empty line(s) dropped, interior blank line
+  preserved, via real file round-trips) and the flipped
+  `TestCSVReaderSingleColumnBlankLineBugCandidate` test; existing round-trip property tests
+  (multi-column, NaN normalisation) re-verified unaffected.
 - Related: BUG-015, ARC-009

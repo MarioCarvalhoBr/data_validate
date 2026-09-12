@@ -28,6 +28,10 @@ Loading facts (`helpers/tools/data_loader/**`):
   the conflict as an error.
 - A file that fails to load is represented as an empty frame with `is_read_successful=False`; the
   four required and four optional names always exist in the loaded map.
+- SEC-003: a file above `ApplicationConfig.MAX_INPUT_FILE_BYTES` (100 MB) is never read; a sheet
+  that reads successfully but exceeds `MAX_SHEET_ROWS` (1,000,000) or `MAX_SHEET_COLUMNS` (5,000)
+  is discarded and treated as unread — both a generous denial-of-service guard, not a business
+  limit. See STRUCT-015.
 
 ## Rules
 
@@ -162,6 +166,32 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Implemented by: same as STRUCT-011
 - Covered by tests: same as STRUCT-011
 - Notes / known defects: for `descricao`, `relacao`/`unidade` are injected before this check (BUG-003), so they never appear as extra.
+
+### STRUCT-015 · Oversized files and sheets are rejected (SEC-003)
+- Severity: error
+- NamesEnum: FS
+- Protocol: not in protocol — implemented behaviour (denial-of-service guard against zip-bomb-style
+  or accidental huge input)
+- Statement: a delivered file above `ApplicationConfig.MAX_INPUT_FILE_BYTES` (100 MB, checked via
+  `Path.stat()` before the file is read) is never read; a sheet that reads successfully but exceeds
+  `MAX_SHEET_ROWS` (1,000,000) or `MAX_SHEET_COLUMNS` (5,000) is discarded (treated the same as an
+  unread file) rather than held in memory. Both limits are generous DoS guards, not business rules.
+- Current message (pt-BR): catalog key `loader_error_file_too_large` — `{filename}: O arquivo
+  excede o tamanho máximo permitido ({size_mb} MB > {limit_mb} MB) e não será lido.` · catalog key
+  `loader_error_sheet_too_big` — `{filename}: A planilha excede o tamanho máximo permitido ({rows}
+  linhas x {columns} colunas > {max_rows} linhas x {max_columns} colunas) e não será lida.`
+  (present in both locales)
+- Target message key: `rule.STRUCT-015.error` (`.file_too_large`, `.sheet_too_big`)
+- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load_all` — limits are
+  injected through the constructor (`limits` tuple) by `controllers/spreadsheet_processor.py::
+  SpreadsheetProcessor._read_data`, which reads the canonical values off
+  `config/application_config.py::ApplicationConfig`; the loading layer never imports `config`
+  directly (`.claude/rules/architecture-boundaries.md`)
+- Covered by tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py::TestDataLoaderFacadeSizeLimits`
+- Notes / known defects: unlike `load_all`'s pre-existing per-exception messages (STRUCT-007, still
+  hardcoded pt-BR strings), this rule's two messages go through an injected `translate` callable
+  (defaulting to a `pt_BR` `MessageCatalog` when the facade is built without a `GeneralContext`),
+  per `.claude/rules/i18n.md` — migrating STRUCT-007 to the same pattern is left to BUG-015/ARC-003.
 
 ## Gaps (protocol ↔ code)
 

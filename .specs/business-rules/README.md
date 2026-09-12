@@ -70,7 +70,7 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 
 | `NamesEnum` | Key (`verification_name_*`) | Rules |
 |---|---|---|
-| `FS` | `file_structure` | STRUCT-001…012, DESC-011, DESC-012, VAL-001, SCEN-001, SCEN-002, PROP-001, PROP-002 |
+| `FS` | `file_structure` | STRUCT-001…012, STRUCT-015, DESC-011, DESC-012, VAL-001, SCEN-001, SCEN-002, PROP-001, PROP-002 |
 | `FC` | `file_cleaning` | CLEAN-001…006, LEG-001…011 |
 | `IR` | `indicator_relations` | COMP-001, COMP-002, COMP-003, VAL-002, PROP-003 |
 | `TH` | `tree_hierarchy` | COMP-007, COMP-008 |

@@ -37,13 +37,37 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: TOOL-008
 
 ### SEC-003 · Unbounded input sizes (zip-bomb / memory exhaustion)
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Where: `readers/excel_reader.py:16`, `readers/csv_reader.py:23` (`low_memory=False`),
   `readers/qml_reader.py:13`
 - Problem: no file-size, row or column limits; a 20 MB xlsx that expands to gigabytes takes the
   process down. `dtype=str` object columns multiply memory.
 - Proposed fix: `MAX_FILE_BYTES`, `MAX_ROWS`, `MAX_COLUMNS` in config with clear issues; read with
   Arrow-backed string dtype; stream CSV in chunks for `valores`.
+- Done: `ApplicationConfig` gained three DoS-guard constants (`MAX_INPUT_FILE_BYTES` = 100 MB,
+  `MAX_SHEET_ROWS` = 1,000,000, `MAX_SHEET_COLUMNS` = 5,000 — generous limits, not business rules).
+  `DataLoaderFacade.__init__` now takes an optional `translate: Callable[..., str] | None` and
+  `limits: tuple[int, int, int] | None`; `SpreadsheetProcessor._read_data` passes
+  `translate=self.language_manager.text` and `limits=(config.MAX_INPUT_FILE_BYTES,
+  config.MAX_SHEET_ROWS, config.MAX_SHEET_COLUMNS)` from `self.context.config`, so the loading
+  layer never imports `data_validate.config` directly (`.claude/rules/architecture-boundaries.md`)
+  — it falls back to its own module-level constants (mirroring the same numbers) and to a
+  `MessageCatalog("pt_BR", default_catalog_dir())` when constructed without either. `load_all` now
+  checks `path.stat().st_size` before reading (an oversized file is never handed to the reader) and
+  the resulting frame's `.shape` after reading (an oversized frame is discarded, same as an unread
+  file); both violations append a translated message (`loader_error_file_too_large` /
+  `loader_error_sheet_too_big`, added to both locale catalogs) to the FS error list, exactly like
+  the pre-existing per-exception messages. New rule ID `STRUCT-015` registered in
+  `.specs/business-rules/file-structure.md` and the `README.md` ID map. Arrow-backed dtypes and
+  chunked CSV streaming (the rest of the original proposed fix) are not part of this slice — the
+  size/shape guard alone is enough to stop the DoS class this item names; left as a follow-up if
+  ever needed. Tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py::
+  TestDataLoaderFacadeSizeLimits` (file-too-large, sheet-too-big by rows, sheet-too-big by columns,
+  within-limits no-false-positive, explicit `translate` callable wiring, default `MessageCatalog`
+  fallback, default limits matching `ApplicationConfig`); every pre-existing
+  `TestDataLoaderFacade` test now runs under an autouse fixture patching `Path.stat()` to a small
+  size, since those tests use real (non-existent) `Path` objects that would otherwise trip
+  `FileNotFoundError` from `stat()` itself.
 - Related: PERF-005
 
 ### SEC-004 · Broad `except Exception` masks failures as "valid" runs
