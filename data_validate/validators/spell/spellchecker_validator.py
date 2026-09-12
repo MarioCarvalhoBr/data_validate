@@ -91,9 +91,12 @@ class SpellCheckerValidator(BaseValidator):
             ],
         }
 
+        self._prepare_statement()
         self.run()
 
-    def validate_spellchecker(self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]) -> Tuple[List[str], List[str]]:
+    def validate_spellchecker(
+        self, model_class: Type[Union[SpDescription, SpTemporalReference, SpScenario]]
+    ) -> Tuple[List[str], List[str]]:
         """
         Perform spell checking validation on specified model class.
 
@@ -160,7 +163,11 @@ class SpellCheckerValidator(BaseValidator):
         Prepare validation errors from dictionary initialization.
 
         Extends the internal errors list with any errors encountered during
-        dictionary loading or initialization by the spell checker.
+        dictionary loading or initialization by the spell checker, and surfaces
+        them in the report under the spelling section so a broken dictionary
+        backend (missing hunspell dictionary, unreadable `extra-words.dic`,
+        enchant initialization failure) is visible instead of silently
+        producing zero spelling warnings (BUG-027).
 
         Notes
         -----
@@ -168,7 +175,13 @@ class SpellCheckerValidator(BaseValidator):
         any errors from the spell checker's dictionary initialization process.
         """
         if self.spellchecker.errors_dictionary:
-            self._errors.extend(self.spellchecker.errors_dictionary)
+            dictionary_errors = list(self.spellchecker.errors_dictionary)
+            self._errors.extend(dictionary_errors)
+            self._report_list.extend(
+                self.TITLES_INFO[NamesEnum.SPELL.value],
+                errors=dictionary_errors,
+                warnings=[],
+            )
 
     def run(self) -> Tuple[List[str], List[str]]:
         """

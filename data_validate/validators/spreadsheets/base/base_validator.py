@@ -123,12 +123,14 @@ class BaseValidator(ABC):
 
         # Check if columns exist
         for model_name, columns in required_columns.items():
-            dataframe: pd.DataFrame = model_dataframes[model_name]
-            if dataframe is not None:
-                for column in columns:
-                    exists_column, error_msg = self.column_exists(dataframe, model_name, column)
-                    if not exists_column:
-                        errors.append(error_msg)
+            # A model name absent from `model_dataframes` is treated as an empty dataframe so
+            # every required column is reported missing through the same catalog-consistent
+            # message path, instead of raising `KeyError` (BUG-025).
+            dataframe: pd.DataFrame = model_dataframes.get(model_name, pd.DataFrame())
+            for column in columns:
+                exists_column, error_msg = self.column_exists(dataframe, model_name, column)
+                if not exists_column:
+                    errors.append(error_msg)
 
         return errors
 

@@ -31,10 +31,6 @@ class FileStructureValidator(BaseValidator):
     ----------
     context : DataModelContext
         Context containing configuration, file system utilities, and data arguments.
-    errors : List[str]
-        Accumulated list of validation errors.
-    warnings : List[str]
-        Accumulated list of validation warnings.
     dir_files : List[str]
         List of file names in the input directory.
     """
@@ -65,8 +61,6 @@ class FileStructureValidator(BaseValidator):
         )
 
         self.context: GeneralContext = data_models_context.context
-        self.errors: List[str] = []
-        self.warnings: List[str] = []
         self.dir_files: List[str] = os.listdir(self.context.data_args.data_file.input_folder)
 
         self._prepare_statement()
@@ -96,7 +90,9 @@ class FileStructureValidator(BaseValidator):
                 - List[str]: List of error messages (empty if directory not empty)
         """
         local_errors = []
-        is_empty, message = self.context.file_system_utils.check_directory_is_empty(self.context.data_args.data_file.input_folder)
+        is_empty, message = self.context.file_system_utils.check_directory_is_empty(
+            self.context.data_args.data_file.input_folder
+        )
         if is_empty:
             local_errors.append(
                 self.context.language_manager.text(
@@ -138,7 +134,11 @@ class FileStructureValidator(BaseValidator):
             file_path = os.path.join(self.context.data_args.data_file.input_folder, file_name)
             is_file, _ = self.context.file_system_utils.check_file_exists(file_path)
             if not is_file:
-                local_errors.append(self.context.language_manager.text("validator_structure_error_unexpected_folder").format(file_name=file_name))
+                local_errors.append(
+                    self.context.language_manager.text("validator_structure_error_unexpected_folder").format(
+                        file_name=file_name
+                    )
+                )
                 continue
 
             file_base, file_ext = os.path.splitext(file_name)
@@ -148,7 +148,11 @@ class FileStructureValidator(BaseValidator):
             if file_base in optional_files and file_ext in optional_files[file_base]:
                 continue
 
-            local_errors.append(self.context.language_manager.text("validator_structure_error_unexpected_file").format(file_name=file_name))
+            local_errors.append(
+                self.context.language_manager.text("validator_structure_error_unexpected_file").format(
+                    file_name=file_name
+                )
+            )
 
         return not local_errors, local_errors
 
@@ -179,7 +183,11 @@ class FileStructureValidator(BaseValidator):
                     file_found = True
                     break
             if not file_found:
-                local_errors.append(self.context.language_manager.text("validator_structure_error_missing_file").format(file_base=file_base))
+                local_errors.append(
+                    self.context.language_manager.text("validator_structure_error_missing_file").format(
+                        file_base=file_base
+                    )
+                )
         return not local_errors, local_errors
 
     def check_ignored_files_in_folder_root(self) -> Tuple[bool, List[str]]:
@@ -209,7 +217,11 @@ class FileStructureValidator(BaseValidator):
 
         for file_base, extensions in file_groups.items():
             if ".xlsx" in extensions and ".csv" in extensions:
-                local_errors.append(self.context.language_manager.text("validator_structure_error_conflicting_files").format(file_base=file_base))
+                local_errors.append(
+                    self.context.language_manager.text("validator_structure_error_conflicting_files").format(
+                        file_base=file_base
+                    )
+                )
 
         return not local_errors, local_errors
 
@@ -233,19 +245,22 @@ class FileStructureValidator(BaseValidator):
         Notes
         -----
         All errors from individual checks are aggregated into a single error list.
+        This method is idempotent: it builds a fresh local list on every call instead
+        of accumulating into shared instance state (BUG-026).
         """
-        all_errors = [
-            [self.check_empty_directory()],
-            [self.check_not_expected_files_in_folder_root()],
-            [self.check_expected_files_in_folder_root()],
-            [self.check_ignored_files_in_folder_root()],
+        checks = [
+            self.check_empty_directory(),
+            self.check_not_expected_files_in_folder_root(),
+            self.check_expected_files_in_folder_root(),
+            self.check_ignored_files_in_folder_root(),
         ]
-        for check in all_errors:
-            is_valid, errors = check[0]
-            if not is_valid:
-                self.errors.extend(errors)
 
-        return self.errors, []
+        local_errors: List[str] = []
+        for is_valid, errors in checks:
+            if not is_valid:
+                local_errors.extend(errors)
+
+        return local_errors, []
 
     def run(self) -> Tuple[List[str], List[str]]:
         """
