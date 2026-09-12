@@ -28,11 +28,6 @@ from data_validate.validators.spreadsheets.value.value_validator import (
     SpValueValidator,
 )
 
-# Package structure
-from data_validate.validators.structure.file_structure_validator import (
-    FileStructureValidator,
-)
-
 __all__ = [
     # Package spreadsheets
     "BaseValidator",
@@ -46,6 +41,4 @@ __all__ = [
     "SpLegendValidator",
     # Package spell
     "SpellCheckerValidator",
-    # Package structure
-    "FileStructureValidator",
 ]

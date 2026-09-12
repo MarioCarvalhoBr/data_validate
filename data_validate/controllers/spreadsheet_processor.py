@@ -7,7 +7,10 @@ data validation pipeline: loading data, initializing models, running validators,
 aggregating results, and generating reports.
 """
 
+import os
 import time
+from datetime import datetime
+from pathlib import Path
 
 import data_validate
 import data_validate.config as config
@@ -15,6 +18,7 @@ import data_validate.controllers as controllers
 import data_validate.helpers.tools as tools
 import data_validate.models as models
 import data_validate.validators as validators
+from data_validate.rules import Engine, RuleContext, STRUCTURE_REGISTRY, extend_report_from_outcomes
 
 
 class SpreadsheetProcessor:
@@ -199,6 +203,35 @@ class SpreadsheetProcessor:
                 warnings=model_instance.data_cleaning_warnings,
             )
 
+    def _run_structure_rules(self) -> None:
+        """
+        Run the STRUCT-00x rule engine over the input folder (ARC-017 Phase 3b port).
+
+        Replaces the deleted `validators.FileStructureValidator` construction: builds an
+        immutable `RuleContext` from a fresh listing of the input folder, runs
+        `data_validate.rules.STRUCTURE_REGISTRY` through the shared `Engine`, then renders every
+        outcome's issues into `self.validation_reports` via `extend_report_from_outcomes` (see
+        `data_validate/rules/structure.py`, `data_validate/rules/legacy_adapter.py`).
+        """
+        structure_context = RuleContext(
+            sheets={},
+            cleaned={},
+            options={
+                "input_folder": Path(self.input_folder),
+                "dir_entries": os.listdir(self.input_folder),
+                "scenarios": self.scenarios,
+            },
+            translate=self.language_manager.text,
+            clock=datetime.now,
+        )
+        structure_result = Engine(STRUCTURE_REGISTRY).run(structure_context)
+        extend_report_from_outcomes(
+            structure_result.outcomes,
+            translate=self.language_manager.text,
+            report=self.validation_reports,
+            titles=self.validation_titles,
+        )
+
     def _build_pipeline(self) -> None:
         """
         Construct and execute the main validation pipeline.
@@ -219,10 +252,8 @@ class SpreadsheetProcessor:
 
         # RUN ALL VALIDATIONS PIPELINE
 
-        # 1. Validate the structure of the data
-        validators.FileStructureValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        # 1. Validate the structure of the data (ARC-017 Phase 3b: ported to the rules engine)
+        self._run_structure_rules()
 
         # 2. Validate the spelling of the data
         validators.SpellCheckerValidator(

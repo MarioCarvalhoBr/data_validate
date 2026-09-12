@@ -1,12 +1,13 @@
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 """
-Unit tests for `SpreadsheetProcessor._read_data` (ARC-009 loader-consumer migration).
+Unit tests for `SpreadsheetProcessor._read_data`/`_run_structure_rules` (ARC-009 loader-consumer
+migration; ARC-017 Phase 3b rules-engine port).
 
 BUG-018/ARC-009: `_read_data` now calls `DataLoaderFacade.load()` (returning a `LoadResult`)
 instead of the deprecated `load_all` property. `SpreadsheetProcessor.__init__` runs the whole
 pipeline as a side effect (ARC-001, a pre-existing debt this test does not attempt to fix), so
-`_read_data` is exercised in isolation on a bare instance built via `__new__`, with only the
-attributes `_read_data` itself reads pre-populated.
+`_read_data`/`_run_structure_rules` are exercised in isolation on a bare instance built via
+`__new__`, with only the attributes each method itself reads pre-populated.
 """
 
 from __future__ import annotations
@@ -22,6 +23,7 @@ import pandas as pd
 # `tests/unit/specs/test_sheet_specs.py` for the same workaround).
 from data_validate.controllers.spreadsheet_processor import SpreadsheetProcessor
 from data_validate import config, models
+from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, LoadResult
 
 
@@ -106,3 +108,51 @@ class TestReadDataUsesLoad:
         processor.validation_reports.extend.assert_any_call(
             processor.validation_titles[config.NamesEnum.FS.value], errors=["boom"]
         )
+
+
+class TestRunStructureRulesUsesTheEngine:
+    """`_run_structure_rules` runs `STRUCTURE_REGISTRY` and renders findings into the FS report."""
+
+    def _build_processor_for(self, mocker, input_folder: Path) -> SpreadsheetProcessor:
+        processor = SpreadsheetProcessor.__new__(SpreadsheetProcessor)
+        processor.input_folder = str(input_folder)
+        processor.scenarios = []
+        processor.validation_titles = {name.value: name.value for name in config.NamesEnum}
+        # Mirrors `_prepare_statement`, which always runs before `_build_pipeline` in `run()`:
+        # every `NamesEnum` bucket exists before a validator ever extends it.
+        processor.validation_reports = ValidationReport()
+        for title in processor.validation_titles.values():
+            processor.validation_reports.add_by_name(title)
+        processor.language_manager = mocker.MagicMock()
+        processor.language_manager.text = mocker.MagicMock(side_effect=lambda key, **kwargs: key)
+        return processor
+
+    def test_an_unexpected_file_is_rendered_into_the_fs_report(self, mocker, tmp_path: Path) -> None:
+        for stem in ("descricao", "composicao", "valores", "referencia_temporal"):
+            (tmp_path / f"{stem}.csv").touch()
+        (tmp_path / "arquivo_aleatorio.xlsx").touch()
+
+        processor = self._build_processor_for(mocker, tmp_path)
+        processor._run_structure_rules()
+
+        fs_title = processor.validation_titles[config.NamesEnum.FS.value]
+        assert "validator_structure_error_unexpected_file" in processor.validation_reports[fs_title].errors
+
+    def test_a_clean_bundle_reports_no_structure_errors(self, mocker, tmp_path: Path) -> None:
+        for stem in ("descricao", "composicao", "valores", "referencia_temporal"):
+            (tmp_path / f"{stem}.csv").touch()
+
+        processor = self._build_processor_for(mocker, tmp_path)
+        processor._run_structure_rules()
+
+        fs_title = processor.validation_titles[config.NamesEnum.FS.value]
+        assert processor.validation_reports[fs_title].errors == []
+
+    def test_an_empty_input_folder_reports_empty_directory_and_missing_files(self, mocker, tmp_path: Path) -> None:
+        processor = self._build_processor_for(mocker, tmp_path)
+        processor._run_structure_rules()
+
+        fs_title = processor.validation_titles[config.NamesEnum.FS.value]
+        errors = processor.validation_reports[fs_title].errors
+        assert errors.count("validator_structure_error_empty_directory") == 1
+        assert errors.count("validator_structure_error_missing_file") == 4

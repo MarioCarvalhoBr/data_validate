@@ -7,7 +7,8 @@ Errores customizados do pacote.
 BUG-015/ARC-009: `MissingFileError` was deleted -- grep confirmed it was never raised anywhere in
 `data_validate/`, only exported from this package's `__init__.py`; a missing required file is
 reported as a structural issue (`FileScanner.scan()`'s `missing` list, surfaced by
-`FileStructureValidator`), not by raising an exception.
+`data_validate.rules.structure.check_required_files_present`, STRUCT-005), not by raising an
+exception.
 """
 
 

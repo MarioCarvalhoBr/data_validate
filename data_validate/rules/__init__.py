@@ -7,16 +7,23 @@ distinct, reasoned `SKIPPED` outcome instead of silently not running (closing th
 placeholder gap tracked as ARC-008) and a crashing rule isolated into a `FAILED` outcome instead of
 being mistaken for a clean run (SEC-004 at the engine level).
 
-Nothing here is wired into the legacy pipeline yet (Phase 3a): no validator was ported to a `Rule`
-module, no CLI/report call site changed. See `.specs/architecture/target-architecture.md` (`Rule`,
-`RuleContext`, `RuleOutcome` sketches) and `docs/adrs/0006-rule-registry-with-prerequisites.md`.
+Phase 3a built the registry/engine core with nothing wired into the legacy pipeline. Phase 3b
+(ARC-017) ports the first validator, `FileStructureValidator`, onto it: `structure.py` declares
+`STRUCTURE_REGISTRY` (the `STRUCT-001`…`STRUCT-006` `RuleSpec`s) and `legacy_adapter.py` renders an
+`Engine.run(...)`'s outcomes into the legacy `ValidationReport`
+(`controllers/spreadsheet_processor.py::SpreadsheetProcessor._run_structure_rules`) — the first
+call site outside `tests/unit/rules/` and the reusable seam every later validator port reuses. See
+`.specs/architecture/target-architecture.md` (`Rule`, `RuleContext`, `RuleOutcome` sketches) and
+`docs/adrs/0006-rule-registry-with-prerequisites.md`.
 """
 
 from __future__ import annotations
 
 from data_validate.rules.context import RuleContext
 from data_validate.rules.engine import Engine, EngineResult, RuleOutcome, RuleStatus, SkipReason
+from data_validate.rules.legacy_adapter import extend_report_from_outcomes
 from data_validate.rules.registry import RegistryCycleError, RuleRegistry, RuleSpec
+from data_validate.rules.structure import STRUCTURE_REGISTRY
 
 __all__ = [
     "Engine",
@@ -27,5 +34,7 @@ __all__ = [
     "RuleRegistry",
     "RuleSpec",
     "RuleStatus",
+    "STRUCTURE_REGISTRY",
     "SkipReason",
+    "extend_report_from_outcomes",
 ]

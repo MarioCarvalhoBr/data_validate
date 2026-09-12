@@ -10,10 +10,11 @@ not from the deleted `data_loader.common.config.Config` singleton.
 
 BUG-015: conflict policy is explicit and documented here, not just implied by which key wins.
 When both a `.csv` and a `.xlsx` file exist for the same stem, `.csv` is preferred (matching the
-pt-BR message `FileStructureValidator` already reports for the same situation, STRUCT-006); the
-losing path is not silently dropped -- it is returned in `ignored` so a caller can inspect or log
-it. `scan()` does not raise or record an error itself for a conflict; that remains
-`FileStructureValidator.check_ignored_files_in_folder_root`'s job.
+pt-BR message `data_validate.rules.structure.check_no_csv_xlsx_conflict` already reports for the
+same situation, STRUCT-006); the losing path is not silently dropped -- it is returned in
+`ignored` so a caller can inspect or log it. `scan()` does not raise or record an error itself for
+a conflict; that remains `check_no_csv_xlsx_conflict`'s job (ARC-017 Phase 3b: ported from the
+deleted `FileStructureValidator.check_ignored_files_in_folder_root`).
 """
 
 from __future__ import annotations
