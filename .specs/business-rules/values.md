@@ -34,8 +34,12 @@ Purpose: one row per spatial feature (`id`), one column per indicator/time/scena
 - Current message (pt-BR): `{valores}: Colunas inválidas: [..].` · `{descricao}: Códigos dos indicadores ausentes em {valores}: [..].` · `{valores}: Códigos dos indicadores ausentes em {descricao}: [..].`
 - Target message key: `rule.VAL-002.error`
 - Implemented by: `validators/spreadsheets/value/value_validator.py::SpValueValidator.validate_relation_indicators_in_values`
-- Covered by tests: helpers covered by `tests/unit/helpers/common/processing/test_collections_processing.py`
-- Notes / known defects: string comparison of `nivel`/`cenario` (BUG-014).
+- Covered by tests: helpers covered by `tests/unit/helpers/common/processing/test_collections_processing.py`;
+  BUG-014 case in `tests/unit/validators/spreadsheets/value/test_value_validator.py::TestSpValueValidatorBug014LevelComparison`
+- Notes / known defects: BUG-014 (string comparison of `nivel`, e.g. `"1.0"` silently not matching
+  `"1"`) fixed — now `DataFrameProcessing.numeric_equals_mask`/`numeric_not_equals_mask`. The
+  `cenario == "0"` comparison alongside it is a distinct column and was left untouched, out of
+  BUG-014's scope.
 
 ### VAL-003 · Each indicator must have exactly the expected time/scenario columns
 - Severity: error

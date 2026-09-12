@@ -15,6 +15,12 @@ zero global state. Each item below names the current smell, where it lives, and 
   unit-test, reuse as a library, or run rules selectively/in parallel.
 - Target: constructors only store dependencies; `Pipeline.run(bundle) -> ValidationResult`;
   `Rule.check(ctx) -> list[Issue]`.
+- Note (Phase 3a slice, ARC-017): the `Rule.check(ctx) -> list[Issue]` execution shape now exists
+  and is exercised end to end (`data_validate/rules/engine.py::Engine.run`) — a `check` function
+  receives an immutable `RuleContext` and returns issues, no constructor work involved. Still
+  open: no `models/sp_*.py`/`validators/**` constructor was touched by this slice; every model and
+  validator still runs its pipeline from `__init__` exactly as described above. Porting a
+  validator to a `Rule` module (closing this item for that validator) is the next slice.
 
 ### ARC-002 · Global mutable state
 - Priority: P0 · Effort: L · Status: open
@@ -145,6 +151,13 @@ zero global state. Each item below names the current smell, where it lives, and 
   validator).
 - Target: rules declare `requires = {"descricao": ["codigo", "nivel"]}`; the engine checks
   prerequisites once and marks rules *skipped* with a reason (feature the placeholder wanted).
+- Note (Phase 3a slice, ARC-017): `data_validate/rules/engine.py::Engine` now implements exactly
+  this — `RuleSpec.requires`/`depends_on` are checked once per rule and an unmet prerequisite
+  produces a `RuleOutcome(status=SKIPPED, skip_reason=...)` naming the reason (missing sheet,
+  missing column, or a `SKIPPED`/`FAILED` dependency), replacing the placeholder's intended
+  behaviour. `base_validator.py` itself (the triplicated `column_exists*` helpers, the
+  `set_not_executed` no-op) is untouched — no validator has been ported to a `Rule` module yet,
+  so the old code path still runs unchanged in the legacy pipeline.
 
 ### ARC-009 · Data loader: property with side effects, mixed result types
 - Priority: P1 · Effort: M · Status: in-progress
@@ -255,9 +268,20 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: SEC-001, SEC-002
 
 ### ARC-017 · Rule execution order and dependencies are implicit
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: in-progress
 - Where: `controllers/spreadsheet_processor.py:181-215` (hand-ordered constructor calls), each
   validator re-checks emptiness/columns of *other* sheets.
 - Target: rule registry with `depends_on` and `requires`; topological execution; optional
   parallel execution of independent rules (process pool) once rules are pure.
+- Done (engine core, Phase 3a, ADR-0006): `data_validate/rules/` is a new package —
+  `context.py` (`RuleContext`, immutable, `has_sheet`/`sheet` helpers), `registry.py`
+  (`RuleSpec`, `RuleRegistry.register`/`get`/`topological_order` with a stable Kahn's algorithm
+  that ties-break on registration order, `RegistryCycleError`, the `@registry.rule(...)`
+  decorator), `engine.py` (`Engine.run(ctx, only=...)`, `RuleOutcome`, `RuleStatus`
+  `PASSED`/`ISSUES`/`SKIPPED`/`FAILED`, `SkipReason`, `EngineResult.validation_result`
+  flattening). 100% line coverage (`tests/unit/rules/`, 67 tests), mypy-strict clean
+  (`data_validate.rules.*` override in `pyproject.toml`). Still open: no rule module exists
+  under `rules/<sheet>/<RULE-ID>.py` yet, `controllers/spreadsheet_processor.py` still
+  hand-orders the legacy validators unchanged, and parallel execution (PERF-007) is not
+  implemented — the per-rule execution loop is shaped for a future pool but runs sequentially.
 - Related: PERF-007

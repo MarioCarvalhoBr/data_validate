@@ -155,8 +155,10 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Current message (pt-BR): `{descricao}: Códigos de legenda ausentes em {legenda}: [..].` · `{legenda}: Códigos de legenda não referenciados em {descricao}: [..].` · missing column → error with the abort text
 - Target message key: `rule.LEG-012.error`, `rule.LEG-012.warning`
 - Implemented by: `validators/spreadsheets/legend/legend_validator.py::SpLegendValidator.validate_relation_indicators_in_legend`
-- Covered by tests: none — TST-001
-- Notes / known defects: string comparison of `nivel` (BUG-014).
+- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 cases only) — broader coverage is TST-001
+- Notes / known defects: none. BUG-014 (string comparison of `nivel`, e.g. `"1.0"` silently not
+  matching `"1"`) fixed — `nivel` is now compared via
+  `DataFrameProcessing.numeric_equals_mask`/`numeric_not_equals_mask`.
 
 ### LEG-013 · Level-1 indicators must not reference a legend
 - Severity: error
@@ -166,8 +168,10 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Current message (pt-BR): `{descricao}: Indicadores de nível 1 não podem ter referência de legenda. Códigos com referência em {legenda}: [..].`
 - Target message key: `rule.LEG-013.error`
 - Implemented by: `legend_validator.py::SpLegendValidator.validate_relation_indicators_in_legend`
-- Covered by tests: none — TST-001
+- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 case only) — broader coverage is TST-001
 - Notes / known defects: the message lists *all* level-1 codes, not only the offending ones.
+  BUG-014 (string comparison of `nivel`, e.g. `"1.0"` silently not matching `"1"` and skipping this
+  rule entirely) fixed.
 
 ### LEG-014 · Indicators at levels other than 1 and 2 must reference a legend
 - Severity: error
@@ -177,8 +181,10 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Current message (pt-BR): `{descricao}: Indicadores de níveis diferentes de 1 e 2 devem ter referência de legenda. Indicadores sem referência em {legenda}: [..].`
 - Target message key: `rule.LEG-014.error`
 - Implemented by: `legend_validator.py::SpLegendValidator.validate_relation_indicators_in_legend`
-- Covered by tests: none — TST-001
+- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 case only) — broader coverage is TST-001
 - Notes / known defects: conflicts with protocol §2.3 p.9 "todos os valores vazios serão associados à legenda default" (gap G-20).
+  BUG-014 (compound `nivel != "1" & nivel != "2"` string comparison, e.g. `"2.0"` wrongly treated
+  as "some other level") fixed — both sides now use `DataFrameProcessing.numeric_not_equals_mask`.
 
 ### LEG-015 · Values must fall inside their legend's range
 - Severity: error
@@ -188,8 +194,9 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Current message (pt-BR): `{valores}, linha {index + 2}: O valor {value} está fora do intervalo da legenda de código '{legend_id}' ({min} a {max}) para a coluna '{column}'.` · `… fora do intervalo da legenda padrão (0 a 1) …`
 - Target message key: `rule.LEG-015.error`
 - Implemented by: `legend_validator.py::SpLegendValidator.validate_range_multiple_legend` (`ModelMappingLegend`)
-- Covered by tests: none — TST-001
-- Notes / known defects: cell-by-cell loop (PERF-001); string comparison of `nivel` (BUG-014).
+- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 case only) — broader coverage is TST-001
+- Notes / known defects: cell-by-cell loop (PERF-001). BUG-014 (string comparison of `nivel`) fixed
+  — level 1 exclusion now uses `DataFrameProcessing.numeric_equals_mask`.
 
 ## Gaps (protocol ↔ code)
 

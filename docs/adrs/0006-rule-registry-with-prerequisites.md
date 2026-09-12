@@ -106,4 +106,8 @@ swallowed exception); the whole point of this ADR is to close that acknowledged 
 - Related ADRs: ADR-0002, ADR-0004, ADR-0013 (rule purity depends on immutable typed frames)
 
 ---
-Last synced with code: a4f76c7
+Last synced with code: 228ae09 (Phase 3a: `data_validate/rules/{context,registry,engine}.py` implement
+`RuleContext`, `RuleSpec`/`RuleRegistry` with `topological_order()`, and `Engine`/`RuleOutcome`/
+`EngineResult` with skipped-with-reason and crash-isolation semantics, 100% covered by
+`tests/unit/rules/`; no validator ported to a `Rule` module yet and nothing is wired into the
+legacy pipeline — see `03-architecture.md`'s ARC-017/ARC-001/ARC-008 entries)

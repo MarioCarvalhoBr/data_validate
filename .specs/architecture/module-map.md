@@ -135,4 +135,17 @@ from the legacy source instead.
 | `specs/issues.py` | Structured validation finding + result grouping/truncation | `Issue`, `Severity`, `ValidationResult` | `specs/test_issues.py` (100 % coverage) | ARC-004 (model implemented, not wired into any validator/model/`ValidationReport` yet — Phase 3) |
 | `i18n/catalog.py` | Locale-scoped message lookup and `Issue` rendering | `MessageCatalog`, `default_catalog_dir`, `CatalogNotFoundError`, `CatalogInvalidError` | `i18n/test_message_catalog.py` (100 % coverage) | ARC-004 (implemented; `helpers/tools/locale/language_manager.py::LanguageManager` remains the module every current call site actually uses) |
 
-Last synced with code: 09279f4
+## `rules/` (new package, Phase 3a — ARC-017 core, foundation for ARC-001/ARC-008)
+
+Brand new at its target-architecture path (no legacy predecessor to map from): the engine core
+ADR-0006 describes. Nothing here is wired into `controllers/spreadsheet_processor.py` yet, and no
+rule module exists under `rules/<sheet>/<RULE-ID>.py` — this slice is the registry/engine
+foundation those future rule modules will register into.
+
+| Module | Responsibility | Key symbols | Tests | Backlog |
+|---|---|---|---|---|
+| `context.py` | Immutable, per-run view of a bundle handed to every `Rule.check` | `RuleContext` (`has_sheet`, `sheet`) | `rules/test_context.py` (100 % coverage) | ARC-017 |
+| `registry.py` | Declares one rule (prerequisites + check function); resolves execution order | `RuleSpec`, `RuleRegistry` (`register`, `get`, `topological_order`, `@rule(...)` decorator), `RegistryCycleError` | `rules/test_registry.py` (100 % coverage) | ARC-017, ARC-008 |
+| `engine.py` | Runs a registry over a context: skipped-with-reason, crash isolation, issue flattening | `Engine`, `RuleOutcome`, `RuleStatus`, `SkipReason`, `EngineResult` | `rules/test_engine.py` (100 % coverage) | ARC-017, ARC-001, ARC-008 |
+
+Last synced with code: 228ae09

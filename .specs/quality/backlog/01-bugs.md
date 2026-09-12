@@ -336,7 +336,7 @@ Every fix here must land with a regression test under `tests/` that fails before
   item's.
 
 ### BUG-014 · Level comparisons rely on exact string `"1"` / `"2"`
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Where: `validators/spreadsheets/legend/legend_validator.py:267,304,313,329-330,338-339,438`,
   `validators/spreadsheets/proportionality/proportionality_validator.py:359,581`,
   `validators/spreadsheets/value/value_validator.py:205,223,228`,
@@ -346,20 +346,69 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Proposed fix: compare against the cleaned integer column produced once by the model.
 - Tests: description with `nivel` = `"1.0"`.
 - Related: PERF-003
-- Finding (Phase 2c review, not implemented this slice): reviewed adding a
+- Finding (Phase 2c review, not implemented that slice): reviewed adding a
   `DataFrameProcessing.numeric_mask(series, value)` helper (`pd.to_numeric(series,
   errors="coerce") == value`) to replace every `== "1"`/`!= "1"`/`== "2"`/`!= "2"` site named
   above. All ~13 call sites compare against a *locally re-cleaned or still-raw* `nivel`/
   `codigo_pai` column, not a model's `cleaned_column(...)` (BUG-002's per-instance store) — so
   this is a pure string-vs-numeric-comparison fix, unrelated to BUG-002/BUG-003's frame/cleaned
-  ownership. Not implemented in this slice: 13 call sites across 3 validators plus
-  `description_processing.py`, several combined into compound boolean masks
-  (`(level != "1") & (level != "2")`), is a wide enough blast radius that verifying golden
-  safety per-site individually was judged disproportionate to bundle into the same change as
-  BUG-002/BUG-003 without dedicated review; flipping `"1.0"` to also match would change output
-  for any bundle carrying that representation, which needs its own test-first slice per
-  `.claude/rules/testing.md` (a fresh failing test with `nivel = "1.0"`, per this item's own
-  "Tests" line) rather than a bundled, uncovered change. Left open for a dedicated BUG-014 slice.
+  ownership.
+- Done: added `DataFrameProcessing.numeric_equals_mask(series, value)` (`pd.to_numeric(series,
+  errors="coerce") == value`; a cell that fails to parse, including `NaN`, evaluates to `False`)
+  and `numeric_not_equals_mask(series, value)` (`~numeric_equals_mask(...)`; a cell that fails to
+  parse evaluates to `True`, mirroring the historical `series != "1"` string-comparison
+  semantics) to `data_validate/helpers/common/validation/dataframe_processing.py`. Replaced all 13
+  literal `"1"`/`"2"` comparisons across the four files this item names — the scenario-column
+  `== "0"` comparisons alongside two of them (`description_processing.py`,
+  `value_validator.py::validate_relation_indicators_in_values`) are a distinct column and were
+  left untouched, out of this item's stated scope. Call-site table (old expression → new
+  expression; all in the four owned files above):
+
+  | # | File : old line(s) | Old expression | New expression |
+  |---|---|---|---|
+  | 1 | `description_processing.py:50` | `df[level] != "1"` | `DataFrameProcessing.numeric_not_equals_mask(df[level], 1)` |
+  | 2 | `description_processing.py:53` | `df[level] == "2"` (compound with `& scenario == "0"`, scenario side untouched) | `DataFrameProcessing.numeric_equals_mask(df[level], 2)` |
+  | 3 | `value_validator.py:208` (`validate_relation_indicators_in_values`) | `df[level] == "1"` | `DataFrameProcessing.numeric_equals_mask(df[level], 1)` |
+  | 4 | `value_validator.py:227` | `df[level] != "1"` | `DataFrameProcessing.numeric_not_equals_mask(df[level], 1)` |
+  | 5 | `value_validator.py:233` (also in `validate_relation_indicators_in_values`; `validate_value_combination_relation`'s own `level = int(row[level_column_name])` already used `int()` and needed no change) | `df[level] == "2"` (compound with `& scenario == "0"`, scenario side untouched) | `DataFrameProcessing.numeric_equals_mask(df[level], 2)` |
+  | 6 | `proportionality_validator.py:367` | `df[level] == "1"` | `DataFrameProcessing.numeric_equals_mask(df[level], 1)` |
+  | 7 | `proportionality_validator.py:605` | `df_composition[parent] != "1"` | `DataFrameProcessing.numeric_not_equals_mask(df_composition[parent], 1)` |
+  | 8 | `legend_validator.py:269` (`validate_relation_indicators_in_legend`) | `df[level] != "1"` | `DataFrameProcessing.numeric_not_equals_mask(df[level], 1)` |
+  | 9 | `legend_validator.py:308` | `df[level] == "1"` | `DataFrameProcessing.numeric_equals_mask(df[level], 1)` |
+  | 10 | `legend_validator.py:317` | `df[level] == "1"` | `DataFrameProcessing.numeric_equals_mask(df[level], 1)` |
+  | 11 | `legend_validator.py:333-334` | `(df[level] != "1") & (df[level] != "2")` | hoisted into a shared `is_other_level_mask = numeric_not_equals_mask(level, 1) & numeric_not_equals_mask(level, 2)`, reused at sites 11 and 12 |
+  | 12 | `legend_validator.py:342-343` | `(df[level] != "1") & (df[level] != "2")` | same `is_other_level_mask` as site 11 |
+  | 13 | `legend_validator.py:442` (`validate_range_multiple_legend`) | `df[level] == "1"` | `DataFrameProcessing.numeric_equals_mask(df[level], 1)` |
+
+  Regression tests: `tests/unit/helpers/common/validation/test_column_validation.py::
+  TestNumericEqualsMask` (table-driven: `"1"`, `"1.0"`, `" 1"`, `"01"`, `int`/`float`, `NaN`, junk
+  strings, for both the equals and not-equals mask), new
+  `tests/unit/helpers/common/validation/test_description_processing.py` (a `nivel = "1.0"` row now
+  correctly excluded from `get_valids_codes_from_description`, and a `nivel = "2.0"`/`cenario = "0"`
+  row correctly excluded), new `tests/unit/validators/spreadsheets/legend/test_legend_validator.py`
+  (three cases: a level-1 indicator with an illegal legend reference stored as `nivel = "1.0"` is
+  now caught instead of silently skipped; a level-2 indicator stored as `nivel = "2.0"` is no
+  longer wrongly required to carry a legend reference; a level-1 indicator stored as `nivel = "1.0"`
+  is now correctly excluded from legend-range checking even when its value sits outside the
+  default `[0, 1]` range), `tests/unit/validators/spreadsheets/value/test_value_validator.py::
+  TestSpValueValidatorBug014LevelComparison` (a level-1 indicator stored as `nivel = "1.0"` is no
+  longer wrongly reported as missing from `valores.csv`), `tests/unit/validators/spreadsheets/
+  proportionality/test_proportionality_validator.py::TestSpProportionalityValidatorBug014LevelComparison`
+  (a level-1 indicator stored as `nivel = "1.0"` is no longer wrongly reported as an extra code
+  present in `proporcionalidades.csv` but missing from `descricao.csv`). Site 7
+  (`proportionality_validator.py:605`, the composition `codigo_pai != "1"` root-node filter) has no
+  test of its own: by construction, the dict this filter builds is only ever queried with keys
+  derived by splitting a *proportionality* column header on `-` (always a clean digit string, never
+  `"1.0"`-shaped), so whether the stray root-formatted row is retained or dropped from that
+  dictionary is unobservable through any public method's return value — the fix was still applied
+  for consistency and is covered indirectly by the general `numeric_not_equals_mask` unit tests.
+  Full unit suite green (1377 passed), `make check` green (ruff, mypy, bandit, unit tests), e2e
+  golden harness 7/7 with an empty `git status --short tests/e2e/golden` diff (none of the
+  `data/input/**` fixtures carry a non-canonical `"1.0"`/`" 1"`/`01`-formatted level or code, so no
+  golden output changed). Remaining, explicitly out of scope for this slice:
+  `composition_tree_validator.py` (dict-keyed level reads, a different pattern — not owned by this
+  item, not audited here) and the `NEW data_validate/rules/` package (owned by a parallel migration
+  slice, untouched).
 
 ### BUG-015 · Data loader mixes types and silently prefers CSV over XLSX
 - Priority: P2 · Effort: M · Status: done

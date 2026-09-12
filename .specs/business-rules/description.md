@@ -85,6 +85,15 @@ instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-0
 - Covered by tests: helper covered by `tests/unit/helpers/common/formatting/test_number_formatting.py`
 - Notes / known defects: duplicates CLEAN-001 (same rows reported under `FC`).
 
+**Cross-sheet consumer note (BUG-014, fixed):** the shared helper
+`helpers/common/validation/description_processing.py::DescriptionProcessing.get_valids_codes_from_description`
+(consumed by VAL-002 and PROP-003 to compute the set of description codes that require a
+matching `valores`/`proporcionalidades` column) used to compare `nivel` against the literal
+strings `"1"`/`"2"`, so a level cell stored as `"1.0"` silently escaped the level-1 exclusion.
+It now compares via `DataFrameProcessing.numeric_not_equals_mask`/`numeric_equals_mask`
+(`pd.to_numeric(series, errors="coerce")`), tolerant of `"1.0"`, `" 1"`, `"01"`, etc. Regression
+test: `tests/unit/helpers/common/validation/test_description_processing.py`.
+
 ### DESC-006 · Punctuation: names never end with punctuation, descriptions end with a period
 - Severity: warning
 - NamesEnum: MAND_PUNC_DESC (`verification_name_mandatory_and_prohibited_punctuation_in_descriptions`)

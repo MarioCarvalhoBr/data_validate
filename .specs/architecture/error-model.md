@@ -119,7 +119,22 @@ with `errors`/`warnings`/`error_count`/`warning_count`, `by_category()`, `trunca
 sketched above, which belongs to `RuleOutcome`/the engine (ADR-0006) and lands with Phase 3.
 `data_validate/i18n/catalog.py` implements `MessageCatalog.text`/`render` and
 `default_catalog_dir()`. Nothing here is wired into the legacy pipeline yet: no validator, model,
-or `ValidationReport` call site was changed. `RuleOutcome`, the full `ValidationResult` sketched
-above, and the report-model grouping/truncation/JSON rendering steps remain open (Phase 3-4).
+or `ValidationReport` call site was changed. The full `ValidationResult` (`outcomes`/`load_issues`/
+`started_at`/`duration_ms`) and the report-model grouping/truncation/JSON rendering steps remain
+open (Phase 3-4).
 
-Last synced with code: 09279f4
+ARC-017/ADR-0006 (engine core, Phase 3a): `data_validate/rules/engine.py` implements `RuleOutcome`
+close to, but refined from, the sketch above: `status` is a 4-value `RuleStatus` StrEnum
+(`PASSED`, `ISSUES`, `SKIPPED`, `FAILED`) rather than the sketch's `Literal["executed", "skipped"]`
+— splitting "executed" into whether the rule actually found anything, and adding `FAILED` for a
+rule that raised (never silently absorbed as a clean run, closing SEC-004 at the engine level); the
+"reason" field is named `skip_reason` and, for `FAILED`, holds `repr(exception)` rather than a
+catalog key (there is no separate error field in this slice). `SkipReason` provides the
+`engine.skipped.missing_sheet`/`missing_column`/`dependency_skipped`/`dependency_failed` keys
+named informally above. `EngineResult.validation_result` flattens every outcome's issues into the
+existing `specs/issues.py::ValidationResult`, not yet the richer `outcomes`/`load_issues`/
+`started_at`/`duration_ms` shape sketched above — that composition is Phase 3b's job once a rule
+module exists to actually populate `RuleContext.sheets` from a loaded bundle. 100 % covered by
+`tests/unit/rules/`.
+
+Last synced with code: 228ae09

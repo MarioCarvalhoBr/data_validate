@@ -53,8 +53,10 @@ by `helpers/common/validation/proportionality_processing.py::ProportionalityProc
 - Current message (pt-BR): `{descricao}: Códigos dos indicadores ausentes em {proporcionalidades}: [..].` · `{proporcionalidades}: Códigos dos indicadores ausentes em {descricao}: [..].`
 - Target message key: `rule.PROP-003.error`
 - Implemented by: `validators/spreadsheets/proportionality/proportionality_validator.py::SpProportionalityValidator.validate_relation_indicators_in_proportionality`
-- Covered by tests: none — TST-001
-- Notes / known defects: string level comparison (BUG-014).
+- Covered by tests: `tests/unit/validators/spreadsheets/proportionality/test_proportionality_validator.py` (BUG-014 case only) — broader coverage is TST-001
+- Notes / known defects: none. BUG-014 (string level comparison, e.g. `nivel = "1.0"` silently not
+  matching `"1"` when building the level-1 codes to strip from P) fixed — now
+  `DataFrameProcessing.numeric_equals_mask`.
 
 ### PROP-004 · A parent indicator must not appear twice on header row 1
 - Severity: error
@@ -87,7 +89,10 @@ by `helpers/common/validation/proportionality_processing.py::ProportionalityProc
 - Target message key: `rule.PROP-006.error`
 - Implemented by: `proportionality_validator.py::SpProportionalityValidator.validate_parent_child_relationships`
 - Covered by tests: none — TST-001
-- Notes / known defects: raw string comparison `codigo_pai != "1"` (BUG-014); `iterrows` (PERF-001); wrongly registers its skip under `IND_VAL_PROP`.
+- Notes / known defects: `iterrows` (PERF-001); wrongly registers its skip under `IND_VAL_PROP`.
+  BUG-014 fixed — `codigo_pai != "1"` now goes through
+  `DataFrameProcessing.numeric_not_equals_mask`, though no observable-behaviour regression test
+  was possible for this specific site (see BUG-014's backlog entry for why).
 
 ### PROP-007 · Cells must be numeric or `DI`
 - Severity: error

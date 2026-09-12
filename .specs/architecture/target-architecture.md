@@ -232,8 +232,8 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 | `models/sp_model_abc.py`, `models/sp_*.py` | `specs/sheet_specs.py` (definitions) + `normalizing/` (cleaning) + `rules/structure/` (checks) | models disappear as classes; column/dtype definitions already mirrored into `specs/sheet_specs.py` (ARC-003), models still own cleaning/behaviour |
 | `validators/structure/file_structure_validator.py` | `rules/structure/STRUCT-00x.py` | — |
 | `validators/spell/spellchecker_validator.py` | `rules/spelling/SPELL-00x.py` | — |
-| `validators/spreadsheets/base/base_validator.py` | `rules/engine.py` | prerequisites centralised |
-| `validators/spreadsheets/<sheet>/*_validator.py` | `rules/<sheet>/<RULE-ID>.py` | one rule per module |
+| `validators/spreadsheets/base/base_validator.py` | `rules/engine.py` | **Done (core, Phase 3a, ADR-0006)**: `RuleContext`/`RuleSpec`/`RuleRegistry`/`Engine` implement prerequisite checks (`requires`/`depends_on`), topological execution, skipped-with-reason (`RuleOutcome.status is SKIPPED`, `SkipReason`), and crash isolation (`FAILED`), 100 % covered by `tests/unit/rules/`; `base_validator.py` itself is untouched, no validator reads from this package yet |
+| `validators/spreadsheets/<sheet>/*_validator.py` | `rules/<sheet>/<RULE-ID>.py` | one rule per module; not started — `rules/` has no `<sheet>/` subpackage yet, only the engine core |
 | `static/locales/*/messages.json` | `i18n/locales/*.json` | keyed by rule ID |
 | `static/report/*`, `static/dictionaries/*`, `static/templates/README.TEMPLATE.md` | `static/report/*`, `static/dictionaries/*`, — | template generator retired |
 
@@ -243,4 +243,4 @@ def validate(folder: Path, options: Options) -> ValidationResult:
   are a `future/ideas.md` item).
 - No change to the report's visual identity during Phases 1–3 (goldens must stay identical).
 
-Last synced with code: 09279f4
+Last synced with code: 228ae09
