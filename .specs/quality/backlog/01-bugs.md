@@ -3,7 +3,7 @@
 Every fix here must land with a regression test under `tests/` that fails before and passes after.
 
 ### BUG-001 · Shared list mutated by `validate_value_combination_relation`
-- Priority: P0 · Effort: S · Status: open
+- Priority: P0 · Effort: S · Status: done
 - Where: `data_validate/validators/spreadsheets/value/value_validator.py:283-285`
 - Problem: `local_required_columns = self.global_required_columns.copy()` is a *shallow* copy; the
   following `.append(scenario_column_name)` mutates the shared `global_required_columns[description]`
@@ -15,6 +15,19 @@ Every fix here must land with a regression test under `tests/` that fails before
   `global_required_columns` a `Mapping[str, tuple[str, ...]]` (immutable).
 - Tests: unit test asserting idempotency across two calls.
 - Related: ARC-002
+- Done: replaced the shallow `dict.copy()` with a per-key list copy
+  (`local_required_columns = {model_name: list(columns) for model_name, columns in
+  self.global_required_columns.items()}`) in `validate_value_combination_relation` so the
+  subsequent `.append(scenario_column_name)` no longer mutates
+  `self.global_required_columns[self.sp_name_description]`; `global_required_columns` stays a
+  `Dict[str, List[str]]` (not a tuple-based `Mapping`) because other methods concatenate it with
+  plain lists. Regression test:
+  `tests/unit/validators/spreadsheets/value/test_value_validator.py`. Scanned every sibling
+  validator (`proportionality_validator.py`, `legend_validator.py`, `composition_*.py`,
+  `temporal_reference_validator.py`, `scenario_validator.py`, `description_validator.py`) for the
+  same shallow-copy-then-append pattern; `legend_validator.py:397` also appends to a
+  `required_columns[...]` list but builds that dict fresh as a local literal each call (no
+  `.copy()` of a shared attribute), so it does not share the same bug and was left untouched.
 
 ### BUG-002 · Models overwrite class-level `RequiredColumn` Series (global mutable state)
 - Priority: P0 · Effort: M · Status: open

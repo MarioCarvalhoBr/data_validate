@@ -45,8 +45,10 @@ Purpose: one row per spatial feature (`id`), one column per indicator/time/scena
 - Current message (pt-BR): `{valores}: A coluna '{combination}' é obrigatória.` · `{valores}: A coluna '{extra_column}' é desnecessária.` · `{valores}: A coluna '{extra_column}' é desnecessária para o indicador de nível 1.`
 - Target message key: `rule.VAL-003.error`
 - Implemented by: `value_validator.py::SpValueValidator.validate_value_combination_relation` → `helpers/common/generation/combinations_processing.py::CombinationsProcessing.generate_combinations`, `find_extra_combinations`
-- Covered by tests: helper covered by `tests/unit/helpers/common/generation/test_combinations.py`
-- Notes / known defects: shared-list mutation (BUG-001); `iterrows` (PERF-001); `cenario` values other than 0/1 yield no expected columns (gap G-09).
+- Covered by tests: helper covered by `tests/unit/helpers/common/generation/test_combinations.py`;
+  regression for the shared-list mutation covered by
+  `tests/unit/validators/spreadsheets/value/test_value_validator.py`
+- Notes / known defects: `iterrows` (PERF-001); `cenario` values other than 0/1 yield no expected columns (gap G-09). Shared-list mutation (BUG-001) fixed — `validate_value_combination_relation` now builds `local_required_columns` as a per-key list copy instead of a shallow `dict.copy()`.
 
 ### VAL-004 · Cells must be numeric or `DI`
 - Severity: error
