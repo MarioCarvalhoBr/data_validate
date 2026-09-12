@@ -7,7 +7,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
-| `application_config.py` | Constants, fallback HTML template, localised verification titles | `ApplicationConfig`, `get_verify_names` | none (83 % incidental) | `app/options.py`, `specs/limits.py` | BUG-011, PERF-004 |
+| `application_config.py` | Constants, fallback HTML template, localised verification titles; optional injected `LanguageManager` | `ApplicationConfig`, `get_verify_names` | `tests/unit/config/test_application_config.py` | `app/options.py`, `specs/limits.py` | PERF-004 |
 | `names_enum.py` | 34 verification keys | `NamesEnum` | none (100 % incidental) | `rules/categories.py` | — |
 | `spreadsheet_info.py` | Sheet stems, extensions, required/optional | `SpreadsheetInfo`, `SHEET` | none | `specs/sheet_specs.py` (implemented, consumers pending) | ARC-003 |
 | `metadata_info.py` | Version string, welcome banner | `MetadataInfo`, `METADATA` | `helpers/base/test_metadata_info.py` | `util/version.py` | BUG-017, TOOL-005 |
@@ -17,31 +17,31 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
 | `spreadsheet_processor.py` | Orchestrates load → models → validators → report | `SpreadsheetProcessor` | none | `app/pipeline.py` | ARC-001, ARC-017 |
-| `context/general_context.py` | DI container: args, i18n, config, fs, logger | `GeneralContext` | none | `app/context.py` | ARC-006, BUG-021 |
+| `context/general_context.py` | DI container: args, i18n, config, fs, logger; builds one `LanguageManager` from `data_args.data_file.locale` and injects it into `config`/`file_system_utils`; opens a log file only in debug mode | `GeneralContext` | `tests/unit/controllers/context/test_general_context.py` | `app/context.py` | ARC-006 |
 | `context/data_model_context.py` | Model registry for validators | `DataModelContext.get_instance_of` | none | `rules/context.py` | ARC-006 |
 | `report/validation_report.py` | Buckets of error/warning strings, truncation | `ReportItem`, `ValidationReport` | `tests/unit/controllers/report/test_validation_report.py` | `app/result.py`, `reporting/model.py` | none |
 | `report/file_report_generator.py` | HTML/PDF/JSON output | `FileReportGenerator` | `tests/unit/controllers/report/test_file_report_generator.py` | `reporting/{html,pdf,json,console}.py` | SEC-001, SEC-002 |
 
 ## `middleware/`
 
-| Module | Responsibility | Key symbols | Tests | Destination | Backlog |
-|---|---|---|---|---|---|
-| `bootstrap.py` | Persist `--locale` to `.config/store.locale` | `Bootstrap` | none (0 %) | deleted | BUG-004, BUG-008 |
+Deleted (BUG-004): `bootstrap.py` (`Bootstrap`) and the whole `middleware` package no longer exist.
+Locale is now an explicit `LanguageManager(locale=...)` constructor argument built once by
+`GeneralContext` — no persistence step, no `.config/store.locale`.
 
 ## `main.py`
 
 | Module | Responsibility | Tests | Destination | Backlog |
 |---|---|---|---|---|
-| `main.py` | Entry point; prints banner at import | none (0 %) | `cli.py` | ARC-011, ARC-012, SEC-008 |
+| `main.py` | Entry point; wires `DataArgs → GeneralContext → SpreadsheetProcessor → finalize`, no `Bootstrap` step; prints banner at import | none (0 %) | `cli.py` | ARC-011, ARC-012, SEC-008 |
 
 ## `helpers/base/`
 
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
 | `constant_base.py` | Immutable-after-init attribute holder | `ConstantBase` | `test_constant_base.py` | frozen dataclasses | — |
-| `data_args.py` | argparse + validation | `DataArgs`, `DataFile`, `DataAction`, `DataReport` | `test_data_args.py` | `cli.py`, `app/options.py` | ARC-011, BUG-009 |
-| `file_system_utils.py` | Encoding detection, exists/remove/create with localised tuples | `FileSystemUtils` | `test_file_system_utils.py` | `util/paths.py` | ARC-014 |
-| `logger_manager.py` | Console + file loggers with colour formatter | `LoggerManager`, `CustomFormatter` | `test_logger_manager.py` | `util/logging.py` | BUG-021 |
+| `data_args.py` | argparse + validation (no longer builds its own unused `LanguageManager`) | `DataArgs`, `DataFile`, `DataAction`, `DataReport` | `test_data_args.py` | `cli.py`, `app/options.py` | ARC-011, BUG-009 |
+| `file_system_utils.py` | Encoding detection, exists/remove/create with localised tuples; optional injected `LanguageManager` | `FileSystemUtils` | `test_file_system_utils.py` | `util/paths.py` | ARC-014 |
+| `logger_manager.py` | Console + file loggers with colour formatter; `log_folder=None` skips directory creation and the file handler entirely | `LoggerManager`, `CustomFormatter` | `test_logger_manager.py` | `util/logging.py` | — |
 
 ## `helpers/common/`
 
@@ -76,7 +76,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | `data_loader/strategies/header.py` | Header rows | `SingleHeaderStrategy`, `DoubleHeaderStrategy` | `strategies/test_header.py` | `SheetSpec.header` | — |
 | `data_loader/common/config.py` | Singleton file specs | `Config`, `SingletonMeta` | none | `specs/sheet_specs.py` (implemented, consumers pending) | ARC-003 |
 | `data_loader/common/exceptions.py` | `MissingFileError`, `ReaderNotFoundError` | — | none | `loading/errors.py` | — |
-| `locale/language_manager.py` | Catalog loading, `text()` | `LanguageManager` | `tools/locale/test_language_manager.py` | `i18n/catalog.py` | BUG-004 |
+| `locale/language_manager.py` | Explicit-`locale` constructor (no file I/O), catalog loading, `text()` | `LanguageManager` | `tools/locale/test_language_manager.py` | `i18n/catalog.py` | — (BUG-004 done) |
 | `locale/language_enum.py` | Supported languages | `LanguageEnum` | `tools/locale/test_language_enum.py` | `i18n/locale.py` | BUG-012 |
 | `readme/generate_readme.py` | README from template | — | none | deleted (ADR-0009) | ARC-010 |
 | `spellchecker/spellchecker.py` | Facade | `SpellChecker` | `spellchecker/test_spellchecker.py` | `spell/service.py` | ARC-015 |

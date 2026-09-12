@@ -11,7 +11,7 @@ Defined in `helpers/base/data_args.py::DataArgs._create_parser` with `allow_abbr
 |---|---|---|
 | `--input_folder PATH` | required | Must be an existing directory (`DataFile._validate_arguments`) |
 | `--output_folder PATH` | default `output_data/` | Any path is accepted, including a basename containing `.` (e.g. `run.2026-08`, `v1.2`); rejected only when the path already exists as a regular file (fixed by BUG-009); created if missing |
-| `--locale`, `-l` | `pt_BR` \| `en_US`, default `pt_BR` | Persisted to `.config/store.locale` by `Bootstrap` (BUG-004) |
+| `--locale`, `-l` | `pt_BR` \| `en_US`, default `pt_BR` | Explicit constructor argument threaded through `GeneralContext` into one shared `LanguageManager`; no persistence, no `.config/store.locale` (BUG-004, fixed) — the same value every run, independent of CWD or previous invocations |
 | `--no-spellchecker` | flag | Skips `SpellCheckerValidator`; listed as skipped in the report |
 | `--no-warning-titles-length` | flag | Skips `TITLES_N`; listed as skipped |
 | `--no-time` | flag | Hides date/time in report and the "Tempo total de execução" stdout line |

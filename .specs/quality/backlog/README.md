@@ -50,10 +50,10 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 
 | Priority | Count | Done | Highlights |
 |---|---|---|---|
-| P0 | 7 | 1 | XSS in HTML report (SEC-001), shared mutable class state (BUG-002, ARC-002), work-in-constructors (ARC-001), no tests for validators (TST-001), no e2e safety net (TST-002), shared list mutation (BUG-001) |
-| P1 | 28 | 6 | locale global state (BUG-004), string-based error model (ARC-004), i18n incomplete (ARC-005), iterrows hot paths (PERF-001), CI non-blocking lint (TOOL-001), exit-code contract (SEC-008) |
-| P2 | 43 | 4 | see files |
-| P3 | 12 | 0 | see files |
-| **Total** | **90** | **11** | |
+| P0 | 7 | 2 done, 5 open — remaining: SEC-001, TST-001, ARC-001, ARC-002, BUG-002 |
+| P1 | 28 | 11 done, 3 in-progress, 14 open |
+| P2 | 43 | 16 done, 1 in-progress, 26 open |
+| P3 | 13 | 4 done, 1 wont-fix, 8 open |
+| **Total** | **91** | **33 done, 4 in-progress, 1 wont-fix, 53 open** |
 
-Status snapshot: 2026-08-25 — 11 done, 4 in-progress, 75 open
+Status snapshot: 2026-09-12 — 33 done, 4 in-progress, 1 wont-fix, 53 open (of 91 items incl. TOOL-011).

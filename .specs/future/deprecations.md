@@ -2,8 +2,8 @@
 
 | What | Why | Replaced by | Warning from | Removed in | Phase | Backlog |
 |---|---|---|---|---|---|---|
-| `middleware/bootstrap.py` (`Bootstrap`) | Locale persistence via CWD-relative file; thread pool for one task | `Options.locale` passed through `AppContext` | — (internal) | 0.8.0 | 1 | BUG-004, BUG-008 |
-| `.config/store.locale` (repo root and CWD) | Global mutable state, breaks installed usage, first-run mismatch | `--locale` per invocation | 0.8.0 (file ignored, stderr note if present) | 0.8.0 | 1 | BUG-004 |
+| `middleware/bootstrap.py` (`Bootstrap`) | Locale persistence via CWD-relative file; thread pool for one task | `LanguageManager(locale=...)` passed through `GeneralContext` (target: `Options.locale` through `AppContext`) | — (internal) | **Removed 2026-09-12** | 1 | BUG-004, BUG-008 |
+| `.config/store.locale` (repo root and CWD) | Global mutable state, breaks installed usage, first-run mismatch | `--locale` per invocation | 0.8.0 (file ignored, stderr note if present) | **Removed 2026-09-12** (no code path reads or writes it any more; nothing deletes a pre-existing file left over from an older version) | 1 | BUG-004 |
 | `pdfkit` + `wkhtmltopdf` | Upstream archived, old WebKit, native binary | `weasyprint` under extra `[pdf]`; PDF opt-in via `--format` | 0.9.0 | 1.0.0 | 4 | SEC-002 |
 | `scripts/*.sh`, `scripts/*.bat` (`run_main_pipeline`, `generate_*`, `prepare_*`) | Shell-only, `git add .` inside hooks, hand-bumped version | `tools/harness/run_fixtures.py`, CI workflows, release workflow | Phase 0 (moved to `tools/legacy/`) | Phase 5 | 0/5 | SEC-006, TOOL-009 |
 | Legacy `.pre-commit-config.yaml` hooks | Run the full pipeline and stage everything | Standard ruff/mypy/bandit hooks | Phase 0 | Phase 0 | 0 | TOOL-002 |

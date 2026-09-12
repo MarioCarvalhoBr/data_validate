@@ -32,6 +32,19 @@ TOOL-008
 4. New CLI (`data_validate/cli.py`, argparse or Typer) with explicit aliases, exit codes, `--json`;
    old spellings kept as deprecated aliases — ADR-0005.
 Gate: goldens unchanged; `mypy --strict` on new modules; coverage ≥ 70 %.
+Status (2026-09-12): Done, this slice — BUG-004, BUG-021, BUG-023 (3 items; part of item 3, ahead of
+the full `AppContext`): `Bootstrap` and `.config/store.locale` are deleted, `GeneralContext` now
+builds one `LanguageManager` from `data_args.data_file.locale` and injects it into
+`ApplicationConfig`/`FileSystemUtils`, and `data/output/logs` is only created in debug mode with
+handlers closed in `finalize()`. ARC-002 partial (locale-related global state closed; module
+singletons `SHEET`/`METADATA`/`Config` and class-level `RequiredColumn` mutation remain, tracked
+under BUG-002/Phase 2). Already done in earlier slices (not part of this change):
+BUG-001/005/008/009/010/011/017. Still open, remaining for Phase 1: `SheetSpec` consumer migration
+(item 1, modelled per ARC-003 but no consumer migrated yet), `Issue`/`MessageCatalog` wiring into
+the legacy pipeline (item 2 — `i18n/catalog.py`/`specs/issues.py` exist as models but no validator
+uses them yet), the rest of `AppContext` beyond locale/logger (item 3), and the new `cli.py` (item 4,
+ADR-0005) — ARC-003/004/006/011/012/SEC-008/PERF-004/TOOL-005/TOOL-008, see
+`01-bugs.md`/`03-architecture.md` for each item's detail.
 
 ## Phase 2 — Loading & normalisation
 Closes: BUG-002, BUG-003, BUG-013, BUG-014, BUG-015, BUG-018, ARC-007 (models), ARC-009, PERF-002,

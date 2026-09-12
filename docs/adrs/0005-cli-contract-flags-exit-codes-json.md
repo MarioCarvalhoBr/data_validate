@@ -1,8 +1,22 @@
 # ADR-0005: CLI contract: explicit flags, exit codes, JSON output; deprecate abbreviations and `.config/store.locale`
 
-- Status: Proposed
+- Status: Proposed (locale/`Bootstrap` removal implemented ahead of the rest — see status update below)
 - Date: 2026-08-25
 - Deciders: Mário de Araújo Carvalho (INPE) with the AI orchestrator
+
+## Status update (2026-09-12)
+
+The locale slice of this ADR is implemented, ahead of the full `cli.py`/`AppContext` rewrite:
+`middleware/bootstrap.py` (`Bootstrap`) and the whole `middleware` package are deleted;
+`.config/store.locale` is no longer read or written anywhere in the package. Locale is now an
+explicit `locale: str | None` argument on `LanguageManager.__init__` (falls back to
+`LanguageEnum.DEFAULT_LANGUAGE.value` when `None`/unsupported, no file I/O either way);
+`GeneralContext` builds the one `LanguageManager` instance for a run from
+`data_args.data_file.locale` and injects it into `ApplicationConfig` and `FileSystemUtils`. The rest
+of this ADR (`cli.py`, `-i/-o/-l` short flags with `allow_abbrev=False`, `--json`, `--format`,
+`--fail-on`, standardised exit codes, moving the import-time banner behind `--verbose`) remains
+open and unimplemented — tracked under ARC-011/ARC-012/SEC-008 in
+`.specs/quality/backlog/03-architecture.md`.
 
 ## Context
 

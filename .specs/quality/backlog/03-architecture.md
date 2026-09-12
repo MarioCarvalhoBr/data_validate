@@ -25,6 +25,20 @@ zero global state. Each item below names the current smell, where it lives, and 
   `DataArgs`, `GeneralContext`, `ApplicationConfig`, `FileSystemUtils` (each re-reads the JSON).
 - Target: one `AppContext` built in `main()` from CLI args and passed down; frozen dataclasses for
   config; no module-level instances with side effects.
+- Done (partial — Phase 1 locale/context slice, BUG-004/BUG-021/BUG-023): locale persisted in
+  `.config/store.locale` is gone (`Bootstrap` and the whole `middleware` package are deleted;
+  `LanguageManager` takes an explicit `locale` constructor argument and performs no file I/O to
+  resolve it). `LanguageManager()` is no longer instantiated independently in `DataArgs`,
+  `GeneralContext`, `ApplicationConfig`, and `FileSystemUtils` (each re-reading the JSON catalog on
+  its own) — `GeneralContext` now builds **one** `LanguageManager` from `data_args.data_file.locale`
+  and injects that same instance into `ApplicationConfig(language_manager=...)` and
+  `FileSystemUtils(language_manager=...)` (both gained an optional constructor parameter; each still
+  defaults to building its own when not given, for any remaining standalone caller). `DataArgs` no
+  longer builds an unused `LanguageManager` of its own. Still open / not touched by this slice:
+  class-level Series mutation (BUG-002), the `SHEET` (`config/spreadsheet_info.py`), `METADATA`
+  (`config/metadata_info.py`), and `Config`/`SingletonMeta` (`data_loader/common/config.py`) module
+  singletons, and `os.environ` mutation (BUG-022) — all remain global mutable state for a future
+  slice of this item.
 
 ### ARC-003 · Three competing sources of truth for sheet definitions
 - Priority: P1 · Effort: M · Status: in-progress
@@ -143,6 +157,13 @@ zero global state. Each item below names the current smell, where it lives, and 
   `file_report_generator.py:153,263,335,340,361,368`, `language_manager.py:38,50,61-65`,
   `bootstrap.py:76-81`, `metadata_info.py:74`.
 - Target: `rich`/`logging` console handler with levels; stdout reserved for machine output.
+- Partial (BUG-004 side effect): `bootstrap.py` no longer exists (the whole `middleware` package
+  was deleted), so its `print()`s are gone with it — not converted, moot. `language_manager.py`'s
+  internal `print()`s (`_load_translations`, `set_language`) are replaced with
+  `logging.getLogger(__name__).warning(...)`/`.error(...)` calls, message text preserved verbatim.
+  `general_context.py:103`'s debug-mode `print("\nLog file created at:", ...)` is intentionally kept
+  as a `print()` for now (still open, tracked here) — only the file-persisted-locale prints were in
+  scope for this slice.
 
 ### ARC-013 · Naming
 - Priority: P2 · Effort: S · Status: open

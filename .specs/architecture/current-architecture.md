@@ -8,8 +8,7 @@ This document describes the code **as it is**. Smells are tagged with backlog ID
 ```mermaid
 flowchart TD
   A[main.py::main] --> B[DataArgs<br/>helpers/base/data_args.py<br/>argparse in __init__]
-  B --> C[Bootstrap<br/>middleware/bootstrap.py<br/>writes .config/store.locale]
-  C --> D[GeneralContext<br/>controllers/context/general_context.py<br/>LanguageManager, ApplicationConfig, FileSystemUtils, LoggerManager]
+  B --> D[GeneralContext<br/>controllers/context/general_context.py<br/>one LanguageManager built from data_args.data_file.locale,<br/>injected into ApplicationConfig/FileSystemUtils; LoggerManager only<br/>opens a file handler when --debug]
   D --> E[SpreadsheetProcessor<br/>controllers/spreadsheet_processor.py<br/>runs pipeline in __init__]
   E --> E1[_prepare_statement: one empty report per NamesEnum]
   E1 --> E2[_read_data: DataLoaderFacade.load_all]
@@ -17,8 +16,12 @@ flowchart TD
   E3 --> E4[_build_pipeline: DataModelContext + 10 validators]
   E4 --> E5[_report: FileReportGenerator.build_report]
   E5 --> F[HTML + PDF in output folder<br/>JSON fragment on stdout]
-  A --> G[GeneralContext.finalize<br/>delete log unless --debug]
+  A --> G[GeneralContext.finalize<br/>closes/detaches every file-logger handler;<br/>prints the log path only when --debug]
 ```
+
+`Bootstrap` (`middleware/bootstrap.py`, and the `middleware` package with it) is deleted (BUG-004):
+locale is threaded as an explicit `--locale` value from `DataArgs` into `GeneralContext`, with no
+`.config/store.locale` persistence step between them.
 
 ### Execution order inside `SpreadsheetProcessor`
 
@@ -36,10 +39,9 @@ flowchart TD
 
 | Component | File | Responsibility | Smells |
 |---|---|---|---|
-| `main()` | `data_validate/main.py` | Wires `DataArgs → Bootstrap → GeneralContext → SpreadsheetProcessor → finalize`; prints welcome banner at import | ARC-012, SEC-008 |
+| `main()` | `data_validate/main.py` | Wires `DataArgs → GeneralContext → SpreadsheetProcessor → finalize`; prints welcome banner at import | ARC-012, SEC-008 |
 | `DataArgs`, `DataFile`, `DataAction`, `DataReport` | `helpers/base/data_args.py` | argparse definition and validation; `allow_abbrev=True` makes `--i/--o/--l` work | ARC-001, ARC-011, BUG-009 |
-| `Bootstrap` | `middleware/bootstrap.py` | Validates `--locale`, persists it to `./.config/store.locale` (relative to CWD) using a thread pool | BUG-004, BUG-008 |
-| `GeneralContext` | `controllers/context/general_context.py` | Holds `data_args`, `language_manager`, `config`, `file_system_utils`, `logger_manager`, `logger`; disables logger unless `--debug`; `finalize()` deletes the log file | ARC-006, BUG-021 |
+| `GeneralContext` | `controllers/context/general_context.py` | Holds `data_args`, `language_manager` (built once from `data_args.data_file.locale`, BUG-004/BUG-023), `config`, `file_system_utils` (both injected with the same `language_manager`), `logger_manager`, `logger`; disables logger unless `--debug`; opens a file handler only in debug mode, under `<output_folder>/logs`; `finalize()` closes and detaches every file-logger handler | ARC-006 |
 | `DataModelContext` | `controllers/context/data_model_context.py` | Holds initialized models; `get_instance_of(cls)` linear `isinstance` scan | ARC-006 |
 | `ApplicationConfig` | `config/application_config.py` | Constants (`TITLE_OVER_N_CHARS=40`, `SIMPLE_DESCRIPTIONS_OVER_N_CHARS=150`, `REPORT_LIMIT_N_MESSAGES=20`, `VALUE_DATA_UNAVAILABLE="DI"`, `LABEL_DATA_UNAVAILABLE="Dado indisponível"`, `PRECISION_DECIMAL_PLACE_TRUNCATE=3`, `DATE_NOW`, `CURRENT_YEAR`), fallback HTML template, `get_verify_names()` | BUG-011, PERF-004 |
 | `NamesEnum` | `config/names_enum.py` | 34 verification keys → i18n keys `verification_name_*` | — |
@@ -113,8 +115,8 @@ static-method namespaces (ARC-007).
 
 | Concern | Implementation | Smells |
 |---|---|---|
-| i18n | `LanguageManager` reads `<repo>/.config/store.locale`, loads `static/locales/<lang>/messages.json`; `text(key, **kwargs)`; used by only two components — everything else is hard-coded pt-BR | ARC-005, BUG-004, BUG-016 |
-| Logging | `LoggerManager` (console + file, colour formatter); file removed unless `--debug` | BUG-021 |
+| i18n | One `LanguageManager` per run, built by `GeneralContext` from the explicit `--locale` value (no file I/O to resolve it, BUG-004 fixed), loads `static/locales/<lang>/messages.json`; `text(key, **kwargs)`; shared by `ApplicationConfig`/`FileSystemUtils`; used by only a few components — everything else is hard-coded pt-BR | ARC-005, BUG-016 |
+| Logging | `LoggerManager` (console + file, colour formatter); a file handler is only created in debug mode, under `<output_folder>/logs`; `finalize()` closes every handler (BUG-021 fixed) | — |
 | Spell-check | `SpellChecker → DictionaryManager (enchant Broker, ENCHANT_CONFIG_DIR = static/dictionaries)`, `SpellCheckerController`, `TextProcessor`, `DataFrameProcessor` | ARC-015, BUG-022 |
 | Errors as data | `list[str]` of pre-formatted messages everywhere | ARC-004 |
 
@@ -137,9 +139,11 @@ class-level column definitions (BUG-002). This is the main obstacle to testing a
 
 | Path | When | Smell |
 |---|---|---|
-| `./.config/store.locale` (CWD) and `<repo>/.config/store.locale` | every run | BUG-004 |
-| `data/output/logs/data_validate_<ts>.log` (CWD) | every run, deleted unless `--debug` | BUG-021 |
+| `<output_folder>/logs/data_validate_<ts>.log` | only with `--debug`; kept on disk, handlers closed by `finalize()` | — |
 | `<output>/<input-name>_report.html`, `.pdf` | every run | — |
 | `<package>/static/dictionaries/<lang>.dic|.exc` | spell-check with user words | BUG-022 |
+
+`./.config/store.locale` and `data/output/logs/` created unconditionally relative to the CWD (BUG-004,
+BUG-021) are both removed as of this slice — see `.specs/future/deprecations.md`.
 
 Last synced with code: 09279f4

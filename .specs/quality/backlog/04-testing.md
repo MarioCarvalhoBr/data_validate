@@ -84,7 +84,16 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
 - Done: files deleted on 2026-09-12 (they were untracked; no commit needed beyond this status).
 
 ### TST-010 · Test data builders for the protocol
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: done
 - Proposed fix: `tests/factories.py` producing minimal valid bundles (description + composition +
   values + temporal reference, optional scenarios/legend/proportionalities) with helpers to inject a
   single defect; used by rule tests and by fixture generation for benchmarks.
+- Done: `tests/factories.py` (`make_description_frame`, `make_composition_frame`,
+  `make_values_frame` + `di_at`, `make_temporal_frame`, `make_scenario_frame`,
+  `make_legend_frame`, `make_proportionality_frame`, `make_bundle`), 100 % line coverage via
+  `tests/unit/test_factories.py` (73 cases); columns sourced from `data_validate.specs.SHEET_SPECS`,
+  every cell a `str` (mirrors the loaders' `dtype=str`). `break_one()`-style single-defect
+  injection was dropped from scope (module docstring documents mutating a copy directly instead;
+  `di_at()` is the one sanctioned marker-injection helper). Phase 3 rule tests
+  (`08-migration-roadmap.md`) and validator unit tests import these factories instead of building
+  ad hoc `pd.DataFrame`/`MagicMock` fixtures by hand.

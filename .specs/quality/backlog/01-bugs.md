@@ -58,7 +58,7 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Related: ARC-007
 
 ### BUG-004 · Locale is resolved from two different `.config/store.locale` paths, in the wrong order
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: done
 - Where: `middleware/bootstrap.py:41-42` (`os.path.expanduser(".config")` → relative to CWD),
   `helpers/tools/locale/language_manager.py:34` (`parents[4]/.config` → repository root, or
   `site-packages` parent when installed), `main.py:13-16` (`DataArgs()` builds a `LanguageManager`
@@ -71,6 +71,27 @@ Every fix here must land with a regression test under `tests/` that fails before
   (no file persistence at all); if persistence is desired, use `platformdirs.user_config_dir`.
 - Tests: run with `--locale en_US` from a temp CWD and assert English messages.
 - Related: ARC-002, BUG-023, TOOL-008
+- Done: `Bootstrap` (`middleware/bootstrap.py`, the whole `middleware` package) is deleted; `main.py`
+  now wires `DataArgs() → GeneralContext(data_args=data_args) → SpreadsheetProcessor → finalize()`
+  directly, with no locale-persistence step in between. `LanguageManager.__init__` takes an explicit
+  `locale: str | None` constructor argument (falls back to `LanguageEnum.DEFAULT_LANGUAGE.value`
+  when `None` or unsupported) and the typo'd `_congifure_language` method — the only code path that
+  ever read or wrote `.config/store.locale` — is deleted entirely; no file is read or written to
+  resolve the locale any more. `GeneralContext.__init__` builds the **one** `LanguageManager`
+  instance for a run from `data_args.data_file.locale` and injects it into `ApplicationConfig` and
+  `FileSystemUtils` (both gained an optional `language_manager` constructor parameter, defaulting to
+  building their own with `locale=None` for backwards compatibility). `DataArgs` no longer builds its
+  own (unused) `LanguageManager` either. Verified with a manual CLI smoke run
+  (`python -m data_validate.main --locale en_US ...` from `/tmp`): the HTML report renders in
+  English (`"Structure of the input folder files"` vs the pt_BR `"Estrutura dos arquivos da pasta de
+  entrada"`) and no `.config/` or `data/` directory is created under the invocation's CWD. Tests:
+  `tests/unit/helpers/tools/locale/test_language_manager.py` (rewritten for the explicit-locale
+  constructor, including a `no file I/O for locale resolution` regression test and two
+  real-catalog end-to-end cases), `tests/unit/controllers/context/test_general_context.py` (new —
+  `test_locale_en_us_produces_english_text`, shared-`LanguageManager` instance test),
+  `tests/unit/config/test_application_config.py::TestApplicationConfigLanguageManagerInjection`,
+  `tests/unit/helpers/base/test_file_system_utils.py::test_init_uses_injected_language_manager`.
+  `middleware/bootstrap.py` and `tests/unit/middleware/` are deleted (see BUG-008, now moot).
 
 ### BUG-005 · `ValidationReport.flatten` crashes when `context` is `None`
 - Priority: P1 · Effort: S · Status: done
@@ -135,6 +156,9 @@ Every fix here must land with a regression test under `tests/` that fails before
   instead of submitting it to a single-task `ThreadPoolExecutor`; the now-unused
   `concurrent.futures` import was removed. `Bootstrap` itself is untouched (that is BUG-004).
   Tests: `tests/unit/middleware/test_bootstrap.py`.
+- Superseded: `Bootstrap` (and `tests/unit/middleware/test_bootstrap.py` with it) was deleted
+  entirely by the BUG-004 fix; this item's fix is moot now that the class it patched no longer
+  exists, kept here only for history.
 
 ### BUG-009 · Output folder names containing a dot are rejected
 - Priority: P2 · Effort: S · Status: done
@@ -318,13 +342,29 @@ Every fix here must land with a regression test under `tests/` that fails before
   `tests/unit/controllers/report/test_validation_report.py::TestReportItemClass`.
 
 ### BUG-021 · Logger creates `data/output/logs` in CWD and leaks the file handler
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `controllers/context/general_context.py:74-84,100-101`, `helpers/base/logger_manager.py:144`
 - Problem: a log directory is always created relative to CWD; a log file is created and then deleted
   when not in debug mode; the `FileHandler` is never closed (deletion fails on Windows, handlers
   accumulate across runs in one process).
 - Proposed fix: log to `output_folder/logs` only when `--debug`; use `logging.config.dictConfig`
   and close handlers in `finalize()`.
+- Done: `LoggerManager.__init__` now accepts `log_folder: str | None`; when `None` (the non-debug
+  path), no directory is created and `configure_logger` attaches no `FileHandler` at all — only a
+  console handler. `GeneralContext.__init__` passes `log_folder=os.path.join(output_folder, "logs")`
+  only when `data_args.data_action.debug` is true, and `log_folder=None` otherwise — never a
+  `logs/` directory relative to the CWD (previously always `"data/output/logs"`, a literal relative
+  path). `GeneralContext.finalize()` no longer calls `file_system_utils.remove_file(...)` (there is
+  no file to delete when not in debug mode); instead it always closes and detaches every handler on
+  `self.logger` (`handler.close()` + `logger.removeHandler(handler)`), fixing the leaked/never-closed
+  `FileHandler`. `logging.config.dictConfig` was not adopted — `LoggerManager`'s existing
+  imperative `configure_logger` already satisfies the "no directory unless debug, handlers closed"
+  acceptance criteria without that larger refactor. Regression tests:
+  `tests/unit/helpers/base/test_logger_manager.py::TestLoggerManagerNoFileLogging` (no directory, no
+  file handler, `log_file is None`, all with `log_folder=None`),
+  `tests/unit/controllers/context/test_general_context.py::TestGeneralContextLogging` (debug=False:
+  no `logs/` directory anywhere under an isolated CWD, logger disabled; debug=True: log file created
+  under `<output_folder>/logs`; `finalize()` leaves `logger.handlers == []` in both modes).
 
 ### BUG-022 · Spellchecker writes personal dictionaries inside the package directory
 - Priority: P2 · Effort: M · Status: open
@@ -337,10 +377,19 @@ Every fix here must land with a regression test under `tests/` that fails before
   temp dir; no environment mutation.
 
 ### BUG-023 · Spell dictionary language taken from CLI arg, UI language from file
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `validators/spell/spellchecker_validator.py:72` vs `helpers/tools/locale/language_manager.py:47-51`
 - Problem: two sources of truth that can disagree (see BUG-004).
 - Proposed fix: single `Locale` value in the context.
+- Done: closed by construction as part of BUG-004. `SpellCheckerValidator` already read
+  `self._data_models_context.context.data_args.data_file.locale` (the parsed `--locale` value)
+  directly — unchanged by this fix — and `GeneralContext.language_manager` is now built from that
+  exact same `data_args.data_file.locale` value (previously `LanguageManager` resolved its language
+  independently from `.config/store.locale`, a second source that could disagree with the CLI arg).
+  Both the spell-check dictionary language and the UI/report language now trace back to the single
+  parsed `--locale` argument. No code change was needed in `spellchecker_validator.py`; verified by
+  inspection and by
+  `tests/unit/controllers/context/test_general_context.py::TestGeneralContextLocale`.
 
 ### BUG-024 · Typos in identifiers and filenames
 - Priority: P3 · Effort: S · Status: open
@@ -349,6 +398,12 @@ Every fix here must land with a regression test under `tests/` that fails before
   (`origina_value`), `language_manager.py:28` ("Pipiline"), `data_args.py:204` ("validaton"),
   `file_system_utils.py:95` ("dempotent").
 - Proposed fix: rename during the module migration; keep a compatibility import for one release.
+- Partial (BUG-004 side effect): `language_manager.py`'s `_congifure_language` method (and its
+  "Pipiline" comment) is deleted entirely, not renamed — it was the sole reader/writer of
+  `.config/store.locale`, removed as part of closing BUG-004. The remaining typos
+  (`compostion_graph_validator.py`, `legend_processing.py:181`'s `origina_value`,
+  `data_args.py:204`'s "validaton", `file_system_utils.py:95`'s "dempotent") are untouched — out of
+  this item's scope.
 
 ### BUG-025 · `check_columns_in_models_dataframes` KeyError on unknown model name
 - Priority: P3 · Effort: S · Status: done
