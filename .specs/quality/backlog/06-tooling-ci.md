@@ -90,3 +90,17 @@
   pandas-stubs compatibility), `poetry.lock` 157 kB.
 - Proposed fix: document upgrade cadence in `.specs/infrastructure/dependencies.md`; Dependabot
   weekly; `pip-audit` in CI.
+
+### TOOL-011 · guard-bash hook rejects quoted multi-line arguments and heredoc bodies
+- Priority: P3 · Effort: S · Status: open
+- Where: `.claude/hooks/guard-bash.sh` (segment splitter)
+- Problem: the hook splits the command on newlines *before* tokenizing, so a quoted multi-line
+  argument (e.g. a `git commit -m` message with a body) or a heredoc body line that mentions `git`
+  is cut mid-string, `shlex` fails, and the fail-closed path blocks a legitimate command.
+  Workarounds: `git commit -F <file>`; write files via the editor tool instead of heredocs.
+- Evidence: two blocked commands while closing TST-008 on 2026-08-25 ("could not safely tokenize
+  a command segment mentioning 'git'").
+- Proposed fix: tokenize the whole command with `shlex` first (quotes intact), then split into
+  segments on operator tokens (`&&`, `;`, `|`, `||`) — never on raw newlines inside quotes; treat
+  heredoc bodies as data, not commands; keep fail-closed for genuine tokenization errors; extend
+  `--self-test` with multi-line `-m` and heredoc cases.
