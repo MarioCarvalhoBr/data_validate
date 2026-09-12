@@ -11,6 +11,7 @@ from typing import List, Tuple, Dict, Any
 from data_validate.config import NamesEnum
 from data_validate.controllers.context.data_model_context import DataModelContext
 from data_validate.controllers.report.validation_report import ValidationReport
+from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
@@ -120,26 +121,38 @@ class SpTemporalReferenceValidator(BaseValidator):
         - First row is excluded from validation (represents current year)
         - Years must be greater than config.CURRENT_YEAR
         - Missing symbol column returns errors immediately
+        - Symbols that are not valid integers are skipped here; they are
+          already reported as data-cleaning errors by the model (BUG-007)
         """
         errors = []
 
-        columns_to_check = [
-            SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name,
-        ]
+        column_name_symbol = SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.name
+        columns_to_check = [column_name_symbol]
         for column in columns_to_check:
             exists_column, msg_error_column = self._column_exists(column)
             if not exists_column:
                 errors.append(msg_error_column)
                 return errors, []
 
-        # Remove first row: This is actual year
-        column_series_symbol = SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.iloc[1:]
+        # Remove first row: This is actual year. Read from the validator's own
+        # dataframe copy, not the model's class-level Series (BUG-002), so the
+        # rule does not depend on a previous model run having populated it.
+        column_series_symbol = self._dataframe[column_name_symbol].iloc[1:]
         years = column_series_symbol.unique()
 
         # Check if all years are greater than the current year
         for year in years:
-            if int(year) < self._data_models_context.context.config.CURRENT_YEAR:
-                errors.append(f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.")
+            is_valid_integer, __ = NumberFormattingProcessing.check_cell_integer(year)
+            if not is_valid_integer:
+                # Non-numeric symbols are already reported as data-cleaning
+                # errors by the model; this rule only judges valid years.
+                continue
+
+            __, numeric_year = NumberFormattingProcessing.parse_numeric(year)
+            if int(numeric_year) < self._data_models_context.context.config.CURRENT_YEAR:
+                errors.append(
+                    f"{self._filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro."
+                )
 
         return errors, []
 
