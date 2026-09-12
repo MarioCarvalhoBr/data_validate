@@ -12,7 +12,7 @@ from data_validate.controllers import GeneralContext
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
-class TestReportItem:
+class ReportItem:
     """
     Data model for a single validation report item.
 
@@ -26,9 +26,12 @@ class TestReportItem:
         was_executed (bool): Flag indicating if the validation was executed.
     """
 
+    # Not a pytest test class despite the legacy `TestReportItem` alias name below (BUG-020).
+    __test__ = False
+
     def __init__(self, test_name: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None):
         """
-        Initialize a TestReportItem.
+        Initialize a ReportItem.
 
         Args:
             test_name (str): The name/identifier of the test.
@@ -77,6 +80,11 @@ class TestReportItem:
         return bool(self.warnings)
 
 
+# Backward-compatible alias kept for one release after the BUG-020 rename;
+# `ReportItem.__test__ = False` above already stops pytest from collecting it.
+TestReportItem = ReportItem
+
+
 class ValidationReport:
     """
     Data model for a collection of validation reports, accessible by test name.
@@ -86,19 +94,19 @@ class ValidationReport:
 
     Attributes:
         context (Optional[GeneralContext]): Application context for localization and utils.
-        reports (dict[str, TestReportItem]): Dictionary of reports indexed by their test name.
+        reports (dict[str, ReportItem]): Dictionary of reports indexed by their test name.
     """
 
-    def __init__(self, context: Optional["GeneralContext"] = None, reports: Optional[List[TestReportItem]] = None):
+    def __init__(self, context: Optional["GeneralContext"] = None, reports: Optional[List[ReportItem]] = None):
         """
         Initialize a ValidationReport.
 
         Args:
             context (Optional[GeneralContext]): DI context. Defaults to None.
-            reports (Optional[List[TestReportItem]]): Initial list of reports. Defaults to None.
+            reports (Optional[List[ReportItem]]): Initial list of reports. Defaults to None.
         """
         self.context = context
-        self.reports: dict[str, TestReportItem] = {}
+        self.reports: dict[str, ReportItem] = {}
         if reports:
             for report in reports:
                 self.add_report(report)
@@ -115,19 +123,21 @@ class ValidationReport:
         if name_test in self.reports:
             self.reports[name_test].was_executed = False
         else:
-            self.reports[name_test] = TestReportItem(name_test)
+            self.reports[name_test] = ReportItem(name_test)
             self.reports[name_test].was_executed = False
 
-    def add_report(self, report: TestReportItem) -> None:
+    def add_report(self, report: ReportItem) -> None:
         """
         Add a full report object to the collection.
 
         Args:
-            report (TestReportItem): The report instance to add.
+            report (ReportItem): The report instance to add.
         """
         self.reports[report.test_name] = report
 
-    def add_by_name(self, name_test: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None) -> None:
+    def add_by_name(
+        self, name_test: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None
+    ) -> None:
         """
         Create and add a report by name with optional errors and warnings.
 
@@ -136,7 +146,7 @@ class ValidationReport:
             errors (Optional[List[str]]): List of errors. Defaults to None.
             warnings (Optional[List[str]]): List of warnings. Defaults to None.
         """
-        self.reports[name_test] = TestReportItem(name_test, errors, warnings)
+        self.reports[name_test] = ReportItem(name_test, errors, warnings)
 
     def list_all_names(self) -> List[str]:
         """
@@ -195,20 +205,39 @@ class ValidationReport:
 
         Returns:
             ValidationReport: A new flattened report instance.
+
+        Raises:
+            ValueError: If truncation is required (some report exceeds
+                `n_messages` errors or warnings) but no `context` was set on
+                this instance, since a context is needed to translate the
+                omitted-message summary. Instances with no truncation needed
+                do not require a context (BUG-005).
         """
+        needs_truncation = any(
+            len(report.errors) > n_messages or len(report.warnings) > n_messages for report in self.reports.values()
+        )
+        if needs_truncation and self.context is None:
+            raise ValueError("ValidationReport.flatten requires a context for message translation")
+
         flattened_reports = []
         for report in self.reports.values():
-            flattened_report = TestReportItem(
+            flattened_report = ReportItem(
                 test_name=report.test_name,
                 errors=report.errors[:n_messages],
                 warnings=report.warnings[:n_messages],
             )
             if len(report.errors) > n_messages:
-                omitted_errors_count = NumberFormattingProcessing.format_number_brazilian(len(report.errors) - n_messages, locale)
-                flattened_report.add_error(self.context.language_manager.text("model_report_msg_errors_omitted", count=omitted_errors_count))
+                omitted_errors_count = NumberFormattingProcessing.format_number_brazilian(
+                    len(report.errors) - n_messages, locale
+                )
+                flattened_report.add_error(
+                    self.context.language_manager.text("model_report_msg_errors_omitted", count=omitted_errors_count)
+                )
 
             if len(report.warnings) > n_messages:
-                count_omitted_warnings = NumberFormattingProcessing.format_number_brazilian(len(report.warnings) - n_messages, locale)
+                count_omitted_warnings = NumberFormattingProcessing.format_number_brazilian(
+                    len(report.warnings) - n_messages, locale
+                )
                 flattened_report.add_warning(
                     self.context.language_manager.text(
                         "model_report_msg_warnings_omitted",
@@ -219,7 +248,7 @@ class ValidationReport:
             flattened_reports.append(flattened_report)
         return ValidationReport(context=self.context, reports=flattened_reports)
 
-    def __getitem__(self, name: str) -> TestReportItem:
+    def __getitem__(self, name: str) -> ReportItem:
         """
         Retrieve a report by name.
 
@@ -227,16 +256,16 @@ class ValidationReport:
             name (str): The name of the test.
 
         Returns:
-            TestReportItem: The requested report object.
+            ReportItem: The requested report object.
         """
         return self.reports[name]
 
-    def __iter__(self) -> Iterator[TestReportItem]:
+    def __iter__(self) -> Iterator[ReportItem]:
         """
         Iterate over the reports.
 
         Returns:
-            Iterator[TestReportItem]: Iterator over Report objects.
+            Iterator[ReportItem]: Iterator over Report objects.
         """
         return iter(self.reports.values())
 

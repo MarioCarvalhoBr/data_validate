@@ -8,6 +8,7 @@ validation process. It supports template-based HTML generation and PDF conversio
 using `pdfkit` and `jinja2`.
 """
 
+import json
 import os
 import platform
 import re
@@ -92,7 +93,9 @@ class FileReportGenerator:
         self.required_variables = re.findall(variable_pattern, self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS)
 
         # Load template from file or use default
-        template_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../static/report/report_template.html"))
+        template_path = os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "../../static/report/report_template.html")
+        )
         if os.path.exists(template_path):
             with open(template_path, "r", encoding="utf-8") as file:
                 self.template_data_text = file.read()
@@ -123,7 +126,9 @@ class FileReportGenerator:
         self.warning_count = report_list.get_total_warnings()
         self.total_tests = len(report_list)
 
-        flattened_reports = report_list.flatten(n_messages=self.context.config.REPORT_LIMIT_N_MESSAGES, locale=self.locale)
+        flattened_reports = report_list.flatten(
+            n_messages=self.context.config.REPORT_LIMIT_N_MESSAGES, locale=self.locale
+        )
 
         skipped_tests = []
         if self.context.data_args.data_action.no_spellchecker:
@@ -197,7 +202,7 @@ class FileReportGenerator:
             if self.context.data_args.data_action.no_version
             else f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{METADATA.__version__} &ndash; {platform.system()}</strong></strong><br>"
         )
-        text_html_skipped_tests = f"<ul>{"\n".join([f"<li>{test_name}</li>" for test_name in skipped_tests])}</ul>"
+        text_html_skipped_tests = f"<ul>{'\n'.join([f'<li>{test_name}</li>' for test_name in skipped_tests])}</ul>"
 
         return {
             "name": METADATA.__project_name__,
@@ -234,7 +239,7 @@ class FileReportGenerator:
         if field_value is None:
             return ""
 
-        return f"<strong>{display_label}: " f"<strong class='text-gray'>{field_value}</strong></strong><br>"
+        return f"<strong>{display_label}: <strong class='text-gray'>{field_value}</strong></strong><br>"
 
     def _print_json_summary(self) -> None:
         """
@@ -255,7 +260,7 @@ class FileReportGenerator:
             }
         }
 
-        json_output = str(summary).replace("'", '"')
+        json_output = json.dumps(summary, ensure_ascii=False)
 
         info_message = f"\n<{json_output}>\n"
 
