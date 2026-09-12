@@ -8,7 +8,7 @@ formatting useful for handling data spreadsheet numeric values.
 """
 
 import math
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_DOWN, Decimal, InvalidOperation
 from typing import Tuple, Any
 
 import pandas as pd
@@ -32,8 +32,9 @@ class NumberFormattingProcessing:
         """
         Convert a value to a truncated Decimal object.
 
-        Truncates the decimal part of the number to the specified precision without rounding.
-        Handles comma as decimal separator. Returns 0 if value is ignored or invalid.
+        Truncates the decimal part of the number to the specified precision without rounding,
+        towards zero. Handles comma as decimal separator, plain and scientific notation.
+        Returns 0 if value is ignored or invalid.
 
         Args:
             value_number (Any): The number to convert.
@@ -46,15 +47,11 @@ class NumberFormattingProcessing:
         if pd.isna(value_number) or value_number == value_to_ignore:
             return Decimal("0")
 
-        s_val = str(value_number).replace(",", ".")
         try:
-            if "." in s_val:
-                integer_part, decimal_part = s_val.split(".")
-                truncated_val = f"{integer_part}.{decimal_part[:precision]}"
-            else:
-                truncated_val = s_val
-            return Decimal(truncated_val)
-        except (ValueError, InvalidOperation, Exception):
+            value_dec = Decimal(str(value_number).replace(",", "."))
+            quantum = Decimal(1).scaleb(-precision)
+            return value_dec.quantize(quantum, rounding=ROUND_DOWN)
+        except (ValueError, InvalidOperation):
             return Decimal("0")
 
     @staticmethod

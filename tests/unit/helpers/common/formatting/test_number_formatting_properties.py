@@ -8,6 +8,7 @@ parsing round-trips.
 """
 
 from decimal import Decimal
+from typing import Any
 
 import pytest
 from hypothesis import given, settings, strategies as st
@@ -105,19 +106,6 @@ class TestToDecimalTruncated:
         result = NumberFormattingProcessing.to_decimal_truncated(value_to_ignore, value_to_ignore, 2)
         assert result == Decimal("0")
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason=(
-            "BUG candidate (TST-005 property finding): to_decimal_truncated() truncates by "
-            "string-splitting on a literal '.', so any value whose str() representation uses "
-            "scientific notation with no fractional mantissa digit (abs(value) < 1e-4, e.g. "
-            "str(1e-05) == '1e-05', no '.') skips truncation entirely -- "
-            "to_decimal_truncated(1e-05, 'DI', 0) returns Decimal('0.00001') instead of Decimal('0'). "
-            "Used by proportionality_processing.py on real (unbounded) float weights, so a very "
-            "small proportionality value silently bypasses the precision truncation. "
-            "Repro: NumberFormattingProcessing.to_decimal_truncated(1e-05, 'DI', 0)."
-        ),
-    )
     @pytest.mark.parametrize(
         "value, precision",
         [
@@ -129,9 +117,34 @@ class TestToDecimalTruncated:
         ],
     )
     def test_to_decimal_truncated_scientific_notation_bug_candidate(self, value: float, precision: int) -> None:
-        """Values whose str() uses scientific notation are silently not truncated (bug)."""
+        """Values whose str() uses scientific notation are truncated like any other value (BUG-028, fixed).
+
+        `to_decimal_truncated` now quantizes via `Decimal.quantize(..., rounding=ROUND_DOWN)` instead of
+        splitting the string representation on a literal '.', so scientific-notation floats (e.g.
+        str(1e-05) == "1e-05", no '.') are no longer silently exempt from truncation.
+        """
         truncated = NumberFormattingProcessing.to_decimal_truncated(value, "DI", precision)
         assert NumberFormattingProcessing.check_n_decimals_places(truncated, "DI", precision) is False
+
+    @pytest.mark.parametrize(
+        "value, precision, expected",
+        [
+            (1e-05, 0, Decimal("0")),
+            (2e-05, 2, Decimal("0.00")),
+            (5e-06, 4, Decimal("0.0000")),
+            (9e-05, 1, Decimal("0.0")),
+            (1e-06, 0, Decimal("0")),
+            (-1.2345e-2, 3, Decimal("-0.012")),
+            (Decimal("3.14159"), 2, Decimal("3.14")),
+            (Decimal("-0.129"), 2, Decimal("-0.12")),
+            (1e20, 0, Decimal("100000000000000000000")),
+            (5, 2, Decimal("5.00")),
+        ],
+    )
+    def test_to_decimal_truncated_deterministic_cases(self, value: Any, precision: int, expected: Decimal) -> None:
+        """Deterministic BUG-028 regression cases: scientific notation, negatives, Decimal inputs, huge exponents."""
+        truncated = NumberFormattingProcessing.to_decimal_truncated(value, "DI", precision)
+        assert truncated == expected
 
 
 class TestParseNumeric:

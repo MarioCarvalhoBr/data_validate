@@ -1,14 +1,46 @@
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 import math
+from decimal import Decimal
 
 import pandas as pd
+import pytest
 
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
 class TestNumberFormatting:
     """Test cases for number formatting functions."""
+
+    @pytest.mark.parametrize(
+        "value, value_to_ignore, precision, expected",
+        [
+            # Plain decimals (existing behaviour, preserved).
+            ("1.23456", "DI", 2, Decimal("1.23")),
+            ("1,23456", "DI", 2, Decimal("1.23")),
+            (10, "DI", 2, Decimal("10.00")),
+            ("DI", "DI", 2, Decimal("0")),
+            (float("nan"), "DI", 2, Decimal("0")),
+            ("not-a-number", "DI", 2, Decimal("0")),
+            # Scientific-notation floats (BUG-028): must truncate, not bypass.
+            (1e-05, "DI", 0, Decimal("0")),
+            (2e-05, "DI", 2, Decimal("0.00")),
+            (5e-06, "DI", 4, Decimal("0.0000")),
+            (9e-05, "DI", 1, Decimal("0.0")),
+            (1e-06, "DI", 0, Decimal("0")),
+            # Negative numbers truncate towards zero, matching the pre-fix string-slicing semantics.
+            (-0.129, "DI", 2, Decimal("-0.12")),
+            (-1.2345e-2, "DI", 3, Decimal("-0.012")),
+            # Decimal input passes through the same quantization path.
+            (Decimal("3.14159"), "DI", 2, Decimal("3.14")),
+            # Huge exponents must not crash and must stay integral when precision is 0.
+            (1e20, "DI", 0, Decimal("100000000000000000000")),
+        ],
+    )
+    def test_to_decimal_truncated(self, value, value_to_ignore, precision, expected) -> None:
+        """`to_decimal_truncated` truncates towards zero for plain, comma, and scientific notation."""
+        result = NumberFormattingProcessing.to_decimal_truncated(value, value_to_ignore, precision)
+        assert result == expected
 
     def test_format_number_brazilian(self):
         """Test Brazilian number formatting."""
