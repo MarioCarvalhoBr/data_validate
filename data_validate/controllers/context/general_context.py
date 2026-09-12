@@ -16,6 +16,7 @@ Components managed by GeneralContext:
     - DataArgs (command line arguments)
 """
 
+import os
 from typing import Any, Dict
 
 from data_validate.config import ApplicationConfig
@@ -57,22 +58,30 @@ class GeneralContext:
 
         The initialization process involves:
         1.  Storing arguments and model_configurations.
-        2.  Initializing the `LanguageManager` for i18n support.
-        3.  Loading the application `ApplicationConfig`.
-        4.  Setting up `FileSystemUtils` for file handling.
-        5.  Configuring the logging system via `LoggerManager`.
+        2.  Initializing a single `LanguageManager` from `data_args.data_file.locale`
+            (BUG-004/BUG-023: one locale source of truth, threaded into every
+            component that needs localized text).
+        3.  Loading the application `ApplicationConfig`, injected with the same
+            `LanguageManager` instance.
+        4.  Setting up `FileSystemUtils`, injected with the same `LanguageManager` instance.
+        5.  Configuring the logging system via `LoggerManager`: a file handler is only
+            created in debug mode, under `<output_folder>/logs` (BUG-021) — never a
+            `logs/` directory relative to the current working directory.
         6.  Disabling the logger if debug mode is not active.
         """
         # Unpack the arguments
         self.data_args = data_args
         self.extra_config = kwargs
 
-        # Configure the Toolkit
-        self.language_manager: LanguageManager = LanguageManager()
-        self.config: ApplicationConfig = ApplicationConfig()
-        self.file_system_utils: FileSystemUtils = FileSystemUtils()
+        # Configure the Toolkit: one shared LanguageManager built from the parsed locale.
+        self.language_manager: LanguageManager = LanguageManager(locale=self.data_args.data_file.locale)
+        self.config: ApplicationConfig = ApplicationConfig(language_manager=self.language_manager)
+        self.file_system_utils: FileSystemUtils = FileSystemUtils(language_manager=self.language_manager)
+
+        is_debug = bool(self.data_args.data_action.debug)
+        log_folder = os.path.join(self.data_args.data_file.output_folder, "logs") if is_debug else None
         self.logger_manager = LoggerManager(
-            log_folder="data/output/logs",
+            log_folder=log_folder,
             console_logger="console_logger",
             prefix="data_validate",
             logger_name="data_validate_file_logger",
@@ -80,7 +89,7 @@ class GeneralContext:
         self.logger = self.logger_manager.file_logger
 
         # Configure the file logger
-        if not self.data_args.data_action.debug:
+        if not is_debug:
             self.logger.disabled = True
 
         self.skipped_validations = []
@@ -89,15 +98,20 @@ class GeneralContext:
         """
         Finalize the application context and cleanup resources.
 
-        This method handles post-execution tasks such as removing temporary log files
-        if the application is not running in debug mode.
+        This method handles post-execution tasks: closing and detaching every handler
+        from the file logger (BUG-021 — handlers were previously never closed, which
+        left file descriptors open and made deleting the log file fail on Windows),
+        and printing the log file location when running in debug mode.
 
         Logic:
-            - If debug mode is OFF: Removes the session log file.
-            - If debug mode is ON: Prints the location of the log file to stdout.
+            - If debug mode is ON: prints the location of the log file to stdout.
+            - Always: closes and removes every handler attached to the file logger.
+              When not in debug mode there is no log file to begin with (BUG-021), so
+              there is nothing to delete.
         """
-        # Remove log file if not in debug mode
-        if not self.data_args.data_action.debug:
-            self.file_system_utils.remove_file(self.logger_manager.log_file)
-        else:
+        if self.data_args.data_action.debug:
             print("\nLog file created at:", self.logger_manager.log_file)
+
+        for handler in list(self.logger.handlers):
+            handler.close()
+            self.logger.removeHandler(handler)

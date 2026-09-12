@@ -75,3 +75,26 @@ class TestApplicationConfigClock:
         # Every other key is looked up without a value kwarg.
         other_key = NamesEnum.FS.value
         assert verify_names[other_key] == f"{other_key}:None"
+
+
+class TestApplicationConfigLanguageManagerInjection:
+    """Regression tests for ARC-002/BUG-004/BUG-023: a single injected `LanguageManager`."""
+
+    def test_injected_language_manager_is_used_as_is(self, mocker) -> None:
+        """When a `language_manager` is given, no new instance is built internally."""
+        mock_language_manager_cls = mocker.patch("data_validate.config.application_config.LanguageManager")
+        shared_language_manager = mocker.MagicMock()
+
+        config = ApplicationConfig(language_manager=shared_language_manager)
+
+        assert config.language_manager is shared_language_manager
+        mock_language_manager_cls.assert_not_called()
+
+    def test_default_construction_builds_its_own_language_manager(self, mocker) -> None:
+        """Backwards compatibility: no `language_manager` given builds a default one."""
+        mock_language_manager_cls = mocker.patch("data_validate.config.application_config.LanguageManager")
+
+        config = ApplicationConfig()
+
+        mock_language_manager_cls.assert_called_once_with()
+        assert config.language_manager is mock_language_manager_cls.return_value

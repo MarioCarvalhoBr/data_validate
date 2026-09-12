@@ -52,6 +52,16 @@ class TestFileSystemUtils:
         mock_lm.assert_called_once()
         assert fs_utils.language_manager == mock_instance
 
+    def test_init_uses_injected_language_manager(self, mocker) -> None:
+        """ARC-002/BUG-004/BUG-023: an injected `language_manager` is used as-is, no new instance built."""
+        mock_lm = mocker.patch("data_validate.helpers.base.file_system_utils.LanguageManager")
+        shared_language_manager = mocker.MagicMock()
+
+        fs_utils = FileSystemUtils(language_manager=shared_language_manager)
+
+        mock_lm.assert_not_called()
+        assert fs_utils.language_manager is shared_language_manager
+
     def test_detect_encoding_success(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test successful encoding detection."""
         mock_detect = mocker.patch("chardet.detect")
@@ -81,7 +91,9 @@ class TestFileSystemUtils:
 
         assert success is False
         assert result == "file_not_found_error"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file))
+        fs_utils.language_manager.text.assert_called_with(
+            "fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file)
+        )
 
     def test_detect_encoding_path_not_file(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test detect_encoding with directory path instead of file."""
@@ -172,7 +184,9 @@ class TestFileSystemUtils:
         assert success is True
         assert message == "file_removed_success"
         assert not os.path.exists(temp_file)
-        fs_utils.language_manager.text.assert_called_with("fs_utils_success_file_removed", filename=os.path.basename(temp_file))
+        fs_utils.language_manager.text.assert_called_with(
+            "fs_utils_success_file_removed", filename=os.path.basename(temp_file)
+        )
 
     def test_remove_file_empty_path(self, fs_utils: FileSystemUtils) -> None:
         """Test remove_file with empty file path."""
@@ -193,7 +207,9 @@ class TestFileSystemUtils:
 
         assert success is True  # Returns True for non-existent files
         assert message == "file_not_found_info"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_info_file_not_found", filename=os.path.basename(non_existent_file))
+        fs_utils.language_manager.text.assert_called_with(
+            "fs_utils_info_file_not_found", filename=os.path.basename(non_existent_file)
+        )
 
     def test_remove_file_path_not_file(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test remove_file with directory path instead of file."""
@@ -329,7 +345,9 @@ class TestFileSystemUtils:
 
         assert exists is False
         assert messages == ["file_not_found_error"]
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file))
+        fs_utils.language_manager.text.assert_called_with(
+            "fs_utils_error_file_not_found", filename=os.path.basename(non_existent_file)
+        )
 
     def test_check_file_exists_path_not_file(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test check_file_exists with directory path instead of file."""
@@ -505,7 +523,12 @@ class TestFileSystemUtilsDataDrivenTests:
         ],
     )
     def test_detect_encoding_various_results(
-        self, fs_utils: FileSystemUtils, encoding_result: Dict[str, Any], expected_success: bool, expected_encoding: str, mocker
+        self,
+        fs_utils: FileSystemUtils,
+        encoding_result: Dict[str, Any],
+        expected_success: bool,
+        expected_encoding: str,
+        mocker,
     ) -> None:
         """Test detect_encoding with various chardet results."""
         with tempfile.NamedTemporaryFile(mode="w", delete=False) as temp_file:

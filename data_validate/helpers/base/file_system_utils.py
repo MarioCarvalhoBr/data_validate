@@ -28,13 +28,16 @@ class FileSystemUtils:
         language_manager (LanguageManager): Instance for handling localized string retrieval.
     """
 
-    def __init__(self):
+    def __init__(self, language_manager: LanguageManager | None = None):
         """
         Initialize the FileSystemUtils instance.
 
-        Sets up the LanguageManager to provide localized feedback for file system operations.
+        Args:
+            language_manager (LanguageManager | None): Shared `LanguageManager` instance
+                (ARC-002/BUG-004/BUG-023: a single locale source of truth). When not given,
+                builds its own with `locale=None` (backwards compatible default behaviour).
         """
-        self.language_manager: LanguageManager = LanguageManager()
+        self.language_manager: LanguageManager = language_manager or LanguageManager()
 
     def detect_encoding(self, file_path: str, num_bytes: int = 1024) -> Tuple[bool, str]:
         """
@@ -106,11 +109,15 @@ class FileSystemUtils:
             if not file_path:
                 return False, self.language_manager.text("fs_utils_error_file_path_empty")
             if not os.path.exists(file_path):
-                return True, self.language_manager.text("fs_utils_info_file_not_found", filename=os.path.basename(file_path))
+                return True, self.language_manager.text(
+                    "fs_utils_info_file_not_found", filename=os.path.basename(file_path)
+                )
             if not os.path.isfile(file_path):
                 return False, self.language_manager.text("fs_utils_error_path_not_file", path=file_path)
             os.remove(file_path)
-            return True, self.language_manager.text("fs_utils_success_file_removed", filename=os.path.basename(file_path))
+            return True, self.language_manager.text(
+                "fs_utils_success_file_removed", filename=os.path.basename(file_path)
+            )
         except OSError as e:
             return False, self.language_manager.text("fs_utils_error_remove_file_os", error=str(e))
         except Exception as e:

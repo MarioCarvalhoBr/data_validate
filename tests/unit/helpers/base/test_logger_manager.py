@@ -159,7 +159,9 @@ class TestLoggerManager:
         assert logger_manager.log_folder == temp_log_dir
         mock_makedirs.assert_not_called()
 
-    @pytest.mark.parametrize("log_level", [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL])
+    @pytest.mark.parametrize(
+        "log_level", [logging.DEBUG, logging.INFO, logging.WARNING, logging.ERROR, logging.CRITICAL]
+    )
     def test_init_custom_log_levels(self, temp_log_dir, log_level, mocker):
         """Test initialization with different log levels."""
         mocker.patch("os.path.exists", return_value=True)
@@ -377,3 +379,27 @@ class TestLoggerManager:
 
         mock_join.assert_called_once_with(temp_log_dir, "test_20230101_120000.log")
         assert result == "mocked_path"
+
+
+class TestLoggerManagerNoFileLogging:
+    """Regression tests for BUG-021: `log_folder=None` creates no directory and no file handler."""
+
+    def test_log_folder_none_creates_no_directory(self, tmp_cwd):
+        """No `logs/` directory is created anywhere when `log_folder=None`."""
+        LoggerManager(log_folder=None, logger_name="test_no_file_logging_dir")
+
+        assert list(tmp_cwd.iterdir()) == []
+
+    def test_log_folder_none_sets_log_file_to_none(self, tmp_cwd):
+        """`log_file` is `None` when no file logging is configured."""
+        logger_manager = LoggerManager(log_folder=None, logger_name="test_no_file_logging_log_file")
+
+        assert logger_manager.log_file is None
+
+    def test_log_folder_none_file_logger_has_no_file_handler(self, tmp_cwd):
+        """`file_logger` only has a console handler, no `FileHandler`, when `log_folder=None`."""
+        logger_manager = LoggerManager(log_folder=None, logger_name="test_no_file_logging_handlers")
+
+        file_handlers = [h for h in logger_manager.file_logger.handlers if isinstance(h, logging.FileHandler)]
+        assert file_handlers == []
+        assert len(logger_manager.file_logger.handlers) == 1

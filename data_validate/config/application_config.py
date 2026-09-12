@@ -91,7 +91,11 @@ class ApplicationConfig:
                                 """
     """str: Default HTML template for reports when the custom template cannot be loaded."""
 
-    def __init__(self, clock: Callable[[], datetime] | None = None):
+    def __init__(
+        self,
+        clock: Callable[[], datetime] | None = None,
+        language_manager: LanguageManager | None = None,
+    ):
         """
         Initializes the ApplicationConfig instance.
 
@@ -103,6 +107,9 @@ class ApplicationConfig:
             clock (Callable[[], datetime] | None): Zero-argument callable returning the current
                 `datetime`, used to compute `CURRENT_YEAR` and `DATE_NOW`. Defaults to
                 `datetime.now` when not provided; injectable for testing/determinism.
+            language_manager (LanguageManager | None): Shared `LanguageManager` instance
+                (ARC-002/BUG-004/BUG-023: a single locale source of truth). When not given,
+                builds its own with `locale=None` (backwards compatible default behaviour).
         """
         self._clock = clock or datetime.now
 
@@ -112,7 +119,7 @@ class ApplicationConfig:
         self.DATE_NOW = self._clock().strftime("%d/%m/%Y %H:%M:%S")
         """str: The current date and time formatted as 'dd/mm/yyyy HH:MM:SS'."""
 
-        self.language_manager: LanguageManager = LanguageManager()
+        self.language_manager: LanguageManager = language_manager or LanguageManager()
         self.spreadsheet_info = SpreadsheetInfo()
         self.names_enum = NamesEnum
 

@@ -298,18 +298,11 @@ class TestDataArgs:
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
 
-    @pytest.fixture
-    def mock_language_manager(self, mocker):
-        """Mock LanguageManager for testing."""
-        return mocker.MagicMock()
-
     def test_init_with_mocked_args(self, temp_input_dir: str, mocker) -> None:
         """Test DataArgs initialization with mocked command line arguments."""
         # Setup mock
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
@@ -334,10 +327,7 @@ class TestDataArgs:
 
     def test_create_parser_method(self, mocker) -> None:
         """Test _create_parser method creates ArgumentParser correctly."""
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
-
-        mock_lm_class.return_value = mocker.MagicMock()
 
         # Mock parse_args to avoid actual parsing and validation
         mock_args = mocker.MagicMock()
@@ -364,10 +354,8 @@ class TestDataArgs:
     def test_get_dict_args_method(self, temp_input_dir: str, mocker) -> None:
         """Test get_dict_args method returns correct dictionary."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
@@ -406,10 +394,8 @@ class TestDataArgs:
     def test_str_method(self, temp_input_dir: str, mocker) -> None:
         """Test __str__ method returns correct string representation."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
@@ -448,8 +434,6 @@ class TestDataArgs:
 
     def test_run_method_calls_parser(self, mocker) -> None:
         """Test that run method creates parser and parses arguments."""
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
-        mock_lm_class.return_value = mocker.MagicMock()
 
         mock_create_parser = mocker.patch.object(DataArgs, "_create_parser")
         mock_parser = mocker.MagicMock()
@@ -475,7 +459,6 @@ class TestDataArgs:
         mocker.patch.object(DataReport, "__init__", return_value=None)
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.language_manager = mocker.MagicMock()
         data_args.allow_abbrev = True
         data_args.run()
 
@@ -504,10 +487,8 @@ class TestDataArgsDataDrivenTests:
     ) -> None:
         """Test DataArgs with different allow_abbrev settings."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
@@ -539,10 +520,8 @@ class TestDataArgsDataDrivenTests:
     ) -> None:
         """Test DataArgs with different locale values."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
@@ -620,10 +599,8 @@ class TestDataArgsDataDrivenTests:
     ) -> None:
         """Test DataArgs with different combinations of boolean flags."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/test/output"
@@ -659,14 +636,11 @@ class TestDataArgsEdgeCases:
 
     def test_create_parser_with_all_arguments(self, temp_input_dir: str, mocker) -> None:
         """Test that _create_parser creates parser with all required arguments."""
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_parse_args.return_value = mocker.MagicMock()
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.language_manager = mocker.MagicMock()
         data_args.allow_abbrev = True
 
         parser = data_args._create_parser()
@@ -694,14 +668,11 @@ class TestDataArgsEdgeCases:
 
     def test_parser_description_and_settings(self, mocker) -> None:
         """Test parser description and allow_abbrev setting."""
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_parse_args.return_value = mocker.MagicMock()
 
         data_args = DataArgs.__new__(DataArgs)
-        data_args.language_manager = mocker.MagicMock()
         data_args.allow_abbrev = False
 
         parser = data_args._create_parser()
@@ -767,10 +738,8 @@ class TestDataArgsIntegration:
     def test_complete_workflow_with_all_parameters(self, temp_input_dir: str, mocker) -> None:
         """Test complete workflow with all parameters set."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "/complete/output"
@@ -791,7 +760,7 @@ class TestDataArgsIntegration:
 
         # Verify all components initialized correctly
         assert data_args.allow_abbrev is False
-        assert isinstance(data_args.language_manager, mocker.MagicMock)
+        assert not hasattr(data_args, "language_manager")
 
         # Verify DataFile
         assert data_args.data_file.input_folder == temp_input_dir
@@ -826,10 +795,8 @@ class TestDataArgsIntegration:
     def test_workflow_with_minimal_parameters(self, temp_input_dir: str, mocker) -> None:
         """Test workflow with minimal required parameters."""
         # Setup mocks
-        mock_lm_class = mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
-        mock_lm_class.return_value = mocker.MagicMock()
         mock_args = mocker.MagicMock()
         mock_args.input_folder = temp_input_dir
         mock_args.output_folder = "output_data/"  # Default value
@@ -861,7 +828,6 @@ class TestDataArgsIntegration:
 
     def test_multiple_dataargs_instances_independence(self, mocker) -> None:
         """Test that multiple DataArgs instances are independent."""
-        mocker.patch("data_validate.helpers.base.data_args.LanguageManager")
         mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
 
         with tempfile.TemporaryDirectory() as temp_dir1:

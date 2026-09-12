@@ -13,8 +13,6 @@ import argparse
 import os
 from abc import ABC, abstractmethod
 
-from data_validate.helpers.tools import LanguageManager
-
 
 class DataModelABC(ABC):
     """
@@ -226,7 +224,6 @@ class DataArgs:
         data_action (DataAction): Instance handling execution flags.
         data_report (DataReport): Instance handling report metadata.
         allow_abbrev (bool): Whether to allow argument abbreviation in argparse.
-        language_manager (LanguageManager): Manager for localization strings.
     """
 
     def __init__(self, allow_abbrev=True):
@@ -236,8 +233,6 @@ class DataArgs:
         Args:
             allow_abbrev (bool, optional): Allows argument abbreviations. Defaults to True.
         """
-
-        self.language_manager: LanguageManager = LanguageManager()
 
         self.data_file = None
         self.data_action = None

@@ -78,7 +78,7 @@ class LoggerManager:
 
     def __init__(
         self,
-        log_folder: str = "logs",
+        log_folder: Optional[str] = "logs",
         default_level: int = logging.DEBUG,
         console_logger="console_logger",
         prefix="data_validate",
@@ -87,10 +87,14 @@ class LoggerManager:
         """
         Initialize the LoggerManager.
 
-        Sets up the log directory and initializes both the console and file loggers.
+        When `log_folder` is `None` (BUG-021), no directory is created and the file
+        logger is configured with no file handler at all — only a console handler.
+        This is the non-debug path: no `logs/` directory is ever created on disk
+        unless a caller explicitly asks for file logging by passing a folder.
 
         Args:
-            log_folder (str, optional): Directory for log files. Defaults to "logs".
+            log_folder (Optional[str], optional): Directory for log files. Defaults to "logs".
+                Pass `None` to skip directory creation and file logging entirely.
             default_level (int, optional): Default log level. Defaults to logging.DEBUG.
             console_logger (str, optional): Name for the console logger. Defaults to "console_logger".
             prefix (str, optional): Prefix for the log file name. Defaults to "data_validate".
@@ -98,11 +102,16 @@ class LoggerManager:
         """
         self.log_folder = log_folder
         self.default_level = default_level
-        if not os.path.exists(self.log_folder):
-            os.makedirs(self.log_folder)
 
         self.console_logger = self.configure_logger(console_logger)
-        self.log_file = self.generate_log_file_name(prefix=prefix)
+
+        if self.log_folder is not None:
+            if not os.path.exists(self.log_folder):
+                os.makedirs(self.log_folder)
+            self.log_file = self.generate_log_file_name(prefix=prefix)
+        else:
+            self.log_file = None
+
         self.file_logger = self.configure_logger(logger_name=logger_name, log_file=self.log_file)
 
     def configure_logger(
