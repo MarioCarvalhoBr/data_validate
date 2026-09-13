@@ -116,7 +116,7 @@ class SpDictionary(SpModelABC):
             self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
-            self.filename, missing_columns, extra_columns
+            self.filename, missing_columns, extra_columns, translate=self.context.language_manager.text
         )
 
         self.structural_errors.extend(col_errors)

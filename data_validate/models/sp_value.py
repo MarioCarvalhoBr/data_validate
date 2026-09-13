@@ -95,7 +95,9 @@ class SpValue(SpModelABC):
 
         if codes_not_matched_by_pattern:
             self.structural_errors.append(
-                f"{self.filename}, linha 1: Colunas fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {codes_not_matched_by_pattern}"
+                self.context.language_manager.text(
+                    "rule.VAL-001.pattern_mismatch", filename=self.filename, columns=codes_not_matched_by_pattern
+                )
             )
 
     def expected_structure_columns(self, *args, **kwargs):
@@ -111,13 +113,18 @@ class SpValue(SpModelABC):
             suffixes_for_matching=self.scenarios,
         )
 
+        translate = self.context.language_manager.text
         for extra_column in extras_columns:
             if extra_column.lower().startswith("unnamed"):
                 continue
-            self.structural_errors.append(f"{self.filename}: A coluna '{extra_column}' não é esperada.")
+            self.structural_errors.append(
+                translate("rule.VAL-001.extra_column", filename=self.filename, column=extra_column)
+            )
         for col in self.EXPECTED_COLUMNS:
             if col not in self.DF_COLUMNS:
-                self.structural_errors.append(f"{self.filename}: Coluna '{col}' esperada mas não foi encontrada.")
+                # Reuses STRUCT-011's generic "expected column not found" message — VAL-001's
+                # `id`-missing case renders identically to that generic structural check.
+                self.structural_errors.append(translate("rule.STRUCT-011.error", filename=self.filename, column=col))
 
     def data_cleaning(self, *args, **kwargs):
         """Run data cleaning steps (currently empty)."""

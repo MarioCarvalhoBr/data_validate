@@ -1060,3 +1060,19 @@ class TestDataArgsCliContract:
         assert excinfo.value.code == 0
         captured = capsys.readouterr()
         assert captured.out.strip() != ""
+
+    def test_list_rules_flag_exits_zero_and_prints_every_rule(self, mocker, capsys) -> None:
+        """`--list-rules` prints one `rule_id<TAB>category<TAB>severity` line per
+        registered rule and exits 0, without requiring `--input_folder` (ARC-011)."""
+        from data_validate.rules import list_all_rules
+
+        mocker.patch("sys.argv", ["prog", "--list-rules"])
+
+        with pytest.raises(SystemExit) as excinfo:
+            DataArgs(allow_abbrev=False)
+
+        assert excinfo.value.code is None or excinfo.value.code == 0
+        captured = capsys.readouterr()
+        lines = captured.out.strip().splitlines()
+        assert len(lines) == len(list_all_rules())
+        assert lines[0].count("\t") == 2

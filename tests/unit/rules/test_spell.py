@@ -28,6 +28,7 @@ from data_validate.rules.context import RuleContext
 from data_validate.rules.engine import Engine, RuleStatus
 from data_validate.rules.spell import (
     SPELL_REGISTRY,
+    SpellBackend,
     check_dictionary_backend,
     check_spelling_description,
     check_spelling_scenario,
@@ -77,6 +78,9 @@ class FakeSpellBackend:
             ),
             None,
         )
+
+    def clean_files_generated(self) -> None:
+        """No-op: this fake holds no temporary resources (ARC-015's `SpellBackend` Protocol)."""
 
 
 def _make_context(
@@ -359,3 +363,44 @@ class TestCheckSpellingScenario:
 
         assert len(issues) == 1
         assert issues[0].params["column"] == "nome"
+
+
+class TestSpellBackendProtocol:
+    """ARC-015: `SpellBackend` is a structural, `pyenchant`-independent Protocol."""
+
+    def test_fake_spell_backend_satisfies_the_protocol(self) -> None:
+        assert isinstance(FakeSpellBackend(), SpellBackend)
+
+    def test_real_spell_checker_satisfies_the_protocol(self, mocker) -> None:
+        """The concrete `SpellChecker` (the only production `SpellBackend` today) satisfies
+        the Protocol structurally, with its heavy `pyenchant`/`DictionaryManager` collaborators
+        mocked out — proving the Protocol names exactly the surface `rules/spell.py` and
+        `SpreadsheetProcessor` actually use, not an implementation detail of one backend."""
+        from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
+
+        mocker.patch(
+            "data_validate.helpers.tools.spellchecker.spellchecker.DictionaryManager",
+            return_value=mocker.MagicMock(),
+        )
+        mocker.patch(
+            "data_validate.helpers.tools.spellchecker.spellchecker.SpellCheckerController",
+            return_value=mocker.MagicMock(),
+        )
+        mocker.patch(
+            "data_validate.helpers.tools.spellchecker.spellchecker.DataFrameProcessor",
+            return_value=mocker.MagicMock(),
+        )
+
+        spell_checker = SpellChecker("pt_BR", [])
+
+        assert isinstance(spell_checker, SpellBackend)
+
+    def test_an_object_missing_clean_files_generated_does_not_satisfy_the_protocol(self) -> None:
+        class _Incomplete:
+            def __init__(self) -> None:
+                self.errors_dictionary: list[str] = []
+
+            def check_spelling_text_structured(self, df, columns_sheets):
+                return (), None
+
+        assert not isinstance(_Incomplete(), SpellBackend)

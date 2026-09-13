@@ -17,6 +17,7 @@ Components managed by GeneralContext:
 """
 
 import os
+import sys
 from typing import Any, Dict
 
 from data_validate.config import ApplicationConfig
@@ -110,7 +111,9 @@ class GeneralContext:
               there is nothing to delete.
         """
         if self.data_args.data_action.debug:
-            print("\nLog file created at:", self.logger_manager.log_file)
+            # ARC-012: machine stdout carries only the `<{json}>` summary fragment; every
+            # other progress/debug line goes to stderr.
+            print("\nLog file created at:", self.logger_manager.log_file, file=sys.stderr)
 
         for handler in list(self.logger.handlers):
             handler.close()

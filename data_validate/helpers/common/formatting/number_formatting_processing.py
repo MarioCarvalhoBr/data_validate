@@ -9,10 +9,12 @@ formatting useful for handling data spreadsheet numeric values.
 
 import math
 from decimal import ROUND_DOWN, Decimal, InvalidOperation
-from typing import Tuple, Any
+from typing import Any, Callable, Optional, Tuple
 
 import pandas as pd
 from babel.numbers import format_decimal
+
+from data_validate.helpers.common.default_translate import get_default_translate
 
 
 class NumberFormattingProcessing:
@@ -149,7 +151,9 @@ class NumberFormattingProcessing:
             return False, 0.0
 
     @staticmethod
-    def validate_integer(value: float, min_value: int = 0) -> Tuple[bool, str]:
+    def validate_integer(
+        value: float, min_value: int = 0, translate: Optional[Callable[..., str]] = None
+    ) -> Tuple[bool, str]:
         """
         Validate that a float value represents a valid integer within constraints.
 
@@ -158,20 +162,28 @@ class NumberFormattingProcessing:
         Args:
             value (float): The numeric value to validate.
             min_value (int, optional): Minimum allowed value. Default is 0.
+            translate (Callable[..., str], optional): Message-catalog renderer
+                (`key, **params -> str`, e.g. `LanguageManager.text`). ARC-005: every
+                error message is a catalog key, never a hardcoded literal; defaults to
+                `get_default_translate()` (the same pt-BR text as before this parameter
+                existed) so existing callers keep working unchanged.
 
         Returns:
             Tuple[bool, str]: A tuple containing:
                 - True and an empty string if valid.
                 - False and an error message if invalid.
         """
+        translate = translate or get_default_translate()
         if not value.is_integer():
-            return False, f"O valor '{value}' não é um número inteiro."
+            return False, translate("rule.file_cleaning.value_not_integer", value=value)
         if int(value) < min_value:
-            return False, f"O valor '{int(value)}' é menor que {min_value}."
+            return False, translate("rule.file_cleaning.value_below_minimum", value=int(value), min_value=min_value)
         return True, ""
 
     @staticmethod
-    def check_cell_integer(cell: Any, min_value: int = 0) -> Tuple[bool, str]:
+    def check_cell_integer(
+        cell: Any, min_value: int = 0, translate: Optional[Callable[..., str]] = None
+    ) -> Tuple[bool, str]:
         """
         Validate if a generic cell content contains a valid integer.
 
@@ -180,20 +192,23 @@ class NumberFormattingProcessing:
         Args:
             cell (Any): Value to check (string, number, etc.).
             min_value (int, optional): Minimum allowed value. Default is 0.
+            translate (Callable[..., str], optional): Message-catalog renderer, see
+                `validate_integer`.
 
         Returns:
             Tuple[bool, str]: A tuple containing:
                 - True and an empty string if valid.
                 - False and an error message if invalid.
         """
+        translate = translate or get_default_translate()
         if NumberFormattingProcessing.is_nan(cell):
-            return False, f"O valor '{cell}' não é um número."
+            return False, translate("rule.file_cleaning.value_not_a_number", value=cell)
 
         ok, num = NumberFormattingProcessing.parse_numeric(cell)
         if not ok:
-            return False, f"O valor '{cell}' não é um número."
+            return False, translate("rule.file_cleaning.value_not_a_number", value=cell)
 
-        valid, msg = NumberFormattingProcessing.validate_integer(num, min_value)
+        valid, msg = NumberFormattingProcessing.validate_integer(num, min_value, translate=translate)
         if not valid:
             return False, msg
 

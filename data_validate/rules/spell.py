@@ -84,14 +84,25 @@ class _SpellingFinding(Protocol):
 
 
 @runtime_checkable
-class _SpellBackend(Protocol):
-    """Structural shape this module needs from `ctx.options["spell_backend"]`.
+class SpellBackend(Protocol):
+    """Structural shape this module needs from `ctx.options["spell_backend"]` (ARC-015).
 
-    A `Protocol` (not the concrete `SpellChecker` class) so a test double
-    (`tests/unit/rules/test_spell.py::FakeSpellBackend`) satisfies `isinstance` too, per
-    `.claude/rules/architecture-boundaries.md`'s "rules never depend on models" combined with
-    `rules/composition.py::_facts`'s `isinstance`-narrowing precedent for a `ctx.options` value
-    typed as `object`.
+    A `Protocol` (not the concrete `helpers.tools.spellchecker.spellchecker.SpellChecker`
+    class) so a test double (`tests/unit/rules/test_spell.py::FakeSpellBackend`) satisfies
+    `isinstance` too, per `.claude/rules/architecture-boundaries.md`'s "rules never depend on
+    models" combined with `rules/composition.py::_facts`'s `isinstance`-narrowing precedent for
+    a `ctx.options` value typed as `object`. Public (not underscore-prefixed) so
+    `SpreadsheetProcessor`/other call sites outside this module can type-hint
+    `ctx.options["spell_backend"]`/`self._spell_backend` against it instead of the concrete
+    `SpellChecker` class, decoupling every consumer from `pyenchant` specifically — the actual
+    goal of ARC-015 ("Spellchecker tightly coupled to pyenchant"). A pure-Python fallback
+    backend (`symspellpy`/`pyspellchecker`) is not implemented in this slice; the interface it
+    would need to satisfy is this one (see ARC-015's "wont-fix (for now)" note in
+    `.specs/quality/backlog/03-architecture.md`).
+
+    Attributes:
+        errors_dictionary: Dictionary/backend initialisation errors collected at construction
+            time (`SPELL-001`, BUG-027).
     """
 
     errors_dictionary: Sequence[str]
@@ -100,11 +111,15 @@ class _SpellBackend(Protocol):
         self, df: pd.DataFrame, columns_sheets: list[str]
     ) -> tuple[tuple[_SpellingFinding, ...], str | None]: ...
 
+    def clean_files_generated(self) -> None:
+        """Release any temporary resources (e.g. the enchant session directory, SEC-007)."""
+        ...
 
-def _backend(ctx: RuleContext) -> _SpellBackend | None:
-    """Return `ctx.options["spell_backend"]` narrowed to `_SpellBackend`, or `None`."""
+
+def _backend(ctx: RuleContext) -> SpellBackend | None:
+    """Return `ctx.options["spell_backend"]` narrowed to `SpellBackend`, or `None`."""
     backend = ctx.options.get("spell_backend")
-    if isinstance(backend, _SpellBackend):
+    if isinstance(backend, SpellBackend):
         return backend
     return None
 

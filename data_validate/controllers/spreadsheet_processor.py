@@ -8,6 +8,7 @@ aggregating results, and generating reports.
 """
 
 import os
+import sys
 import time
 from datetime import datetime
 from pathlib import Path
@@ -28,6 +29,7 @@ from data_validate.rules import (
     SCENARIO_REGISTRY,
     SPELL_REGISTRY,
     STRUCTURE_REGISTRY,
+    SpellBackend,
     TEMPORAL_REGISTRY,
     VALUE_REGISTRY,
     compute_composition_facts,
@@ -91,6 +93,12 @@ class SpreadsheetProcessor:
 
         self.data_models_context: controllers.DataModelContext | None = None
         self.initialized_models = []
+        # ARC-006: name-keyed lookup for the report step, replacing the repeated
+        # `DataModelContext.get_instance_of(...)` linear `isinstance` scans; built once in
+        # `_configure`, keyed by each model's `CONSTANTS.SP_NAME` (e.g. "descricao").
+        # `DataModelContext.get_instance_of` itself is unchanged/still exercised directly by
+        # its own tests.
+        self._models_by_name: dict[str, models.SpModelABC] = {}
         self.target_model_classes = [
             models.SpDescription,
             models.SpComposition,
@@ -103,7 +111,9 @@ class SpreadsheetProcessor:
         ]
         self.validation_reports = controllers.ValidationReport(context=self.context)
 
-        self._spell_backend = None
+        # ARC-015: typed against the `SpellBackend` Protocol, not the concrete `SpellChecker`
+        # class, so this attribute's static type does not couple the processor to `pyenchant`.
+        self._spell_backend: SpellBackend | None = None
 
     def _prepare_statement(self) -> None:
         """
@@ -197,6 +207,7 @@ class SpreadsheetProcessor:
             model_instance.run()
             setattr(self, attribute_name, model_instance)
             self.initialized_models.append(model_instance)
+            self._models_by_name[sp_name_key] = model_instance
 
             self.validation_reports.extend(
                 self.validation_titles[config.NamesEnum.FS.value],
@@ -237,9 +248,9 @@ class SpreadsheetProcessor:
         Returns:
             RuleContext: The shared context for this run.
         """
-        description_model = self.data_models_context.get_instance_of(models.SpDescription)
-        legend_model = self.data_models_context.get_instance_of(models.SpLegend)
-        dictionary_model = self.data_models_context.get_instance_of(models.SpDictionary)
+        description_model = self._models_by_name.get(models.SpDescription.CONSTANTS.SP_NAME)
+        legend_model = self._models_by_name.get(models.SpLegend.CONSTANTS.SP_NAME)
+        dictionary_model = self._models_by_name.get(models.SpDictionary.CONSTANTS.SP_NAME)
 
         self._spell_backend = tools.SpellChecker(
             self.context.data_args.data_file.locale,
@@ -427,4 +438,10 @@ class SpreadsheetProcessor:
 
         # End time measurement if --no-time is not set
         if not self.context.data_args.data_action.no_time:
-            print("Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos")
+            # ARC-012: machine stdout carries only the `<{json}>` summary fragment
+            # (`FileReportGenerator._print_json_summary`); every other progress line goes to
+            # stderr.
+            print(
+                "Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos",
+                file=sys.stderr,
+            )

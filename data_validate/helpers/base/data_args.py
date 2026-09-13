@@ -59,6 +59,27 @@ def _make_deprecated_alias_action(replacement: str) -> type[argparse.Action]:
     return _DeprecatedAliasAction
 
 
+class _ListRulesAction(argparse.Action):
+    """Print every registered rule and exit (ARC-011's `--list-rules`).
+
+    Mirrors argparse's own built-in `action="version"`: it runs during `parse_args()`,
+    before `DataArgs.run()` would otherwise reject a missing `--input_folder`, so
+    `--list-rules` never requires an input/output folder — it is independent of any
+    particular bundle.
+    """
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        # Local import: `data_validate.rules` transitively imports `data_validate.config`,
+        # which would re-enter `helpers/base/__init__.py` (which imports this very module)
+        # if this were a top-level import — the same circular-import hazard `_create_parser`
+        # already works around for `METADATA`.
+        from data_validate.rules import list_all_rules
+
+        for rule in list_all_rules():
+            print(f"{rule.rule_id}\t{rule.category}\t{rule.severity}")
+        parser.exit()
+
+
 class CliArgsGroup(ABC):
     """
     Abstract base class for argument parsing and validation.
@@ -431,6 +452,12 @@ class DataArgs:
             action="version",
             version=f"%(prog)s {METADATA.__version__}",
             help="Show the program's version number and exit.",
+        )
+        parser.add_argument(
+            "--list-rules",
+            action=_ListRulesAction,
+            nargs=0,
+            help="List every registered rule (rule_id, category, severity), one per line, and exit.",
         )
 
         return parser

@@ -136,23 +136,25 @@ class SpModelABC(ABC):
         (`.claude/rules/coding-standards.md` "no work in `__init__`").
         """
         self.scenarios = list(set(self.scenarios))
+        translate = self.context.language_manager.text
 
         # CHECK 0: Add COLUMNS
         if not self.data_loader_model.raw_data.empty:
             self.DF_COLUMNS = list(self.data_loader_model.raw_data.columns)
 
         if self.data_loader_model.raw_data.empty and self.data_loader_model.is_read_successful:
-            self.structural_errors.append(f"{self.filename}: O arquivo enviado está vazio.")
+            # STRUCT-008: a file that loads successfully but yields zero rows/columns.
+            self.structural_errors.append(translate("rule.STRUCT-008.error", filename=self.filename))
 
-        # CHECK 1: Vertical Bar Check
+        # CHECK 1: Vertical Bar Check (STRUCT-009)
         _, errors_vertical_bar = DataFrameProcessing.check_dataframe_vertical_bar(
-            self.data_loader_model.raw_data, self.filename
+            self.data_loader_model.raw_data, self.filename, translate=translate
         )
         self.structural_errors.extend(errors_vertical_bar)
 
-        # CHECK 2: Expected Structure Columns Check: check_unnamed_columns
+        # CHECK 2: Expected Structure Columns Check: check_unnamed_columns (STRUCT-010)
         _, errors_unnamed_columns = DataFrameProcessing.check_dataframe_unnamed_columns(
-            self.data_loader_model.raw_data, self.filename
+            self.data_loader_model.raw_data, self.filename, translate=translate
         )
         self.structural_errors.extend(errors_unnamed_columns)
 

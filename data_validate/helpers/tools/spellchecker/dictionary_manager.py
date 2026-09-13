@@ -183,14 +183,11 @@ class DictionaryManager:
         broker/dictionary references and discards the temporary directory
         (if one was created) so the underlying resources can be released.
         """
-        try:
-            if self.dictionary:
-                self.dictionary = None
-
-            if self.broker:
-                self.broker = None
-        except Exception as e:
-            self._errors.append(f"Warning: Could not cleanup Enchant resources: {e}")
+        # SEC-004: dropping a reference by assigning `None` cannot raise, so the broad
+        # `except Exception` this used to wrap (with its own hardcoded pt-BR-adjacent
+        # fallback message) is gone — there is no plausible failure mode here.
+        self.dictionary = None
+        self.broker = None
 
         if self._enchant_session_dir is not None:
             self._enchant_session_dir.cleanup()

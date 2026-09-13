@@ -30,6 +30,8 @@ caller instead of automatically from `__init__` (ARC-001). See
 
 from __future__ import annotations
 
+from typing import NamedTuple
+
 from data_validate.rules.composition import COMPOSITION_REGISTRY, CompositionFacts, compute_composition_facts
 from data_validate.rules.context import RuleContext
 from data_validate.rules.description import DESCRIPTION_REGISTRY
@@ -39,12 +41,65 @@ from data_validate.rules.legend import LEGEND_REGISTRY
 from data_validate.rules.proportionality import PROPORTIONALITY_REGISTRY
 from data_validate.rules.registry import RegistryCycleError, RuleRegistry, RuleSpec
 from data_validate.rules.scenario import SCENARIO_REGISTRY
-from data_validate.rules.spell import SPELL_REGISTRY
+from data_validate.rules.spell import SPELL_REGISTRY, SpellBackend
 from data_validate.rules.structure import STRUCTURE_REGISTRY
 from data_validate.rules.temporal_reference import TEMPORAL_REGISTRY
 from data_validate.rules.value import VALUE_REGISTRY
 
+#: Every rule registry the pipeline runs, in the same fixed order
+#: `SpreadsheetProcessor._build_pipeline` runs them (registry-to-registry order is still
+#: explicit, per ARC-017's "Done" note — only each registry's *internal* order is topological).
+ALL_REGISTRIES: tuple[RuleRegistry, ...] = (
+    STRUCTURE_REGISTRY,
+    SPELL_REGISTRY,
+    DESCRIPTION_REGISTRY,
+    COMPOSITION_REGISTRY,
+    TEMPORAL_REGISTRY,
+    PROPORTIONALITY_REGISTRY,
+    VALUE_REGISTRY,
+    SCENARIO_REGISTRY,
+    LEGEND_REGISTRY,
+)
+
+
+class RuleSummary(NamedTuple):
+    """One row of `list_all_rules()` — ARC-011's `--list-rules`.
+
+    Attributes:
+        rule_id: Stable rule identifier (`"DESC-004"`).
+        category: The report bucket this rule belongs to (`RuleSpec.category`).
+        severity: The rule's default severity (`RuleSpec.severity_default`), as plain text.
+    """
+
+    rule_id: str
+    category: str
+    severity: str
+
+
+def list_all_rules() -> tuple[RuleSummary, ...]:
+    """List every rule registered across `ALL_REGISTRIES`, sorted by rule ID.
+
+    ARC-011: backs the CLI's `--list-rules` flag — one `RuleSummary` per rule, independent of
+    any particular run/bundle (no `RuleContext` needed), so it can print and exit before any
+    input folder is even read.
+
+    Returns:
+        tuple[RuleSummary, ...]: One entry per registered rule, sorted by `rule_id`.
+    """
+    return tuple(
+        sorted(
+            (
+                RuleSummary(rule_id=spec.rule_id, category=spec.category, severity=spec.severity_default.value)
+                for registry in ALL_REGISTRIES
+                for spec in registry
+            ),
+            key=lambda summary: summary.rule_id,
+        )
+    )
+
+
 __all__ = [
+    "ALL_REGISTRIES",
     "COMPOSITION_REGISTRY",
     "CompositionFacts",
     "DESCRIPTION_REGISTRY",
@@ -58,12 +113,15 @@ __all__ = [
     "RuleRegistry",
     "RuleSpec",
     "RuleStatus",
+    "RuleSummary",
     "SCENARIO_REGISTRY",
     "SPELL_REGISTRY",
     "STRUCTURE_REGISTRY",
     "SkipReason",
+    "SpellBackend",
     "TEMPORAL_REGISTRY",
     "VALUE_REGISTRY",
     "compute_composition_facts",
     "extend_report_from_outcomes",
+    "list_all_rules",
 ]

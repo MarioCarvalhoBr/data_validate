@@ -409,5 +409,98 @@
   },
   "rule.SPELL-005.error": {
     "message": "Error processing file {filename}: {message}"
+  },
+  "rule.file_cleaning.column_not_found": {
+    "message": "{filename}: Column '{column}' was not found."
+  },
+  "rule.file_cleaning.invalid_cell": {
+    "message": "{filename}, line {row}: Column '{column}' contains an invalid value: {message}"
+  },
+  "rule.file_cleaning.value_not_a_number": {
+    "message": "Value '{value}' is not a number."
+  },
+  "rule.file_cleaning.value_not_integer": {
+    "message": "Value '{value}' is not an integer."
+  },
+  "rule.file_cleaning.value_below_minimum": {
+    "message": "Value '{value}' is less than {min_value}."
+  },
+  "rule.CLEAN-001.error": {
+    "message": "{filename}, line {row}: Column '{column}' contains an invalid value: {message}"
+  },
+  "rule.CLEAN-002.error": {
+    "message": "{filename}, line {row}: Column '{column}' contains an invalid value: {message}"
+  },
+  "rule.CLEAN-003.error": {
+    "message": "{filename}, line {row}: Column '{column}' contains an invalid value: {message}"
+  },
+  "rule.CLEAN-004.error": {
+    "message": "{filename}, line {row}: Column '{column}' contains an invalid value: {message}"
+  },
+  "rule.CLEAN-005.error": {
+    "message": "{filename}, line {row}: Column '{column}' contains an invalid value: {message}"
+  },
+  "rule.CLEAN-006.error": {
+    "message": "{filename}: The table must have exactly one row because the '{scenarios_file}' file does not exist or is empty."
+  },
+  "rule.STRUCT-008.error": {
+    "message": "{filename}: The submitted file is empty."
+  },
+  "rule.STRUCT-009.header_multiindex_level0": {
+    "message": "{filename}: The level-0 column name '{column}' must not contain the '|' character."
+  },
+  "rule.STRUCT-009.header_multiindex_level1": {
+    "message": "{filename}: The level-1 subcolumn name '{child_column}' of level-0 parent '{parent_column}' must not contain the '|' character."
+  },
+  "rule.STRUCT-009.header_single": {
+    "message": "{filename}: Column '{column}' must not contain the '|' character."
+  },
+  "rule.STRUCT-009.cell": {
+    "message": "{filename}, line {row}: Column '{column}' must not contain the '|' character."
+  },
+  "rule.STRUCT-010.singular": {
+    "message": "{filename}, line {row}: The row has {count} values, but the table only has {valid_columns_count} valid column."
+  },
+  "rule.STRUCT-010.plural": {
+    "message": "{filename}, line {row}: The row has {count} values, but the table only has {valid_columns_count} valid columns."
+  },
+  "rule.STRUCT-011.error": {
+    "message": "{filename}: Column '{column}' was expected but not found."
+  },
+  "rule.STRUCT-012.warning": {
+    "message": "{filename}: Column '{column}' will be ignored because it is not in the specification."
+  },
+  "rule.DESC-011.error": {
+    "message": "{filename}: Column '{column}' must not exist if the '{scenarios_file}' file is not configured or does not exist."
+  },
+  "rule.DESC-012.error": {
+    "message": "{filename}: Column '{column}' must not exist if the legend file is not configured or does not exist."
+  },
+  "rule.SCEN-001.error": {
+    "message": "{filename}: Scenarios file has an incorrect configuration. Refer to the data model specification."
+  },
+  "rule.SCEN-002.error": {
+    "message": "{filename}: Duplicate values found in column '{column}': [{values}]"
+  },
+  "rule.VAL-001.pattern_mismatch": {
+    "message": "{filename}, line 1: Columns outside the expected pattern (CODE-YEAR or CODE-YEAR-SCENARIO): {columns}"
+  },
+  "rule.VAL-001.extra_column": {
+    "message": "{filename}: Column '{column}' is not expected."
+  },
+  "rule.PROP-001.level1": {
+    "message": "{filename}, line 1: Level-1 columns outside the expected pattern (CODE-YEAR or CODE-YEAR-SCENARIO): {columns}"
+  },
+  "rule.PROP-001.level2": {
+    "message": "{filename}, line 2: Level-2 columns outside the expected pattern (CODE-YEAR or CODE-YEAR-SCENARIO): {columns}"
+  },
+  "rule.PROP-002.level1_unexpected": {
+    "message": "{filename}: Level-1 column '{column}' is not expected."
+  },
+  "rule.PROP-002.level2_unexpected": {
+    "message": "{filename}: Level-2 column '{column}' is not expected."
+  },
+  "rule.PROP-002.level2_missing": {
+    "message": "{filename}: Level-2 column '{column}' was expected but not found."
   }
 }

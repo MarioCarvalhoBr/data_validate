@@ -323,7 +323,9 @@ class FileReportGenerator:
             info_message = f"HTML report created at: {output_path}"
 
             logger.info(info_message)
-            print(info_message, file=sys.stdout)
+            # ARC-012: machine stdout carries only the `<{json}>` summary fragment
+            # (`_print_json_summary`); every other progress line goes to stderr.
+            print(info_message, file=sys.stderr)
         except OSError as error:
             error_message = f"Error saving HTML report: {error}"
 
@@ -370,7 +372,7 @@ class FileReportGenerator:
                 return
             info_message = f"PDF report created at: {pdf_file_path}"
             logger.info(info_message)
-            print(info_message, file=sys.stdout)
+            print(info_message, file=sys.stderr)
             return
 
         try:
@@ -392,4 +394,4 @@ class FileReportGenerator:
             return
         info_message = f"PDF report created at: {pdf_file_path}"
         logger.info(info_message)
-        print(info_message, file=sys.stdout)
+        print(info_message, file=sys.stderr)

@@ -409,5 +409,98 @@
   },
   "rule.SPELL-005.error": {
     "message": "Erro ao processar o arquivo {filename}: {message}"
+  },
+  "rule.file_cleaning.column_not_found": {
+    "message": "{filename}: A coluna '{column}' não foi encontrada."
+  },
+  "rule.file_cleaning.invalid_cell": {
+    "message": "{filename}, linha {row}: A coluna '{column}' contém um valor inválido: {message}"
+  },
+  "rule.file_cleaning.value_not_a_number": {
+    "message": "O valor '{value}' não é um número."
+  },
+  "rule.file_cleaning.value_not_integer": {
+    "message": "O valor '{value}' não é um número inteiro."
+  },
+  "rule.file_cleaning.value_below_minimum": {
+    "message": "O valor '{value}' é menor que {min_value}."
+  },
+  "rule.CLEAN-001.error": {
+    "message": "{filename}, linha {row}: A coluna '{column}' contém um valor inválido: {message}"
+  },
+  "rule.CLEAN-002.error": {
+    "message": "{filename}, linha {row}: A coluna '{column}' contém um valor inválido: {message}"
+  },
+  "rule.CLEAN-003.error": {
+    "message": "{filename}, linha {row}: A coluna '{column}' contém um valor inválido: {message}"
+  },
+  "rule.CLEAN-004.error": {
+    "message": "{filename}, linha {row}: A coluna '{column}' contém um valor inválido: {message}"
+  },
+  "rule.CLEAN-005.error": {
+    "message": "{filename}, linha {row}: A coluna '{column}' contém um valor inválido: {message}"
+  },
+  "rule.CLEAN-006.error": {
+    "message": "{filename}: A tabela deve ter apenas um valor porque o arquivo '{scenarios_file}' não existe ou está vazio."
+  },
+  "rule.STRUCT-008.error": {
+    "message": "{filename}: O arquivo enviado está vazio."
+  },
+  "rule.STRUCT-009.header_multiindex_level0": {
+    "message": "{filename}: O nome da coluna de nível 0 '{column}' não pode conter o caracter '|'."
+  },
+  "rule.STRUCT-009.header_multiindex_level1": {
+    "message": "{filename}: O nome da subcoluna de nível 1 '{child_column}' do pai '{parent_column}' de nível 0 não pode conter o caracter '|'."
+  },
+  "rule.STRUCT-009.header_single": {
+    "message": "{filename}: A coluna '{column}' não pode conter o caractere '|'."
+  },
+  "rule.STRUCT-009.cell": {
+    "message": "{filename}, linha {row}: A coluna '{column}' não pode conter o caracter '|'."
+  },
+  "rule.STRUCT-010.singular": {
+    "message": "{filename}, linha {row}: A linha possui {count} valores, mas a tabela possui apenas {valid_columns_count} coluna válida."
+  },
+  "rule.STRUCT-010.plural": {
+    "message": "{filename}, linha {row}: A linha possui {count} valores, mas a tabela possui apenas {valid_columns_count} colunas válidas."
+  },
+  "rule.STRUCT-011.error": {
+    "message": "{filename}: Coluna '{column}' esperada mas não foi encontrada."
+  },
+  "rule.STRUCT-012.warning": {
+    "message": "{filename}: Coluna '{column}' será ignorada pois não está na especificação."
+  },
+  "rule.DESC-011.error": {
+    "message": "{filename}: A coluna '{column}' não pode existir se o arquivo '{scenarios_file}' não estiver configurado ou não existir."
+  },
+  "rule.DESC-012.error": {
+    "message": "{filename}: A coluna '{column}' não pode existir se o arquivo de legenda não estiver configurado ou não existir."
+  },
+  "rule.SCEN-001.error": {
+    "message": "{filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."
+  },
+  "rule.SCEN-002.error": {
+    "message": "{filename}: Valores duplicados encontrados na coluna '{column}': [{values}]"
+  },
+  "rule.VAL-001.pattern_mismatch": {
+    "message": "{filename}, linha 1: Colunas fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {columns}"
+  },
+  "rule.VAL-001.extra_column": {
+    "message": "{filename}: A coluna '{column}' não é esperada."
+  },
+  "rule.PROP-001.level1": {
+    "message": "{filename}, linha 1: Colunas de nível 1 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {columns}"
+  },
+  "rule.PROP-001.level2": {
+    "message": "{filename}, linha 2: Colunas de nível 2 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {columns}"
+  },
+  "rule.PROP-002.level1_unexpected": {
+    "message": "{filename}: A coluna de nível 1 '{column}' não é esperada."
+  },
+  "rule.PROP-002.level2_unexpected": {
+    "message": "{filename}: A coluna de nível 2 '{column}' não é esperada."
+  },
+  "rule.PROP-002.level2_missing": {
+    "message": "{filename}: Coluna de nível 2 '{column}' esperada mas não foi encontrada."
   }
 }

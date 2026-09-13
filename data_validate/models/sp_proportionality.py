@@ -94,6 +94,7 @@ class SpProportionality(SpModelABC):
 
         Performs checks on level 1 and level 2 column names to ensure they follow the expected pattern.
         """
+        translate = self.context.language_manager.text
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
         unique_columns_level_1 = self.frame.columns.get_level_values(0).unique().tolist()
@@ -107,7 +108,7 @@ class SpProportionality(SpModelABC):
 
         if level_1_codes_not_matched_by_pattern:
             self.structural_errors.append(
-                f"{self.filename}, linha 1: Colunas de nível 1 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_1_codes_not_matched_by_pattern}"
+                translate("rule.PROP-001.level1", filename=self.filename, columns=level_1_codes_not_matched_by_pattern)
             )
 
         unique_columns_level_2 = self.frame.columns.get_level_values(1).unique().tolist()
@@ -119,7 +120,7 @@ class SpProportionality(SpModelABC):
 
         if level_2_codes_not_matched_by_pattern:
             self.structural_errors.append(
-                f"{self.filename}, linha 2: Colunas de nível 2 fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): {level_2_codes_not_matched_by_pattern}"
+                translate("rule.PROP-001.level2", filename=self.filename, columns=level_2_codes_not_matched_by_pattern)
             )
 
     def expected_structure_columns(self, *args, **kwargs):
@@ -129,6 +130,7 @@ class SpProportionality(SpModelABC):
         Checks for missing required columns and identifies extra columns not in the specification.
         Updates structural errors list.
         """
+        translate = self.context.language_manager.text
         if self.data_loader_model.header_type == "double":
             unique_columns_level_1 = self.frame.columns.get_level_values(0).unique().tolist()
             unique_columns_level_2 = self.frame.columns.get_level_values(1).unique().tolist()
@@ -142,7 +144,7 @@ class SpProportionality(SpModelABC):
             for extra_column in extras_level_1:
                 if not extra_column.lower().startswith("unnamed"):
                     self.structural_errors.append(
-                        f"{self.filename}: A coluna de nível 1 '{extra_column}' não é esperada."
+                        translate("rule.PROP-002.level1_unexpected", filename=self.filename, column=extra_column)
                     )
 
             # Check extra columns in level 2 (ignore 'id')
@@ -154,14 +156,14 @@ class SpProportionality(SpModelABC):
             for extra_column in extras_level_2:
                 if not extra_column.lower().startswith("unnamed"):
                     self.structural_errors.append(
-                        f"{self.filename}: A coluna de nível 2 '{extra_column}' não é esperada."
+                        translate("rule.PROP-002.level2_unexpected", filename=self.filename, column=extra_column)
                     )
 
             # Check for missing expected columns in level 2
             for col in self.EXPECTED_COLUMNS:
                 if col not in unique_columns_level_2:
                     self.structural_errors.append(
-                        f"{self.filename}: Coluna de nível 2 '{col}' esperada mas não foi encontrada."
+                        translate("rule.PROP-002.level2_missing", filename=self.filename, column=col)
                     )
 
     def data_cleaning(self, *args, **kwargs):

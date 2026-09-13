@@ -101,7 +101,7 @@ class SpComposition(SpModelABC):
             self.frame, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
-            self.filename, missing_columns, extra_columns
+            self.filename, missing_columns, extra_columns, translate=self.context.language_manager.text
         )
 
         self.structural_errors.extend(col_errors)
@@ -127,6 +127,8 @@ class SpComposition(SpModelABC):
                 self.filename,
                 [str(column_name)],
                 min_value=1,
+                translate=self.context.language_manager.text,
+                rule_id="CLEAN-004",
             )
             self.data_cleaning_errors.extend(errors)
 

@@ -91,14 +91,13 @@ class SpScenario(SpModelABC):
 
     def pre_processing(self):
         """Run pre-processing steps."""
-        if self.scenario_exists_file and not self.scenarios:
-            self.structural_errors.extend(
-                [
-                    f"{self.filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."
-                ]
-            )
+        translate = self.context.language_manager.text
 
-        # Repeated values in the 'simbolo' column
+        # SCEN-001: a delivered scenarios file must define at least one symbol.
+        if self.scenario_exists_file and not self.scenarios:
+            self.structural_errors.append(translate("rule.SCEN-001.error", filename=self.filename))
+
+        # SCEN-002: repeated values in the 'simbolo' column (structural pass).
         if self.RequiredColumn.COLUMN_SYMBOL.name in self.data_loader_model.raw_data.columns:
             duplicated_symbols = self.data_loader_model.raw_data[self.RequiredColumn.COLUMN_SYMBOL.name].duplicated(
                 keep=False
@@ -108,7 +107,12 @@ class SpScenario(SpModelABC):
                     self.RequiredColumn.COLUMN_SYMBOL.name
                 ].unique()
                 self.structural_errors.append(
-                    f"{self.filename}: Valores duplicados encontrados na coluna '{self.RequiredColumn.COLUMN_SYMBOL.name}': [{', '.join(map(str, duplicated_values))}]"
+                    translate(
+                        "rule.SCEN-002.error",
+                        filename=self.filename,
+                        column=self.RequiredColumn.COLUMN_SYMBOL.name,
+                        values=", ".join(map(str, duplicated_values)),
+                    )
                 )
 
     def expected_structure_columns(self, *args, **kwargs):
@@ -123,7 +127,7 @@ class SpScenario(SpModelABC):
             self.data_loader_model.raw_data, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
-            self.filename, missing_columns, extra_columns
+            self.filename, missing_columns, extra_columns, translate=self.context.language_manager.text
         )
 
         self.structural_errors.extend(col_errors)

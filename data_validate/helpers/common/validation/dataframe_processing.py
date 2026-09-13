@@ -13,9 +13,11 @@ should be reported to the user as a data-quality error, so any failure
 with code 2, per `.claude/rules/security.md`.
 """
 
-from typing import List, Tuple
+from typing import Callable, List, Optional, Tuple
 
 import pandas as pd
+
+from data_validate.helpers.common.default_translate import get_default_translate
 
 
 class DataFrameProcessing:
@@ -31,16 +33,23 @@ class DataFrameProcessing:
         pass
 
     @staticmethod
-    def check_dataframe_vertical_bar(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool, List[str]]:
+    def check_dataframe_vertical_bar(
+        dataframe: pd.DataFrame, file_name: str, translate: Optional[Callable[..., str]] = None
+    ) -> Tuple[bool, List[str]]:
         """Check for vertical bar characters in DataFrame columns.
 
         Args:
             dataframe: The pandas DataFrame to validate
             file_name: Name of the file being validated for error reporting
+            translate: Message-catalog renderer (`key, **params -> str`). ARC-005:
+                every error message is a catalog key (`rule.STRUCT-009.*`), never a
+                hardcoded literal; defaults to `get_default_translate()` so existing
+                direct callers keep working unchanged.
 
         Returns:
             Tuple of (is_valid, error_messages) where is_valid is True if no errors found
         """
+        translate = translate or get_default_translate()
         dataframe = dataframe.copy()
         errors: List[str] = []
 
@@ -49,17 +58,22 @@ class DataFrameProcessing:
             for col_tuple in dataframe.columns:
                 if "|" in str(col_tuple[0]):
                     errors.append(
-                        f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'."
+                        translate("rule.STRUCT-009.header_multiindex_level0", filename=file_name, column=col_tuple[0])
                     )
 
                 if len(col_tuple) > 1 and "|" in str(col_tuple[1]):
                     errors.append(
-                        f"{file_name}: O nome da subcoluna de nível 1 '{col_tuple[1]}' do pai '{col_tuple[0]}' de nível 0 não pode conter o caracter '|'."
+                        translate(
+                            "rule.STRUCT-009.header_multiindex_level1",
+                            filename=file_name,
+                            child_column=col_tuple[1],
+                            parent_column=col_tuple[0],
+                        )
                     )
         else:
             for column_name in dataframe.columns:
                 if "|" in str(column_name):
-                    errors.append(f"{file_name}: A coluna '{column_name}' não pode conter o caractere '|'.")
+                    errors.append(translate("rule.STRUCT-009.header_single", filename=file_name, column=column_name))
 
         # Check data values for vertical bars using vectorized operations
         string_data = dataframe.astype(str)
@@ -72,7 +86,7 @@ class DataFrameProcessing:
 
                 for row_idx in error_indices:
                     errors.append(
-                        f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'."
+                        translate("rule.STRUCT-009.cell", filename=file_name, row=row_idx + 2, column=col_display_name)
                     )
 
         return not bool(errors), errors
@@ -99,16 +113,23 @@ class DataFrameProcessing:
         return missing_columns, extra_columns
 
     @staticmethod
-    def check_dataframe_unnamed_columns(dataframe: pd.DataFrame, file_name: str) -> Tuple[bool, List[str]]:
+    def check_dataframe_unnamed_columns(
+        dataframe: pd.DataFrame, file_name: str, translate: Optional[Callable[..., str]] = None
+    ) -> Tuple[bool, List[str]]:
         """Check for unnamed columns and validate row data consistency.
 
         Args:
             dataframe: The pandas DataFrame to validate
             file_name: Name of the file being validated for error reporting
+            translate: Message-catalog renderer (`key, **params -> str`). ARC-005:
+                every error message is a catalog key (`rule.STRUCT-010.*`), never a
+                hardcoded literal; defaults to `get_default_translate()` so existing
+                direct callers keep working unchanged.
 
         Returns:
             Tuple of (is_valid, error_messages) where is_valid is True if no errors found
         """
+        translate = translate or get_default_translate()
         dataframe = dataframe.copy()
         errors: List[str] = []
 
@@ -130,10 +151,16 @@ class DataFrameProcessing:
 
         if invalid_rows.any():
             invalid_indices = invalid_rows[invalid_rows].index
+            key = "rule.STRUCT-010.singular" if valid_columns_count == 1 else "rule.STRUCT-010.plural"
             for idx in invalid_indices:
-                text_column = "coluna válida" if valid_columns_count == 1 else "colunas válidas"
                 errors.append(
-                    f"{file_name}, linha {idx + 2}: A linha possui {non_null_counts[idx]} valores, mas a tabela possui apenas {valid_columns_count} {text_column}."
+                    translate(
+                        key,
+                        filename=file_name,
+                        row=idx + 2,
+                        count=non_null_counts[idx],
+                        valid_columns_count=valid_columns_count,
+                    )
                 )
 
         return not bool(errors), errors

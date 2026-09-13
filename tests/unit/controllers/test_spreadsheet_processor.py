@@ -63,6 +63,7 @@ def _build_bare_processor(mocker) -> SpreadsheetProcessor:
     processor.validation_titles = {name.value: name.value for name in config.NamesEnum}
     processor.validation_reports = mocker.MagicMock()
     processor.scenarios = []
+    processor._models_by_name = {}
     return processor
 
 
@@ -210,3 +211,16 @@ class TestConfigureCallsRunExplicitly:
 
         assert processor.sp_descricao.ran is True
         assert processor.initialized_models[0].ran is True
+
+    def test_configure_populates_models_by_name(self, mocker) -> None:
+        """ARC-006: `_configure` keys `_models_by_name` by each model's `CONSTANTS.SP_NAME`,
+        replacing the `DataModelContext.get_instance_of` linear scan the report step used."""
+        processor = _build_bare_processor(mocker)
+        processor.raw_data_map = {"descricao": mocker.MagicMock()}
+        processor.model_configurations = {}
+        processor.initialized_models = []
+        processor.target_model_classes = [_FakeModel]
+
+        processor._configure()
+
+        assert processor._models_by_name["descricao"] is processor.sp_descricao

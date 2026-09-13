@@ -311,21 +311,18 @@ class TestDictionaryManager:
         assert not session_dir.exists()
         assert manager._enchant_session_dir is None
 
-    def test_clean_temporary_files_dictionary_cleanup_error(self, mocker) -> None:
-        """Test cleanup when dictionary cleanup fails."""
+    def test_clean_temporary_files_always_drops_references(self, mocker) -> None:
+        """SEC-004: `clean_temporary_files` unconditionally assigns `None`, which cannot
+        raise — there is no longer a broad `except Exception` fallback to test."""
         manager = DictionaryManager("pt_BR")
-
-        # Create a mock dictionary that raises an exception when accessed
-        mock_dictionary = mocker.MagicMock()
-        mock_dictionary.__bool__ = mocker.MagicMock(side_effect=Exception("Cleanup error"))
-        manager.dictionary = mock_dictionary
+        manager.dictionary = mocker.MagicMock()
         manager.broker = mocker.MagicMock()
 
         manager.clean_temporary_files()
 
-        # Should handle cleanup error gracefully
-        assert len(manager._errors) == 1
-        assert "Warning: Could not cleanup Enchant resources: Cleanup error" in manager._errors[0]
+        assert manager.dictionary is None
+        assert manager.broker is None
+        assert manager._errors == []
 
     def test_clean_temporary_files_without_session_directory_is_a_no_op(self) -> None:
         """Test that cleanup tolerates a manager that never created a session directory."""

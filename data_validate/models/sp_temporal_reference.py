@@ -102,7 +102,7 @@ class SpTemporalReference(SpModelABC):
             self.frame, list(self.RequiredColumn.ALL)
         )
         col_errors, col_warnings = MessageFormattingProcessing.format_text_to_missing_and_expected_columns(
-            self.filename, missing_columns, extra_columns
+            self.filename, missing_columns, extra_columns, translate=self.context.language_manager.text
         )
 
         self.structural_errors.extend(col_errors)
@@ -122,18 +122,25 @@ class SpTemporalReference(SpModelABC):
         # Verify if the scenarios list is empty and handle single-value constraint. The
         # cleaned 'symbol' column is stored on this instance (BUG-002), not overwritten on
         # the class-level `RequiredColumn` placeholder Series shared by every instance/run.
+        translate = self.context.language_manager.text
         column_name_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
         if (not self.scenarios) and (len(self.frame) != 1):
+            # CLEAN-006: without scenarios the table must have exactly one row.
             self.data_cleaning_errors.append(
-                f"{self.filename}: A tabela deve ter apenas um valor porque o arquivo '{SHEET.SP_NAME_SCENARIOS}' não existe ou está vazio."
+                translate("rule.CLEAN-006.error", filename=self.filename, scenarios_file=SHEET.SP_NAME_SCENARIOS)
             )
 
             if column_name_symbol in self.frame.columns:
                 self.cleaned[column_name_symbol] = self.frame[column_name_symbol].iloc[0:1]
         else:
-            # 1. Clean and validate the 'symbol' column (minimum 0)
+            # 1. Clean and validate the 'symbol' column (minimum 0) (CLEAN-005)
             df, errors_symbol = DataCleaningProcessing.clean_dataframe_integers(
-                self.frame, self.filename, [str(column_name_symbol)], min_value=0
+                self.frame,
+                self.filename,
+                [str(column_name_symbol)],
+                min_value=0,
+                translate=translate,
+                rule_id="CLEAN-005",
             )
             self.data_cleaning_errors.extend(errors_symbol)
 
