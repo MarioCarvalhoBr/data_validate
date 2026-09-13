@@ -5,14 +5,37 @@ Target: validate a sector bundle with 5 000 indicators × 60 value columns (≈ 
 harness (PERF-009); never optimise without a number.
 
 ### PERF-001 · Row-by-row `iterrows()` / cell loops in hot paths
-- Priority: P1 · Effort: M · Status: open
-- Where: `helpers/common/validation/legend_processing.py:202,249,313`,
-  `helpers/tools/spellchecker/dataframe_processor.py:42-45`.
-  (`validators/spreadsheets/value/value_validator.py:316` and
+- Priority: P1 · Effort: M · Status: in-progress
+- Where (re-verified by grep, Phase 5, 2026-09-13 — line numbers drifted from this item's
+  original text, current file confirmed):
+  `helpers/common/validation/legend_processing.py:208` (`validate_color_format`, LEG-008),
+  `:255` (`validate_min_max_has_excessive_decimals`, LEG-009), `:315`/`:320`
+  (`validate_min_max_values`, LEG-010, two loops: one read-only pass computing whether *any*
+  slice in the group has excessive decimals, one stateful pass carrying `prev_max_val` between
+  iterations to check interval continuity). All four are per-*legend-code-group* loops (one
+  small group per `codigo`, typically single-digit-to-low-tens rows — a `legenda` sheet's total
+  row count, not `valores`' ~300k-cell width) rather than a loop over the whole sheet; `LEG-001…
+  011` are not yet ported to the rules engine (ARC-007/ARC-017 follow-up), so they were out of
+  every prior port's scope, not overlooked.
+  (`helpers/tools/spellchecker/dataframe_processor.py`'s two `.iterrows()`-shaped sites named in
+  this item's original text are confirmed gone — PERF-006 replaced them with
+  `Series.unique()`-deduplicated `.items()` loops over one row-per-*unique-text*, not one
+  row-per-cell; `validators/spreadsheets/value/value_validator.py:316` and
   `helpers/common/validation/value_processing.py:125` removed — see the "Done (value slice)"
   note below; `validators/spreadsheets/legend/legend_validator.py:514-527` removed — see the
   "Done (legend slice)" note below; `validators/spreadsheets/proportionality/
   proportionality_validator.py:584` removed — see the "Done (proportionality slice)" note below.)
+- Not done (Phase 5, 2026-09-13): the four `legend_processing.py` sites above were not vectorised
+  in this slice — `validate_min_max_values`'s continuity check carries `prev_max_val` across
+  iterations (an inherently sequential comparison against the *previous* row once sorted by
+  `minimo`, not an independent per-row check), so vectorising it is a real, non-mechanical
+  rewrite (a shifted-comparison via `Series.shift(1)` is the likely shape, not attempted here to
+  avoid a rushed, undertested change to a still-error-reporting code path), not a drive-by
+  change bundled with the ARC-005/i18n slice this round otherwise focused on for
+  `legend_processing.py`. No fresh `tools/harness/profile_pipeline.py` measurement was taken for
+  this specific residual (the existing PERF-002/PERF-003 budget numbers cover overall wall time,
+  not this one function in isolation) — left honestly **in-progress**, not marked done or
+  wont-fix without a number behind either claim (`.claude/rules/performance.md`).
 - Proposed fix: vectorised masks (`pd.to_numeric(errors="coerce")`, `str.contains`, `isin`,
   `merge`), `nx.from_pandas_edgelist`, `groupby` aggregations; produce issues from mask indices.
 - Done (description slice, ARC-017 Phase 3 Port 2): the two `description_validator.py` sites

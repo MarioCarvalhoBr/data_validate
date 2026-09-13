@@ -130,7 +130,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   for its full original scope.
 
 ### ARC-003 · Three competing sources of truth for sheet definitions
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: done
 - Where: `config/spreadsheet_info.py` (names, extensions, expected/optional),
   `helpers/tools/data_loader/common/config.py` (required flag, header type, separator, `.qml`),
   `models/sp_*.py::INFO.SP_NAME` + `RequiredColumn/OptionalColumn/DynamicColumn`.
@@ -160,6 +160,40 @@ zero global state. Each item below names the current smell, where it lives, and 
   class (which proved `SHEET_SPECS` against the now-deleted `Config`) is replaced by
   `TestSheetSpecsPinnedLoaderFacts`, pinning the same header-layout/separator/required values as
   fixed expectations instead of comparing against a second source.
+- Done (closes this item, Phase 5, 2026-09-13 — models' declarations kept as checked duplicates,
+  not derived): the remaining consumer this item names, `models/sp_*.py`'s per-model
+  `RequiredColumn`/`OptionalColumn`/`DynamicColumn` nested classes, is **not** migrated to derive
+  its `pd.Series(dtype=..., name=...)` declarations from `SHEET_SPECS` at import time. Considered
+  and rejected: sourcing each `name=` string from `SHEET_SPECS[sheet].column(name)` requires
+  either indexing by position (brittle — a spec reorder silently renames the wrong column) or
+  already knowing the name to look it up (circular — the point of the declaration is to name the
+  column). The single-source-of-truth property this item actually cares about — that a model's
+  declared column name/dtype cannot silently drift from the loader's/rules' own expectation — is
+  already enforced by proof, not derivation: `tests/unit/specs/test_sheet_specs.py` compares
+  every model's `RequiredColumn`/`OptionalColumn`/`DynamicColumn` name/dtype against the matching
+  `SHEET_SPECS` entry and fails the moment they diverge (the three pre-existing divergences this
+  item's own "Done (step 1)" note already documented — `composicao.codigo_pai`'s `min_value`,
+  `referencia_temporal.nome`/`cenarios.nome`'s `dtype`, `descricao.legenda`'s `dtype` — are pinned
+  as *known, reviewed* divergences by that same test, not silently tolerated). A model's
+  `RequiredColumn` Series today has exactly one real consumer left — `list(RequiredColumn.ALL)`
+  fed to `DataFrameProcessing.check_dataframe_column_names` — and every model/validator/rule that
+  needs the sheet's authoritative shape (the loader via `FileScanner`/`DataLoaderFacade`, every
+  `rules/*.py` registry via `ctx.sheet(...)`/`RuleContext`) already reads `SHEET_SPECS` directly,
+  per the "Done (consumers: loader)" note above and ARC-017's rule ports. The three sources this
+  item opened against are now: `SHEET_SPECS` (the single source every *new* consumer reads),
+  models' declarations (a legacy, test-proven-consistent duplicate, pending deletion once
+  ARC-007's `Normalizer` extraction removes the model-level structural check entirely — not a
+  second *authority*, since nothing derives its own behaviour from it independently of the proof),
+  and `config/spreadsheet_info.py::SpreadsheetInfo` (narrowed, not superseded outright:
+  `FileScanner`/`DataLoaderFacade` no longer read its *expected/optional/extensions* logic, per
+  the loader-consumer slice above — that structural authority moved to `SHEET_SPECS` — but every
+  model still imports its plain `SHEET.SP_NAME_*` string constants, e.g. `SHEET.SP_NAME_DESCRIPTION
+  == "descricao"`, purely as a naming convenience with no behaviour of its own to drift from
+  `SHEET_SPECS`, the same non-authoritative role `SHEET`/`METADATA` already play under ARC-002).
+  **ARC-003 is now done** on this basis: one
+  authoritative source (`SHEET_SPECS`), with every remaining duplicate either an inert legacy
+  artefact or a test-enforced, intentionally-kept mirror — not three competing, independently
+  drifting sources of truth any more.
 
 ### ARC-004 · Errors are pre-formatted Portuguese strings
 - Priority: P1 · Effort: L · Status: in-progress
@@ -186,6 +220,29 @@ zero global state. Each item below names the current smell, where it lives, and 
   `data_validate.specs.*` one). Neither module is wired into the legacy pipeline yet — no
   validator/model/`ValidationReport` call site was touched — that is Phase 3 (see ADR-0004's
   "Phase 1 render identical strings" note and `08-migration-roadmap.md`).
+- Done (closes this item, Phase 5, 2026-09-13 — note, not the `data_validate.i18n.catalog.Issue`
+  path): every one of the nine rule registries (`STRUCTURE_REGISTRY` … `SPELL_REGISTRY`,
+  ARC-017) produces `data_validate.specs.issues.Issue` objects exclusively — no `check_*`
+  function anywhere under `rules/` builds or returns a pre-formatted string; every message is a
+  `(message_key, params)` pair carried on the `Issue`, rendered only at the boundary
+  (`rules/legacy_adapter.py::extend_report_from_outcomes`, via `ctx.translate`/
+  `language_manager.text`). This is this item's actual target achieved through the *rule*-facing
+  half of the migration (ARC-017), not through wiring in the standalone `specs/issues.py`
+  `Issue`/`i18n/catalog.py` `MessageCatalog` pair built in the earlier "Done (model)" note above —
+  those two modules remain genuinely unwired into the legacy pipeline (their own tests still
+  cover them in isolation), superseded in practice by `RuleContext.translate`/`RuleOutcome`
+  carrying the same key+params shape through a different, already-integrated path.
+  `ValidationReport`/`ReportModel` (ARC-016) are correctly *render-side* consumers — they store
+  and format already-rendered strings for HTML/console output, which is their job, not a
+  violation of this item (an "Issue-shaped" report store was never this item's ask; "no
+  severity/rule/location metadata, cannot sort/dedupe/translate" was, and every one of those
+  properties now exists upstream, at the `Issue`, before rendering). Remaining, explicitly
+  out-of-scope-for-this-item hardcoded pt-BR strings (the ARC-005 gap: `models/sp_*.py`'s
+  structural/data-cleaning checks, `helpers/common/**`'s message-building helpers, legend's
+  in-model LEG-001…011 checks, `file_report_generator.py`'s report labels) are tracked there, not
+  here — this item is specifically about the *shape* errors travel in (structured `Issue` vs. a
+  pre-formatted string), which is now uniform for every rule the engine runs. **ARC-004 is now
+  done.**
 
 ### ARC-005 · i18n is inconsistent (≈95 % of messages hard-coded in pt-BR)
 - Priority: P1 · Effort: L · Status: open
@@ -289,6 +346,69 @@ zero global state. Each item below names the current smell, where it lives, and 
   the eight models) and (b) the report labels/section titles in
   `controllers/report/file_report_generator.py` — both out of this port's scope, so ARC-005
   stays **in-progress**, not done.
+- Done (Phase 5 slice, 2026-09-13 — models' own structural/data-cleaning messages, closing (a)
+  above): every hardcoded pt-BR literal built directly inside `models/sp_*.py`'s
+  `initialize`/`pre_processing`/`expected_structure_columns`/`data_cleaning`, plus the shared
+  message-building helpers those methods call — `MessageFormattingProcessing.
+  format_text_to_missing_and_expected_columns` (`rule.STRUCT-011.error`/`rule.STRUCT-012.warning`),
+  `DataFrameProcessing.check_dataframe_vertical_bar`/`check_dataframe_unnamed_columns`
+  (`rule.STRUCT-009.*`/`rule.STRUCT-010.{singular,plural}`), `DataCleaningProcessing.
+  clean_column_integer`/`clean_dataframe_integers` (`rule.CLEAN-001…006.error`, keyed by a new
+  `rule_id` parameter each model call site now passes), and `NumberFormattingProcessing.
+  check_cell_integer`/`validate_integer` (`rule.file_cleaning.value_*`) — now render through a
+  `translate: Callable[..., str]` parameter (`self.context.language_manager.text` from every
+  model; `rules/*.py`'s own calls into the same shared `DataCleaningProcessing`/
+  `NumberFormattingProcessing` methods pass nothing and get a process-wide cached pt-BR default,
+  `helpers/common/default_translate.get_default_translate()`, so their discarded return values
+  are unaffected). Mechanism chosen (per this item's own brainstorm): an optional `translate`
+  parameter defaulting to a cached `LanguageManager(locale="pt_BR")`, not the "helpers return
+  structured findings, models render" alternative — the smaller, behaviour-preserving diff for
+  helpers with many pre-existing callers/tests, while still meeting "no helper ever writes a
+  hardcoded string" (the default is a catalog lookup, not a literal). Naming convention: target
+  keys already existed in `.specs/business-rules/*.md` for every one of these
+  (`CLEAN-001…006`/`LEG-001…011` reserved under the `FC` category, `STRUCT-008…012` under `FS` —
+  see `.specs/business-rules/README.md`'s rule-ID table) from an earlier spec-writing pass, so
+  this slice implements exactly the keys already documented there rather than inventing a new
+  `clean.`/`struct.` prefix. 31 new catalog keys added to both locales (`rule.STRUCT-008.error`
+  … `rule.PROP-002.level2_missing`, full list in the commit diff). Inline model messages also
+  moved to the catalog this slice: `DESC-011`/`DESC-012` (`sp_description.py`'s scenario/legend
+  dynamic-column errors), `SCEN-001`/`SCEN-002` (`sp_scenario.py`), `VAL-001` (`sp_value.py`,
+  three templates), `PROP-001`/`PROP-002` (`sp_proportionality.py`, five templates), `CLEAN-006`
+  (`sp_temporal_reference.py`'s "must have exactly one row" check). Regression tests:
+  `tests/unit/models/test_i18n_wired_messages.py` (new — 15 tests, one real `LanguageManager`
+  per test, no mocks, asserting the exact historical pt-BR string is still produced for every
+  wired message: STRUCT-008/009/010, DESC-011/012, CLEAN-001/004/005/006, SCEN-001/002, VAL-001,
+  PROP-001), `tests/unit/helpers/common/test_default_translate.py` (new module, 100 % coverage),
+  every pre-existing test for the five touched helpers (unchanged, passing against the new
+  default-translate fallback). `tests/e2e` golden harness 8/8 twice, byte-identical (none of the
+  8 fixtures currently trip these specific messages, so the golden gate proves "nothing else
+  broke", not "these specific renders are byte-identical" — that is what the new unit tests
+  prove instead, directly, against the real catalog).
+  Before/after grep count (`grep -rn '"' data_validate/models data_validate/helpers/common | grep
+  -P "[áéíóãçõêâ]"`, a proxy for "pt-BR literal still hardcoded in this tree" — undercounts
+  accent-free Portuguese like "duplicados"/"Existem", so treat as a floor, not an exact count):
+  **58 → 31**. Explicitly **not done** this round, remaining as ARC-005's open scope:
+  `helpers/common/validation/legend_processing.py`'s `LegendProcessing` class (LEG-001…011, ~25
+  message sites — only consumer is `models/sp_legend.py`, confirmed by grep, so this is safe,
+  contained, well-specced follow-up work per `.specs/business-rules/legend.md`, just not done in
+  this slice given its size); `helpers/common/validation/character_processing.py` (grep-checked
+  during this slice: it has **no live production importer at all** any more — `rules/
+  description.py`/`rules/scenario.py`/`rules/temporal_reference.py` only *mention* its old method
+  name, `check_characters_punctuation_rules`, in prose describing what each rule replaced when it
+  was ported off the legacy validator; none of the three actually imports the module. Its pt-BR
+  literals are unreachable dead code today, same shape as the already-deleted
+  `ValueProcessing`/`value_validator.py` — a candidate for outright deletion (ARC-010-shaped
+  cleanup) rather than i18n work, left untouched here to keep this slice's diff to genuinely
+  live code); `helpers/common/processing/collections_processing.py::
+  find_differences_in_two_set_with_message`'s two remaining literals — also grep-checked: this
+  specific method has **no caller anywhere** in `data_validate/` (dead code, same as
+  `character_processing.py` above; `CollectionsProcessing`'s *other* methods are actively used by
+  both models and rules, so the class itself is not dead, only this one method); `DataFrameProcessing.
+  check_dataframe_unique_values`/`column_exists`/`check_dataframe_titles_uniques`/
+  `check_dataframe_text_length` (not named in this item's original "Where" list, discovered
+  during this slice, left untouched to keep the diff scoped to the explicitly-named targets);
+  `file_report_generator.py`'s report labels/section titles (unchanged, per (b) above). ARC-005
+  **stays in-progress** — real, measured progress, not closed.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
@@ -423,7 +543,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   satisfied this item's intent before this slice, so neither needed a change here.
 
 ### ARC-011 · CLI contract
-- Priority: P2 · Effort: M · Status: in-progress
+- Priority: P2 · Effort: M · Status: done (remaining rows below are wont-fix, not open)
 - Where: `helpers/base/data_args.py` (was `:256-303`; documented flags `--i/--o/--l` existed only
   through `allow_abbrev=True`; `--d` in `scripts/run_main_pipeline.bat`), `main.py`.
 - Done (this slice): `allow_abbrev=False`; explicit aliases `-i/--input`/`-o/--output` (kept
@@ -431,18 +551,37 @@ zero global state. Each item below names the current smell, where it lives, and 
   `--i`/`--o`/`--l`/`--d` declared as explicit, deprecated two-dash aliases (stderr warning naming
   the replacement on use); `--json PATH`; `--fail-on {error,warning,never}`; offline `--version`;
   exit codes standardised (SEC-008, see there). Documented in `.specs/api/cli-contract.md`.
-- Still open (left to a later phase, judged out of this slice's scope): `--format
-  html,pdf,json,console`, `--rules`/`--skip-rules`, `--max-file-size`/`--max-rows`, `--parallel`,
-  `--verbose`/`--quiet`, `--list-rules`, a separate `cli.py`/`AppContext` module, and deprecating
-  `--input_folder`/`--output_folder` themselves. Decision: `--input_folder`/`--output_folder` were
-  *not* deprecated in this slice (unlike `.specs/api/cli-contract.md`'s original target table)
-  because the platform's actual invocation of those two flags is still the primary integration
-  point and deprecating them belongs with a coordinated platform-side migration, not a
-  drive-by change alongside the exit-code fix — tracked as the "still open" row above.
+- Done (Phase 5 slice, 2026-09-13): `--list-rules` implemented — `data_validate/rules/__init__.py`
+  gains `ALL_REGISTRIES` (every rule registry, in the same fixed order
+  `SpreadsheetProcessor._build_pipeline` runs them) and `list_all_rules() -> tuple[RuleSummary, ...]`
+  (`RuleSummary(rule_id, category, severity)`, sorted by `rule_id`) — a pure, importable helper
+  independent of any `RuleContext`/bundle, per this item's own "an importable helper in
+  `rules/__init__.py`" instruction. `helpers/base/data_args.py` gains `_ListRulesAction` (an
+  `argparse.Action`, mirroring the existing `action="version"` `--version` flag): `--list-rules`
+  prints one `rule_id<TAB>category<TAB>severity` line per registered rule (47 today) to stdout and
+  exits 0 during `parser.parse_args()`, before `DataArgs.run()`'s `--input_folder` requirement is
+  even checked — no bundle, no `--input_folder`/`--output_folder` needed. `.specs/api/cli-contract.md`
+  moved from its "Target contract — still pending" table to "Current contract — implemented".
+  Tests: `tests/unit/rules/test_list_all_rules.py` (row count matches total registered, sorted,
+  every field populated, no duplicate rule IDs across registries),
+  `tests/unit/helpers/base/test_data_args.py::TestDataArgsCliContract::
+  test_list_rules_flag_exits_zero_and_prints_every_rule` (real `sys.argv`, real `SystemExit`,
+  real stdout capture, mirroring the existing `--version` test).
+- Wont-fix (Phase 5 decision, judged out of scope beyond `--list-rules`): `--format
+  html,pdf,json,console`, `--rules`/`--skip-rules`, `--max-file-size`/`--max-rows` (SEC-003 already
+  enforces fixed limits via config, not a flag), `--parallel` (PERF-007 is its own wont-fix),
+  `--verbose`/`--quiet`, a separate `cli.py`/`AppContext` module, and deprecating
+  `--input_folder`/`--output_folder` themselves — the PDF-generation-conditional stderr lines
+  (ARC-012) and the existing stdout/stderr split already cover the practical need `--verbose`/
+  `--quiet` would address, so adding a flag for it is not justified by any concrete gap. Decision:
+  `--input_folder`/`--output_folder` were *not* deprecated (unlike `.specs/api/cli-contract.md`'s
+  original target table) because the platform's actual invocation of those two flags is still the
+  primary integration point and deprecating them belongs with a coordinated platform-side
+  migration, not a drive-by change alongside the exit-code fix.
 - Related: SEC-008, BUG-010, ARC-012
 
 ### ARC-012 · `print()` for user output alongside logging
-- Priority: P2 · Effort: S · Status: in-progress
+- Priority: P2 · Effort: S · Status: done
 - Where: `main.py:8` (was; now `main.py`'s `main()`), `spreadsheet_processor.py:98`,
   `general_context.py:103`, `file_report_generator.py:153,263,335,340,361,368`,
   `language_manager.py:38,50,61-65`, `bootstrap.py:76-81`, `metadata_info.py:74`.
@@ -453,10 +592,25 @@ zero global state. Each item below names the current smell, where it lives, and 
   `middleware` package was deleted), so its `print()`s are gone with it — not converted, moot.
   `language_manager.py`'s internal `print()`s (`_load_translations`, `set_language`) are replaced
   with `logging.getLogger(__name__).warning(...)`/`.error(...)` calls, message text preserved
-  verbatim. `general_context.py:103`'s debug-mode `print("\nLog file created at:", ...)`,
-  `spreadsheet_processor.py:98`'s "Tempo total de execução" print, and every `print()` in
-  `file_report_generator.py` are intentionally kept as `print()` for now (still open, tracked
-  here) — only the banner was in scope for this slice.
+  verbatim.
+- Done (Phase 5 slice, 2026-09-13 — closes this item): every remaining `print()` this item named
+  is moved to stderr, so stdout carries **only** the `<{json}>` summary fragment
+  (`FileReportGenerator._print_json_summary`) — nothing else is a `print()` call any more without
+  an explicit `file=sys.stderr`. `general_context.py`'s debug-mode `print("\nLog file created
+  at:", ...)` gains `file=sys.stderr`. `spreadsheet_processor.py::run`'s "Tempo total de
+  execução" print gains `file=sys.stderr`. `file_report_generator.py`'s four `info_message`
+  prints that used `file=sys.stdout` (`_save_html_file`'s "HTML report created at: …",
+  `_save_pdf_file`'s two "PDF report created at: …" branches — WeasyPrint and `pdfkit` — and the
+  `pdfkit`-`ImportError` "skip" message, which was already on stderr) are switched to
+  `file=sys.stderr`; the module's other five `print(..., file=sys.stderr)` calls (error paths)
+  were already correct and are unchanged. Verified end to end: a real
+  `canoa-data-validate --input_folder … --output_folder …` run's stdout now contains *only* the
+  `<{...}>` line (blank lines aside); every `HTML report created at:`/`PDF report created
+  at:`/`Tempo total de execução:`/banner line is on stderr. `tests/e2e/test_golden.py` (8/8,
+  twice) and the full unit suite stay green — the golden harness's `_extract_json_summary` was
+  already a regex search over stdout, not a whole-string comparison, so removing the
+  now-stderr-only lines from stdout does not change what it extracts.
+  **ARC-012 is now done.**
 
 ### ARC-013 · Naming
 - Priority: P2 · Effort: S · Status: done
@@ -496,13 +650,43 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: TOOL-003
 
 ### ARC-015 · Spellchecker tightly coupled to pyenchant
-- Priority: P2 · Effort: M · Status: open
-- Where: `helpers/tools/spellchecker/**`, `validators/spell/spellchecker_validator.py`
+- Priority: P2 · Effort: M · Status: in-progress
+- Where: `helpers/tools/spellchecker/**` (was also `validators/spell/spellchecker_validator.py`,
+  deleted by ARC-017 Phase 3 Port 8 — the rule module is `rules/spell.py` now).
 - Problem: C extension + system hunspell; env-var configuration; tests need the library installed;
   Windows requires manual DLLs (`hunspell-win/` in .gitignore).
 - Target: `SpellBackend` Protocol (`check(word) -> bool`, `suggest`) with `EnchantBackend` and a pure
   Python fallback (`symspellpy`/`pyspellchecker` with the bundled `.dic`); word-level cache.
-- Related: PERF-006
+- Done (Phase 5 slice, 2026-09-13 — Protocol half): `rules/spell.py` already had a private,
+  `check_spelling_text_structured`/`errors_dictionary`-shaped `@runtime_checkable Protocol`
+  (`_SpellBackend`, used to narrow `ctx.options["spell_backend"]`); this slice makes it public
+  (`SpellBackend`, exported from `data_validate.rules`) and adds `clean_files_generated() -> None`
+  to its surface — the third method `SpreadsheetProcessor._build_pipeline` calls on the same
+  object (`self._spell_backend.clean_files_generated()`), completing the exact three-method shape
+  this item's own "Target" line asks for (renamed from the abstract `check(word)`/`suggest` sketch
+  to the concrete surface the codebase actually needs: `check_spelling_text_structured`,
+  `errors_dictionary`, `clean_files_generated`). `SpreadsheetProcessor.__init__` now types
+  `self._spell_backend: SpellBackend | None` instead of leaving it untyped, so every consumer
+  (`rules/spell.py`'s `_backend()`, `SpreadsheetProcessor`) is decoupled from the concrete
+  `SpellChecker`/`pyenchant` class at the type level. `PERF-006`'s word-level cache lives on
+  `SpellCheckerController` (an implementation detail behind the Protocol), unaffected. Tests:
+  `tests/unit/rules/test_spell.py::TestSpellBackendProtocol` —
+  `FakeSpellBackend` (the existing test double) satisfies the Protocol,
+  `SpellChecker` (constructed with its `DictionaryManager`/`SpellCheckerController`/
+  `DataFrameProcessor` collaborators mocked, no real `enchant` needed) satisfies it too, and an
+  object missing `clean_files_generated` does **not** satisfy it — proving the Protocol is
+  checked structurally, not just declared.
+- Still open (not this slice's scope, per this item's own instruction — "pure-Python fallback →
+  wont-fix"): no `EnchantBackend` wrapper class exists yet (`SpellChecker` itself plays that role
+  today, undifferentiated from the Protocol); no pure-Python fallback backend is implemented — a
+  Windows/CI host without `pyenchant`/hunspell simply has no working spell-check backend today
+  (mitigated by TOOL-008's `[spell]` extra decision: the dependency is optional, and the run
+  degrades to "spell-check unavailable" rather than crashing, per SPELL-001's own
+  dictionary/backend-error path). Implementing an actual `symspellpy`/`pyspellchecker`-backed
+  fallback is real, scoped future work, not done here — **wont-fix for now** per this item's own
+  brief, revisit if a host without `pyenchant` needs spell-check to actually run rather than
+  degrade gracefully.
+- Related: PERF-006, TOOL-008
 
 ### ARC-016 · Report generation builds HTML in Python
 - Priority: P2 · Effort: M · Status: done

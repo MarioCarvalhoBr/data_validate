@@ -146,6 +146,60 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   `import pdfkit` when the optional dependency/its native `wkhtmltopdf` binary is missing).
   Every other site this item names when it was opened is done; the two remaining sites above
   belong to `validators/`/`spellchecker.py` and are tracked separately (parallel migration work).
+- Final inventory (Phase 5 close, 2026-09-13 — `grep -rn "except Exception" data_validate/`, every
+  survivor enumerated and judged):
+  - `main.py`'s `main()` boundary — **sanctioned by design** (SEC-008): the one place an
+    unexpected construction/pipeline failure is caught to print `Fatal error: <exc>` to stderr
+    and return exit code 2, rather than a raw traceback; narrower catching here would defeat the
+    exit-code contract this item and SEC-008 both rely on.
+  - `rules/engine.py::Engine.run` — **sanctioned by design**, documented inline: isolates an
+    unexpected failure in *any* rule (unknowable type in advance, since rules are
+    plugin-shaped from the engine's point of view) into a `FAILED` `RuleOutcome` instead of
+    crashing the whole run or being silently absorbed as a clean pass — this *is* SEC-004's own
+    fix pattern (fail visibly, not silently), applied at the one seam that must stay generic.
+  - `validators/spreadsheets/base/base_validator.py` — **confirmed gone**: `validators/` was
+    deleted entirely by ARC-008/ARC-017 Phase 3 Port 8; this item's original site no longer
+    exists.
+  - `helpers/tools/spellchecker/dictionary_manager.py`'s `clean_temporary_files` — **fixed this
+    slice**: the try/except wrapped two plain `self.x = None` assignments, which cannot raise;
+    removed outright (no plausible failure mode), matching this item's own precedent for
+    `dataframe_processing.py`'s two already-fixed sites. Regression test updated:
+    `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py::
+    test_clean_temporary_files_always_drops_references` (was
+    `test_clean_temporary_files_dictionary_cleanup_error`, which asserted a scenario only a
+    contrived `mocker.MagicMock` with a raising `__bool__` could trigger — not a real enchant
+    failure mode).
+  - `helpers/tools/spellchecker/dictionary_manager.py`'s `validate_dictionary`/
+    `initialize_dictionary`/`_load_extra_words` (3 sites) — **newly discovered, not fixed this
+    slice, flagged for follow-up**: each wraps a call into the `enchant` C-extension boundary
+    (`Broker()`, `broker.dict_exists`, `broker.request_dict`) or file I/O reading
+    `extra-words.dic`; unlike `clean_temporary_files`, these *do* have a plausible failure mode
+    (a malformed/missing system dictionary, a native library error surfacing as an
+    enchant-specific exception type this module does not import), so blindly narrowing to
+    `OSError` risks silently stopping error reporting for a real enchant failure. Narrowing
+    these correctly needs enumerating enchant's actual exception hierarchy first — real,
+    scoped follow-up work, not a same-slice drive-by change.
+  - `helpers/tools/spellchecker/spellchecker.py::check_spelling_text` — **newly discovered, not
+    fixed this slice, flagged for follow-up**: dead code in production (only
+    `check_spelling_text_structured` — a separate method with its own, already-sanctioned SPELL-005
+    broad catch — is called by `rules/spell.py`), but its own test file
+    (`tests/unit/helpers/tools/spellchecker/test_spellchecker.py`, 20 tests across 3 classes)
+    exercises it directly, including three tests that set a **generic** `Exception("...")`
+    `side_effect` and assert on the resulting fallback message. Narrowing the `except` clause
+    would break those three tests' premise (a generic `Exception` would no longer be caught);
+    deleting the dead method outright would require rewriting the entire test file. Either fix
+    is real, scoped work, not a safe same-slice change given the size of the surrounding test
+    suite — flagged, not silently ignored.
+  - `helpers/tools/locale/language_manager.py`'s `_load_translations`/`text()` (2 sites) — **not
+    named in this item's original scope, reviewed, left as-is**: both are the i18n subsystem's
+    own last-resort fallback (a translation-file load failure or a template-formatting error
+    must never crash the whole validation run just because one message couldn't be localised);
+    narrowing further risks the i18n layer itself becoming a new crash source for every rule
+    that calls `translate(...)`, which is a materially different risk profile from a validator
+    silently downgrading a real bug into a fake "valid" result.
+  - `helpers/tools/data_loader/api/facade.py` — its own docstring documents the "former final
+    `except Exception`" as already removed (SEC-004, prior slice); grep-confirmed no `except
+    Exception` remains in this file today.
   Tests: `tests/unit/helpers/base/test_file_system_utils.py` (six `*_unexpected_error_propagates`
   tests replacing the old `*_unexpected_error` assertions, plus new `OSError`-path regression tests
   for the three sites that previously had no dedicated `OSError` branch),

@@ -24,6 +24,7 @@ Defined in `helpers/base/data_args.py::DataArgs._create_parser` with `allow_abbr
 | `--json PATH` | | | optional, default `None` | After the run, writes the same summary object as the stdout `<{...}>` fragment to `PATH` as pretty JSON (UTF-8) |
 | `--fail-on {error,warning,never}` | | | default `error` | Governs the exit code (see below); `never` restores the historical always-0 behaviour |
 | `--version` | | | action | Prints `<prog> <METADATA.__version__>` and exits 0; no file I/O, works offline (TOOL-008) |
+| `--list-rules` | | | action | Prints one `rule_id<TAB>category<TAB>severity` line per rule registered across `rules.ALL_REGISTRIES` (sorted by rule ID) to stdout and exits 0; independent of any bundle, works offline, does not require `--input_folder` (ARC-011, Phase 5) |
 
 The deprecated two-dash aliases (`--i`, `--o`, `--l`, `--d`) only ever worked through
 `allow_abbrev=True` prefix matching; they are now declared explicitly (so they keep working under
@@ -36,12 +37,18 @@ Outputs:
 - `<output_folder>/<input-folder-name>_report.html` and `.pdf` (PDF silently skipped with a
   stderr message if `wkhtmltopdf` is missing).
 - stderr: welcome banner, printed once from inside `main()` (ARC-012) — no longer printed at
-  `import data_validate` time, and no longer mixed onto stdout.
-- stdout: `HTML report created at: …`, `PDF report created at: …`, then a line
-  `<{"data_validate": {"version": "0.7.65b732", "report": {"errors": E, "warnings": W, "tests":
-  35}}}>` (built with `json.dumps(summary, ensure_ascii=False)`, so it stays valid JSON even when a
-  value contains a quote or non-ASCII character — BUG-010, fixed), then `Tempo total de execução: N
-  segundos` unless `--no-time`.
+  `import data_validate` time, and no longer mixed onto stdout; also (ARC-012, Phase 5) `HTML
+  report created at: …`, `PDF report created at: …` (or the `[pdf]`-extra skip message),
+  `Tempo total de execução: N segundos` (unless `--no-time`), and, in `--debug` mode, `Log file
+  created at: …` — every one of these moved off stdout in this slice so stdout is never mixed
+  with anything but the JSON summary fragment below.
+- stdout: **only** the line `<{"data_validate": {"version": "0.7.65b732", "report": {"errors": E,
+  "warnings": W, "tests": 35}}}>` (built with `json.dumps(summary, ensure_ascii=False)`, so it
+  stays valid JSON even when a value contains a quote or non-ASCII character — BUG-010, fixed).
+  A platform integration that only ever read this one JSON fragment off stdout is unaffected;
+  one that also expected the (now-removed) `HTML report created at: …`/`PDF report created
+  at: …`/`Tempo total de execução: …` lines interleaved on stdout must read them from stderr
+  instead (ARC-012).
 - Exit code: see below (SEC-008, fixed — no longer always `0`).
 
 ### Exit codes (SEC-008 — implemented)
@@ -76,12 +83,13 @@ remain open (tracked under ARC-011/ARC-012, follow-on phases):
 | `--max-file-size BYTES`, `--max-rows N` | Input limits (SEC-003) |
 | `--parallel` | Run independent rule groups concurrently |
 | `--verbose` / `-v`, `--quiet` / `-q` | Console verbosity; today's stderr progress/log lines are
-  unconditional, not gated by a verbosity flag |
-| `--list-rules` | Print rule IDs, categories, severities and exit 0 |
-| Full stdout quieting | stdout carries the JSON summary today, which already matches the target;
-  the remaining gap is that `FileReportGenerator` also prints `HTML report created at: …`/`PDF
-  report created at: …` to stdout unconditionally (ARC-012, not moved to logging/stderr in this
-  change — see `.specs/quality/backlog/03-architecture.md#ARC-012`) |
+  unconditional, not gated by a verbosity flag — wont-fix for now: PDF-generation-conditional
+  stderr lines (ARC-012) and the stdout/stderr split already cover the practical need this flag
+  would address |
+| ~~Full stdout quieting~~ | **Done, Phase 5** (ARC-012): stdout carries only the JSON summary
+  fragment; `FileReportGenerator`'s `HTML report created at: …`/`PDF report created at: …` and
+  `SpreadsheetProcessor`'s `Tempo total de execução: …` all moved to stderr — see
+  `.specs/quality/backlog/03-architecture.md#ARC-012` |
 | `--input_folder`/`--output_folder` deprecation | Kept as first-class, non-deprecated flags in
   this change (brief decision, see `08-migration-roadmap.md` Phase 1 notes) rather than deprecated
   aliases of `--input`/`--output`; deprecating them is left to a later phase if the platform's
