@@ -1,5 +1,5 @@
 .PHONY: help setup lint format typecheck security security-offline test-unit test-e2e test \
-        coverage check harness-update bench profile run run-all docs build clean i18n-check badges
+        coverage check harness-update bench profile run run-all docs build clean i18n-check
 
 # Variables
 PATH_SRC = data_validate
@@ -109,7 +109,7 @@ build: ## Build the distributable package
 	poetry build
 
 clean: ## Remove generated output, caches and build artifacts
-	rm -rf data/output/temp/ data/output/logs/  # tracked reports under data/output/ stay until TOOL-006
+	rm -rf data/output/  # gitignored (SEC-009/TOOL-006): safe to remove wholesale
 	rm -rf data/temp/
 	rm -rf dist/
 	rm -rf dev-reports/
@@ -121,8 +121,3 @@ clean: ## Remove generated output, caches and build artifacts
 
 i18n-check: ## Check i18n catalog parity and unused/missing keys
 	$(PYTHON) tools/i18n_check.py
-
-badges: ## Generate coverage and tests badges from the latest reports
-	@mkdir -p assets/coverage
-	poetry run genbadge coverage -i dev-reports/coverage.xml -o assets/coverage/coverage_badge.svg
-	poetry run genbadge tests --input-file dev-reports/junit/junit.xml -o assets/coverage/tests_badge.svg
