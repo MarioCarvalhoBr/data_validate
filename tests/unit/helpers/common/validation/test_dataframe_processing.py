@@ -1,18 +1,25 @@
-"""Unit tests for data validation utilities.
+#  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+"""Unit tests for `DataFrameProcessing` (dataframe_processing.py).
 
 This module provides comprehensive tests for DataFrame validation functions
-including vertical bars, unnamed columns, punctuation rules, special characters,
-and text length constraints.
-"""
+including vertical bars, unnamed columns, uniqueness, column existence, and
+text length constraints.
 
-#  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
+Renamed from `test_dataframe_character_processing.py` (Phase 5 round L2,
+2026-09-13): `character_processing.py` (the other half of that combined test
+file) was deleted as dead code (ARC-005/ARC-010 — zero production callers, see
+`.specs/quality/backlog/03-architecture.md`'s ARC-005 entry); this file keeps
+every `DataFrameProcessing`-only test unchanged (including the SEC-004
+`*_unexpected_error_propagates` regression tests), dropping only the
+`CharacterProcessing`-specific classes and the two `CharacterProcessing` calls
+inside `TestDataValidationIntegration`.
+"""
 
 import pytest
 import pandas as pd
-from typing import List, Tuple, Optional
+from typing import List, Optional
 
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
-from data_validate.helpers.common.validation.character_processing import CharacterProcessing
 
 
 class TestCheckVerticalBar:
@@ -335,304 +342,6 @@ class TestCheckUnnamedColumns:
         # Act / Assert
         with pytest.raises(RuntimeError, match="Test exception"):
             DataFrameProcessing.check_dataframe_unnamed_columns(df, "test.xlsx")
-
-
-class TestCheckPunctuation:
-    """Test suite for check_punctuation function."""
-
-    @pytest.fixture
-    def sample_dataframe(self) -> pd.DataFrame:
-        """Create sample DataFrame for punctuation testing."""
-        return pd.DataFrame(
-            {
-                "titulo": ["Título sem ponto", "Título com ponto.", "Título,"],
-                "descricao": [
-                    "Descrição completa.",
-                    "Descrição sem ponto",
-                    "Descrição com exclamação!",
-                ],
-                "codigo": ["A001", "B002", "C003"],
-                "observacao": ["", None, "Observação válida."],
-            }
-        )
-
-    @pytest.mark.parametrize(
-        "columns_dont_punctuation,columns_must_end_with_dot,expected_warning_count",
-        [
-            # Test case 1: No restrictions
-            ([], [], 0),
-            # Test case 2: Titles shouldn't end with punctuation
-            (["titulo"], [], 2),  # Two titles end with punctuation
-            # Test case 3: Descriptions must end with dot
-            ([], ["descricao"], 2),  # Two descriptions don't end with dot
-            # Test case 4: Both restrictions
-            (["titulo"], ["descricao"], 4),  # Combined warnings
-            # Test case 5: Non-existent columns
-            (["non_existent"], ["also_non_existent"], 0),
-        ],
-    )
-    def test_check_punctuation_parametrized_scenarios(
-        self,
-        sample_dataframe: pd.DataFrame,
-        columns_dont_punctuation: List[str],
-        columns_must_end_with_dot: List[str],
-        expected_warning_count: int,
-    ) -> None:
-        """Test check_punctuation with various column configurations."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_characters_punctuation_rules(
-            sample_dataframe,
-            "test.xlsx",
-            columns_dont_punctuation,
-            columns_must_end_with_dot,
-        )
-
-        # Assert
-        assert len(warnings) == expected_warning_count
-        assert is_valid == (expected_warning_count == 0)
-
-    def test_check_punctuation_empty_dataframe(self) -> None:
-        """Test check_punctuation with empty DataFrame."""
-        # Arrange
-        df = pd.DataFrame()
-
-        # Act
-        is_valid, warnings = CharacterProcessing.check_characters_punctuation_rules(
-            df, "empty.xlsx", ["col1"], ["col2"]
-        )
-
-        # Assert
-        assert is_valid is True
-        assert warnings == []
-
-    def test_check_punctuation_handles_none_values(self) -> None:
-        """Test check_punctuation properly handles None and empty values."""
-        # Arrange
-        df = pd.DataFrame({"test_col": [None, "", "Valid text.", "Invalid text,"]})
-
-        # Act
-        is_valid, warnings = CharacterProcessing.check_characters_punctuation_rules(df, "test.xlsx", ["test_col"], [])
-
-        # Assert
-        assert len(warnings) == 2  # Fixed: Both Valid text. and Invalid text, trigger warnings
-        assert any("pontuação" in warning for warning in warnings)
-
-    @pytest.mark.parametrize(
-        "text_value,should_warn_no_punct,should_warn_need_dot",
-        [
-            # Test case 1: Perfect text ending with dot
-            (
-                "Texto correto.",
-                True,
-                False,
-            ),  # Fixed: dot is punctuation, so should warn for no_punct
-            # Test case 2: Text with comma (punctuation)
-            ("Texto com vírgula,", True, True),
-            # Test case 3: Text without punctuation
-            ("Texto sem pontuação", False, True),
-            # Test case 4: Text with question mark
-            ("Texto com pergunta?", True, True),
-            # Test case 5: Empty text
-            ("", False, False),
-        ],
-    )
-    def test_check_punctuation_individual_text_cases(
-        self, text_value: str, should_warn_no_punct: bool, should_warn_need_dot: bool
-    ) -> None:
-        """Test check_punctuation with individual text cases."""
-        # Arrange
-        df = pd.DataFrame({"test_col": [text_value]})
-
-        # Act - Test no punctuation rule
-        is_valid_no_punct, warnings_no_punct = CharacterProcessing.check_characters_punctuation_rules(
-            df, "test.xlsx", ["test_col"], []
-        )
-
-        # Act - Test must end with dot rule
-        is_valid_dot, warnings_dot = CharacterProcessing.check_characters_punctuation_rules(
-            df, "test.xlsx", [], ["test_col"]
-        )
-
-        # Assert
-        assert (len(warnings_no_punct) > 0) == should_warn_no_punct
-        assert (len(warnings_dot) > 0) == should_warn_need_dot
-
-
-class TestCheckSpecialCharactersCrLf:
-    """Test suite for CR/LF special characters checking functions."""
-
-    @pytest.fixture
-    def dataframe_with_cr_lf_characters(self) -> pd.DataFrame:
-        """Create DataFrame with CR/LF characters in various positions."""
-        return pd.DataFrame(
-            {
-                "text_start_cr": ["\x0dStart with CR", "Normal text", "Another normal"],
-                "text_end_lf": ["End with LF\x0a", "Normal text", "Also normal"],
-                "text_middle_cr": ["Middle\x0dCR text", "Normal", "Text with\x0dCR"],
-                "normal_column": ["Normal text 1", "Normal text 2", "Normal text 3"],
-            }
-        )
-
-    @pytest.fixture
-    def clean_dataframe_no_special_chars(self) -> pd.DataFrame:
-        """Create clean DataFrame without special characters."""
-        return pd.DataFrame(
-            {
-                "column1": ["Normal text", "Another normal", "Clean text"],
-                "column2": ["Clean data", "No special chars", "All good"],
-            }
-        )
-
-    def test_check_special_characters_cr_lf_columns_start_end_clean_data(
-        self, clean_dataframe_no_special_chars: pd.DataFrame
-    ) -> None:
-        """Test start/end CR/LF check with clean data."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
-            clean_dataframe_no_special_chars, "test.xlsx", ["column1", "column2"]
-        )
-
-        # Assert
-        assert is_valid is True
-        assert warnings == []
-
-    def test_check_special_characters_cr_lf_columns_start_end_with_issues(
-        self, dataframe_with_cr_lf_characters: pd.DataFrame
-    ) -> None:
-        """Test start/end CR/LF check with problematic data."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
-            dataframe_with_cr_lf_characters,
-            "test.xlsx",
-            ["text_start_cr", "text_end_lf"],
-        )
-
-        # Assert
-        assert is_valid is False
-        assert len(warnings) == 2  # One start CR, one end LF
-
-        # Check warning content
-        assert any("início do texto" in warning for warning in warnings)
-        assert any("final do texto" in warning for warning in warnings)
-
-    def test_check_special_characters_cr_lf_columns_anywhere_clean_data(
-        self, clean_dataframe_no_special_chars: pd.DataFrame
-    ) -> None:
-        """Test anywhere CR/LF check with clean data."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
-            clean_dataframe_no_special_chars, "test.xlsx", ["column1"]
-        )
-
-        # Assert
-        assert is_valid is True
-        assert warnings == []
-
-    def test_check_special_characters_cr_lf_columns_anywhere_with_issues(
-        self, dataframe_with_cr_lf_characters: pd.DataFrame
-    ) -> None:
-        """Test anywhere CR/LF check with problematic data."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
-            dataframe_with_cr_lf_characters, "test.xlsx", ["text_middle_cr"]
-        )
-
-        # Assert
-        assert is_valid is False
-        assert len(warnings) == 2  # Two texts with middle CR
-
-        # Check position information in warnings
-        assert any("posição" in warning for warning in warnings)
-
-    def test_check_special_characters_cr_lf_combined_function(
-        self, dataframe_with_cr_lf_characters: pd.DataFrame
-    ) -> None:
-        """Test the combined CR/LF checking function."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf(
-            dataframe_with_cr_lf_characters,
-            "test.xlsx",
-            columns_start_end=["text_start_cr", "text_end_lf"],
-            columns_anywhere=["text_middle_cr"],
-        )
-
-        # Assert
-        assert is_valid is False
-        assert len(warnings) == 4  # 2 start/end + 2 anywhere
-
-        # Verify all types of warnings are present
-        warning_text = " ".join(warnings)
-        assert "início do texto" in warning_text
-        assert "final do texto" in warning_text
-        assert "posição" in warning_text
-
-    @pytest.mark.parametrize(
-        "text_with_special_chars,expected_positions",
-        [
-            # Test case 1: No special characters
-            ("Normal text", []),
-            # Test case 2: Single CR at position 5
-            ("Text\x0dhere", [(5, "CR")]),
-            # Test case 3: Single LF at position 3
-            ("AB\x0aCD", [(3, "LF")]),
-            # Test case 4: Multiple special characters
-            ("A\x0dB\x0aC", [(2, "CR"), (4, "LF")]),
-            # Test case 5: Special chars at start and end
-            ("\x0dStart\x0a", [(1, "CR"), (7, "LF")]),
-        ],
-    )
-    def test_find_cr_lf_positions_parametrized(
-        self, text_with_special_chars: str, expected_positions: List[Tuple[int, str]]
-    ) -> None:
-        """Test CR/LF position finding with various text patterns."""
-        # Arrange
-        df = pd.DataFrame({"test_col": [text_with_special_chars]})
-
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
-            df, "test.xlsx", ["test_col"]
-        )
-
-        # Assert
-        assert len(warnings) == len(expected_positions)
-        if expected_positions:
-            assert is_valid is False
-            for i, (pos, char_type) in enumerate(expected_positions):
-                assert f"posição {pos}" in warnings[i]
-                assert char_type in warnings[i]
-        else:
-            assert is_valid is True
-
-    def test_check_special_characters_empty_columns_list(self, dataframe_with_cr_lf_characters: pd.DataFrame) -> None:
-        """Test CR/LF functions with empty column lists."""
-        # Act
-        is_valid_start_end, warnings_start_end = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
-            dataframe_with_cr_lf_characters, "test.xlsx", []
-        )
-
-        is_valid_anywhere, warnings_anywhere = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
-            dataframe_with_cr_lf_characters, "test.xlsx", []
-        )
-
-        # Assert
-        assert is_valid_start_end is True
-        assert warnings_start_end == []
-        assert is_valid_anywhere is True
-        assert warnings_anywhere == []
-
-    def test_check_special_characters_nonexistent_columns(self, clean_dataframe_no_special_chars: pd.DataFrame) -> None:
-        """Test CR/LF functions with non-existent columns."""
-        # Act
-        is_valid, warnings = CharacterProcessing.check_special_characters_cr_lf(
-            clean_dataframe_no_special_chars,
-            "test.xlsx",
-            columns_start_end=["nonexistent1"],
-            columns_anywhere=["nonexistent2"],
-        )
-
-        # Assert
-        assert is_valid is True
-        assert warnings == []
 
 
 class TestCheckUniqueValues:
@@ -1031,19 +740,13 @@ class TestDataValidationIntegration:
         )
         all_errors.extend(errors_unnamed)
 
-        # 3. Check punctuation
-        is_valid_punct, warnings_punct = CharacterProcessing.check_characters_punctuation_rules(
-            complex_test_dataframe, file_name, ["titulo"], ["descricao"]
-        )
-        all_warnings.extend(warnings_punct)
-
-        # 4. Check unique values
+        # 3. Check unique values
         is_valid_unique, warnings_unique = DataFrameProcessing.check_dataframe_unique_values(
             complex_test_dataframe, file_name, ["codigo_unico"]
         )
         all_warnings.extend(warnings_unique)
 
-        # 5. Check text length
+        # 4. Check text length
         is_valid_length, errors_length = DataFrameProcessing.check_dataframe_text_length(
             complex_test_dataframe, file_name, "texto_longo", 20
         )
@@ -1068,7 +771,6 @@ class TestDataValidationIntegration:
         functions_to_test = [
             (DataFrameProcessing.check_dataframe_vertical_bar, (df, file_name)),
             (DataFrameProcessing.check_dataframe_unnamed_columns, (df, file_name)),
-            (CharacterProcessing.check_characters_punctuation_rules, (df, file_name, [], [])),
             (DataFrameProcessing.check_dataframe_unique_values, (df, file_name, [])),
             (DataFrameProcessing.column_exists, (df, file_name, "test")),
             (DataFrameProcessing.check_dataframe_text_length, (df, file_name, "test", 50)),
@@ -1177,172 +879,6 @@ class TestCheckDataframeTitlesUniques:
         )
         assert len(result) == 1
         assert "titles one duplicados: ['Title 1']" in result[0]
-
-
-class TestCheckSpecialCharactersCrLfColumnsStartEnd:
-    """Test suite for check_special_characters_cr_lf_columns_start_end function."""
-
-    def test_check_special_characters_cr_lf_columns_start_end_no_issues(self):
-        """Test with no CR/LF characters."""
-        df = pd.DataFrame({"text_col": ["Normal text", "Another text", "Clean text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_start_end_with_cr_end(self):
-        """Test with CR character at end."""
-        df = pd.DataFrame({"text_col": ["Text with CR\r", "Normal text", "Another with CR\r"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2
-        assert all("CR) no final do texto" in msg for msg in result[1])
-
-    def test_check_special_characters_cr_lf_columns_start_end_with_lf_end(self):
-        """Test with LF character at end."""
-        df = pd.DataFrame({"text_col": ["Text with LF\n", "Normal text", "Another with LF\n"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2
-        assert all("LF) no final do texto" in msg for msg in result[1])
-
-    def test_check_special_characters_cr_lf_columns_start_end_with_cr_start(self):
-        """Test with CR character at start."""
-        df = pd.DataFrame({"text_col": ["\rText with CR", "Normal text", "\rAnother with CR"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2
-        assert all("CR) no início do texto" in msg for msg in result[1])
-
-    def test_check_special_characters_cr_lf_columns_start_end_with_lf_start(self):
-        """Test with LF character at start."""
-        df = pd.DataFrame({"text_col": ["\nText with LF", "Normal text", "\nAnother with LF"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2
-        assert all("LF) no início do texto" in msg for msg in result[1])
-
-    def test_check_special_characters_cr_lf_columns_start_end_empty_columns(self):
-        """Test with empty or None columns."""
-        df = pd.DataFrame({"text_col": ["", None, "Normal text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_start_end_missing_column(self):
-        """Test with missing column."""
-        df = pd.DataFrame({"other_col": ["Text", "More text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(df, "test.xlsx", ["text_col"])
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_start_end_all_empty_values(self):
-        """Test with column containing only empty/NaN values (covers line 179)."""
-        df = pd.DataFrame(
-            {
-                "empty_col": [None, "", pd.NA, None],
-                "normal_col": ["Normal text", "\rText with CR at start", "Text with LF at end\n", "Another text"],
-            }
-        )
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
-            df, "test.xlsx", ["empty_col", "normal_col"]
-        )
-        # Should only check normal_col since empty_col has no non-empty values
-        assert result[0] is False
-        assert len(result[1]) == 2  # Two warnings for normal_col
-        assert all("normal_col" in msg for msg in result[1])  # Only normal_col should have warnings
-
-
-class TestCheckSpecialCharactersCrLfColumnsAnywhere:
-    """Test suite for check_special_characters_cr_lf_columns_anywhere function."""
-
-    def test_check_special_characters_cr_lf_columns_anywhere_no_issues(self):
-        """Test with no CR/LF characters."""
-        df = pd.DataFrame({"text_col": ["Normal text", "Another text", "Clean text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_anywhere_with_cr_middle(self):
-        """Test with CR character in middle of text."""
-        df = pd.DataFrame({"text_col": ["Text\rwith CR", "Normal text", "Another\rwith CR"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2
-        assert all("CR) na posição" in msg for msg in result[1])
-
-    def test_check_special_characters_cr_lf_columns_anywhere_with_lf_middle(self):
-        """Test with LF character in middle of text."""
-        df = pd.DataFrame({"text_col": ["Text\nwith LF", "Normal text", "Another\nwith LF"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2
-        assert all("LF) na posição" in msg for msg in result[1])
-
-    def test_check_special_characters_cr_lf_columns_anywhere_multiple_cr_lf(self):
-        """Test with multiple CR/LF characters in same text."""
-        df = pd.DataFrame({"text_col": ["Text\r\nwith both", "Normal text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
-        assert result[0] is False
-        assert len(result[1]) == 2  # One for CR, one for LF
-
-    def test_check_special_characters_cr_lf_columns_anywhere_empty_columns(self):
-        """Test with empty or None columns."""
-        df = pd.DataFrame({"text_col": ["", None, "Normal text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_anywhere_missing_column(self):
-        """Test with missing column."""
-        df = pd.DataFrame({"other_col": ["Text", "More text"]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(df, "test.xlsx", ["text_col"])
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_anywhere_all_empty_values(self):
-        """Test with column containing only empty/NaN values (covers line 234)."""
-        df = pd.DataFrame(
-            {
-                "empty_col": [None, "", pd.NA, None],
-                "normal_col": ["Normal text", "Text with\nLF", "Text with\rCR", "Another text"],
-            }
-        )
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
-            df, "test.xlsx", ["empty_col", "normal_col"]
-        )
-        # Should only check normal_col since empty_col has no non-empty values
-        assert result[0] is False
-        assert len(result[1]) == 2  # Two warnings for normal_col
-        assert all("normal_col" in msg for msg in result[1])  # Only normal_col should have warnings
-
-    def test_check_special_characters_cr_lf_columns_start_end_all_empty_values_edge_case(self):
-        """Test edge case where all values are empty/NaN (covers line 184)."""
-        df = pd.DataFrame({"completely_empty_col": [None, "", pd.NA, None, None]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_start_end(
-            df, "test.xlsx", ["completely_empty_col"]
-        )
-        # Should not crash and return no warnings since all values are empty
-        assert result == (True, [])
-
-    def test_check_special_characters_cr_lf_columns_anywhere_all_empty_values_edge_case(self):
-        """Test edge case where all values are empty/NaN (covers line 244)."""
-        df = pd.DataFrame({"completely_empty_col": [None, "", pd.NA, None, None]})
-
-        result = CharacterProcessing.check_special_characters_cr_lf_columns_anywhere(
-            df, "test.xlsx", ["completely_empty_col"]
-        )
-        # Should not crash and return no warnings since all values are empty
-        assert result == (True, [])
 
 
 class TestColumnExistsMultiIndex:

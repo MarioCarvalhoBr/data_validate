@@ -100,13 +100,20 @@ class DictionaryManager:
         """
         try:
             # Lazy import: heavy/optional dependency, only needed when spell-check runs (PERF-008).
+            import enchant.errors
             from enchant import Broker
 
             with self._enchant_config_dir_scope():
                 self.broker = Broker()
                 if not self.broker.dict_exists(self.lang_dict_spell):
                     self._errors.append(f"Dicionário {self.lang_dict_spell} não encontrado")
-        except Exception as e:
+        except (enchant.errors.Error, OSError, ImportError) as e:
+            # SEC-004: narrowed from a bare `except Exception` — `enchant.errors.Error` is the
+            # base of every enchant-specific failure (e.g. a broken system dictionary),
+            # `OSError` covers a missing/unreadable native libenchant/hunspell backend, and
+            # `ImportError` covers the lazy import itself when `pyenchant` is not installed
+            # (`.claude/rules/security.md`). Any other exception is a programming error and
+            # propagates instead of being downgraded to a "valid" run.
             self._errors.append(f"Erro ao verificar dicionário: {e}")
 
         return self._errors
@@ -126,6 +133,7 @@ class DictionaryManager:
         """
         try:
             # Lazy import: heavy/optional dependency, only needed when spell-check runs (PERF-008).
+            import enchant.errors
             from enchant import Broker
 
             with self._enchant_config_dir_scope():
@@ -143,7 +151,8 @@ class DictionaryManager:
                         self.dictionary.add_to_session(word)
 
             return self.dictionary
-        except Exception as e:
+        except (enchant.errors.Error, OSError, ImportError) as e:
+            # SEC-004: see `validate_dictionary`'s narrowing note above.
             self._errors.append(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
 
     def _load_extra_words(self) -> None:
@@ -154,6 +163,8 @@ class DictionaryManager:
         with '#'.
         """
         try:
+            import enchant.errors
+
             extra_words_path = self.path_dictionary / "extra-words.dic"
 
             if extra_words_path.exists():
@@ -167,8 +178,9 @@ class DictionaryManager:
                     "Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema."
                 )
 
-        except Exception as e:
-            # Log the error but don't interrupt execution
+        except (enchant.errors.Error, OSError, ImportError) as e:
+            # SEC-004: see `validate_dictionary`'s narrowing note above — `OSError` also covers
+            # the file-read failure modes this method's own `open(...)` can raise.
             self._errors.append(f"Aviso: Não foi possível carregar palavras extras: {e}")
 
     def clean_temporary_files(self) -> None:

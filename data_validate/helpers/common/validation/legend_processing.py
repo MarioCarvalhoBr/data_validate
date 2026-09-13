@@ -5,14 +5,28 @@ Module providing legend data validation utilities.
 This module defines the `LegendProcessing` class, which offers methods
 to validate legend labels, sequential types, color formats, order sequences,
 and logical consistency of min/max values.
+
+ARC-005: every message this class builds is a catalog key (`rule.LEG-001.*` …
+`rule.LEG-011.*`, see `.specs/business-rules/legend.md`), rendered through an optional
+`translate: Callable[..., str]` parameter on each `validate_*` method — never a hardcoded
+pt-BR literal. `SpLegend.data_cleaning` passes `self.context.language_manager.text`; a
+caller that does not supply one (every pre-existing direct-helper unit test) falls back to
+`helpers.common.default_translate.get_default_translate()`, a cached pt-BR
+`LanguageManager`, so historical behaviour is unchanged.
+
+PERF-001: the four `.iterrows()` loops this module used to run (`validate_color_format`,
+`validate_min_max_has_excessive_decimals`, and two in `validate_min_max_values`) are
+vectorised — boolean masks and `Series.shift(1)` replace per-row `Series` boxing; only the
+message-building loop remains, over `zip()`-ed plain lists, never over `.iterrows()`.
 """
 
 import re
 from decimal import Decimal, InvalidOperation
-from typing import List, Any
+from typing import Any, Callable, List, Optional
 
 import pandas as pd
 
+from data_validate.helpers.common.default_translate import get_default_translate
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 
@@ -57,25 +71,32 @@ class LegendProcessing:
 
         return min_value, max_value
 
-    def validate_legend_labels(self, dataframe: pd.DataFrame, code: Any, label_col: str) -> List[str]:
+    def validate_legend_labels(
+        self,
+        dataframe: pd.DataFrame,
+        code: Any,
+        label_col: str,
+        translate: Optional[Callable[..., str]] = None,
+    ) -> List[str]:
         """
-        Validate that labels are unique within a legend group.
+        Validate that labels are unique within a legend group (LEG-007).
 
         Args:
             dataframe: Validating DataFrame subset
             code: Legend code identifier
             label_col: Column name containing labels
+            translate: Message-catalog renderer (`key, **params -> str`); defaults to
+                `get_default_translate()` (`.claude/rules/i18n.md`).
 
         Returns:
             List of error messages for duplicated labels
         """
+        translate = translate or get_default_translate()
         errors = []
         if dataframe[label_col].duplicated().any():
             duplicate_labels = dataframe[dataframe[label_col].duplicated()][label_col].unique()
             for label in duplicate_labels:
-                errors.append(
-                    f"{self.filename} [código: {code}]: O label '{label}' está duplicado. Labels devem ser únicos para cada código de legenda."
-                )
+                errors.append(translate("rule.LEG-007.error", filename=self.filename, code=code, label=label))
         return errors
 
     def validate_legend_columns_dtypes_numeric(
@@ -87,12 +108,15 @@ class LegendProcessing:
         min_col: str,
         max_col: str,
         order_col: str,
+        translate: Optional[Callable[..., str]] = None,
     ) -> List[str]:
         """
         Validate that required columns have the correct data types (numeric).
 
-        Checks for empty labels, ensures code/min/max/order are numeric, and verifies
-        specific rules for 'unavailable data' rows (min/max should be empty).
+        Checks for empty labels (LEG-002), ensures code/min/max/order are numeric
+        (LEG-003), verifies the 'unavailable data' row's min/max are empty (LEG-004),
+        that exactly one such row exists (LEG-005), and that code/order are integers
+        (LEG-006).
 
         Args:
             original_dataframe: Detailed DataFrame
@@ -102,15 +126,17 @@ class LegendProcessing:
             min_col: Column name for minimum values
             max_col: Column name for maximum values
             order_col: Column name for order
+            translate: Message-catalog renderer, see `validate_legend_labels`.
 
         Returns:
             List of validation error messages
         """
+        translate = translate or get_default_translate()
         errors = []
         # Check if columns exist
         columns_to_check = [col for col in [code_col, min_col, max_col, order_col] if col in original_dataframe.columns]
 
-        # 1 - Check column label: Null or empty values
+        # 1 - Check column label: Null or empty values (LEG-002)
         if label_col in original_dataframe.columns:
             empty_labels = original_dataframe[
                 original_dataframe[label_col].isnull() | (original_dataframe[label_col] == "")
@@ -119,13 +145,19 @@ class LegendProcessing:
                 indices_empty_labels = empty_labels.index.tolist()
                 indices_empty_labels = [idx + 2 for idx in indices_empty_labels]  # Adjust for header row
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_empty_labels))}]: A coluna '{label_col}' contém valores vazios ou nulos."
+                    translate(
+                        "rule.LEG-002.error",
+                        filename=self.filename,
+                        code=code_value,
+                        rows=", ".join(map(str, indices_empty_labels)),
+                        column=label_col,
+                    )
                 )
 
         # INSTANCE LOCAL DATAFRAME
         local_dataframe = original_dataframe.copy()
 
-        # 2 - Check column code, min, max, order: Numeric values
+        # 2 - Check column code, min, max, order: Numeric values (LEG-003)
         for col in columns_to_check:
             local_dataframe[col] = pd.to_numeric(local_dataframe[col], errors="coerce")
         for col in columns_to_check:
@@ -135,14 +167,21 @@ class LegendProcessing:
                 non_numeric_values_original = original_dataframe.loc[indices_non_numeric_values, col].to_list()
                 indices_non_numeric_values = [idx + 2 for idx in indices_non_numeric_values]  # Adjust for header row
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_non_numeric_values))}]: A coluna '{col}' contém valores não numéricos: {non_numeric_values_original}"
+                    translate(
+                        "rule.LEG-003.error",
+                        filename=self.filename,
+                        code=code_value,
+                        rows=", ".join(map(str, indices_non_numeric_values)),
+                        column=col,
+                        values=non_numeric_values_original,
+                    )
                 )
                 continue
 
         # NEW INSTANCE
         local_dataframe = original_dataframe.copy()
 
-        # 2.2 - If the label is 'Dado indisponível', the min, max values must be empty (cannot have any values)
+        # 2.2 - If the label is 'Dado indisponível', the min, max values must be empty (LEG-004)
         if (
             min_col in local_dataframe.columns
             and max_col in local_dataframe.columns
@@ -156,61 +195,109 @@ class LegendProcessing:
                 indices_invalid_min = invalid_min.index.tolist()
                 indices_invalid_min = [idx + 2 for idx in indices_invalid_min]
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_min))}]: A coluna '{min_col}' deve estar vazia quando o label é '{self.value_data_unavailable}'."
+                    translate(
+                        "rule.LEG-004.error",
+                        filename=self.filename,
+                        code=code_value,
+                        rows=", ".join(map(str, indices_invalid_min)),
+                        column=min_col,
+                        value_data_unavailable=self.value_data_unavailable,
+                    )
                 )
             if not invalid_max.empty:
                 indices_invalid_max = invalid_max.index.tolist()
                 indices_invalid_max = [idx + 2 for idx in indices_invalid_max]
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_invalid_max))}]: A coluna '{max_col}' deve estar vazia quando o label é '{self.value_data_unavailable}'."
+                    translate(
+                        "rule.LEG-004.error",
+                        filename=self.filename,
+                        code=code_value,
+                        rows=", ".join(map(str, indices_invalid_max)),
+                        column=max_col,
+                        value_data_unavailable=self.value_data_unavailable,
+                    )
                 )
 
-        # 2.3 - There must be exactly one label 'Dado indisponível'. If there is more than one, error. If there is none, error. If there is exactly one, ok.
+        # 2.3 - There must be exactly one label 'Dado indisponível' per code (LEG-005)
         if label_col in local_dataframe.columns:
             unavailable_labels = original_dataframe[original_dataframe[label_col] == self.value_data_unavailable]
             if len(unavailable_labels) == 0:
                 errors.append(
-                    f"{self.filename} [código: {code_value}]: Deve existir um label '{self.value_data_unavailable}' por código, mas nenhum foi encontrado."
+                    translate(
+                        "rule.LEG-005.error_missing",
+                        filename=self.filename,
+                        code=code_value,
+                        value_data_unavailable=self.value_data_unavailable,
+                    )
                 )
             elif len(unavailable_labels) > 1:
                 indices_unavailable_labels = unavailable_labels.index.tolist()
                 indices_unavailable_labels = [idx + 2 for idx in indices_unavailable_labels]
                 errors.append(
-                    f"{self.filename} [código: {code_value}, linha(s): {', '.join(map(str, indices_unavailable_labels))}]: Deve existir exatamente um label '{self.value_data_unavailable}' por código, mas foram encontrados {len(unavailable_labels)}."
+                    translate(
+                        "rule.LEG-005.error_multiple",
+                        filename=self.filename,
+                        code=code_value,
+                        rows=", ".join(map(str, indices_unavailable_labels)),
+                        value_data_unavailable=self.value_data_unavailable,
+                        count=len(unavailable_labels),
+                    )
                 )
 
-        # 3 - Check column code, order: Integer values
+        # 3 - Check column code, order: Integer values (LEG-006)
         for col in [code_col, order_col]:
             if col in local_dataframe.columns:
                 for index, value in local_dataframe[col].items():
-                    valid, message = NumberFormattingProcessing.check_cell_integer(value, min_value=1)
+                    valid, message = NumberFormattingProcessing.check_cell_integer(
+                        value, min_value=1, translate=translate
+                    )
                     original_value = original_dataframe.at[index, col]
                     if not valid:
                         errors.append(
-                            f"{self.filename} [código: {code_value}, linha: {index + 2}]: A coluna '{col}' contém um valor inválido: O valor '{original_value}' não é um número inteiro válido."
+                            translate(
+                                "rule.LEG-006.error",
+                                filename=self.filename,
+                                code=code_value,
+                                row=index + 2,
+                                column=col,
+                                value=original_value,
+                            )
                         )
         return errors
 
-    def validate_color_format(self, dataframe: pd.DataFrame, code: Any, color_col: str) -> List[str]:
+    def validate_color_format(
+        self,
+        dataframe: pd.DataFrame,
+        code: Any,
+        color_col: str,
+        translate: Optional[Callable[..., str]] = None,
+    ) -> List[str]:
         """
-        Validate that color format is a valid hexadecimal string.
+        Validate that color format is a valid hexadecimal string (LEG-008).
 
         Args:
             dataframe: DataFrame to validate
             code: Legend code identifier
             color_col: Column name containing color codes
+            translate: Message-catalog renderer, see `validate_legend_labels`.
 
         Returns:
             List of error messages for invalid color formats
         """
+        translate = translate or get_default_translate()
         errors = []
         hex_color_pattern = re.compile(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
-        for index, row in dataframe.iterrows():
-            color = row[color_col]
-            if not hex_color_pattern.match(str(color)):
-                errors.append(
-                    f"{self.filename} [código: {code}, linha: {index + 2}]: O formato da cor '{color}' é inválido. Use o formato hexadecimal (ex: #RRGGBB)."
-                )
+
+        # PERF-001: a single vectorised `.str.match()` mask replaces the legacy
+        # `for index, row in dataframe.iterrows(): ...` loop; the remaining loop only
+        # formats a message per already-known invalid index (`.claude/skills/pandas-vectorization`).
+        color_as_str = dataframe[color_col].astype(str)
+        invalid_mask = ~color_as_str.str.match(hex_color_pattern)
+
+        for index, color in color_as_str[invalid_mask].items():
+            errors.append(
+                translate("rule.LEG-008.error", filename=self.filename, code=code, row=index + 2, color=color)
+            )
         return errors
 
     def validate_min_max_has_excessive_decimals(
@@ -220,9 +307,10 @@ class LegendProcessing:
         min_col: str,
         max_col: str,
         label_col: str,
+        translate: Optional[Callable[..., str]] = None,
     ) -> List[str]:
         """
-        Validate min/max values for excessive decimals.
+        Validate min/max values for excessive decimals (LEG-009).
 
         Checks if min/max values exceed allowed decimal precision (usually 2 places).
 
@@ -232,10 +320,12 @@ class LegendProcessing:
             min_col: Column name for minimum values
             max_col: Column name for maximum values
             label_col: Column name for labels
+            translate: Message-catalog renderer, see `validate_legend_labels`.
 
         Returns:
             List of error messages for excessive decimals
         """
+        translate = translate or get_default_translate()
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
         sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
@@ -252,18 +342,32 @@ class LegendProcessing:
 
         sorted_group = sorted_group.sort_values(by=min_col)
 
-        for index, row in sorted_group.iterrows():
-            min_val = row[min_col]
-            max_val = row[max_col]
-            index = int(str(index))
+        # PERF-001: `Series.apply` replaces the legacy `for index, row in
+        # sorted_group.iterrows(): ...` loop — one vectorised pass per column instead of
+        # boxing every row into a `Series`; the remaining loop (over the small,
+        # per-legend-code group, in row order) only formats messages, preserving the
+        # historical min-then-max-per-row ordering.
+        min_excessive_mask = sorted_group[min_col].apply(NumberFormattingProcessing.check_two_decimals_places)
+        max_excessive_mask = sorted_group[max_col].apply(NumberFormattingProcessing.check_two_decimals_places)
 
-            if NumberFormattingProcessing.check_two_decimals_places(min_val):
+        for index, min_val, max_val, min_excessive, max_excessive in zip(
+            sorted_group.index,
+            sorted_group[min_col],
+            sorted_group[max_col],
+            min_excessive_mask,
+            max_excessive_mask,
+        ):
+            if min_excessive:
                 errors.append(
-                    f"{self.filename} [código: {code}, linha: {index + 2}]: Legenda inválida. O valor mínimo '{min_val}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
+                    translate(
+                        "rule.LEG-009.error_minimum", filename=self.filename, code=code, row=index + 2, value=min_val
+                    )
                 )
-            if NumberFormattingProcessing.check_two_decimals_places(max_val):
+            if max_excessive:
                 errors.append(
-                    f"{self.filename} [código: {code}, linha: {index + 2}]: Legenda inválida. O valor máximo '{max_val}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
+                    translate(
+                        "rule.LEG-009.error_maximum", filename=self.filename, code=code, row=index + 2, value=max_val
+                    )
                 )
 
         return errors
@@ -275,9 +379,10 @@ class LegendProcessing:
         min_col: str,
         max_col: str,
         label_col: str,
+        translate: Optional[Callable[..., str]] = None,
     ) -> List[str]:
         """
-        Validate min/max values logical consistency.
+        Validate min/max values logical consistency (LEG-010).
 
         Ensures min < max and that intervals are continuous (next min = prev max + 0.01).
 
@@ -287,10 +392,12 @@ class LegendProcessing:
             min_col: Column name for minimum values
             max_col: Column name for maximum values
             label_col: Column name for labels
+            translate: Message-catalog renderer, see `validate_legend_labels`.
 
         Returns:
             List of error messages for logical inconsistencies
         """
+        translate = translate or get_default_translate()
         errors = []
         # Filter out 'Dado indisponível' and sort by min value
         sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
@@ -307,93 +414,143 @@ class LegendProcessing:
 
         sorted_group = sorted_group.sort_values(by=min_col)
 
-        # If any min or max value has more than 2 decimal places, skip the following validations and return errors
-
-        if any(
-            NumberFormattingProcessing.check_two_decimals_places(row[min_col])
-            or NumberFormattingProcessing.check_two_decimals_places(row[max_col])
-            for _, row in sorted_group.iterrows()
-        ):
+        # If any min or max value has more than 2 decimal places, skip the following
+        # validations and return errors. PERF-001: `Series.apply(...).any()` replaces the
+        # legacy `any(... for _, row in sorted_group.iterrows())` generator.
+        has_excessive_decimals = (
+            sorted_group[min_col].apply(NumberFormattingProcessing.check_two_decimals_places).any()
+            or sorted_group[max_col].apply(NumberFormattingProcessing.check_two_decimals_places).any()
+        )
+        if has_excessive_decimals:
             return errors
 
-        prev_max_val = None
-        for index, row in sorted_group.iterrows():
-            min_val = row[min_col]
-            max_val = row[max_col]
+        # PERF-001: `invalid_range_mask` is a single vectorised comparison; `previous_max`
+        # expresses "the previous row's maximum" via `Series.shift(1)` instead of a
+        # `prev_max_val` variable carried by hand across a `.iterrows()` loop. The
+        # remaining `zip()` loop (over plain values, never over `.iterrows()`) preserves
+        # the historical per-row ordering: the range check, then the continuity check,
+        # for each row in turn (`.claude/skills/pandas-vectorization/SKILL.md` pattern 5).
+        invalid_range_mask = sorted_group[min_col] >= sorted_group[max_col]
+        previous_max = sorted_group[max_col].shift(1)
 
-            if min_val >= max_val:
+        for index, min_val, max_val, is_invalid_range, prev_max_val in zip(
+            sorted_group.index,
+            sorted_group[min_col],
+            sorted_group[max_col],
+            invalid_range_mask,
+            previous_max,
+        ):
+            if is_invalid_range:
                 errors.append(
-                    f"{self.filename} [código: {code}, linha: {index + 2}]: O valor mínimo ({min_val}) deve ser menor que o valor máximo ({max_val})."
+                    translate(
+                        "rule.LEG-010.range_error",
+                        filename=self.filename,
+                        code=code,
+                        row=index + 2,
+                        min=min_val,
+                        max=max_val,
+                    )
                 )
 
-            if prev_max_val is not None:
+            if pd.notna(prev_max_val):
                 try:
                     # Using Decimal for precision
                     if Decimal(str(min_val)) - Decimal(str(prev_max_val)) != Decimal("0.01"):
                         errors.append(
-                            f"{self.filename} [código: {code}, linha: {index + 2}]: O intervalo não é contínuo. O valor mínimo {min_val} deveria ser {prev_max_val + 0.01} para seguir o valor máximo anterior."
+                            translate(
+                                "rule.LEG-010.continuity_error",
+                                filename=self.filename,
+                                code=code,
+                                row=index + 2,
+                                min=min_val,
+                                expected=prev_max_val + 0.01,
+                            )
                         )
                 except InvalidOperation:
                     errors.append(
-                        f"{self.filename} [código: {code}, linha: {index + 2}]: Valor inválido para operação de mínimo/máximo."
+                        translate(
+                            "rule.LEG-010.invalid_operation_error", filename=self.filename, code=code, row=index + 2
+                        )
                     )
-
-            prev_max_val = max_val
 
         return errors
 
-    def validate_order_sequence(self, dataframe: pd.DataFrame, code: Any, order_col: str) -> List[str]:
+    def validate_order_sequence(
+        self,
+        dataframe: pd.DataFrame,
+        code: Any,
+        order_col: str,
+        translate: Optional[Callable[..., str]] = None,
+    ) -> List[str]:
         """
-        Validate that order is sequential starting from 1.
+        Validate that order is sequential starting from 1 (LEG-011).
 
         Args:
             dataframe: DataFrame to validate
             code: Legend code identifier
             order_col: Column name for order
+            translate: Message-catalog renderer, see `validate_legend_labels`.
 
         Returns:
             List of error messages if sequence is broken or invalid
         """
+        translate = translate or get_default_translate()
         errors = []
         dataframe = dataframe.copy()
         dataframe[order_col] = pd.to_numeric(dataframe[order_col], errors="coerce")
         if dataframe[order_col].isnull().any():
-            errors.append(f"{self.filename}: A coluna '{order_col}' da legenda '{code}' contém valores não numéricos.")
+            errors.append(translate("rule.LEG-011.non_numeric", filename=self.filename, column=order_col, code=code))
             return errors
 
         sorted_order = dataframe[order_col].sort_values()
         expected_sequence = list(range(1, len(sorted_order) + 1))
         if not sorted_order.tolist() == expected_sequence:
             errors.append(
-                f"{self.filename} [código: {code}]: A coluna '{order_col}' da legenda não é sequencial ou não começa em 1. Valores encontrados: {sorted_order.tolist()}"
+                translate(
+                    "rule.LEG-011.not_sequential",
+                    filename=self.filename,
+                    code=code,
+                    column=order_col,
+                    values=sorted_order.tolist(),
+                )
             )
         return errors
 
-    def validate_code_sequence(self, dataframe: pd.DataFrame, code_col: str) -> List[str]:
+    def validate_code_sequence(
+        self,
+        dataframe: pd.DataFrame,
+        code_col: str,
+        translate: Optional[Callable[..., str]] = None,
+    ) -> List[str]:
         """
-        Validate that legend codes are sequential.
+        Validate that legend codes are sequential (LEG-001).
 
         Args:
             dataframe: DataFrame to validate
             code_col: Column name for legend codes
+            translate: Message-catalog renderer, see `validate_legend_labels`.
 
         Returns:
             List of error messages if codes are not sequential
         """
+        translate = translate or get_default_translate()
         errors = []
         local_dataframe = dataframe.copy()
         local_dataframe[code_col] = pd.to_numeric(local_dataframe[code_col], errors="coerce")
 
         if local_dataframe[code_col].isnull().any():
-            errors.append(
-                f"{self.filename}: A coluna '{code_col}' contém valores não numéricos e não pode ser validada para sequencialidade."
-            )
+            errors.append(translate("rule.LEG-001.non_numeric", filename=self.filename, column=code_col))
 
             indices_non_numeric_values_local = local_dataframe[local_dataframe[code_col].isnull()].index.tolist()
             non_numeric_values_original = dataframe.loc[indices_non_numeric_values_local, code_col].tolist()
 
             errors.append(
-                f"{self.filename}: Valores não numéricos encontrados na coluna '{code_col}': {non_numeric_values_original}"
+                translate(
+                    "rule.LEG-001.non_numeric_values",
+                    filename=self.filename,
+                    column=code_col,
+                    values=non_numeric_values_original,
+                )
             )
 
             return errors
@@ -407,12 +564,8 @@ class LegendProcessing:
 
         # Report if the first value of the sequence does not start at 1
         if actual_sequence and actual_sequence[0] != 1:
-            errors.append(
-                f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}"
-            )
+            errors.append(translate("rule.LEG-001.must_start_at_one", filename=self.filename, first=actual_sequence[0]))
 
         if not actual_sequence == expected_sequence:
-            errors.append(
-                f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}"
-            )
+            errors.append(translate("rule.LEG-001.not_sequential", filename=self.filename, codes=actual_sequence))
         return errors

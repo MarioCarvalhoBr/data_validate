@@ -148,6 +148,14 @@ class TestValidateLegendLabels:
 
         assert len(errors) == 0
 
+    def test_uses_provided_translate_callable(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured instead of the pt-BR default (ARC-005)."""
+        df = pd.DataFrame({"label": ["Baixo", "Baixo"]})
+
+        errors = legend_processor.validate_legend_labels(df, 1, "label", translate=lambda key, **params: f"<{key}>")
+
+        assert errors == ["<rule.LEG-007.error>"]
+
 
 class TestValidateLegendColumnsDtypesNumeric:
     """Test suite for validate_legend_columns_dtypes_numeric method."""
@@ -164,7 +172,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) == 0
 
@@ -180,7 +190,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) == 1
         assert "contém valores vazios ou nulos" in errors[0]
@@ -198,7 +210,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) >= 4  # At least one error per invalid column
 
@@ -214,7 +228,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) == 2
         assert "deve estar vazia quando o label é 'Dado indisponível'" in errors[0]
@@ -232,7 +248,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) == 1
         assert "Deve existir um label 'Dado indisponível' por código" in errors[0]
@@ -249,7 +267,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) == 1
         assert "Deve existir exatamente um label 'Dado indisponível'" in errors[0]
@@ -267,7 +287,9 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         assert len(errors) == 2
         assert "não é um número inteiro válido" in errors[0]
@@ -283,10 +305,69 @@ class TestValidateLegendColumnsDtypesNumeric:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         # Should not crash and should validate available columns
         assert isinstance(errors, list)
+
+    def test_uses_provided_translate_callable_for_every_rule_id(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured for LEG-002…006 (ARC-005)."""
+        df = pd.DataFrame(
+            {
+                "codigo": [1.5, "bad"],
+                "label": ["", None],
+                "minimo": [0.0, "invalid"],
+                "maximo": [9.99, "invalid"],
+                "ordem": [1, "invalid"],
+            }
+        )
+
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem", translate=lambda key, **params: f"<{key}>"
+        )
+
+        assert "<rule.LEG-002.error>" in errors
+        assert "<rule.LEG-003.error>" in errors
+        assert "<rule.LEG-005.error_missing>" in errors
+        assert "<rule.LEG-006.error>" in errors
+
+    def test_uses_provided_translate_callable_for_leg_004(self, legend_processor: LegendProcessing) -> None:
+        """LEG-004 ('Dado indisponível' must have empty min/max) uses its own key."""
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2],
+                "label": ["Baixo", "Dado indisponível"],
+                "minimo": [0.0, 10.0],
+                "maximo": [9.99, 20.0],
+                "ordem": [1, 2],
+            }
+        )
+
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem", translate=lambda key, **params: f"<{key}>"
+        )
+
+        assert errors == ["<rule.LEG-004.error>", "<rule.LEG-004.error>"]
+
+    def test_uses_provided_translate_callable_for_leg_005_multiple(self, legend_processor: LegendProcessing) -> None:
+        """LEG-005's "more than one DI label" branch uses its own key."""
+        df = pd.DataFrame(
+            {
+                "codigo": [1, 2, 3],
+                "label": ["Dado indisponível", "Médio", "Dado indisponível"],
+                "minimo": [None, 10.0, None],
+                "maximo": [None, 19.99, None],
+                "ordem": [1, 2, 3],
+            }
+        )
+
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem", translate=lambda key, **params: f"<{key}>"
+        )
+
+        assert errors == ["<rule.LEG-005.error_multiple>"]
 
 
 class TestValidateColorFormat:
@@ -339,6 +420,81 @@ class TestValidateColorFormat:
 
         assert len(errors) == 1
         assert "linha: 3" in errors[0]  # Row index 1 + 2 for header
+
+    def test_uses_provided_translate_callable(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured instead of the pt-BR default (ARC-005)."""
+        df = pd.DataFrame({"cor": ["#FF0000", "invalid"]})
+
+        errors = legend_processor.validate_color_format(df, 1, "cor", translate=lambda key, **params: f"<{key}>")
+
+        assert errors == ["<rule.LEG-008.error>"]
+
+
+class TestValidateMinMaxHasExcessiveDecimals:
+    """Test suite for validate_min_max_has_excessive_decimals (LEG-009, PERF-001 vectorised)."""
+
+    def test_no_excessive_decimals_no_errors(self, legend_processor: LegendProcessing) -> None:
+        """Two-decimal values never trip LEG-009."""
+        df = pd.DataFrame({"label": ["Baixo", "Alto"], "minimo": [0.0, 10.01], "maximo": [10.0, 20.0]})
+
+        errors = legend_processor.validate_min_max_has_excessive_decimals(df, 1, "minimo", "maximo", "label")
+
+        assert errors == []
+
+    def test_excessive_minimum_only(self, legend_processor: LegendProcessing) -> None:
+        """Only the minimum has >2 decimals: one error, mentions 'mínimo'."""
+        df = pd.DataFrame({"label": ["Baixo"], "minimo": [0.001], "maximo": [10.0]})
+
+        errors = legend_processor.validate_min_max_has_excessive_decimals(df, 1, "minimo", "maximo", "label")
+
+        assert len(errors) == 1
+        assert "valor mínimo '0.001' possui mais de duas casas decimais" in errors[0]
+        assert "linha: 2" in errors[0]
+
+    def test_excessive_maximum_only(self, legend_processor: LegendProcessing) -> None:
+        """Only the maximum has >2 decimals: one error, mentions 'máximo'."""
+        df = pd.DataFrame({"label": ["Baixo"], "minimo": [0.0], "maximo": [10.001]})
+
+        errors = legend_processor.validate_min_max_has_excessive_decimals(df, 1, "minimo", "maximo", "label")
+
+        assert len(errors) == 1
+        assert "valor máximo '10.001' possui mais de duas casas decimais" in errors[0]
+
+    def test_excessive_both_same_row_order_is_min_then_max(self, legend_processor: LegendProcessing) -> None:
+        """Both columns violate on the same row: minimum error precedes maximum error."""
+        df = pd.DataFrame({"label": ["Baixo"], "minimo": [0.001], "maximo": [10.001]})
+
+        errors = legend_processor.validate_min_max_has_excessive_decimals(df, 1, "minimo", "maximo", "label")
+
+        assert len(errors) == 2
+        assert "valor mínimo" in errors[0]
+        assert "valor máximo" in errors[1]
+
+    def test_dado_indisponivel_row_excluded(self, legend_processor: LegendProcessing) -> None:
+        """'Dado indisponível' rows are filtered out before the decimal check runs."""
+        df = pd.DataFrame({"label": ["Dado indisponível"], "minimo": [None], "maximo": [None]})
+
+        errors = legend_processor.validate_min_max_has_excessive_decimals(df, 1, "minimo", "maximo", "label")
+
+        assert errors == []
+
+    def test_uses_provided_translate_callable(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured instead of the pt-BR default."""
+        df = pd.DataFrame({"label": ["Baixo"], "minimo": [0.001], "maximo": [10.0]})
+        calls = []
+
+        def fake_translate(key, **params):
+            calls.append((key, params))
+            return f"<{key}>"
+
+        errors = legend_processor.validate_min_max_has_excessive_decimals(
+            df, 1, "minimo", "maximo", "label", translate=fake_translate
+        )
+
+        assert errors == ["<rule.LEG-009.error_minimum>"]
+        assert calls == [
+            ("rule.LEG-009.error_minimum", {"filename": "test_legend.xlsx", "code": 1, "row": 2, "value": 0.001})
+        ]
 
 
 class TestValidateMinMaxValues:
@@ -460,6 +616,44 @@ class TestValidateMinMaxValues:
 
         assert len(errors) == 0
 
+    def test_validate_min_max_values_interleaved_order_preserved(self, legend_processor: LegendProcessing) -> None:
+        """PERF-001: range-then-continuity ordering per row survives vectorisation.
+
+        Row 1 (Alto) has both a range violation and a continuity violation (its `minimo`
+        does not follow row 0's `maximo` + 0.01); row 2 (Baixo) is clean. The legacy
+        `.iterrows()` loop interleaved range/continuity checks per row in row order — this
+        pins that a mask/`shift()`-based rewrite still produces the same interleaving,
+        not "all range errors, then all continuity errors".
+        """
+        df = pd.DataFrame(
+            {
+                "label": ["Baixo", "Alto", "Dado indisponível"],
+                "minimo": [0.0, 50.0, None],  # Alto: min(50) >= max(19) AND not continuous with 10.0
+                "maximo": [10.0, 19.0, None],
+            }
+        )
+
+        errors = legend_processor.validate_min_max_values(df, 1, "minimo", "maximo", "label")
+
+        assert len(errors) == 2
+        assert "valor mínimo (50.0) deve ser menor que o valor máximo (19.0)" in errors[0]
+        assert "intervalo não é contínuo" in errors[1]
+
+    def test_uses_provided_translate_callable(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured instead of the pt-BR default (ARC-005)."""
+        df = pd.DataFrame({"label": ["Baixo", "Alto"], "minimo": [0.0, 50.0], "maximo": [10.0, 19.0]})
+        calls = []
+
+        def fake_translate(key, **params):
+            calls.append((key, params))
+            return f"<{key}>"
+
+        errors = legend_processor.validate_min_max_values(df, 1, "minimo", "maximo", "label", translate=fake_translate)
+
+        assert errors == ["<rule.LEG-010.range_error>", "<rule.LEG-010.continuity_error>"]
+        assert calls[0][0] == "rule.LEG-010.range_error"
+        assert calls[1][0] == "rule.LEG-010.continuity_error"
+
 
 class TestValidateOrderSequence:
     """Test suite for validate_order_sequence method."""
@@ -524,6 +718,22 @@ class TestValidateOrderSequence:
 
         assert len(errors) == 1
         assert "não é sequencial ou não começa em 1" in errors[0]
+
+    def test_uses_provided_translate_callable_non_numeric(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured for the non-numeric branch (ARC-005)."""
+        df = pd.DataFrame({"ordem": [1, "invalid", 3]})
+
+        errors = legend_processor.validate_order_sequence(df, 1, "ordem", translate=lambda key, **params: f"<{key}>")
+
+        assert errors == ["<rule.LEG-011.non_numeric>"]
+
+    def test_uses_provided_translate_callable_not_sequential(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured for the not-sequential branch (ARC-005)."""
+        df = pd.DataFrame({"ordem": [2, 3, 4]})
+
+        errors = legend_processor.validate_order_sequence(df, 1, "ordem", translate=lambda key, **params: f"<{key}>")
+
+        assert errors == ["<rule.LEG-011.not_sequential>"]
 
 
 class TestValidateCodeSequence:
@@ -612,6 +822,22 @@ class TestValidateCodeSequence:
         assert len(errors) == 2
         assert "contém valores não numéricos" in errors[0]
         assert "['a', 'b', 'c']" in errors[1]
+
+    def test_uses_provided_translate_callable_non_numeric(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured for both non-numeric-branch messages (ARC-005)."""
+        df = pd.DataFrame({"codigo": [1, "invalid", 3]})
+
+        errors = legend_processor.validate_code_sequence(df, "codigo", translate=lambda key, **params: f"<{key}>")
+
+        assert errors == ["<rule.LEG-001.non_numeric>", "<rule.LEG-001.non_numeric_values>"]
+
+    def test_uses_provided_translate_callable_sequence_errors(self, legend_processor: LegendProcessing) -> None:
+        """A custom `translate` is honoured for both sequence-branch messages (ARC-005)."""
+        df = pd.DataFrame({"codigo": [2, 3, 4]})
+
+        errors = legend_processor.validate_code_sequence(df, "codigo", translate=lambda key, **params: f"<{key}>")
+
+        assert errors == ["<rule.LEG-001.must_start_at_one>", "<rule.LEG-001.not_sequential>"]
 
 
 class TestIntegrationScenarios:
@@ -720,7 +946,9 @@ class TestEdgeCasesAndBoundaryConditions:
             }
         )
 
-        errors = legend_processor.validate_legend_columns_dtypes_numeric(df, 1, "codigo", "label", "minimo", "maximo", "ordem")
+        errors = legend_processor.validate_legend_columns_dtypes_numeric(
+            df, 1, "codigo", "label", "minimo", "maximo", "ordem"
+        )
 
         # Should handle mixed numeric types correctly
         assert len(errors) == 0

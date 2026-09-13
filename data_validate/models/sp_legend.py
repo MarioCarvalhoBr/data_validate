@@ -141,12 +141,13 @@ class SpLegend(SpModelABC):
         """
         errors = []
         dataframe = self.data_loader_model.raw_data
+        translate = self.context.language_manager.text
 
         legend_validator = LegendProcessing(
             value_data_unavailable=self.context.config.LABEL_DATA_UNAVAILABLE, filename=self.filename
         )
 
-        errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code))
+        errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code, translate=translate))
 
         # Group by legend code_value and perform group-wise validations
         for code_value, group in dataframe.groupby(self.column_name_code):
@@ -160,13 +161,22 @@ class SpLegend(SpModelABC):
                     self.column_name_minimum,
                     self.column_name_maximum,
                     self.column_name_order,
+                    translate=translate,
                 )
             )
             errors.extend(errors_dtypes)
 
             if not errors_dtypes:
-                errors.extend(legend_validator.validate_legend_labels(group, code_value, self.column_name_label))
-                errors.extend(legend_validator.validate_color_format(group, code_value, self.column_name_color))
+                errors.extend(
+                    legend_validator.validate_legend_labels(
+                        group, code_value, self.column_name_label, translate=translate
+                    )
+                )
+                errors.extend(
+                    legend_validator.validate_color_format(
+                        group, code_value, self.column_name_color, translate=translate
+                    )
+                )
                 errors.extend(
                     legend_validator.validate_min_max_has_excessive_decimals(
                         group,
@@ -174,6 +184,7 @@ class SpLegend(SpModelABC):
                         self.column_name_minimum,
                         self.column_name_maximum,
                         self.column_name_label,
+                        translate=translate,
                     )
                 )
                 errors.extend(
@@ -183,9 +194,14 @@ class SpLegend(SpModelABC):
                         self.column_name_minimum,
                         self.column_name_maximum,
                         self.column_name_label,
+                        translate=translate,
                     )
                 )
-                errors.extend(legend_validator.validate_order_sequence(group, code_value, self.column_name_order))
+                errors.extend(
+                    legend_validator.validate_order_sequence(
+                        group, code_value, self.column_name_order, translate=translate
+                    )
+                )
 
         self.data_cleaning_errors.extend(errors)
 

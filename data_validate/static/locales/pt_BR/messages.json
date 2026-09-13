@@ -227,6 +227,63 @@
   "rule.SCEN-004.error": {
     "message": "{filename}: A coluna '{column}' não deve conter valores repetidos."
   },
+  "rule.LEG-001.non_numeric": {
+    "message": "{filename}: A coluna '{column}' contém valores não numéricos e não pode ser validada para sequencialidade."
+  },
+  "rule.LEG-001.non_numeric_values": {
+    "message": "{filename}: Valores não numéricos encontrados na coluna '{column}': {values}"
+  },
+  "rule.LEG-001.must_start_at_one": {
+    "message": "{filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {first}"
+  },
+  "rule.LEG-001.not_sequential": {
+    "message": "{filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {codes}"
+  },
+  "rule.LEG-002.error": {
+    "message": "{filename} [código: {code}, linha(s): {rows}]: A coluna '{column}' contém valores vazios ou nulos."
+  },
+  "rule.LEG-003.error": {
+    "message": "{filename} [código: {code}, linha(s): {rows}]: A coluna '{column}' contém valores não numéricos: {values}"
+  },
+  "rule.LEG-004.error": {
+    "message": "{filename} [código: {code}, linha(s): {rows}]: A coluna '{column}' deve estar vazia quando o label é '{value_data_unavailable}'."
+  },
+  "rule.LEG-005.error_missing": {
+    "message": "{filename} [código: {code}]: Deve existir um label '{value_data_unavailable}' por código, mas nenhum foi encontrado."
+  },
+  "rule.LEG-005.error_multiple": {
+    "message": "{filename} [código: {code}, linha(s): {rows}]: Deve existir exatamente um label '{value_data_unavailable}' por código, mas foram encontrados {count}."
+  },
+  "rule.LEG-006.error": {
+    "message": "{filename} [código: {code}, linha: {row}]: A coluna '{column}' contém um valor inválido: O valor '{value}' não é um número inteiro válido."
+  },
+  "rule.LEG-007.error": {
+    "message": "{filename} [código: {code}]: O label '{label}' está duplicado. Labels devem ser únicos para cada código de legenda."
+  },
+  "rule.LEG-008.error": {
+    "message": "{filename} [código: {code}, linha: {row}]: O formato da cor '{color}' é inválido. Use o formato hexadecimal (ex: #RRGGBB)."
+  },
+  "rule.LEG-009.error_minimum": {
+    "message": "{filename} [código: {code}, linha: {row}]: Legenda inválida. O valor mínimo '{value}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
+  },
+  "rule.LEG-009.error_maximum": {
+    "message": "{filename} [código: {code}, linha: {row}]: Legenda inválida. O valor máximo '{value}' possui mais de duas casas decimais. Será considerado o intervalo padrão (0 a 1)."
+  },
+  "rule.LEG-010.range_error": {
+    "message": "{filename} [código: {code}, linha: {row}]: O valor mínimo ({min}) deve ser menor que o valor máximo ({max})."
+  },
+  "rule.LEG-010.continuity_error": {
+    "message": "{filename} [código: {code}, linha: {row}]: O intervalo não é contínuo. O valor mínimo {min} deveria ser {expected} para seguir o valor máximo anterior."
+  },
+  "rule.LEG-010.invalid_operation_error": {
+    "message": "{filename} [código: {code}, linha: {row}]: Valor inválido para operação de mínimo/máximo."
+  },
+  "rule.LEG-011.non_numeric": {
+    "message": "{filename}: A coluna '{column}' da legenda '{code}' contém valores não numéricos."
+  },
+  "rule.LEG-011.not_sequential": {
+    "message": "{filename} [código: {code}]: A coluna '{column}' da legenda não é sequencial ou não começa em 1. Valores encontrados: {values}"
+  },
   "rule.legend.missing_required_column": {
     "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
   },

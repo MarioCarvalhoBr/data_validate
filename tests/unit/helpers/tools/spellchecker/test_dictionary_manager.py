@@ -106,9 +106,13 @@ class TestDictionaryManager:
         assert "Dicionário pt_BR não encontrado" in errors[0]
 
     def test_validate_dictionary_broker_exception(self, mocker) -> None:
-        """Test dictionary validation when broker raises exception."""
+        """Test dictionary validation when broker raises an enchant-specific error (SEC-004:
+        the `except` clause is narrowed to `enchant.errors.Error`/`OSError`/`ImportError`, so
+        this must be a realistic enchant failure, not a bare `Exception`)."""
+        import enchant.errors
+
         mock_broker = mocker.MagicMock()
-        mock_broker.dict_exists.side_effect = Exception("Broker error")
+        mock_broker.dict_exists.side_effect = enchant.errors.Error("Broker error")
         mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
@@ -116,6 +120,18 @@ class TestDictionaryManager:
 
         assert len(errors) == 1
         assert "Erro ao verificar dicionário: Broker error" in errors[0]
+
+    def test_validate_dictionary_unexpected_error_propagates(self, mocker) -> None:
+        """SEC-004: a non-enchant, non-`OSError` failure is a programming error and must
+        propagate instead of being downgraded to a "valid" run."""
+        mock_broker = mocker.MagicMock()
+        mock_broker.dict_exists.side_effect = ValueError("boom")
+        mocker.patch("enchant.Broker", return_value=mock_broker)
+
+        manager = DictionaryManager("pt_BR")
+
+        with pytest.raises(ValueError, match="boom"):
+            manager.validate_dictionary()
 
     def test_initialize_dictionary_success(self, mocker) -> None:
         """Test successful dictionary initialization."""
@@ -203,9 +219,12 @@ class TestDictionaryManager:
         mock_broker.request_dict.assert_called_once_with("pt_BR")
 
     def test_initialize_dictionary_exception(self, mocker) -> None:
-        """Test dictionary initialization when exception occurs."""
+        """Test dictionary initialization when an enchant-specific error occurs (SEC-004:
+        narrowed `except` clause, see `test_validate_dictionary_broker_exception`)."""
+        import enchant.errors
+
         mock_broker = mocker.MagicMock()
-        mock_broker.request_dict.side_effect = Exception("Dictionary error")
+        mock_broker.request_dict.side_effect = enchant.errors.Error("Dictionary error")
         mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
@@ -216,6 +235,18 @@ class TestDictionaryManager:
         assert result is None
         assert len(manager._errors) == 1
         assert "Erro ao inicializar dicionário pt_BR: Dictionary error" in manager._errors[0]
+
+    def test_initialize_dictionary_unexpected_error_propagates(self, mocker) -> None:
+        """SEC-004: a non-enchant, non-`OSError` failure must propagate, not be swallowed."""
+        mock_broker = mocker.MagicMock()
+        mock_broker.request_dict.side_effect = ValueError("boom")
+        mocker.patch("enchant.Broker", return_value=mock_broker)
+
+        manager = DictionaryManager("pt_BR")
+        manager.broker = mock_broker
+
+        with pytest.raises(ValueError, match="boom"):
+            manager.initialize_dictionary(["word1"])
 
     def test_load_extra_words_file_exists(self, mocker) -> None:
         """Test loading extra words when file exists."""
@@ -273,6 +304,21 @@ class TestDictionaryManager:
 
         assert len(manager._errors) == 1
         assert "Aviso: Não foi possível carregar palavras extras: File read error" in manager._errors[0]
+
+    def test_load_extra_words_unexpected_error_propagates(self, mocker) -> None:
+        """SEC-004: a non-enchant, non-`OSError` failure must propagate, not be swallowed."""
+        mock_dictionary = mocker.MagicMock()
+        mock_dictionary.add_to_session.side_effect = ValueError("boom")
+
+        manager = DictionaryManager("pt_BR")
+        manager.dictionary = mock_dictionary
+
+        mocker.patch.object(Path, "exists", return_value=True)
+        mock_file = mocker.mock_open(read_data="word1\n")
+        mocker.patch("builtins.open", mock_file)
+
+        with pytest.raises(ValueError, match="boom"):
+            manager._load_extra_words()
 
     def test_clean_temporary_files_releases_dictionary_and_broker(self, mocker) -> None:
         """Test that cleanup drops the dictionary/broker references.
@@ -344,8 +390,14 @@ class TestDictionaryManagerEdgeCases:
             manager = DictionaryManager(lang)
             assert manager.lang_dict_spell == lang
 
-    def test_initialize_dictionary_with_none_words(self, mocker) -> None:
-        """Test dictionary initialization with None words list."""
+    def test_initialize_dictionary_with_none_words_raises(self, mocker) -> None:
+        """`None` is not iterable (`for word in list_words_user` raises `TypeError`).
+
+        SEC-004: this is a programming error (`SpellChecker.__init__` already normalises
+        `None` to `[]` before ever calling `initialize_dictionary` — see
+        `spellchecker.py`), not an enchant/OS failure, so the narrowed `except` clause
+        must let it propagate rather than downgrade it to a recorded `_errors` entry.
+        """
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
@@ -356,12 +408,8 @@ class TestDictionaryManagerEdgeCases:
 
         mocker.patch.object(manager, "_load_extra_words")
 
-        result = manager.initialize_dictionary(None)
-
-        # When None is passed, it should raise an exception in the for loop
-        assert result is None
-        assert len(manager._errors) == 1
-        assert "Erro ao inicializar dicionário pt_BR" in manager._errors[0]
+        with pytest.raises(TypeError):
+            manager.initialize_dictionary(None)
 
     def test_initialize_dictionary_with_very_long_word_list(self, mocker) -> None:
         """Test dictionary initialization with very long word list."""

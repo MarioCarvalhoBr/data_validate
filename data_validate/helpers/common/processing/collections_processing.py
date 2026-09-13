@@ -160,10 +160,14 @@ class CollectionsProcessing:
             suffixes_for_matching = []
 
         set_of_strings_to_ignore = {str(item) for item in strings_to_ignore}
-        pattern_matched_strings, initially_unmatched_strings = CollectionsProcessing.categorize_strings_by_id_pattern_from_list(
-            source_list, suffixes_for_matching
+        pattern_matched_strings, initially_unmatched_strings = (
+            CollectionsProcessing.categorize_strings_by_id_pattern_from_list(source_list, suffixes_for_matching)
         )
-        final_unmatched_strings = [unmatched_str for unmatched_str in initially_unmatched_strings if unmatched_str not in set_of_strings_to_ignore]
+        final_unmatched_strings = [
+            unmatched_str
+            for unmatched_str in initially_unmatched_strings
+            if unmatched_str not in set_of_strings_to_ignore
+        ]
         extracted_numeric_ids = {int(matched_string.split("-", 1)[0]) for matched_string in pattern_matched_strings}
         return extracted_numeric_ids, final_unmatched_strings
 
@@ -188,33 +192,3 @@ class CollectionsProcessing:
         missing_in_b = first_set - second_set
         missing_in_a = second_set - first_set
         return missing_in_b, missing_in_a
-
-    @staticmethod
-    def find_differences_in_two_set_with_message(first_set: Set[Any], label_1: str, second_set: Set[Any], label_2: str) -> List[str]:
-        """
-        Compares two sets and returns formatted error messages for missing elements.
-
-        Wraps `find_differences_in_two_set` to generate human-readable error messages
-        identifying which elements are missing from which set.
-
-        Args:
-            first_set (Set[Any]): First set to compare.
-            label_1 (str): Label for the first set (for error messages).
-            second_set (Set[Any]): Second set to compare.
-            label_2 (str): Label for the second set (for error messages).
-
-        Returns:
-            List[str]: List of error strings describing the set differences found.
-        """
-        errors: List[str] = []
-        if first_set is None:
-            first_set = set()
-        if second_set is None:
-            second_set = set()
-        missing_in_b, missing_in_a = CollectionsProcessing.find_differences_in_two_set(first_set, second_set)
-        if missing_in_b:
-            errors.append(f"{label_1}: Códigos dos indicadores ausentes em {label_2}: {sorted(list(missing_in_b))}.")
-        if missing_in_a:
-            errors.append(f"{label_2}: Códigos dos indicadores ausentes em {label_1}: {sorted(list(missing_in_a))}.")
-
-        return errors

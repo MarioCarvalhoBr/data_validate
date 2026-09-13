@@ -66,47 +66,13 @@ class SpellChecker:
     def clean_files_generated(self) -> None:
         self.dictionary_manager.clean_temporary_files()
 
-    def check_spelling_text(
-        self, df: pd.DataFrame, file_name: str, columns_sheets: List[str]
-    ) -> Tuple[List[str], List[str]]:
-        """Check spelling and formatting in DataFrame text columns.
-
-        Args:
-            df: DataFrame to check.
-            file_name: Name of the file for error messages.
-            columns_sheets: Column names to check.
-
-        Returns:
-            Tuple of (errors, warnings) lists.
-        """
-        errors, warnings = [], []
-
-        try:
-            df = df.copy()
-            if df.empty:
-                return errors, warnings
-
-            # Validate columns
-            valid_columns, column_warnings = self.df_processor.validate_columns(df, columns_sheets, file_name)
-            # warnings.extend(column_warnings)
-
-            # Process DataFrame
-            if valid_columns:
-                processing_warnings = self.df_processor.process_dataframe(df, valid_columns, file_name)
-                warnings.extend(processing_warnings)
-
-        except Exception as e:
-            errors.append(f"Erro ao processar o arquivo {file_name}: {e}")
-
-        return errors, warnings
-
     def check_spelling_text_structured(
         self, df: pd.DataFrame, columns_sheets: List[str]
     ) -> Tuple[Tuple[SpellingFinding, ...], str | None]:
-        """Structured counterpart of `check_spelling_text` (ARC-017 Phase 3 Port 8, SPELL-005).
+        """Structured spelling/quality check for a sheet (ARC-017 Phase 3 Port 8, SPELL-005).
 
-        `rules/spell.py`'s `SPELL-002`…`004` call this instead of `check_spelling_text`: no
-        pre-formatted Portuguese string is built here (the rule renders every message through
+        `rules/spell.py`'s `SPELL-002`…`004` call this: no pre-formatted Portuguese string is
+        built here (the rule renders every message through
         the i18n catalog, `.claude/rules/i18n.md`), and no `file_name`/missing-column bookkeeping
         is duplicated — the rule already resolves the file name and already filters
         `columns_sheets` down to columns that exist on `df` before calling this.

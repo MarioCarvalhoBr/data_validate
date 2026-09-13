@@ -227,6 +227,63 @@
   "rule.SCEN-004.error": {
     "message": "{filename}: Column '{column}' must not contain duplicated values."
   },
+  "rule.LEG-001.non_numeric": {
+    "message": "{filename}: Column '{column}' contains non-numeric values and cannot be validated for sequentiality."
+  },
+  "rule.LEG-001.non_numeric_values": {
+    "message": "{filename}: Non-numeric values found in column '{column}': {values}"
+  },
+  "rule.LEG-001.must_start_at_one": {
+    "message": "{filename}: The legend code sequence must start at 1. Initial code found: {first}"
+  },
+  "rule.LEG-001.not_sequential": {
+    "message": "{filename}: Legend codes are not sequential. Codes found: {codes}"
+  },
+  "rule.LEG-002.error": {
+    "message": "{filename} [code: {code}, row(s): {rows}]: Column '{column}' contains empty or null values."
+  },
+  "rule.LEG-003.error": {
+    "message": "{filename} [code: {code}, row(s): {rows}]: Column '{column}' contains non-numeric values: {values}"
+  },
+  "rule.LEG-004.error": {
+    "message": "{filename} [code: {code}, row(s): {rows}]: Column '{column}' must be empty when the label is '{value_data_unavailable}'."
+  },
+  "rule.LEG-005.error_missing": {
+    "message": "{filename} [code: {code}]: There must be one '{value_data_unavailable}' label per code, but none was found."
+  },
+  "rule.LEG-005.error_multiple": {
+    "message": "{filename} [code: {code}, row(s): {rows}]: There must be exactly one '{value_data_unavailable}' label per code, but {count} were found."
+  },
+  "rule.LEG-006.error": {
+    "message": "{filename} [code: {code}, row: {row}]: Column '{column}' contains an invalid value: '{value}' is not a valid integer."
+  },
+  "rule.LEG-007.error": {
+    "message": "{filename} [code: {code}]: Label '{label}' is duplicated. Labels must be unique for each legend code."
+  },
+  "rule.LEG-008.error": {
+    "message": "{filename} [code: {code}, row: {row}]: Color format '{color}' is invalid. Use the hexadecimal format (e.g. #RRGGBB)."
+  },
+  "rule.LEG-009.error_minimum": {
+    "message": "{filename} [code: {code}, row: {row}]: Invalid legend. The minimum value '{value}' has more than two decimal places. The default range (0 to 1) will be used."
+  },
+  "rule.LEG-009.error_maximum": {
+    "message": "{filename} [code: {code}, row: {row}]: Invalid legend. The maximum value '{value}' has more than two decimal places. The default range (0 to 1) will be used."
+  },
+  "rule.LEG-010.range_error": {
+    "message": "{filename} [code: {code}, row: {row}]: The minimum value ({min}) must be less than the maximum value ({max})."
+  },
+  "rule.LEG-010.continuity_error": {
+    "message": "{filename} [code: {code}, row: {row}]: The interval is not continuous. The minimum value {min} should be {expected} to follow the previous maximum value."
+  },
+  "rule.LEG-010.invalid_operation_error": {
+    "message": "{filename} [code: {code}, row: {row}]: Invalid value for minimum/maximum operation."
+  },
+  "rule.LEG-011.non_numeric": {
+    "message": "{filename}: Column '{column}' of legend '{code}' contains non-numeric values."
+  },
+  "rule.LEG-011.not_sequential": {
+    "message": "{filename} [code: {code}]: Column '{column}' of the legend is not sequential or does not start at 1. Values found: {values}"
+  },
   "rule.legend.missing_required_column": {
     "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
   },
