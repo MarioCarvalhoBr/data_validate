@@ -81,7 +81,15 @@ def profile_pipeline(input_dir: Path, output_dir: Path, report_dir: Path, top: i
     try:
         profiler.enable()
         try:
+            # `data_validate.main` ends with `if __name__ == "__main__": sys.exit(main())`; run
+            # under `run_name="__main__"` it always raises `SystemExit` (0 on a clean run, a
+            # non-zero exit code when the fixture has validation errors) once `main()` returns.
+            # Swallowed here (not re-raised) so the profiler and the `.prof`/text report below
+            # still get written for *every* run, not only ones that happen to exit 0 — a failed
+            # or dirty fixture is exactly the case a profile is most useful for.
             runpy.run_module("data_validate.main", run_name="__main__")
+        except SystemExit:
+            pass
         finally:
             profiler.disable()
     finally:
