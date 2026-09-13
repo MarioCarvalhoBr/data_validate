@@ -84,7 +84,8 @@ GIT_GLOBAL_NOARG_FLAGS = (
 
 SUBSHELL_RE = re.compile(r"\$\(((?:[^()]|\([^()]*\))*)\)")
 BACKTICK_RE = re.compile(r"`([^`]+)`")
-OPERATOR_SPLIT_RE = re.compile(r"(&&|\|\||;|\|)")
+HEREDOC_START_RE = re.compile(r"<<(-?)\s*(['\"]?)(\w+)\2")
+OPERATOR_TOKENS = ("&&", "||", ";", "|")
 
 
 def extract_nested_commands(text: str) -> list[str]:
@@ -94,38 +95,87 @@ def extract_nested_commands(text: str) -> list[str]:
     return nested
 
 
-def tokenize_segment(seg_text: str) -> list[str]:
-    """shlex.split with a fail-closed fallback for unparsable segments."""
+def strip_heredoc_bodies(text: str) -> str:
+    """Remove heredoc body lines so they are analysed as data, never as commands.
+
+    Scans line by line for a `<<WORD` / `<<-WORD` (optionally quoted `WORD`)
+    redirection. Every following line is heredoc body data — excluded from
+    command analysis entirely — until one whose content starts with `WORD` at
+    a word boundary; that terminator's own prefix is dropped, but any trailing
+    shell text after the delimiter on the same line (e.g. `EOF && git push`)
+    is kept for normal analysis, and so is everything after the terminator
+    line. An unterminated heredoc (`WORD` never found) drops the remainder of
+    the command as data rather than risk misparsing it.
+    """
+    lines = text.split("\n")
+    out_lines: list[str] = []
+    i = 0
+    while i < len(lines):
+        line = lines[i]
+        out_lines.append(line)
+        match = HEREDOC_START_RE.search(line)
+        if match is None:
+            i += 1
+            continue
+        strip_indent = match.group(1) == "-"
+        terminator_re = re.compile(r"^" + re.escape(match.group(3)) + r"\b(.*)$")
+        i += 1
+        while i < len(lines):
+            candidate = lines[i].lstrip("\t") if strip_indent else lines[i]
+            end_match = terminator_re.match(candidate)
+            if end_match is not None:
+                trailing = end_match.group(1)
+                if trailing.strip():
+                    out_lines.append(trailing)
+                i += 1
+                break
+            i += 1
+        else:
+            break  # unterminated heredoc: nothing after it is safe to analyze
+    return "\n".join(out_lines)
+
+
+def tokenize_whole_command(text: str) -> list[str]:
+    """Tokenize the entire command in one shlex pass, quotes intact.
+
+    A single pass over the whole command (posix mode, `punctuation_chars=
+    "|&;"` so `&&`/`||`/`;`/`|` come out as their own tokens) — instead of
+    splitting on raw newlines before tokenizing — means a quoted multi-line
+    argument (e.g. a `git commit -m` message with a body) stays one token,
+    embedded newlines and all, and is never mistaken for a segment boundary.
+    Falls back to a fail-closed check only for a genuine tokenization error of
+    the command line itself (e.g. a truly unbalanced quote); heredoc bodies
+    are already stripped by the caller before this runs.
+    """
     try:
-        return shlex.split(seg_text)
+        lexer = shlex.shlex(text, posix=True, punctuation_chars="|&;")
+        lexer.whitespace_split = True
+        return list(lexer)
     except ValueError:
-        lowered = seg_text.lower()
+        lowered = text.lower()
         for danger in DANGEROUS_WORDS:
             if re.search(r"\b" + re.escape(danger) + r"\b", lowered):
                 raise HookFailClosed(
-                    f"could not safely tokenize a command segment mentioning "
-                    f"{danger!r}: {seg_text!r}"
+                    f"could not safely tokenize a command mentioning {danger!r}: {text!r}"
                 ) from None
-        return seg_text.split()
+        return text.split()
 
 
 def split_segments(text: str) -> list[tuple[list[str], str | None]]:
-    """Split on &&, ||, ;, | and newlines; return (tokens, preceding_op)."""
+    """Split the tokenized command into segments on `&&`, `||`, `;`, `|`."""
     segments: list[tuple[list[str], str | None]] = []
-    for line in text.split("\n"):
-        if not line.strip():
+    current: list[str] = []
+    pending_op: str | None = None
+    for token in tokenize_whole_command(text):
+        if token in OPERATOR_TOKENS:
+            if current:
+                segments.append((current, pending_op))
+                current = []
+            pending_op = token
             continue
-        parts = OPERATOR_SPLIT_RE.split(line)
-        pending_op: str | None = None
-        for part in parts:
-            if part in ("&&", "||", ";", "|"):
-                pending_op = part
-                continue
-            seg_text = part.strip()
-            if not seg_text:
-                continue
-            segments.append((tokenize_segment(seg_text), pending_op))
-            pending_op = None
+        current.append(token)
+    if current:
+        segments.append((current, pending_op))
     return segments
 
 
@@ -411,6 +461,7 @@ def check_segment(
 def check_command(text: str, repo_root: str, depth: int = 0) -> str | None:
     if depth > 8:
         raise HookFailClosed("command nesting is too deep to analyze safely")
+    text = strip_heredoc_bodies(text)
     for inner in extract_nested_commands(text):
         reason = check_command(inner, repo_root, depth + 1)
         if reason:
@@ -482,6 +533,13 @@ SELF_TEST_CASES: list[tuple[str, str]] = [
     ("chmod -R 777 .", "block"),
     ("poetry run pytest -q", "allow"),
     ('git commit -m "x"', "allow"),
+    ('git commit -m "subject\n\nbody"', "allow"),  # TOOL-011: quoted multi-line -m argument
+    ('git commit -m "a; b"', "allow"),  # TOOL-011: operator characters inside quotes
+    (
+        "cat > /tmp/f.txt <<EOF\nDocs example: run git push after review.\nEOF\n",
+        "allow",
+    ),  # TOOL-011: heredoc body is data, not a command
+    ("cat <<EOF\nbody\nEOF && git push", "block"),  # TOOL-011: push outside the heredoc body
     ("git stash drop", "block"),
     ("gh pr merge 42", "block"),
     ("gh release create v1.0.0", "block"),

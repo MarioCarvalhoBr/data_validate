@@ -44,7 +44,7 @@ format: ## Auto-format and auto-fix with ruff
 
 typecheck: ## Run mypy (data_validate is legacy-exempt; tools/ and tests/e2e/ are strict)
 	@targets="$(PATH_SRC)"; \
-	[ -n "$$(find tools -maxdepth 2 -name '*.py' -not -path 'tools/legacy/*' 2>/dev/null)" ] && targets="$$targets tools"; \
+	[ -n "$$(find tools -maxdepth 2 -name '*.py' 2>/dev/null)" ] && targets="$$targets tools"; \
 	[ -n "$$(find tests/e2e -name '*.py' 2>/dev/null)" ] && targets="$$targets tests/e2e"; \
 	echo "mypy $$targets"; \
 	$(MYPY) $$targets

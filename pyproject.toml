@@ -167,7 +167,7 @@ module = ["networkx.*"]
 ignore_missing_imports = true
 
 [tool.bandit]
-exclude_dirs = ["tests", "tools/legacy"]
+exclude_dirs = ["tests"]
 # Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —
 # not a silent mask — and is removed once the linked item is closed.
 skips = [
