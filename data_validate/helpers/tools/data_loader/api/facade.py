@@ -45,6 +45,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
 
+import chardet
 import pandas as pd
 import python_calamine
 
@@ -61,6 +62,87 @@ from ..strategies.header import SingleHeaderStrategy, DoubleHeaderStrategy
 _DEFAULT_MAX_FILE_BYTES = 100 * 1024 * 1024
 _DEFAULT_MAX_SHEET_ROWS = 1_000_000
 _DEFAULT_MAX_SHEET_COLUMNS = 5_000
+
+# PROTO-007 (STRUCT-013, gap G-01): only flag a confident, clearly-non-UTF-8 `chardet` guess --
+# a low-confidence detection on a short/ambiguous sample is not reported, to avoid a false
+# positive on a genuinely UTF-8 file `chardet` cannot fully tell apart from ASCII.
+_ENCODING_SAMPLE_BYTES = 4096
+_ENCODING_CONFIDENCE_THRESHOLD = 0.7
+_ACCEPTED_ENCODINGS = frozenset({"utf-8", "ascii"})
+
+
+def _worksheet_names(path: Path) -> list[str]:
+    """PROTO-003 (STRUCT-014, protocol §2 p.3, since v1.14): every worksheet name in an `.xlsx`.
+
+    `python_calamine`/pandas' `engine="calamine"` silently reads only the first worksheet of an
+    `.xlsx`; a workbook with more than one is not rejected, only reported here -- the first sheet
+    is still what gets parsed and validated (today's silent behaviour, now surfaced to the user
+    instead of invisible). A file this check cannot even open (`OSError`, e.g. the path vanished
+    between the earlier `Path.stat()` size check and here; or `python_calamine.CalamineError` for
+    a malformed/corrupt `.xlsx`) is swallowed and reported as "cannot determine" (`[]`) rather
+    than raised here -- this check is a best-effort structural warning, not the file's actual read
+    attempt, which still runs right after (via `reader.read()`) and reports its own, more specific
+    STRUCT-007 error for a genuinely unreadable file, with that error's own original message
+    (not this check's own, possibly differently-worded, attempt to open the same broken file).
+
+    Args:
+        path: Path to an `.xlsx` file.
+
+    Returns:
+        list[str]: Every sheet name, in workbook order, or `[]` when the workbook could not be
+            opened for this check (treated the same as "nothing to report").
+    """
+    try:
+        return list(python_calamine.CalamineWorkbook.from_path(str(path)).sheet_names)
+    except (OSError, python_calamine.CalamineError):
+        return []
+
+
+def _detect_non_utf8_encoding(path: Path) -> str | None:
+    """PROTO-007 (STRUCT-013, gap G-01): detect a confidently non-UTF-8 CSV encoding.
+
+    Reads a sample of raw bytes and first tries to decode it as UTF-8 directly: a sample that
+    round-trips through `bytes.decode("utf-8")` IS UTF-8 (accented characters included), full
+    stop -- trusted over `chardet`'s own guess, which is known to mis-detect short samples
+    containing only a couple of accented characters as `ISO-8859-1` with moderate-to-high
+    confidence (a real false-positive risk this project must not surface as a false error). Only
+    when the sample genuinely fails to decode as UTF-8 does `chardet` run, to name the encoding
+    the FAQ message reports (the same detection
+    `helpers.base.file_system_utils.FileSystemUtils.detect_encoding` performs, reproduced here
+    directly on `chardet` -- without that class's `LanguageManager` dependency -- so the loading
+    layer stays dependent only on `specs`/`util`, per `.claude/rules/architecture-boundaries.md`).
+    A low-confidence `chardet` guess (`_ENCODING_CONFIDENCE_THRESHOLD`) on that already-invalid
+    sample is still not reported, so an ambiguous case does not name a wrong encoding.
+
+    An `OSError` opening the sample (e.g. the path vanished between the earlier `Path.stat()`
+    size check and here) is swallowed and treated as "nothing to report" -- the file's actual
+    read attempt still runs right after and reports its own, more specific error.
+
+    Args:
+        path: Path to a `.csv` file.
+
+    Returns:
+        str | None: The detected encoding name when the sample is confidently not UTF-8,
+            otherwise `None` (empty/unreadable file, valid UTF-8, or a low-confidence guess).
+    """
+    try:
+        with open(path, "rb") as handle:
+            raw_sample = handle.read(_ENCODING_SAMPLE_BYTES)
+    except OSError:
+        return None
+    if not raw_sample:
+        return None
+    try:
+        raw_sample.decode("utf-8")
+        return None
+    except UnicodeDecodeError:
+        pass
+    detection = chardet.detect(raw_sample)
+    encoding = detection.get("encoding")
+    confidence = detection.get("confidence") or 0.0
+    if not encoding or encoding.lower() in _ACCEPTED_ENCODINGS or confidence < _ENCODING_CONFIDENCE_THRESHOLD:
+        return None
+    return str(encoding)
 
 
 class LoadedSheet:
@@ -207,6 +289,28 @@ class DataLoaderFacade:
                         )
                     )
                 else:
+                    if path.suffix == ".xlsx":
+                        sheet_names = _worksheet_names(path)
+                        if len(sheet_names) > 1:
+                            errors.append(
+                                self._translate(
+                                    "rule.STRUCT-014.error",
+                                    filename=path.name,
+                                    first_sheet=sheet_names[0],
+                                    extra_sheets=", ".join(sheet_names[1:]),
+                                )
+                            )
+                    elif path.suffix == ".csv":
+                        non_utf8_encoding = _detect_non_utf8_encoding(path)
+                        if non_utf8_encoding is not None:
+                            errors.append(
+                                self._translate(
+                                    "rule.STRUCT-013.error",
+                                    filename=path.name,
+                                    encoding=non_utf8_encoding,
+                                )
+                            )
+
                     df_local = reader.read()
                     rows, columns = df_local.shape
                     if rows > self._max_sheet_rows or columns > self._max_sheet_columns:

@@ -29,6 +29,10 @@ import pandas as pd
 from data_validate.helpers.common.default_translate import get_default_translate
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
+_MAX_LEGEND_SLICES = 11
+"""PROTO-011 (LEG-016, protocol §2.5 pp.10-11): "podendo ter no maximo onze fatias (sendo de
+cinco a sete o recomendado)" -- a legend code above this count of non-DI slices is a warning."""
+
 
 class LegendProcessing:
     """
@@ -286,7 +290,10 @@ class LegendProcessing:
         """
         translate = translate or get_default_translate()
         errors: list[str] = []
-        hex_color_pattern = re.compile(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
+        # PROTO-011 (protocol §2.5 pp.10-11, G-19): "formato hexadecimal ... seguido de seis
+        # valores hexadecimais" -- the 3-digit shorthand (`#RGB`) is no longer accepted, only
+        # the full six-digit form.
+        hex_color_pattern = re.compile(r"^#[A-Fa-f0-9]{6}$")
 
         # PERF-001: a single vectorised `.str.match()` mask replaces the legacy
         # `for index, row in dataframe.iterrows(): ...` loop; the remaining loop only
@@ -571,3 +578,40 @@ class LegendProcessing:
         if not actual_sequence == expected_sequence:
             errors.append(translate("rule.LEG-001.not_sequential", filename=self.filename, codes=actual_sequence))
         return errors
+
+    def validate_legend_slice_count(
+        self,
+        dataframe: pd.DataFrame,
+        code: Any,
+        label_col: str,
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
+        """
+        Warn when a legend code has more than the recommended maximum number of slices (LEG-016).
+
+        Protocol §2.5 pp.10-11 (PROTO-011): up to eleven slices are accepted (five to seven
+        advised); the count excludes the "Dado indisponível" row, which is not a data slice.
+
+        Args:
+            dataframe: DataFrame to validate (one legend code's group).
+            code: Legend code identifier.
+            label_col: Column name containing labels.
+            translate: Message-catalog renderer, see `validate_legend_labels`.
+
+        Returns:
+            List containing one warning message when the slice count exceeds the maximum,
+            otherwise an empty list.
+        """
+        translate = translate or get_default_translate()
+        slice_count = int((dataframe[label_col] != self.value_data_unavailable).sum())
+        if slice_count <= _MAX_LEGEND_SLICES:
+            return []
+        return [
+            translate(
+                "rule.LEG-016.warning",
+                filename=self.filename,
+                code=code,
+                count=slice_count,
+                max_slices=_MAX_LEGEND_SLICES,
+            )
+        ]

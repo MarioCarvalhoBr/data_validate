@@ -29,6 +29,7 @@ message-building functions), per `.claude/rules/architecture-boundaries.md`.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 
 from data_validate.config import NamesEnum
@@ -187,3 +188,42 @@ def check_name_and_symbol_are_unique(ctx: RuleContext) -> list[Issue]:
             )
         )
     return issues
+
+
+_SYMBOL_CHARSET_PATTERN = re.compile(r"^[A-Za-z0-9]$")
+"""PROTO-006 (protocol §2.1 p.4, v1.16): "Um único caractere ... apenas letras e números" --
+exactly one ASCII letter or digit; an accented letter, punctuation, space, or a multi-character
+value all fail this pattern."""
+
+
+@SCENARIO_REGISTRY.rule(rule_id="SCEN-005", category=NamesEnum.SYMB_SCEN.value, requires={_SHEET: ()})
+def check_symbol_charset(ctx: RuleContext) -> list[Issue]:
+    """SCEN-005 (PROTO-006, gap G-17): `simbolo` must be exactly one ASCII letter or digit.
+
+    Protocol §2.1 p.4 (v1.16, clarifying v1.10's G-17): "Um único caractere ... apenas letras e
+    números, não podendo ter espaço, pontuação ou qualquer outro caracter especial." An accented
+    letter (e.g. `"é"`) is not ASCII and therefore also rejected -- the protocol's "apenas letras"
+    means the unaccented Latin alphabet the value-column pattern (`CÓDIGO-ANO[-CENÁRIO]`) can
+    actually match.
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _SYMBOL not in frame.columns:
+        return [_missing_column_issue("SCEN-005", Severity.ERROR, NamesEnum.SYMB_SCEN.value, filename, _SYMBOL)]
+
+    series = frame[_SYMBOL].astype(str)
+    invalid_mask = ~series.str.match(_SYMBOL_CHARSET_PATTERN)
+    return [
+        Issue(
+            rule_id="SCEN-005",
+            severity=Severity.ERROR,
+            sheet=filename,
+            row=int(idx),
+            column=_SYMBOL,
+            message_key="rule.SCEN-005.error",
+            params={"filename": filename, "row": _excel_row(idx), "column": _SYMBOL, "value": series.loc[idx]},
+            category=NamesEnum.SYMB_SCEN.value,
+        )
+        for idx in series.index[invalid_mask]
+    ]

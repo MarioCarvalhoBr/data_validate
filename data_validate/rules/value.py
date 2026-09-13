@@ -597,3 +597,38 @@ def check_excessive_decimal_places(ctx: RuleContext) -> list[Issue]:
 
     _errors, warnings = _analyze_value_columns(ctx)
     return warnings
+
+
+# --------------------------------------------------------------------------------------------
+# VAL-006: id uniqueness (UNIQ_VAL)
+# --------------------------------------------------------------------------------------------
+
+
+@VALUE_REGISTRY.rule(rule_id="VAL-006", category=NamesEnum.UNIQ_VAL.value, requires={_VALUES_SHEET: ()})
+def check_id_uniqueness(ctx: RuleContext) -> list[Issue]:
+    """VAL-006 (PROTO-017, gap G-13): `valores.id` must contain no duplicated value.
+
+    Protocol §2.6 p.11 ("identificador único"). No registry (`spd_data.json`, PROTO-013/TERR-002)
+    is needed for this half of the gap -- uniqueness is a property of `valores` alone.
+    """
+    frame = ctx.sheet(_VALUES_SHEET)
+    filename = _filename(ctx, _VALUES_SHEET)
+
+    if _ID not in frame.columns:
+        return [_missing_column_issue("VAL-006", NamesEnum.UNIQ_VAL.value, filename, _ID)]
+
+    duplicated_ids = frame[_ID][frame[_ID].duplicated()].tolist()
+    if not duplicated_ids:
+        return []
+    return [
+        Issue(
+            rule_id="VAL-006",
+            severity=Severity.ERROR,
+            sheet=filename,
+            row=None,
+            column=_ID,
+            message_key="rule.VAL-006.error",
+            params={"filename": filename, "column": _ID, "duplicated_ids": str(duplicated_ids)},
+            category=NamesEnum.UNIQ_VAL.value,
+        )
+    ]

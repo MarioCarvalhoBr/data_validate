@@ -30,6 +30,8 @@ from data_validate.rules.temporal_reference import (
     check_description_ends_with_period,
     check_name_and_symbol_are_unique,
     check_reference_years_are_future,
+    check_single_observed_reference,
+    check_symbol_is_four_digits,
 )
 from data_validate.specs.issues import Severity
 from tests.factories import make_temporal_frame
@@ -57,7 +59,13 @@ class TestTemporalRegistryShape:
     """The registry declares exactly the TEMP ids in the legacy validator's run() order."""
 
     def test_registry_contains_every_ported_temp_id_in_legacy_order(self) -> None:
-        assert [spec.rule_id for spec in TEMPORAL_REGISTRY] == ["TEMP-001", "TEMP-002", "TEMP-003"]
+        assert [spec.rule_id for spec in TEMPORAL_REGISTRY] == [
+            "TEMP-001",
+            "TEMP-002",
+            "TEMP-003",
+            "TEMP-004",
+            "TEMP-005",
+        ]
 
     def test_every_spec_declares_its_documented_category(self) -> None:
         categories = {spec.rule_id: spec.category for spec in TEMPORAL_REGISTRY}
@@ -65,6 +73,8 @@ class TestTemporalRegistryShape:
             "TEMP-001": NamesEnum.MAND_PUNC_TEMP.value,
             "TEMP-002": NamesEnum.YEARS_TEMP.value,
             "TEMP-003": NamesEnum.UVR_TEMP.value,
+            "TEMP-004": NamesEnum.YEARS_TEMP.value,
+            "TEMP-005": NamesEnum.YEARS_TEMP.value,
         }
 
     def test_empty_sheet_skips_every_rule_silently(self) -> None:
@@ -228,3 +238,74 @@ class TestCheckNameAndSymbolAreUnique:
         issues = check_name_and_symbol_are_unique(ctx)
 
         assert [issue.params["column"] for issue in issues] == ["nome", "simbolo"]
+
+
+class TestCheckSymbolIsFourDigits:
+    """TEMP-004 (PROTO-014, gap G-15): `simbolo` must be exactly four numeric characters."""
+
+    def test_four_digit_symbols_report_nothing(self) -> None:
+        frame = pd.DataFrame({"nome": ["atual", "futuro"], "simbolo": ["2020", "2021"]})
+        ctx = _make_context(frame)
+        assert check_symbol_is_four_digits(ctx) == []
+
+    @pytest.mark.parametrize(
+        "value",
+        ["1", "12345", "203a", "20.0", "-202", ""],
+        ids=["one_digit", "five_digits", "trailing_letter", "decimal", "signed", "empty"],
+    )
+    def test_a_non_four_digit_symbol_is_reported(self, value: str) -> None:
+        frame = pd.DataFrame({"nome": ["atual", "b"], "simbolo": ["2000", value]})
+        ctx = _make_context(frame)
+
+        issues = check_symbol_is_four_digits(ctx)
+
+        assert len(issues) == 1
+        issue = issues[0]
+        assert issue.rule_id == "TEMP-004"
+        assert issue.severity is Severity.ERROR
+        assert issue.category == NamesEnum.YEARS_TEMP.value
+        assert issue.message_key == "rule.TEMP-004.error"
+        assert issue.params == {"filename": _FILENAME, "row": 3, "column": "simbolo", "value": value}
+
+    def test_missing_column_reports_an_error(self) -> None:
+        frame = make_temporal_frame().drop(columns=["simbolo"])
+        ctx = _make_context(frame)
+
+        issues = check_symbol_is_four_digits(ctx)
+
+        assert len(issues) == 1
+        assert issues[0].severity is Severity.ERROR
+        assert issues[0].message_key == "rule.temporal_reference.missing_required_column"
+        assert issues[0].params == {"filename": _FILENAME, "column": "simbolo"}
+
+
+class TestCheckSingleObservedReference:
+    """TEMP-005 (PROTO-014, gap G-16): at most one `simbolo` <= the current year."""
+
+    def test_a_single_observed_reference_reports_nothing(self) -> None:
+        frame = pd.DataFrame({"nome": ["atual", "2030"], "simbolo": ["2000", "2030"]})
+        ctx = _make_context(frame, current_year=2026)
+        assert check_single_observed_reference(ctx) == []
+
+    def test_two_observed_references_are_reported_as_a_warning(self) -> None:
+        frame = pd.DataFrame({"nome": ["atual", "passado", "futuro"], "simbolo": ["2000", "2020", "2030"]})
+        ctx = _make_context(frame, current_year=2026)
+
+        issues = check_single_observed_reference(ctx)
+
+        assert len(issues) == 1
+        issue = issues[0]
+        assert issue.rule_id == "TEMP-005"
+        assert issue.severity is Severity.WARNING
+        assert issue.category == NamesEnum.YEARS_TEMP.value
+        assert issue.message_key == "rule.TEMP-005.warning"
+        assert issue.params == {
+            "filename": _FILENAME,
+            "column": "simbolo",
+            "observed_symbols": "['2000', '2020']",
+        }
+
+    def test_missing_column_reports_nothing(self) -> None:
+        frame = make_temporal_frame().drop(columns=["simbolo"])
+        ctx = _make_context(frame)
+        assert check_single_observed_reference(ctx) == []

@@ -207,26 +207,24 @@ class TestCheckLevelOneMustNotReferenceLegend:
 
 
 class TestCheckOtherLevelsMustReferenceLegend:
-    """LEG-014: every non-1/2-level `descricao` row must carry a `legenda` reference (BUG-014)."""
+    """LEG-014 (retired by PROTO-012, protocol §2.3 p.9): always reports nothing.
+
+    "Quando esta coluna for usada, todos os valores vazios serão associados à legenda default" --
+    an empty `legenda` reference at any level is not an error; the platform assigns the default
+    legend. A non-empty reference that matches no `legenda.codigo` is still an error, but that is
+    `LEG-012`'s "missing codes" finding, not this rule's (see `TestCheckRelationMissingAndUnreferencedCodes`).
+    """
 
     def test_a_level_two_indicator_without_a_legend_reports_nothing(self) -> None:
-        """BUG-014: `nivel = "2.0"` must still be excluded from the "other levels" mask."""
         descricao = pd.DataFrame({"codigo": ["20"], "nivel": ["2.0"], "legenda": [pd.NA]})
         ctx = _make_context(descricao=descricao, legenda=pd.DataFrame({"codigo": []}))
         assert check_other_levels_must_reference_legend(ctx) == []
 
-    def test_a_level_three_indicator_without_a_legend_is_an_error(self) -> None:
+    def test_a_level_three_indicator_without_a_legend_reports_nothing(self) -> None:
+        """PROTO-012: an empty `legenda` cell at level 3 is no longer an error (default legend)."""
         descricao = pd.DataFrame({"codigo": ["30"], "nivel": ["3"], "legenda": [pd.NA]})
         ctx = _make_context(descricao=descricao, legenda=pd.DataFrame({"codigo": []}))
-
-        issues = check_other_levels_must_reference_legend(ctx)
-
-        assert len(issues) == 1
-        issue = issues[0]
-        assert issue.rule_id == "LEG-014"
-        assert issue.severity is Severity.ERROR
-        assert issue.message_key == "rule.LEG-014.error"
-        assert issue.params == {"filename": _DESCRICAO, "legend_filename": _LEGENDA, "codes": "['30']"}
+        assert check_other_levels_must_reference_legend(ctx) == []
 
     def test_a_level_three_indicator_with_a_legend_reports_nothing(self) -> None:
         descricao = pd.DataFrame({"codigo": ["30"], "nivel": ["3"], "legenda": ["5"]})

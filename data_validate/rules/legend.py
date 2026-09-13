@@ -191,7 +191,6 @@ class _RelationFindings:
     missing_codes: Issue | None = None
     unreferenced_codes: Issue | None = None
     level_one_with_legend: Issue | None = None
-    other_levels_missing_legend: Issue | None = None
 
 
 def _analyze_relation_indicators(ctx: RuleContext) -> _RelationFindings:
@@ -294,37 +293,17 @@ def _analyze_relation_indicators(ctx: RuleContext) -> _RelationFindings:
             category=NamesEnum.LEG_REL.value,
         )
 
-    other_levels_mask = DataFrameProcessing.numeric_not_equals_mask(
-        df_description[_LEVEL], 1
-    ) & DataFrameProcessing.numeric_not_equals_mask(df_description[_LEVEL], 2)
-    codes_other_levels = set(df_description[other_levels_mask][_CODE].astype(str).tolist())
-    codes_other_levels_with_legend = set(
-        df_description[other_levels_mask & df_description[_LEGEND_COLUMN].notna()][_CODE].astype(str).tolist()
-    )
-    missing_other_levels = codes_other_levels - codes_other_levels_with_legend
-
-    other_levels_issue = None
-    if missing_other_levels:
-        other_levels_issue = Issue(
-            rule_id="LEG-014",
-            severity=Severity.ERROR,
-            sheet=description_filename,
-            row=None,
-            column=_LEGEND_COLUMN,
-            message_key="rule.LEG-014.error",
-            params={
-                "filename": description_filename,
-                "legend_filename": legend_filename,
-                "codes": str(sorted(missing_other_levels)),
-            },
-            category=NamesEnum.LEG_REL.value,
-        )
+    # LEG-014 (retired by PROTO-012, protocol §2.3 p.9): an empty `legenda` reference at any
+    # level used to be flagged here for levels other than 1/2; the protocol assigns the default
+    # legend to an empty cell instead, so this half of the legacy check is no longer computed --
+    # see `check_other_levels_must_reference_legend`'s docstring. A non-empty reference that
+    # matches no `legenda.codigo` remains an error, but that is `missing_codes_issue` above
+    # (LEG-012), never this one.
 
     return _RelationFindings(
         missing_codes=missing_codes_issue,
         unreferenced_codes=unreferenced_issue,
         level_one_with_legend=level_one_issue,
-        other_levels_missing_legend=other_levels_issue,
     )
 
 
@@ -361,15 +340,22 @@ def check_level_one_must_not_reference_legend(ctx: RuleContext) -> list[Issue]:
 
 @LEGEND_REGISTRY.rule(rule_id="LEG-014", category=NamesEnum.LEG_REL.value, requires={_DESCRIPTION_SHEET: ()})
 def check_other_levels_must_reference_legend(ctx: RuleContext) -> list[Issue]:
-    """LEG-014: every `descricao` row at a level other than 1 or 2 must carry a `legenda` reference.
+    """LEG-014 (retired by PROTO-012, protocol §2.3 p.9): always reports nothing.
 
-    Silent (no issue) when the shared missing-column abort would have fired — `LEG-012` already
-    reports that.
+    Protocol §2.3 p.9: "Quando esta coluna for usada, todos os valores vazios serão associados
+    à legenda default" -- this rule used to flag every `descricao` row at a level other than 1
+    or 2 whose `legenda` cell was empty; that half of the check directly contradicted the
+    protocol (an empty cell is not an error, the platform assigns the default legend) and is
+    retired here. A NON-empty reference that matches no `legenda.codigo` is still an error, but
+    that was always `LEG-012`'s "missing codes" finding (`_analyze_relation_indicators`'s
+    `missing_in_legend`), never this rule's, and is unaffected by this retirement.
+
+    The rule ID and its registration stay (traceability -- `.specs/business-rules/legend.md`,
+    `.specs/business-rules/README.md`); the check body is now a permanent no-op rather than
+    being removed from the registry, so a future re-baseline/report never has to explain a
+    vanished rule ID.
     """
-    findings = _analyze_relation_indicators(ctx)
-    if findings.abort is not None or findings.other_levels_missing_legend is None:
-        return []
-    return [findings.other_levels_missing_legend]
+    return []
 
 
 # --------------------------------------------------------------------------------------------

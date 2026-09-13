@@ -139,6 +139,7 @@ class SpLegend(SpModelABC):
            cross-sheet relation/range checks (LEG-012…015) run in `rules/legend.py` instead.
         """
         errors: List[str] = []
+        warnings: List[str] = []
         dataframe = self.data_loader_model.raw_data
         translate = self.context.language_manager.text
 
@@ -201,8 +202,14 @@ class SpLegend(SpModelABC):
                         group, code_value, self.column_name_order, translate=translate
                     )
                 )
+                warnings.extend(
+                    legend_validator.validate_legend_slice_count(
+                        group, code_value, self.column_name_label, translate=translate
+                    )
+                )
 
         self.data_cleaning_errors.extend(errors)
+        self.data_cleaning_warnings.extend(warnings)
 
     def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""

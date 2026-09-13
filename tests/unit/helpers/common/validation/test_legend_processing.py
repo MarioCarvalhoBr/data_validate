@@ -377,8 +377,10 @@ class TestValidateColorFormat:
         "colors, expected_error_count",
         [
             (["#FF0000", "#00FF00", "#0000FF"], 0),  # Valid 6-digit hex
-            (["#F00", "#0F0", "#00F"], 0),  # Valid 3-digit hex
-            (["#FF0000", "#F00", "#ABCDEF"], 0),  # Mixed valid formats
+            # PROTO-011 (protocol §2.5 pp.10-11, G-19): the 3-digit shorthand is no longer
+            # accepted -- `cor` must be exactly six hex digits.
+            (["#F00", "#0F0", "#00F"], 3),  # 3-digit hex is now invalid
+            (["#FF0000", "#F00", "#ABCDEF"], 1),  # Mixed: only the 3-digit one is invalid
             (["invalid", "#00FF00", "#0000FF"], 1),  # One invalid
             (["#GG0000", "#00FF00", "#0000FF"], 1),  # Invalid character
             (["FF0000", "#00FF00", "#0000FF"], 1),  # Missing #
@@ -979,3 +981,32 @@ class TestEdgeCasesAndBoundaryConditions:
 
         # Should handle precision correctly
         assert len(errors) == 0
+
+
+class TestValidateLegendSliceCount:
+    """Test suite for validate_legend_slice_count (LEG-016, PROTO-011)."""
+
+    def test_five_slices_report_nothing(self, legend_processor: LegendProcessing) -> None:
+        df = pd.DataFrame({"label": ["A", "B", "C", "D", "Dado indisponível"]})
+        assert legend_processor.validate_legend_slice_count(df, 1, "label") == []
+
+    def test_exactly_eleven_slices_report_nothing(self, legend_processor: LegendProcessing) -> None:
+        df = pd.DataFrame({"label": [f"Faixa {i}" for i in range(11)] + ["Dado indisponível"]})
+        assert legend_processor.validate_legend_slice_count(df, 1, "label") == []
+
+    def test_twelve_slices_is_a_warning(self, legend_processor: LegendProcessing) -> None:
+        df = pd.DataFrame({"label": [f"Faixa {i}" for i in range(12)] + ["Dado indisponível"]})
+
+        errors = legend_processor.validate_legend_slice_count(df, 1, "label")
+
+        assert len(errors) == 1
+        assert "12" in errors[0]
+
+    def test_uses_provided_translate_callable(self, legend_processor: LegendProcessing) -> None:
+        df = pd.DataFrame({"label": [f"Faixa {i}" for i in range(12)] + ["Dado indisponível"]})
+
+        errors = legend_processor.validate_legend_slice_count(
+            df, 1, "label", translate=lambda key, **params: f"<{key}>"
+        )
+
+        assert errors == ["<rule.LEG-016.warning>"]

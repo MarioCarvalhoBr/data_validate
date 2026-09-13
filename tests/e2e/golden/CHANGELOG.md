@@ -4,6 +4,52 @@ Every regeneration of `tests/e2e/golden/*.json` is recorded here: date, fixture(
 the commit/PR it shipped with. See `.claude/skills/golden-harness/SKILL.md` for the update
 process — regenerate only via `make harness-update`, with the diff reviewed.
 
+## 2026-09-13 (Phase 6 round N2: PROTO-003/006/007/011/012/014/017)
+
+- **Fixtures re-baselined**: all eight (`data_errors_01`, `data_errors_09`, `data_errors_11`,
+  `data_errors_13`, `data_errors_14`, `data_errors_15`, `data_errors_xss`, `data_ground_truth_01`)
+  gain the two new report sections (see below); only `data_errors_01` gains an additional
+  content change (a new TEMP-004 error).
+- **Reason**: `.specs/quality/backlog/09-protocol-v116.md`'s PROTO-003 (STRUCT-014, one worksheet
+  per `.xlsx`), PROTO-006 (SCEN-005, scenario symbol charset), PROTO-007 (STRUCT-013, proactive
+  UTF-8 check), PROTO-011 (LEG-008 six-hex tightening + LEG-016 slice-count warning), PROTO-012
+  (LEG-014 empty-cell narrowing), PROTO-014 (TEMP-004/TEMP-005), and PROTO-017 (VAL-006 `id`
+  uniqueness).
+- **Content diff (every fixture, reviewed line-by-line)**:
+  - Two new, always-empty-today report sections/titles appear at the end of `section_order`
+    (new `NamesEnum` members, so `get_verify_names()`/the report always lists them, findings or
+    not — matching every prior new-category precedent, e.g. `CATEG_DESC`): **"Conjunto de
+    caracteres do símbolo de cenário"** (SCEN-005/`SYMB_SCEN`) and **"Unicidade do identificador
+    em valores"** (VAL-006/`UNIQ_VAL`). `json_summary.data_validate.report.tests` moves
+    35 → 37 in every fixture accordingly.
+  - **TEMP-004** (`data_errors_01` only): one new error in "Anos em referência temporal" —
+    `referencia_temporal.xlsx`'s `simbolo="2050B"` is not exactly four numeric characters (a
+    known, pre-existing defect in that fixture, previously undetected by `CLEAN-005`'s looser
+    "parses as a non-negative integer" check). No other fixture's `simbolo` values fail the
+    four-digit format.
+  - **STRUCT-014** (none): no fixture's `.xlsx` files have more than one worksheet (verified via
+    `python_calamine.CalamineWorkbook.from_path(...).sheet_names` over every `data/input/**/*.xlsx`
+    file) — the new check never fires against a real fixture.
+  - **STRUCT-013** (none): the bundle's one `.csv` fixture (`data_errors_xss/descricao.csv`) is
+    genuinely UTF-8 with high `chardet` confidence; every other fixture delivers `.xlsx` only
+    (exempt).
+  - **SCEN-005** (none): every fixture's `cenarios.simbolo` values are already single ASCII
+    letters (`"O"`/`"P"`).
+  - **LEG-008 tightening** (none): the two fixtures that carry a `legenda` file
+    (`data_ground_truth_01`, `data_errors_xss`) use six-hex colours only, never the 3-digit
+    shorthand.
+  - **LEG-016** (none): both legend-bearing fixtures' legend codes have 5 non-DI slices each,
+    under the new 11-slice warning threshold.
+  - **PROTO-012/LEG-014 narrowing** (none): `rule.LEG-014.error` never appeared in any golden
+    before this change (grep confirmed) — the two legend-bearing fixtures' level≥3 `descricao`
+    rows already carry a non-empty `legenda` reference, so the now-retired empty-cell branch was
+    already silent for both; the narrowing is a code/spec change with no observable fixture
+    impact.
+  - **VAL-006** (none): no fixture's `valores.id` column has a duplicate value.
+- Reviewed and applied via `make harness-update`; diff limited to exactly the items above
+  (`python3 -c "..."` diffed `sections`/`section_order` key-by-key against the prior golden for
+  every fixture before regenerating).
+
 ## 2026-09-13 (PROTO-008/PROTO-009/PROTO-010: DESC-014/DESC-015/DESC-017/DESC-019)
 
 - **Fixtures re-baselined**: `data_errors_01`, `data_errors_09`, `data_errors_11`,

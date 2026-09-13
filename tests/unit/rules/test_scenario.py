@@ -27,7 +27,10 @@ from data_validate.rules.scenario import (
     SCENARIO_REGISTRY,
     check_name_and_symbol_are_unique,
     check_punctuation,
+    check_symbol_charset,
 )
+
+
 from data_validate.specs.issues import Severity
 from tests.factories import make_scenario_frame
 
@@ -49,13 +52,14 @@ class TestScenarioRegistryShape:
     """The registry declares exactly the SCEN ids in the legacy validator's run() order."""
 
     def test_registry_contains_every_ported_scen_id_in_legacy_order(self) -> None:
-        assert [spec.rule_id for spec in SCENARIO_REGISTRY] == ["SCEN-003", "SCEN-004"]
+        assert [spec.rule_id for spec in SCENARIO_REGISTRY] == ["SCEN-003", "SCEN-004", "SCEN-005"]
 
     def test_every_spec_declares_its_documented_category(self) -> None:
         categories = {spec.rule_id: spec.category for spec in SCENARIO_REGISTRY}
         assert categories == {
             "SCEN-003": NamesEnum.MAND_PUNC_SCEN.value,
             "SCEN-004": NamesEnum.UVR_SCEN.value,
+            "SCEN-005": NamesEnum.SYMB_SCEN.value,
         }
 
     def test_empty_sheet_skips_every_rule_silently(self) -> None:
@@ -171,3 +175,42 @@ class TestCheckNameAndSymbolAreUnique:
         issues = check_name_and_symbol_are_unique(ctx)
 
         assert [issue.params["column"] for issue in issues] == ["nome", "simbolo"]
+
+
+class TestCheckSymbolCharset:
+    """SCEN-005 (PROTO-006, gap G-17): `simbolo` is exactly one alphanumeric ASCII character."""
+
+    def test_single_letter_symbols_report_nothing(self) -> None:
+        ctx = _make_context(make_scenario_frame(symbols=("O", "P", "9")))
+        assert check_symbol_charset(ctx) == []
+
+    @pytest.mark.parametrize(
+        "value",
+        ["OP", "O ", "O.", "-", "á", "", " "],
+        ids=["two_chars", "trailing_space", "punctuation", "single_punctuation", "accented", "empty", "blank"],
+    )
+    def test_an_invalid_symbol_is_reported(self, value: str) -> None:
+        frame = make_scenario_frame(symbols=("O",))
+        frame.loc[0, "simbolo"] = value
+        ctx = _make_context(frame)
+
+        issues = check_symbol_charset(ctx)
+
+        assert len(issues) == 1
+        issue = issues[0]
+        assert issue.rule_id == "SCEN-005"
+        assert issue.severity is Severity.ERROR
+        assert issue.category == NamesEnum.SYMB_SCEN.value
+        assert issue.message_key == "rule.SCEN-005.error"
+        assert issue.params == {"filename": _FILENAME, "row": 2, "column": "simbolo", "value": value}
+
+    def test_missing_column_reports_an_error(self) -> None:
+        frame = make_scenario_frame(symbols=("O",)).drop(columns=["simbolo"])
+        ctx = _make_context(frame)
+
+        issues = check_symbol_charset(ctx)
+
+        assert len(issues) == 1
+        assert issues[0].severity is Severity.ERROR
+        assert issues[0].message_key == "rule.scenario.missing_required_column"
+        assert issues[0].params == {"filename": _FILENAME, "column": "simbolo"}

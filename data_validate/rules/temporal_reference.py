@@ -39,6 +39,7 @@ message-building functions), per `.claude/rules/architecture-boundaries.md`.
 
 from __future__ import annotations
 
+import re
 from collections.abc import Mapping
 
 import pandas as pd
@@ -214,3 +215,84 @@ def check_name_and_symbol_are_unique(ctx: RuleContext) -> list[Issue]:
             )
         )
     return issues
+
+
+_FOUR_DIGIT_PATTERN = re.compile(r"^\d{4}$")
+"""PROTO-014 (TEMP-004, protocol §2.2 p.5): "Quatro caracteres numéricos" -- exactly four ASCII
+digits, no sign, no decimal separator, no extra characters."""
+
+
+@TEMPORAL_REGISTRY.rule(rule_id="TEMP-004", category=NamesEnum.YEARS_TEMP.value, requires={_SHEET: ()})
+def check_symbol_is_four_digits(ctx: RuleContext) -> list[Issue]:
+    """TEMP-004 (PROTO-014, gap G-15): `simbolo` must be exactly four numeric characters.
+
+    Protocol §2.2 p.5: "Quatro caracteres numéricos". Checked against the sheet's own raw
+    `simbolo` column (format, not value), independently of `CLEAN-005`'s "parses as an integer
+    >= 0" cleaning check -- a value can pass one and fail the other (e.g. `"1"` is a valid
+    non-negative integer but not four digits).
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _SYMBOL not in frame.columns:
+        return [_missing_column_issue("TEMP-004", Severity.ERROR, NamesEnum.YEARS_TEMP.value, filename, _SYMBOL)]
+
+    series = frame[_SYMBOL].astype(str)
+    invalid_mask = ~series.str.match(_FOUR_DIGIT_PATTERN)
+    return [
+        Issue(
+            rule_id="TEMP-004",
+            severity=Severity.ERROR,
+            sheet=filename,
+            row=int(idx),
+            column=_SYMBOL,
+            message_key="rule.TEMP-004.error",
+            params={"filename": filename, "row": _excel_row(idx), "column": _SYMBOL, "value": series.loc[idx]},
+            category=NamesEnum.YEARS_TEMP.value,
+        )
+        for idx in series.index[invalid_mask]
+    ]
+
+
+@TEMPORAL_REGISTRY.rule(
+    rule_id="TEMP-005",
+    category=NamesEnum.YEARS_TEMP.value,
+    requires={_SHEET: ()},
+    severity_default=Severity.WARNING,
+)
+def check_single_observed_reference(ctx: RuleContext) -> list[Issue]:
+    """TEMP-005 (PROTO-014, gap G-16): at most one `simbolo` may be an observed (non-future) year.
+
+    Protocol §2.2 p.5 (footnote): "atualmente suporta apenas uma referência temporal para dados
+    observados" -- the platform's own limitation, not a hard protocol requirement, so this is a
+    conservative **warning**, not an error (matching `TEMP-004`'s stricter, format-only error and
+    `TEMP-002`'s existing per-symbol error for a genuinely past *scenario* year). "Observed" means
+    `<= ctx.clock().year`, over every `simbolo` value including the present-time row -- unlike
+    `TEMP-002`, which excludes that row. Silent (`[]`) when `simbolo` is absent: `TEMP-002`/
+    `TEMP-004` already own that column's missing-column abort.
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _SYMBOL not in frame.columns:
+        return []
+
+    series = frame[_SYMBOL]
+    numeric = pd.to_numeric(series.astype(str).str.replace(",", ".", regex=False), errors="coerce")
+    observed_mask = numeric.notna() & (numeric <= ctx.clock().year)
+    observed_symbols = series[observed_mask].tolist()
+    if len(observed_symbols) <= 1:
+        return []
+
+    return [
+        Issue(
+            rule_id="TEMP-005",
+            severity=Severity.WARNING,
+            sheet=filename,
+            row=None,
+            column=_SYMBOL,
+            message_key="rule.TEMP-005.warning",
+            params={"filename": filename, "column": _SYMBOL, "observed_symbols": str(observed_symbols)},
+            category=NamesEnum.YEARS_TEMP.value,
+        )
+    ]

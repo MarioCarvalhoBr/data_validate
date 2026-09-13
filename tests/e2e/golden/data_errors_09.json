@@ -5,7 +5,7 @@
     "data_validate": {
       "report": {
         "errors": 21,
-        "tests": 35,
+        "tests": 37,
         "warnings": 13
       },
       "version": "<version>"
@@ -45,7 +45,9 @@
     "Indicadores em valores e proporcionalidades",
     "Indicadores folhas sem dados associados",
     "Níveis dos indicadores filhos",
-    "Categoria do indicador"
+    "Categoria do indicador",
+    "Conjunto de caracteres do símbolo de cenário",
+    "Unicidade do identificador em valores"
   ],
   "sections": {
     "Anos em referência temporal": {
@@ -61,6 +63,10 @@
       "warnings": [
         "descricao.xlsx: A coluna 'categoria' está ausente; o protocolo exige uma categoria (social, economico, ambiental ou climatico) para cada indicador."
       ]
+    },
+    "Conjunto de caracteres do símbolo de cenário": {
+      "errors": [],
+      "warnings": []
     },
     "Códigos HTML nas descrições simples": {
       "errors": [],
@@ -216,6 +222,10 @@
       "warnings": []
     },
     "Títulos únicos": {
+      "errors": [],
+      "warnings": []
+    },
+    "Unicidade do identificador em valores": {
       "errors": [],
       "warnings": []
     },

@@ -14,6 +14,8 @@ key and its QML-specific tests are deleted along with `.qml` support (BUG-015).
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
+import zipfile
+
 import pandas as pd
 import pytest
 from pathlib import Path
@@ -22,6 +24,60 @@ from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet, Data
 from data_validate.specs.sheet_specs import ColumnKind, ColumnSpec, HeaderLayout, SheetSpec
 
 FACADE_MODULE = "data_validate.helpers.tools.data_loader.api.facade"
+
+
+def _write_minimal_xlsx(path: Path, sheet_names: list[str]) -> None:
+    """Write a minimal, valid `.xlsx` (hand-built OOXML zip) with the given worksheet names.
+
+    PROTO-003 (STRUCT-014): no XLSX-writing dependency (`openpyxl`/`xlsxwriter`) is available in
+    this project (only the read-only `python_calamine`), so this helper builds the handful of
+    OOXML parts a minimal workbook needs directly, matching what `python_calamine` (and pandas'
+    `engine="calamine"`) can parse.
+    """
+    content_types = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+  <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+  <Default Extension="xml" ContentType="application/xml"/>
+  <Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>
+</Types>"""
+    root_rels = """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+  <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>
+</Relationships>"""
+    sheet_entries = "\n".join(
+        f'    <sheet name="{name}" sheetId="{index + 1}" r:id="rId{index + 1}"/>'
+        for index, name in enumerate(sheet_names)
+    )
+    workbook = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">
+  <sheets>
+{sheet_entries}
+  </sheets>
+</workbook>"""
+    rel_entries = "\n".join(
+        f'  <Relationship Id="rId{index + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet{index + 1}.xml"/>'
+        for index in range(len(sheet_names))
+    )
+    workbook_rels = f"""<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+{rel_entries}
+</Relationships>"""
+
+    with zipfile.ZipFile(path, "w") as zf:
+        zf.writestr("[Content_Types].xml", content_types)
+        zf.writestr("_rels/.rels", root_rels)
+        zf.writestr("xl/workbook.xml", workbook)
+        zf.writestr("xl/_rels/workbook.xml.rels", workbook_rels)
+        for index in range(len(sheet_names)):
+            zf.writestr(
+                f"xl/worksheets/sheet{index + 1}.xml",
+                """<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">
+  <sheetData>
+    <row r="1"><c r="A1" t="inlineStr"><is><t>id</t></is></c></row>
+  </sheetData>
+</worksheet>""",
+            )
 
 
 def _fake_spec(name: str, header: HeaderLayout, csv_separator: str = "|", required: bool = True) -> SheetSpec:
@@ -540,6 +596,139 @@ class TestDataLoaderFacadeSizeLimits:
         assert result.errors == []
         assert result.models["file1"].is_read_successful is True
         mock_reader.read.assert_called_once()
+
+
+class TestDataLoaderFacadeStructuralChecks:
+    """PROTO-003 (STRUCT-014) and PROTO-007 (STRUCT-013): loader-level structural checks."""
+
+    def test_single_sheet_xlsx_reports_nothing(self, mocker, tmp_path: Path) -> None:
+        """STRUCT-014: an `.xlsx` with exactly one worksheet is not flagged."""
+        xlsx_path = tmp_path / "file1.xlsx"
+        _write_minimal_xlsx(xlsx_path, ["Sheet1"])
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": xlsx_path}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        facade = DataLoaderFacade(str(tmp_path), translate=lambda key, **params: key.format(**params))
+        facade.scanner = mock_scanner
+
+        result = facade.load()
+
+        assert result.errors == []
+        assert result.models["file1"].is_read_successful is True
+
+    def test_two_sheet_xlsx_reports_struct_014_error(self, mocker, tmp_path: Path) -> None:
+        """STRUCT-014: an `.xlsx` with more than one worksheet is an error naming the extras."""
+        xlsx_path = tmp_path / "file1.xlsx"
+        _write_minimal_xlsx(xlsx_path, ["Sheet1", "Sheet2", "Sheet3"])
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": xlsx_path}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        recorded_calls = []
+
+        def _record_translate(key: str, **params: object) -> str:
+            recorded_calls.append((key, params))
+            return key
+
+        facade = DataLoaderFacade(str(tmp_path), translate=_record_translate)
+        facade.scanner = mock_scanner
+
+        result = facade.load()
+
+        assert result.errors == ["rule.STRUCT-014.error"]
+        assert recorded_calls[0][0] == "rule.STRUCT-014.error"
+        assert recorded_calls[0][1]["filename"] == "file1.xlsx"
+        assert recorded_calls[0][1]["first_sheet"] == "Sheet1"
+        assert recorded_calls[0][1]["extra_sheets"] == "Sheet2, Sheet3"
+        # The first sheet is still read normally (matches the calamine "first sheet wins" reality).
+        assert result.models["file1"].is_read_successful is True
+
+    def test_csv_file_is_never_checked_for_multiple_sheets(self, mocker, tmp_path: Path) -> None:
+        """STRUCT-014 only applies to `.xlsx`; a `.csv` never triggers the sheet-count check."""
+        csv_path = tmp_path / "file1.csv"
+        csv_path.write_text("id\n1\n", encoding="utf-8")
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": csv_path}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        facade = DataLoaderFacade(str(tmp_path), translate=lambda key, **params: key.format(**params))
+        facade.scanner = mock_scanner
+
+        result = facade.load()
+
+        assert result.errors == []
+
+    def test_utf8_csv_reports_nothing(self, mocker, tmp_path: Path) -> None:
+        """STRUCT-013: a genuinely UTF-8 CSV is not flagged."""
+        csv_path = tmp_path / "file1.csv"
+        csv_path.write_text("id|nome\n1|São Paulo\n", encoding="utf-8")
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": csv_path}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        facade = DataLoaderFacade(str(tmp_path), translate=lambda key, **params: key.format(**params))
+        facade.scanner = mock_scanner
+
+        result = facade.load()
+
+        assert result.errors == []
+
+    def test_latin1_csv_reports_struct_013_error(self, mocker, tmp_path: Path) -> None:
+        """STRUCT-013 (PROTO-007, G-01): a confidently-non-UTF-8 CSV is an error with the FAQ shape."""
+        csv_path = tmp_path / "file1.csv"
+        # "ção" repeated gives chardet enough signal to confidently call this latin-1, not utf-8.
+        csv_path.write_bytes("id|nome\n1|informação, condição, situação, ação, nação\n".encode("latin-1"))
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": csv_path}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        recorded_calls = []
+
+        def _record_translate(key: str, **params: object) -> str:
+            recorded_calls.append((key, params))
+            return key
+
+        facade = DataLoaderFacade(str(tmp_path), translate=_record_translate)
+        facade.scanner = mock_scanner
+
+        result = facade.load()
+
+        # STRUCT-013 fires proactively (informational, does not block the subsequent read
+        # attempt); the genuinely-latin-1 file then also fails `pd.read_csv`'s default UTF-8
+        # decode, so STRUCT-007's own (pre-existing) encoding-error message is reported too --
+        # this rule adds a second, more specific message, it does not replace the first.
+        assert result.errors[0] == "rule.STRUCT-013.error"
+        assert recorded_calls[0][0] == "rule.STRUCT-013.error"
+        assert recorded_calls[0][1]["filename"] == "file1.csv"
+        assert "encoding" in recorded_calls[0][1]
+
+    def test_xlsx_is_never_checked_for_encoding(self, mocker, tmp_path: Path) -> None:
+        """STRUCT-013 only applies to `.csv`; a `.xlsx` (a zip container) is exempt."""
+        xlsx_path = tmp_path / "file1.xlsx"
+        _write_minimal_xlsx(xlsx_path, ["Sheet1"])
+
+        mock_scanner = mocker.MagicMock()
+        mock_scanner.scan.return_value = ({"file1": xlsx_path}, {}, [])
+        fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
+        mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
+
+        facade = DataLoaderFacade(str(tmp_path), translate=lambda key, **params: key.format(**params))
+        facade.scanner = mock_scanner
+
+        result = facade.load()
+
+        assert result.errors == []
 
     def test_sheet_exceeding_max_rows_is_dropped_and_reports_error(self, mocker) -> None:
         """A frame read successfully but with too many rows is treated as unread."""

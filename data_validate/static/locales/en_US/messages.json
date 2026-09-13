@@ -583,5 +583,32 @@
   },
   "rule.PROP-002.level2_missing": {
     "message": "{filename}: Level-2 column '{column}' was expected but not found."
+  },
+  "rule.STRUCT-013.error": {
+    "message": "The file {filename} is in {encoding} format; it should be UTF-8."
+  },
+  "rule.STRUCT-014.error": {
+    "message": "{filename}: The Excel file has more than one worksheet; only the first ('{first_sheet}') will be used. Extra worksheets: {extra_sheets}."
+  },
+  "rule.SCEN-005.error": {
+    "message": "{filename}, row {row}: value '{value}' in column 'simbolo' must be exactly one alphanumeric character."
+  },
+  "rule.LEG-016.warning": {
+    "message": "{filename} [code: {code}]: the legend has {count} slices, more than the recommended maximum of {max_slices}."
+  },
+  "rule.TEMP-004.error": {
+    "message": "{filename}, row {row}: value '{value}' in column 'simbolo' must be exactly four numeric characters."
+  },
+  "rule.TEMP-005.warning": {
+    "message": "{filename}: column 'simbolo' has more than one observed (current or past) temporal reference: {observed_symbols}. The platform currently supports only one."
+  },
+  "rule.VAL-006.error": {
+    "message": "{filename}: column '{column}' contains duplicated 'id' values: {duplicated_ids}."
+  },
+  "verification_name_scenario_symbol_charset": {
+    "message": "Scenario symbol charset"
+  },
+  "verification_name_value_id_uniqueness": {
+    "message": "Value id uniqueness"
   }
 }

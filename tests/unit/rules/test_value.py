@@ -32,6 +32,7 @@ from data_validate.rules.engine import Engine, RuleStatus
 from data_validate.rules.value import (
     VALUE_REGISTRY,
     check_excessive_decimal_places,
+    check_id_uniqueness,
     check_relation_indicators_in_values,
     check_unavailable_and_invalid_values,
     check_value_combination_relation,
@@ -96,7 +97,13 @@ class TestValueRegistryShape:
     """The registry declares exactly the VAL ids in the legacy validator's run() order."""
 
     def test_registry_contains_every_ported_val_id_in_legacy_order(self) -> None:
-        assert [spec.rule_id for spec in VALUE_REGISTRY] == ["VAL-002", "VAL-003", "VAL-004", "VAL-005"]
+        assert [spec.rule_id for spec in VALUE_REGISTRY] == [
+            "VAL-002",
+            "VAL-003",
+            "VAL-004",
+            "VAL-005",
+            "VAL-006",
+        ]
 
     def test_every_spec_declares_its_documented_category(self) -> None:
         categories = {spec.rule_id: spec.category for spec in VALUE_REGISTRY}
@@ -105,6 +112,7 @@ class TestValueRegistryShape:
             "VAL-003": NamesEnum.VAL_COMB.value,
             "VAL-004": NamesEnum.UNAV_INV.value,
             "VAL-005": NamesEnum.UNAV_INV.value,
+            "VAL-006": NamesEnum.UNIQ_VAL.value,
         }
 
     def test_empty_values_sheet_skips_every_rule_silently(self) -> None:
@@ -554,6 +562,40 @@ class TestCheckExcessiveDecimalPlaces:
         assert check_excessive_decimal_places(ctx) == []
 
 
+class TestCheckIdUniqueness:
+    """VAL-006 (PROTO-017, gap G-13): `valores.id` must contain no duplicated value."""
+
+    def test_unique_ids_report_nothing(self) -> None:
+        valores = pd.DataFrame({"id": ["1", "2", "3"], "2-2020": ["1.00", "2.00", "3.00"]})
+        ctx = _make_context(valores=valores)
+        assert check_id_uniqueness(ctx) == []
+
+    def test_a_duplicated_id_is_reported(self) -> None:
+        valores = pd.DataFrame({"id": ["1", "2", "1"], "2-2020": ["1.00", "2.00", "3.00"]})
+        ctx = _make_context(valores=valores)
+
+        issues = check_id_uniqueness(ctx)
+
+        assert len(issues) == 1
+        issue = issues[0]
+        assert issue.rule_id == "VAL-006"
+        assert issue.severity is Severity.ERROR
+        assert issue.category == NamesEnum.UNIQ_VAL.value
+        assert issue.message_key == "rule.VAL-006.error"
+        assert issue.params == {"filename": _VALORES, "column": "id", "duplicated_ids": "['1']"}
+
+    def test_missing_column_reports_an_error(self) -> None:
+        valores = pd.DataFrame({"2-2020": ["1.00"]})
+        ctx = _make_context(valores=valores)
+
+        issues = check_id_uniqueness(ctx)
+
+        assert len(issues) == 1
+        assert issues[0].severity is Severity.ERROR
+        assert issues[0].message_key == "rule.value.missing_required_column"
+        assert issues[0].params == {"filename": _VALORES, "column": "id"}
+
+
 class TestIdempotency:
     """BUG-001: no rule here holds shared mutable state — calling one twice must be stable."""
 
@@ -575,3 +617,4 @@ class TestIdempotency:
         assert check_value_combination_relation(ctx) == check_value_combination_relation(ctx)
         assert check_unavailable_and_invalid_values(ctx) == check_unavailable_and_invalid_values(ctx)
         assert check_excessive_decimal_places(ctx) == check_excessive_decimal_places(ctx)
+        assert check_id_uniqueness(ctx) == check_id_uniqueness(ctx)

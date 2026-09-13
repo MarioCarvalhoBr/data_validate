@@ -48,3 +48,7 @@ class NamesEnum(Enum):
     CATEG_DESC = "verification_name_indicator_category"
     """PROTO-004/DESC-013: `descricao.categoria` domain (`social`/`economico`/`ambiental`/
     `climatico`) and its staged absence warning."""
+    SYMB_SCEN = "verification_name_scenario_symbol_charset"
+    """PROTO-006/SCEN-005: `cenarios.simbolo` must be exactly one alphanumeric ASCII character."""
+    UNIQ_VAL = "verification_name_value_id_uniqueness"
+    """PROTO-017/VAL-006: `valores.id` must contain no duplicated value."""

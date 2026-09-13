@@ -583,5 +583,32 @@
   },
   "rule.PROP-002.level2_missing": {
     "message": "{filename}: Coluna de nível 2 '{column}' esperada mas não foi encontrada."
+  },
+  "rule.STRUCT-013.error": {
+    "message": "O arquivo {filename} está no formato {encoding}, deveria ser UTF-8."
+  },
+  "rule.STRUCT-014.error": {
+    "message": "{filename}: O arquivo Excel possui mais de uma planilha; apenas a primeira ('{first_sheet}') será considerada. Planilhas extras: {extra_sheets}."
+  },
+  "rule.SCEN-005.error": {
+    "message": "{filename}, linha {row}: O valor '{value}' da coluna 'simbolo' deve conter exatamente um caractere alfanumérico."
+  },
+  "rule.LEG-016.warning": {
+    "message": "{filename} [código: {code}]: A legenda possui {count} fatias, mais do que o máximo recomendado de {max_slices}."
+  },
+  "rule.TEMP-004.error": {
+    "message": "{filename}, linha {row}: O valor '{value}' da coluna 'simbolo' deve conter exatamente quatro caracteres numéricos."
+  },
+  "rule.TEMP-005.warning": {
+    "message": "{filename}: A coluna 'simbolo' possui mais de uma referência temporal observada (ano atual ou passado): {observed_symbols}. A plataforma atualmente suporta apenas uma."
+  },
+  "rule.VAL-006.error": {
+    "message": "{filename}: A coluna '{column}' contém valores de 'id' duplicados: {duplicated_ids}."
+  },
+  "verification_name_scenario_symbol_charset": {
+    "message": "Conjunto de caracteres do símbolo de cenário"
+  },
+  "verification_name_value_id_uniqueness": {
+    "message": "Unicidade do identificador em valores"
   }
 }
