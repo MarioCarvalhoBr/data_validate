@@ -6,6 +6,7 @@ import json
 import logging
 import os
 from pathlib import Path
+from typing import Any
 
 from data_validate.helpers.tools.locale.language_enum import LanguageEnum
 
@@ -23,7 +24,7 @@ class LanguageManager:
     directory or on leftover state from a previous run.
     """
 
-    def __init__(self, locale: str | None = None, path_locale_dir: str | Path | None = None):
+    def __init__(self, locale: str | None = None, path_locale_dir: str | Path | None = None) -> None:
         """
         Initializes the LanguageManager with an explicit locale and locale directory.
 
@@ -37,15 +38,15 @@ class LanguageManager:
         """
         self.path_locale_dir = path_locale_dir or Path(__file__).resolve().parents[3] / "static" / "locales"
 
-        self.default_language = LanguageEnum.DEFAULT_LANGUAGE.value
-        self.supported_languages = LanguageEnum.list_supported_languages()
-        self.translations = {}
+        self.default_language: str = LanguageEnum.DEFAULT_LANGUAGE.value
+        self.supported_languages: list[str] = LanguageEnum.list_supported_languages()
+        self.translations: dict[str, Any] = {}
 
         self.current_language = locale if locale in self.supported_languages else self.default_language
 
         self._load_translations(self.current_language)
 
-    def _load_translations(self, lang_code):
+    def _load_translations(self, lang_code: str) -> bool:
         """Loads translations from the JSON file for a given language."""
         filepath = os.path.join(self.path_locale_dir, lang_code, "messages.json")
         try:
@@ -60,7 +61,7 @@ class LanguageManager:
             logger.error("Unexpected error loading language '%s': %s", lang_code, e)
         return False
 
-    def set_language(self, lang_code):
+    def set_language(self, lang_code: str) -> bool | None:
         """
         Sets the current language and loads the corresponding translations.
 
@@ -93,7 +94,7 @@ class LanguageManager:
                     self.current_language = self.default_language
             return False
 
-    def text(self, key, **kwargs):
+    def text(self, key: str, **kwargs: object) -> str:
         """
         Retrieves the translated string for the given key in the current language.
 
@@ -105,6 +106,7 @@ class LanguageManager:
             str: The translated and formatted string, or a fallback string.
         """
         translation_object = self.translations.get(key)
+        text: str
         if isinstance(translation_object, dict):
             text = translation_object.get("message", f"<Message for '{key}' missing in '{self.current_language}'>")
         else:
@@ -119,15 +121,15 @@ class LanguageManager:
             logger.warning("Generic formatting error for key '%s': %s", key, format_exc)
             return text
 
-    def get_supported_languages(self):
+    def get_supported_languages(self) -> list[str]:
         """Returns the list of supported language codes."""
         return self.supported_languages
 
-    def get_current_language(self):
+    def get_current_language(self) -> str:
         """Returns the currently selected language code."""
         return self.current_language
 
-    def get_info(self):
+    def get_info(self) -> dict[str, str | list[str]]:
         """
         Returns the current language and supported languages.
         """
@@ -136,7 +138,7 @@ class LanguageManager:
             "supported_languages": self.supported_languages,
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Returns a string representation of the LanguageManager object.
         """

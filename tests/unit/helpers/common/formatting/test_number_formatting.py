@@ -110,6 +110,23 @@ class TestNumberFormatting:
         assert success is False
         assert value == 0.0
 
+    def test_check_n_decimals_places(self) -> None:
+        """Test the decimal-place-count check, including its NaN/Infinity edge case."""
+        # Normal values: strictly more than the allowed decimal places is flagged.
+        assert NumberFormattingProcessing.check_n_decimals_places("1.234", "DI", 2) is True
+        assert NumberFormattingProcessing.check_n_decimals_places("1.23", "DI", 2) is False
+        assert NumberFormattingProcessing.check_n_decimals_places("1", "DI", 2) is False
+        # The ignored sentinel and NaN never trigger the check.
+        assert NumberFormattingProcessing.check_n_decimals_places("DI", "DI", 2) is False
+        assert NumberFormattingProcessing.check_n_decimals_places(float("nan"), "DI", 2) is False
+
+        # Regression (found via mypy --strict on ARC-014): `Decimal("Infinity").as_tuple().exponent`
+        # is the literal string "F", not an int, so comparing it with `<` used to raise a
+        # `TypeError` instead of returning a bool. A spreadsheet cell containing the literal text
+        # "Infinity" is not caught by the `pd.isna`/`value_to_ignore` guards above it, so it used
+        # to reach that comparison uncaught.
+        assert NumberFormattingProcessing.check_n_decimals_places("Infinity", "DI", 2) is False
+
     def test_validate_integer(self):
         """Test integer validation function."""
         # Test valid integers

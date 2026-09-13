@@ -7,7 +7,7 @@ validation, and processing of scenario data (e.g., SSPs, climate scenarios).
 """
 
 from types import MappingProxyType
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -41,7 +41,7 @@ class SpScenario(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_SCENARIOS
@@ -67,18 +67,18 @@ class SpScenario(SpModelABC):
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
-        ALL: List[str] = [COLUMN_NAME.name, COLUMN_DESCRIPTION.name, COLUMN_SYMBOL.name]
+        ALL: List[str] = [str(COLUMN_NAME.name), str(COLUMN_DESCRIPTION.name), str(COLUMN_SYMBOL.name)]
 
-    OPTIONAL_COLUMNS = MappingProxyType({})
+    OPTIONAL_COLUMNS: MappingProxyType[str, str] = MappingProxyType({})
 
-    COLUMNS_PLURAL = MappingProxyType({})
+    COLUMNS_PLURAL: MappingProxyType[str, str] = MappingProxyType({})
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpScenario model.
 
@@ -89,7 +89,7 @@ class SpScenario(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """Run pre-processing steps."""
         translate = self.context.language_manager.text
 
@@ -115,7 +115,7 @@ class SpScenario(SpModelABC):
                     )
                 )
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -133,15 +133,13 @@ class SpScenario(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """Run data cleaning steps (currently empty)."""
-        pass
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

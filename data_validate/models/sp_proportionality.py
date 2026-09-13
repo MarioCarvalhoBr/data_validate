@@ -6,7 +6,7 @@ This module defines the `SpProportionality` class, which handles the loading,
 validation, and processing of proportionality data (influence weights between indicators).
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -41,7 +41,7 @@ class SpProportionality(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_PROPORTIONALITIES
@@ -63,15 +63,15 @@ class SpProportionality(SpModelABC):
         COLUMN_ID = pd.Series(dtype="int64", name="id")
 
         ALL: List[str] = [
-            COLUMN_ID.name,
+            str(COLUMN_ID.name),
         ]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpProportionality model.
 
@@ -88,7 +88,7 @@ class SpProportionality(SpModelABC):
         # `LoadedSheet` instance would also observe.
         self.header_layout_invalid: bool = False
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """
         Run pre-processing steps.
 
@@ -123,7 +123,7 @@ class SpProportionality(SpModelABC):
                 translate("rule.PROP-001.level2", filename=self.filename, columns=level_2_codes_not_matched_by_pattern)
             )
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -166,11 +166,10 @@ class SpProportionality(SpModelABC):
                         translate("rule.PROP-002.level2_missing", filename=self.filename, column=col)
                     )
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """Run data cleaning steps (currently empty)."""
-        pass
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """
         Invalidate this instance's working frame when the header layout is structurally broken.
 
@@ -186,7 +185,7 @@ class SpProportionality(SpModelABC):
             self.frame = pd.DataFrame()
             self.header_layout_invalid = True
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

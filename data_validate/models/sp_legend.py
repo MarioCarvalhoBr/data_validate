@@ -6,7 +6,7 @@ This module defines the `SpLegend` class, which handles the loading,
 validation, and processing of legend data (e.g., labels, min/max values, colors).
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -41,7 +41,7 @@ class SpLegend(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_LEGEND
@@ -76,20 +76,20 @@ class SpLegend(SpModelABC):
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
 
         ALL: List[str] = [
-            COLUMN_CODE.name,
-            COLUMN_LABEL.name,
-            COLUMN_COLOR.name,
-            COLUMN_MINIMUM.name,
-            COLUMN_MAXIMUM.name,
-            COLUMN_ORDER.name,
+            str(COLUMN_CODE.name),
+            str(COLUMN_LABEL.name),
+            str(COLUMN_COLOR.name),
+            str(COLUMN_MINIMUM.name),
+            str(COLUMN_MAXIMUM.name),
+            str(COLUMN_ORDER.name),
         ]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpLegend model.
 
@@ -108,11 +108,10 @@ class SpLegend(SpModelABC):
         self.column_name_maximum = str(self.RequiredColumn.COLUMN_MAXIMUM.name)
         self.column_name_order = str(self.RequiredColumn.COLUMN_ORDER.name)
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """Run pre-processing steps (currently empty)."""
-        pass
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -130,7 +129,7 @@ class SpLegend(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """
         Perform data cleaning operations.
 
@@ -139,7 +138,7 @@ class SpLegend(SpModelABC):
         2. Perform specific legend validations (LEG-001…011, `LegendProcessing`); the
            cross-sheet relation/range checks (LEG-012…015) run in `rules/legend.py` instead.
         """
-        errors = []
+        errors: List[str] = []
         dataframe = self.data_loader_model.raw_data
         translate = self.context.language_manager.text
 
@@ -205,11 +204,10 @@ class SpLegend(SpModelABC):
 
         self.data_cleaning_errors.extend(errors)
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

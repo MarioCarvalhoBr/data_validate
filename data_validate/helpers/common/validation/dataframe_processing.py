@@ -13,7 +13,7 @@ should be reported to the user as a data-quality error, so any failure
 with code 2, per `.claude/rules/security.md`.
 """
 
-from typing import Callable, List, Optional, Tuple
+from typing import Callable
 
 import pandas as pd
 
@@ -34,8 +34,8 @@ class DataFrameProcessing:
 
     @staticmethod
     def check_dataframe_vertical_bar(
-        dataframe: pd.DataFrame, file_name: str, translate: Optional[Callable[..., str]] = None
-    ) -> Tuple[bool, List[str]]:
+        dataframe: pd.DataFrame, file_name: str, translate: Callable[..., str] | None = None
+    ) -> tuple[bool, list[str]]:
         """Check for vertical bar characters in DataFrame columns.
 
         Args:
@@ -51,7 +51,7 @@ class DataFrameProcessing:
         """
         translate = translate or get_default_translate()
         dataframe = dataframe.copy()
-        errors: List[str] = []
+        errors: list[str] = []
 
         # Check column names for vertical bars
         if isinstance(dataframe.columns, pd.MultiIndex):
@@ -93,8 +93,8 @@ class DataFrameProcessing:
 
     @staticmethod
     def check_dataframe_column_names(
-        dataframe: pd.DataFrame, expected_columns: List[str]
-    ) -> Tuple[List[str], List[str]]:
+        dataframe: pd.DataFrame, expected_columns: list[str]
+    ) -> tuple[list[str], list[str]]:
         """
         Checks for missing and extra columns in a DataFrame compared to the expected columns.
 
@@ -103,7 +103,7 @@ class DataFrameProcessing:
             expected_columns (List[str]): List of expected column names.
 
         Returns:
-            Tuple[List[str], List[str]]: A tuple containing a list of missing columns and a list of extra columns.
+            tuple[list[str], list[str]]: A tuple containing a list of missing columns and a list of extra columns.
         """
         missing_columns = [col for col in expected_columns if col not in dataframe.columns]
         extra_columns = [col for col in dataframe.columns if col not in expected_columns]
@@ -114,8 +114,8 @@ class DataFrameProcessing:
 
     @staticmethod
     def check_dataframe_unnamed_columns(
-        dataframe: pd.DataFrame, file_name: str, translate: Optional[Callable[..., str]] = None
-    ) -> Tuple[bool, List[str]]:
+        dataframe: pd.DataFrame, file_name: str, translate: Callable[..., str] | None = None
+    ) -> tuple[bool, list[str]]:
         """Check for unnamed columns and validate row data consistency.
 
         Args:
@@ -131,7 +131,7 @@ class DataFrameProcessing:
         """
         translate = translate or get_default_translate()
         dataframe = dataframe.copy()
-        errors: List[str] = []
+        errors: list[str] = []
 
         columns = dataframe.columns
         is_multi_level_2 = isinstance(columns, pd.MultiIndex) and columns.nlevels == 2
@@ -168,7 +168,7 @@ class DataFrameProcessing:
     @staticmethod
     def check_dataframe_titles_uniques(
         dataframe: pd.DataFrame, column_one: str, column_two: str, plural_column_one: str, plural_column_two: str
-    ) -> List[str]:
+    ) -> list[str]:
         """
         Check for duplicate values in specified columns and return warnings.
 
@@ -186,7 +186,7 @@ class DataFrameProcessing:
             List of warning messages about duplicates
         """
         dataframe = dataframe.copy()
-        warnings = []
+        warnings: list[str] = []
 
         if dataframe.empty:
             return warnings
@@ -215,8 +215,8 @@ class DataFrameProcessing:
 
     @staticmethod
     def check_dataframe_unique_values(
-        dataframe: pd.DataFrame, file_name: str, columns_uniques: List[str]
-    ) -> Tuple[bool, List[str]]:
+        dataframe: pd.DataFrame, file_name: str, columns_uniques: list[str]
+    ) -> tuple[bool, list[str]]:
         """Check for unique values in specified columns.
 
         Args:
@@ -228,7 +228,7 @@ class DataFrameProcessing:
             Tuple of (is_valid, warning_messages) where is_valid is True if no warnings found
         """
         dataframe = dataframe.copy()
-        warnings: List[str] = []
+        warnings: list[str] = []
         existing_columns = [col for col in columns_uniques if col in dataframe.columns]
 
         for column in existing_columns:
@@ -238,7 +238,7 @@ class DataFrameProcessing:
         return not bool(warnings), warnings
 
     @staticmethod
-    def column_exists(dataframe: pd.DataFrame, file_name: str, column: str) -> Tuple[bool, str]:
+    def column_exists(dataframe: pd.DataFrame, file_name: str, column: str) -> tuple[bool, str]:
         """Check if a column exists in the DataFrame (supports MultiIndex).
 
         Args:
@@ -310,7 +310,7 @@ class DataFrameProcessing:
     @staticmethod
     def check_dataframe_text_length(
         dataframe: pd.DataFrame, file_name: str, column: str, max_length: int
-    ) -> Tuple[bool, List[str]]:
+    ) -> tuple[bool, list[str]]:
         """Validate text length in a specific column.
 
         Args:
@@ -324,7 +324,7 @@ class DataFrameProcessing:
         """
 
         dataframe = dataframe.copy()
-        errors: List[str] = []
+        errors: list[str] = []
 
         column_exists_result, error_message = DataFrameProcessing.column_exists(dataframe, file_name, column)
         if not column_exists_result:

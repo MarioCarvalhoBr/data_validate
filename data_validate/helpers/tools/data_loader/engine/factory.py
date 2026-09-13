@@ -11,19 +11,20 @@ old reader produced.
 from pathlib import Path
 
 from ..common.exceptions import ReaderNotFoundError
+from ..readers.base_reader import BaseReader
 from ..readers.csv_reader import CSVReader
 from ..readers.excel_reader import ExcelReader
 from ..strategies.header import HeaderStrategy
 
 
 class ReaderFactory:
-    _registry = {
+    _registry: dict[str, type[BaseReader]] = {
         ".csv": CSVReader,
         ".xlsx": ExcelReader,
     }
 
     @classmethod
-    def get_reader(cls, file_path: Path, header_strategy: HeaderStrategy, sep: str = "|"):
+    def get_reader(cls, file_path: Path, header_strategy: HeaderStrategy, sep: str = "|") -> BaseReader:
         """Build the reader for `file_path`'s extension.
 
         Args:

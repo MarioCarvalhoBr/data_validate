@@ -8,7 +8,7 @@ from data_validate.helpers.base.constant_base import ConstantBase
 class SpreadsheetInfo(ConstantBase):
     """Enum: Constants related to model settings, including spreadsheet names and allowed file extensions."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize SpreadsheetInfo with spreadsheet names and allowed file extensions.
         """

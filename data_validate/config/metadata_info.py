@@ -48,7 +48,7 @@ class MetadataInfo(ConstantBase):
 
     _FALLBACK_VERSION: Final = "0.0.0+unknown"
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize MetadataInfo with package metadata.
 

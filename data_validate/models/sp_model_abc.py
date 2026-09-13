@@ -8,7 +8,7 @@ and processing required by all specific spreadsheet implementations.
 """
 
 from abc import ABC, abstractmethod
-from typing import List, Dict, Any
+from typing import List, Dict, Any, cast
 
 import pandas as pd
 
@@ -49,7 +49,7 @@ class SpModelABC(ABC):
 
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the ModelConfigKeys constants."""
             super().__init__()
 
@@ -64,14 +64,16 @@ class SpModelABC(ABC):
 
     CONFIG_KEYS = ModelConfigKeys()
 
-    CONSTANTS = None
+    # Each concrete model overrides this with its own `Constants` class instance (a distinct
+    # type per subclass); `Any` is the honest common supertype, not `None` (ARC-014).
+    CONSTANTS: Any = None
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **model_configurations: Dict[str, Any],
-    ):
+        **model_configurations: object,
+    ) -> None:
         """
         Initialize the Abstract Spreadsheet Model.
 
@@ -86,7 +88,7 @@ class SpModelABC(ABC):
         # SETUP
         self.context: GeneralContext = context
         self.data_loader_model: LoadedSheet = data_model
-        self._kwargs: Dict[str, Any] = model_configurations
+        self._kwargs: Dict[str, object] = model_configurations
 
         # UNPACKING DATA ARGS
         self.filename: str = self.data_loader_model.filename
@@ -103,12 +105,12 @@ class SpModelABC(ABC):
         self.frame: pd.DataFrame = self.data_loader_model.raw_data
         self.cleaned: Dict[str, pd.Series] = {}
 
-        self.legend_exists_file: bool = self._kwargs.get(self.CONFIG_KEYS.LEGEND_EXISTS_FILE, False)
-        self.legend_read_success: bool = self._kwargs.get(self.CONFIG_KEYS.LEGEND_READ_SUCCESS, False)
+        self.legend_exists_file: bool = cast(bool, self._kwargs.get(self.CONFIG_KEYS.LEGEND_EXISTS_FILE, False))
+        self.legend_read_success: bool = cast(bool, self._kwargs.get(self.CONFIG_KEYS.LEGEND_READ_SUCCESS, False))
 
-        self.scenario_exists_file: bool = self._kwargs.get(self.CONFIG_KEYS.SCENARIO_EXISTS_FILE, False)
-        self.scenario_read_success: bool = self._kwargs.get(self.CONFIG_KEYS.SCENARIO_READ_SUCCESS, False)
-        self.scenarios: List[str] = self._kwargs.get(self.CONFIG_KEYS.SCENARIOS, [])
+        self.scenario_exists_file: bool = cast(bool, self._kwargs.get(self.CONFIG_KEYS.SCENARIO_EXISTS_FILE, False))
+        self.scenario_read_success: bool = cast(bool, self._kwargs.get(self.CONFIG_KEYS.SCENARIO_READ_SUCCESS, False))
+        self.scenarios: List[str] = cast(List[str], self._kwargs.get(self.CONFIG_KEYS.SCENARIOS, []))
 
         # CONFIGURE VARIABLES AND LISTS
         self.structural_errors: List[str] = []
@@ -124,7 +126,7 @@ class SpModelABC(ABC):
         # Additional variables
         self.all_ok: bool = True
 
-    def initialize(self):
+    def initialize(self) -> None:
         """
         Initialize the verification process by performing basic sanity checks.
 
@@ -199,45 +201,41 @@ class SpModelABC(ABC):
         return value
 
     @abstractmethod
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """
         Abstract method for pre-processing logic.
 
         Should implement initial checks, column adjustments, or dependency verification
         before main validation starts.
         """
-        pass
 
     @abstractmethod
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Abstract method for validating column structure.
 
         Should check if the DataFrame contains all required columns and verify column naming conventions.
         """
-        pass
 
     @abstractmethod
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """
         Abstract method for data cleaning.
 
         Should implement type conversion, valid value checks (e.g., positive integers),
         and cleaning of raw data.
         """
-        pass
 
     @abstractmethod
-    def post_processing(self):
+    def post_processing(self) -> None:
         """
         Abstract method for post-processing logic.
 
         Should implement final adjustments or derived calculations after cleaning.
         """
-        pass
 
     @abstractmethod
-    def run(self):
+    def run(self) -> None:
         """
         Abstract method to execute the validation pipeline.
 
@@ -246,9 +244,8 @@ class SpModelABC(ABC):
         `data_cleaning`, and `post_processing`. Callers construct a model, then explicitly call
         `run()` — never the other way around (`SpreadsheetProcessor._configure`).
         """
-        pass
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a string representation of the model.
 

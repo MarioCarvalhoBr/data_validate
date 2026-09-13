@@ -43,7 +43,7 @@ class LanguageEnum(enum.Enum):
     DEFAULT_LANGUAGE = "pt_BR"
 
     @classmethod
-    def list_supported_languages(cls):
+    def list_supported_languages(cls) -> list[str]:
         """
         Returns a list of supported language codes.
 
@@ -53,7 +53,7 @@ class LanguageEnum(enum.Enum):
         return [lang.value for lang in cls]
 
     @classmethod
-    def default_language(cls):
+    def default_language(cls) -> str:
         """
         Returns the default language code.
 

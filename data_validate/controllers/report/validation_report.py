@@ -6,7 +6,7 @@ This module defines structures to store, manage, and retrieve validation errors
 and warnings generated during the data validation process.
 """
 
-from typing import List, Optional, Iterator
+from typing import List, Optional, Iterator, cast
 
 from data_validate.controllers import GeneralContext
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
@@ -230,16 +230,21 @@ class ValidationReport:
                 omitted_errors_count = NumberFormattingProcessing.format_number_brazilian(
                     len(report.errors) - n_messages, locale
                 )
+                # `needs_truncation` (checked above) is exactly this condition ORed across
+                # every report, so reaching here means `self.context is None` would already
+                # have raised; the cast is typing-only narrowing, not a new guard.
+                context = cast(GeneralContext, self.context)
                 flattened_report.add_error(
-                    self.context.language_manager.text("model_report_msg_errors_omitted", count=omitted_errors_count)
+                    context.language_manager.text("model_report_msg_errors_omitted", count=omitted_errors_count)
                 )
 
             if len(report.warnings) > n_messages:
                 count_omitted_warnings = NumberFormattingProcessing.format_number_brazilian(
                     len(report.warnings) - n_messages, locale
                 )
+                context = cast(GeneralContext, self.context)
                 flattened_report.add_warning(
-                    self.context.language_manager.text(
+                    context.language_manager.text(
                         "model_report_msg_warnings_omitted",
                         count=count_omitted_warnings,
                     )

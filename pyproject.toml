@@ -129,37 +129,10 @@ warn_unreachable = true
 plugins = []
 
 [[tool.mypy.overrides]]
-# Legacy pipeline: not yet typed. Ignored wholesale until each module is migrated
-# (see .specs/quality/backlog/08-migration-roadmap.md); ratchet removes entries over time.
-module = ["data_validate.*"]
-ignore_errors = true
-
-[[tool.mypy.overrides]]
+# `tools/` (dev scripts) and `tests/e2e/` (golden harness) are held to the same strict bar as
+# `data_validate/` itself — redundant with the global `strict = true` above, kept explicit
+# because these two trees live outside the `data_validate` package the global setting names.
 module = ["tests.e2e.*", "tools.*"]
-strict = true
-
-[[tool.mypy.overrides]]
-# ARC-003: the SheetSpec registry is new, migrated code — hold it to the strict bar the
-# blanket `data_validate.*` override above waives for the legacy pipeline. Must stay last so
-# it wins over the blanket override for this one module.
-module = ["data_validate.specs.*"]
-ignore_errors = false
-strict = true
-
-[[tool.mypy.overrides]]
-# ARC-004: the Issue/MessageCatalog model is new, migrated code — same strict bar as
-# `data_validate.specs.*` above, for the same reason. Must stay last so it wins over the
-# blanket `data_validate.*` override for this one module.
-module = ["data_validate.i18n.*"]
-ignore_errors = false
-strict = true
-
-[[tool.mypy.overrides]]
-# ARC-017/ARC-001/ARC-008 (ADR-0006): the rule registry/engine core is new, migrated code — same
-# strict bar as `data_validate.specs.*`/`data_validate.i18n.*` above. Must stay last so it wins
-# over the blanket `data_validate.*` override for this one module.
-module = ["data_validate.rules.*"]
-ignore_errors = false
 strict = true
 
 [[tool.mypy.overrides]]
@@ -169,6 +142,22 @@ strict = true
 # fail with `import-untyped`. Scoped to the one untyped third-party library, not a code
 # suppression.
 module = ["networkx.*"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# ARC-014/ARC-015: pyenchant (the `enchant` import) ships no inline type hints and no
+# `types-enchant` stub package is packaged for this project; without this, every
+# `enchant.*` call site in `helpers.tools.spellchecker.*` would fail with `import-untyped`.
+# Scoped to the one untyped third-party library, not a code suppression.
+module = ["enchant.*", "enchant"]
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+# ARC-014/ADR-0007: WeasyPrint (the primary PDF backend) and `pdfkit` (the legacy
+# compatibility path, SEC-002) ship no inline type hints/stub packages; both are optional,
+# lazily-imported dependencies (`FileReportGenerator._save_pdf_file`). Scoped to these two
+# untyped third-party libraries, not a code suppression.
+module = ["weasyprint.*", "weasyprint", "pdfkit.*", "pdfkit"]
 ignore_missing_imports = true
 
 [tool.bandit]

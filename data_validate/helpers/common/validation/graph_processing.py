@@ -1,8 +1,6 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 """Graph data validation utilities for hierarchical structure validation."""
 
-from typing import List, Tuple, Optional
-
 import networkx as nx
 import pandas as pd
 
@@ -21,9 +19,9 @@ class GraphProcessing:
 
     def __init__(
         self,
-        dataframe: Optional[pd.DataFrame] = None,
-        parent_column: Optional[str] = None,
-        child_column: Optional[str] = None,
+        dataframe: pd.DataFrame | None = None,
+        parent_column: str | None = None,
+        child_column: str | None = None,
     ) -> None:
         """
         Initialize GraphProcessing with optional DataFrame.
@@ -33,7 +31,7 @@ class GraphProcessing:
             parent_column: Name of the parent column
             child_column: Name of the child column
         """
-        self.graph: Optional[nx.DiGraph] = None
+        self.graph: nx.DiGraph | None = None
 
         # If columns are in the dataframe, create the graph
         if (
@@ -77,7 +75,7 @@ class GraphProcessing:
         self.graph = directed_graph
         return directed_graph
 
-    def detect_cycles(self, graph: Optional[nx.DiGraph] = None) -> Tuple[bool, Optional[List[Tuple[str, str]]]]:
+    def detect_cycles(self, graph: nx.DiGraph | None = None) -> tuple[bool, list[tuple[str, str]] | None]:
         """
         Detect cycles in the directed graph.
 
@@ -97,7 +95,7 @@ class GraphProcessing:
         except nx.NetworkXNoCycle:
             return False, None
 
-    def detect_disconnected_components(self, graph: Optional[nx.DiGraph] = None) -> List[nx.DiGraph]:
+    def detect_disconnected_components(self, graph: nx.DiGraph | None = None) -> list[nx.DiGraph]:
         """
         Detect disconnected components in the graph.
 
@@ -115,7 +113,7 @@ class GraphProcessing:
         sub_graphs.sort(key=len, reverse=True)
         return sub_graphs[1:] if len(sub_graphs) > 1 else []
 
-    def generate_graph_report(self, graph: Optional[nx.DiGraph] = None) -> str:
+    def generate_graph_report(self, graph: nx.DiGraph | None = None) -> str:
         """
         Generate a formatted string report of graph edges.
 
@@ -140,7 +138,7 @@ class GraphProcessing:
 
         return ", ".join(sorted(text_graph, key=lambda x: x, reverse=False))
 
-    def get_leaf_nodes(self, graph: Optional[nx.DiGraph] = None) -> List[str]:
+    def get_leaf_nodes(self, graph: nx.DiGraph | None = None) -> list[str]:
         """
         Get all leaf nodes (nodes with no outgoing edges) from the graph.
 
@@ -161,7 +159,7 @@ class GraphProcessing:
                 leaf_nodes.append(node)
         return leaf_nodes
 
-    def convert_to_tree(self, root_node: str, graph: Optional[nx.DiGraph] = None) -> nx.DiGraph:
+    def convert_to_tree(self, root_node: str, graph: nx.DiGraph | None = None) -> nx.DiGraph:
         """
         Convert the directed graph to a tree structure starting from root node.
 
@@ -185,7 +183,7 @@ class GraphProcessing:
         tree = nx.bfs_tree(target_graph, root_node)
         return tree
 
-    def breadth_first_search_from_node(self, start_node: str, graph: Optional[nx.DiGraph] = None) -> nx.DiGraph:
+    def breadth_first_search_from_node(self, start_node: str, graph: nx.DiGraph | None = None) -> nx.DiGraph:
         """
         Perform breadth-first search from a starting node.
 
@@ -214,14 +212,14 @@ class GraphProcessing:
         """Get the number of nodes in the graph."""
         if self.graph is None:
             return 0
-        return self.graph.number_of_nodes()
+        return int(self.graph.number_of_nodes())
 
     @property
     def edge_count(self) -> int:
         """Get the number of edges in the graph."""
         if self.graph is None:
             return 0
-        return self.graph.number_of_edges()
+        return int(self.graph.number_of_edges())
 
     @property
     def is_empty(self) -> bool:

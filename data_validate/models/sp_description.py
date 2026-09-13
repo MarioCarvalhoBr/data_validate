@@ -6,7 +6,7 @@ This module defines the `SpDescription` class, which handles the loading,
 validation, and processing of description data (metadata for indicators).
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -46,7 +46,7 @@ class SpDescription(SpModelABC):
             MAX_SIMPLE_DESC_LENGTH (int): Maximum allowed length for simple descriptions.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_DESCRIPTION
@@ -84,14 +84,14 @@ class SpDescription(SpModelABC):
         COLUMN_META = pd.Series(dtype="str", name="meta")
 
         ALL: List[str] = [
-            COLUMN_CODE.name,
-            COLUMN_LEVEL.name,
-            COLUMN_SIMPLE_NAME.name,
-            COLUMN_COMPLETE_NAME.name,
-            COLUMN_SIMPLE_DESC.name,
-            COLUMN_COMPLETE_DESC.name,
-            COLUMN_SOURCES.name,
-            COLUMN_META.name,
+            str(COLUMN_CODE.name),
+            str(COLUMN_LEVEL.name),
+            str(COLUMN_SIMPLE_NAME.name),
+            str(COLUMN_COMPLETE_NAME.name),
+            str(COLUMN_SIMPLE_DESC.name),
+            str(COLUMN_COMPLETE_DESC.name),
+            str(COLUMN_SOURCES.name),
+            str(COLUMN_META.name),
         ]
 
     class DynamicColumn:
@@ -107,7 +107,7 @@ class SpDescription(SpModelABC):
 
         COLUMN_SCENARIO = pd.Series(dtype="int64", name="cenario")
         COLUMN_LEGEND = pd.Series(dtype="Int64", name="legenda")
-        ALL: List[str] = [COLUMN_SCENARIO.name, COLUMN_LEGEND.name]
+        ALL: List[str] = [str(COLUMN_SCENARIO.name), str(COLUMN_LEGEND.name)]
 
     class OptionalColumn:
         """
@@ -125,9 +125,9 @@ class SpDescription(SpModelABC):
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
 
         ALL: List[str] = [
-            COLUMN_UNIT.name,
-            COLUMN_RELATION.name,
-            COLUMN_ORDER.name,
+            str(COLUMN_UNIT.name),
+            str(COLUMN_RELATION.name),
+            str(COLUMN_ORDER.name),
         ]
 
     class PluralColumn:
@@ -142,14 +142,14 @@ class SpDescription(SpModelABC):
 
         COLUMN_PLURAL_SIMPLE_NAME = pd.Series(dtype="str", name="nomes_simples")
         COLUMN_PLURAL_COMPLETE_NAME = pd.Series(dtype="str", name="nomes_completos")
-        ALL: List[str] = [COLUMN_PLURAL_SIMPLE_NAME.name, COLUMN_PLURAL_COMPLETE_NAME.name]
+        ALL: List[str] = [str(COLUMN_PLURAL_SIMPLE_NAME.name), str(COLUMN_PLURAL_COMPLETE_NAME.name)]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpDescription model.
 
@@ -160,7 +160,7 @@ class SpDescription(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """
         Run pre-processing steps including dynamic column handling and filling optional columns.
 
@@ -200,16 +200,16 @@ class SpDescription(SpModelABC):
         # 2. Handling optional columns. `.assign` returns a new frame rather than mutating
         # `self.frame`/`raw_data` in place (BUG-003).
         if self.OptionalColumn.COLUMN_RELATION.name not in self.frame.columns:
-            self.frame = self.frame.assign(**{self.OptionalColumn.COLUMN_RELATION.name: 1})
+            self.frame = self.frame.assign(**{str(self.OptionalColumn.COLUMN_RELATION.name): 1})
         if self.OptionalColumn.COLUMN_UNIT.name not in self.frame.columns:
-            self.frame = self.frame.assign(**{self.OptionalColumn.COLUMN_UNIT.name: ""})
+            self.frame = self.frame.assign(**{str(self.OptionalColumn.COLUMN_UNIT.name): ""})
 
         for opt_column_name in self.OptionalColumn.ALL:
             if (opt_column_name in self.frame.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
         self.EXPECTED_COLUMNS = local_expected_columns
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -227,7 +227,7 @@ class SpDescription(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """
         Perform data cleaning operations.
 
@@ -258,11 +258,11 @@ class SpDescription(SpModelABC):
             self.data_cleaning_errors.extend(errors_data_clean_local)
 
             if column_name in dataframe_cleaned.columns:
-                self.cleaned[column_name] = dataframe_cleaned[column_name]
+                self.cleaned[str(column_name)] = dataframe_cleaned[column_name]
 
         # 2. If scenarios exist, clean and validate 'cenario' column (minimum -1) (CLEAN-002)
         if self.scenarios:
-            column_name_scenario = self.DynamicColumn.COLUMN_SCENARIO.name
+            column_name_scenario = str(self.DynamicColumn.COLUMN_SCENARIO.name)
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
                 self.frame,
                 self.filename,
@@ -277,7 +277,7 @@ class SpDescription(SpModelABC):
 
         # 3. If legend column exists, ensure values are integers (minimum 1) or empty (CLEAN-003)
         if self.legend_exists_file and (self.DynamicColumn.COLUMN_LEGEND.name in self.frame.columns):
-            column_name_legend = self.DynamicColumn.COLUMN_LEGEND.name
+            column_name_legend = str(self.DynamicColumn.COLUMN_LEGEND.name)
             dataframe_cleaned, errors_data_clean_local = DataCleaningProcessing.clean_dataframe_integers(
                 self.frame,
                 self.filename,
@@ -291,11 +291,10 @@ class SpDescription(SpModelABC):
                 self.cleaned[column_name_legend] = dataframe_cleaned[column_name_legend]
             self.data_cleaning_errors.extend(errors_data_clean_local)
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

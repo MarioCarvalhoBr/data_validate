@@ -17,7 +17,7 @@ Every method below now returns structured data (masks, indices, `(id, column)` p
 """
 
 from decimal import Decimal
-from typing import Any, List, Tuple
+from typing import Any, cast
 
 import pandas as pd
 from pandas import DataFrame
@@ -43,7 +43,7 @@ class ProportionalityProcessing:
         pass
 
     @staticmethod
-    def build_subdatasets(df_proportionalities: DataFrame, column_name_id: str):
+    def build_subdatasets(df_proportionalities: DataFrame, column_name_id: str) -> dict[Any, DataFrame]:
         """
         Construct subdatasets mapping parent indicators to their children data.
 
@@ -67,13 +67,13 @@ class ProportionalityProcessing:
         ]
 
         # Create subdatasets and others variables
-        subdatasets = {}
+        subdatasets: dict[Any, DataFrame] = {}
         has_found_col_id = False
         found_col_level_0 = None
 
         # Find the column with the ID
         for column in columns_multi_index_prop:
-            col_level_0, col_level_1 = column
+            col_level_0, col_level_1 = cast(tuple[Any, Any], column)
             if col_level_1 == column_name_id:
                 has_found_col_id = True
                 found_col_level_0 = col_level_0
@@ -94,7 +94,7 @@ class ProportionalityProcessing:
         df_data: DataFrame,
         is_di: DataFrame,
         value_di: Any,
-    ) -> Tuple[DataFrame, DataFrame]:
+    ) -> tuple[DataFrame, DataFrame]:
         """
         Replace non-numeric, non-DI cells with `value_di` and report which cells were invalid.
 
@@ -171,7 +171,7 @@ class ProportionalityProcessing:
         sp_df_values: DataFrame,
         column_name_id: str,
         value_di: Any,
-    ) -> List[Tuple[Any, str]]:
+    ) -> list[tuple[Any, str]]:
         """
         Find rows whose factors sum to zero but whose `valores` counterpart is not zero/DI.
 
@@ -190,7 +190,7 @@ class ProportionalityProcessing:
             List of `(row_id, child_column)` pairs that violate the zero-sum statement, in the
             order the zero-sum rows and their matching value columns were encountered.
         """
-        violations: List[Tuple[Any, str]] = []
+        violations: list[tuple[Any, str]] = []
         zero_sum_mask = row_sums == 0
 
         if not zero_sum_mask.any():
@@ -224,7 +224,7 @@ class ProportionalityProcessing:
         return violations
 
     @staticmethod
-    def sum_tolerance_indices(row_sums: pd.Series) -> Tuple[pd.Index, pd.Index]:
+    def sum_tolerance_indices(row_sums: pd.Series) -> tuple[pd.Index, pd.Index]:
         """
         Split row indices into the error/warning tolerance buckets around a sum of 1.
 

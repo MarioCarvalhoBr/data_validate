@@ -7,7 +7,7 @@ validation, and processing of temporal reference data (e.g., years, periods)
 used in the data validation process.
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -42,7 +42,7 @@ class SpTemporalReference(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
 
@@ -68,14 +68,14 @@ class SpTemporalReference(SpModelABC):
         COLUMN_DESCRIPTION = pd.Series(dtype="str", name="descricao")
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
-        ALL: List[str] = [COLUMN_NAME.name, COLUMN_DESCRIPTION.name, COLUMN_SYMBOL.name]
+        ALL: List[str] = [str(COLUMN_NAME.name), str(COLUMN_DESCRIPTION.name), str(COLUMN_SYMBOL.name)]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpTemporalReference model.
 
@@ -86,11 +86,10 @@ class SpTemporalReference(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """Run pre-processing steps (currently empty)."""
-        pass
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -108,7 +107,7 @@ class SpTemporalReference(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """
         Perform data cleaning operations.
 
@@ -123,7 +122,7 @@ class SpTemporalReference(SpModelABC):
         # cleaned 'symbol' column is stored on this instance (BUG-002), not overwritten on
         # the class-level `RequiredColumn` placeholder Series shared by every instance/run.
         translate = self.context.language_manager.text
-        column_name_symbol = self.RequiredColumn.COLUMN_SYMBOL.name
+        column_name_symbol = str(self.RequiredColumn.COLUMN_SYMBOL.name)
         if (not self.scenarios) and (len(self.frame) != 1):
             # CLEAN-006: without scenarios the table must have exactly one row.
             self.data_cleaning_errors.append(
@@ -147,11 +146,10 @@ class SpTemporalReference(SpModelABC):
             if column_name_symbol in df.columns:
                 self.cleaned[column_name_symbol] = df[column_name_symbol]
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

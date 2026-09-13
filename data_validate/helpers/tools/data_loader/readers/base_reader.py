@@ -4,16 +4,21 @@
 """Base class implementing the Template Method pattern for file readers."""
 
 from abc import ABC, abstractmethod
+from pathlib import Path
+
+import pandas as pd
+
+from ..strategies.header import HeaderStrategy
 
 
 class BaseReader(ABC):
-    def __init__(self, file_path, header_strategy):
+    def __init__(self, file_path: Path, header_strategy: HeaderStrategy) -> None:
         self.file_path = file_path
         self.header_strategy = header_strategy
 
-    def read(self):
+    def read(self) -> pd.DataFrame:
         return self._read_file()
 
     @abstractmethod
-    def _read_file(self):
+    def _read_file(self) -> pd.DataFrame:
         pass

@@ -8,7 +8,7 @@ extracting numeric identifiers, and comparing sets to find differences.
 """
 
 import re
-from typing import List, Set, Any, Tuple
+from typing import Any
 
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
@@ -23,10 +23,9 @@ class CollectionsProcessing:
 
     def __init__(self) -> None:
         """Initialize the CollectionsProcessing class."""
-        pass
 
     @staticmethod
-    def generate_group_from_list(items: List) -> List[List]:
+    def generate_group_from_list(items: list[Any]) -> list[list[Any]]:
         """
         Group consecutive identical elements in a list.
 
@@ -44,8 +43,8 @@ class CollectionsProcessing:
         if not items:
             raise ValueError("Input list must not be empty.")
 
-        grouped: List[List] = []
-        current_group: List = [items[0]]
+        grouped: list[list[Any]] = []
+        current_group: list[Any] = [items[0]]
 
         for element in items[1:]:
             if element == current_group[0]:
@@ -59,8 +58,8 @@ class CollectionsProcessing:
 
     @staticmethod
     def categorize_strings_by_id_pattern_from_list(
-        items_to_categorize: List[Any], allowed_scenario_suffixes: List[Any] = None
-    ) -> Tuple[List[str], List[str]]:
+        items_to_categorize: list[Any], allowed_scenario_suffixes: list[Any] | None = None
+    ) -> tuple[list[str], list[str]]:
         """
         Categorizes a list of items (converted to strings) based on predefined ID patterns.
 
@@ -88,8 +87,8 @@ class CollectionsProcessing:
             scenario_pattern_id_year_suffix = re.compile(r"(?!)")
 
         string_items_to_categorize = [str(item) for item in items_to_categorize]
-        matched_by_pattern: List[str] = []
-        not_matched_by_pattern: List[str] = []
+        matched_by_pattern: list[str] = []
+        not_matched_by_pattern: list[str] = []
 
         for current_item_str in string_items_to_categorize:
             if base_pattern_id_year.match(current_item_str):
@@ -103,8 +102,8 @@ class CollectionsProcessing:
 
     @staticmethod
     def extract_numeric_integer_ids_from_list(
-        id_values_list: List[Any],
-    ) -> Tuple[Set[int], Set[Any]]:
+        id_values_list: list[Any],
+    ) -> tuple[set[int], set[Any]]:
         """
         Extracts and categorizes valid and invalid IDs from a list of values.
 
@@ -118,8 +117,8 @@ class CollectionsProcessing:
                 - Set[int]: Set of valid integer IDs.
                 - Set[Any]: Set of invalid values found.
         """
-        valid_ids: Set[int] = set()
-        invalid_ids: Set[Any] = set()
+        valid_ids: set[int] = set()
+        invalid_ids: set[Any] = set()
 
         for value in id_values_list:
             is_valid, _ = NumberFormattingProcessing.check_cell_integer(value, 1)
@@ -131,10 +130,10 @@ class CollectionsProcessing:
 
     @staticmethod
     def extract_numeric_ids_and_unmatched_strings_from_list(
-        source_list: List[Any] = None,
-        strings_to_ignore: List[Any] = None,
-        suffixes_for_matching: List[Any] = None,
-    ) -> Tuple[Set[int], List[str]]:
+        source_list: list[Any] | None = None,
+        strings_to_ignore: list[Any] | None = None,
+        suffixes_for_matching: list[Any] | None = None,
+    ) -> tuple[set[int], list[str]]:
         """
         Extracts numeric IDs from a list of strings that match specific patterns and returns a list of strings
         that do not match or are not ignored.
@@ -172,7 +171,9 @@ class CollectionsProcessing:
         return extracted_numeric_ids, final_unmatched_strings
 
     @staticmethod
-    def find_differences_in_two_set(first_set: Set[Any], second_set: Set[Any]) -> Tuple[Set[Any], Set[Any]]:
+    def find_differences_in_two_set(
+        first_set: set[Any] | None, second_set: set[Any] | None
+    ) -> tuple[set[Any], set[Any]]:
         """
         Compares two sets and identifies missing elements in each set relative to the other.
 

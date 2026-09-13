@@ -26,7 +26,7 @@ class CustomFormatter(logging.Formatter):
         red (str): ANSI code for red text (Error).
         bold_red (str): ANSI code for bold red text (Critical).
         reset (str): ANSI code to reset terminal formatting.
-        format (str): The log message format string.
+        log_format (str): The log message format string.
         FORMATS (dict): Mapping of log levels to formatted strings.
     """
 
@@ -35,18 +35,18 @@ class CustomFormatter(logging.Formatter):
     red = "\x1b[31;20m"
     bold_red = "\x1b[31;1m"
     reset = "\x1b[0m"
-    format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
+    log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s (%(filename)s:%(lineno)d)"
     # logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
     FORMATS = {
-        logging.DEBUG: grey + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset,
+        logging.DEBUG: grey + log_format + reset,
+        logging.INFO: grey + log_format + reset,
+        logging.WARNING: yellow + log_format + reset,
+        logging.ERROR: red + log_format + reset,
+        logging.CRITICAL: bold_red + log_format + reset,
     }
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
         """
         Format the specified record as text.
 
@@ -80,10 +80,10 @@ class LoggerManager:
         self,
         log_folder: Optional[str] = "logs",
         default_level: int = logging.DEBUG,
-        console_logger="console_logger",
-        prefix="data_validate",
-        logger_name="data_validate_file_logger",
-    ):
+        console_logger: str = "console_logger",
+        prefix: str = "data_validate",
+        logger_name: str = "data_validate_file_logger",
+    ) -> None:
         """
         Initialize the LoggerManager.
 
@@ -105,6 +105,7 @@ class LoggerManager:
 
         self.console_logger = self.configure_logger(console_logger)
 
+        self.log_file: str | None
         if self.log_folder is not None:
             if not os.path.exists(self.log_folder):
                 os.makedirs(self.log_folder)
@@ -169,6 +170,9 @@ class LoggerManager:
         Returns:
             str: The absolute path to the generated log file.
         """
+        if self.log_folder is None:
+            raise ValueError("log_folder must be set to generate a log file name")
+
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         file_name = f"{prefix}_{timestamp}.log"
         return os.path.join(self.log_folder, file_name)

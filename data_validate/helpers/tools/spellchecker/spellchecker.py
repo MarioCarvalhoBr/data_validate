@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Tuple
 
 import pandas as pd
 
@@ -31,7 +30,7 @@ class SpellingFinding:
     row_index: int
     column: str
     kind: str
-    words: Tuple[str, ...] = field(default_factory=tuple)
+    words: tuple[str, ...] = field(default_factory=tuple)
 
 
 class SpellChecker:
@@ -41,16 +40,14 @@ class SpellChecker:
     multiple sheets and columns for spelling and formatting quality issues.
     """
 
-    def __init__(self, lang_dict_spell: str = "pt_BR", list_words_user: List[str] = None):
-        self.list_words_user = list_words_user
-        if self.list_words_user is None:
-            self.list_words_user = []
+    def __init__(self, lang_dict_spell: str = "pt_BR", list_words_user: list[str] | None = None):
+        self.list_words_user: list[str] = list_words_user if list_words_user is not None else []
         self.lang_dict_spell = lang_dict_spell
         self.dictionary_manager = DictionaryManager(lang_dict_spell)
         self.spell_checker_controller = SpellCheckerController(self.dictionary_manager)
         self.df_processor = DataFrameProcessor(self.spell_checker_controller)
 
-        self.errors_dictionary = []
+        self.errors_dictionary: list[str] = []
 
         self._prepare_statement()
 
@@ -67,8 +64,8 @@ class SpellChecker:
         self.dictionary_manager.clean_temporary_files()
 
     def check_spelling_text_structured(
-        self, df: pd.DataFrame, columns_sheets: List[str]
-    ) -> Tuple[Tuple[SpellingFinding, ...], str | None]:
+        self, df: pd.DataFrame, columns_sheets: list[str]
+    ) -> tuple[tuple[SpellingFinding, ...], str | None]:
         """Structured spelling/quality check for a sheet (ARC-017 Phase 3 Port 8, SPELL-005).
 
         `rules/spell.py`'s `SPELL-002`…`004` call this: no pre-formatted Portuguese string is

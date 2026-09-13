@@ -23,11 +23,13 @@ file) is preserved untouched, and a trailing row is only dropped when literally 
 NaN (a whitespace-only cell is not NaN, so a trailing whitespace-only row is kept).
 """
 
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
 from .base_reader import BaseReader
-from ..strategies.header import DoubleHeaderStrategy
+from ..strategies.header import DoubleHeaderStrategy, HeaderStrategy
 
 
 def _drop_trailing_blank_rows(df: pd.DataFrame) -> pd.DataFrame:
@@ -55,7 +57,7 @@ def _drop_trailing_blank_rows(df: pd.DataFrame) -> pd.DataFrame:
 
 
 class CSVReader(BaseReader):
-    def __init__(self, file_path, header_strategy, sep: str = "|"):
+    def __init__(self, file_path: Path, header_strategy: HeaderStrategy, sep: str = "|") -> None:
         """Initialize the reader.
 
         Args:
@@ -66,7 +68,7 @@ class CSVReader(BaseReader):
         super().__init__(file_path, header_strategy)
         self.sep = sep
 
-    def _read_file(self):
+    def _read_file(self) -> pd.DataFrame:
         header = self.header_strategy.get_header(self.file_path)
         df = pd.read_csv(
             self.file_path, header=header, sep=self.sep, low_memory=False, dtype=str, skip_blank_lines=False

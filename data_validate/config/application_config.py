@@ -69,7 +69,7 @@ class ApplicationConfig:
         self,
         clock: Callable[[], datetime] | None = None,
         language_manager: LanguageManager | None = None,
-    ):
+    ) -> None:
         """
         Initializes the ApplicationConfig instance.
 
@@ -96,9 +96,9 @@ class ApplicationConfig:
         self.language_manager: LanguageManager = language_manager or LanguageManager()
         self.spreadsheet_info = SpreadsheetInfo()
         self.names_enum = NamesEnum
-        self._verify_names_cache: MappingProxyType | None = None
+        self._verify_names_cache: MappingProxyType[str, str] | None = None
 
-    def get_verify_names(self):
+    def get_verify_names(self) -> MappingProxyType[str, str]:
         """
         Retrieves a dictionary of verification names with localized text.
 

@@ -29,8 +29,8 @@ class DataModelContext:
     def __init__(
         self,
         context: GeneralContext,
-        initialized_models: List[Any] = None,
-    ):
+        initialized_models: Optional[List[Any]] = None,
+    ) -> None:
         """
         Initialize the DataModelContext.
 

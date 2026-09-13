@@ -10,10 +10,11 @@ legacy `pdfkit` compatibility path, SEC-002).
 """
 
 import json
+import logging
 import platform
 import sys
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 from jinja2 import Environment, PackageLoader, TemplateError, select_autoescape
 
@@ -22,6 +23,7 @@ from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.controllers.report.report_model import ReportModel, ReportSection
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.config.metadata_info import METADATA
+from data_validate.helpers.base.data_args import DataAction, DataFile
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
 _TEMPLATE_NAME = "report_template.html"
@@ -48,7 +50,7 @@ class FileReportGenerator:
         env (Environment): Jinja2 environment for template rendering.
     """
 
-    def __init__(self, context: GeneralContext = None):
+    def __init__(self, context: GeneralContext):
         """
         Initialize the report generator with context configuration.
 
@@ -63,9 +65,13 @@ class FileReportGenerator:
         self.warning_count = 0
         self.total_tests = 0
 
+        # `DataArgs.run()` (called from its own `__init__`) always populates `data_file`
+        # before this constructor can observe it; the cast is typing-only narrowing.
+        data_file = cast(DataFile, self.context.data_args.data_file)
+
         # Setup file paths and template environment.
-        self.input_folder = self.context.data_args.data_file.input_folder
-        self.output_folder = self.context.data_args.data_file.output_folder
+        self.input_folder = cast(str, data_file.input_folder)
+        self.output_folder = cast(str, data_file.output_folder)
 
         # SEC-001/ADR-0007: templates are loaded exclusively from the package's own
         # `static/report/` directory -- never from the user-writable output directory, which
@@ -177,10 +183,13 @@ class FileReportGenerator:
                 (`--no-spellchecker`, then `--no-warning-titles-length`, then any report marked
                 `was_executed=False`).
         """
-        skipped_tests = []
-        if self.context.data_args.data_action.no_spellchecker:
+        # See the `__init__` narrowing note; `data_action` is always populated by `DataArgs.run()`.
+        data_action = cast(DataAction, self.context.data_args.data_action)
+
+        skipped_tests: list[str] = []
+        if data_action.no_spellchecker:
             skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.SPELL.value])
-        if self.context.data_args.data_action.no_warning_titles_length:
+        if data_action.no_warning_titles_length:
             skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
 
         for report in report_list.reports.values():
@@ -228,8 +237,9 @@ class FileReportGenerator:
             for report in report_list
         )
 
-        show_date = not self.context.data_args.data_action.no_time
-        show_version = not self.context.data_args.data_action.no_version
+        data_action = cast(DataAction, self.context.data_args.data_action)
+        show_date = not data_action.no_time
+        show_version = not data_action.no_version
 
         return ReportModel(
             name=METADATA.__project_name__,
@@ -301,7 +311,7 @@ class FileReportGenerator:
         }
 
     @staticmethod
-    def _save_html_file(html_content: str, output_path: str, logger) -> None:
+    def _save_html_file(html_content: str, output_path: str, logger: logging.Logger) -> None:
         """
         Save HTML content to file.
 
@@ -333,7 +343,7 @@ class FileReportGenerator:
             print(error_message, file=sys.stderr)
 
     @staticmethod
-    def _save_pdf_file(html_file_path: str, logger) -> None:
+    def _save_pdf_file(html_file_path: str, logger: logging.Logger) -> None:
         """
         Generate and save a PDF report from the HTML file (SEC-002).
 

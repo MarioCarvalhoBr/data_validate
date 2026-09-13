@@ -22,7 +22,7 @@ message-building loop remains, over `zip()`-ed plain lists, never over `.iterrow
 
 import re
 from decimal import Decimal, InvalidOperation
-from typing import Any, Callable, List, Optional
+from typing import Any, Callable, cast
 
 import pandas as pd
 
@@ -54,7 +54,7 @@ class LegendProcessing:
         self.filename = filename
 
     @staticmethod
-    def get_min_max_values(df, key_lower, key_upper):
+    def get_min_max_values(df: pd.DataFrame, key_lower: str, key_upper: str) -> tuple[Any, Any]:
         """
         Calculate global min and max values from dataframe columns.
 
@@ -76,8 +76,8 @@ class LegendProcessing:
         dataframe: pd.DataFrame,
         code: Any,
         label_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate that labels are unique within a legend group (LEG-007).
 
@@ -92,7 +92,7 @@ class LegendProcessing:
             List of error messages for duplicated labels
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         if dataframe[label_col].duplicated().any():
             duplicate_labels = dataframe[dataframe[label_col].duplicated()][label_col].unique()
             for label in duplicate_labels:
@@ -108,8 +108,8 @@ class LegendProcessing:
         min_col: str,
         max_col: str,
         order_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate that required columns have the correct data types (numeric).
 
@@ -132,7 +132,7 @@ class LegendProcessing:
             List of validation error messages
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         # Check if columns exist
         columns_to_check = [col for col in [code_col, min_col, max_col, order_col] if col in original_dataframe.columns]
 
@@ -258,7 +258,7 @@ class LegendProcessing:
                                 "rule.LEG-006.error",
                                 filename=self.filename,
                                 code=code_value,
-                                row=index + 2,
+                                row=cast(int, index) + 2,
                                 column=col,
                                 value=original_value,
                             )
@@ -270,8 +270,8 @@ class LegendProcessing:
         dataframe: pd.DataFrame,
         code: Any,
         color_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate that color format is a valid hexadecimal string (LEG-008).
 
@@ -285,7 +285,7 @@ class LegendProcessing:
             List of error messages for invalid color formats
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         hex_color_pattern = re.compile(r"^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$")
 
         # PERF-001: a single vectorised `.str.match()` mask replaces the legacy
@@ -296,7 +296,9 @@ class LegendProcessing:
 
         for index, color in color_as_str[invalid_mask].items():
             errors.append(
-                translate("rule.LEG-008.error", filename=self.filename, code=code, row=index + 2, color=color)
+                translate(
+                    "rule.LEG-008.error", filename=self.filename, code=code, row=cast(int, index) + 2, color=color
+                )
             )
         return errors
 
@@ -307,8 +309,8 @@ class LegendProcessing:
         min_col: str,
         max_col: str,
         label_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate min/max values for excessive decimals (LEG-009).
 
@@ -326,7 +328,7 @@ class LegendProcessing:
             List of error messages for excessive decimals
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         # Filter out 'Dado indisponível' and sort by min value
         sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
 
@@ -379,8 +381,8 @@ class LegendProcessing:
         min_col: str,
         max_col: str,
         label_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate min/max values logical consistency (LEG-010).
 
@@ -398,7 +400,7 @@ class LegendProcessing:
             List of error messages for logical inconsistencies
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         # Filter out 'Dado indisponível' and sort by min value
         sorted_group = dataframe[dataframe[label_col] != self.value_data_unavailable].copy()
 
@@ -480,8 +482,8 @@ class LegendProcessing:
         dataframe: pd.DataFrame,
         code: Any,
         order_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate that order is sequential starting from 1 (LEG-011).
 
@@ -495,7 +497,7 @@ class LegendProcessing:
             List of error messages if sequence is broken or invalid
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         dataframe = dataframe.copy()
         dataframe[order_col] = pd.to_numeric(dataframe[order_col], errors="coerce")
         if dataframe[order_col].isnull().any():
@@ -520,8 +522,8 @@ class LegendProcessing:
         self,
         dataframe: pd.DataFrame,
         code_col: str,
-        translate: Optional[Callable[..., str]] = None,
-    ) -> List[str]:
+        translate: Callable[..., str] | None = None,
+    ) -> list[str]:
         """
         Validate that legend codes are sequential (LEG-001).
 
@@ -534,7 +536,7 @@ class LegendProcessing:
             List of error messages if codes are not sequential
         """
         translate = translate or get_default_translate()
-        errors = []
+        errors: list[str] = []
         local_dataframe = dataframe.copy()
         local_dataframe[code_col] = pd.to_numeric(local_dataframe[code_col], errors="coerce")
 

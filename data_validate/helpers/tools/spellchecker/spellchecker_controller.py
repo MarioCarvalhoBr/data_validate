@@ -1,11 +1,16 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
-from typing import Dict, List, Tuple
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, cast
 
 from data_validate.helpers.tools.spellchecker.dictionary_manager import (
     DictionaryManager,
 )
 from data_validate.helpers.tools.spellchecker.text_processor import TextProcessor
+
+if TYPE_CHECKING:
+    from enchant import Dict as EnchantDict
 
 
 class SpellCheckerController:
@@ -18,15 +23,15 @@ class SpellCheckerController:
     def __init__(self, dictionary_manager: DictionaryManager):
         self.dictionary_manager = dictionary_manager
         self.text_processor = TextProcessor()
-        self.dictionary = None
+        self.dictionary: EnchantDict | None = None
         # Word-level lookup cache (PERF-006): avoids calling the enchant
         # dictionary more than once per unique word for the lifetime of this
         # controller. Memory bound is roughly the number of unique tokens
         # seen across the run (typical sheets have < 5k unique words), never
         # cleared mid-run since a run only ever validates one dictionary.
-        self._check_cache: Dict[str, bool] = {}
+        self._check_cache: dict[str, bool] = {}
 
-    def find_spelling_errors(self, text: str) -> List[str]:
+    def find_spelling_errors(self, text: str) -> list[str]:
         """Find spelling errors in the given text.
 
         Args:
@@ -49,7 +54,10 @@ class SpellCheckerController:
 
             is_correct = self._check_cache.get(word)
             if is_correct is None:
-                is_correct = self.dictionary.check(word)
+                # `self.dictionary` is `None` when the backend failed to initialise; calling
+                # `.check` on it then raises `AttributeError` by design (SPELL-005) — this
+                # `cast` is typing-only narrowing, not a new guard, and preserves that.
+                is_correct = cast("EnchantDict", self.dictionary).check(word)
                 self._check_cache[word] = is_correct
 
             if not is_correct:
@@ -57,7 +65,7 @@ class SpellCheckerController:
 
         return errors
 
-    def evaluate_text_quality(self, text: str) -> Tuple[bool, List[str]]:
+    def evaluate_text_quality(self, text: str) -> tuple[bool, list[str]]:
         """Compute the row-independent text-quality signals for `text`.
 
         Both signals (multiple-spaces and spelling errors) depend only on
@@ -79,10 +87,10 @@ class SpellCheckerController:
     def build_quality_findings(
         self,
         has_multiple_spaces: bool,
-        spelling_errors: List[str],
+        spelling_errors: list[str],
         column: str,
         row_index: int,
-    ) -> List[Tuple[int, str, str, List[str] | None]]:
+    ) -> list[tuple[int, str, str, list[str] | None]]:
         """Turn precomputed quality signals into structured `(row, column, kind, payload)` findings.
 
         ARC-017 Phase 3 Port 8: this is the structured counterpart of
@@ -104,7 +112,7 @@ class SpellCheckerController:
             multiple-spaces first, when both signals are set for the same row/column (matching
             `format_quality_warnings`'s own append order).
         """
-        findings: List[Tuple[int, str, str, List[str] | None]] = []
+        findings: list[tuple[int, str, str, list[str] | None]] = []
         if has_multiple_spaces:
             findings.append((row_index, column, "multiple_spaces", None))
         if spelling_errors:
@@ -114,11 +122,11 @@ class SpellCheckerController:
     def format_quality_warnings(
         self,
         has_multiple_spaces: bool,
-        spelling_errors: List[str],
+        spelling_errors: list[str],
         column: str,
         row_index: int,
         sheet_name: str,
-    ) -> List[str]:
+    ) -> list[str]:
         """Format row-specific warning messages from precomputed quality signals.
 
         Kept as a thin, string-returning compatibility wrapper over `build_quality_findings`
@@ -151,7 +159,7 @@ class SpellCheckerController:
 
         return warnings
 
-    def check_text_quality(self, text: str, column: str, row_index: int, sheet_name: str) -> List[str]:
+    def check_text_quality(self, text: str, column: str, row_index: int, sheet_name: str) -> list[str]:
         """Check text quality (multiple spaces and spelling errors).
 
         Args:

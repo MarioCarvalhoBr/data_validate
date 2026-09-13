@@ -6,7 +6,7 @@ This module defines the `SpDictionary` class, which handles the loading and
 verification of dictionary data (allowed/ignored words) for spellchecking validation.
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -43,7 +43,7 @@ class SpDictionary(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_DICTIONARY
@@ -65,15 +65,15 @@ class SpDictionary(SpModelABC):
         COLUMN_WORD = pd.Series(dtype="str", name="palavra")
 
         ALL: List[str] = [
-            COLUMN_WORD.name,
+            str(COLUMN_WORD.name),
         ]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpDictionary model.
 
@@ -86,7 +86,7 @@ class SpDictionary(SpModelABC):
 
         self.words_to_ignore: List[str] = []
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """
         Pre-process the dictionary file to extract words.
 
@@ -104,7 +104,7 @@ class SpDictionary(SpModelABC):
 
                 self.words_to_ignore = remaining_words
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -122,7 +122,7 @@ class SpDictionary(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """
         Perform data cleaning operations.
 
@@ -132,13 +132,11 @@ class SpDictionary(SpModelABC):
         Returns:
             List[str]: Empty list (placeholder).
         """
-        pass
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

@@ -8,9 +8,14 @@ full specification.
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from data_validate.config.metadata_info import MetadataInfo
+
 
 # Lazy loading - imports only when necessary
-def get_metadata():
+def get_metadata() -> "MetadataInfo":
     """Get package metadata lazily."""
     from data_validate.config.metadata_info import METADATA
 
@@ -18,7 +23,7 @@ def get_metadata():
 
 
 # Package metadata - using lazy loading
-def __getattr__(name: str):
+def __getattr__(name: str) -> Any:
     """Lazy attribute access for metadata."""
     """Get package metadata lazily."""
     metadata = get_metadata()

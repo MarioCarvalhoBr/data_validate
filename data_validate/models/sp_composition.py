@@ -6,7 +6,7 @@ This module defines the `SpComposition` class, which handles the loading,
 validation, and processing of composition data (parent-child relationships).
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -41,7 +41,7 @@ class SpComposition(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_COMPOSITION
@@ -65,16 +65,16 @@ class SpComposition(SpModelABC):
         COLUMN_CHILD_CODE = pd.Series(dtype="int64", name="codigo_filho")
 
         ALL: List[str] = [
-            COLUMN_PARENT_CODE.name,
-            COLUMN_CHILD_CODE.name,
+            str(COLUMN_PARENT_CODE.name),
+            str(COLUMN_CHILD_CODE.name),
         ]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpComposition model.
 
@@ -85,11 +85,10 @@ class SpComposition(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """Run pre-processing steps (currently empty)."""
-        pass
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -107,7 +106,7 @@ class SpComposition(SpModelABC):
         self.structural_errors.extend(col_errors)
         self.structural_warnings.extend(col_warnings)
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """
         Perform data cleaning operations.
 
@@ -133,13 +132,12 @@ class SpComposition(SpModelABC):
             self.data_cleaning_errors.extend(errors)
 
             if column_name in df.columns:
-                self.cleaned[column_name] = df[column_name]
+                self.cleaned[str(column_name)] = df[column_name]
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

@@ -5,7 +5,7 @@ import contextlib
 import os
 import tempfile
 from pathlib import Path
-from typing import TYPE_CHECKING, Iterator, List
+from typing import TYPE_CHECKING, Iterator, List, cast
 
 if TYPE_CHECKING:
     from enchant import Broker, Dict
@@ -40,7 +40,7 @@ class DictionaryManager:
         self.broker: Broker | None = None
         self._errors: List[str] = []
         self.path_dictionary: Path = Path(__file__).resolve().parents[3] / "static" / "dictionaries"
-        self._enchant_session_dir: tempfile.TemporaryDirectory | None = None
+        self._enchant_session_dir: tempfile.TemporaryDirectory[str] | None = None
 
     def _ensure_enchant_session_dir(self) -> Path:
         """Create, once per manager, a session-scoped Enchant config directory.
@@ -118,7 +118,7 @@ class DictionaryManager:
 
         return self._errors
 
-    def initialize_dictionary(self, list_words_user) -> Dict | None:
+    def initialize_dictionary(self, list_words_user: List[str]) -> Dict | None:
         """Initialize Enchant dictionary and load custom words.
 
         Loads extra words from extra-words.dic file and adds user-provided words.
@@ -154,6 +154,7 @@ class DictionaryManager:
         except (enchant.errors.Error, OSError, ImportError) as e:
             # SEC-004: see `validate_dictionary`'s narrowing note above.
             self._errors.append(f"Erro ao inicializar dicionário {self.lang_dict_spell}: {e}")
+            return None
 
     def _load_extra_words(self) -> None:
         """Load additional words from extra-words.dic file.
@@ -167,12 +168,18 @@ class DictionaryManager:
 
             extra_words_path = self.path_dictionary / "extra-words.dic"
 
+            # Only called from `initialize_dictionary`, right after `self.dictionary` is set
+            # from `Broker.request_dict`; the cast is typing-only narrowing, not a new guard
+            # (an `assert` here would trip bandit's B101 for no behavioural benefit, since
+            # `cast` is a runtime no-op either way).
+            dictionary = cast("Dict", self.dictionary)
+
             if extra_words_path.exists():
                 with open(extra_words_path, "r", encoding="utf-8") as file:
                     for line in file:
                         word = line.strip()
                         if word and not word.startswith("#"):  # Ignore empty lines and comments
-                            self.dictionary.add_to_session(word)
+                            dictionary.add_to_session(word)
             else:
                 self._errors.append(
                     "Arquivo extra-words.dic não encontrado. Reporte o erro ao administrador do sistema."

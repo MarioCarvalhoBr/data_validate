@@ -6,7 +6,7 @@ This module defines the `SpValue` class, which handles the loading,
 validation, and processing of numerical value data across indicators.
 """
 
-from typing import List, Dict, Any
+from typing import Any, List
 
 import pandas as pd
 
@@ -39,7 +39,7 @@ class SpValue(SpModelABC):
             SP_DESCRIPTION (str): Description of the dataset.
         """
 
-        def __init__(self):
+        def __init__(self) -> None:
             """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_VALUES
@@ -61,15 +61,15 @@ class SpValue(SpModelABC):
         COLUMN_ID = pd.Series(dtype="int64", name="id")
 
         ALL: List[str] = [
-            COLUMN_ID.name,
+            str(COLUMN_ID.name),
         ]
 
     def __init__(
         self,
         context: GeneralContext,
         data_model: LoadedSheet,
-        **kwargs: Dict[str, Any],
-    ):
+        **kwargs: object,
+    ) -> None:
         """
         Initialize the SpValue model.
 
@@ -80,7 +80,7 @@ class SpValue(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-    def pre_processing(self):
+    def pre_processing(self) -> None:
         """Run pre-processing steps."""
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
 
@@ -100,7 +100,7 @@ class SpValue(SpModelABC):
                 )
             )
 
-    def expected_structure_columns(self, *args, **kwargs):
+    def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
         """
         Validate the structure of columns in the DataFrame.
 
@@ -126,15 +126,13 @@ class SpValue(SpModelABC):
                 # `id`-missing case renders identically to that generic structural check.
                 self.structural_errors.append(translate("rule.STRUCT-011.error", filename=self.filename, column=col))
 
-    def data_cleaning(self, *args, **kwargs):
+    def data_cleaning(self, *args: Any, **kwargs: Any) -> None:
         """Run data cleaning steps (currently empty)."""
-        pass
 
-    def post_processing(self):
+    def post_processing(self) -> None:
         """Run post-processing steps (currently empty)."""
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the full validation pipeline for this model.
 

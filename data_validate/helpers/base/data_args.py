@@ -12,7 +12,9 @@ This module defines classes for managing command-line arguments related to:
 import argparse
 import sys
 from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Any, cast
 
 
 def _resolve_path(path: str) -> Path:
@@ -48,7 +50,13 @@ def _make_deprecated_alias_action(replacement: str) -> type[argparse.Action]:
     class _DeprecatedAliasAction(argparse.Action):
         """Stores a value under the replacement's destination, with a warning."""
 
-        def __call__(self, parser, namespace, values, option_string=None):
+        def __call__(
+            self,
+            parser: argparse.ArgumentParser,
+            namespace: argparse.Namespace,
+            values: str | Sequence[Any] | None,
+            option_string: str | None = None,
+        ) -> None:
             print(
                 f"Warning: '{option_string}' is deprecated; use '{replacement}' instead.",
                 file=sys.stderr,
@@ -68,7 +76,13 @@ class _ListRulesAction(argparse.Action):
     particular bundle.
     """
 
-    def __call__(self, parser, namespace, values, option_string=None):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values: str | Sequence[Any] | None,
+        option_string: str | None = None,
+    ) -> None:
         # Local import: `data_validate.rules` transitively imports `data_validate.config`,
         # which would re-enter `helpers/base/__init__.py` (which imports this very module)
         # if this were a top-level import — the same circular-import hazard `_create_parser`
@@ -91,12 +105,11 @@ class CliArgsGroup(ABC):
         _validate_arguments(): Abstract method to validate parsed arguments.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the CliArgsGroup class."""
-        pass
 
     @abstractmethod
-    def _validate_arguments(self):
+    def _validate_arguments(self) -> None:
         """
         Validate the parsed arguments.
 
@@ -123,7 +136,12 @@ class DataFile(CliArgsGroup):
         locale (str): Language/region code (e.g., 'pt_BR', 'en_US').
     """
 
-    def __init__(self, input_folder=None, output_folder=None, locale=None):
+    def __init__(
+        self,
+        input_folder: str | None = None,
+        output_folder: str | None = None,
+        locale: str | None = None,
+    ) -> None:
         """
         Initialize the DataFile class with file paths and locale.
 
@@ -140,7 +158,7 @@ class DataFile(CliArgsGroup):
         # Run the argument parser
         self.run()
 
-    def _validate_arguments(self):
+    def _validate_arguments(self) -> None:
         """
         Validate the file-related arguments.
 
@@ -156,8 +174,10 @@ class DataFile(CliArgsGroup):
             ValueError: If the input folder does not exist or the output folder path
                 already exists as a regular file.
         """
-        resolved_input_folder = _resolve_path(self.input_folder)
-        resolved_output_folder = _resolve_path(self.output_folder)
+        # `Path(None)` raises `TypeError` at runtime, same as before this annotation — the
+        # `cast` here is a typing-only narrowing, not a new guard (SEC-010 predates this).
+        resolved_input_folder = _resolve_path(cast(str, self.input_folder))
+        resolved_output_folder = _resolve_path(cast(str, self.output_folder))
 
         if not resolved_input_folder.is_dir():
             raise ValueError(f"Input folder does not exist: {self.input_folder}")
@@ -168,7 +188,7 @@ class DataFile(CliArgsGroup):
         self.input_folder = str(resolved_input_folder)
         self.output_folder = str(resolved_output_folder)
 
-    def run(self):
+    def run(self) -> None:
         """Execute parsing and validation of file arguments."""
         self._validate_arguments()
 
@@ -190,12 +210,12 @@ class DataAction(CliArgsGroup):
 
     def __init__(
         self,
-        no_spellchecker=None,
-        no_warning_titles_length=None,
-        no_time=None,
-        no_version=None,
-        debug=None,
-    ):
+        no_spellchecker: bool | None = None,
+        no_warning_titles_length: bool | None = None,
+        no_time: bool | None = None,
+        no_version: bool | None = None,
+        debug: bool | None = None,
+    ) -> None:
         """
         Initialize the DataAction class with configuration flags.
 
@@ -216,7 +236,7 @@ class DataAction(CliArgsGroup):
         # Run the argument parser
         self.run()
 
-    def _validate_arguments(self):
+    def _validate_arguments(self) -> None:
         """
         Validate the action-related arguments.
 
@@ -236,7 +256,7 @@ class DataAction(CliArgsGroup):
         if not isinstance(self.debug, bool):
             raise ValueError("debug must be a boolean value.")
 
-    def run(self):
+    def run(self) -> None:
         """Execute parsing and validation of action arguments."""
         self._validate_arguments()
 
@@ -255,7 +275,13 @@ class DataReport(CliArgsGroup):
         file (str): Name of the file being processed.
     """
 
-    def __init__(self, sector=None, protocol=None, user=None, file=None):
+    def __init__(
+        self,
+        sector: str | None = None,
+        protocol: str | None = None,
+        user: str | None = None,
+        file: str | None = None,
+    ) -> None:
         """
         Initialize the DataReport class with metadata.
 
@@ -274,7 +300,7 @@ class DataReport(CliArgsGroup):
         # Run the argument parser
         self.run()
 
-    def _validate_arguments(self):
+    def _validate_arguments(self) -> None:
         """
         Validate the report-related arguments.
 
@@ -283,9 +309,8 @@ class DataReport(CliArgsGroup):
         Raises:
             ValueError: If any validation rule fails.
         """
-        pass
 
-    def run(self):
+    def run(self) -> None:
         """Execute parsing and validation of report arguments."""
         self._validate_arguments()
 
@@ -306,7 +331,7 @@ class DataArgs:
         fail_on (str): Exit-code policy: "error" (default), "warning", or "never".
     """
 
-    def __init__(self, allow_abbrev=True):
+    def __init__(self, allow_abbrev: bool = True) -> None:
         """
         Initialize the DataArgs class and parse CLI arguments immediately.
 
@@ -314,9 +339,9 @@ class DataArgs:
             allow_abbrev (bool, optional): Allows argument abbreviations. Defaults to True.
         """
 
-        self.data_file = None
-        self.data_action = None
-        self.data_report = None
+        self.data_file: DataFile | None = None
+        self.data_action: DataAction | None = None
+        self.data_report: DataReport | None = None
         self.allow_abbrev = allow_abbrev
         self.json_path: str | None = None
         self.fail_on: str = "error"
@@ -324,7 +349,7 @@ class DataArgs:
         # Run the argument parser
         self.run()
 
-    def _create_parser(self):
+    def _create_parser(self) -> argparse.ArgumentParser:
         """
         Create and configure the ArgumentParser object.
 
@@ -462,7 +487,7 @@ class DataArgs:
 
         return parser
 
-    def get_dict_args(self):
+    def get_dict_args(self) -> dict[str, Any]:
         """
         Return the parsed arguments as a dictionary.
 
@@ -472,40 +497,48 @@ class DataArgs:
         Returns:
             dict: Dictionary of all parsed arguments.
         """
+        # `run()` (called from `__init__`) always populates these before this method can be
+        # reached in normal usage; the casts are typing-only narrowing, not a new guard.
+        data_file = cast(DataFile, self.data_file)
+        data_action = cast(DataAction, self.data_action)
+        data_report = cast(DataReport, self.data_report)
         return {
-            "input_folder": self.data_file.input_folder,
-            "output_folder": self.data_file.output_folder,
-            "locale": self.data_file.locale,
-            "no_spellchecker": self.data_action.no_spellchecker,
-            "no_warning_titles_length": self.data_action.no_warning_titles_length,
-            "no_time": self.data_action.no_time,
-            "no_version": self.data_action.no_version,
-            "debug": self.data_action.debug,
-            "sector": self.data_report.sector,
-            "protocol": self.data_report.protocol,
-            "user": self.data_report.user,
-            "file": self.data_report.file,
+            "input_folder": data_file.input_folder,
+            "output_folder": data_file.output_folder,
+            "locale": data_file.locale,
+            "no_spellchecker": data_action.no_spellchecker,
+            "no_warning_titles_length": data_action.no_warning_titles_length,
+            "no_time": data_action.no_time,
+            "no_version": data_action.no_version,
+            "debug": data_action.debug,
+            "sector": data_report.sector,
+            "protocol": data_report.protocol,
+            "user": data_report.user,
+            "file": data_report.file,
         }
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         Return a string representation of the parsed arguments.
 
         Returns:
             str: String representation of the parsed arguments.
         """
+        data_file = cast(DataFile, self.data_file)
+        data_action = cast(DataAction, self.data_action)
+        data_report = cast(DataReport, self.data_report)
         return (
-            f"DataArgs(input_folder={self.data_file.input_folder}, "
-            f"output_folder={self.data_file.output_folder}, locale={self.data_file.locale}, "
-            f"no_spellchecker={self.data_action.no_spellchecker}, "
-            f"no_warning_titles_length={self.data_action.no_warning_titles_length}, "
-            f"no_time={self.data_action.no_time}, no_version={self.data_action.no_version}, "
-            f"debug={self.data_action.debug}, sector={self.data_report.sector}, "
-            f"protocol={self.data_report.protocol}, user={self.data_report.user}, "
-            f"file={self.data_report.file})"
+            f"DataArgs(input_folder={data_file.input_folder}, "
+            f"output_folder={data_file.output_folder}, locale={data_file.locale}, "
+            f"no_spellchecker={data_action.no_spellchecker}, "
+            f"no_warning_titles_length={data_action.no_warning_titles_length}, "
+            f"no_time={data_action.no_time}, no_version={data_action.no_version}, "
+            f"debug={data_action.debug}, sector={data_report.sector}, "
+            f"protocol={data_report.protocol}, user={data_report.user}, "
+            f"file={data_report.file})"
         )
 
-    def run(self):
+    def run(self) -> None:
         """
         Parse and validate the command-line arguments.
 

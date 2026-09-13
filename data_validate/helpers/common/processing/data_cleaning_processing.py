@@ -7,7 +7,7 @@ to clean and validate DataFrame columns, specifically ensuring integer integrity
 and handling empty values.
 """
 
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, cast
 
 import pandas as pd
 
@@ -34,9 +34,9 @@ class DataCleaningProcessing:
         file_name: str,
         min_value: int = 0,
         allow_empty: bool = False,
-        translate: Optional[Callable[..., str]] = None,
+        translate: Callable[..., str] | None = None,
         rule_id: str = "",
-    ) -> Tuple[pd.DataFrame, List[str]]:
+    ) -> tuple[pd.DataFrame, list[str]]:
         """
         Validate and clean a single DataFrame column, enforcing integer constraints.
 
@@ -61,26 +61,28 @@ class DataCleaningProcessing:
                 falls back to a shared, rule-agnostic key.
 
         Returns:
-            Tuple[pd.DataFrame, List[str]]: A tuple containing:
+            tuple[pd.DataFrame, list[str]]: A tuple containing:
                 - pd.DataFrame: A new DataFrame with only valid rows for this column.
-                - List[str]: A list of error messages for invalid cells found.
+                - list[str]: A list of error messages for invalid cells found.
         """
         translate = translate or get_default_translate()
         error_key = f"rule.{rule_id}.error" if rule_id else "rule.file_cleaning.invalid_cell"
 
-        errors: List[str] = []
+        errors: list[str] = []
         if column not in df.columns:
             errors.append(translate("rule.file_cleaning.column_not_found", filename=file_name, column=column))
             return df, errors
 
-        mask_valid: List[bool] = []
+        mask_valid: list[bool] = []
         for idx, raw in df[column].items():
             if allow_empty and (pd.isna(raw) or str(raw).strip() == ""):
                 mask_valid.append(True)
                 continue
             is_valid, message = NumberFormattingProcessing.check_cell_integer(raw, min_value, translate=translate)
             if not is_valid:
-                errors.append(translate(error_key, filename=file_name, row=idx + 2, column=column, message=message))
+                errors.append(
+                    translate(error_key, filename=file_name, row=cast(int, idx) + 2, column=column, message=message)
+                )
                 mask_valid.append(False)
             else:
                 mask_valid.append(True)
@@ -90,7 +92,7 @@ class DataCleaningProcessing:
             df_clean[column] = df_clean[column].apply(lambda x: int(float(str(x).replace(",", "."))))
         else:
             df_clean[column] = df_clean[column].apply(
-                lambda x: int(float(str(x).replace(",", "."))) if pd.notna(x) and str(x).strip() != "" else x
+                lambda x: int(float(str(x).replace(",", "."))) if bool(pd.notna(x)) and str(x).strip() != "" else x
             )
         return df_clean, errors
 
@@ -98,12 +100,12 @@ class DataCleaningProcessing:
     def clean_dataframe_integers(
         df: pd.DataFrame,
         file_name: str,
-        columns_to_clean: List[str],
+        columns_to_clean: list[str],
         min_value: int = 0,
         allow_empty: bool = False,
-        translate: Optional[Callable[..., str]] = None,
+        translate: Callable[..., str] | None = None,
         rule_id: str = "",
-    ) -> Tuple[pd.DataFrame, List[str]]:
+    ) -> tuple[pd.DataFrame, list[str]]:
         """
         Clean multiple columns in the DataFrame, enforcing integer validation on all.
 
@@ -113,7 +115,7 @@ class DataCleaningProcessing:
         Args:
             df (pd.DataFrame): The DataFrame to process.
             file_name (str): Original file name for error reporting context.
-            columns_to_clean (List[str]): List of column names to validate and clean.
+            columns_to_clean (list[str]): List of column names to validate and clean.
             min_value (int, optional): Minimum allowed value for integers. Defaults to 0.
             allow_empty (bool, optional): If True, allows empty values in the columns. Defaults to False.
             translate (Callable[..., str], optional): Message-catalog renderer, see
@@ -122,12 +124,12 @@ class DataCleaningProcessing:
                 `clean_column_integer`.
 
         Returns:
-            Tuple[pd.DataFrame, List[str]]: A tuple containing:
+            tuple[pd.DataFrame, list[str]]: A tuple containing:
                 - pd.DataFrame: The fully cleaned DataFrame.
-                - List[str]: Aggregated list of all validation errors encountered.
+                - list[str]: Aggregated list of all validation errors encountered.
         """
         df_work = df.copy()
-        all_errors: List[str] = []
+        all_errors: list[str] = []
 
         for col in columns_to_clean:
             df_work, errors = DataCleaningProcessing.clean_column_integer(

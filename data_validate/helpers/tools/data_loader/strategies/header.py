@@ -9,15 +9,15 @@ from pathlib import Path
 
 class HeaderStrategy(ABC):
     @abstractmethod
-    def get_header(self, file_path: Path):
+    def get_header(self, file_path: Path) -> int | list[int]:
         pass
 
 
 class SingleHeaderStrategy(HeaderStrategy):
-    def get_header(self, file_path: Path):
+    def get_header(self, file_path: Path) -> int | list[int]:
         return 0
 
 
 class DoubleHeaderStrategy(HeaderStrategy):
-    def get_header(self, file_path: Path):
+    def get_header(self, file_path: Path) -> int | list[int]:
         return [0, 1]

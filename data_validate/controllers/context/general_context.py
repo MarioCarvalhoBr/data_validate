@@ -18,10 +18,11 @@ Components managed by GeneralContext:
 
 import os
 import sys
-from typing import Any, Dict
+from typing import Any, cast
 
 from data_validate.config import ApplicationConfig
 from data_validate.helpers.base import DataArgs, FileSystemUtils, LoggerManager
+from data_validate.helpers.base.data_args import DataAction, DataFile
 from data_validate.helpers.tools import LanguageManager
 
 
@@ -47,9 +48,9 @@ class GeneralContext:
 
     def __init__(
         self,
-        data_args: DataArgs = None,
-        **kwargs: Dict[str, Any],
-    ):
+        data_args: DataArgs,
+        **kwargs: Any,
+    ) -> None:
         """
         Initialize the GeneralContext with a toolkit, configuration, file system utilities, and logger.
 
@@ -74,13 +75,19 @@ class GeneralContext:
         self.data_args = data_args
         self.extra_config = kwargs
 
+        # `DataArgs.run()` (called from its own `__init__`) always populates `data_file`/
+        # `data_action` before this constructor can observe them; the casts below are
+        # typing-only narrowing, not a new guard.
+        data_file = cast(DataFile, self.data_args.data_file)
+        data_action = cast(DataAction, self.data_args.data_action)
+
         # Configure the Toolkit: one shared LanguageManager built from the parsed locale.
-        self.language_manager: LanguageManager = LanguageManager(locale=self.data_args.data_file.locale)
+        self.language_manager: LanguageManager = LanguageManager(locale=data_file.locale)
         self.config: ApplicationConfig = ApplicationConfig(language_manager=self.language_manager)
         self.file_system_utils: FileSystemUtils = FileSystemUtils(language_manager=self.language_manager)
 
-        is_debug = bool(self.data_args.data_action.debug)
-        log_folder = os.path.join(self.data_args.data_file.output_folder, "logs") if is_debug else None
+        is_debug = bool(data_action.debug)
+        log_folder = os.path.join(cast(str, data_file.output_folder), "logs") if is_debug else None
         self.logger_manager = LoggerManager(
             log_folder=log_folder,
             console_logger="console_logger",
@@ -93,9 +100,9 @@ class GeneralContext:
         if not is_debug:
             self.logger.disabled = True
 
-        self.skipped_validations = []
+        self.skipped_validations: list[str] = []
 
-    def finalize(self):
+    def finalize(self) -> None:
         """
         Finalize the application context and cleanup resources.
 
@@ -110,7 +117,9 @@ class GeneralContext:
               When not in debug mode there is no log file to begin with (BUG-021), so
               there is nothing to delete.
         """
-        if self.data_args.data_action.debug:
+        # See the `__init__` narrowing note above; `data_action` is always populated by the
+        # time `finalize()` can be called.
+        if cast(DataAction, self.data_args.data_action).debug:
             # ARC-012: machine stdout carries only the `<{json}>` summary fragment; every
             # other progress/debug line goes to stderr.
             print("\nLog file created at:", self.logger_manager.log_file, file=sys.stderr)

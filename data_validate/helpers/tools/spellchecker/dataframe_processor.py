@@ -1,6 +1,6 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
-from typing import List, Tuple
+from typing import cast
 
 import pandas as pd
 
@@ -19,7 +19,7 @@ class DataFrameProcessor:
     def __init__(self, spell_checker: SpellCheckerController):
         self.spell_checker = spell_checker
 
-    def validate_columns(self, df: pd.DataFrame, columns: List[str], file_name: str) -> Tuple[List[str], List[str]]:
+    def validate_columns(self, df: pd.DataFrame, columns: list[str], file_name: str) -> tuple[list[str], list[str]]:
         """Validate that requested columns exist in the DataFrame.
 
         Args:
@@ -43,8 +43,8 @@ class DataFrameProcessor:
         return valid_columns, warnings
 
     def find_quality_findings(
-        self, df: pd.DataFrame, columns: List[str]
-    ) -> List[Tuple[int, str, str, List[str] | None]]:
+        self, df: pd.DataFrame, columns: list[str]
+    ) -> list[tuple[int, str, str, list[str] | None]]:
         """Structured counterpart of `process_dataframe` (ARC-017 Phase 3 Port 8).
 
         Evaluates each unique text per column exactly once (PERF-006, same caching as
@@ -60,7 +60,7 @@ class DataFrameProcessor:
             List of `(row_index, column, kind, payload)` tuples; see
             `SpellCheckerController.build_quality_findings` for `kind`/`payload`'s shape.
         """
-        findings: List[Tuple[int, str, str, List[str] | None]] = []
+        findings: list[tuple[int, str, str, list[str] | None]] = []
 
         for column in columns:
             mask = df[column].notna() & (df[column] != "")
@@ -73,12 +73,14 @@ class DataFrameProcessor:
             for idx, text in texts.items():
                 has_multiple_spaces, spelling_errors = quality_by_text[text]
                 findings.extend(
-                    self.spell_checker.build_quality_findings(has_multiple_spaces, spelling_errors, column, idx)
+                    self.spell_checker.build_quality_findings(
+                        has_multiple_spaces, spelling_errors, column, cast(int, idx)
+                    )
                 )
 
         return findings
 
-    def process_dataframe(self, df: pd.DataFrame, columns: List[str], sheet_name: str) -> List[str]:
+    def process_dataframe(self, df: pd.DataFrame, columns: list[str], sheet_name: str) -> list[str]:
         """Process DataFrame columns and emit formatted warning messages.
 
         Uses vectorized operations and per-text caching (PERF-006) to avoid
@@ -113,7 +115,7 @@ class DataFrameProcessor:
             for idx, text in texts.items():
                 has_multiple_spaces, spelling_errors = quality_by_text[text]
                 text_warnings = self.spell_checker.format_quality_warnings(
-                    has_multiple_spaces, spelling_errors, column, idx, sheet_name
+                    has_multiple_spaces, spelling_errors, column, cast(int, idx), sheet_name
                 )
                 warnings.extend(text_warnings)
 

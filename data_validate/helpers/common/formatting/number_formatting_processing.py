@@ -9,7 +9,7 @@ formatting useful for handling data spreadsheet numeric values.
 
 import math
 from decimal import ROUND_DOWN, Decimal, InvalidOperation
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable
 
 import pandas as pd
 from babel.numbers import format_decimal
@@ -74,7 +74,14 @@ class NumberFormattingProcessing:
         if pd.isna(value_number) or value_number == value_to_ignore:
             return False
         decimal_value = Decimal(str(value_number).replace(",", "."))
-        return decimal_value.as_tuple().exponent < -number_decimal_places
+        exponent = decimal_value.as_tuple().exponent
+        # ARC-014: `Decimal.as_tuple().exponent` is `int | Literal["n", "N", "F"]` — the
+        # non-int forms only occur for NaN/sNaN/Infinity decimals (e.g. a cell literally
+        # containing the text "Infinity"), which is not a "too many decimals" condition;
+        # found via mypy strict, not previously covered by a test (regression test added).
+        if not isinstance(exponent, int):
+            return False
+        return exponent < -number_decimal_places
 
     @staticmethod
     def check_two_decimals_places(value: Any) -> bool:
@@ -129,7 +136,7 @@ class NumberFormattingProcessing:
             return False
 
     @staticmethod
-    def parse_numeric(cell: Any) -> Tuple[bool, float]:
+    def parse_numeric(cell: Any) -> tuple[bool, float]:
         """
         Attempt to parse a cell value to a float.
 
@@ -139,7 +146,7 @@ class NumberFormattingProcessing:
             cell (Any): Value to parse.
 
         Returns:
-            Tuple[bool, float]: A tuple containing:
+            tuple[bool, float]: A tuple containing:
                 - True and the float value if successful.
                 - False and 0.0 if parsing failed.
         """
@@ -152,8 +159,8 @@ class NumberFormattingProcessing:
 
     @staticmethod
     def validate_integer(
-        value: float, min_value: int = 0, translate: Optional[Callable[..., str]] = None
-    ) -> Tuple[bool, str]:
+        value: float, min_value: int = 0, translate: Callable[..., str] | None = None
+    ) -> tuple[bool, str]:
         """
         Validate that a float value represents a valid integer within constraints.
 
@@ -169,7 +176,7 @@ class NumberFormattingProcessing:
                 existed) so existing callers keep working unchanged.
 
         Returns:
-            Tuple[bool, str]: A tuple containing:
+            tuple[bool, str]: A tuple containing:
                 - True and an empty string if valid.
                 - False and an error message if invalid.
         """
@@ -182,8 +189,8 @@ class NumberFormattingProcessing:
 
     @staticmethod
     def check_cell_integer(
-        cell: Any, min_value: int = 0, translate: Optional[Callable[..., str]] = None
-    ) -> Tuple[bool, str]:
+        cell: Any, min_value: int = 0, translate: Callable[..., str] | None = None
+    ) -> tuple[bool, str]:
         """
         Validate if a generic cell content contains a valid integer.
 
@@ -196,7 +203,7 @@ class NumberFormattingProcessing:
                 `validate_integer`.
 
         Returns:
-            Tuple[bool, str]: A tuple containing:
+            tuple[bool, str]: A tuple containing:
                 - True and an empty string if valid.
                 - False and an error message if invalid.
         """

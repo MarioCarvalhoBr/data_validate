@@ -1,7 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 """Tree data validation utilities for hierarchical structure validation."""
 
-from typing import List, Tuple, Dict, Set
+from typing import cast
 
 import pandas as pd
 
@@ -20,7 +20,7 @@ class TreeProcessing:
         pass
 
     @staticmethod
-    def create_tree_structure(dataframe: pd.DataFrame, parent_column: str, child_column: str) -> Dict[str, List[str]]:
+    def create_tree_structure(dataframe: pd.DataFrame, parent_column: str, child_column: str) -> dict[str, list[str]]:
         """
         Create a tree structure from parent-child relationships.
 
@@ -49,12 +49,12 @@ class TreeProcessing:
             }
         )
         grouped = edges.groupby("__parent__", sort=False)["__child__"].apply(list)
-        return grouped.to_dict()
+        return cast("dict[str, list[str]]", grouped.to_dict())
 
     @staticmethod
     def detect_cycles_dfs(
-        tree: Dict[str, List[str]], node: str, visited: Set[str], current_path: List[str]
-    ) -> Tuple[bool, List[str]]:
+        tree: dict[str, list[str]], node: str, visited: set[str], current_path: list[str]
+    ) -> tuple[bool, list[str]]:
         """
         Detect cycles in tree using depth-first search.
 
@@ -85,7 +85,7 @@ class TreeProcessing:
         return False, []
 
     @staticmethod
-    def detect_tree_cycles(tree: Dict[str, List[str]]) -> Tuple[bool, List[str]]:
+    def detect_tree_cycles(tree: dict[str, list[str]]) -> tuple[bool, list[str]]:
         """
         Detect cycles in a tree structure.
 
@@ -95,7 +95,7 @@ class TreeProcessing:
         Returns:
             Tuple of (cycle_found, cycle_path)
         """
-        visited: Set[str] = set()
+        visited: set[str] = set()
 
         for node in tree:
             cycle_found, cycle = TreeProcessing.detect_cycles_dfs(tree, node, visited, [])

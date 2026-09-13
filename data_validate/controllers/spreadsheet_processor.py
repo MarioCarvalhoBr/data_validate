@@ -12,12 +12,14 @@ import sys
 import time
 from datetime import datetime
 from pathlib import Path
+from typing import Any, Callable, cast
 
 import data_validate
 import data_validate.config as config
 import data_validate.controllers as controllers
 import data_validate.helpers.tools as tools
 import data_validate.models as models
+from data_validate.helpers.base.data_args import DataAction, DataFile
 from data_validate.rules import (
     COMPOSITION_REGISTRY,
     DESCRIPTION_REGISTRY,
@@ -80,19 +82,22 @@ class SpreadsheetProcessor:
         self.validation_titles = self.context.config.get_verify_names()
 
         # SETUP CONFIGURE VARIABLES
-        self.input_folder = self.context.data_args.data_file.input_folder
-        self.output_folder = self.context.data_args.data_file.output_folder
+        # `DataArgs.run()` (called from its own `__init__`) always populates `data_file`
+        # before this constructor can observe it; the cast is typing-only narrowing.
+        data_file = cast(DataFile, self.context.data_args.data_file)
+        self.input_folder = cast(str, data_file.input_folder)
+        self.output_folder = cast(str, data_file.output_folder)
 
         # Setup model_configurations for model initialization
-        self.scenarios = []
+        self.scenarios: list[Any] = []
 
         # OBJECTS AND ARRAYS
-        self.raw_data_map = None
-        self.data_loader_facade = None
-        self.model_configurations = None
+        self.raw_data_map: dict[str, tools.LoadedSheet] | None = None
+        self.data_loader_facade: tools.DataLoaderFacade | None = None
+        self.model_configurations: dict[str, object] | None = None
 
         self.data_models_context: controllers.DataModelContext | None = None
-        self.initialized_models = []
+        self.initialized_models: list[models.SpModelABC] = []
         # ARC-006: name-keyed lookup for the report step, replacing the repeated
         # `DataModelContext.get_instance_of(...)` linear `isinstance` scans; built once in
         # `_configure`, keyed by each model's `CONSTANTS.SP_NAME` (e.g. "descricao").
@@ -190,6 +195,12 @@ class SpreadsheetProcessor:
         Collected structural and cleaning errors are immediately added to the report.
         """
         self.context.logger.info("Configuring the processor...")
+
+        # `_read_data()` (always called first by `run()`) populates both of these; the casts
+        # are typing-only narrowing across the method boundary, not a new guard.
+        raw_data_map = cast("dict[str, tools.LoadedSheet]", self.raw_data_map)
+        model_configurations = cast("dict[str, object]", self.model_configurations)
+
         # 1.2 SPECIFIC STRUCTURE VALIDATION ERRORS: Errors from the specific structure validation
         for model_class in self.target_model_classes:
             sp_name_key = model_class.CONSTANTS.SP_NAME
@@ -198,11 +209,15 @@ class SpreadsheetProcessor:
             attribute_name = f"sp_{sp_name_key.lower()}"
 
             # Model instance creation; ARC-001: construction no longer runs the pipeline as a
-            # side effect, so `run()` is called explicitly right after construction.
-            model_instance = model_class(
+            # side effect, so `run()` is called explicitly right after construction. `model_class`
+            # is statically `type[SpModelABC]` (the abstract base) even though every element of
+            # `target_model_classes` is a concrete subclass; the cast tells mypy what is already
+            # true at runtime, matching this loop's existing behaviour exactly.
+            model_ctor = cast(Callable[..., models.SpModelABC], model_class)
+            model_instance = model_ctor(
                 context=self.context,
-                data_model=self.raw_data_map.get(sp_name_key),
-                **self.model_configurations,
+                data_model=cast(tools.LoadedSheet, raw_data_map.get(sp_name_key)),
+                **model_configurations,
             )
             model_instance.run()
             setattr(self, attribute_name, model_instance)
@@ -252,28 +267,42 @@ class SpreadsheetProcessor:
         legend_model = self._models_by_name.get(models.SpLegend.CONSTANTS.SP_NAME)
         dictionary_model = self._models_by_name.get(models.SpDictionary.CONSTANTS.SP_NAME)
 
-        self._spell_backend = tools.SpellChecker(
-            self.context.data_args.data_file.locale,
-            dictionary_model.words_to_ignore if dictionary_model else [],
+        # `_read_data`/`_configure` (always called first by `run()`) populate these; the casts
+        # are typing-only narrowing across the method boundary, not a new guard.
+        raw_data_map = cast("dict[str, tools.LoadedSheet]", self.raw_data_map)
+        model_configurations = cast("dict[str, object]", self.model_configurations)
+        data_file = cast(DataFile, self.context.data_args.data_file)
+        data_action = cast(DataAction, self.context.data_args.data_action)
+
+        # `SpellChecker` is not a nominal subtype of the `SpellBackend` Protocol (its
+        # `errors_dictionary` is the mutable `list[str]` it needs internally for `.extend()`,
+        # not the Protocol's invariant `Sequence[str]`); the cast documents that the two are
+        # still structurally compatible for every member `rules/spell.py` actually calls.
+        self._spell_backend = cast(
+            SpellBackend,
+            tools.SpellChecker(
+                cast(str, data_file.locale),
+                cast(models.SpDictionary, dictionary_model).words_to_ignore if dictionary_model else [],
+            ),
         )
 
         sheets = {model.CONSTANTS.SP_NAME: model.frame for model in self.initialized_models}
         cleaned = {model.CONSTANTS.SP_NAME: dict(model.cleaned) for model in self.initialized_models}
-        base_options = {
+        base_options: dict[str, object] = {
             "input_folder": Path(self.input_folder),
             "dir_entries": os.listdir(self.input_folder),
             "scenarios": self.scenarios,
             "filenames": {model.CONSTANTS.SP_NAME: model.filename for model in self.initialized_models},
-            "no_warning_titles_length": self.context.data_args.data_action.no_warning_titles_length,
+            "no_warning_titles_length": data_action.no_warning_titles_length,
             "expected_columns": tuple(description_model.EXPECTED_COLUMNS) if description_model else (),
             "title_max_length": self.context.config.TITLE_OVER_N_CHARS,
             "simple_desc_max_length": self.context.config.SIMPLE_DESCRIPTIONS_OVER_N_CHARS,
-            "proportionality_read_successful": self.raw_data_map[
+            "proportionality_read_successful": raw_data_map[
                 models.SpProportionality.CONSTANTS.SP_NAME
             ].is_read_successful,
-            "scenario_exists_file": self.model_configurations[models.SpModelABC.CONFIG_KEYS.SCENARIO_EXISTS_FILE],
+            "scenario_exists_file": model_configurations[models.SpModelABC.CONFIG_KEYS.SCENARIO_EXISTS_FILE],
             "legend_sanity_ok": legend_model.is_sanity_check_passed if legend_model else False,
-            "legend_read_success": self.model_configurations[models.SpModelABC.CONFIG_KEYS.LEGEND_READ_SUCCESS],
+            "legend_read_success": model_configurations[models.SpModelABC.CONFIG_KEYS.LEGEND_READ_SUCCESS],
             "min_lower_legend_default": models.SpLegend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT,
             "max_upper_legend_default": models.SpLegend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT,
             "label_data_unavailable": self.context.config.LABEL_DATA_UNAVAILABLE,
@@ -281,7 +310,7 @@ class SpreadsheetProcessor:
             "precision_decimal_place_truncate": self.context.config.PRECISION_DECIMAL_PLACE_TRUNCATE,
             "current_language": self.language_manager.current_language,
             "spell_backend": self._spell_backend,
-            "no_spellchecker": self.context.data_args.data_action.no_spellchecker,
+            "no_spellchecker": data_action.no_spellchecker,
         }
 
         preliminary_context = RuleContext(
@@ -352,7 +381,9 @@ class SpreadsheetProcessor:
         # 2. Validate the spelling of the data (ARC-017 Phase 3 Port 8, ported to the rules
         # engine, replacing the deleted `validators.SpellCheckerValidator`)
         self._run_rule_registries([SPELL_REGISTRY], rule_context)
-        self._spell_backend.clean_files_generated()
+        # `_build_rule_context()` (called just above) always sets `self._spell_backend`; the
+        # cast is typing-only narrowing across the method boundary, not a new guard.
+        cast(SpellBackend, self._spell_backend).clean_files_generated()
 
         # 3. Validate spreadsheet data mandatory (description: ARC-017 Phase 3 Port 2;
         # composition: ARC-017 Phase 3 Port 3, ported to the rules engine, replacing the
@@ -383,8 +414,12 @@ class SpreadsheetProcessor:
         and triggers the generation of HTML/PDF reports via `FileReportGenerator`.
         """
         self.context.logger.info("Generating reports...")
+        # `DataArgs.run()` (called from its own `__init__`) always populates `data_action`;
+        # the cast is typing-only narrowing, not a new guard.
+        data_action = cast(DataAction, self.context.data_args.data_action)
+
         # Debug all reports and their errors
-        if self.context.data_args.data_action.debug:
+        if data_action.debug:
             self.context.logger.info("\nModo DEBUG ativado.")
             self.context.logger.info("------ Resultados da verificação dos testes ------")
 
@@ -402,14 +437,14 @@ class SpreadsheetProcessor:
         total_errors = sum(len(report.errors) for report in self.validation_reports)
         total_warnings = sum(len(report.warnings) for report in self.validation_reports)
 
-        if self.context.data_args.data_action.debug:
+        if data_action.debug:
             self.context.logger.error(f"Total errors: {total_errors}")
             self.context.logger.warning(f"Total warnings: {total_warnings}")
 
         # Generate report in HTML and PDF formats
         controllers.FileReportGenerator(context=self.context).build_report(report_list=self.validation_reports)
 
-    def run(self):
+    def run(self) -> None:
         """
         Execute the complete processing workflow.
 
@@ -437,7 +472,9 @@ class SpreadsheetProcessor:
         self._report()
 
         # End time measurement if --no-time is not set
-        if not self.context.data_args.data_action.no_time:
+        # `DataArgs.run()` (called from its own `__init__`) always populates `data_action`;
+        # the cast is typing-only narrowing, not a new guard.
+        if not cast(DataAction, self.context.data_args.data_action).no_time:
             # ARC-012: machine stdout carries only the `<{json}>` summary fragment
             # (`FileReportGenerator._print_json_summary`); every other progress line goes to
             # stderr.

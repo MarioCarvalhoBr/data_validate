@@ -99,7 +99,7 @@ class LoadedSheet:
         self.path = self.path
         self.header_type = "single" if self.raw_data.columns.nlevels == 1 else "double"
 
-    def __str__(self):
+    def __str__(self) -> str:
         return (
             f"LoadedSheet({self.name}):\n"
             + f"  input_folder: {self.input_folder}\n"
