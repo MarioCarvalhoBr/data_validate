@@ -72,7 +72,8 @@
   documented and in live use") is met in full.
 
 ### DOC-004 · API docs
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
+- Done: all packages verified Google-style English (2026-09-13 sweep); pdoc builds clean; PT remains only in catalogs/data identifiers.
 - Where: `docs/**` pdoc output committed; docstring styles mixed (NumPy in validators, Google in
   helpers, Sphinx `:ivar:` in `facade.py`), several docstrings in Portuguese (`facade.py`,
   `scanner.py`, `spellchecker*.py`).
@@ -100,7 +101,8 @@
   spec for the distinction and the "how to version the protocol in the tool" section.
 
 ### DOC-007 · Portuguese/English mix in code comments
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
+- Done: tool packages translated (2026-09-12) and final sweep found zero PT docstrings/comments outside catalogs (2026-09-13).
 - Where: `helpers/tools/data_loader/**`, `helpers/tools/spellchecker/**`, `scripts/*.sh`,
   `pyproject.toml` (black comments in Portuguese).
 - Proposed fix: English for code, comments, docs and commit messages; Portuguese only inside message
