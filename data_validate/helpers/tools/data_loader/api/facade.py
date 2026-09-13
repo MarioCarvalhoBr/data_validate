@@ -1,8 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 # File: data_loader/facade.py
-"""
-Facade para importar todos os arquivos esperados de forma simples.
+"""Facade to load all expected spreadsheet files from a bundle.
 
 ARC-009/ARC-003: `DataLoaderFacade.load()` is a real method (no I/O in a property) that returns a
 `LoadResult`; header layout, CSV separator and the required/optional flag all come from
@@ -65,27 +64,18 @@ _DEFAULT_MAX_SHEET_COLUMNS = 5_000
 
 
 class DataLoaderModel:
-    """
-    Handles the importation and management of data models from a specified file path,
-    providing access to metadata and data for further operations.
+    """Encapsulates loaded spreadsheet data and file metadata.
 
-    The class is used to manage the details of data model files, encapsulating metadata
-    such as the file name, extension, and path, as well as the associated data stored
-    as a pandas DataFrame. It provides an informative string representation for debugging
-    and logging purposes.
-
-    :ivar input_folder: Path to the folder where the data model file is located.
-    :type input_folder: str
-    :ivar name: The stem (base name without extension) of the file.
-    :type name: str
-    :ivar filename: The full name of the file including the extension.
-    :type filename: str
-    :ivar extension: The file extension.
-    :type extension: str
-    :ivar path: Full path to the file.
-    :type path: Path
-    :ivar raw_data: Data extracted from the file as a pandas DataFrame.
-    :type raw_data: pd.DataFrame
+    Attributes:
+        input_folder (str): Path to the folder where the data file is located.
+        name (str): File stem (base name without extension).
+        filename (str): Full file name including extension.
+        extension (str): File extension (e.g. '.csv', '.xlsx').
+        path (pathlib.Path): Full path to the file.
+        raw_data (pd.DataFrame): Data extracted from the file.
+        header_type (str): `"single"` or `"double"` based on the DataFrame's column levels.
+        is_read_successful (bool): True if the file was successfully read.
+        does_file_exist (bool): True if the file exists on disk.
     """
 
     def __init__(

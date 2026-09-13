@@ -1,8 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 # File: data_loader/engine/scanner.py
-"""
-Escaneia diretório de entrada e valida existência de arquivos.
+"""Scan an input folder for spreadsheet files matching a sheet registry.
 
 BUG-018/ARC-003: the expected sheet stems and allowed extensions come from
 `data_validate.specs.sheet_specs.SHEET_SPECS`/`ALLOWED_EXTENSIONS` (the single source of truth),

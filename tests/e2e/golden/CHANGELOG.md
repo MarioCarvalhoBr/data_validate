@@ -4,6 +4,40 @@ Every regeneration of `tests/e2e/golden/*.json` is recorded here: date, fixture(
 the commit/PR it shipped with. See `.claude/skills/golden-harness/SKILL.md` for the update
 process — regenerate only via `make harness-update`, with the diff reviewed.
 
+## 2026-09-13
+
+- **Fixtures re-baselined**: `data_errors_01` (one line changed, everything else byte-identical).
+- **Fixture added**: `data_errors_xss` (new, additive — a `data_ground_truth_01` copy with one
+  cell mutated: `descricao`'s row-1 `nome_simples` gets ` <Script>Alert(1)</Script>` appended,
+  which breaks `DESC-004`'s ABNT-capitalisation check and surfaces the raw payload verbatim in
+  that rule's "Encontrado: '...'" warning text).
+- **Reason**: SEC-001 (Phase 4) rebuilt `FileReportGenerator`/`report_template.html` on
+  `Environment(loader=PackageLoader(...), autoescape=select_autoescape(["html"]))` (ADR-0007):
+  every message/CLI-metadata value is now escaped before being written to the saved HTML report,
+  instead of being concatenated as a raw string in Python
+  (`FileReportGenerator._format_messages_as_html`, deleted). The golden harness's own extractor
+  (`_ReportSectionParser`, an `HTMLParser` with `convert_charrefs=True`) unescapes entities back
+  to plain text before comparison, so this change is invisible to the stored JSON goldens **except**
+  where a message previously contained a literal `<`/`>` that the pre-fix, non-escaping renderer
+  emitted raw into the HTML — the naive `HTMLParser` misread that raw `<...>` as a bogus tag and
+  silently dropped its contents from the extracted text. `data_errors_01`'s
+  "Estrutura dos arquivos da pasta de entrada" section carries exactly one such case: a corrupt
+  `legenda.xlsx` raises `python_calamine.CalamineError`, and the abort message embeds
+  `str(type(exc))` (`"...Detalhes: Cannot detect file format (<class 'python_calamine.CalamineError'>)"`).
+  Pre-fix, the raw `<class 'python_calamine.CalamineError'>` in the saved HTML was parsed as a
+  (bogus) tag and its text silently disappeared, so the *previous* golden recorded the mangled
+  `"...format ()"`. Post-fix, the same content is written as
+  `&lt;class &#39;python_calamine.CalamineError&#39;&gt;`, which `HTMLParser` correctly unescapes
+  back to the full, undamaged message — this is the one and only content diff in
+  `data_errors_01.json`, reviewed line-by-line above; no other fixture's extracted section content
+  changed at all (`exit_code`, already excluded from the comparison per the 2026-09-12 entry below,
+  is the only other field that differs, an artefact of re-running the harness rather than of this
+  change).
+- **XSS regression evidence** (not itself part of the golden, verified manually and via
+  `tests/unit/controllers/report/test_file_report_generator.py::TestXssEscaping`): the raw HTML
+  report generated for `data_errors_xss` contains `&lt;Script&gt;Alert(1)&lt;/Script&gt;`, never a
+  literal `<Script>` tag.
+
 ## 2026-09-12
 
 - **Fixtures**: none regenerated — every `tests/e2e/golden/*.json` file is byte-identical to the

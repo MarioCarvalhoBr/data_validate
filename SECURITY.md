@@ -37,9 +37,9 @@ Full model and control matrix: [`.specs/quality/security.md`](.specs/quality/sec
 
 | Asset | Threat | Vector |
 |---|---|---|
-| Analyst's browser | Stored XSS | Spreadsheet cell content rendered unescaped into the HTML report |
+| Analyst's browser | Stored XSS | Spreadsheet cell content rendered unescaped into the HTML report — **fixed, SEC-001** (Jinja2 `autoescape=True` + `PackageLoader`, ADR-0007) |
 | Validator host | Resource exhaustion | Oversized/malformed `.xlsx`/`.csv` input |
-| Validator host | Arbitrary file read / SSRF | `wkhtmltopdf` rendering attacker-controlled HTML |
+| Validator host | Arbitrary file read / SSRF | `wkhtmltopdf` rendering attacker-controlled HTML — **mitigated, SEC-002**: WeasyPrint (pure Python, no native daemon) is now the primary PDF backend; `wkhtmltopdf`/`pdfkit` remains only as an opt-in compatibility fallback for hosts that already have it, not a declared dependency |
 | Platform ingestion | Wrong acceptance decision | Exceptions swallowed, exit code always `0` today |
 | Supply chain | Malicious/vulnerable dependency | Unpinned CI actions, unaudited dependencies |
 
@@ -52,11 +52,16 @@ failure.
 
 | ID | Issue | Scheduled |
 |---|---|---|
-| SEC-001 | Report HTML rendered without Jinja2 autoescape (stored XSS via cell content) | Migration Phase 4 — `ReportModel` + autoescaped templates (ADR-0007) |
-| SEC-002 | PDF generation via `wkhtmltopdf` (unmaintained, historically vulnerable to SSRF/file-read) | Migration Phase 4 — replace with WeasyPrint behind an optional `[pdf]` extra (ADR-0007) |
 | SEC-003 | No input size/row/column limits before parsing | Migration Phase 2 |
 | SEC-007 | Spell-check writes personal dictionaries inside the installed package directory | Migration Phase 5 |
 | SEC-008 | Exit code is always `0`, regardless of validation result or crash | Migration Phase 1 — explicit exit codes (ADR-0005) |
+
+## Resolved items
+
+| ID | Issue | Fixed in |
+|---|---|---|
+| SEC-001 | Report HTML rendered without Jinja2 autoescape (stored XSS via cell content) | Migration Phase 4 — `ReportModel` + `Environment(autoescape=True, loader=PackageLoader(...))` (ADR-0007) |
+| SEC-002 | PDF generation via `wkhtmltopdf` (unmaintained, historically vulnerable to SSRF/file-read) | Migration Phase 4 — WeasyPrint is the primary PDF backend behind an optional `[pdf]` extra; `wkhtmltopdf`/`pdfkit` is an opt-in compatibility fallback only, no longer a declared dependency (ADR-0007) |
 
 The full, prioritised list (with `bandit`/`pip-audit` findings and CVSS-like severity) lives in
 [`.specs/quality/backlog/02-security.md`](.specs/quality/backlog/02-security.md). `bandit` and

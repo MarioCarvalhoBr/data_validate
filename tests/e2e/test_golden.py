@@ -18,7 +18,6 @@ from __future__ import annotations
 
 import json
 import re
-import shutil
 import subprocess
 import sys
 from html.parser import HTMLParser
@@ -27,7 +26,7 @@ from typing import Any
 
 import pytest
 
-from tests.conftest import enchant_pt_br_available
+from tests.conftest import enchant_pt_br_available, pdf_backend_available
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _GOLDEN_DIR = _REPO_ROOT / "tests" / "e2e" / "golden"
@@ -79,11 +78,10 @@ def _discover_fixtures() -> list[str]:
 class _ReportSectionParser(HTMLParser):
     """Extract per-verification error/warning messages from the report HTML.
 
-    Walks the `<span>` markers emitted by
-    `FileReportGenerator._format_messages_as_html`: a `text-primary` span
-    starts a new verification section, and each following
-    `text-danger-errors`/`text-orange-warning` span is one message that
-    belongs to the most recently seen section title.
+    Walks the `<span>` markers the report template (`static/report/report_template.html`)
+    loops over from `ReportModel.sections` (ARC-016): a `text-primary` span starts a new
+    verification section, and each following `text-danger-errors`/`text-orange-warning`
+    span is one message that belongs to the most recently seen section title.
     """
 
     _TITLE_CLASS = "text-primary"
@@ -319,9 +317,9 @@ def test_golden_report(fixture_name: str, tmp_path: Path, request: pytest.Fixtur
     html_path = output_dir / f"{fixture_name}_report.html"
     assert html_path.is_file(), f"HTML report not found at {html_path}"
 
-    if shutil.which("wkhtmltopdf"):
+    if pdf_backend_available():
         pdf_path = output_dir / f"{fixture_name}_report.pdf"
-        assert pdf_path.is_file(), f"PDF report not found at {pdf_path} (wkhtmltopdf is installed)"
+        assert pdf_path.is_file(), f"PDF report not found at {pdf_path} (a PDF backend is installed)"
 
     html_content = html_path.read_text(encoding="utf-8")
     actual = _build_actual(fixture_name, result, output_dir, html_content)

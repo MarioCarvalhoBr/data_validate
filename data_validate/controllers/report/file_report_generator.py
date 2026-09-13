@@ -4,24 +4,29 @@ Module for generating validation reports in HTML and PDF formats.
 
 This module provides the `FileReportGenerator` class, which handles the creation
 of detailed validation reports based on the results collected during the data
-validation process. It supports template-based HTML generation and PDF conversion
-using `pdfkit` and `jinja2`.
+validation process. It supports template-based HTML generation (Jinja2,
+autoescaped, SEC-001/ADR-0007) and optional PDF conversion (WeasyPrint, with a
+legacy `pdfkit` compatibility path, SEC-002).
 """
 
 import json
 import os
 import platform
-import re
 import sys
-from typing import List, Dict, Any
+from typing import Any
 
-from jinja2 import Environment, FileSystemLoader, TemplateError
+from jinja2 import Environment, PackageLoader, TemplateError, select_autoescape
 
 from data_validate.config import NamesEnum
 from data_validate.controllers.context.general_context import GeneralContext
+from data_validate.controllers.report.report_model import ReportModel, ReportSection
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.config.metadata_info import METADATA
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
+
+_TEMPLATE_NAME = "report_template.html"
+"""str: Name of the report template, loaded from the package's own `static/report/`
+directory (never the user-writable output directory -- SEC-001)."""
 
 
 class FileReportGenerator:
@@ -38,9 +43,6 @@ class FileReportGenerator:
         total_tests (int): Total number of tests executed.
         input_folder (str): Path to the input data folder.
         output_folder (str): Path to the output folder for reports.
-        template_name (str): Name of the HTML template file.
-        template_data_text (str): Content of the HTML template.
-        required_variables (List[str]): List of required variables in the template.
         env (Environment): Jinja2 environment for template rendering.
     """
 
@@ -62,13 +64,19 @@ class FileReportGenerator:
         # Setup file paths and template environment.
         self.input_folder = self.context.data_args.data_file.input_folder
         self.output_folder = self.context.data_args.data_file.output_folder
-        self.template_name = self.context.config.REPORT_OUTPUT_DEFAULT_HTML
-        self.template_data_text = ""
-        self.required_variables = []
-        self.env = Environment(loader=FileSystemLoader(self.output_folder))
+
+        # SEC-001/ADR-0007: templates are loaded exclusively from the package's own
+        # `static/report/` directory -- never from the user-writable output directory, which
+        # closed a template-planting hole -- and `autoescape` is always on, so every value
+        # rendered through `{{ }}` (untrusted spreadsheet content or CLI metadata) is escaped
+        # unless the template itself authors the markup (e.g. the `&ndash;`/`&eacute;` entities
+        # and card layout already in `report_template.html`).
+        self.env = Environment(
+            loader=PackageLoader("data_validate", "static/report"),
+            autoescape=select_autoescape(["html"]),
+        )
 
         self._prepare_environment()
-        self._validate_html_template()
 
     def _prepare_environment(self) -> None:
         """
@@ -79,30 +87,6 @@ class FileReportGenerator:
         """
         self.context.file_system_utils.create_directory(self.output_folder)
 
-    def _validate_html_template(self) -> None:
-        """
-        Validate HTML template existence and required variables.
-
-        Loads the report template from the static files directory. If the file
-        doesn't exist or misses required variables, falls back to a default basic
-        template defined in the configuration.
-        """
-        # Extract template variables using regex
-        variable_pattern = r"\{\{\s*.*?\s*\}\}"
-        self.required_variables = re.findall(variable_pattern, self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS)
-
-        # Load template from file or use default
-        template_path = os.path.abspath(
-            os.path.join(os.path.dirname(__file__), "../../static/report/report_template.html")
-        )
-        if os.path.exists(template_path):
-            with open(template_path, "r", encoding="utf-8") as file:
-                self.template_data_text = file.read()
-
-        # Validate required variables and fallback to default if needed
-        if any(var not in self.template_data_text for var in self.required_variables):
-            self.template_data_text = self.context.config.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS
-
     def build_report(self, report_list: ValidationReport) -> None:
         """
         Generate and save HTML and PDF reports from validation results.
@@ -111,7 +95,7 @@ class FileReportGenerator:
         1. Aggregates error and warning statistics.
         2. Identifies tests that were skipped.
         3. Flattens the report list (truncating excessive messages).
-        4. Generates HTML content from the template.
+        4. Builds the `ReportModel` and renders it through the Jinja2 template.
         5. Saves the HTML file and converts it to PDF.
         6. Prints a JSON summary to stdout.
 
@@ -134,23 +118,15 @@ class FileReportGenerator:
             n_messages=self.context.config.REPORT_LIMIT_N_MESSAGES, locale=self.locale
         )
 
-        skipped_tests = []
-        if self.context.data_args.data_action.no_spellchecker:
-            skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.SPELL.value])
-        if self.context.data_args.data_action.no_warning_titles_length:
-            skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
-
-        for report in report_list.reports.values():
-            if not report.was_executed:
-                skipped_tests.append(report.test_name)
+        skipped_tests = self._collect_skipped_tests(flattened_reports)
 
         try:
-            html_content = self._generate_html_content(flattened_reports, skipped_tests)
+            report_model = self._build_report_model(flattened_reports, skipped_tests)
+            html_content = self._render_html(report_model)
             output_html_path = os.path.join(self.output_folder, file_name + html_output_file)
 
             self._save_html_file(html_content, output_html_path, logger=self.context.logger)
             self._save_pdf_file(
-                pdf_options=self._get_pdf_options(),
                 html_file_path=output_html_path,
                 logger=self.context.logger,
             )
@@ -161,92 +137,90 @@ class FileReportGenerator:
             self.context.logger.info(error_message)
             print(error_message, file=sys.stderr)
 
-    def _generate_html_content(self, report_list: ValidationReport, skipped_tests: List[str]) -> str:
+    def _collect_skipped_tests(self, report_list: ValidationReport) -> list[str]:
         """
-        Generate HTML content from template and report data.
-
-        Renders the Jinja2 template with the prepared variables derived from
-        the validation results.
+        Collect the localized names of every verification that was not executed.
 
         Args:
-            report_list (ValidationReport): List of validation test reports.
-            skipped_tests (List[str]): List of test names that were not executed.
+            report_list (ValidationReport): The (already flattened) report list.
 
         Returns:
-            str: Rendered HTML content as string.
+            list[str]: Localized names of skipped verifications, in a fixed order
+                (`--no-spellchecker`, then `--no-warning-titles-length`, then any report marked
+                `was_executed=False`).
         """
-        template = self.env.from_string(self.template_data_text)
-        template_vars = self._build_template_variables(report_list, skipped_tests)
-        return template.render(template_vars)
+        skipped_tests = []
+        if self.context.data_args.data_action.no_spellchecker:
+            skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.SPELL.value])
+        if self.context.data_args.data_action.no_warning_titles_length:
+            skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
 
-    def _build_template_variables(self, report_list: ValidationReport, skipped_tests: List[str]) -> Dict[str, Any]:
+        for report in report_list.reports.values():
+            if not report.was_executed:
+                skipped_tests.append(report.test_name)
+
+        return skipped_tests
+
+    def _render_html(self, report_model: ReportModel) -> str:
         """
-        Build template variables dictionary for HTML generation.
-
-        Constructs a dictionary containing all necessary data bits (metadata,
-        formatted lists of issues, statistics) required by the HTML template.
+        Render the report template against a `ReportModel`.
 
         Args:
-            report_list (ValidationReport): List of validation test reports.
-            skipped_tests (List[str]): List of test names that were not executed.
+            report_model (ReportModel): The immutable model built for this run.
 
         Returns:
-            Dict[str, Any]: Dictionary containing all template variables.
+            str: The rendered, autoescaped HTML content.
         """
-        errors_html = self._format_messages_as_html(report_list, "errors", "text-danger-errors")
-        warnings_html = self._format_messages_as_html(report_list, "warnings", "text-orange-warning")
+        template = self.env.get_template(_TEMPLATE_NAME)
+        return template.render(report=report_model)
 
-        date_display_html = (
-            ""
-            if self.context.data_args.data_action.no_time
-            else f"<strong>Data e hora do processo: <strong class='text-gray'>{self.context.config.DATE_NOW}</strong></strong><br>"
-        )
-        text_html_version_and_os_info = (
-            ""
-            if self.context.data_args.data_action.no_version
-            else (
-                f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{METADATA.__version__} "
-                f"&ndash; {platform.system()} &ndash; Protocolo {METADATA.__protocol_version__}</strong></strong><br>"
+    def _build_report_model(self, report_list: ValidationReport, skipped_tests: list[str]) -> ReportModel:
+        """
+        Build the `ReportModel` (ARC-016) the template renders.
+
+        Every value here is a plain Python value -- no HTML is built in this method. The
+        template loops over `sections`/`skipped_tests` itself (`{% for %}`) and renders every
+        field through `{{ }}`, so Jinja2's `autoescape=True` (SEC-001) protects both untrusted
+        spreadsheet content (`section.errors`/`section.warnings`) and CLI metadata
+        (`sector`/`protocol`/`user`/`file`).
+
+        Args:
+            report_list (ValidationReport): The (already flattened) report list.
+            skipped_tests (list[str]): Localized names of skipped verifications.
+
+        Returns:
+            ReportModel: The immutable model consumed by `_render_html`.
+        """
+        sections = tuple(
+            ReportSection(
+                title=report.test_name,
+                errors=tuple(report.errors),
+                warnings=tuple(report.warnings),
             )
+            for report in report_list
         )
-        text_html_skipped_tests = f"<ul>{'\n'.join([f'<li>{test_name}</li>' for test_name in skipped_tests])}</ul>"
 
-        return {
-            "name": METADATA.__project_name__,
-            "errors": errors_html,
-            "warnings": warnings_html,
-            "error_count": NumberFormattingProcessing.format_number_brazilian(self.error_count),
-            "warning_count": NumberFormattingProcessing.format_number_brazilian(self.warning_count),
-            "total_tests": self.total_tests,
-            "text_display_version_and_os_info": text_html_version_and_os_info,
-            "text_display_date": date_display_html,
-            "text_display_sector": self._get_optional_field_text("sector", "Setor estrat&eacute;gico"),
-            "text_display_protocol": self._get_optional_field_text("protocol", "Protocolo"),
-            "text_display_user": self._get_optional_field_text("user", "Usu&aacute;rio"),
-            "text_display_file": self._get_optional_field_text("file", "Arquivo submetido"),
-            "skipped_tests": text_html_skipped_tests,
-            "display_skipped_tests": "block" if skipped_tests else "none",
-        }
+        show_date = not self.context.data_args.data_action.no_time
+        show_version = not self.context.data_args.data_action.no_version
 
-    def _get_optional_field_text(self, field_name: str, display_label: str) -> str:
-        """
-        Get formatted text for optional report fields.
-
-        Helper method to format optional metadata fields (like sector, protocol,
-        user) for display in the report header.
-
-        Args:
-            field_name (str): Name of the field in data_report.
-            display_label (str): Label to display for the field in the HTML.
-
-        Returns:
-            str: Formatted field text (HTML) or empty string if field is None.
-        """
-        field_value = getattr(self.context.data_args.data_report, field_name, None)
-        if field_value is None:
-            return ""
-
-        return f"<strong>{display_label}: <strong class='text-gray'>{field_value}</strong></strong><br>"
+        return ReportModel(
+            name=METADATA.__project_name__,
+            error_count=NumberFormattingProcessing.format_number_brazilian(self.error_count),
+            warning_count=NumberFormattingProcessing.format_number_brazilian(self.warning_count),
+            total_tests=self.total_tests,
+            sections=sections,
+            skipped_tests=tuple(skipped_tests),
+            show_date=show_date,
+            date_now=self.context.config.DATE_NOW,
+            show_version=show_version,
+            version=METADATA.__version__,
+            os_name=platform.system(),
+            protocol_version=METADATA.__protocol_version__,
+            sector=getattr(self.context.data_args.data_report, "sector", None),
+            protocol=getattr(self.context.data_args.data_report, "protocol", None),
+            user=getattr(self.context.data_args.data_report, "user", None),
+            file=getattr(self.context.data_args.data_report, "file", None),
+        )
 
     def _print_json_summary(self) -> None:
         """
@@ -275,43 +249,16 @@ class FileReportGenerator:
         print(info_message, file=sys.stdout)
 
     @staticmethod
-    def _format_messages_as_html(report_list: ValidationReport, message_type: str, css_class: str) -> str:
+    def _get_pdf_options() -> dict[str, Any]:
         """
-        Format error or warning messages as HTML.
-
-        Iterates through reports and formats lists of messages into HTML spans
-        with appropriate CSS classes.
-
-        Args:
-            report_list (ValidationReport): List of validation test reports.
-            message_type (str): Type of messages to format ('errors' or 'warnings').
-            css_class (str): CSS class for styling the messages.
-
-        Returns:
-            str: Formatted HTML string with messages.
-        """
-        html_parts = []
-
-        for report in report_list:
-            html_parts.append(f"<br><span class='text-primary'>{report.test_name}</span>")
-
-            messages = getattr(report, message_type, [])
-            for message in messages:
-                html_parts.append(f"<br><span class='{css_class}' preserve-spaces>{message}</span>")
-
-        result = "\n".join(html_parts)
-        return result[4:] if result.startswith("<br>") else result
-
-    @staticmethod
-    def _get_pdf_options() -> Dict[str, Any]:
-        """
-        Get PDF generation options.
+        Get PDF generation options for the legacy `pdfkit` compatibility path.
 
         Returns a dictionary of configuration options for `pdfkit` (wkhtmltopdf wrapper).
-        Configures page size, margins, and encoding.
+        Configures page size, margins, and encoding. Not used by the WeasyPrint path
+        (SEC-002), which needs no equivalent options for this report's layout.
 
         Returns:
-            Dict[str, Any]: Dictionary with PDF generation options.
+            dict[str, Any]: Dictionary with PDF generation options.
         """
         return {
             "page-size": "Letter",
@@ -356,37 +303,65 @@ class FileReportGenerator:
             print(error_message, file=sys.stderr)
 
     @staticmethod
-    def _save_pdf_file(pdf_options: Dict[str, Any], html_file_path: str, logger) -> None:
+    def _save_pdf_file(html_file_path: str, logger) -> None:
         """
-        Generate and save PDF report from HTML file.
+        Generate and save a PDF report from the HTML file (SEC-002).
 
-        Uses the `pdfkit` library to convert the saved HTML file into a PDF report.
-        The PDF filename is derived from the HTML filename.
+        PDF is optional and pluggable: WeasyPrint (pure Python, actively maintained, the
+        `[pdf]` Poetry extra) is tried first; `pdfkit`/`wkhtmltopdf` is tried next only for
+        backward compatibility (neither is a declared dependency any more); if neither backend
+        is usable, PDF generation is skipped with a message and the HTML report -- the primary,
+        always-produced artefact -- is unaffected.
 
-        SEC-004: catches `ImportError` (`pdfkit`/its native `wkhtmltopdf` binary not installed --
-        the lazy import above) and `OSError` (`pdfkit` raises a plain `IOError`, an `OSError` alias
-        in Python 3, for every conversion failure it can report -- missing source file,
-        `wkhtmltopdf` exiting non-zero, ...). Any other exception propagates.
+        SEC-004: a backend being unusable (`ImportError` -- not installed -- or `OSError` raised
+        at import time, e.g. WeasyPrint's own native pango/cairo libraries missing) falls through
+        to the next backend/the skip message; `OSError` raised by the backend's own conversion
+        call (a real rendering failure, not an availability problem) is reported instead. Any
+        other exception propagates.
 
         Args:
-            pdf_options (Dict[str, Any]): Options for PDF generation.
             html_file_path (str): Path to the source HTML file.
             logger (logging.Logger): Logger instance for status messages.
         """
+        pdf_file_path = html_file_path.replace(".html", ".pdf")
+
         try:
             # Lazy import: heavy/optional dependency, only needed for PDF output (PERF-008).
-            import pdfkit
-
-            pdf_file_path = html_file_path.replace(".html", ".pdf")
-
-            pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)
+            # `OSError` here (not just `ImportError`) covers WeasyPrint's own native
+            # pango/cairo libraries being missing even though the Python package is installed.
+            from weasyprint import HTML
+        except (ImportError, OSError):
+            pass
+        else:
+            try:
+                HTML(filename=html_file_path).write_pdf(pdf_file_path)
+            except OSError as error:
+                error_message = f"Error creating PDF report: {error}"
+                logger.error(error_message)
+                print(error_message, file=sys.stderr)
+                return
             info_message = f"PDF report created at: {pdf_file_path}"
-
             logger.info(info_message)
             print(info_message, file=sys.stdout)
+            return
 
-        except (ImportError, OSError) as error:
+        try:
+            # Legacy compatibility path (SEC-002): pdfkit/wkhtmltopdf are no longer declared
+            # dependencies, but are still used when already present on the host.
+            import pdfkit
+        except ImportError:
+            info_message = "PDF generation skipped: install canoa-data-validate[pdf] for PDF output."
+            logger.info(info_message)
+            print(info_message, file=sys.stderr)
+            return
+
+        try:
+            pdfkit.from_file(html_file_path, pdf_file_path, options=FileReportGenerator._get_pdf_options())
+        except OSError as error:
             error_message = f"Error creating PDF report: {error}"
-
             logger.error(error_message)
             print(error_message, file=sys.stderr)
+            return
+        info_message = f"PDF report created at: {pdf_file_path}"
+        logger.info(info_message)
+        print(info_message, file=sys.stdout)

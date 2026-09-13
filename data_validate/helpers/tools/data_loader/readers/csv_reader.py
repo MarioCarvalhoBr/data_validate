@@ -1,8 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 # File: data_loader/readers/csv_reader.py
-"""
-Lê CSV com pandas, corrige cabeçalho duplo e separador explícito.
+"""Read CSV files with pandas, handling double headers and explicit separators.
 
 BUG-018: the separator is received as an explicit constructor parameter (`sep`), sourced by the
 caller (`DataLoaderFacade`) from the sheet's `SheetSpec.csv_separator` -- this reader no longer
@@ -80,7 +79,7 @@ class CSVReader(BaseReader):
             s0 = s0.replace("", np.nan)
             s0 = s0.ffill()
             filled0 = s0.tolist()
-            # garante rótulo no primeiro
+            # Ensure first-level header has a label.
             if pd.isna(filled0[0]):
                 filled0[0] = lvl0[0] or "Unnamed: 0_level_0"
             df.columns = pd.MultiIndex.from_tuples(list(zip(filled0, lvl1)))

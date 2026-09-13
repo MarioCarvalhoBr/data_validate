@@ -9,7 +9,11 @@ from data_validate.helpers.tools.spellchecker.text_processor import TextProcesso
 
 
 class SpellCheckerController:
-    """Verificador ortográfico principal"""
+    """Main spell-checking service for text quality validation.
+
+    Caches per-word spell-check results (PERF-006) to avoid redundant dictionary
+    lookups across the validation run.
+    """
 
     def __init__(self, dictionary_manager: DictionaryManager):
         self.dictionary_manager = dictionary_manager
@@ -23,7 +27,13 @@ class SpellCheckerController:
         self._check_cache: Dict[str, bool] = {}
 
     def find_spelling_errors(self, text: str) -> List[str]:
-        """Encontra erros ortográficos no texto"""
+        """Find spelling errors in the given text.
+
+        Args:
+            text: Input string to check.
+
+        Returns:
+            List of misspelled words found."""
         # Input string
         preprocessed_text = self.text_processor.sanitize_text(text)
         words = preprocessed_text.split()
@@ -142,6 +152,15 @@ class SpellCheckerController:
         return warnings
 
     def check_text_quality(self, text: str, column: str, row_index: int, sheet_name: str) -> List[str]:
-        """Verifica a qualidade do texto (espaços e ortografia)"""
+        """Check text quality (multiple spaces and spelling errors).
+
+        Args:
+            text: Input string to check.
+            column: Column name for the warning message.
+            row_index: Zero-based row index for the warning message.
+            sheet_name: Sheet name for the warning message.
+
+        Returns:
+            List of formatted warning messages."""
         has_multiple_spaces, spelling_errors = self.evaluate_text_quality(text)
         return self.format_quality_warnings(has_multiple_spaces, spelling_errors, column, row_index, sheet_name)

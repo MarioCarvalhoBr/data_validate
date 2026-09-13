@@ -35,7 +35,11 @@ class SpellingFinding:
 
 
 class SpellChecker:
-    """Serviço principal para verificação ortográfica"""
+    """Main spell-checking service for validation bundles.
+
+    Integrates dictionary management and DataFrame processing to check
+    multiple sheets and columns for spelling and formatting quality issues.
+    """
 
     def __init__(self, lang_dict_spell: str = "pt_BR", list_words_user: List[str] = None):
         self.list_words_user = list_words_user
@@ -51,10 +55,10 @@ class SpellChecker:
         self._prepare_statement()
 
     def _prepare_statement(self) -> None:
-        # Inicializa dicionário
+        # Initialize dictionary with user words.
         self.spell_checker_controller.dictionary = self.dictionary_manager.initialize_dictionary(self.list_words_user)
 
-        # Valida dicionário
+        # Validate dictionary and collect any initialization errors.
         validation_errors = self.dictionary_manager.validate_dictionary()
         if validation_errors:
             self.errors_dictionary.extend(validation_errors)
@@ -65,8 +69,16 @@ class SpellChecker:
     def check_spelling_text(
         self, df: pd.DataFrame, file_name: str, columns_sheets: List[str]
     ) -> Tuple[List[str], List[str]]:
-        """Verifica ortografia em texto com tratamento melhorado de erros"""
+        """Check spelling and formatting in DataFrame text columns.
 
+        Args:
+            df: DataFrame to check.
+            file_name: Name of the file for error messages.
+            columns_sheets: Column names to check.
+
+        Returns:
+            Tuple of (errors, warnings) lists.
+        """
         errors, warnings = [], []
 
         try:

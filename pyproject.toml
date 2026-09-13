@@ -23,12 +23,18 @@ dependencies = [
     "pandas (>=3.0.1,<4.0.0)",
     "chardet (>=5.2.0,<6.0.0)",
     "pyenchant (>=3.3.0,<4.0.0)",
-    "pdfkit (>=1.0.0,<2.0.0)",
     "babel (>=2.18.0,<3.0.0)",
     "jinja2 (>=3.1.6,<4.0.0)",
     "networkx (>=3.6.1,<4.0.0)",
     "python-calamine (>=0.6.2,<0.7.0)",
 ]
+
+[project.optional-dependencies]
+# SEC-002/ADR-0007: PDF generation is optional. WeasyPrint (pure Python + pango, actively
+# maintained) is the supported renderer; `pdfkit`/`wkhtmltopdf` is no longer a declared
+# dependency (archived upstream, unpatched QtWebKit) but is still used as a compatibility
+# fallback when already present on the host (see `FileReportGenerator._save_pdf_file`).
+pdf = ["weasyprint (>=70,<80)"]  # >=70: fixes PYSEC-2026-3940 (see `make security`)
 
 [project.urls]
 Homepage = "https://github.com/AdaptaBrasil/"
@@ -171,9 +177,6 @@ exclude_dirs = ["tests"]
 # Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —
 # not a silent mask — and is removed once the linked item is closed.
 skips = [
-    "B701",  # Jinja2 Environment without autoescape in file_report_generator.py — tracked as
-             # SEC-001 (P0, stored XSS), fixed in migration Phase 4 (ReportModel + autoescaped
-             # templates). Not disabled lightly: SEC-001 is the top item of the security backlog.
     "B110",  # try/except/pass in dictionary_manager.py cleanup — tracked as SEC-007, fixed in
              # migration Phase 5 (session-scoped temp dir replaces __del__-based cleanup).
 ]
@@ -231,7 +234,7 @@ markers = [
     "e2e: end-to-end tests that run the CLI against data/input/* fixtures",
     "slow: tests that are expensive enough to skip from the default fast loop",
     "requires_enchant: tests that need a working pyenchant/hunspell installation",
-    "requires_pdf: tests that need wkhtmltopdf installed",
+    "requires_pdf: tests that need a PDF backend installed (WeasyPrint or wkhtmltopdf)",
     "keep_cwd: opt out of the tests/unit/ autouse CWD isolation (TST-003); use sparingly",
 ]
 filterwarnings = [

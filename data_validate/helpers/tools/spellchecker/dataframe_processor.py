@@ -10,13 +10,25 @@ from data_validate.helpers.tools.spellchecker.spellchecker_controller import (
 
 
 class DataFrameProcessor:
-    """Processador de DataFrame para verificação ortográfica"""
+    """Process DataFrames to find spelling and formatting quality issues.
+
+    Evaluates each unique text value per column exactly once (PERF-006),
+    then emits findings for every row/column/signal combination.
+    """
 
     def __init__(self, spell_checker: SpellCheckerController):
         self.spell_checker = spell_checker
 
     def validate_columns(self, df: pd.DataFrame, columns: List[str], file_name: str) -> Tuple[List[str], List[str]]:
-        """Valida se as colunas existem no DataFrame"""
+        """Validate that requested columns exist in the DataFrame.
+
+        Args:
+            df: DataFrame to validate.
+            columns: Column names to check for.
+            file_name: Name of the file for warning messages.
+
+        Returns:
+            Tuple of (existing_columns, warnings)."""
         existing_columns = set(df.columns)
         target_columns = set(columns)
         missing_columns = target_columns - existing_columns
@@ -67,7 +79,19 @@ class DataFrameProcessor:
         return findings
 
     def process_dataframe(self, df: pd.DataFrame, columns: List[str], sheet_name: str) -> List[str]:
-        """Processa o DataFrame usando operações vetorizadas"""
+        """Process DataFrame columns and emit formatted warning messages.
+
+        Uses vectorized operations and per-text caching (PERF-006) to avoid
+        redundant spell-check calls on duplicate text values.
+
+        Args:
+            df: DataFrame to process.
+            columns: Column names to check.
+            sheet_name: Sheet name for the warning messages.
+
+        Returns:
+            List of formatted warning messages.
+        """
         warnings = []
 
         for column in columns:

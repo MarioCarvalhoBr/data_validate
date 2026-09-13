@@ -46,10 +46,15 @@ Data Validate works without any of these — they only unlock spell-check and PD
 | Feature | Linux (Debian/Ubuntu) | Windows |
 |---|---|---|
 | Spell-check (`SPELL` category) | `sudo apt install enchant-2 hunspell-pt-br hunspell-en-us` | bundled hunspell dictionaries, or run under WSL |
-| PDF report | `sudo apt install wkhtmltopdf` | `choco install -y wkhtmltopdf`, or download from <https://wkhtmltopdf.org/downloads.html> |
+| PDF report | `pip install "canoa-data-validate[pdf]"` (WeasyPrint; needs `sudo apt install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libcairo2`) | `pip install "canoa-data-validate[pdf]"` plus the [WeasyPrint Windows GTK runtime](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html#windows) |
 
-Without `wkhtmltopdf`, PDF generation is skipped with a stderr message and the HTML report is
-still produced. Without `enchant`, spell-check tests/rules skip with a clear reason.
+PDF generation is optional (`[pdf]` extra, SEC-002/ADR-0007): WeasyPrint (pure Python, no native
+daemon) is the supported backend; the legacy `wkhtmltopdf`/`pdfkit` combination (archived
+upstream, unpatched QtWebKit) still works as a compatibility fallback if already installed, but is
+no longer a declared dependency and is not the recommended path for new installs. Without either
+backend, PDF generation is skipped with a stderr message and the HTML report — the primary,
+always-produced artefact — is still produced. Without `enchant`, spell-check tests/rules skip with
+a clear reason.
 
 ## Usage
 
@@ -78,8 +83,8 @@ Or without installing the package: `python -m data_validate.main --input_folder 
 | `--debug` | flag | Verbose logging; keeps the log file |
 | `--sector`, `--protocol`, `--user`, `--file` | optional text | Shown in the report header |
 
-**Outputs:** `<output_folder>/<input-folder-name>_report.html`, the same `.pdf` (unless
-`wkhtmltopdf` is unavailable), and a one-line JSON summary on stdout, e.g.
+**Outputs:** `<output_folder>/<input-folder-name>_report.html`, the same `.pdf` (unless no PDF
+backend — WeasyPrint or `wkhtmltopdf` — is available), and a one-line JSON summary on stdout, e.g.
 `{"data_validate": {"version": "0.7.65...", "report": {"errors": 0, "warnings": 3, "tests": 34}}}`.
 
 **Exit code:** today the process **always exits 0**, regardless of validation result — the
@@ -164,7 +169,7 @@ flowchart LR
   E --> E1[DataLoaderFacade<br/>8 Sp* models]
   E1 --> E2[FileStructureValidator,<br/>SpellCheckerValidator,<br/>per-sheet business validators]
   E2 --> F[ValidationReport]
-  F --> G[FileReportGenerator<br/>Jinja2 + pdfkit]
+  F --> G[FileReportGenerator<br/>Jinja2 autoescape + WeasyPrint]
   G --> H[HTML + PDF report,<br/>JSON summary on stdout]
 ```
 

@@ -1,5 +1,5 @@
 {
-  "exit_code": 0,
+  "exit_code": 1,
   "fixture": "data_errors_01",
   "json_summary": {
     "data_validate": {
@@ -87,7 +87,7 @@
         "legenda.xlsx: Coluna 'maximo' esperada mas não foi encontrada.",
         "legenda.xlsx: Coluna 'minimo' esperada mas não foi encontrada.",
         "legenda.xlsx: Coluna 'ordem' esperada mas não foi encontrada.",
-        "legenda.xlsx: Erro inesperado ao processar o arquivo. Detalhes: Cannot detect file format ()",
+        "legenda.xlsx: Erro inesperado ao processar o arquivo. Detalhes: Cannot detect file format (<class 'python_calamine.CalamineError'>)",
         "valores.xlsx, linha 1: Colunas fora do padrão esperado (CÓDIGO-ANO ou CÓDIGO-ANO-CENÁRIO): ['5000-2080-M']",
         "valores.xlsx: A coluna '5000-2080-M' não é esperada."
       ],

@@ -62,7 +62,8 @@ jobs:
         with:
           python-version: "3.12"
           cache: poetry
-      - run: poetry install --sync
+      - name: Install dependencies (with the [pdf] extra, so pip-audit scans WeasyPrint too)
+        run: poetry install --sync --extras pdf
       - run: make security
 
   test:
@@ -79,25 +80,34 @@ jobs:
           persist-credentials: false
       - name: Install system dependencies (Linux)
         if: runner.os == 'Linux'
-        # TST-007: enchant-2/hunspell/wkhtmltopdf are optional system dependencies with no
-        # supported Windows equivalent installable from this workflow (no Chocolatey/winget
-        # package provides a native libenchant + hunspell pt_BR/en_US backend or wkhtmltopdf that
-        # matches the Linux setup here). The Windows leg of this matrix intentionally does not
-        # install them: tests that need them are marked `requires_enchant`/`requires_pdf` and are
-        # skipped (not failed) by the `pytest_collection_modifyitems` hook in `tests/conftest.py`
-        # when the corresponding probe (`enchant_pt_br_available`/`wkhtmltopdf_available`) reports
-        # the backend unavailable, so the Windows job still exercises the full suite minus those
-        # dependency-gated cases.
+        # TST-007: enchant-2/hunspell/wkhtmltopdf/pango are optional system dependencies with
+        # no supported Windows equivalent installable from this workflow (no Chocolatey/winget
+        # package provides a native libenchant + hunspell pt_BR/en_US backend, wkhtmltopdf, or
+        # the WeasyPrint pango/cairo/gdk-pixbuf stack that matches the Linux setup here). The
+        # Windows leg of this matrix intentionally does not install them: tests that need them
+        # are marked `requires_enchant`/`requires_pdf` and are skipped (not failed) by the
+        # `pytest_collection_modifyitems` hook in `tests/conftest.py` when the corresponding
+        # probe (`enchant_pt_br_available`/`pdf_backend_available`) reports the backend
+        # unavailable, so the Windows job still exercises the full suite minus those
+        # dependency-gated cases. `wkhtmltopdf` stays installed to keep the legacy `pdfkit`
+        # compatibility path (SEC-002) exercised alongside WeasyPrint.
         run: |
           sudo apt-get update
-          sudo apt-get install -y enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf
+          sudo apt-get install -y enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf \
+            libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libcairo2
       - name: Install Poetry
         run: pipx install "poetry==${{ env.POETRY_VERSION }}"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: ${{ matrix.python-version }}
           cache: poetry
-      - run: poetry install --sync
+      - name: Install dependencies (Linux, with the [pdf] extra)
+        if: runner.os == 'Linux'
+        # SEC-002: exercises the WeasyPrint PDF path in CI, not just the legacy pdfkit one.
+        run: poetry install --sync --extras pdf
+      - name: Install dependencies (Windows)
+        if: runner.os != 'Linux'
+        run: poetry install --sync
       - name: Run unit tests with coverage
         run: >
           poetry run pytest tests/unit -n auto -m "not e2e"
@@ -129,16 +139,19 @@ jobs:
         with:
           persist-credentials: false
       - name: Install system dependencies
+        # SEC-002: wkhtmltopdf stays installed to exercise the legacy pdfkit compatibility
+        # path; the pango/cairo/gdk-pixbuf packages are WeasyPrint's native runtime deps.
         run: |
           sudo apt-get update
-          sudo apt-get install -y enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf
+          sudo apt-get install -y enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf \
+            libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0 libcairo2
       - name: Install Poetry
         run: pipx install "poetry==${{ env.POETRY_VERSION }}"
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
           python-version: "3.12"
           cache: poetry
-      - run: poetry install --sync
+      - run: poetry install --sync --extras pdf
       - run: make test-e2e PYTEST_CI_FLAGS="--durations=10 -p no:cacheprovider"
 
   build:

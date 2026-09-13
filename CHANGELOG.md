@@ -56,6 +56,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   which AdaptaBrasil protocol version the validator implements (`"1.16"`); surfaced in the HTML
   report's version line alongside the validator version and OS. See
   `.specs/business-rules/protocol-changelog.md`.
+- `data_validate.controllers.report.report_model.ReportModel`/`ReportSection` (ARC-016): frozen
+  dataclasses replacing the ad hoc `Dict[str, Any]` the report template used to receive, built by
+  `FileReportGenerator._build_report_model` from a `ValidationReport` + the run's CLI args.
+- `[project.optional-dependencies] pdf = ["weasyprint (>=70,<80)"]` (SEC-002).
+- e2e fixture `data/input/data_errors_xss/` and its golden (`tests/e2e/golden/
+  data_errors_xss.json`): a `data_ground_truth_01` copy with one `descricao` cell mutated to
+  embed `<Script>Alert(1)</Script>`, exercising the SEC-001 fix against the real CLI pipeline.
+
+### Security
+- **Stored XSS in the HTML/PDF report (SEC-001, P0)**: `FileReportGenerator`'s Jinja2
+  `Environment` now loads templates exclusively from the package's own `static/report/`
+  directory (`PackageLoader`, never the user-writable output folder — closing a
+  template-planting hole) and always runs with `autoescape=select_autoescape(["html"])`. Every
+  validation message and every `--sector`/`--protocol`/`--user`/`--file` CLI value now flows
+  into the template as a plain Python value (`ReportModel`/`ReportSection`, new) and is escaped
+  by the template itself instead of being concatenated into raw HTML strings in Python — a cell
+  or CLI argument containing `<script>alert(1)</script>` now renders as inert, escaped text
+  (`&lt;script&gt;alert(1)&lt;/script&gt;`), never an executable tag. See ADR-0007.
+- **PDF generation no longer requires `wkhtmltopdf` (SEC-002, P1)**: `pdfkit` is removed from the
+  package's declared dependencies; PDF output is now optional (`pip install
+  "canoa-data-validate[pdf]"`) and rendered with WeasyPrint (pure Python, actively maintained, no
+  native daemon process) by default. `pdfkit`/`wkhtmltopdf` still works as a compatibility
+  fallback if already installed on the host; if neither backend is available, PDF generation is
+  skipped with a stderr message and the HTML report (the primary, always-produced artefact) is
+  unaffected. Closes the `pdfkit` `pip-audit` finding (`PYSEC-2026-2860`/`GHSA-9g3x-6x24-vf9f`,
+  no upstream fix) that previously needed an explicit `--ignore-vuln`. See ADR-0007.
 
 ### Changed
 - **CLI exit code (SEC-008, breaking for scripts that assumed "always 0")**: `canoa-data-validate`
@@ -92,6 +118,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - The six legacy per-OS CI workflows (`linux-ci-build-*.yml`, `linux-lint-*.yml`,
   `linux-unit-tests-*.yml`, `windows-ci-build-*.yml`, `windows-unit-tests-*.yml`), superseded by
   `ci.yml`.
+- `pdfkit` from `[project].dependencies` (SEC-002 — see "Security" above); `FileReportGenerator
+  ._format_messages_as_html`/`_get_optional_field_text`, the regex-based template-variable
+  validator, and its fallback template constant (`ApplicationConfig
+  .REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS`) — all superseded by `ReportModel` + autoescaped Jinja
+  templates (SEC-001/ARC-016).
 
 ## [0.7.65] - 2026-02-20
 

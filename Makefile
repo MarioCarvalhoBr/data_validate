@@ -51,8 +51,10 @@ typecheck: ## Run mypy (data_validate is legacy-exempt; tools/ and tests/e2e/ ar
 
 security: ## Run bandit and pip-audit (pip-audit needs network access)
 	$(BANDIT) -c pyproject.toml -r $(PATH_SRC) tools
-	# pdfkit: no upstream fix, replaced by WeasyPrint in Phase 4 (SEC-002)
-	poetry run pip-audit --ignore-vuln PYSEC-2026-2860 --ignore-vuln GHSA-9g3x-6x24-vf9f
+	# SEC-002: pdfkit is no longer a declared dependency (WeasyPrint replaces it, `[pdf]`
+	# extra) -- its PYSEC-2026-2860/GHSA-9g3x-6x24-vf9f finding is gone from the lock, so the
+	# `--ignore-vuln` escape hatch that used to sit here is removed, not silenced.
+	poetry run pip-audit
 
 security-offline: ## Run bandit only (no network required; use when pip-audit is unavailable offline)
 	$(BANDIT) -c pyproject.toml -r $(PATH_SRC) tools

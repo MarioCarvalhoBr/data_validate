@@ -73,10 +73,27 @@ def enchant_pt_br_available() -> bool:
 def wkhtmltopdf_available() -> bool:
     """Detect whether the `wkhtmltopdf` binary is on `PATH`.
 
+    Kept for the legacy `pdfkit`/`wkhtmltopdf` compatibility path (SEC-002); see
+    `pdf_backend_available` for the probe that also covers WeasyPrint.
+
     Returns:
         bool: True when `wkhtmltopdf` can be resolved via `shutil.which`.
     """
     return shutil.which("wkhtmltopdf") is not None
+
+
+@functools.lru_cache(maxsize=1)
+def pdf_backend_available() -> bool:
+    """Detect whether *any* PDF rendering backend is usable (SEC-002).
+
+    `FileReportGenerator._save_pdf_file` tries WeasyPrint first (the `[pdf]` extra), then
+    falls back to `pdfkit`/`wkhtmltopdf` if present, so a test asserting PDF output must
+    accept either backend rather than only the legacy `wkhtmltopdf` binary.
+
+    Returns:
+        bool: True when WeasyPrint is importable or `wkhtmltopdf` is on `PATH`.
+    """
+    return importlib.util.find_spec("weasyprint") is not None or wkhtmltopdf_available()
 
 
 def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
@@ -91,9 +108,9 @@ def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
             markers where the corresponding backend is unavailable.
     """
     skip_enchant = pytest.mark.skip(reason="pyenchant/hunspell pt_BR backend unavailable in this environment")
-    skip_pdf = pytest.mark.skip(reason="wkhtmltopdf not installed in this environment")
+    skip_pdf = pytest.mark.skip(reason="no PDF backend (WeasyPrint or wkhtmltopdf) available in this environment")
     enchant_ok = enchant_pt_br_available()
-    pdf_ok = wkhtmltopdf_available()
+    pdf_ok = pdf_backend_available()
 
     for item in items:
         if _REQUIRES_ENCHANT_MARKER in item.keywords and not enchant_ok:

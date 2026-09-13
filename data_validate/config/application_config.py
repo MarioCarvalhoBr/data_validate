@@ -62,46 +62,8 @@ class ApplicationConfig:
     # REPORT
     REPORT_LIMIT_N_MESSAGES = 20
     """int: Maximum number of error messages to display per validation type in reports."""
-    REPORT_OUTPUT_DEFAULT_HTML = "default.html"
-    """str: Filename for the default HTML report output."""
     REPORT_OUTPUT_REPORT_HTML = "_report.html"
     """str: Suffix for generated HTML report files."""
-    REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS = """
-                                <!DOCTYPE html>
-                                <html lang="pt-br">
-                                <head>
-                                    <meta charset="UTF-8">
-                                    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-                                    <title>Canoa Report</title>
-                                </head>
-                                <body>
-                                    <h1 style="color:#FF0000;">Relat&oacute;rio gerando com o template padr&atilde;o de erro</h1>
-                                    <p>Esse relat&oacute;rio foi gerado com o template padr&atilde;o de erro, pois o template personalizado n&atilde;o foi encontrado ou est&aacute; faltando vari&aacute;veis obrigat&oacute;rias.</p>
-                                    <p>Entre em contato com o administrador do sistema para corrigir o problema.</p>
-                                    <p>RELAT&Oacute;RIO</p>
-                                    {{ name }}
-                                    Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados
-                                    Informa&ccedil;&otilde;es:
-                                    {{ text_display_user }}
-                                    {{ text_display_sector }}
-                                    {{ text_display_protocol }}
-                                    {{ text_display_date }}
-                                    {{ text_display_version_and_os_info }}
-                                    {{ text_display_file }}
-                                    Resumo da validação
-                                    N&uacute;mero de Erros: {{ error_count }}
-                                    N&uacute;mero de Avisos: {{ warning_count }}
-                                    N&uacute;mero de testes executados: {{ total_tests }}
-                                    Testes n&atilde;o executados: {{ skipped_tests }}
-                                    Mostrar erros n&atilde;o executados: {{ display_skipped_tests }}
-                                    Erros
-                                    {{ errors }}
-                                    Avisos
-                                    {{ warnings }}
-                                </body>
-                                </html>
-                                """
-    """str: Default HTML template for reports when the custom template cannot be loaded."""
 
     def __init__(
         self,

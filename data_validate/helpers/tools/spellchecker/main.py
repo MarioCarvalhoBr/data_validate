@@ -5,7 +5,7 @@ from data_validate.helpers.tools.spellchecker.spellchecker import SpellChecker
 
 
 def main():
-    """Exemplo de uso"""
+    """Example usage of the SpellChecker."""
     df = pd.DataFrame(
         {
             "texto_sem_erro": [

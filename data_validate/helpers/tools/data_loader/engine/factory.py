@@ -1,8 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 # File: data_loader/factory.py
-"""
-Factory Method para instanciar leitores adequados.
+"""Factory to instantiate file readers based on file extension.
 
 BUG-015: `.qml` was removed from the registry along with `QMLReader` (ADR-0003) -- no evidence
 was found that the protocol needs it, and nothing in `data_validate/` consumed the QML content the

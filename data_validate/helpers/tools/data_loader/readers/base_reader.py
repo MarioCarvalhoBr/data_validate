@@ -1,9 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 # File: data_loader/readers/base_reader.py
-"""
-Template Method: define passo de leitura comum.
-"""
+"""Base class implementing the Template Method pattern for file readers."""
 
 from abc import ABC, abstractmethod
 

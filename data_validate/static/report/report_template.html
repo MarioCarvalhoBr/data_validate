@@ -210,7 +210,7 @@
 
     <!-- DIV HEADER -->
     <div class="info-header-center">
-        <h1><strong>{{ name }}</strong></h1>
+        <h1><strong>{{ report.name }}</strong></h1>
         <h2 class="text-subtitle">Relat&oacute;rio de Valida&ccedil;&atilde;o de Dados</h2>
     </div>
 
@@ -220,12 +220,12 @@
             <h5 class="card-title text-white">Informa&ccedil;&otilde;es</h5>
         </div>
         <div class="card-body">
-            {{ text_display_user }}
-            {{ text_display_sector }}
-            {{ text_display_protocol }}
-            {{ text_display_date }}
-            {{ text_display_version_and_os_info }}
-            {{ text_display_file }}
+            {% if report.user %}<strong>Usu&aacute;rio: <strong class="text-gray">{{ report.user }}</strong></strong><br>{% endif %}
+            {% if report.sector %}<strong>Setor estrat&eacute;gico: <strong class="text-gray">{{ report.sector }}</strong></strong><br>{% endif %}
+            {% if report.protocol %}<strong>Protocolo: <strong class="text-gray">{{ report.protocol }}</strong></strong><br>{% endif %}
+            {% if report.show_date %}<strong>Data e hora do processo: <strong class="text-gray">{{ report.date_now }}</strong></strong><br>{% endif %}
+            {% if report.show_version %}<strong>Vers&atilde;o do validador: <strong class="text-gray">{{ report.version }} &ndash; {{ report.os_name }} &ndash; Protocolo {{ report.protocol_version }}</strong></strong><br>{% endif %}
+            {% if report.file %}<strong>Arquivo submetido: <strong class="text-gray">{{ report.file }}</strong></strong><br>{% endif %}
         </div>
     </div>
 
@@ -235,12 +235,16 @@
             <h5 class="card-title text-white">Resumo da valida&ccedil;&atilde;o</h5>
         </div>
         <div class="card-body">
-            <strong class="text-danger">N&uacute;mero de Erros: {{ error_count }}</strong><br>
-            <strong class="text-warning">N&uacute;mero de Avisos: {{ warning_count }}</strong><br>
-            <strong class="text-green">N&uacute;mero de testes executados: {{ total_tests }}</strong><br>
-            <div class="info-header-left" id="skipped_tests" style="display: {{ display_skipped_tests }}">
+            <strong class="text-danger">N&uacute;mero de Erros: {{ report.error_count }}</strong><br>
+            <strong class="text-warning">N&uacute;mero de Avisos: {{ report.warning_count }}</strong><br>
+            <strong class="text-green">N&uacute;mero de testes executados: {{ report.total_tests }}</strong><br>
+            <div class="info-header-left" id="skipped_tests" style="display: {{ 'block' if report.skipped_tests else 'none' }}">
                 <strong>Testes n&atilde;o executados: </strong>
-                {{ skipped_tests }}
+                <ul>
+                    {% for test_name in report.skipped_tests %}
+                    <li>{{ test_name }}</li>
+                    {% endfor %}
+                </ul>
             </div>
 
         </div>
@@ -253,7 +257,10 @@
             <h5 class="card-title text-white">Erros</h5>
         </div>
         <div class="card-body">
-            {{ errors }}
+            {% for section in report.sections %}
+            <span class="text-primary">{{ section.title }}</span><br>
+            {% for message in section.errors %}<span class="text-danger-errors" preserve-spaces>{{ message }}</span><br>{% endfor %}
+            {% endfor %}
         </div>
     </div>
 
@@ -264,7 +271,10 @@
             <h5 class="card-title text-white">Avisos</h5>
         </div>
         <div class="card-body">
-            {{ warnings }}
+            {% for section in report.sections %}
+            <span class="text-primary">{{ section.title }}</span><br>
+            {% for message in section.warnings %}<span class="text-orange-warning" preserve-spaces>{{ message }}</span><br>{% endfor %}
+            {% endfor %}
         </div>
     </div>
 
