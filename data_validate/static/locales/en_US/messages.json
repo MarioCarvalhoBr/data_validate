@@ -349,5 +349,50 @@
   },
   "verification_name_child_indicator_levels": {
     "message": "Child indicator levels"
+  },
+  "rule.proportionality.missing_required_column": {
+    "message": "{filename}: The check was aborted because the required column '{column}' is missing."
+  },
+  "rule.proportionality.missing_required_column_level2": {
+    "message": "{filename}: The check was aborted because the required level-2 column '{column}' is missing."
+  },
+  "rule.PROP-003.missing_codes": {
+    "message": "{label_from}: Indicator codes missing from {label_to}: {missing_codes}."
+  },
+  "rule.PROP-004.error": {
+    "message": "{filename}: Parent indicator '{parent}' is repeated in the sheet."
+  },
+  "rule.PROP-005.missing_codes": {
+    "message": "{label_from}: Indicator codes missing from {label_to}: {missing_codes}."
+  },
+  "rule.PROP-006.parent_missing": {
+    "message": "{filename}: Parent indicator '{parent}' (in '{parent_col}') is not present in the 'codigo_pai' column of sheet {composicao_filename}."
+  },
+  "rule.PROP-006.child_mismatch": {
+    "message": "{filename}: Indicator '{child}' (in '{child_col}') is not a child of indicator '{parent}' (in '{parent_col}') as specified in {composicao_filename}."
+  },
+  "rule.PROP-006.child_missing": {
+    "message": "{filename}: At least one relationship must exist between child indicator '{child}' and parent indicator '{parent}' (in '{parent_col}') as specified in {composicao_filename}."
+  },
+  "rule.PROP-007.error_single": {
+    "message": "{filename}, line {row}: The value is not a valid number nor {value_di} (Unavailable Data) for parent indicator '{parent}'."
+  },
+  "rule.PROP-007.error_aggregate": {
+    "message": "{filename}: {count} values are neither a valid number nor {value_di} (Unavailable Data) for parent indicator '{parent}' between lines {first_row} and {last_row}."
+  },
+  "rule.PROP-008.warning_one": {
+    "message": "{filename}, line {first_line}: There is {count} value with more than 3 decimal places; only the first 3 decimal places will be considered."
+  },
+  "rule.PROP-008.warning_many": {
+    "message": "{filename}, line {first_line}: There are {count} values with more than 3 decimal places; only the first 3 decimal places will be considered."
+  },
+  "rule.PROP-009.error": {
+    "message": "{filename}: The sum of influencing factors for ID '{id}' under parent '{col}' is 0 (zero). In sheet {values_filename}, there is (are) value(s) for the children of indicator '{col}', for the same ID, that is (are) not zero or DI (Unavailable Data)."
+  },
+  "rule.PROP-010.error": {
+    "message": "{filename}, line {row}: The sum of values for parent indicator {parent} is {sum}, not 1."
+  },
+  "rule.PROP-010.warning": {
+    "message": "{filename}, line {row}: The sum of values for parent indicator {parent} is {sum}, not 1."
   }
 }

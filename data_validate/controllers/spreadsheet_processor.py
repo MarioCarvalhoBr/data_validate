@@ -23,6 +23,7 @@ from data_validate.rules import (
     DESCRIPTION_REGISTRY,
     Engine,
     LEGEND_REGISTRY,
+    PROPORTIONALITY_REGISTRY,
     RuleContext,
     RuleRegistry,
     SCENARIO_REGISTRY,
@@ -260,6 +261,8 @@ class SpreadsheetProcessor:
             "max_upper_legend_default": models.SpLegend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT,
             "label_data_unavailable": self.context.config.LABEL_DATA_UNAVAILABLE,
             "value_data_unavailable": self.context.config.VALUE_DATA_UNAVAILABLE,
+            "precision_decimal_place_truncate": self.context.config.PRECISION_DECIMAL_PLACE_TRUNCATE,
+            "current_language": self.language_manager.current_language,
         }
 
         preliminary_context = RuleContext(
@@ -340,14 +343,14 @@ class SpreadsheetProcessor:
         self._run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], rule_context)
         self._run_rule_registries([TEMPORAL_REGISTRY], rule_context)
 
-        # 4. Validate spreadsheet data optional (value: ARC-017 Phase 3 Port 5, ported to the
-        # rules engine, replacing the deleted `validators.SpValueValidator`; scenario: ARC-017
-        # Phase 3 Port 4, ported to the rules engine, replacing the deleted
-        # `validators.SpScenarioValidator`; legend: ARC-017 Phase 3 Port 6, ported to the rules
-        # engine, replacing the deleted `validators.SpLegendValidator`)
-        validators.SpProportionalityValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        # 4. Validate spreadsheet data optional (proportionality: ARC-017 Phase 3 Port 7, ported
+        # to the rules engine, replacing the deleted `validators.SpProportionalityValidator`;
+        # value: ARC-017 Phase 3 Port 5, ported to the rules engine, replacing the deleted
+        # `validators.SpValueValidator`; scenario: ARC-017 Phase 3 Port 4, ported to the rules
+        # engine, replacing the deleted `validators.SpScenarioValidator`; legend: ARC-017 Phase 3
+        # Port 6, ported to the rules engine, replacing the deleted
+        # `validators.SpLegendValidator`)
+        self._run_rule_registries([PROPORTIONALITY_REGISTRY], rule_context)
         self._run_rule_registries([VALUE_REGISTRY], rule_context)
         self._run_rule_registries([SCENARIO_REGISTRY], rule_context)
         self._run_rule_registries([LEGEND_REGISTRY], rule_context)

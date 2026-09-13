@@ -92,12 +92,15 @@ class NumberFormattingProcessing:
         return NumberFormattingProcessing.check_n_decimals_places(value, 0, 2)
 
     @staticmethod
-    def format_number_brazilian(n: float, locale: str = "pt_BR") -> str:
+    def format_number_brazilian(n: float | Decimal, locale: str = "pt_BR") -> str:
         """
         Format a number using Brazilian locale conventions.
 
         Args:
-            n (float): Number to format.
+            n (float | Decimal): Number to format; `babel.numbers.format_decimal` accepts a
+                `Decimal` directly (used by `rules/proportionality.py`'s PROP-010 sum
+                formatting), so the hint is widened from `float` to match every accepted
+                runtime type rather than the historically narrower (and inaccurate) one.
             locale (str, optional): Locale string. Default is "pt_BR".
 
         Returns:

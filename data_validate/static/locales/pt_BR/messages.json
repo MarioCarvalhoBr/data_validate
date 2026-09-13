@@ -349,5 +349,50 @@
   },
   "verification_name_child_indicator_levels": {
     "message": "Níveis dos indicadores filhos"
+  },
+  "rule.proportionality.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.proportionality.missing_required_column_level2": {
+    "message": "{filename}: A verificação foi abortada para a coluna nível 2 obrigatória '{column}' que está ausente."
+  },
+  "rule.PROP-003.missing_codes": {
+    "message": "{label_from}: Códigos dos indicadores ausentes em {label_to}: {missing_codes}."
+  },
+  "rule.PROP-004.error": {
+    "message": "{filename}: O indicador pai '{parent}' está repetido na planilha."
+  },
+  "rule.PROP-005.missing_codes": {
+    "message": "{label_from}: Códigos dos indicadores ausentes em {label_to}: {missing_codes}."
+  },
+  "rule.PROP-006.parent_missing": {
+    "message": "{filename}: O indicador pai '{parent}' (em '{parent_col}') não está presente na coluna 'codigo_pai' da planilha {composicao_filename}."
+  },
+  "rule.PROP-006.child_mismatch": {
+    "message": "{filename}: O indicador '{child}' (em '{child_col}') não é filho do indicador '{parent}' (em '{parent_col}') conforme especificado em {composicao_filename}."
+  },
+  "rule.PROP-006.child_missing": {
+    "message": "{filename}: Deve existir pelo menos uma relação do indicador filho '{child}' com o indicador pai '{parent}' (em '{parent_col}') conforme especificado em {composicao_filename}."
+  },
+  "rule.PROP-007.error_single": {
+    "message": "{filename}, linha {row}: O valor não é um número válido e nem {value_di} (Dado Indisponível) para o indicador pai '{parent}'."
+  },
+  "rule.PROP-007.error_aggregate": {
+    "message": "{filename}: {count} valores que não são número válido nem {value_di} (Dado Indisponível) para o indicador pai '{parent}' entre as linhas {first_row} e {last_row}."
+  },
+  "rule.PROP-008.warning_one": {
+    "message": "{filename}, linha {first_line}: Existe {count} valor com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais."
+  },
+  "rule.PROP-008.warning_many": {
+    "message": "{filename}, linha {first_line}: Existem {count} valores com mais de 3 casas decimais, serão consideradas apenas as 3 primeiras casas decimais."
+  },
+  "rule.PROP-009.error": {
+    "message": "{filename}: A soma de fatores influenciadores para o ID '{id}' no pai '{col}' é 0 (zero). Na planilha {values_filename}, existe(m) valor(es) para os filhos do indicador '{col}', no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
+  },
+  "rule.PROP-010.error": {
+    "message": "{filename}, linha {row}: A soma dos valores para o indicador pai {parent} é {sum}, e não 1."
+  },
+  "rule.PROP-010.warning": {
+    "message": "{filename}, linha {row}: A soma dos valores para o indicador pai {parent} é {sum}, e não 1."
   }
 }

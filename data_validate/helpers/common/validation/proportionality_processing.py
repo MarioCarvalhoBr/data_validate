@@ -2,26 +2,40 @@
 """
 Module providing proportionality data cleaning and validation utilities.
 
-This module defines the `ProportionalityProcessing` class, which offers methods
-to construct subdatasets for proportionality analysis, validate numeric types,
-sum constraints, and decimal precisions in proportionality datasets.
+This module defines the `ProportionalityProcessing` class: pure, frame-level helpers that build
+per-parent subdatasets, flag non-numeric/excessive-decimal cells, sum truncated `Decimal` values,
+find zero-sum rows that disagree with `valores`, and find rows whose sum falls outside the [0.99,
+1.01] tolerance band.
+
+ARC-017 Phase 3 Port 7 (`rules/proportionality.py`, PROP-007…010): every method here used to build
+and return pre-formatted Portuguese error/warning strings directly (`errors.append(f"...")`), which
+both duplicated message text outside the i18n catalog and coupled this otherwise-pure helper to one
+specific validator's wording (`.claude/rules/architecture-boundaries.md`, `.claude/rules/i18n.md`).
+Every method below now returns structured data (masks, indices, `(id, column)` pairs) instead;
+`rules/proportionality.py` is the only place that turns that data into `Issue`s, matching
+`rules/value.py`'s decision to not reuse `ValueProcessing`'s (deleted) message-building helper.
 """
 
 from decimal import Decimal
-from typing import List, Tuple, Any
+from typing import Any, List, Tuple
 
 import pandas as pd
 from pandas import DataFrame
 
 from data_validate.helpers.common.formatting.number_formatting_processing import NumberFormattingProcessing
 
+_TOLERANCE_LOWER_BOUND = Decimal("0.99")
+_TOLERANCE_UPPER_BOUND = Decimal("1.01")
+
 
 class ProportionalityProcessing:
     """
     Utility class for processing proportionality data.
 
-    Provides static methods to build hierarchical sub-datasets, check sums equal 1 (or 100%),
-    verify decimal precision, and validate numeric consistency in proportionality tables.
+    Provides static methods to build hierarchical sub-datasets, flag non-numeric/excessive-decimal
+    cells, sum truncated `Decimal` values, and locate rows that violate the zero-sum or tolerance
+    statements — every method is pure (no message text, no I/O) and frame/row-index level (no
+    `.iterrows()`).
     """
 
     def __init__(self) -> None:
@@ -48,7 +62,9 @@ class ProportionalityProcessing:
         # Create columns information
         columns_multi_index_prop = df_proportionalities.columns
         columns_level_one_prop = df_proportionalities.columns.get_level_values(0).unique().tolist()
-        columns_level_one_prop_cleaned = [col for col in columns_level_one_prop if not col.lower().startswith("unnamed")]
+        columns_level_one_prop_cleaned = [
+            col for col in columns_level_one_prop if not col.lower().startswith("unnamed")
+        ]
 
         # Create subdatasets and others variables
         subdatasets = {}
@@ -74,86 +90,54 @@ class ProportionalityProcessing:
         return subdatasets
 
     @staticmethod
-    def validate_numeric_format(
+    def find_invalid_numeric_cells(
         df_data: DataFrame,
         is_di: DataFrame,
         value_di: Any,
-        parent_id: str,
-        sp_name: str,
-    ) -> Tuple[DataFrame, List[str]]:
+    ) -> Tuple[DataFrame, DataFrame]:
         """
-        Validate that data contains valid numeric values.
+        Replace non-numeric, non-DI cells with `value_di` and report which cells were invalid.
 
-        Checks for non-numeric values that are not marked as 'Data Unavailable' (DI).
-        Invalid entries are collected as errors and replaced with DI value in the returned DataFrame.
+        A cell is invalid when it is not `DI`, is not empty, and does not parse as a number
+        (comma accepted as the decimal separator).
 
         Args:
-            df_data: DataFrame with data to validate
-            is_di: boolean DataFrame mask indicating DI values
-            value_di: Value representing 'Data Unavailable'
-            parent_id: ID of the parent indicator
-            sp_name: Name of the spreadsheet for error reporting
+            df_data: DataFrame with data to validate.
+            is_di: Boolean DataFrame mask indicating which cells already equal `value_di`.
+            value_di: Value representing "Data Unavailable".
 
         Returns:
-            Tuple of (cleaned DataFrame, list of error messages)
+            Tuple of (cleaned DataFrame with invalid cells replaced by `value_di`, boolean
+            DataFrame of the same shape marking every invalid cell).
         """
-        errors = []
-
         df_numeric = df_data.replace(",", ".", regex=True).apply(pd.to_numeric, errors="coerce")
-        is_invalid = df_numeric.isna() & (~is_di) & (df_data.notna())
+        invalid_mask = df_numeric.isna() & (~is_di) & (df_data.notna())
 
-        if not is_invalid.any().any():
-            return df_data, errors
-
-        rows_with_errors = is_invalid.any(axis=1)
-        error_indices = rows_with_errors[rows_with_errors].index
-        excel_indices = error_indices + 3
-        count_errors = is_invalid.sum().sum()
-
-        if count_errors == 1:
-            row_idx = error_indices[0]
-            errors.append(
-                f"{sp_name}, linha {row_idx + 3}: O valor não é um número válido e nem {value_di} (Dado Indisponível) para o indicador pai '{parent_id}'."
-            )
-        else:
-            line_init = excel_indices.min()
-            line_end = excel_indices.max()
-            errors.append(
-                f"{sp_name}: {count_errors} valores que não são número válido nem {value_di} (Dado Indisponível) para o indicador pai '{parent_id}' entre as linhas {line_init} e {line_end}."
-            )
-
-        df_data[is_invalid] = value_di
-        return df_data, errors
+        cleaned = df_data.copy()
+        cleaned[invalid_mask] = value_di
+        return cleaned, invalid_mask
 
     @staticmethod
-    def check_excessive_decimals(
+    def find_excessive_decimal_mask(
         df_data: DataFrame,
         value_di: Any,
         precision: int,
-    ) -> Tuple[bool, int, int]:
+    ) -> DataFrame:
         """
-        Check for values exceeding the allowed decimal precision.
+        Flag cells whose decimal precision exceeds `precision`.
 
         Args:
-            df_data: DataFrame to check
-            value_di: Value to ignore (DI)
-            precision: Maximum allowed decimal places
+            df_data: DataFrame to check.
+            value_di: Value to ignore (DI).
+            precision: Maximum allowed decimal places.
 
         Returns:
-            Tuple of (has_excess, count_of_errors, first_line_index)
+            Boolean DataFrame of the same shape as `df_data`, `True` where a cell has more than
+            `precision` decimal places.
         """
-        has_excess_decimals_mask = df_data.map(
+        return df_data.map(
             lambda value_number: NumberFormattingProcessing.check_n_decimals_places(value_number, value_di, precision)
         )
-        count_excess = has_excess_decimals_mask.sum().sum()
-
-        if count_excess == 0:
-            return False, 0, 0
-
-        first_row_idx = has_excess_decimals_mask.any(axis=1).idxmax()
-        first_line_excel = first_row_idx + 3
-
-        return True, count_excess, first_line_excel
 
     @staticmethod
     def convert_to_decimal_and_sum(
@@ -174,44 +158,43 @@ class ProportionalityProcessing:
         Returns:
             Series containing the sum for each row
         """
-        df_decimals = df_data.map(lambda value_number: NumberFormattingProcessing.to_decimal_truncated(value_number, value_di, precision))
+        df_decimals = df_data.map(
+            lambda value_number: NumberFormattingProcessing.to_decimal_truncated(value_number, value_di, precision)
+        )
         return df_decimals.sum(axis=1)
 
     @staticmethod
-    def validate_zero_sum_rows(
+    def find_zero_sum_violations(
         row_sums: pd.Series,
         ids: pd.Series,
         df_data: DataFrame,
         sp_df_values: DataFrame,
         column_name_id: str,
         value_di: Any,
-        sp_name: str,
-        sp_name_value: str,
-    ) -> List[str]:
+    ) -> List[Tuple[Any, str]]:
         """
-        Validate that rows summing to zero also have zero values in the source values spreadsheet.
+        Find rows whose factors sum to zero but whose `valores` counterpart is not zero/DI.
 
-        If a proportionality row sums to 0, the corresponding indicator values in the values spreadsheet
-        must also be 0 or DI. Deviations generate errors.
+        For every proportionality row that sums to 0, the corresponding indicator values in the
+        values spreadsheet must also be 0 or DI; every child column that disagrees is reported.
 
         Args:
-            row_sums: Series of row sums
-            ids: Series of IDs corresponding to rows
-            df_data: Proportionality DataFrame
-            sp_df_values: Values spreadsheet DataFrame
-            column_name_id: Name of ID column
-            value_di: DI value string
-            sp_name: Name of proportionality spreadsheet
-            sp_name_value: Name of values spreadsheet
+            row_sums: Series of row sums.
+            ids: Series of IDs corresponding to rows.
+            df_data: Proportionality DataFrame (only its column names are read).
+            sp_df_values: Values spreadsheet DataFrame.
+            column_name_id: Name of the ID column.
+            value_di: DI value string.
 
         Returns:
-            List of error messages
+            List of `(row_id, child_column)` pairs that violate the zero-sum statement, in the
+            order the zero-sum rows and their matching value columns were encountered.
         """
-        errors = []
+        violations: List[Tuple[Any, str]] = []
         zero_sum_mask = row_sums == 0
 
         if not zero_sum_mask.any():
-            return errors
+            return violations
 
         zero_indices = zero_sum_mask[zero_sum_mask].index
         zero_ids = ids.loc[zero_indices]
@@ -234,58 +217,26 @@ class ProportionalityProcessing:
 
                 try:
                     if float(str(val).replace(",", ".")) != 0:
-                        errors.append(
-                            f"{sp_name}: A soma de fatores influenciadores para o ID '{row_id}' no pai '{col}' é 0 (zero). "
-                            f"Na planilha {sp_name_value}, existe(m) valor(es) para os filhos do indicador '{col}', "
-                            f"no mesmo ID, que não é (são) zero ou DI (Dado Indisponível)."
-                        )
-                except (ValueError, TypeError, Exception):
-                    pass
+                        violations.append((row_id, col))
+                except (ValueError, TypeError):
+                    continue
 
-        return errors
+        return violations
 
     @staticmethod
-    def validate_sum_tolerance(
-        row_sums: pd.Series,
-        parent_id: str,
-        sp_name: str,
-        current_language: str,
-    ) -> Tuple[List[str], List[str]]:
+    def sum_tolerance_indices(row_sums: pd.Series) -> Tuple[pd.Index, pd.Index]:
         """
-        Validate that row sums are within acceptable tolerance of 1 (100%).
+        Split row indices into the error/warning tolerance buckets around a sum of 1.
 
-        Checks if sums fall strictly outside tolerance (error) or just slightly off 1 within tolerance (warning).
-        Tolerance range: [0.99, 1.01].
+        Tolerance range: `[0.99, 1.01]`. A sum outside that range (and not exactly 0) is an
+        error; a sum inside it but not exactly 1 is a warning.
 
         Args:
-            row_sums: Series of row sums
-            parent_id: Parent indicator ID
-            sp_name: Spreadsheet name
-            current_language: Language code for number formatting
+            row_sums: Series of row sums.
 
         Returns:
-            Tuple of (list of errors, list of warnings)
+            Tuple of `(error_index, warning_index)`.
         """
-        errors = []
-        warnings = []
-
-        limit_low = Decimal("0.99")
-        limit_high = Decimal("1.01")
-
-        # Critical errors: sum outside [0.99, 1.01] and != 0
-        error_mask = (row_sums != 0) & ((row_sums < limit_low) | (row_sums > limit_high))
-
-        for idx in error_mask[error_mask].index:
-            val_sum = row_sums[idx]
-            formatted_sum = NumberFormattingProcessing.format_number_brazilian(val_sum, current_language)
-            errors.append(f"{sp_name}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1.")
-
-        # Warnings: sum within [0.99, 1.01] but != 1
-        warning_mask = (row_sums != 1) & (row_sums >= limit_low) & (row_sums <= limit_high)
-
-        for idx in warning_mask[warning_mask].index:
-            val_sum = row_sums[idx]
-            formatted_sum = NumberFormattingProcessing.format_number_brazilian(val_sum, current_language)
-            warnings.append(f"{sp_name}, linha {idx + 3}: A soma dos valores para o indicador pai {parent_id} é {formatted_sum}, e não 1.")
-
-        return errors, warnings
+        error_mask = (row_sums != 0) & ((row_sums < _TOLERANCE_LOWER_BOUND) | (row_sums > _TOLERANCE_UPPER_BOUND))
+        warning_mask = (row_sums != 1) & (row_sums >= _TOLERANCE_LOWER_BOUND) & (row_sums <= _TOLERANCE_UPPER_BOUND)
+        return row_sums.index[error_mask], row_sums.index[warning_mask]
