@@ -27,6 +27,7 @@ from data_validate.rules import (
     SCENARIO_REGISTRY,
     STRUCTURE_REGISTRY,
     TEMPORAL_REGISTRY,
+    VALUE_REGISTRY,
     compute_composition_facts,
     extend_report_from_outcomes,
 )
@@ -250,6 +251,7 @@ class SpreadsheetProcessor:
             "proportionality_read_successful": self.raw_data_map[
                 models.SpProportionality.CONSTANTS.SP_NAME
             ].is_read_successful,
+            "scenario_exists_file": self.model_configurations[models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE],
         }
 
         preliminary_context = RuleContext(
@@ -330,14 +332,14 @@ class SpreadsheetProcessor:
         self._run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], rule_context)
         self._run_rule_registries([TEMPORAL_REGISTRY], rule_context)
 
-        # 4. Validate spreadsheet data optional (scenario: ARC-017 Phase 3 Port 4, ported to the
-        # rules engine, replacing the deleted `validators.SpScenarioValidator`)
+        # 4. Validate spreadsheet data optional (value: ARC-017 Phase 3 Port 5, ported to the
+        # rules engine, replacing the deleted `validators.SpValueValidator`; scenario: ARC-017
+        # Phase 3 Port 4, ported to the rules engine, replacing the deleted
+        # `validators.SpScenarioValidator`)
         validators.SpProportionalityValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
-        validators.SpValueValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        self._run_rule_registries([VALUE_REGISTRY], rule_context)
         self._run_rule_registries([SCENARIO_REGISTRY], rule_context)
         validators.SpLegendValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports

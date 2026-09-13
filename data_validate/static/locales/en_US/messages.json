@@ -182,6 +182,42 @@
   "rule.scenario.missing_required_column": {
     "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
   },
+  "rule.value.missing_required_column": {
+    "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
+  },
+  "rule.VAL-002.invalid_columns": {
+    "message": "{filename}: Invalid columns: {invalid_columns}."
+  },
+  "rule.VAL-002.missing_codes": {
+    "message": "{label_from}: Indicator codes missing from {label_to}: {missing_codes}."
+  },
+  "rule.VAL-003.required_column": {
+    "message": "{filename}: Column '{combination}' is required."
+  },
+  "rule.VAL-003.unnecessary_column": {
+    "message": "{filename}: Column '{extra_column}' is unnecessary."
+  },
+  "rule.VAL-003.unnecessary_column_level1": {
+    "message": "{filename}: Column '{extra_column}' is unnecessary for the level 1 indicator."
+  },
+  "rule.VAL-004.error": {
+    "message": "{filename}, line {row}: The value {value} is not a valid number nor DI (Data Unavailable) for column '{column}'."
+  },
+  "rule.VAL-004.aggregate": {
+    "message": "{filename}: {count} values that are not a valid number nor DI (Data Unavailable) for column '{column}', between lines {first_row} and {last_row}."
+  },
+  "rule.VAL-004.decimal_parse_error": {
+    "message": "{filename}, line {row}: Error processing decimal value for column '{column}'."
+  },
+  "rule.VAL-004.silent": {
+    "message": ""
+  },
+  "rule.VAL-005.warning_one": {
+    "message": "{filename}: There is {count} value with more than 2 decimal places; only the first 2 decimal places will be considered. Between lines {first_row} and {last_row}."
+  },
+  "rule.VAL-005.warning_many": {
+    "message": "{filename}: There are {count} values with more than 2 decimal places; only the first 2 decimal places will be considered. Between lines {first_row} and {last_row}."
+  },
   "rule.SCEN-003.no_punctuation": {
     "message": "{filename}, line {row}: The value in column '{column}' must not end with punctuation."
   },

@@ -14,7 +14,8 @@ Phase 3a built the registry/engine core with nothing wired into the legacy pipel
 (`controllers/spreadsheet_processor.py::SpreadsheetProcessor._run_structure_rules`) — the first
 call site outside `tests/unit/rules/` and the reusable seam every later validator port reuses.
 Phase 3 Port 4 adds `temporal_reference.py` (`TEMPORAL_REGISTRY`, `TEMP-001`…`TEMP-003`) and
-`scenario.py` (`SCENARIO_REGISTRY`, `SCEN-003`…`SCEN-004`). See
+`scenario.py` (`SCENARIO_REGISTRY`, `SCEN-003`…`SCEN-004`). Phase 3 Port 5 adds `value.py`
+(`VALUE_REGISTRY`, `VAL-002`…`VAL-005`), replacing the deleted `validators.SpValueValidator`. See
 `.specs/architecture/target-architecture.md` (`Rule`, `RuleContext`, `RuleOutcome` sketches) and
 `docs/adrs/0006-rule-registry-with-prerequisites.md`.
 """
@@ -30,6 +31,7 @@ from data_validate.rules.registry import RegistryCycleError, RuleRegistry, RuleS
 from data_validate.rules.scenario import SCENARIO_REGISTRY
 from data_validate.rules.structure import STRUCTURE_REGISTRY
 from data_validate.rules.temporal_reference import TEMPORAL_REGISTRY
+from data_validate.rules.value import VALUE_REGISTRY
 
 __all__ = [
     "COMPOSITION_REGISTRY",
@@ -47,6 +49,7 @@ __all__ = [
     "STRUCTURE_REGISTRY",
     "SkipReason",
     "TEMPORAL_REGISTRY",
+    "VALUE_REGISTRY",
     "compute_composition_facts",
     "extend_report_from_outcomes",
 ]

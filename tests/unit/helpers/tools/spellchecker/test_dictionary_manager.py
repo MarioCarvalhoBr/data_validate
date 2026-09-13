@@ -16,34 +16,11 @@ import pytest
 
 from data_validate.helpers.tools.spellchecker.dictionary_manager import DictionaryManager
 
-
-def _real_pt_br_dictionary_available() -> bool:
-    """Probe whether the bundled pt_BR hunspell dictionary can be loaded for real.
-
-    Mirrors the probe in `tests/e2e/test_golden.py`: some environments have the
-    `enchant` Python package installed without the native libenchant/hunspell
-    backend, so even the dictionary bundled under
-    `static/dictionaries/hunspell` cannot be opened there.
-
-    Returns:
-        bool: True when a real `DictionaryManager("pt_BR")` can validate its
-            dictionary without errors.
-    """
-    try:
-        manager = DictionaryManager("pt_BR")
-        errors = manager.validate_dictionary()
-        manager.clean_temporary_files()
-        return not errors
-    except Exception:
-        return False
-
-
-_REAL_ENCHANT_AVAILABLE = _real_pt_br_dictionary_available()
-
-requires_real_enchant = pytest.mark.skipif(
-    not _REAL_ENCHANT_AVAILABLE,
-    reason="pyenchant/hunspell native backend unavailable in this environment",
-)
+# TST-007: the availability probe (and the resulting skip) is centralised in
+# `tests/conftest.py`'s `enchant_pt_br_available()` /
+# `pytest_collection_modifyitems` hook, shared with `tests/e2e/test_golden.py`.
+# The `@pytest.mark.requires_enchant` marker on `TestDictionaryManagerRealEnchant` below is all
+# that is needed here; no local probe/skipif duplication.
 
 
 class TestDictionaryManager:
@@ -518,7 +495,6 @@ class TestDictionaryManagerRealEnchant:
     """
 
     @pytest.mark.requires_enchant
-    @requires_real_enchant
     def test_session_word_is_checkable(self) -> None:
         manager = DictionaryManager("pt_BR")
         try:
@@ -529,7 +505,6 @@ class TestDictionaryManagerRealEnchant:
             manager.clean_temporary_files()
 
     @pytest.mark.requires_enchant
-    @requires_real_enchant
     def test_environment_is_unchanged_after_full_lifecycle(self) -> None:
         before = os.environ.copy()
 
@@ -541,7 +516,6 @@ class TestDictionaryManagerRealEnchant:
         assert os.environ == before
 
     @pytest.mark.requires_enchant
-    @requires_real_enchant
     def test_no_file_created_under_package_dictionaries_directory(self) -> None:
         manager = DictionaryManager("pt_BR")
         before_listing = sorted(p.name for p in manager.path_dictionary.iterdir())
@@ -554,7 +528,6 @@ class TestDictionaryManagerRealEnchant:
         assert after_listing == before_listing
 
     @pytest.mark.requires_enchant
-    @requires_real_enchant
     def test_two_managers_do_not_interfere(self) -> None:
         manager_one = DictionaryManager("pt_BR")
         manager_two = DictionaryManager("pt_BR")

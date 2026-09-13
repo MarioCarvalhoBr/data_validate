@@ -182,6 +182,42 @@
   "rule.scenario.missing_required_column": {
     "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
   },
+  "rule.value.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.VAL-002.invalid_columns": {
+    "message": "{filename}: Colunas inválidas: {invalid_columns}."
+  },
+  "rule.VAL-002.missing_codes": {
+    "message": "{label_from}: Códigos dos indicadores ausentes em {label_to}: {missing_codes}."
+  },
+  "rule.VAL-003.required_column": {
+    "message": "{filename}: A coluna '{combination}' é obrigatória."
+  },
+  "rule.VAL-003.unnecessary_column": {
+    "message": "{filename}: A coluna '{extra_column}' é desnecessária."
+  },
+  "rule.VAL-003.unnecessary_column_level1": {
+    "message": "{filename}: A coluna '{extra_column}' é desnecessária para o indicador de nível 1."
+  },
+  "rule.VAL-004.error": {
+    "message": "{filename}, linha {row}: O valor {value} não é um número válido e nem DI (Dado Indisponível) para a coluna '{column}'."
+  },
+  "rule.VAL-004.aggregate": {
+    "message": "{filename}: {count} valores que não são número válido nem DI (Dado Indisponível) para a coluna '{column}', entre as linhas {first_row} e {last_row}."
+  },
+  "rule.VAL-004.decimal_parse_error": {
+    "message": "{filename}, linha {row}: Erro ao processar valor decimal para a coluna '{column}'."
+  },
+  "rule.VAL-004.silent": {
+    "message": ""
+  },
+  "rule.VAL-005.warning_one": {
+    "message": "{filename}: Existe {count} valor com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas {first_row} e {last_row}."
+  },
+  "rule.VAL-005.warning_many": {
+    "message": "{filename}: Existem {count} valores com mais de 2 casas decimais, serão consideradas apenas as 2 primeiras casas decimais. Entre as linhas {first_row} e {last_row}."
+  },
   "rule.SCEN-003.no_punctuation": {
     "message": "{filename}, linha {row}: O valor da coluna '{column}' não deve terminar com pontuação."
   },
@@ -191,7 +227,7 @@
   "rule.SCEN-004.error": {
     "message": "{filename}: A coluna '{column}' não deve conter valores repetidos."
   },
-   "verification_name_file_structure": {
+  "verification_name_file_structure": {
     "message": "Estrutura dos arquivos da pasta de entrada"
   },
   "verification_name_file_cleaning": {

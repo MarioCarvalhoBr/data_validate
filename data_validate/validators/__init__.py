@@ -11,14 +11,10 @@ from data_validate.validators.spreadsheets.legend.legend_validator import (
 from data_validate.validators.spreadsheets.proportionality.proportionality_validator import (
     SpProportionalityValidator,
 )
-from data_validate.validators.spreadsheets.value.value_validator import (
-    SpValueValidator,
-)
 
 __all__ = [
     # Package spreadsheets
     "BaseValidator",
-    "SpValueValidator",
     "SpProportionalityValidator",
     "SpLegendValidator",
     # Package spell
