@@ -33,9 +33,9 @@ backlog `09-protocol-v116.md` (`PROTO-*` items).
 | `CLEAN-` | Type/cleaning checks done inside `Sp*` models (`data_cleaning`) | File cleaning (`FC`) |
 | `DESC-` | `descricao` content rules | various, incl. `CATEG_DESC` |
 | `COMP-` | `composicao` hierarchy rules | `IR`, `TH`, `UT`, `CHILD_LVL`, `LEAF_NO_DATA` |
-| `VAL-` | `valores` rules | `FS`, `IR`, `VAL_COMB`, `UNAV_INV` |
+| `VAL-` | `valores` rules | `FS`, `IR`, `VAL_COMB`, `UNAV_INV`, `UNIQ_VAL` |
 | `TEMP-` | `referencia_temporal` rules | `MAND_PUNC_TEMP`, `YEARS_TEMP`, `UVR_TEMP` |
-| `SCEN-` | `cenarios` rules | `FS`, `MAND_PUNC_SCEN`, `UVR_SCEN` |
+| `SCEN-` | `cenarios` rules | `FS`, `MAND_PUNC_SCEN`, `UVR_SCEN`, `SYMB_SCEN` |
 | `LEG-` | `legenda` rules and legend relations | `FC`, `LEG_REL`, `LEG_RANGE` |
 | `PROP-` | `proporcionalidades` rules | `FS`, `IR`, `REP_IND_PROP`, `IND_VAL_PROP`, `IR_PROP`, `SUM_PROP` |
 | `SPELL-` | Spell-check | `SPELL` |
@@ -43,16 +43,22 @@ backlog `09-protocol-v116.md` (`PROTO-*` items).
 
 Target message keys follow `rule.<RULE-ID>.<error|warning>` (see `.specs/i18n/catalog.md`).
 
-Planned IDs reserved by the v1.16 alignment and the gap list (not yet implemented): STRUCT-013
-(UTF-8, G-01), STRUCT-014 (single-worksheet xlsx, PROTO-003), DESC-018 (meta format — parked, no
-owner decision), DESC-016 (retired unimplemented — `relacao` removed by protocol v1.15),
-SCEN-005 (symbol charset/length), TEMP-004, TEMP-005, LEG-016 (>11 slices), VAL-006 (id
-uniqueness), TERR-001, TERR-002.
+Planned IDs reserved by the v1.16 alignment and the gap list (not yet implemented): DESC-018
+(meta format — parked, no owner decision), DESC-016 (retired unimplemented — `relacao` removed by
+protocol v1.15), TERR-001, TERR-002 (sequenced last per the scheduling note in
+`09-protocol-v116.md`).
 
 `DESC-013` (categoria domain, PROTO-004 step 1), `DESC-014` (codes ordered by level, PROTO-008),
 `DESC-015` (cenario domain/propagation, PROTO-009), `DESC-017` (ordem sequence, PROTO-010), and
 `DESC-019` (nome_completo length, PROTO-010) are all implemented — see the `CATEG_DESC`/`IL`/
-`TH`/`CHILD_LVL`/`INP` rows below.
+`TH`/`CHILD_LVL`/`INP` rows below. Phase 6 round N2 implements **STRUCT-013** (proactive UTF-8
+check, PROTO-007), **STRUCT-014** (single-worksheet xlsx, PROTO-003), **SCEN-005** (symbol
+charset, PROTO-006, new category `SYMB_SCEN`), **LEG-008** tightened to six-hex-only and
+**LEG-016** (>11 slices warning, both PROTO-011), **LEG-014** narrowed to a permanent no-op
+(PROTO-012 — an empty `legenda` cell is the protocol's default-legend case, not an error;
+non-empty dangling references remain `LEG-012`'s concern), **TEMP-004**/**TEMP-005** (four-digit
+symbol / single observed reference, PROTO-014, both under `YEARS_TEMP`), and **VAL-006** (`id`
+uniqueness, PROTO-017, new category `UNIQ_VAL`).
 
 ## Severity
 
@@ -68,14 +74,15 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 
 ## Map `NamesEnum` → verification title key → rule IDs
 
-`data_validate/config/names_enum.py` (35 members, since PROTO-004 added `CATEG_DESC`). Titles are resolved through the i18n catalog
+`data_validate/config/names_enum.py` (37 members: PROTO-004 added `CATEG_DESC`; Phase 6 round N2
+added `SYMB_SCEN` (PROTO-006/SCEN-005) and `UNIQ_VAL` (PROTO-017/VAL-006)). Titles are resolved through the i18n catalog
 (`static/locales/<locale>/messages.json`), and every title is pre-registered in the report by
 `SpreadsheetProcessor._prepare_statement`, so unused members still appear as empty sections.
 
 | `NamesEnum` | Key (`verification_name_*`) | Rules |
 |---|---|---|
-| `FS` | `file_structure` | STRUCT-001…012, STRUCT-015, DESC-011, DESC-012, VAL-001, SCEN-001, SCEN-002, PROP-001, PROP-002 |
-| `FC` | `file_cleaning` | CLEAN-001…006, LEG-001…011 |
+| `FS` | `file_structure` | STRUCT-001…015 (STRUCT-013/014 loader-level, not `RuleSpec`-registered), DESC-011, DESC-012, VAL-001, SCEN-001, SCEN-002, PROP-001, PROP-002 |
+| `FC` | `file_cleaning` | CLEAN-001…006, LEG-001…011, LEG-016 |
 | `IR` | `indicator_relations` | COMP-001, COMP-002, COMP-003, VAL-002, PROP-003 |
 | `TH` | `tree_hierarchy` | COMP-007, COMP-008, DESC-015 |
 | `IL` | `indicator_levels` | DESC-005, DESC-014 |
@@ -95,13 +102,15 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 | `UVR_TEMP` | `unique_value_relations_in_temporal_reference` | TEMP-003 |
 | `VAL_COMB` | `value_combination_relations` | VAL-003 |
 | `UNAV_INV` | `unavailable_and_invalid_values` | VAL-004, VAL-005 |
+| `UNIQ_VAL` | `value_id_uniqueness` | VAL-006 |
+| `SYMB_SCEN` | `scenario_symbol_charset` | SCEN-005 |
 | `LB_DESC` | `line_break_in_description` | DESC-008 |
 | `LB_SCEN` | `line_break_in_scenarios` | **none — registered, never emitted** (gap G-08) |
 | `LB_TEMP` | `line_break_in_temporal_reference` | **none — registered, never emitted** (gap G-08) |
-| `YEARS_TEMP` | `years_in_temporal_reference` | TEMP-002 |
+| `YEARS_TEMP` | `years_in_temporal_reference` | TEMP-002, TEMP-004, TEMP-005 |
 | `LEG_RANGE` | `legend_data_range` | LEG-015 |
 | `LEG_OVER` | `legend_value_overlap` | **none — registered, never emitted** (gap G-08; overlap is covered by LEG-010 continuity under `FC`) |
-| `LEG_REL` | `legend_relations` | LEG-012, LEG-013, LEG-014 |
+| `LEG_REL` | `legend_relations` | LEG-012, LEG-013, LEG-014 (retired-by-v1.16 no-op, PROTO-012) |
 | `SUM_PROP` | `sum_properties_in_influencing_factors` | PROP-007, PROP-008, PROP-009, PROP-010 |
 | `REP_IND_PROP` | `repeated_indicators_in_proportionalities` | PROP-004 |
 | `IR_PROP` | `indicator_relations_in_proportionalities` | PROP-006 |

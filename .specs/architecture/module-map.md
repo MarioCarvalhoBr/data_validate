@@ -8,7 +8,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
 | `application_config.py` | Constants, fallback HTML template, localised verification titles; optional injected `LanguageManager` | `ApplicationConfig`, `get_verify_names` | `tests/unit/config/test_application_config.py` | `app/options.py`, `specs/limits.py` | PERF-004 |
-| `names_enum.py` | 35 verification keys (since PROTO-004 added `CATEG_DESC`) | `NamesEnum` | none (100 % incidental) | `rules/categories.py` | — |
+| `names_enum.py` | 37 verification keys (PROTO-004 added `CATEG_DESC`; Phase 6 round N2 added `SYMB_SCEN`/`UNIQ_VAL`) | `NamesEnum` | none (100 % incidental) | `rules/categories.py` | — |
 | `spreadsheet_info.py` | Sheet stems, extensions, required/optional | `SpreadsheetInfo`, `SHEET` | none | `specs/sheet_specs.py` (implemented, consumers pending) | ARC-003 |
 | `metadata_info.py` | Version string, welcome banner | `MetadataInfo`, `METADATA` | `helpers/base/test_metadata_info.py` | `util/version.py` | BUG-017, TOOL-005 |
 

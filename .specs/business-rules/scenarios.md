@@ -63,18 +63,37 @@ every model as `scenarios` (`SpModelABC.VAR_CONSTS.SCENARIOS`); the loader sets
 - Covered by tests: `tests/unit/rules/test_scenario.py::TestCheckNameAndSymbolAreUnique`
 - Notes / known defects: —
 
+### SCEN-005 · `simbolo` must be exactly one ASCII letter or digit
+- Severity: error
+- NamesEnum: SYMB_SCEN (`verification_name_scenario_symbol_charset`)
+- Protocol: §2.1 p.4 (v1.16, clarifying v1.10's gap G-17): "Um único caractere ... apenas letras e
+  números, não podendo ter espaço, pontuação ou qualquer outro caracter especial."
+- Statement: every `simbolo` cell must match `^[A-Za-z0-9]$` — exactly one character, an ASCII
+  letter or digit (an accented letter, e.g. `"é"`, is not ASCII and is also rejected: the protocol
+  means the unaccented Latin alphabet the value-column pattern `CÓDIGO-ANO[-CENÁRIO]` can
+  actually match).
+- Current message (pt-BR): catalog key `rule.SCEN-005.error` — `{filename}, linha {row}: O valor
+  '{value}' da coluna 'simbolo' deve conter exatamente um caractere alfanumérico.` (present in
+  both locales)
+- Target message key: `rule.SCEN-005.error`
+- Implemented by: `rules/scenario.py::check_symbol_charset`
+- Covered by tests: `tests/unit/rules/test_scenario.py::TestCheckSymbolCharset`
+- Notes / known defects: resolves gap G-17 (PROTO-006). Every fixture's `cenarios.simbolo` is
+  already a single ASCII letter (`"O"`/`"P"`), so this rule never fires against a shipped fixture.
+
 ## Gaps (protocol ↔ code)
 
-- **G-17 symbol charset**: "apenas letras e números, não podendo ter espaço, pontuação ou qualquer outro caracter especial" (v1.10) is not validated; a symbol with `-` would also break the value column pattern silently.
+- **G-17 symbol charset** (resolved, PROTO-006): SCEN-005 now validates "apenas letras e números,
+  não podendo ter espaço, pontuação ou qualquer outro caracter especial" (length 1, ASCII
+  alphanumeric).
 - **G-18 default symbols `O`/`P`**: the protocol defines defaults when the file is absent; the code treats "no file" as "no scenarios" (both the `cenario` column and scenario columns become invalid). Confirm the intended behaviour with the protocol owners.
 - `LB_SCEN` title is registered but never emitted (gap G-08).
 
 ## Protocol v1.16 update (2026-09-12)
 
-- `simbolo` is explicitly "**Um único caractere**", letters and digits only (§2.1 p.4). No
-  version-history entry marks this as new, so it is treated as a clarification of G-17 → planned
-  SCEN-005 (PROTO-006): length 1 + `isalnum()`.
+- `simbolo` is explicitly "**Um único caractere**", letters and digits only (§2.1 p.4) — resolved:
+  SCEN-005 (PROTO-006) validates length 1 + ASCII alphanumeric.
 - New explicit note: sheet row order = display order in the platform; the first row is the default
   scenario (documentation only, nothing to validate).
 
-Last synced with code: ARC-017 Phase 3 Port 4 (scenario content rules ported to `rules/scenario.py`; legacy validator deleted)
+Last synced with code: Phase 6 round N2, 2026-09-13 (SCEN-005/PROTO-006 added to `rules/scenario.py`)

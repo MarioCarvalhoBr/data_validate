@@ -109,12 +109,15 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Severity: error
 - NamesEnum: FC
 - Protocol: §2.5 p.12 ("formato hexadecimal começando com # e seguido de seis valores hexadecimais")
-- Statement: `cor` matches `^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$`.
+- Statement: `cor` matches `^#[A-Fa-f0-9]{6}$` — exactly six hex digits (PROTO-011, protocol
+  §2.5 pp.10-11: since v1.16 the 3-digit shorthand, e.g. `#F00`, is no longer accepted).
 - Current message (pt-BR): `{filename} [código: {code}, linha: {row}]: O formato da cor '{color}' é inválido. Use o formato hexadecimal (ex: #RRGGBB).`
 - Message key (implemented, Phase 5 round L2, 2026-09-13): `rule.LEG-008.error`
 - Implemented by: `legend_processing.py::LegendProcessing.validate_color_format` (catalog-rendered via `translate`; PERF-001: vectorised — a single `Series.str.match()` mask replaces the legacy `.iterrows()` loop)
-- Covered by tests: `tests/unit/helpers/common/validation/test_legend_processing.py` (`TestValidateColorFormat`, including a `translate`-wiring test)
-- Notes / known defects: 3-digit form accepted although the protocol requires six digits (gap G-19). `iterrows` fixed (PERF-001, Phase 5 round L2, 2026-09-13).
+- Covered by tests: `tests/unit/helpers/common/validation/test_legend_processing.py` (`TestValidateColorFormat`, including a `translate`-wiring test and the PROTO-011 3-digit-now-invalid cases)
+- Notes / known defects: `iterrows` fixed (PERF-001, Phase 5 round L2, 2026-09-13). Gap G-19
+  resolved by PROTO-011 (2026-09-13, Phase 6 round N2) — both fixtures that carry a `legenda`
+  file use six-hex colours only, so this tightening never fires against a shipped fixture.
 
 ### LEG-009 · `minimo`/`maximo` must have at most two decimals
 - Severity: error
@@ -175,18 +178,26 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
   BUG-014 (string comparison of `nivel`, e.g. `"1.0"` silently not matching `"1"` and skipping this
   rule entirely) fixed.
 
-### LEG-014 · Indicators at levels other than 1 and 2 must reference a legend
-- Severity: error
+### LEG-014 · Retired by PROTO-012 (empty `legenda` cell is not an error)
+- Severity: n/a — this rule is a permanent no-op since PROTO-012 (2026-09-13, Phase 6 round N2)
 - NamesEnum: LEG_REL
-- Protocol: not in protocol — implemented behaviour (protocol says empty cells use the default legend)
-- Statement: every description row with level ∉ {1, 2} has a non-empty `legenda`.
-- Current message (pt-BR): `{descricao}: Indicadores de níveis diferentes de 1 e 2 devem ter referência de legenda. Indicadores sem referência em {legenda}: [..].`
-- Target message key: `rule.LEG-014.error`
-- Implemented by: `rules/legend.py::check_other_levels_must_reference_legend`/`_analyze_relation_indicators` (ARC-017 Phase 3 Port 6; silent when LEG-012's shared abort fired)
-- Covered by tests: `tests/unit/rules/test_legend.py` (table-driven: missing reference, has reference, BUG-014 float-level regression, missing-column silence)
-- Notes / known defects: conflicts with protocol §2.3 p.9 "todos os valores vazios serão associados à legenda default" (gap G-20).
-  BUG-014 (compound `nivel != "1" & nivel != "2"` string comparison, e.g. `"2.0"` wrongly treated
-  as "some other level") fixed — both sides now use `DataFrameProcessing.numeric_not_equals_mask`.
+- Protocol: §2.3 p.9 ("Quando esta coluna for usada, todos os valores vazios serão associados à
+  legenda default")
+- Statement (historical, pre-PROTO-012): every description row with level ∉ {1, 2} had to have a
+  non-empty `legenda`, an empty cell was an error. This directly contradicted the protocol (an
+  empty `legenda` cell means the default legend applies, not a validation failure — the same
+  fact `LEG-015`'s own default-range fallback already relies on) and is retired: the check body
+  now always returns no issues. A NON-empty reference that matches no `legenda.codigo` remains an
+  error — that was always `LEG-012`'s "missing codes" finding, not this rule's, and is unaffected.
+- Current message (pt-BR): none — the rule never fires
+- Target message key: n/a (`rule.LEG-014.error` still exists in the catalog for
+  backward-compatibility/parity but is no longer rendered by any code path)
+- Implemented by: `rules/legend.py::check_other_levels_must_reference_legend` (rule ID/registration
+  kept for traceability; body is a permanent `return []`)
+- Covered by tests: `tests/unit/rules/test_legend.py::TestCheckOtherLevelsMustReferenceLegend`
+  (every case, including a level-3 row with an empty `legenda` cell, now asserts `== []`)
+- Notes / known defects: resolves gap G-20. `rule.LEG-014.error` never appeared in any golden
+  fixture before this change (grep-verified), so the retirement has no observable fixture impact.
 
 ### LEG-015 · Values must fall inside their legend's range
 - Severity: error
@@ -205,14 +216,37 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
   (string comparison of `nivel`) fixed — level 1 exclusion now uses
   `DataFrameProcessing.numeric_equals_mask`.
 
+### LEG-016 · A legend code should not exceed eleven slices
+- Severity: warning
+- NamesEnum: FC (`verification_name_file_cleaning`) — same model-level bucket as LEG-001…011,
+  not a dedicated category (`SpLegend.data_cleaning_warnings` is reported under `FC` regardless
+  of which check populated it, see `controllers/spreadsheet_processor.py`)
+- Protocol: §2.5 pp.10-11 (PROTO-011): "podendo ter no maximo onze fatias (sendo de cinco a sete
+  o recomendado)"
+- Statement: within a legend code group, count rows whose label ≠ `Dado indisponível`; more than
+  eleven such slices is a warning (5–7 is advised, only documented, not enforced).
+- Current message (pt-BR): catalog key `rule.LEG-016.warning` — `{filename} [código: {code}]: A
+  legenda possui {count} fatias, mais do que o máximo recomendado de {max_slices}.` (present in
+  both locales)
+- Target message key: `rule.LEG-016.warning`
+- Implemented by: `legend_processing.py::LegendProcessing.validate_legend_slice_count`, called
+  from `models/sp_legend.py::SpLegend.data_cleaning` in the same "LEG-002…006 passed cleanly"
+  gated block as LEG-007…011
+- Covered by tests: `tests/unit/helpers/common/validation/test_legend_processing.py::
+  TestValidateLegendSliceCount`
+- Notes / known defects: resolves half of gap G-21 (max slices; the grey-for-DI half stays
+  documentation only, not validated). Both legend-bearing fixtures have 5 non-DI slices per code
+  (under the 11-slice threshold), so this rule never fires against a shipped fixture.
+
 ## Gaps (protocol ↔ code)
 
-- **G-19 colour format**: protocol requires six hex digits; code accepts three.
-- **G-20 empty `legenda` cells**: protocol assigns the default legend; code errors for levels ≥ 3 (LEG-014).
-- **G-21 grey for DI** and **max 11 slices / 5–7 advised**: not validated.
+- **G-19 colour format** (resolved, PROTO-011): LEG-008 now requires exactly six hex digits; the
+  3-digit shorthand is rejected.
+- **G-20 empty `legenda` cells** (resolved, PROTO-012): LEG-014 no longer errors on an empty cell
+  at levels ≥ 3 — see its entry above.
+- **G-21 grey for DI** (still documentation only, not validated) **and max 11 slices** (resolved,
+  PROTO-011 → LEG-016).
 - **G-22 legend ≤ data minimum**: protocol demands the smallest `minimo` be ≤ the indicator's minimum; code reports out-of-range values (LEG-015) — equivalent in effect, different wording.
 
-Last synced with code: Phase 5 round L2, 2026-09-13 (ARC-005/PERF-001: LEG-001…011's messages are
-catalog keys and its four `.iterrows()` loops are vectorised — see each rule's entry above; still
-not ported to `rules/legend.py`, unlike LEG-012…015, which were ported by ARC-017 Phase 3 Port 6,
-legacy `SpLegendValidator`/`ModelMappingLegend` deleted)
+Last synced with code: Phase 6 round N2, 2026-09-13 (PROTO-011: LEG-008 tightened to six-hex-only,
+new LEG-016 slice-count warning; PROTO-012: LEG-014 retired to a permanent no-op)

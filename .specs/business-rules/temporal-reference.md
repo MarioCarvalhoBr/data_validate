@@ -70,10 +70,49 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Covered by tests: `tests/unit/rules/test_temporal_reference.py::TestCheckNameAndSymbolAreUnique`
 - Notes / known defects: —
 
+### TEMP-004 · `simbolo` must be exactly four numeric characters
+- Severity: error
+- NamesEnum: YEARS_TEMP (`verification_name_years_in_temporal_reference`)
+- Protocol: §2.2 p.5 ("Quatro caracteres numéricos")
+- Statement: every `simbolo` cell (raw, not the model's cleaned integer column) matches `^\d{4}$`
+  — exactly four ASCII digits, no sign, no decimal separator. Independent of `CLEAN-005`'s
+  "parses as an integer ≥ 0" cleaning check: a value can pass one and fail the other (e.g. `"1"`
+  is a valid non-negative integer but not four digits).
+- Current message (pt-BR): catalog key `rule.TEMP-004.error` — `{filename}, linha {row}: O valor
+  '{value}' da coluna 'simbolo' deve conter exatamente quatro caracteres numéricos.` (present in
+  both locales)
+- Target message key: `rule.TEMP-004.error`
+- Implemented by: `rules/temporal_reference.py::check_symbol_is_four_digits`
+- Covered by tests: `tests/unit/rules/test_temporal_reference.py::TestCheckSymbolIsFourDigits`
+- Notes / known defects: resolves gap G-15 (PROTO-014). `data_errors_01`'s `simbolo="2050B"` (a
+  known, pre-existing defect, previously undetected by `CLEAN-005`'s looser check) newly triggers
+  this rule — reviewed golden re-baseline. No other fixture's `simbolo` fails the four-digit format.
+
+### TEMP-005 · At most one `simbolo` may be an observed (non-future) reference
+- Severity: warning
+- NamesEnum: YEARS_TEMP (`verification_name_years_in_temporal_reference`)
+- Protocol: §2.2 p.5 (footnote): "atualmente suporta apenas uma referência temporal para dados observados"
+- Statement: count every `simbolo` value (including the present-time first row, unlike TEMP-002)
+  that is `<= ctx.clock().year`; more than one such value is a warning, naming every observed
+  symbol found. A conservative severity (warning, not error): this is the platform's own current
+  limitation, not a hard protocol requirement, matching TEMP-004's stricter format-only error and
+  TEMP-002's existing per-symbol error for a genuinely past *scenario* year, which stay unchanged.
+- Current message (pt-BR): catalog key `rule.TEMP-005.warning` — `{filename}: A coluna 'simbolo'
+  possui mais de uma referência temporal observada (ano atual ou passado): {observed_symbols}. A
+  plataforma atualmente suporta apenas uma.` (present in both locales)
+- Target message key: `rule.TEMP-005.warning`
+- Implemented by: `rules/temporal_reference.py::check_single_observed_reference`
+- Covered by tests: `tests/unit/rules/test_temporal_reference.py::TestCheckSingleObservedReference`
+- Notes / known defects: resolves gap G-16 (PROTO-014). Every fixture has exactly one symbol
+  `<=` the current year (the present-time row itself), so this rule never fires against a
+  shipped fixture. Silent (`[]`) when `simbolo` is absent — TEMP-002/TEMP-004 already own that
+  column's missing-column abort.
+
 ## Gaps (protocol ↔ code)
 
-- **G-15 four-digit symbol**: `simbolo` must be exactly four digits per protocol; code accepts any integer ≥ 0.
-- **G-16 single observed time**: "atualmente suporta apenas uma referência temporal para dados observados" — the code assumes row 1 is the present time but does not verify that only one symbol is ≤ current year.
+- **G-15 four-digit symbol** (resolved, PROTO-014): TEMP-004 now requires exactly four numeric characters.
+- **G-16 single observed time** (resolved, PROTO-014): TEMP-005 warns when more than one `simbolo` is `<=` the current year.
 - CR/LF and line-break checks exist for `descricao` (DESC-008) but `LB_TEMP` is never emitted (gap G-08).
 
-Last synced with code: ARC-017 Phase 3 Port 4 (temporal reference content rules ported to `rules/temporal_reference.py`; legacy validator deleted)
+Last synced with code: Phase 6 round N2, 2026-09-13 (PROTO-014: TEMP-004/TEMP-005 added to
+`rules/temporal_reference.py`)

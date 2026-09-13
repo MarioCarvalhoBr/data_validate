@@ -118,9 +118,25 @@ loop was rewritten as vectorised `pd.to_numeric` masks (PERF-001); see each rule
   cells excluded, missing-scenario-column abort)
 - Notes / known defects: —
 
+### VAL-006 · `id` must contain no duplicated value
+- Severity: error
+- NamesEnum: UNIQ_VAL (`verification_name_value_id_uniqueness`)
+- Protocol: §2.6 p.11 ("identificador único")
+- Statement: `valores.id` must contain no duplicated value; duplicates are listed. No registry
+  (`spd_data.json`, PROTO-013/TERR-002) is needed for this half of gap G-13 — uniqueness is a
+  property of `valores` alone; completeness (every registry id present in `valores`) remains out
+  of scope, tracked separately as TERR-001/TERR-002.
+- Current message (pt-BR): catalog key `rule.VAL-006.error` — `{filename}: A coluna '{column}'
+  contém valores de 'id' duplicados: {duplicated_ids}.` (present in both locales)
+- Target message key: `rule.VAL-006.error`
+- Implemented by: `rules/value.py::check_id_uniqueness`
+- Covered by tests: `tests/unit/rules/test_value.py::TestCheckIdUniqueness`
+- Notes / known defects: resolves the uniqueness half of gap G-13 (PROTO-017). No fixture's
+  `valores.id` has a duplicate, so this rule never fires against a shipped fixture.
+
 ## Gaps (protocol ↔ code)
 
-- **G-13 `id` completeness**: "Nesta coluna deverão ter todos os objetos descritos no shapefile ou … todos os municípios brasileiros" cannot be checked without the spatial layer; uniqueness of `id` is also not checked.
+- **G-13 `id` completeness/uniqueness**: "Nesta coluna deverão ter todos os objetos descritos no shapefile ou … todos os municípios brasileiros" (completeness) cannot be checked without the spatial layer — remains open, tracked as TERR-001 (PROTO-013); uniqueness is **resolved** — VAL-006 (PROTO-017).
 - **G-14 normalised range**: the [0,1] expectation is enforced only through the legend range rule (LEG-015) with default bounds 0–1.
 
 ## Protocol v1.16 update (2026-09-12)
@@ -129,8 +145,7 @@ loop was rewritten as vectorised `pd.to_numeric` masks (PERF-001); see each rule
   removed from `descricao`; per the v1.15 history the information now lives in the legend. Until
   the owners fix the text, value orientation is treated as legend-defined (PROTO-016).
 - **Territory registry**: when the optional server file `spd_data.json` is present, every
-  `valores.id` must exist in it — TERR-001 in [territories.md](territories.md) (PROTO-013).
-  `id` uniqueness becomes VAL-006 (PROTO-017).
+  `valores.id` must exist in it — TERR-001 in [territories.md](territories.md) (PROTO-013,
+  still open, sequenced last). `id` uniqueness is **resolved** — VAL-006 (PROTO-017).
 
-Last synced with code: ARC-017 Phase 3 Port 5 (VAL-002…005 ported to `rules/value.py`; legacy
-`SpValueValidator`/`ValueProcessing` deleted)
+Last synced with code: Phase 6 round N2, 2026-09-13 (PROTO-017: VAL-006 added to `rules/value.py`)

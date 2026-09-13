@@ -238,9 +238,59 @@ Loading facts (`helpers/tools/data_loader/**`):
   (defaulting to a `pt_BR` `MessageCatalog` when the facade is built without a `GeneralContext`),
   per `.claude/rules/i18n.md` — migrating STRUCT-007 to the same pattern is left to BUG-015/ARC-003.
 
+### STRUCT-013 · Proactive UTF-8 encoding check (FAQ message shape)
+- Severity: error
+- NamesEnum: FS (`verification_name_file_structure`)
+- Protocol: §2 p.3 (UTF-8 requirement) + FAQ "O arquivo XXX está no formato YYY, deveria ser UTF-8."
+- Statement: on load, every `.csv` file (never `.xlsx` — a zip container, exempt) has a sample of
+  its raw bytes read; when the sample fails to decode as UTF-8 and `chardet`'s own guess over the
+  same sample is confident (`>= 0.7`) and names an encoding other than UTF-8/ASCII, report the
+  FAQ's exact message shape. A low-confidence guess is not reported (avoids a false positive on a
+  genuinely UTF-8 file with only a couple of accented characters, which `chardet` alone can
+  mis-detect as `ISO-8859-1`). Does not block the subsequent read attempt — a genuinely
+  undecodable file still also raises STRUCT-007's own, more specific error.
+- Current message (pt-BR): catalog key `rule.STRUCT-013.error` — `O arquivo {filename} está no
+  formato {encoding}, deveria ser UTF-8.` (present in both locales)
+- Target message key: `rule.STRUCT-013.error`
+- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()` (module-level
+  `_detect_non_utf8_encoding`), a loader-level check (not a `RuleSpec`) appended straight to
+  `LoadResult.errors`, the same shape STRUCT-015's size-limit errors use
+- Covered by tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py::
+  TestDataLoaderFacadeStructuralChecks`
+- Notes / known defects: resolves gap G-01 (PROTO-007). The bundle's own `.csv` fixture
+  (`data_errors_xss/descricao.csv`) is genuinely UTF-8 with high `chardet` confidence, so this
+  rule never fires against a shipped fixture — verified before the golden re-baseline.
+
+### STRUCT-014 · Each `.xlsx` must contain exactly one worksheet
+- Severity: error
+- NamesEnum: FS (`verification_name_file_structure`)
+- Protocol: §2 p.3 (since v1.14)
+- Statement: on load, every `.xlsx` file's worksheet names are read via
+  `python_calamine.CalamineWorkbook.from_path(...).sheet_names`; more than one worksheet is an
+  error naming the file, the first (still-used) sheet, and every extra sheet. Does not block the
+  subsequent read — the first sheet is still parsed and validated, matching calamine's own
+  "reads the first sheet" behaviour, now surfaced instead of silent. A file this check cannot even
+  open (corrupt zip, vanished path) is silently skipped by this check alone; the real read
+  attempt right after still reports its own STRUCT-007 error with its own message.
+- Current message (pt-BR): catalog key `rule.STRUCT-014.error` — `{filename}: O arquivo Excel
+  possui mais de uma planilha; apenas a primeira ('{first_sheet}') será considerada. Planilhas
+  extras: {extra_sheets}.` (present in both locales)
+- Target message key: `rule.STRUCT-014.error`
+- Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()` (module-level
+  `_worksheet_names`), a loader-level check (not a `RuleSpec`) appended straight to
+  `LoadResult.errors`
+- Covered by tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py::
+  TestDataLoaderFacadeStructuralChecks` (a real, hand-built two/three-sheet `.xlsx` under
+  `tmp_path` — no `.xlsx`-writing dependency is available in this project, see the test helper's
+  docstring)
+- Notes / known defects: resolves gap "calamine reads the first sheet silently" (PROTO-003). No
+  fixture under `data/input/` has more than one worksheet (verified against every fixture before
+  the golden re-baseline), so this rule never fires against a shipped fixture.
+
 ## Gaps (protocol ↔ code)
 
-- **G-01 UTF-8 encoding**: the protocol requires UTF-8 and the FAQ names a dedicated message; the code only reacts to `UnicodeDecodeError` (STRUCT-007). Proposal: STRUCT-013 encoding detection via `chardet` before parsing.
+- **G-01 UTF-8 encoding** (resolved, PROTO-007): STRUCT-013 now detects a confidently non-UTF-8
+  CSV proactively via `chardet`, with the FAQ's exact message shape.
 - **G-02 `|` in CSV**: impossible to detect after `pd.read_csv(sep="|")`; would need a pre-parse scan of raw text.
 - **G-03 decimal comma**: the protocol mandates comma as decimal separator in CSV; code accepts both `,` and `.` everywhere (lenient, undocumented).
 - **G-04 `.qml`** (resolved, BUG-015/ADR-0003): was still scanned (`Config.extensions`) though
@@ -249,13 +299,14 @@ Loading facts (`helpers/tools/data_loader/**`):
 
 ## Protocol v1.16 update (2026-09-12)
 
-- **Single-worksheet xlsx** (v1.14): each `.xlsx` must contain exactly one worksheet; the calamine
-  reader currently loads the first sheet silently → planned STRUCT-014 (PROTO-003).
+- **Single-worksheet xlsx** (v1.14, resolved PROTO-003): each `.xlsx` must contain exactly one
+  worksheet; STRUCT-014 now reports the extra sheets instead of the calamine reader silently
+  loading only the first.
 - **Optional `spd_data.json`** (maintainer decision 2026-09-12, see
   [territories.md](territories.md)): the server-generated territory registry may accompany the
   bundle; STRUCT-004 must whitelist it instead of reporting "arquivo não esperado" → PROTO-013.
-- UTF-8 proactive check (G-01) remains pending as STRUCT-013 (PROTO-007); the v1.16 FAQ keeps the
-  exact expected message.
+- UTF-8 proactive check (G-01, resolved PROTO-007): STRUCT-013 implements the v1.16 FAQ's exact
+  expected message.
 
-Last synced with code: f1e88af (ARC-017 Phase 3b: STRUCT-001…006 ported to `rules/structure.py`;
-`validators/structure/file_structure_validator.py` deleted)
+Last synced with code: Phase 6 round N2, 2026-09-13 (PROTO-003/STRUCT-014 and PROTO-007/
+STRUCT-013 implemented in `DataLoaderFacade.load()`)

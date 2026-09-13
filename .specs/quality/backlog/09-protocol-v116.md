@@ -55,7 +55,7 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   `.specs/business-rules/composition.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-003 · STRUCT-014: each `.xlsx` must contain exactly one worksheet
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: done
 - Protocol: §2 p.3 (since v1.14).
 - Where: `helpers/tools/data_loader/readers/excel_reader.py` (calamine reads the first sheet
   silently), new rule STRUCT-014, message keys in both catalogs.
@@ -63,6 +63,17 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   error naming the file and the extra sheets; register STRUCT-014 under `FS`.
 - Tests: unit with a 2-sheet xlsx fixture built via openpyxl in tmp_path; golden case in a
   data_errors fixture (new fixture folder or extend an existing one — reviewed re-baseline).
+- Done: implemented in `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()`
+  (module-level `_worksheet_names`, using `python_calamine.CalamineWorkbook.from_path(...)`
+  directly — not `excel_reader.py`, which stays a thin pandas wrapper); a loader-level error
+  (like STRUCT-015's size-limit checks), not a `RuleSpec`. No `.xlsx`-writing library is
+  available in this project (`openpyxl`/`xlsxwriter` are not dependencies), so the unit test
+  hand-builds a minimal OOXML zip via the stdlib `zipfile` instead. Tests:
+  `tests/unit/helpers/tools/data_loader/api/test_facade.py::TestDataLoaderFacadeStructuralChecks`.
+  No fixture under `data/input/` has more than one worksheet (verified), so no fixture's golden
+  changes for this item beyond the two new always-empty report sections shared with PROTO-006/
+  PROTO-017 (see the golden CHANGELOG). Spec: `.specs/business-rules/file-structure.md`,
+  `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-004 · DESC-013: require `categoria` and validate its domain
 - Priority: P1 · Effort: M · Status: done (step 1 — see Done note; step 2, absence → error, stays open for a future re-baseline)
@@ -105,18 +116,43 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   `.specs/business-rules/description.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-006 · SCEN-005: scenario symbol is one character, letters/digits only (G-17)
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Protocol: §2.1 p.4: "Um único caractere … apenas letras e números".
 - Proposed fix: new rule in the scenario validator (`len == 1` and `isalnum()`); register under
   `MAND_PUNC_SCEN` or a new title (decide with the rule-authoring skill).
 - Tests: unit table (multi-char, space, punctuation, accents); golden case.
+- Done: `rules/scenario.py::check_symbol_charset` (new category `NamesEnum.SYMB_SCEN`,
+  `verification_name_scenario_symbol_charset`, both locales) — reusing `MAND_PUNC_SCEN`/
+  `UVR_SCEN` was rejected (symbols are neither punctuation nor a uniqueness check; a dedicated
+  title keeps each category's meaning unambiguous, matching the PROTO-004/`CATEG_DESC`
+  precedent). Pattern `^[A-Za-z0-9]$` (ASCII only — an accented letter is not "letras" in the
+  protocol's own unaccented-alphabet sense). Tests:
+  `tests/unit/rules/test_scenario.py::TestCheckSymbolCharset` (table-driven: two chars, trailing
+  space, punctuation, accented, empty, blank). Every fixture's `cenarios.simbolo` is already a
+  single ASCII letter, so no fixture's error/warning content changes; goldens gain only the new,
+  always-empty section (see the golden CHANGELOG). Spec: `.specs/business-rules/scenarios.md`,
+  `.specs/business-rules/README.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-007 · STRUCT-013: proactive UTF-8 check with the FAQ message (G-01)
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Protocol: §2 p.3 + FAQ "O arquivo XXX está no formato YYY, deveria ser UTF-8."
 - Proposed fix: on CSV load, detect encoding (`FileSystemUtils.detect_encoding`, currently unused)
   and emit exactly the FAQ message shape as an error; xlsx exempt (zip container).
 - Tests: latin-1 fixture file; golden case.
+- Done: implemented in `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()`
+  (module-level `_detect_non_utf8_encoding`), calling `chardet` directly rather than reusing
+  `FileSystemUtils.detect_encoding` — that class depends on `LanguageManager`, which the loading
+  layer must not pull in (`.claude/rules/architecture-boundaries.md`: loading depends only on
+  `specs`/`util`). A sample that round-trips through `bytes.decode("utf-8")` is trusted as UTF-8
+  outright, before `chardet` ever runs — `chardet` alone mis-detects short accented-character
+  samples as `ISO-8859-1` with confidence above the 0.7 threshold, a real false-positive this
+  project must not surface. Does not block the subsequent read attempt (informational, additive
+  to STRUCT-007's own reactive error). Tests:
+  `tests/unit/helpers/tools/data_loader/api/test_facade.py::TestDataLoaderFacadeStructuralChecks`
+  (a real latin-1 file and a real UTF-8-with-accents file in `tmp_path`, no mocked reader). The
+  bundle's one `.csv` fixture (`data_errors_xss/descricao.csv`) is genuinely UTF-8 with high
+  `chardet` confidence, so no fixture's error/warning content changes. Spec:
+  `.specs/business-rules/file-structure.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-008 · DESC-014: codes ordered by hierarchy level (G-06)
 - Priority: P2 · Effort: M · Status: done
@@ -173,16 +209,29 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   `.specs/business-rules/description.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-011 · Legend tightening: six-hex colours, ≤ 11 slices (G-19, G-21 → LEG-016)
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Protocol: §2.5 pp.10–11: `cor` = "#" + six hex digits; up to 11 intervals (5–7 advised); grey
   reserved for "Dado indisponível".
 - Proposed fix: tighten LEG-008's regex to 6-hex only; new LEG-016 warning for >11 slices; grey
   advisory left as documentation.
 - Tests: unit (`#abc` now invalid); goldens: check fixtures for 3-hex colours before deciding on
   re-baseline.
+- Done: `helpers/common/validation/legend_processing.py::LegendProcessing.validate_color_format`'s
+  regex tightened to `^#[A-Fa-f0-9]{6}$`; new `::validate_legend_slice_count` (LEG-016), called
+  from `models/sp_legend.py::SpLegend.data_cleaning` in the same "LEG-002…006 passed cleanly"
+  block as LEG-007…011, appending to `data_cleaning_warnings` — category stays `FC`
+  (`verification_name_file_cleaning`), matching every other LEG-001…011 model-level check's
+  bucket (`SpreadsheetProcessor` reports every model's `data_cleaning_warnings` under `FC`
+  regardless of which check populated it), not a new dedicated category. Grey-for-DI stays
+  documentation only (not validated). Tests:
+  `tests/unit/helpers/common/validation/test_legend_processing.py::TestValidateColorFormat`
+  (3-digit cases flipped to invalid) and `::TestValidateLegendSliceCount`. Both fixtures with a
+  `legenda` file use six-hex colours and 5 non-DI slices per code (checked before implementing),
+  so no fixture's content changes for this item. Spec: `.specs/business-rules/legend.md`,
+  `.specs/business-rules/README.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-012 · Empty `legenda` cell means default legend, not an error (G-20)
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Protocol: §2.3 p.8: "Quando esta coluna for usada, todos os valores vazios serão associados à
   legenda default."
 - Where: `validators/spreadsheets/legend/legend_validator.py` LEG-014 errors for levels ≥3 without
@@ -190,6 +239,17 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
 - Proposed fix: empty cell → default legend [0,1]; LEG-014's error narrows to dangling references
   (non-empty values that match no legend code).
 - Tests: unit; goldens change for fixtures that trigger today's LEG-014 — reviewed re-baseline.
+- Done: `rules/legend.py::check_other_levels_must_reference_legend` (LEG-014) is retired to a
+  permanent `return []` — the underlying `_analyze_relation_indicators` no longer computes the
+  "other levels missing legend" finding at all (dead code removed, not merely unreached). The
+  rule ID stays registered (traceability) rather than being deleted from the registry, so a
+  future report/spec never has to explain a vanished ID. Dangling non-empty references are
+  unaffected — that was always `LEG-012`'s "missing codes" finding. Tests:
+  `tests/unit/rules/test_legend.py::TestCheckOtherLevelsMustReferenceLegend` (every case,
+  including a level-3 row with an empty `legenda` cell, now asserts `== []`). `rule.LEG-014.error`
+  never appeared in any golden before this change (grep-verified across all eight fixtures), so
+  the retirement has **no observable fixture impact**. Spec:
+  `.specs/business-rules/legend.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-013 · Territory registry `spd_data.json`: loader + TERR-001/TERR-002 + whitelist
 - Priority: P1 (importance) · **Sequenced last — after all 01–07 items, per the scheduling note
@@ -224,17 +284,40 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   owner decision, NOT part of this item), territories.md
 
 ### PROTO-017 · VAL-006: duplicate `id` rows in `valores`
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Protocol: §2.6 p.11 ("identificador único"); gap G-13 (uniqueness half).
 - Proposed fix: duplicate values in `valores.id` → error listing the duplicated ids; no registry
   needed. Register VAL-006 under `FS` or `UNAV_INV` (decide via the rule-authoring skill).
 - Tests: unit + golden case.
+- Done: `rules/value.py::check_id_uniqueness`, new category `NamesEnum.UNIQ_VAL`
+  (`verification_name_value_id_uniqueness`, both locales) — neither `FS` (structural, not this
+  rule's concern) nor `UNAV_INV` (value-content validity, a different property than identifier
+  uniqueness) fit; a dedicated title keeps this finding unambiguous in the report, matching the
+  PROTO-006/`SYMB_SCEN` precedent. Tests: `tests/unit/rules/test_value.py::
+  TestCheckIdUniqueness`. No fixture's `valores.id` has a duplicate, so no fixture's error/warning
+  content changes; goldens gain only the new, always-empty section (see the golden CHANGELOG).
+  Spec: `.specs/business-rules/values.md`, `.specs/business-rules/README.md`,
+  `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-014 · TEMP-004/TEMP-005: four-digit symbols and single observed time (G-15, G-16)
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Protocol: §2.2 p.5: `simbolo` four numeric characters; only one observed (non-future) reference
   supported by the platform (footnote).
 - Tests: unit; golden case.
+- Done: `rules/temporal_reference.py::check_symbol_is_four_digits` (TEMP-004, error, raw
+  `^\d{4}$` format check, independent of `CLEAN-005`'s looser "parses as an integer ≥ 0"
+  cleaning) and `::check_single_observed_reference` (TEMP-005, **warning**, conservative
+  severity — the footnote states a platform limitation, not a hard protocol rule, matching the
+  PROTO-004/PROTO-009 staging precedent for a footnote-based/platform-limitation finding).
+  TEMP-005 counts every `simbolo` `<= ctx.clock().year` including the present-time row (unlike
+  `TEMP-002`, which excludes it) and fires only when more than one such value exists. Both
+  registered under the existing `YEARS_TEMP` category (no new title — both are still about years
+  in `referencia_temporal`). Tests: `tests/unit/rules/test_temporal_reference.py::
+  TestCheckSymbolIsFourDigits`/`TestCheckSingleObservedReference`. Goldens: `data_errors_01`
+  gains one new TEMP-004 error (`simbolo="2050B"`, a known pre-existing defect, previously
+  undetected); no other fixture's `simbolo` values fail either check — reviewed re-baseline, see
+  `tests/e2e/golden/CHANGELOG.md`'s "Phase 6 round N2" entry. Spec:
+  `.specs/business-rules/temporal-reference.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-015 · Proportionality sum ≠ 1 severity when data is not normalised
 - Priority: P3 · Effort: S · Status: open
