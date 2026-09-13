@@ -227,6 +227,27 @@
   "rule.SCEN-004.error": {
     "message": "{filename}: A coluna '{column}' não deve conter valores repetidos."
   },
+  "rule.legend.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.LEG-012.error": {
+    "message": "{filename}: Códigos de legenda ausentes em {legend_filename}: {missing_codes}."
+  },
+  "rule.LEG-012.warning": {
+    "message": "{filename}: Códigos de legenda não referenciados em {description_filename}: {missing_codes}."
+  },
+  "rule.LEG-013.error": {
+    "message": "{filename}: Indicadores de nível 1 não podem ter referência de legenda. Códigos com referência em {legend_filename}: {codes}."
+  },
+  "rule.LEG-014.error": {
+    "message": "{filename}: Indicadores de níveis diferentes de 1 e 2 devem ter referência de legenda. Indicadores sem referência em {legend_filename}: {codes}."
+  },
+  "rule.LEG-015.error_default": {
+    "message": "{filename}, linha {row}: O valor {value} está fora do intervalo da legenda padrão ({min_value} a {max_value}) para a coluna '{column}'."
+  },
+  "rule.LEG-015.error_coded": {
+    "message": "{filename}, linha {row}: O valor {value} está fora do intervalo da legenda de código '{legend_id}' ({min_value} a {max_value}) para a coluna '{column}'."
+  },
   "verification_name_file_structure": {
     "message": "Estrutura dos arquivos da pasta de entrada"
   },

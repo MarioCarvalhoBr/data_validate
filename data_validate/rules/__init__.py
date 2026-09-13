@@ -15,7 +15,9 @@ Phase 3a built the registry/engine core with nothing wired into the legacy pipel
 call site outside `tests/unit/rules/` and the reusable seam every later validator port reuses.
 Phase 3 Port 4 adds `temporal_reference.py` (`TEMPORAL_REGISTRY`, `TEMP-001`…`TEMP-003`) and
 `scenario.py` (`SCENARIO_REGISTRY`, `SCEN-003`…`SCEN-004`). Phase 3 Port 5 adds `value.py`
-(`VALUE_REGISTRY`, `VAL-002`…`VAL-005`), replacing the deleted `validators.SpValueValidator`. See
+(`VALUE_REGISTRY`, `VAL-002`…`VAL-005`), replacing the deleted `validators.SpValueValidator`.
+Phase 3 Port 6 adds `legend.py` (`LEGEND_REGISTRY`, `LEG-012`…`LEG-015`), replacing the deleted
+`validators.SpLegendValidator`. See
 `.specs/architecture/target-architecture.md` (`Rule`, `RuleContext`, `RuleOutcome` sketches) and
 `docs/adrs/0006-rule-registry-with-prerequisites.md`.
 """
@@ -27,6 +29,7 @@ from data_validate.rules.context import RuleContext
 from data_validate.rules.description import DESCRIPTION_REGISTRY
 from data_validate.rules.engine import Engine, EngineResult, RuleOutcome, RuleStatus, SkipReason
 from data_validate.rules.legacy_adapter import extend_report_from_outcomes
+from data_validate.rules.legend import LEGEND_REGISTRY
 from data_validate.rules.registry import RegistryCycleError, RuleRegistry, RuleSpec
 from data_validate.rules.scenario import SCENARIO_REGISTRY
 from data_validate.rules.structure import STRUCTURE_REGISTRY
@@ -40,6 +43,7 @@ __all__ = [
     "Engine",
     "EngineResult",
     "RegistryCycleError",
+    "LEGEND_REGISTRY",
     "RuleContext",
     "RuleOutcome",
     "RuleRegistry",

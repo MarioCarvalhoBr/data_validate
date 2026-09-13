@@ -138,12 +138,15 @@ class SpLegend(SpModelABC):
 
         Specific rules:
         1. Clean and validate the 'legenda' column ensuring it contains positive integers (minimum 1).
-        2. Perform specific legend validations (handled in SpLegendValidator now).
+        2. Perform specific legend validations (LEG-001…011, `LegendProcessing`); the
+           cross-sheet relation/range checks (LEG-012…015) run in `rules/legend.py` instead.
         """
         errors = []
         dataframe = self.data_loader_model.raw_data
 
-        legend_validator = LegendProcessing(value_data_unavailable=self.context.config.LABEL_DATA_UNAVAILABLE, filename=self.filename)
+        legend_validator = LegendProcessing(
+            value_data_unavailable=self.context.config.LABEL_DATA_UNAVAILABLE, filename=self.filename
+        )
 
         errors.extend(legend_validator.validate_code_sequence(dataframe, self.column_name_code))
 

@@ -227,6 +227,27 @@
   "rule.SCEN-004.error": {
     "message": "{filename}: Column '{column}' must not contain duplicated values."
   },
+  "rule.legend.missing_required_column": {
+    "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
+  },
+  "rule.LEG-012.error": {
+    "message": "{filename}: Legend codes missing from {legend_filename}: {missing_codes}."
+  },
+  "rule.LEG-012.warning": {
+    "message": "{filename}: Legend codes not referenced in {description_filename}: {missing_codes}."
+  },
+  "rule.LEG-013.error": {
+    "message": "{filename}: Level 1 indicators must not reference a legend. Codes referenced in {legend_filename}: {codes}."
+  },
+  "rule.LEG-014.error": {
+    "message": "{filename}: Indicators at levels other than 1 and 2 must reference a legend. Indicators with no reference in {legend_filename}: {codes}."
+  },
+  "rule.LEG-015.error_default": {
+    "message": "{filename}, line {row}: Value {value} is outside the default legend range ({min_value} to {max_value}) for column '{column}'."
+  },
+  "rule.LEG-015.error_coded": {
+    "message": "{filename}, line {row}: Value {value} is outside the range of legend code '{legend_id}' ({min_value} to {max_value}) for column '{column}'."
+  },
   "verification_name_file_structure": {
     "message": "Structure of the input folder files"
   },

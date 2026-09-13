@@ -22,6 +22,7 @@ from data_validate.rules import (
     COMPOSITION_REGISTRY,
     DESCRIPTION_REGISTRY,
     Engine,
+    LEGEND_REGISTRY,
     RuleContext,
     RuleRegistry,
     SCENARIO_REGISTRY,
@@ -236,6 +237,7 @@ class SpreadsheetProcessor:
             RuleContext: The shared context for this run.
         """
         description_model = self.data_models_context.get_instance_of(models.SpDescription)
+        legend_model = self.data_models_context.get_instance_of(models.SpLegend)
 
         sheets = {model.CONSTANTS.SP_NAME: model.frame for model in self.initialized_models}
         cleaned = {model.CONSTANTS.SP_NAME: dict(model.cleaned) for model in self.initialized_models}
@@ -252,6 +254,12 @@ class SpreadsheetProcessor:
                 models.SpProportionality.CONSTANTS.SP_NAME
             ].is_read_successful,
             "scenario_exists_file": self.model_configurations[models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE],
+            "legend_sanity_ok": legend_model.is_sanity_check_passed if legend_model else False,
+            "legend_read_success": self.model_configurations[models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS],
+            "min_lower_legend_default": models.SpLegend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT,
+            "max_upper_legend_default": models.SpLegend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT,
+            "label_data_unavailable": self.context.config.LABEL_DATA_UNAVAILABLE,
+            "value_data_unavailable": self.context.config.VALUE_DATA_UNAVAILABLE,
         }
 
         preliminary_context = RuleContext(
@@ -335,15 +343,14 @@ class SpreadsheetProcessor:
         # 4. Validate spreadsheet data optional (value: ARC-017 Phase 3 Port 5, ported to the
         # rules engine, replacing the deleted `validators.SpValueValidator`; scenario: ARC-017
         # Phase 3 Port 4, ported to the rules engine, replacing the deleted
-        # `validators.SpScenarioValidator`)
+        # `validators.SpScenarioValidator`; legend: ARC-017 Phase 3 Port 6, ported to the rules
+        # engine, replacing the deleted `validators.SpLegendValidator`)
         validators.SpProportionalityValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
         self._run_rule_registries([VALUE_REGISTRY], rule_context)
         self._run_rule_registries([SCENARIO_REGISTRY], rule_context)
-        validators.SpLegendValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        self._run_rule_registries([LEGEND_REGISTRY], rule_context)
 
     def _report(self) -> None:
         """

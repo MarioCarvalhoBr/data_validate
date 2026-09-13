@@ -5,9 +5,6 @@ from data_validate.validators.spell.spellchecker_validator import SpellCheckerVa
 
 # Package spreadsheets
 from data_validate.validators.spreadsheets.base.base_validator import BaseValidator
-from data_validate.validators.spreadsheets.legend.legend_validator import (
-    SpLegendValidator,
-)
 from data_validate.validators.spreadsheets.proportionality.proportionality_validator import (
     SpProportionalityValidator,
 )
@@ -16,7 +13,6 @@ __all__ = [
     # Package spreadsheets
     "BaseValidator",
     "SpProportionalityValidator",
-    "SpLegendValidator",
     # Package spell
     "SpellCheckerValidator",
 ]
