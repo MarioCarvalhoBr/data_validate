@@ -16,7 +16,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
-| `spreadsheet_processor.py` | Orchestrates load → models → validators → report | `SpreadsheetProcessor` | none | `app/pipeline.py` | ARC-001, ARC-017 |
+| `spreadsheet_processor.py` | Orchestrates load → models → rule registries → report | `SpreadsheetProcessor` | `tests/unit/controllers/test_spreadsheet_processor.py` | `app/pipeline.py` | ARC-017 (ARC-001 done: construction only stores dependencies, `run()` called explicitly by `main.py`) |
 | `context/general_context.py` | DI container: args, i18n, config, fs, logger; builds one `LanguageManager` from `data_args.data_file.locale` and injects it into `config`/`file_system_utils`; opens a log file only in debug mode | `GeneralContext` | `tests/unit/controllers/context/test_general_context.py` | `app/context.py` | ARC-006 |
 | `context/data_model_context.py` | Model registry for validators | `DataModelContext.get_instance_of` | none | `rules/context.py` | ARC-006 |
 | `report/validation_report.py` | Buckets of error/warning strings, truncation | `ReportItem`, `ValidationReport` | `tests/unit/controllers/report/test_validation_report.py` | `app/result.py`, `reporting/model.py` | none |
@@ -98,21 +98,25 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 | `sp_legend.py` | `legenda` | none | idem + `rules/legend.py` (LEG-012…015) | — |
 | `sp_dictionary.py` | `dicionario` | none | `spell/` | — |
 
-## `validators/`
+## `validators/` — package deleted (ARC-008, ARC-017 Phase 3 Port 8)
 
-| Module | Tests | Destination | Backlog |
-|---|---|---|---|
-| `spreadsheets/base/base_validator.py` | none | `rules/engine.py` | ARC-008 |
-| ~~`structure/file_structure_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3b) — `rules/structure.py`** | BUG-026 (its "no duplicate errors/warnings instance state" concern no longer applies: each check is a pure function, no instance to duplicate state on) |
-| `spell/spellchecker_validator.py` | none | `rules/spelling/SPELL-00x.py` | BUG-023 |
-| ~~`spreadsheets/description/description_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 2) — `rules/description.py`** | PERF-001 (its two `iterrows()` sites are gone, see `05-performance.md`) |
-| ~~`spreadsheets/composition/compostion_graph_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 3) — `rules/composition.py`** | BUG-019 (done), BUG-024 (the `compostion_` filename typo is gone) |
-| ~~`spreadsheets/composition/composition_tree_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 3) — `rules/composition.py`** | PERF-001 (its `iterrows()` sites are gone/vectorised, see `05-performance.md`) |
-| ~~`spreadsheets/temporal_reference/temporal_reference_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 4) — `rules/temporal_reference.py`** | BUG-007 (preserved, not reopened) |
-| ~~`spreadsheets/proportionality/proportionality_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 7) — `rules/proportionality.py`** | BUG-006 (preserved, not reopened), BUG-014 (preserved, not reopened), PERF-001 (its `iterrows()` composition-dict-building site is gone, see `05-performance.md`) |
-| ~~`spreadsheets/value/value_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 5) — `rules/value.py`** | BUG-001 (preserved as a rule test, `tests/unit/rules/test_value.py::TestIdempotency` — the validator path itself is gone) |
-| ~~`spreadsheets/scenario/scenario_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 4) — `rules/scenario.py`** | — |
-| ~~`spreadsheets/legend/legend_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 6) — `rules/legend.py`** | BUG-014 (preserved, not reopened), PERF-001 (its cell-by-cell loop is gone, see `05-performance.md`) |
+Every module below is deleted; `data_validate/validators/` no longer exists as a package. Kept
+as a historical map from the last validator that lived at each path to the `rules/` module that
+replaced it.
+
+| Former module | Destination | Backlog |
+|---|---|---|
+| ~~`spreadsheets/base/base_validator.py`~~ | **deleted (ARC-008, ARC-017 Phase 3 Port 8) — `rules/engine.py`/`rules/registry.py`** | ARC-008 (done: `RuleSpec.requires`/`depends_on` + `Engine._unmet_prerequisite` replace `set_not_executed`/triplicated `column_exists*`) |
+| ~~`structure/file_structure_validator.py`~~ | **deleted (ARC-017 Phase 3b) — `rules/structure.py`** | BUG-026 (its "no duplicate errors/warnings instance state" concern no longer applies: each check is a pure function, no instance to duplicate state on) |
+| ~~`spell/spellchecker_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 8, the last validator ported) — `rules/spell.py`** | BUG-023, BUG-027 (preserved, not reopened) |
+| ~~`spreadsheets/description/description_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 2) — `rules/description.py`** | PERF-001 (its two `iterrows()` sites are gone, see `05-performance.md`) |
+| ~~`spreadsheets/composition/compostion_graph_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 3) — `rules/composition.py`** | BUG-019 (done), BUG-024 (the `compostion_` filename typo is gone) |
+| ~~`spreadsheets/composition/composition_tree_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 3) — `rules/composition.py`** | PERF-001 (its `iterrows()` sites are gone/vectorised, see `05-performance.md`) |
+| ~~`spreadsheets/temporal_reference/temporal_reference_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 4) — `rules/temporal_reference.py`** | BUG-007 (preserved, not reopened) |
+| ~~`spreadsheets/proportionality/proportionality_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 7) — `rules/proportionality.py`** | BUG-006 (preserved, not reopened), BUG-014 (preserved, not reopened), PERF-001 (its `iterrows()` composition-dict-building site is gone, see `05-performance.md`) |
+| ~~`spreadsheets/value/value_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 5) — `rules/value.py`** | BUG-001 (preserved as a rule test, `tests/unit/rules/test_value.py::TestIdempotency` — the validator path itself is gone) |
+| ~~`spreadsheets/scenario/scenario_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 4) — `rules/scenario.py`** | — |
+| ~~`spreadsheets/legend/legend_validator.py`~~ | **deleted (ARC-017 Phase 3 Port 6) — `rules/legend.py`** | BUG-014 (preserved, not reopened), PERF-001 (its cell-by-cell loop is gone, see `05-performance.md`) |
 
 ## `static/`
 
@@ -135,16 +139,19 @@ from the legacy source instead.
 | `specs/issues.py` | Structured validation finding + result grouping/truncation | `Issue`, `Severity`, `ValidationResult` | `specs/test_issues.py` (100 % coverage) | ARC-004 (model implemented, not wired into any validator/model/`ValidationReport` yet — Phase 3) |
 | `i18n/catalog.py` | Locale-scoped message lookup and `Issue` rendering | `MessageCatalog`, `default_catalog_dir`, `CatalogNotFoundError`, `CatalogInvalidError` | `i18n/test_message_catalog.py` (100 % coverage) | ARC-004 (implemented; `helpers/tools/locale/language_manager.py::LanguageManager` remains the module every current call site actually uses) |
 
-## `rules/` (new package, Phase 3a engine core + Phase 3b/3 Port 2/3/4/5/6 ports — ARC-017, ARC-001, ARC-008)
+## `rules/` (new package, Phase 3a engine core + Phase 3b/3 Port 2–8 — every legacy validator ported, ARC-017, ARC-001, ARC-008)
 
 Brand new at its target-architecture path (no legacy predecessor to map the registry/engine core
-from): ADR-0006's engine, plus (Phase 3b/Phase 3 Port 2/3/4/5/6) the first seven ported validators,
+from): ADR-0006's engine, plus (Phase 3b/Phase 3 Port 2–8) all eight ported validators —
 `structure.py`, `description.py`, `composition.py`, `temporal_reference.py`, `scenario.py`,
-`value.py`, and `legend.py`, and the reusable legacy-report adapter, `legacy_adapter.py`. All seven
-deviate from the target architecture's aspirational "one `Rule` per module under
-`rules/<sheet>/<RULE-ID>.py`" (ADR-0006) by declaring every rule for their sheet in one flat
-module — the sheet-level `rules/<sheet>/` subpackage split is deferred to whichever later port
-first needs it.
+`value.py`, `legend.py`, `proportionality.py`, and `spell.py` (the last one, Port 8) — and the
+reusable legacy-report adapter, `legacy_adapter.py`. Every one of these eight deviates from the
+target architecture's aspirational "one `Rule` per module under `rules/<sheet>/<RULE-ID>.py`"
+(ADR-0006) by declaring every rule for their sheet in one flat module — the sheet-level
+`rules/<sheet>/` subpackage split is deferred to a later phase (no port needed it). With `spell.py`
+landed, `data_validate/validators/` is deleted entirely (ARC-008) and every model's `run()` /
+`SpreadsheetProcessor.run()` is called explicitly by its caller instead of automatically from
+`__init__` (ARC-001).
 
 | Module | Responsibility | Key symbols | Tests | Backlog |
 |---|---|---|---|---|
@@ -159,7 +166,10 @@ first needs it.
 | `value.py` | VAL-002…005: `valores` content checks, ported from `SpValueValidator`/`ValueProcessing` | `VALUE_REGISTRY`, `check_relation_indicators_in_values`, `check_value_combination_relation`, `check_unavailable_and_invalid_values`, `check_excessive_decimal_places` | `rules/test_value.py` (100 % coverage) | ARC-017, ARC-001, ARC-005, BUG-001, PERF-001, TST-001 |
 | `legend.py` | LEG-012…015: `legenda` relation/range checks, ported from `SpLegendValidator`/`ModelMappingLegend` | `LEGEND_REGISTRY`, `check_relation_missing_and_unreferenced_codes`, `check_level_one_must_not_reference_legend`, `check_other_levels_must_reference_legend`, `check_value_range_within_legend` | `rules/test_legend.py` (98.93 % coverage) | ARC-017, ARC-001, ARC-005, BUG-014, PERF-001, TST-001 |
 | `proportionality.py` | PROP-003…010: `proporcionalidades` content checks, ported from `SpProportionalityValidator` | `PROPORTIONALITY_REGISTRY`, `check_relation_indicators_in_proportionality`, `check_columns_repeated_indicators`, `check_relation_indicators_in_value_and_proportionality`, `check_parent_child_relationships`, `check_sum_properties_in_influencing_factors` | `rules/test_proportionality.py` (97.84 % coverage) | ARC-017, ARC-001, ARC-005, BUG-006, BUG-014, PERF-001, TST-001 |
+| `spell.py` | SPELL-001…005: dictionary/backend errors + `descricao`/`referencia_temporal`/`cenarios` spell-check, ported from `SpellCheckerValidator` (the last validator port — `data_validate/validators/` is now deleted entirely) | `SPELL_REGISTRY`, `check_dictionary_backend`, `check_spelling_description`, `check_spelling_temporal_reference`, `check_spelling_scenario` | `rules/test_spell.py` (98.63 % coverage) | ARC-017, ARC-001, ARC-005 (in-progress: models' structural/cleaning messages and report labels are still hardcoded pt-BR), ARC-008, BUG-027, TST-001 |
 | `legacy_adapter.py` | Renders `Engine.run(...)`'s outcomes into the legacy `ValidationReport`, reused by every later port | `extend_report_from_outcomes` | `rules/test_legacy_adapter.py` (100 % coverage) | ARC-017 |
 
-Last synced with code: ARC-017 Phase 3 Port 7 (PROP-003…010 ported to `rules/proportionality.py`;
-legacy `SpProportionalityValidator` deleted)
+Last synced with code: ARC-017 Phase 3 Port 8 (SPELL-001…005 ported to `rules/spell.py`; legacy
+`SpellCheckerValidator` deleted; `data_validate/validators/` deleted entirely, closing ARC-008;
+every model/`SpreadsheetProcessor` constructor stops running its pipeline automatically, closing
+ARC-001 except for `DataArgs`'s argparse-in-`__init__`, an accepted CLI-boundary exception)

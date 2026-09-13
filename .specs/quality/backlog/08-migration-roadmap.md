@@ -102,6 +102,25 @@ PERF-007, TST-001, TST-006, TST-010, DOC-002, DOC-003
 Gate: goldens unchanged (message text identical); all 34 `NamesEnum` rules mapped to rule IDs in
 `.specs/business-rules/`; coverage ≥ 85 %.
 
+**Done (Phase 3 complete, Port 8 — spell — was the last of the nine ports):** every step above is
+finished. Step 1 (engine core) landed in Phase 3a (ADR-0006). Step 2 ported all nine registries in
+the planned order (structure → description → composition → temporal reference → value → scenario
+→ legend → proportionality → spell), each with a dedicated `tests/unit/rules/test_*.py` module and
+verified byte-identical against the e2e golden harness (twice) at every step; every message any of
+these nine registries emits is a catalog key in both `pt_BR`/`en_US`. Step 3's `validators/` half
+is done — `data_validate/validators/` (and its mirrored `tests/unit/validators/`) is deleted
+entirely; `helpers/common/validation/` is **not** deleted (its pure, frame-level helpers —
+`DataFrameProcessing`, `CharacterProcessing`, `GraphProcessing`, `TreeProcessing`,
+`LegendProcessing`, `ProportionalityProcessing`, `DescriptionProcessing` — are still imported by
+several `rules/*.py` modules, per each port's own docstring; "once empty" never became true and
+this is an accepted, documented deviation from the original plan, not an oversight). Coverage
+under `tests/unit/` alone is 91.35 % (`tools/coverage_baseline.txt`: 90.10), above this phase's
+85 % gate. Closes ARC-001, ARC-008, ARC-017, TST-001 in full. ARC-005 closes only *partially*:
+every validator-owned message is now a catalog key, but `models/sp_*.py`'s own
+structural/data-cleaning f-strings (~15 across the eight models) and
+`controllers/report/file_report_generator.py`'s report labels are still hardcoded pt-BR — left
+open for a future slice, since neither is a "validator" in this phase's scope.
+
 ## Phase 4 — Reporting & i18n completion
 Closes: SEC-001, SEC-002, ARC-016, BUG-016, BUG-020, DOC-004, DOC-006
 1. `ReportModel` + Jinja templates with autoescape; HTML, JSON, console renderers; PDF via WeasyPrint

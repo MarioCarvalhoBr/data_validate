@@ -108,17 +108,24 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 ## Skipped verifications
 
 `--no-spellchecker` and `--no-warning-titles-length` list `SPELL` / `TITLES_N` as "not executed"
-in the report. Validators also silently skip rules when a sheet is empty or a prerequisite column is
-missing (`BaseValidator.set_not_executed` is a no-op — backlog ARC-008); the target design records
-*skipped-with-reason* per rule (ADR-0006).
+in the report. `data_validate/validators/` (and its `BaseValidator.set_not_executed` no-op) is
+deleted entirely (ARC-008, ARC-017 Phase 3 Port 8): every rule now runs through
+`rules/engine.py::Engine`, whose `RuleSpec.requires`/`depends_on` (checked once per rule by
+`Engine._unmet_prerequisite`) record *skipped-with-reason* (`RuleOutcome.status is SKIPPED`,
+`SkipReason`) exactly as ADR-0006 targeted — closing the gap the old placeholder left open.
 
 ## Test coverage summary
 
-STRUCT-001…006 (file-structure.md) have dedicated unit tests under `tests/unit/rules/
-test_structure.py`, the first rules ported onto the `rules` engine (ARC-017 Phase 3b). DESC-001…010
-(description.md) have dedicated table-driven unit tests under `tests/unit/rules/test_description.py`
-(ARC-017 Phase 3 Port 2) — see `.specs/quality/backlog/04-testing.md`'s TST-001 entry for both.
-Every other rule still has no dedicated unit test (backlog TST-001). Helper functions used by
-rules are covered under `tests/unit/helpers/**`; those are cited per rule as "helper covered by …".
+Every rule ID in this map is now ported onto the `rules` engine (ARC-017 Phase 3, Ports 2–8) with
+a dedicated, table-driven unit test module: `tests/unit/rules/test_structure.py` (STRUCT-001…006,
+Phase 3b), `test_description.py` (DESC-001…010, Port 2), `test_composition.py` (COMP-001…009, Port
+3), `test_temporal_reference.py`/`test_scenario.py` (TEMP-001…003/SCEN-003…004, Port 4),
+`test_value.py` (VAL-002…005, Port 5), `test_legend.py` (LEG-012…015, Port 6),
+`test_proportionality.py` (PROP-003…010, Port 7), and `test_spell.py` (SPELL-001…005, Port 8, the
+last validator ported — `data_validate/validators/` no longer exists). This closes backlog
+TST-001 (`.specs/quality/backlog/04-testing.md`) for models/validators/controllers; helper
+functions used by rules are covered under `tests/unit/helpers/**`, cited per rule as "helper
+covered by …".
 
-Last synced with code: cf5ddaa
+Last synced with code: ARC-017 Phase 3 Port 8 (SPELL-001…005 ported, `data_validate/validators/`
+deleted entirely)

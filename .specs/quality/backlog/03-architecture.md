@@ -6,7 +6,7 @@ zero global state. Each item below names the current smell, where it lives, and 
 (details in `.specs/architecture/target-architecture.md`).
 
 ### ARC-001 · Work is done in constructors (models, validators, processor)
-- Priority: P0 · Effort: L · Status: open
+- Priority: P0 · Effort: L · Status: done
 - Where: `controllers/spreadsheet_processor.py:94` (`self.run()` in `__init__`), every model
   (`models/sp_*.py` → `self.run()`), every validator (`validators/**` → `self._prepare_statement();
   self.run()` in `__init__`), `helpers/base/data_args.py:244` (argparse in `__init__`),
@@ -48,6 +48,33 @@ zero global state. Each item below names the current smell, where it lives, and 
   through the same `_run_rule_registries`/`_build_rule_context` call shape. No constructor work
   at all for either validator any more. Still open: spelling, temporal reference,
   proportionality, value, scenario, legend.
+- Done (Phase 3 Port 8 slice, ARC-017 — closes this item): the eighth and last validator is
+  ported — `validators/spell/spellchecker_validator.py::SpellCheckerValidator` is deleted; its
+  pipeline is now `rules/spell.py`'s `SPELL-001`…`SPELL-005` (`SPELL_REGISTRY`), run by
+  `SpreadsheetProcessor._run_rule_registries([SPELL_REGISTRY], ctx)`. With every validator now
+  ported, `data_validate/validators/` is deleted **entirely** (see ARC-008's own "Done" note),
+  and this slice also fixes every remaining constructor-runs-pipeline case named above: (a)
+  `SpModelABC.__init__` no longer calls `self.initialize()` — every concrete model's `run()`
+  calls `self.initialize()` as its own first statement instead (only *when* it runs moved, from
+  construction to an explicit `run()` call — `initialize()`'s body is unchanged); (b) every
+  model's own `__init__` (`SpDescription`, `SpComposition`, `SpValue`, `SpTemporalReference`,
+  `SpProportionality`, `SpScenario`, `SpLegend`, `SpDictionary`) no longer calls `self.run()` —
+  `SpreadsheetProcessor._configure` calls `model_instance.run()` explicitly right after
+  constructing each one; (c) `SpreadsheetProcessor.__init__` (line 94 named above) no longer
+  calls `self.run()` — `main.py::main` now does `processor =
+  SpreadsheetProcessor(context=general_context); processor.run()`; the welcome-banner log line
+  and the total-execution-time print (both previously in `__init__`, around the old `self.run()`
+  call) moved into `run()` unchanged, so timing still covers exactly the same work. The one
+  remaining, **accepted** exception is `DataArgs.__init__` (`helpers/base/data_args.py:244`,
+  named above): its argparse construction is a CLI-boundary object (ADR-0005 territory —
+  parsing `sys.argv` *is* what constructing that object means), not a validation/business-logic
+  side effect, and stays out of this item's scope; `middleware/bootstrap.py` (also named above)
+  no longer exists (deleted by a prior slice, BUG-004). Every test constructing a model or
+  `SpreadsheetProcessor` directly and asserting on post-`run()` state now calls `.run()`
+  explicitly (`tests/unit/models/test_model_isolation.py`;
+  `tests/unit/controllers/test_spreadsheet_processor.py` gained
+  `TestConfigureCallsRunExplicitly`, pinning that `_configure` calls `model.run()` on every
+  constructed model). **ARC-001 is now done.**
 
 ### ARC-002 · Global mutable state
 - Priority: P0 · Effort: L · Status: open
@@ -215,6 +242,26 @@ zero global state. Each item below names the current smell, where it lives, and 
   keep, since all four already came from one legacy method and share one category, `SUM_PROP`)
   but still tag each `Issue` with its own specific `PROP-0XX` id, so the catalog/spec traceability
   is unaffected by that grouping.
+- Note (Phase 3 Port 8 slice, ARC-017 — last validator port): `SpellCheckerValidator`
+  (`spellchecker_validator.py`) is deleted; its ported rules (`rules/spell.py`'s
+  `SPELL-001`…`SPELL-005`) render every message through `ctx.translate(message_key, **params)` —
+  5 new catalog keys added to both `static/locales/{pt_BR,en_US}/messages.json`
+  (`rule.spelling.missing_required_column`, `rule.SPELL-001.backend_error`,
+  `rule.SPELL-003.warning`, `rule.SPELL-004.warning`, `rule.SPELL-005.error`), the four
+  behavioural keys' pt-BR values copied verbatim from the legacy f-strings (verified
+  byte-identical by the e2e golden harness run twice — the pt_BR e2e fixtures skip the SPELL
+  section entirely when the `pt_BR` enchant dictionary is unavailable, so this port's output is
+  compared only when it is). `rule.SPELL-001.backend_error` is a **documented exception** to "one
+  key per distinct message, real translations both ways": `DictionaryManager`/`SpellChecker`
+  errors are pre-formed, hardcoded-Portuguese strings today regardless of `--locale` (a
+  pre-existing gap, not fixed here), so its template is an intentional `{message}`-only
+  passthrough, identical in both locales, rather than an invented "translation" of text this port
+  has no authority to retranslate. With this port, **every** validator's messages are now catalog
+  keys — the only hardcoded pt-BR strings left are (a) ~15 f-strings inside `models/sp_*.py`'s
+  structural/data-cleaning checks (`SpModelABC.initialize`, `pre_processing`/`data_cleaning` across
+  the eight models) and (b) the report labels/section titles in
+  `controllers/report/file_report_generator.py` — both out of this port's scope, so ARC-005
+  stays **in-progress**, not done.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
@@ -246,7 +293,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   roadmap.
 
 ### ARC-008 · Validator base class carries dead code and triplicated helpers
-- Priority: P1 · Effort: S · Status: open
+- Priority: P1 · Effort: S · Status: done
 - Where: `validators/spreadsheets/base/base_validator.py:89-96` (`initialize` no-op),
   `:135-205` (`column_exists`, `_column_exists`, `_column_exists_dataframe`), `:238-260`
   (`set_not_executed` placeholder with commented code), `:81` (`get_verify_names()` recomputed per
@@ -260,6 +307,15 @@ zero global state. Each item below names the current smell, where it lives, and 
   behaviour. `base_validator.py` itself (the triplicated `column_exists*` helpers, the
   `set_not_executed` no-op) is untouched — no validator has been ported to a `Rule` module yet,
   so the old code path still runs unchanged in the legacy pipeline.
+- Done (Phase 3 Port 8 slice, ARC-017 — closes this item): with the eighth and last validator
+  ported (`rules/spell.py`, replacing the deleted `SpellCheckerValidator`), no validator reads
+  from `base_validator.py` any more — `data_validate/validators/` (`base_validator.py` included)
+  is deleted **entirely**. Its triplicated `column_exists`/`_column_exists`/
+  `_column_exists_dataframe` helpers, the `initialize()` no-op, and the `set_not_executed`
+  placeholder are gone with it; every rule now declares its own `RuleSpec.requires` and the
+  engine's `Engine._unmet_prerequisite` (Phase 3a) is what actually checks prerequisites and
+  records a `SKIPPED` outcome with a reason, for every rule, exactly as this item targeted.
+  **ARC-008 is now done.**
 
 ### ARC-009 · Data loader: property with side effects, mixed result types
 - Priority: P1 · Effort: M · Status: in-progress
@@ -370,7 +426,7 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: SEC-001, SEC-002
 
 ### ARC-017 · Rule execution order and dependencies are implicit
-- Priority: P2 · Effort: M · Status: in-progress
+- Priority: P2 · Effort: M · Status: done (PERF-007 parallel execution stays a separate, related item)
 - Where: `controllers/spreadsheet_processor.py:181-215` (hand-ordered constructor calls), each
   validator re-checks emptiness/columns of *other* sheets.
 - Target: rule registry with `depends_on` and `requires`; topological execution; optional
@@ -415,4 +471,26 @@ zero global state. Each item below names the current smell, where it lives, and 
   coverage on the new module (`tests/unit/rules/test_composition.py`), mypy-strict clean, e2e
   golden harness 7/7 twice, byte-identical. Still open: spelling, temporal reference,
   proportionality, value, scenario, legend.
+- Done (validators 5–8, Phase 3 Ports 4–7, not individually logged here at the time — see
+  `04-testing.md`'s TST-001 entry and `08-migration-roadmap.md` for the per-port detail): temporal
+  reference/scenario (`rules/temporal_reference.py`, `rules/scenario.py`), value
+  (`rules/value.py`), legend (`rules/legend.py`), and proportionality (`rules/proportionality.py`)
+  are each their own `RuleRegistry`, run through the same `_run_rule_registries`/
+  `_build_rule_context` call shape as every port above.
+- Done (eighth/last validator port, Phase 3 Port 8 — closes this item): `rules/spell.py` declares
+  `SPELL_REGISTRY` (`SPELL-001`…`SPELL-005`, registered in the legacy validator's own check order:
+  dictionary/backend errors first — never gated on any prerequisite — then description, then
+  temporal reference, then scenario), run through the same `_run_rule_registries`/
+  `_build_rule_context` call shape. With this port, every rule executed by
+  `SpreadsheetProcessor` (structure, spelling, description, composition, temporal reference,
+  proportionality, value, scenario, legend — nine registries in total) goes through
+  `Engine(registry).run(ctx)`; `controllers/spreadsheet_processor.py` no longer hand-orders any
+  validator construction, only which registries run in which order (still a fixed,
+  hand-written sequence in `_build_pipeline`, not a `depends_on`-derived topological one across
+  registries — each registry's *internal* rule order is topological via
+  `RuleRegistry.topological_order()`, but registry-to-registry order is still explicit). Parallel
+  execution (PERF-007) remains unimplemented — a separate, related item. **ARC-017 is now done**
+  for its own scope (rule registry + topological execution + skipped-with-reason, replacing every
+  hand-ordered validator construction); PERF-007's optional parallel pool is intentionally left
+  open as a follow-on, not a blocker for closing this item.
 - Related: PERF-007

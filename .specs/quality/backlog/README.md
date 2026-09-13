@@ -74,3 +74,22 @@ core from ADR-0006, 100% covered by `tests/unit/rules/`; ARC-001 and ARC-008 gai
 (the `Rule.check`/skipped-with-reason shapes those items target now exist and are exercised, but
 no validator or model constructor was touched) (see `03-architecture.md`,
 `docs/adrs/0006-rule-registry-with-prerequisites.md`).
+
+Status snapshot: 2026-09-13 (Phase 3 Port 8 slice — the migration's last validator port). Not a
+recomputed aggregate (the intervening Phase 3b/Port 2–7 slices did not update the counts/snapshot
+above either — see each backlog file's own item statuses for the authoritative per-item state).
+This slice: `rules/spell.py` (`SPELL_REGISTRY`, `SPELL-001`…`SPELL-005`) replaces the deleted
+`validators/spell/spellchecker_validator.py::SpellCheckerValidator` — the eighth and last
+validator ported — so `data_validate/validators/` (and its mirrored `tests/unit/validators/`) is
+deleted **entirely**, moving **ARC-008 → done**. The same slice fixes every remaining
+constructor-runs-pipeline case (`SpModelABC`/every `Sp*` model/`SpreadsheetProcessor`), moving
+**ARC-001 → done** (the one accepted exception, `DataArgs`'s argparse-in-`__init__`, is a
+CLI-boundary object, out of scope). **ARC-017 → done** (every validator now runs through a
+`RuleRegistry`/`Engine`, replacing every hand-ordered validator construction; PERF-007's parallel
+execution is a separate, still-open follow-on). **TST-001 → done** (`04-testing.md`: every rule
+ID now has a dedicated, table-driven unit test module; models/controllers/CLI are exercised via
+`tests/unit/models/test_model_isolation.py`, `tests/unit/controllers/test_spreadsheet_processor.py`,
+`tests/unit/test_main.py`). ARC-005 stays in-progress (spelling's messages are now catalog keys;
+~15 hardcoded pt-BR f-strings remain in `models/sp_*.py`'s structural/cleaning checks and in
+`controllers/report/file_report_generator.py`'s report labels). See `03-architecture.md`,
+`04-testing.md`, `.specs/business-rules/spelling.md`.

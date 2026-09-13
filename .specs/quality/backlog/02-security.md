@@ -71,12 +71,10 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: PERF-005
 
 ### SEC-004 · Broad `except Exception` masks failures as "valid" runs
-- Priority: P1 · Effort: M · Status: open
-- Where: `validators/spreadsheets/base/base_validator.py:290-295`,
-  `helpers/tools/spellchecker/spellchecker.py:64-65`, `helpers/base/file_system_utils.py:75,116,143,171,194,217`,
-  `helpers/common/validation/dataframe_processing.py:68,131`,
-  `controllers/report/file_report_generator.py:150-153`,
-  `helpers/tools/data_loader/api/facade.py:126`.
+- Priority: P1 · Effort: M · Status: in-progress
+- Where (remaining, not yet ported — outside this slice's scope):
+  `validators/spreadsheets/base/base_validator.py:296` (`except Exception as e:`),
+  `helpers/tools/spellchecker/spellchecker.py:64` (`except Exception as e:`).
   (`helpers/common/validation/proportionality_processing.py`'s `except (ValueError, TypeError,
   Exception): pass` removed — see the note below.)
 - Problem: programming errors are converted into user-facing Portuguese strings (or swallowed
@@ -88,7 +86,43 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   `except (ValueError, TypeError): continue` — the redundant `Exception` member (a bare
   `except Exception` in disguise, since `Exception` already covers `ValueError`/`TypeError`) is
   gone; `float(str(val).replace(",", "."))` cannot raise anything else on this input shape.
-  Every other site this item names is still open.
+- Done (loading/reporting slice): all six broad `except Exception` fallbacks in
+  `helpers/base/file_system_utils.py` are gone — every method now catches only `OSError` (the
+  family every `os.path.*`/`open()`/`os.remove()`/`os.makedirs()`/`os.listdir()` call can
+  plausibly raise); a non-`OSError` failure propagates to `main()`'s boundary (exit 2). The two
+  `except Exception` sites in `helpers/common/validation/dataframe_processing.py`
+  (`check_dataframe_vertical_bar`, `check_dataframe_unnamed_columns`) are removed outright — there
+  is no plausible failure mode in that pure-pandas code worth reporting as a data-quality error, so
+  any failure now propagates. `helpers/tools/data_loader/api/facade.py`'s `load()` read loop keeps
+  its specific `except` chain (`FileNotFoundError`, `UnicodeDecodeError`, `pd.errors.ParserError`,
+  `ValueError`, `IOError`) and gains one more specific type, `python_calamine.CalamineError` (the
+  base of `python-calamine`'s `ZipError`/`XmlError`/`PasswordError`, raised by pandas'
+  `engine="calamine"` for a malformed/corrupt `.xlsx` — an expected failure mode of untrusted
+  input, confirmed by the `data_errors_01` golden fixture, not a programming error); the final
+  `except Exception` fallback (redundant with the specific chain) is gone, so a truly unexpected
+  reader failure now propagates instead of being downgraded to a per-file message.
+  `controllers/report/file_report_generator.py` narrows all three of its `except Exception` sites:
+  `build_report` to `(OSError, jinja2.TemplateError)`, `_save_html_file` to `OSError`, and
+  `_save_pdf_file` to `(ImportError, OSError)` (`pdfkit` raises a plain `IOError`, an `OSError`
+  alias in Python 3, for every conversion failure it reports; `ImportError` covers the lazy
+  `import pdfkit` when the optional dependency/its native `wkhtmltopdf` binary is missing).
+  Every other site this item names when it was opened is done; the two remaining sites above
+  belong to `validators/`/`spellchecker.py` and are tracked separately (parallel migration work).
+  Tests: `tests/unit/helpers/base/test_file_system_utils.py` (six `*_unexpected_error_propagates`
+  tests replacing the old `*_unexpected_error` assertions, plus new `OSError`-path regression tests
+  for the three sites that previously had no dedicated `OSError` branch),
+  `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
+  (`test_check_vertical_bar_unexpected_error_propagates`,
+  `test_check_unnamed_columns_unexpected_error_propagates`),
+  `tests/unit/helpers/tools/data_loader/api/test_facade.py`
+  (`test_load_with_general_exception_propagates`), `tests/unit/controllers/report/
+  test_file_report_generator.py` (`TestBuildReportExceptionHandling`,
+  `TestSaveHtmlFileExceptionHandling`, `TestSavePdfFileExceptionHandling` — new classes; this
+  module had no prior test coverage of these three `except` sites at all). `make check` and the
+  full `tests/e2e` golden harness (7/7) both verified green for this slice in isolation (a
+  detached-HEAD worktree with only these four production + four test files applied on top of the
+  last commit), since the shared working tree had unrelated, uncommitted, in-progress changes from
+  a parallel migration effort (`models/`, `spreadsheet_processor.py`) at the time of this slice.
 - Related: ARC-011
 
 ### SEC-005 · Supply-chain and CI hygiene
@@ -175,10 +209,13 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   `except Exception` around `DataArgs`/`GeneralContext`/`SpreadsheetProcessor` construction prints
   `Fatal error: <exc>` to stderr and returns 2. `--json PATH` writes the same summary object as the
   stdout fragment. The import-time banner (`main.py:8`) moved into `main()`, on stderr (ARC-012).
-- Not in scope for this fix (pre-existing, unchanged): `FileReportGenerator.build_report`'s own
-  broad `except Exception` around HTML/PDF generation still swallows a report-rendering failure
-  and prints to stderr instead of propagating it into the new exit-code-2 path; a `--verbose`
-  flag to further quiet stdout/stderr is not implemented (see ARC-011's "still open" list).
+- Not in scope for this fix at the time (later narrowed by SEC-004): `FileReportGenerator
+  .build_report`'s own broad `except Exception` around HTML/PDF generation used to swallow every
+  report-rendering failure and print to stderr instead of propagating it into the exit-code-2 path;
+  SEC-004 narrowed it to `(OSError, jinja2.TemplateError)`, so any other failure now does propagate
+  into `main()`'s broad catch and returns 2, same as any other unexpected construction failure. A
+  `--verbose` flag to further quiet stdout/stderr is still not implemented (see ARC-011's "still
+  open" list).
 - Related: ARC-011, ARC-012, BUG-010
 
 ### SEC-009 · Sensitive artefacts tracked in git

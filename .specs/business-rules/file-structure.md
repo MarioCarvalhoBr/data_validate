@@ -143,7 +143,13 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()` (the
   deprecated `load_all` property wraps the same logic for one release, ARC-009)
 - Covered by tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py`
-- Notes / known defects: raw exception text is leaked to the user; encoding is never proactively detected (`FileSystemUtils.detect_encoding` unused) — gap G-01.
+- Notes / known defects: raw exception text is leaked to the user; encoding is never proactively detected (`FileSystemUtils.detect_encoding` unused) — gap G-01. SEC-004: the "unexpected" cause is
+  now specifically `python_calamine.CalamineError` (the base of `python-calamine`'s
+  `ZipError`/`XmlError`/`PasswordError`, raised by pandas' `engine="calamine"` for a
+  malformed/corrupt `.xlsx`) rather than a catch-all `except Exception` — a reader failure that
+  isn't one of these six documented causes now propagates out of `load()` and reaches `main()`'s
+  boundary as a fatal error (exit code 2) instead of being silently downgraded to a per-file
+  message.
 
 ### STRUCT-008 · A delivered file must not be empty
 - Severity: error
@@ -161,11 +167,14 @@ Loading facts (`helpers/tools/data_loader/**`):
 - NamesEnum: FS
 - Protocol: §2 p.3 ("O caractere barra vertical (|) é reservado para uso interno da ferramenta e não poderá existir nos arquivos entregues")
 - Statement: no column name (any header level) and no cell may contain `|`. One message per offending header and per offending cell.
-- Current message (pt-BR): `{file_name}: A coluna '{column_name}' não pode conter o caractere '|'.` · `{file_name}: O nome da coluna de nível 0 '{col}' não pode conter o caracter '|'.` · `{file_name}: O nome da subcoluna de nível 1 '{col1}' do pai '{col0}' de nível 0 não pode conter o caracter '|'.` · `{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'.` · on exception `{file_name}: Erro ao processar a checagem de barra vertical: {e}`
+- Current message (pt-BR): `{file_name}: A coluna '{column_name}' não pode conter o caractere '|'.` · `{file_name}: O nome da coluna de nível 0 '{col}' não pode conter o caracter '|'.` · `{file_name}: O nome da subcoluna de nível 1 '{col1}' do pai '{col0}' de nível 0 não pode conter o caracter '|'.` · `{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'.`
 - Target message key: `rule.STRUCT-009.error`
 - Implemented by: `helpers/common/validation/dataframe_processing.py::DataFrameProcessing.check_dataframe_vertical_bar`, called from `SpModelABC.initialize`
 - Covered by tests: `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
-- Notes / known defects: converts the whole frame to `str` (PERF-002); for CSV a `|` in data cannot survive parsing, so the check is effective for XLSX only; double-header row offset is still `+2` (should be `+3`).
+- Notes / known defects: converts the whole frame to `str` (PERF-002); for CSV a `|` in data cannot survive parsing, so the check is effective for XLSX only; double-header row offset is still `+2` (should be `+3`). SEC-004: the function no longer wraps its pure-pandas logic in a broad
+  `except Exception` (the dead "on exception" message is gone) — there is no plausible failure in
+  this code path, so a genuine programming error now propagates instead of being reported as a
+  data-quality issue.
 
 ### STRUCT-010 · A row may not have more values than named columns
 - Severity: error
@@ -176,7 +185,10 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Target message key: `rule.STRUCT-010.error`
 - Implemented by: `dataframe_processing.py::DataFrameProcessing.check_dataframe_unnamed_columns`, called from `SpModelABC.initialize`
 - Covered by tests: `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
-- Notes / known defects: on exception `{file_name}: Erro ao processar a checagem de colunas sem nome: {e}`.
+- Notes / known defects: SEC-004: the function no longer wraps its pure-pandas logic in a broad
+  `except Exception` (the dead "on exception" message, `{file_name}: Erro ao processar a checagem
+  de colunas sem nome: {e}`, is gone) — a genuine programming error now propagates instead of
+  being reported as a data-quality issue.
 
 ### STRUCT-011 · Expected columns must be present
 - Severity: error

@@ -5,7 +5,7 @@ module ships with ≥ 95 % line coverage, every bug fix ships with a regression 
 rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-strategy.md`.
 
 ### TST-001 · No tests for models, validators, controllers, CLI
-- Priority: P0 · Effort: XL · Status: open
+- Priority: P0 · Effort: XL · Status: done
 - Where: coverage 0 % `main.py`, 0 % `middleware/bootstrap.py`, 10.3 % `proportionality_validator.py`,
   11.5 % `compostion_graph_validator.py`, 11.7 % `legend_validator.py`, 14.5 % `value_validator.py`,
   16.5 % `composition_tree_validator.py`, 16.9 % `spreadsheet_processor.py`, 18.7 %
@@ -101,6 +101,28 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   closed under this item; the rest of the list (`spreadsheet_processor.py`'s remaining
   validator-construction lines, spellchecker, `file_report_generator.py`,
   `validation_report.py`, models) is still open.
+- Done (spellchecker — tenth and last validator; closes this item): `SpellCheckerValidator`/
+  `spellchecker_validator.py` (25.5 % coverage, 0 dedicated rule tests) is deleted; its five
+  ported SPELL-001…005 rules (`rules/spell.py`) are 98.63 % covered by
+  `tests/unit/rules/test_spell.py` (table-driven per rule: dictionary/backend errors surfacing
+  regardless of `--no-spellchecker`, missing-column abort per model, quality findings
+  [multiple-spaces/misspelled-words] via a `FakeSpellBackend` test double — no `enchant`
+  dependency needed for these tests, a processing failure aborting with no other issues, the
+  legacy sort-by-rendered-text reordering, the scenario-gate, and the engine-level empty-sheet
+  skip for the whole registry), including the BUG-027 regression tests migrated from the deleted
+  `tests/unit/validators/spell/test_spellchecker_validator.py`. With no validator left
+  unported, `data_validate/validators/` (and its mirrored `tests/unit/validators/`) is deleted
+  entirely (ARC-008). `SpreadsheetProcessor.__init__`/every `Sp*` model's `__init__` no longer
+  run their pipeline as a side effect either (ARC-001): `tests/unit/models/
+  test_model_isolation.py` now calls `.run()` explicitly on every model it constructs, and
+  `tests/unit/controllers/test_spreadsheet_processor.py` gained `TestConfigureCallsRunExplicitly`
+  pinning that `_configure` calls `model.run()`. `main.py` (35 statements, 100 % coverage per
+  `tests/unit/test_main.py`) and `controllers/spreadsheet_processor.py`'s own coverage moved from
+  16.9 % to 37.61 % measured on `tests/unit/` alone (the remaining uncovered lines are the
+  `_build_pipeline`/`_build_rule_context`/`_report` bodies, exercised for real by
+  `tests/e2e/test_golden.py`, not by a narrow unit-only coverage run) — **TST-001 is now done**:
+  every rule ID has a dedicated table-driven unit test module, and models/`SpreadsheetProcessor`/
+  CLI can all be constructed and exercised without triggering unrelated I/O.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration

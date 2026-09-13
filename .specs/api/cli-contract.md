@@ -53,10 +53,13 @@ Outputs:
 | 2 | The tool itself failed: bad/missing arguments (`argparse` `SystemExit(2)`, e.g. a missing
     `--input_folder`), or an unexpected exception anywhere in `DataArgs`/`GeneralContext`/
     `SpreadsheetProcessor` construction — `main()` wraps that single span in one broad
-    `except Exception`, prints `Fatal error: <exc>` to stderr, and returns 2. A failure *inside*
-    `FileReportGenerator.build_report` (e.g. a broken template) is still swallowed there and
-    printed to stderr without raising — that broad `except Exception` is pre-existing and out of
-    scope for this change (tracked separately, not part of ARC-011/SEC-008's "one broad catch"). |
+    `except Exception`, prints `Fatal error: <exc>` to stderr, and returns 2. `SpreadsheetProcessor`
+    construction calls `FileReportGenerator.build_report` (SEC-004): a failure there is now caught
+    (printed to stderr, not raised) only when it is an `OSError` (writing the HTML/PDF to disk) or
+    a `jinja2.TemplateError` (rendering the report template) — every other exception (e.g. a
+    programming error in a validator) propagates out of `build_report`, out of
+    `SpreadsheetProcessor.__init__`, into `main()`'s own broad catch, which reports it as
+    `Fatal error: <exc>` and returns 2, same as any other unexpected construction failure. |
 
 Totals are read from `SpreadsheetProcessor.validation_reports.get_total_errors()`/
 `get_total_warnings()`; the `tests` count is `len(validation_reports)`.

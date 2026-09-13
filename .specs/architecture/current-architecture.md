@@ -9,11 +9,11 @@ This document describes the code **as it is**. Smells are tagged with backlog ID
 flowchart TD
   A[main.py::main] --> B[DataArgs<br/>helpers/base/data_args.py<br/>argparse in __init__]
   B --> D[GeneralContext<br/>controllers/context/general_context.py<br/>one LanguageManager built from data_args.data_file.locale,<br/>injected into ApplicationConfig/FileSystemUtils; LoggerManager only<br/>opens a file handler when --debug]
-  D --> E[SpreadsheetProcessor<br/>controllers/spreadsheet_processor.py<br/>runs pipeline in __init__]
+  D --> E[SpreadsheetProcessor<br/>controllers/spreadsheet_processor.py<br/>constructor only stores dependencies ARC-001;<br/>main.py calls processor.run() explicitly]
   E --> E1[_prepare_statement: one empty report per NamesEnum]
-  E1 --> E2[_read_data: DataLoaderFacade.load_all]
-  E2 --> E3[_configure: instantiate 8 Sp* models]
-  E3 --> E4[_build_pipeline: DataModelContext + rules engine STRUCT-*/DESC-* + 8 validators]
+  E1 --> E2[_read_data: DataLoaderFacade.load]
+  E2 --> E3[_configure: instantiate 8 Sp* models, call model.run() explicitly on each]
+  E3 --> E4[_build_pipeline: DataModelContext + rules engine, every validator ported to a RuleRegistry ARC-008/ARC-017]
   E4 --> E5[_report: FileReportGenerator.build_report]
   E5 --> F[HTML + PDF in output folder<br/>JSON fragment on stdout]
   A --> G[GeneralContext.finalize<br/>closes/detaches every file-logger handler;<br/>prints the log path only when --debug]
@@ -28,10 +28,15 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 | Step | Method | What happens | Report bucket |
 |---|---|---|---|
 | 0 | `_prepare_statement` | `ValidationReport.add_by_name` for every `NamesEnum` title (fixed order in the report) | all |
-| 1 | `_read_data` | `DataLoaderFacade(input_folder).load_all` → `raw_data_map: dict[str, DataLoaderModel]` + load errors; extracts `scenarios` from `cenarios.simbolo`; builds `model_configurations` (`scenario_exists_file`, `scenario_read_success`, `scenarios`, `legend_exists_file`, `legend_read_success`) | FS |
-| 2 | `_configure` | For each class in `target_model_classes` (`SpDescription, SpComposition, SpValue, SpTemporalReference, SpProportionality, SpScenario, SpLegend, SpDictionary`) instantiate the model (which runs `initialize()` + `run()` in `__init__`), then copy `structural_errors/warnings` → FS and `data_cleaning_errors/warnings` → FC | FS, FC |
-| 3 | `_build_pipeline` | `DataModelContext(context, initialized_models)`; builds one shared `RuleContext` (`_build_rule_context`, which also computes `composition_facts` once via `compute_composition_facts` — BUG-019), then calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)` (ARC-017 Phase 3b) where `_run_structure_rules` used to run standalone, then `SpellCheckerValidator`, then `_run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` (ARC-017 Phase 3 Port 2/3, replacing the deleted `SpDescriptionValidator`/`SpCompositionGraphValidator`/`SpCompositionTreeValidator`) — each `_run_rule_registries` call builds `Engine(registry).run(ctx)` and renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes`, no constructor-runs-pipeline involved — then `_run_rule_registries([TEMPORAL_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4, replacing the deleted `SpTemporalReferenceValidator`), then `_run_rule_registries([PROPORTIONALITY_REGISTRY], ctx)` (ARC-017 Phase 3 Port 7, replacing the deleted `SpProportionalityValidator`), then `_run_rule_registries([VALUE_REGISTRY], ctx)` (ARC-017 Phase 3 Port 5, replacing the deleted `SpValueValidator`), then `_run_rule_registries([SCENARIO_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4, replacing the deleted `SpScenarioValidator`), then `_run_rule_registries([LEGEND_REGISTRY], ctx)` (ARC-017 Phase 3 Port 6, replacing the deleted `SpLegendValidator`) | per `NamesEnum` |
+| 1 | `_read_data` | `DataLoaderFacade(input_folder).load()` → `raw_data_map: dict[str, DataLoaderModel]` + load errors; extracts `scenarios` from `cenarios.simbolo`; builds `model_configurations` (`scenario_exists_file`, `scenario_read_success`, `scenarios`, `legend_exists_file`, `legend_read_success`) | FS |
+| 2 | `_configure` | For each class in `target_model_classes` (`SpDescription, SpComposition, SpValue, SpTemporalReference, SpProportionality, SpScenario, SpLegend, SpDictionary`) instantiate the model (constructor only stores dependencies, ARC-001 Phase 3 Port 8), then call `model_instance.run()` explicitly (`initialize()` + `pre_processing()`/`expected_structure_columns()`/`data_cleaning()`), then copy `structural_errors/warnings` → FS and `data_cleaning_errors/warnings` → FC | FS, FC |
+| 3 | `_build_pipeline` | `DataModelContext(context, initialized_models)`; builds one shared `RuleContext` (`_build_rule_context`, which also computes `composition_facts` once via `compute_composition_facts` — BUG-019, and constructs the `SpellChecker` backend once, injected as `ctx.options["spell_backend"]`), then calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)` (ARC-017 Phase 3b), then `_run_rule_registries([SPELL_REGISTRY], ctx)` + `self._spell_backend.clean_files_generated()` (ARC-017 Phase 3 Port 8, replacing the deleted `SpellCheckerValidator` — the last validator ported, `data_validate/validators/` is now deleted entirely, ARC-008), then `_run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` (ARC-017 Phase 3 Port 2/3), then `_run_rule_registries([TEMPORAL_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([PROPORTIONALITY_REGISTRY], ctx)` (ARC-017 Phase 3 Port 7), then `_run_rule_registries([VALUE_REGISTRY], ctx)` (ARC-017 Phase 3 Port 5), then `_run_rule_registries([SCENARIO_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([LEGEND_REGISTRY], ctx)` (ARC-017 Phase 3 Port 6) — every `_run_rule_registries` call builds `Engine(registry).run(ctx)` and renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes`; no constructor-runs-pipeline involved anywhere in this step | per `NamesEnum` |
 | 4 | `_report` | debug dump to logger; `FileReportGenerator(context).build_report(validation_reports)` | — |
+
+`SpreadsheetProcessor.run()` itself is now called explicitly by `main.py::main` (ARC-001 Phase 3
+Port 8) — construction only stores dependencies; `run()` prints the welcome banner via the logger,
+starts the timer, runs the five steps above, then prints the total-execution-time line (unchanged
+behaviour, just moved out of `__init__`).
 
 ## Components
 
@@ -63,13 +68,15 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 
 ### Models (`data_validate/models/`)
 
-All inherit `SpModelABC` (`sp_model_abc.py`): `__init__` stores context/data model/kwargs, sets
-`self.frame` (this instance's own working frame, aliasing `data_model.raw_data` until a subclass
-reassigns it via a non-mutating op) and `self.cleaned` (this instance's own cleaned-column
-store), then `initialize()` (dedupe scenarios, empty-file error, `|` check, unnamed-column
-check) and the subclass `__init__` calls `run()` → `pre_processing() →
-expected_structure_columns() → data_cleaning() [→ post_processing()]` when the file exists.
-Results go to `structural_errors/warnings` and `data_cleaning_errors/warnings`. Column
+All inherit `SpModelABC` (`sp_model_abc.py`): `__init__` only stores context/data model/kwargs and
+sets `self.frame` (this instance's own working frame, aliasing `data_model.raw_data` until a
+subclass reassigns it via a non-mutating op) and `self.cleaned` (this instance's own
+cleaned-column store) — no I/O, no validation work (ARC-001 Phase 3 Port 8). Each subclass's
+`run()` (called explicitly by its caller, e.g. `SpreadsheetProcessor._configure`, never
+automatically from `__init__`) calls `self.initialize()` first (dedupe scenarios, empty-file
+error, `|` check, unnamed-column check — this used to run from `SpModelABC.__init__` itself), then
+`pre_processing() → expected_structure_columns() → data_cleaning() [→ post_processing()]` when the
+file exists. Results go to `structural_errors/warnings` and `data_cleaning_errors/warnings`. Column
 *definitions* remain nested classes of `pd.Series` (`RequiredColumn`, `OptionalColumn`,
 `DynamicColumn`, `PluralColumn`) — pure name/dtype placeholders, never reassigned (BUG-002,
 fixed); cleaned *data* lives on the instance (`self.cleaned[column_name]`, read via
@@ -86,18 +93,22 @@ fixed); cleaned *data* lives on the instance (`self.cleaned[column_name]`, read 
 | `SpLegend` | `legenda` | `data_cleaning` runs `LegendProcessing` per legend code (sequence, dtypes, labels, colour, decimals, min/max continuity, order) only if `is_sanity_check_passed` | — |
 | `SpDictionary` | `dicionario` | Reads first column as `words_to_ignore` | — |
 
-### Validators (`data_validate/validators/`)
+### Validators — `data_validate/validators/` is deleted (ARC-008, ARC-017 Phase 3 Port 8)
 
-All inherit `BaseValidator` (`spreadsheets/base/base_validator.py`): resolve the model from
-`DataModelContext`, copy its `frame` (`self._data_model.frame.copy()`, not
-`data_loader_model.raw_data` — BUG-003, fixed), compute `TITLES_INFO = config.get_verify_names()`, then
-`run()` builds a list of `(callable, NamesEnum.value)` and `build_reports()` executes each,
-extending `ValidationReport` and catching **any** exception into an error message.
+Every validator that used to live under `data_validate/validators/` (`BaseValidator` and its
+eight `Sp*Validator` subclasses) is now deleted; the package itself no longer exists. Each
+validator's checks were ported, one Phase 3 slice at a time, onto the `rules` engine
+(`data_validate/rules/`) as pure `check_*` functions registered in a `RuleRegistry` and run
+through `SpreadsheetProcessor._run_rule_registries([REGISTRY], ctx) → Engine(REGISTRY).run(ctx) →
+rules.legacy_adapter.extend_report_from_outcomes`; `ARC-008`'s ad hoc `set_not_executed`
+placeholder and triplicated `column_exists*` helpers are gone with `base_validator.py` — the
+engine's `RuleSpec.requires`/`depends_on` (checked once per rule, `Engine._unmet_prerequisite`)
+now do what that placeholder wanted.
 
-| Validator | Rules (method → NamesEnum) | Smells |
+| Former validator | Rules (method → NamesEnum) | Smells |
 |---|---|---|
 | ~~`FileStructureValidator`~~ | **deleted (ARC-017 Phase 3b)** — its four checks (empty dir, unexpected files/folders, missing required, csv/xlsx conflict) are now `rules/structure.py`'s six `STRUCT-001`…`STRUCT-006` pure functions, run by `SpreadsheetProcessor._run_rule_registries([STRUCTURE_REGISTRY], ctx) → FS` | BUG-026 (resolved by the port: no instance state left to duplicate) |
-| `SpellCheckerValidator` | `validate_spellchecker(SpDescription/SpTemporalReference/SpScenario) → SPELL` via `SpellChecker` (pyenchant) | BUG-022, BUG-023 |
+| ~~`SpellCheckerValidator`~~ | **deleted (ARC-017 Phase 3 Port 8, the last validator ported)** — its pipeline (`_prepare_statement` dictionary/backend errors, `validate_spellchecker(SpDescription/SpTemporalReference/SpScenario)`) is now `rules/spell.py`'s `SPELL-001`…`SPELL-005` pure functions, backed by the same `SpellChecker` (pyenchant, constructed once by `SpreadsheetProcessor._build_rule_context` and injected as `ctx.options["spell_backend"]`), run by `SpreadsheetProcessor._run_rule_registries([SPELL_REGISTRY], ctx) → SPELL` | BUG-022, BUG-023, BUG-027 (preserved, not reopened: dictionary errors still surface regardless of `--no-spellchecker`) |
 | ~~`SpDescriptionValidator`~~ | **deleted (ARC-017 Phase 3 Port 2)** — its nine checks are now `rules/description.py`'s ten `DESC-001`…`DESC-010` pure functions (`HTML_DESC, SC, CO_UN, INP, IL, MAND_PUNC_DESC, EF, LB_DESC, SIMP_DESC_N, TITLES_N`), run by `SpreadsheetProcessor._run_rule_registries([DESCRIPTION_REGISTRY], ctx)` | PERF-001 (resolved by the port: no `iterrows()` left in this validator) |
 | ~~`SpCompositionGraphValidator`~~ / ~~`SpCompositionTreeValidator`~~ | **deleted (ARC-017 Phase 3 Port 3)** — their nine checks are now `rules/composition.py`'s nine `COMP-001`…`COMP-009` pure functions (`IR, IR, IR, UT, LEAF_NO_DATA, LEAF_NO_DATA, TH, TH, CHILD_LVL`), run by `SpreadsheetProcessor._run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` | BUG-019 (resolved: `compute_composition_facts` computes the graph/tree/relation facts once, injected via `ctx.options["composition_facts"]`), BUG-024 (resolved: the `compostion_` filename typo is gone), PERF-001 (resolved: no `iterrows()` left in this validator) |
 | ~~`SpTemporalReferenceValidator`~~ | **deleted (ARC-017 Phase 3 Port 4)** — its three checks are now `rules/temporal_reference.py`'s `TEMP-001`…`TEMP-003` pure functions (`MAND_PUNC_TEMP, YEARS_TEMP, UVR_TEMP`), run by `SpreadsheetProcessor._run_rule_registries([TEMPORAL_REGISTRY], ctx)` | BUG-007 (preserved, not reopened: the current year now comes from `ctx.clock().year`) |
@@ -106,9 +117,14 @@ extending `ValidationReport` and catching **any** exception into an error messag
 | ~~`SpScenarioValidator`~~ | **deleted (ARC-017 Phase 3 Port 4)** — its two checks are now `rules/scenario.py`'s `SCEN-003`…`SCEN-004` pure functions (`MAND_PUNC_SCEN, UVR_SCEN`), run by `SpreadsheetProcessor._run_rule_registries([SCENARIO_REGISTRY], ctx)` | — |
 | ~~`SpLegendValidator`~~ | **deleted (ARC-017 Phase 3 Port 6)** — its two checks are now `rules/legend.py`'s four `LEG-012`…`LEG-015` pure functions (`LEG_REL, LEG_REL, LEG_REL, LEG_RANGE`), run by `SpreadsheetProcessor._run_rule_registries([LEGEND_REGISTRY], ctx)` | PERF-001 (resolved by the port: no per-cell loop left in this validator) |
 
-Helpers used by validators live in `helpers/common/` (`validation/*Processing`,
+Helpers used by rules live in `helpers/common/` (`validation/*Processing`,
 `processing/*Processing`, `formatting/*Processing`, `generation/CombinationsProcessing`) as
-static-method namespaces (ARC-007).
+static-method namespaces (ARC-007), and — for spelling — `helpers/tools/spellchecker/**`
+(`SpellChecker`, `SpellCheckerController`, `DataFrameProcessor`, `DictionaryManager`,
+`TextProcessor`), unchanged in shape but extended with a structured
+(`SpellingFinding`-returning) surface (`check_spelling_text_structured`,
+`find_quality_findings`, `build_quality_findings`) alongside the original string-returning one,
+kept for backward compatibility.
 
 ### Reporting
 
@@ -145,14 +161,15 @@ flowchart LR
 Every model owns its own `self.frame` (working copy, starts out aliasing `raw_data`) and
 `self.cleaned` (dict of cleaned `pd.Series` by column name); `data_loader_model.raw_data` is
 never written after load, and the `RequiredColumn`/`OptionalColumn`/`DynamicColumn` nested
-classes stay pure column *definitions* — no `setattr`/reassignment on them. Validators read a
-model's working data through `model.frame`/`BaseValidator._dataframe` and its cleaned columns
-through `model.cleaned_column(name)`, never through a class attribute. This removes the
-cross-instance/cross-run state leak (BUG-002) and the shared-object mutation (BUG-003) that used
-to make two models/validators built from different input in the same process interfere with each
-other; the remaining obstacle to testing and parallelism is ARC-001 (work still happens in
-constructors) and ARC-007 (models still both validate and clean, "Processing" classes are still
-procedural namespaces).
+classes stay pure column *definitions* — no `setattr`/reassignment on them. Rules read a model's
+working data through `ctx.sheet(name)`/`RuleContext.sheets` and its cleaned columns through
+`RuleContext.cleaned`, never through a class attribute. This removes the cross-instance/cross-run
+state leak (BUG-002) and the shared-object mutation (BUG-003) that used to make two models built
+from different input in the same process interfere with each other; ARC-001 is done (models,
+`SpreadsheetProcessor`, and every deleted validator no longer do work in `__init__` — `DataArgs`'s
+argparse-in-`__init__` is the one accepted exception, a CLI-boundary object, ADR-0005) — the
+remaining obstacle to a fully declarative pipeline is ARC-007 (models still both validate and
+clean, "Processing" classes are still procedural namespaces).
 
 ## Files and folders written at runtime
 
@@ -165,5 +182,8 @@ procedural namespaces).
 `./.config/store.locale` and `data/output/logs/` created unconditionally relative to the CWD (BUG-004,
 BUG-021) are both removed as of this slice — see `.specs/future/deprecations.md`.
 
-Last synced with code: ARC-017 Phase 3 Port 7 (PROP-003…010 ported to `rules/proportionality.py`;
-legacy `SpProportionalityValidator` deleted)
+Last synced with code: ARC-017 Phase 3 Port 8 (SPELL-001…005 ported to `rules/spell.py`; legacy
+`SpellCheckerValidator` deleted; `data_validate/validators/` deleted entirely, closing ARC-008;
+every model's `run()` and `SpreadsheetProcessor.run()` are called explicitly by their caller
+instead of automatically from `__init__`, closing ARC-001 except for `DataArgs`'s
+argparse-in-`__init__`)

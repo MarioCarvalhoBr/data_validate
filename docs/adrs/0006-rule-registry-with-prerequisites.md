@@ -1,6 +1,7 @@
 # ADR-0006: Rule registry with declared prerequisites; skipped-with-reason semantics
 
-- Status: Proposed
+- Status: Accepted (implemented — every validator named in "Execution order is topological..."
+  below is ported and `data_validate/validators/` is deleted entirely, ARC-017 Phase 3 Port 8)
 - Date: 2026-08-25
 - Deciders: Mário de Araújo Carvalho (INPE) with the AI orchestrator
 
@@ -106,8 +107,13 @@ swallowed exception); the whole point of this ADR is to close that acknowledged 
 - Related ADRs: ADR-0002, ADR-0004, ADR-0013 (rule purity depends on immutable typed frames)
 
 ---
-Last synced with code: 228ae09 (Phase 3a: `data_validate/rules/{context,registry,engine}.py` implement
-`RuleContext`, `RuleSpec`/`RuleRegistry` with `topological_order()`, and `Engine`/`RuleOutcome`/
-`EngineResult` with skipped-with-reason and crash-isolation semantics, 100% covered by
-`tests/unit/rules/`; no validator ported to a `Rule` module yet and nothing is wired into the
-legacy pipeline — see `03-architecture.md`'s ARC-017/ARC-001/ARC-008 entries)
+Last synced with code: ARC-017 Phase 3 Port 8 (`rules/spell.py`, the ninth and last registry —
+`SPELL-001`…`SPELL-005` — replaces the deleted `SpellCheckerValidator`; every registry named in
+this ADR's decision, `structure → description → composition → temporal reference → value →
+scenario → legend → proportionality → spell`, now exists and runs through `Engine.run(ctx)`;
+`data_validate/validators/` — `base_validator.py` included — is deleted entirely, closing ARC-008;
+`SpreadsheetProcessor`/every `Sp*` model constructor stops running its pipeline as a side effect,
+closing ARC-001 except for `DataArgs`'s argparse-in-`__init__` — see `03-architecture.md`'s
+ARC-017/ARC-001/ARC-008 entries, now all `done`). `PROCESS_POOL`-based parallel execution
+(PERF-007) remains unimplemented, as this ADR's decision always scoped it as a later, independent
+step ("may later run under `ProcessPoolExecutor`").
