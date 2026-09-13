@@ -247,7 +247,7 @@ See [`SECURITY.md`](SECURITY.md) to report a vulnerability privately.
 [MIT](LICENSE) — Copyright (c) 2024-2026 National Institute for Space Research (INPE) of the
 Brazilian Ministry of Science, Technology and Innovations.
 
-## 👥 Authors
+## Authors
 
 - **Pedro Andrade** - *Coordinator* - [MAIL](mailto:pedro.andrade@inpe.br) and [GitHub](https://www.github.com/pedro-andrade-inpe)
 - **Mário de Araújo Carvalho** - *Contributor and Developer* - [GitHub](https://github.com/MarioCarvalhoBr)
