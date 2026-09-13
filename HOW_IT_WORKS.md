@@ -3,7 +3,7 @@
 `canoa-data-validate` reads a bundle of spreadsheets (`descricao`, `composicao`, `valores`,
 `referencia_temporal` required; `proporcionalidades`, `cenarios`, `legenda`, `dicionario`
 optional), loads and structurally checks each sheet into a model, runs 34 structural and
-business-rule validators defined by Protocol v1.13, aggregates the results into a
+business-rule validators defined by Protocol v1.16, aggregates the results into a
 `ValidationReport`, and renders an HTML/PDF report plus a one-line JSON summary on stdout that
 the AdaptaBrasil platform consumes.
 

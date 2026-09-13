@@ -247,11 +247,11 @@ See [`SECURITY.md`](SECURITY.md) to report a vulnerability privately.
 [MIT](LICENSE) — Copyright (c) 2024-2026 National Institute for Space Research (INPE) of the
 Brazilian Ministry of Science, Technology and Innovations.
 
-## Authors
+## 👥 Authors
 
-- **Pedro Andrade** — Coordinator — INPE
-- **Mário de Araújo Carvalho** — Contributor and Developer — INPE
-- **Mauro Assis** — Contributor — INPE
-- **Miguel Gastelumendi** — Contributor — INPE
+- **Pedro Andrade** - *Coordinator* - [MAIL](mailto:pedro.andrade@inpe.br) and [GitHub](https://www.github.com/pedro-andrade-inpe)
+- **Mário de Araújo Carvalho** - *Contributor and Developer* - [GitHub](https://github.com/MarioCarvalhoBr)
+- **Mauro Assis** - *Contributor* - [GitHub](https://www.github.com/assismauro)
+- **Miguel Gastelumendi** - *Contributor* - [GitHub](https://github.com/miguelGastelumendi)
 
-Developed for and with the **AdaptaBrasil** platform team.
+**Developed with ❤️ by the [AdaptaBrasil](https://github.com/AdaptaBrasil/) team**
