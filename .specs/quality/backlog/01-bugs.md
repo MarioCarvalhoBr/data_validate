@@ -28,6 +28,14 @@ Every fix here must land with a regression test under `tests/` that fails before
   same shallow-copy-then-append pattern; `legend_validator.py:397` also appends to a
   `required_columns[...]` list but builds that dict fresh as a local literal each call (no
   `.copy()` of a shared attribute), so it does not share the same bug and was left untouched.
+- Note (ARC-017 Phase 3 Port 5): `value_validator.py` (and its regression test,
+  `tests/unit/validators/spreadsheets/value/test_value_validator.py`) is deleted — the shared-list
+  path this bug lived on no longer exists at all. `rules/value.py::check_value_combination_relation`
+  is a pure `RuleContext -> list[Issue]` function reading an immutable `RuleContext`
+  (`.claude/rules/dataframe-conventions.md`) with no instance/module-level mutable state to share
+  between calls, so the bug class cannot recur by construction; the regression now lives as
+  `tests/unit/rules/test_value.py::TestIdempotency` (calls every VAL-002…005 check twice on one
+  context and asserts equal results).
 
 ### BUG-002 · Models overwrite class-level `RequiredColumn` Series (global mutable state)
 - Priority: P0 · Effort: M · Status: done

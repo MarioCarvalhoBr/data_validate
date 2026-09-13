@@ -7,11 +7,12 @@ harness (PERF-009); never optimise without a number.
 ### PERF-001 · Row-by-row `iterrows()` / cell loops in hot paths
 - Priority: P1 · Effort: M · Status: open
 - Where: `validators/spreadsheets/proportionality/proportionality_validator.py:584`,
-  `validators/spreadsheets/value/value_validator.py:316`,
   `helpers/common/validation/legend_processing.py:202,249,313`,
-  `helpers/common/validation/value_processing.py:125` (cell by cell, `pd.to_numeric` per cell),
   `validators/spreadsheets/legend/legend_validator.py:514-527` (cell by cell),
   `helpers/tools/spellchecker/dataframe_processor.py:42-45`.
+  (`validators/spreadsheets/value/value_validator.py:316` and
+  `helpers/common/validation/value_processing.py:125` removed — see the "Done (value slice)"
+  note below.)
 - Proposed fix: vectorised masks (`pd.to_numeric(errors="coerce")`, `str.contains`, `isin`,
   `merge`), `nx.from_pandas_edgelist`, `groupby` aggregations; produce issues from mask indices.
 - Done (description slice, ARC-017 Phase 3 Port 2): the two `description_validator.py` sites
@@ -42,6 +43,17 @@ harness (PERF-009); never optimise without a number.
   Regression/behaviour coverage: `tests/unit/rules/test_composition.py`,
   `tests/unit/helpers/common/validation/test_graph_processing.py`,
   `tests/unit/helpers/common/validation/test_tree_processing.py`.
+- Done (value slice, ARC-017 Phase 3 Port 5): both `value_validator.py`/`value_processing.py`
+  sites are gone — the files were deleted along with the rest of `SpValueValidator`/
+  `ValueProcessing` when VAL-002…005 moved onto the rules engine.
+  `value_validator.py:335`'s `for _, row in df_description.iterrows(): code = str(row[...]); ...`
+  is now `rules/value.py::check_value_combination_relation`'s `zip()` over three plain lists
+  extracted once via `.tolist()` (no `.iterrows()`, no per-row `Series` construction).
+  `value_processing.py:125`'s `for index, value in dataframe[column].items(): ...` (cell by
+  cell, `pd.to_numeric` per cell) is now `rules/value.py::_analyze_value_column`'s
+  `pd.to_numeric(errors="coerce")` masks over the whole column at once, plus a `Series.map`
+  that runs the `Decimal` exponent check once per *unique* candidate value instead of once per
+  cell. Regression/behaviour coverage: `tests/unit/rules/test_value.py`.
 
 ### PERF-002 · Defensive full-frame copies everywhere
 - Priority: P1 · Effort: S · Status: open

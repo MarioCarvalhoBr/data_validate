@@ -59,6 +59,18 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   Fifth/sixth validators closed under this item; the rest of the list (legend, value,
   `spreadsheet_processor.py`'s remaining validator-construction lines, spellchecker,
   `file_report_generator.py`, `validation_report.py`, models) is still open.
+- Done (value): `SpValueValidator`/`value_validator.py` (14.5 % coverage, 0 dedicated rule
+  tests) and its message-building helper `ValueProcessing`/`value_processing.py` are both
+  deleted; its four ported VAL-002…005 rules (`rules/value.py`) are 100 % covered by
+  `tests/unit/rules/test_value.py` (table-driven per rule: valid case, every failure mode,
+  missing-required-column abort in legacy check order, scenario/no-scenario, the level-2/
+  scenario-0 special case, the gap G-09 out-of-range `cenario` case, and the engine-level
+  empty-sheet skip for the whole registry), including the BUG-001 (idempotency, `TestIdempotency`)
+  and BUG-014 (`nivel = "1.0"` still recognised as level 1) regressions migrated from the deleted
+  `tests/unit/validators/spreadsheets/value/test_value_validator.py`. Seventh validator closed
+  under this item; the rest of the list (legend, `spreadsheet_processor.py`'s remaining
+  validator-construction lines, spellchecker, `file_report_generator.py`,
+  `validation_report.py`, models) is still open.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration
@@ -122,11 +134,37 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   and goldens.
 
 ### TST-007 · CI runners lack system dependencies for real spell-check / PDF tests
-- Priority: P2 · Effort: S · Status: open
-- Where: `.github/workflows/*unit-tests*.yml` (no `apt install enchant-2 hunspell-pt-br
-  wkhtmltopdf`), Windows job has no enchant.
+- Priority: P2 · Effort: S · Status: done
+- Where: `.github/workflows/ci.yml` (Linux `test`/`e2e` jobs already install `enchant-2
+  hunspell-pt-br hunspell-en-us wkhtmltopdf`; Windows leg of the `test` matrix does not and
+  cannot — no equivalent native libenchant+hunspell/wkhtmltopdf package is installable there),
+  the probes were duplicated in `tests/e2e/test_golden.py` (`_spell_backend_available`) and
+  `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py`
+  (`_real_pt_br_dictionary_available`).
 - Proposed fix: install deps on Linux; mark spell/PDF tests with `@pytest.mark.requires_enchant` /
   `requires_pdf` and skip when absent; pure-Python spell fallback (ARC-015) removes the need.
+- Done: probes centralised in `tests/conftest.py` as cached `enchant_pt_br_available()`
+  (`enchant.Dict("pt_BR")`, catching `enchant.errors.Error`/`OSError`/`ImportError`) and
+  `wkhtmltopdf_available()` (`shutil.which`), with a `pytest_collection_modifyitems` hook that
+  skips any item marked `requires_enchant`/`requires_pdf` when the corresponding probe is False,
+  with a clear per-marker reason string. `tests/e2e/test_golden.py` and
+  `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py` now import the shared
+  probe instead of duplicating it; the local `requires_real_enchant` `skipif` in the latter is
+  removed in favour of the marker-driven hook (the four `TestDictionaryManagerRealEnchant` tests
+  keep only `@pytest.mark.requires_enchant`). `requires_enchant`/`requires_pdf` were already
+  registered in `pyproject.toml` — no change needed there. No test in `tests/e2e/**` is dedicated
+  solely to asserting PDF output (the one PDF assertion in `test_golden_report` is inline,
+  conditioned on `shutil.which("wkhtmltopdf")`, and covers the same run as the rest of the
+  golden comparison, so it is left as-is rather than marked/split); the one PDF-related test
+  outside this item's ownership, `test_module_import_does_not_import_pdfkit` in
+  `tests/unit/controllers/report/test_file_report_generator.py`, does not need wkhtmltopdf
+  installed (it only asserts `pdfkit` isn't imported eagerly), so it is not a `requires_pdf`
+  candidate either. `.github/workflows/ci.yml`'s Windows leg gets a comment documenting why it
+  skips the system-dependency install step and relies on the marker/probe skip instead of
+  failing. Verified: full `tests/unit` suite (1538 passed, 4 skipped — the four real-enchant
+  tests, since this sandbox has no `pt_BR` hunspell word list) and `tests/e2e` (7/7 goldens)
+  green with no direct top-level `import enchant`/`from enchant import` anywhere under `tests/`
+  outside the three files that now share the centralised probe.
 
 ### TST-008 · Test execution ergonomics
 - Priority: P2 · Effort: S · Status: done

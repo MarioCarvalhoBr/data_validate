@@ -181,6 +181,18 @@ zero global state. Each item below names the current smell, where it lives, and 
   from the legacy f-strings (verified byte-identical by the e2e golden harness run twice).
   TEMP-002's current-year comparison now reads `ctx.clock().year` instead of
   `ApplicationConfig.CURRENT_YEAR` directly, keeping the rule pure.
+- Note (Phase 3 Port 5 slice, ARC-017): `SpValueValidator` (`value_validator.py`) and its
+  message-building helper `ValueProcessing` (`value_processing.py`) are both deleted; its four
+  ported rules (`rules/value.py`'s VAL-002…005) render every message through
+  `ctx.translate(message_key, **params)` — 12 new catalog keys added to both
+  `static/locales/{pt_BR,en_US}/messages.json` (`rule.value.missing_required_column` shared by
+  every rule's "required column is missing" abort case, plus one-or-more
+  `rule.VAL-0XX.<slug>` keys per rule — e.g. VAL-004 has four:
+  `error`/`aggregate`/`decimal_parse_error`/`silent`), all pt-BR values copied verbatim from the
+  legacy f-strings (verified byte-identical by the e2e golden harness run twice). VAL-004's
+  `silent` key renders to the empty string, preserving the legacy
+  `ValueProcessing.check_numeric_value`'s literal-infinity branch (`return False, "", False`)
+  rather than "fixing" it.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains

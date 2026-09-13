@@ -22,6 +22,16 @@ flowchart TB
 
 Optional dependencies: `requires_enchant` (real hunspell), `requires_pdf` (wkhtmltopdf /
 WeasyPrint). Tests with these markers skip with a clear reason when the backend is absent.
+The availability probes and the skip itself are centralised in `tests/conftest.py` (TST-007):
+cached `enchant_pt_br_available()` (imports `enchant`, calls `enchant.Dict("pt_BR")`, catches
+`enchant.errors.Error`/`OSError`/`ImportError`) and `wkhtmltopdf_available()`
+(`shutil.which("wkhtmltopdf")`), consumed by a `pytest_collection_modifyitems` hook that adds a
+`pytest.mark.skip` (with a reason naming the missing dependency) to any item carrying
+`requires_enchant`/`requires_pdf` when the corresponding probe returns False — no test module
+defines its own probe or `skipif`. `.github/workflows/ci.yml`'s Linux `test`/`e2e` jobs install
+`enchant-2 hunspell-pt-br hunspell-en-us wkhtmltopdf`; the Windows leg of the `test` matrix
+does not (no equivalent native package there) and instead relies on this marker/probe skip, so
+it still runs the full suite minus the dependency-gated cases rather than failing.
 
 ## Fixtures (`tests/conftest.py`)
 
