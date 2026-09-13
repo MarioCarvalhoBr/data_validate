@@ -4,17 +4,25 @@
 Global pytest configuration and fixtures.
 
 The `tmp_cwd` fixture below is opt-in — request it explicitly in a test's
-signature — not autouse. An autouse `monkeypatch.chdir(tmp_path)` was tried first, as
-suggested by the harness spec, but several existing unit tests under
-`tests/unit/` construct `LoggerManager`/`FileSystemUtils` instances that
-resolve relative paths (e.g. default log/output folders) against the
-process's current working directory at collection or fixture-setup time,
-and some read the real repository tree (e.g. locale catalogs) via paths
-that are only valid from the repository root. Chdir'ing every test into an
-empty `tmp_path` broke those tests, and this run may not modify
-`tests/unit/**`. Making the fixture opt-in keeps all 878 existing unit
-tests green while still giving new tests (e.g. `tests/e2e/`) an explicit,
-readable way to ask for an isolated CWD when they need one.
+signature — and remains available repo-wide (e.g. for `tests/e2e/` cases
+that want an isolated CWD for a single test without running the whole
+subtree from one). It is no longer the only isolation mechanism: TST-003
+adds an *autouse* CWD-isolation fixture scoped to `tests/unit/**` in
+`tests/unit/conftest.py` (`_isolate_unit_test_cwd`), so every unit test
+now runs with `Path.cwd()` pointed at a fresh `tmp_path` unless it opts
+out with `@pytest.mark.keep_cwd`.
+
+An autouse `monkeypatch.chdir(tmp_path)` at this repo-wide level was tried
+first, as suggested by the harness spec, but `tests/e2e/` and
+`tests/benchmarks/` invoke the CLI (via subprocess) with relative
+`data/input/<fixture>` paths and must keep running from the repository
+root — hence the fixture lives in `tests/unit/conftest.py` instead of
+here. Making it autouse for `tests/unit/` specifically was blocked until
+BUG-004 (no more `.config/store.locale` file I/O in `LanguageManager`) and
+BUG-021 (the file logger is only created under an explicit
+`<output_folder>/logs`, never a CWD-relative `logs/`) landed; both are
+fixed, so the autouse fixture is now safe for the whole `tests/unit/`
+subtree — see `tests/unit/conftest.py` for the fixture itself.
 """
 
 from __future__ import annotations
@@ -133,12 +141,14 @@ def fixture_folder(repo_root: Path) -> Callable[[str], Path]:
 def tmp_cwd(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Change the process's working directory to an isolated temp directory.
 
-    Opt-in: request the `tmp_cwd` fixture explicitly in a test's signature
-    rather than autouse — see the module docstring for why: several
-    `tests/unit/**` tests are sensitive to the working directory and this
-    run may not edit `tests/unit/**`. New tests that would otherwise write
-    `.config/` or `data/output/logs/` under the repo root should request
-    this fixture explicitly.
+    Opt-in: request the `tmp_cwd` fixture explicitly in a test's signature.
+    Every `tests/unit/**` test already gets this behaviour automatically
+    via the autouse fixture in `tests/unit/conftest.py` (TST-003); this
+    fixture remains available repo-wide (e.g. for an individual
+    `tests/e2e/`/`tests/benchmarks/` test that wants isolation without
+    the whole subtree running from `tmp_path`) and is a harmless no-op
+    re-chdir when a `tests/unit/**` test requests it on top of the
+    autouse isolation.
 
     Args:
         tmp_path: pytest's built-in per-test temporary directory.

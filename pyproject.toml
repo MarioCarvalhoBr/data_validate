@@ -232,6 +232,7 @@ markers = [
     "slow: tests that are expensive enough to skip from the default fast loop",
     "requires_enchant: tests that need a working pyenchant/hunspell installation",
     "requires_pdf: tests that need wkhtmltopdf installed",
+    "keep_cwd: opt out of the tests/unit/ autouse CWD isolation (TST-003); use sparingly",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
