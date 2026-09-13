@@ -224,6 +224,72 @@ class TestBuildReportEndToEnd:
         assert '"errors": 1' in captured.out
 
 
+class TestResolveReportPath:
+    """SEC-010: `_resolve_report_path` builds the output path with `pathlib` and refuses to
+    write outside the resolved output directory (defence in depth)."""
+
+    @staticmethod
+    def _build_generator_with_output_folder(mocker, output_folder: str) -> FileReportGenerator:
+        generator = FileReportGenerator.__new__(FileReportGenerator)
+        generator.context = mocker.MagicMock()
+        generator.output_folder = output_folder
+        return generator
+
+    def test_resolve_report_path_builds_expected_path_inside_output_dir(self, mocker, tmp_path) -> None:
+        """The happy path: `file_name + suffix` under the output directory."""
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        generator = self._build_generator_with_output_folder(mocker, str(output_dir))
+
+        result = generator._resolve_report_path("bundle", "_report.html")
+
+        assert result == str((output_dir / "bundle_report.html").resolve())
+
+    def test_resolve_report_path_raises_when_file_name_escapes_output_dir(self, mocker, tmp_path) -> None:
+        """A `file_name` containing `..` that would land outside the output dir is refused."""
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+        generator = self._build_generator_with_output_folder(mocker, str(output_dir))
+
+        with pytest.raises(ValueError, match="output directory"):
+            generator._resolve_report_path("../escape", "_report.html")
+
+    def test_build_report_propagates_containment_guard_failure(self, mocker, tmp_path) -> None:
+        """`build_report` surfaces the guard's `ValueError` when `get_last_directory_name`
+        (the source of `file_name`) returns a value crafted to escape the output directory.
+
+        Not caught by `build_report`'s `except (OSError, TemplateError)` clause (SEC-004): a
+        `ValueError` here is treated as an unexpected programming/security-relevant error and
+        propagates to `main()`'s boundary.
+        """
+        output_dir = tmp_path / "output"
+        output_dir.mkdir()
+
+        generator = FileReportGenerator.__new__(FileReportGenerator)
+        generator.context = mocker.MagicMock()
+        generator.error_count = 0
+        generator.warning_count = 0
+        generator.total_tests = 0
+        generator.locale = "pt_BR"
+        generator.input_folder = "/input"
+        generator.output_folder = str(output_dir)
+        generator.context.file_system_utils.get_last_directory_name.return_value = "../escape"
+        generator.context.config.REPORT_OUTPUT_REPORT_HTML = "_report.html"
+        generator.context.data_args.data_action.no_spellchecker = False
+        generator.context.data_args.data_action.no_warning_titles_length = False
+
+        report_list = mocker.MagicMock()
+        report_list.get_total_errors.return_value = 0
+        report_list.get_total_warnings.return_value = 0
+        report_list.flatten.return_value = mocker.MagicMock()
+        report_list.reports = {}
+
+        mocker.patch.object(generator, "_render_html", return_value="<html></html>")
+
+        with pytest.raises(ValueError, match="output directory"):
+            generator.build_report(report_list)
+
+
 class TestXssEscaping:
     """SEC-001: untrusted spreadsheet content and CLI metadata must render as inert text."""
 

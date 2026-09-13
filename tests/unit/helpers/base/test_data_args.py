@@ -13,6 +13,7 @@ This module provides complete test coverage for all classes in data_args.py:
 import argparse
 import os
 import tempfile
+from pathlib import Path
 from typing import Any, Dict, Generator
 import pytest
 
@@ -160,10 +161,14 @@ class TestDataFileOutputFolderDots:
         ],
     )
     def test_output_folder_with_dot_is_accepted(self, dotted_output_folder: str, temp_input_dir: str) -> None:
-        """A non-existent output folder path containing a dot must be accepted."""
+        """A non-existent output folder path containing a dot must be accepted.
+
+        SEC-010: the stored path is resolved to an absolute path, so a relative
+        input is compared against its own resolution rather than the literal string.
+        """
         data_file = DataFile(input_folder=temp_input_dir, output_folder=dotted_output_folder, locale="pt_BR")
 
-        assert data_file.output_folder == dotted_output_folder
+        assert data_file.output_folder == str(Path(dotted_output_folder).resolve())
 
     def test_output_folder_that_is_an_existing_file_is_rejected(self, temp_input_dir: str) -> None:
         """An output folder path that already exists as a regular file must be rejected."""
@@ -173,6 +178,54 @@ class TestDataFileOutputFolderDots:
 
         with pytest.raises(ValueError, match="Output folder name is invalid"):
             DataFile(input_folder=temp_input_dir, output_folder=existing_file, locale="pt_BR")
+
+
+class TestDataFilePathResolution:
+    """SEC-010: `DataFile` resolves both folders to absolute, normalized paths."""
+
+    @pytest.fixture
+    def temp_input_dir(self) -> Generator[str, None, None]:
+        """Create temporary input directory for testing."""
+        with tempfile.TemporaryDirectory() as temp_dir:
+            yield temp_dir
+
+    def test_input_folder_is_resolved_to_an_absolute_path(self, temp_input_dir: str) -> None:
+        """The stored `input_folder` is always absolute, even when given as relative."""
+        cwd = Path.cwd()
+        nested = Path(temp_input_dir) / "nested"
+        nested.mkdir()
+        relative_input = os.path.relpath(nested, cwd)
+
+        data_file = DataFile(input_folder=relative_input, output_folder="output", locale="pt_BR")
+
+        assert data_file.input_folder == str(nested.resolve())
+        assert Path(data_file.input_folder).is_absolute()
+
+    def test_input_folder_with_dot_dot_segments_is_normalized(self, temp_input_dir: str) -> None:
+        """`<dir>/child/..` collapses to `<dir>` once resolved (SEC-010)."""
+        child = Path(temp_input_dir) / "child"
+        child.mkdir()
+        traversal_input = str(child / "..")
+
+        data_file = DataFile(input_folder=traversal_input, output_folder="output", locale="pt_BR")
+
+        assert data_file.input_folder == str(Path(temp_input_dir).resolve())
+        assert ".." not in data_file.input_folder
+
+    def test_output_folder_with_dot_dot_segments_is_normalized(self, temp_input_dir: str) -> None:
+        """An output folder path containing `..` is resolved before being stored (SEC-010)."""
+        nested_output = os.path.join(temp_input_dir, "a", "b", "..", "out.put")
+
+        data_file = DataFile(input_folder=temp_input_dir, output_folder=nested_output, locale="pt_BR")
+
+        assert data_file.output_folder == str(Path(temp_input_dir) / "a" / "out.put")
+        assert ".." not in data_file.output_folder
+
+    def test_relative_output_folder_resolves_against_cwd(self, temp_input_dir: str) -> None:
+        """A relative `output_folder` resolves against the current working directory."""
+        data_file = DataFile(input_folder=temp_input_dir, output_folder="relative_out", locale="pt_BR")
+
+        assert data_file.output_folder == str((Path.cwd() / "relative_out").resolve())
 
 
 class TestDataAction:
@@ -814,8 +867,8 @@ class TestDataArgsIntegration:
 
         data_args = DataArgs()
 
-        # Verify defaults are set correctly
-        assert data_args.data_file.output_folder == "output_data/"
+        # Verify defaults are set correctly (SEC-010: resolved to an absolute path)
+        assert data_args.data_file.output_folder == str(Path("output_data/").resolve())
         assert data_args.data_file.locale == "pt_BR"
         assert data_args.data_action.debug is False
         assert data_args.data_report.sector is None

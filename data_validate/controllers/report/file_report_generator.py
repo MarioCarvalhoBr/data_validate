@@ -10,9 +10,9 @@ legacy `pdfkit` compatibility path, SEC-002).
 """
 
 import json
-import os
 import platform
 import sys
+from pathlib import Path
 from typing import Any
 
 from jinja2 import Environment, PackageLoader, TemplateError, select_autoescape
@@ -41,8 +41,10 @@ class FileReportGenerator:
         error_count (int): Total number of errors found in validation.
         warning_count (int): Total number of warnings found in validation.
         total_tests (int): Total number of tests executed.
-        input_folder (str): Path to the input data folder.
-        output_folder (str): Path to the output folder for reports.
+        input_folder (str): Path to the input data folder (already resolved to an
+            absolute path by `DataFile`, SEC-010).
+        output_folder (str): Path to the output folder for reports (already resolved
+            to an absolute path by `DataFile`, SEC-010).
         env (Environment): Jinja2 environment for template rendering.
     """
 
@@ -87,6 +89,32 @@ class FileReportGenerator:
         """
         self.context.file_system_utils.create_directory(self.output_folder)
 
+    def _resolve_report_path(self, file_name: str, html_output_file: str) -> str:
+        """Build the HTML report's output path, refusing to write outside the output dir.
+
+        `file_name` is derived from `Path(input_folder).name` (SEC-010), which cannot itself
+        contain a path separator, but this check is defence in depth against any future caller
+        that supplies a `file_name` containing `..` or an absolute path.
+
+        Args:
+            file_name (str): Last path component of the input folder.
+            html_output_file (str): Configured HTML report suffix (e.g. `_report.html`).
+
+        Returns:
+            str: The absolute, resolved report path.
+
+        Raises:
+            ValueError: If the resolved report path is not inside the resolved output
+                directory.
+        """
+        output_dir = Path(self.output_folder).resolve()
+        report_path = (output_dir / f"{file_name}{html_output_file}").resolve()
+
+        if not report_path.is_relative_to(output_dir):
+            raise ValueError(f"Refusing to write report outside the output directory: {report_path}")
+
+        return str(report_path)
+
     def build_report(self, report_list: ValidationReport) -> None:
         """
         Generate and save HTML and PDF reports from validation results.
@@ -123,7 +151,7 @@ class FileReportGenerator:
         try:
             report_model = self._build_report_model(flattened_reports, skipped_tests)
             html_content = self._render_html(report_model)
-            output_html_path = os.path.join(self.output_folder, file_name + html_output_file)
+            output_html_path = self._resolve_report_path(file_name, html_output_file)
 
             self._save_html_file(html_content, output_html_path, logger=self.context.logger)
             self._save_pdf_file(

@@ -10,9 +10,21 @@ This module defines classes for managing command-line arguments related to:
 """
 
 import argparse
-import os
 import sys
 from abc import ABC, abstractmethod
+from pathlib import Path
+
+
+def _resolve_path(path: str) -> Path:
+    """Resolve `path` to an absolute, normalized `Path` (SEC-010).
+
+    Args:
+        path: Absolute or relative filesystem path, as given on the command line.
+
+    Returns:
+        Path: The resolved path. `Path.resolve()` does not require `path` to exist.
+    """
+    return Path(path).resolve()
 
 
 def _make_deprecated_alias_action(replacement: str) -> type[argparse.Action]:
@@ -81,8 +93,12 @@ class DataFile(DataModelABC):
     Executes validation logic immediately upon instantiation.
 
     Attributes:
-        input_folder (str): Absolute or relative path to the input data directory.
-        output_folder (str): Absolute or relative path to the output directory.
+        input_folder (str): Absolute, resolved path to the input data directory
+            (`Path.resolve()`, SEC-010). Accepted as an absolute or relative path
+            on the command line; normalized on validation.
+        output_folder (str): Absolute, resolved path to the output directory
+            (`Path.resolve()`, SEC-010). Accepted as an absolute or relative path
+            on the command line; normalized on validation.
         locale (str): Language/region code (e.g., 'pt_BR', 'en_US').
     """
 
@@ -107,21 +123,29 @@ class DataFile(DataModelABC):
         """
         Validate the file-related arguments.
 
-        Checks if the input folder exists and if the output folder path is
-        usable as a directory: any path is accepted, including ones whose
-        basename contains a dot (e.g. `run.2026-08`, `v1.2`), except a path
-        that already exists as a regular file, which can never become a
-        directory.
+        Both paths are resolved once, via `Path.resolve()` (SEC-010), so every downstream
+        consumer (report generator, spreadsheet processor, data loader) sees an absolute,
+        normalized path regardless of what was typed on the command line (relative,
+        containing `.`/`..`, or a symlink). Checks if the input folder exists and if the
+        output folder path is usable as a directory: any path is accepted, including ones
+        whose basename contains a dot (e.g. `run.2026-08`, `v1.2`), except a path that
+        already exists as a regular file, which can never become a directory.
 
         Raises:
             ValueError: If the input folder does not exist or the output folder path
                 already exists as a regular file.
         """
-        if not os.path.isdir(self.input_folder):
+        resolved_input_folder = _resolve_path(self.input_folder)
+        resolved_output_folder = _resolve_path(self.output_folder)
+
+        if not resolved_input_folder.is_dir():
             raise ValueError(f"Input folder does not exist: {self.input_folder}")
 
-        if os.path.isfile(self.output_folder):
+        if resolved_output_folder.is_file():
             raise ValueError(f"Output folder name is invalid: {self.output_folder}")
+
+        self.input_folder = str(resolved_input_folder)
+        self.output_folder = str(resolved_output_folder)
 
     def run(self):
         """Execute parsing and validation of file arguments."""
