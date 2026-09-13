@@ -6,10 +6,7 @@ harness (PERF-009); never optimise without a number.
 
 ### PERF-001 · Row-by-row `iterrows()` / cell loops in hot paths
 - Priority: P1 · Effort: M · Status: open
-- Where: `helpers/common/validation/tree_processing.py:37,73,75,117`,
-  `helpers/common/validation/graph_processing.py:57`,
-  `validators/spreadsheets/composition/composition_tree_validator.py:242,253`,
-  `validators/spreadsheets/proportionality/proportionality_validator.py:584`,
+- Where: `validators/spreadsheets/proportionality/proportionality_validator.py:584`,
   `validators/spreadsheets/value/value_validator.py:316`,
   `helpers/common/validation/legend_processing.py:202,249,313`,
   `helpers/common/validation/value_processing.py:125` (cell by cell, `pd.to_numeric` per cell),
@@ -26,6 +23,25 @@ harness (PERF-009); never optimise without a number.
   `check_indicator_levels` uses a `pd.to_numeric` mask reproducing `check_cell_integer`'s
   comma-decimal/integer/min-value semantics, per `.claude/skills/pandas-vectorization/SKILL.md`
   patterns 1/2). Regression/behaviour coverage: `tests/unit/rules/test_description.py`.
+- Done (composition slice, ARC-017 Phase 3 Port 3): every `iterrows()` site above previously
+  attributed to composition is gone. `helpers/common/validation/graph_processing.py::
+  create_graph_structure:57` now builds the whole edge list in one
+  `nx.from_pandas_edgelist(...)` call instead of an `add_edge`-per-row loop (node ids via
+  `.map(str)`, not `.astype(str)`, so `NaN` cells still stringify to `"nan"` and
+  `parent_column == child_column` self-loops still work).
+  `helpers/common/validation/tree_processing.py::create_tree_structure:37` now builds the
+  adjacency dict via `groupby(..., sort=False)["child"].apply(list)` (`sort=False` preserves
+  each parent's first-seen order, matching the old loop's insertion order exactly).
+  `validate_level_hierarchy`/`validate_missing_codes_in_description` (the other three
+  `tree_processing.py` iterrows sites, plus the dead helper never called by production code) are
+  deleted outright: COMP-008's level-hierarchy check is now a `.map()`-based vectorised mask
+  inline in `rules/composition.py::check_parent_level_below_child_level`, and
+  `composition_tree_validator.py:242,253`'s two nested `iterrows()` loops (the file itself is
+  deleted) are now `rules/composition.py::check_children_share_parent_level`, vectorised via
+  `groupby`/`isin`/`.map()` (`.claude/skills/pandas-vectorization/SKILL.md` patterns 3/4).
+  Regression/behaviour coverage: `tests/unit/rules/test_composition.py`,
+  `tests/unit/helpers/common/validation/test_graph_processing.py`,
+  `tests/unit/helpers/common/validation/test_tree_processing.py`.
 
 ### PERF-002 · Defensive full-frame copies everywhere
 - Priority: P1 · Effort: S · Status: open

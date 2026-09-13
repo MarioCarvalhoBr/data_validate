@@ -46,7 +46,7 @@
   real target that exists today.
 
 ### TOOL-005 · Versioning by shell scripts and a hand-incremented `serial`
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `scripts/prepare_metadata.sh`, `scripts/prepare_pyproject.sh`, `config/metadata_info.py:44`
   (`serial = 732`), README badge `0.7.65b732`.
 - Proposed fix: single version in `pyproject.toml`; `importlib.metadata.version("canoa_data_validate")`;
@@ -56,6 +56,16 @@
   removed the `print()` on `PackageNotFoundError` in `_make_version`/`MetadataInfo.__init__`. This
   item's remaining scope is only the version-composition overhaul (hand-maintained `serial`, shell
   scripts, `0.0.0b732` in editable/uninstalled mode) — unchanged.
+- Done: `MetadataInfo.__version__` reads `importlib.metadata.version("canoa_data_validate")`
+  verbatim (fallback `"0.0.0+unknown"` when not installed); `_make_version` and the hand-maintained
+  `release_level`/`serial`/`dev` composition deleted entirely; `__status__` simplified to always
+  `"Production/Stable"`. `pyproject.toml`'s `[project] version` (already the single source since
+  d1ae7c1) is unaffected. `scripts/prepare_metadata.sh`/`prepare_pyproject.sh` were already dead
+  (moved to `tools/legacy/`, unused by any `make`/CI target — TOOL-002/TOOL-009) and are left as-is
+  for eventual deletion; `.github/workflows/release.yml` does not reference `serial` and needed no
+  change. The e2e golden harness (`tests/e2e/test_golden.py`) already replaced the JSON summary's
+  `version` field with a stable placeholder before this change, so the 7 goldens needed no
+  re-baseline.
 - Related: BUG-017
 
 ### TOOL-006 · Generated artefacts committed

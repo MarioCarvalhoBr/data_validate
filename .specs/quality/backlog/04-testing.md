@@ -35,6 +35,19 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   item; the rest of the list (proportionality, composition, legend, value, composition tree,
   `spreadsheet_processor.py`'s remaining validator-construction lines, spellchecker,
   `file_report_generator.py`, `validation_report.py`, models) is still open.
+- Done (composition): `SpCompositionGraphValidator`/`compostion_graph_validator.py` (11.5 %
+  coverage) and `SpCompositionTreeValidator`/`composition_tree_validator.py` (16.5 % coverage,
+  0 dedicated rule tests each) are both deleted; their nine ported COMP-001…009 rules
+  (`rules/composition.py`) are 96.72 % covered by `tests/unit/rules/test_composition.py`
+  (table-driven per rule: valid tree, cycle, disconnected groups, parent/child level
+  violations, sibling-level mismatches, duplicate titles within vs. across subtrees, missing
+  root, leaf-without-`valores`/`proporcionalidades`, codes-mismatch both directions,
+  proportionality-unavailable skip, missing-required-column abort, and the engine-level
+  empty-sheet skip for the whole registry); `compute_composition_facts` (BUG-019) is
+  independently covered by `TestComputeCompositionFacts`. Third/fourth validators closed under
+  this item; the rest of the list (legend, value, `spreadsheet_processor.py`'s remaining
+  validator-construction lines, spellchecker, `file_report_generator.py`,
+  `validation_report.py`, models) is still open.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration

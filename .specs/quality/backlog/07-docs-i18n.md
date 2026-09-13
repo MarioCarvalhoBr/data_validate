@@ -64,11 +64,17 @@
 - Done: CHANGELOG rewritten, Unreleased section
 
 ### DOC-006 · Protocol versioning
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `assets/protocolo-1.0.pdf`, `assets/protocolo-v-1.13.pdf`; the validator does not know
   which protocol version it implements; `--protocol` CLI flag is free text.
 - Proposed fix: `PROTOCOL_VERSION = "1.13"` constant surfaced in reports and `--version`;
   `.specs/business-rules/protocol-changelog.md`.
+- Done: `MetadataInfo.PROTOCOL_VERSION`/`__protocol_version__ = "1.16"` (matching the current
+  protocol document per `.specs/business-rules/protocol-changelog.md`, not the historical v1.13
+  baseline); surfaced in the HTML report's version line (`&ndash; Protocolo {protocol_version}`,
+  suppressed together with the rest of the line by `--no-version`). The `--protocol` CLI
+  flag/`--version` output are unrelated free-text/tool-version fields and are unchanged — see the
+  spec for the distinction and the "how to version the protocol in the tool" section.
 
 ### DOC-007 · Portuguese/English mix in code comments
 - Priority: P3 · Effort: S · Status: open

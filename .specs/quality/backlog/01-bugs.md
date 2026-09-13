@@ -499,13 +499,20 @@ Every fix here must land with a regression test under `tests/` that fails before
 - Related: ARC-003 (consumer migration)
 
 ### BUG-019 · Duplicate work and hard-coded root in the graph validator
-- Priority: P2 · Effort: S · Status: open
-- Where: `validators/spreadsheets/composition/compostion_graph_validator.py:374,385-395,398`
+- Priority: P2 · Effort: S · Status: done
+- Where (legacy, now deleted): `validators/spreadsheets/composition/compostion_graph_validator.py:374,385-395,398`
 - Problem: `validate_unique_titles_with_graph` re-runs `validate_relation_indicators_in_composition`
   and cycle/disconnection detection already executed by the previous rules; root node `"1"` is
   hard-coded.
-- Proposed fix: compute graph facts once in `_prepare_statement`; make the root configurable in the
-  sheet spec.
+- Done: ARC-017 Phase 3 Port 3 replaced both legacy composition validators with
+  `data_validate/rules/composition.py`. `compute_composition_facts(ctx)` builds the graph, runs
+  cycle/disconnected-component detection, the tree-cycle DFS, and the `descricao`<->`composicao`
+  code comparison exactly once per run; `SpreadsheetProcessor._build_rule_context` calls it once
+  and injects the result via `ctx.options["composition_facts"]`, and every `COMP-*` rule
+  (including COMP-004, the former re-runner) reads that same `CompositionFacts` instead of
+  recomputing anything. The hard-coded root is now `ctx.options.get("composition_root", "1")` —
+  configurable, defaulting to the prior behaviour. Tests: `tests/unit/rules/test_composition.py`
+  (`TestComputeCompositionFacts`, `TestCheckUniqueTitlesPerSubtree`).
 
 ### BUG-020 · `TestReportItem` is collected by pytest
 - Priority: P3 · Effort: S · Status: done
@@ -586,17 +593,19 @@ Every fix here must land with a regression test under `tests/` that fails before
 
 ### BUG-024 · Typos in identifiers and filenames
 - Priority: P3 · Effort: S · Status: open
-- Where: `validators/spreadsheets/composition/compostion_graph_validator.py` (filename),
-  `language_manager.py:29,33` (`_congifure_language`), `legend_processing.py:181`
-  (`origina_value`), `language_manager.py:28` ("Pipiline"), `data_args.py:204` ("validaton"),
+- Where: `legend_processing.py:181` (`origina_value`), `data_args.py:204` ("validaton"),
   `file_system_utils.py:95` ("dempotent").
 - Proposed fix: rename during the module migration; keep a compatibility import for one release.
 - Partial (BUG-004 side effect): `language_manager.py`'s `_congifure_language` method (and its
   "Pipiline" comment) is deleted entirely, not renamed — it was the sole reader/writer of
-  `.config/store.locale`, removed as part of closing BUG-004. The remaining typos
-  (`compostion_graph_validator.py`, `legend_processing.py:181`'s `origina_value`,
-  `data_args.py:204`'s "validaton", `file_system_utils.py:95`'s "dempotent") are untouched — out of
-  this item's scope.
+  `.config/store.locale`, removed as part of closing BUG-004.
+- Partial (ARC-017 Phase 3 Port 3 side effect): `validators/spreadsheets/composition/
+  compostion_graph_validator.py` (the misspelled filename) and its sibling
+  `composition_tree_validator.py` are both deleted — both legacy composition validators are
+  replaced by `data_validate/rules/composition.py`, so the `compostion_` typo no longer exists
+  anywhere in the tree. The remaining typos (`legend_processing.py:181`'s `origina_value`,
+  `data_args.py:204`'s "validaton", `file_system_utils.py:95`'s "dempotent") are untouched — out
+  of this item's scope.
 
 ### BUG-025 · `check_columns_in_models_dataframes` KeyError on unknown model name
 - Priority: P3 · Effort: S · Status: done

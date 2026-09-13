@@ -3,11 +3,12 @@
 Protocol: "Especificação de Requisitos e Formatos para Entrega de Setores Estratégicos para o
 AdaptaBrasil MCTI" — **current version 1.16, 2026-08-21** (`assets/protocolo-v-1.16.pdf`;
 `assets/protocolo-v-1.13.pdf` and `assets/protocolo-1.0.pdf` are kept as historical references).
-The validator does not yet declare which protocol version it implements (backlog DOC-006); this
-table records what each version changed and whether the code follows it. The rule files in this
-directory were originally traced against v1.13; v1.16 deltas are recorded below and in each
-affected file under "Protocol v1.16 update", and the code changes they require are backlog items
-`PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
+The validator declares which protocol version it implements via `MetadataInfo.PROTOCOL_VERSION`/
+`__protocol_version__ = "1.16"` (backlog DOC-006, done), surfaced in the HTML report's version
+line; this table records what each version changed and whether the code follows it. The rule
+files in this directory were originally traced against v1.13; v1.16 deltas are recorded below and
+in each affected file under "Protocol v1.16 update", and the code changes they require are
+backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 
 ## v1.13 → v1.16 delta (announced by the user on 2026-09-12)
 
@@ -45,11 +46,13 @@ affected file under "Protocol v1.16 update", and the code changes they require a
 
 ## How to version the protocol in the tool (target)
 
-1. `PROTOCOL_VERSION = "1.16"` constant in the sheet-spec registry; printed by `--version` and in
-   the report header.
-2. Each rule carries `since: <protocol version>` and, when removed, `until:`.
-3. A protocol bump is an ADR + an entry here + updates to the rule files + golden re-baseline with
-   reviewed diff.
+1. **Done (DOC-006)**: `PROTOCOL_VERSION = "1.16"` constant — lives on `MetadataInfo`
+   (`data_validate/config/metadata_info.py`), not yet on the sheet-spec registry; surfaced in the
+   report header's version line. Not yet printed by `--version` (that flag shows only the tool
+   version, via `argparse`'s own `action="version"`, read-only per DOC-006's brief).
+2. Still open: each rule carries `since: <protocol version>` and, when removed, `until:`.
+3. Still open: a protocol bump is an ADR + an entry here + updates to the rule files + golden
+   re-baseline with reviewed diff.
 
 ## Consolidated gap list (protocol ↔ current code)
 

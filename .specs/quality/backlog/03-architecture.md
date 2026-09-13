@@ -40,6 +40,14 @@ zero global state. Each item below names the current smell, where it lives, and 
   `RuleContext` built once per pipeline run. No constructor work at all for this validator any
   more. Still open: spelling, composition, temporal reference, proportionality, value, scenario,
   legend.
+- Note (Phase 3 Port 3 slice, ARC-017): the third/fourth validators are ported — both
+  `SpCompositionGraphValidator`/`compostion_graph_validator.py` and
+  `SpCompositionTreeValidator`/`composition_tree_validator.py` are deleted (BUG-024: the
+  `compostion_` filename typo is gone); their nine checks are now `rules/composition.py`'s nine
+  pure `check_*` functions (`COMP-001`…`COMP-009`), registered in `COMPOSITION_REGISTRY` and run
+  through the same `_run_rule_registries`/`_build_rule_context` call shape. No constructor work
+  at all for either validator any more. Still open: spelling, temporal reference,
+  proportionality, value, scenario, legend.
 
 ### ARC-002 · Global mutable state
 - Priority: P0 · Effort: L · Status: open
@@ -149,6 +157,19 @@ zero global state. Each item below names the current smell, where it lives, and 
   three: `non_numeric`/`must_start_at_one`/`must_be_sequential`), all pt-BR values copied
   verbatim from the legacy f-strings (verified byte-identical by the e2e golden harness run
   twice).
+- Note (Phase 3 Port 3 slice, ARC-017): both composition validators
+  (`compostion_graph_validator.py`/`composition_tree_validator.py`) are deleted; their nine
+  ported rules (`rules/composition.py`, COMP-001…009) render every message through
+  `ctx.translate(message_key, **params)` — 14 new catalog keys added to both
+  `static/locales/{pt_BR,en_US}/messages.json` (`rule.composition.missing_required_column`/
+  `_level2` shared by every rule's "required column is missing" abort case,
+  `rule.composition.leaf_without_data` shared by COMP-005/COMP-006, plus one-or-more
+  `rule.COMP-0XX.<slug>` keys per rule — e.g. COMP-009 has three:
+  `parent_missing`/`child_missing`/`level_mismatch`), all pt-BR values copied verbatim from the
+  legacy f-strings (verified byte-identical by the e2e golden harness run twice). COMP-004's
+  duplicate-title warning uses two distinct keys (`warning.simple_name`/`warning.complete_name`)
+  rather than one key with a Portuguese-noun param, so the en_US locale renders a genuine English
+  sentence instead of an English template around a Portuguese word.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
@@ -334,4 +355,19 @@ zero global state. Each item below names the current smell, where it lives, and 
   e2e golden harness 7/7 twice, byte-identical. `legacy_adapter.py` imports `ValidationReport`
   under `TYPE_CHECKING` only — a runtime import would cycle back through
   `controllers/__init__.py` → `spreadsheet_processor.py` → `rules`.
+- Done (third/fourth validator port, Phase 3 Port 3): `rules/composition.py` declares
+  `COMPOSITION_REGISTRY` (`COMP-001`…`COMP-009`, registered in the two legacy validators'
+  combined check order), run through the same `_run_rule_registries`/`_build_rule_context` call
+  shape as description. Each `RuleSpec.requires` now names both sheets a rule needs
+  (`{"composicao": (), "descricao": ()}` for COMP-001/COMP-004/COMP-007/COMP-008/COMP-009,
+  `{"composicao": (), "valores": ()}` for COMP-005/COMP-006) so the engine's `SKIPPED` status
+  replaces the legacy `set_not_executed` no-op for an empty sheet (ARC-008 closed for this
+  validator). `data_validate.rules.composition.compute_composition_facts` closes BUG-019
+  (computes the graph/tree/relation facts once, injected via
+  `ctx.options["composition_facts"]` by `_build_rule_context`, read — never recomputed — by
+  every `COMP-*` rule). `validators/spreadsheets/composition/` (both
+  `compostion_graph_validator.py` and `composition_tree_validator.py`) is deleted. 96.72 % line
+  coverage on the new module (`tests/unit/rules/test_composition.py`), mypy-strict clean, e2e
+  golden harness 7/7 twice, byte-identical. Still open: spelling, temporal reference,
+  proportionality, value, scenario, legend.
 - Related: PERF-007
