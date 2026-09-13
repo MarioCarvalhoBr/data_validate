@@ -70,7 +70,7 @@ backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 | G-10 | description | `relacao ∈ {1,−1}`, `ordem` sibling sequence, `meta` format, `nome_completo` length | `relacao` sub-gap retired unimplemented (column removed, PROTO-002); **`ordem` sequence resolved** — DESC-017 (PROTO-010, done); `meta` format still parked (DESC-018, no owner decision); **`nome_completo` length resolved** — DESC-019 (PROTO-010, done) |
 | G-11 | description/composition | global uniqueness of names vs per-subtree | clarify; possibly a second UT variant |
 | G-12 | composition | root semantics (code `0` vs node `"1"`) | unify in `SheetSpec` |
-| G-13 | values | `id` completeness/uniqueness | **uniqueness resolved** — VAL-006 (PROTO-017, done); completeness out of scope (tracked as TERR-001, PROTO-013) |
+| G-13 | values | `id` completeness/uniqueness | **uniqueness resolved** — VAL-006 (PROTO-017, done); **subset direction resolved** — TERR-001/TERR-002 (PROTO-013, done: every `valores`/`proporcionalidades` id must exist in the optional `spd_data.json` registry); full **completeness** (every registry id present in `valores`) remains an open owner decision, NOT part of PROTO-013 — see `territories.md` |
 | G-14 | values | [0,1] normalisation only via legend default | document |
 | G-15 | temporal | four-digit symbol | **resolved** — TEMP-004 (PROTO-014, done) |
 | G-16 | temporal | at most one observed (past/present) time | **resolved** — TEMP-005 (PROTO-014, done, warning severity) |
@@ -119,4 +119,18 @@ error by future owner decision** — before that change reached a commit, the pr
 other docs (`CLAUDE.md`) point at this fixture as a "run it and see it pass" example; promoting
 the propagation half back to an error is left to a future owner decision.
 
-Last synced with code: Phase 6 round N2, 2026-09-13
+**Phase 6 round N3 (2026-09-13)**: the subset direction of **G-13** resolved — **TERR-001**/
+**TERR-002** (PROTO-013): an optional, server-generated `spd_data.json` registry
+(`.specs/business-rules/territories.md`), when present, checks every `valores`/
+`proporcionalidades` id exists among the registry's ids; absent → the new `TERR` category is
+reported as skipped, never an error. **PROTO-018** adds the JSON summary's
+`spatial_data_validated` boolean alongside it. Every fixture gains the new, always-empty `TERR`
+section (none of the eight pre-existing fixtures ships a registry) and
+`spatial_data_validated: false`; two new fixtures, `data_ground_truth_02_registry` (registry
+covers every id, `true`) and `data_errors_16_registry` (registry omits two ids, `false`,
+TERR-001/TERR-002 both fire), were added. See `tests/e2e/golden/CHANGELOG.md`'s "Phase 6 round
+N3" entry for the full reviewed diff, and `territories.md`'s "Resolved ambiguity" note (a
+duplicate registry id is a warning, the registry still loads — not part of the "malformed,
+rules skipped" case).
+
+Last synced with code: Phase 6 round N3, 2026-09-13

@@ -137,4 +137,11 @@ existing `specs/issues.py::ValidationResult`, not yet the richer `outcomes`/`loa
 module exists to actually populate `RuleContext.sheets` from a loaded bundle. 100 % covered by
 `tests/unit/rules/`.
 
-Last synced with code: 228ae09
+PROTO-013 (Phase 6 round N3): `SkipReason.DISABLED_BY_OPTION` (`engine.skipped.disabled_by_option`)
+is now implemented — its first consumer is `rules/territories.py`'s TERR-001/TERR-002, gated by a
+new `RuleSpec.requires_options: tuple[str, ...]` field (`ctx.options` keys that must all be
+truthy; checked by `Engine._unmet_prerequisite` after `requires`, before `depends_on`). This is the
+only sketched `SkipReason` key that was still unimplemented; all four now exist.
+
+Last synced with code: Phase 6 round N3, 2026-09-13 (PROTO-013: `RuleSpec.requires_options` /
+`SkipReason.DISABLED_BY_OPTION` implemented)

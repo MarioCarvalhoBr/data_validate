@@ -136,7 +136,7 @@ loop was rewritten as vectorised `pd.to_numeric` masks (PERF-001); see each rule
 
 ## Gaps (protocol ↔ code)
 
-- **G-13 `id` completeness/uniqueness**: "Nesta coluna deverão ter todos os objetos descritos no shapefile ou … todos os municípios brasileiros" (completeness) cannot be checked without the spatial layer — remains open, tracked as TERR-001 (PROTO-013); uniqueness is **resolved** — VAL-006 (PROTO-017).
+- **G-13 `id` completeness/uniqueness**: "Nesta coluna deverão ter todos os objetos descritos no shapefile ou … todos os municípios brasileiros" (full completeness — every registry id present in `valores`) cannot be checked without the spatial layer — remains open (an owner decision, not part of PROTO-013); the **subset direction is resolved** — TERR-001 (PROTO-013, done: every `valores.id` must exist in the optional `spd_data.json` registry, when present); uniqueness is **resolved** — VAL-006 (PROTO-017).
 - **G-14 normalised range**: the [0,1] expectation is enforced only through the legend range rule (LEG-015) with default bounds 0–1.
 
 ## Protocol v1.16 update (2026-09-12)
@@ -145,7 +145,8 @@ loop was rewritten as vectorised `pd.to_numeric` masks (PERF-001); see each rule
   removed from `descricao`; per the v1.15 history the information now lives in the legend. Until
   the owners fix the text, value orientation is treated as legend-defined (PROTO-016).
 - **Territory registry**: when the optional server file `spd_data.json` is present, every
-  `valores.id` must exist in it — TERR-001 in [territories.md](territories.md) (PROTO-013,
-  still open, sequenced last). `id` uniqueness is **resolved** — VAL-006 (PROTO-017).
+  `valores.id` must exist in it — TERR-001 in [territories.md](territories.md) (**resolved**,
+  PROTO-013, Phase 6 round N3). `id` uniqueness is **resolved** — VAL-006 (PROTO-017).
 
-Last synced with code: Phase 6 round N2, 2026-09-13 (PROTO-017: VAL-006 added to `rules/value.py`)
+Last synced with code: Phase 6 round N3, 2026-09-13 (PROTO-013: TERR-001 added to
+`rules/territories.py`)

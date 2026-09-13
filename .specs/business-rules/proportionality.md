@@ -151,11 +151,14 @@ by `helpers/common/validation/proportionality_processing.py::ProportionalityProc
 
 - **Territory registry**: when the optional server file `spd_data.json` is present, every
   `proporcionalidades.id` must exist in it — TERR-002 in [territories.md](territories.md)
-  (PROTO-013).
+  (**resolved**, PROTO-013, Phase 6 round N3). Uses the same `id`-by-level-1 lookup G-24 already
+  documents (`("Unnamed: 0_level_0", "id")` in a real bundle, never `("id", "id")`) —
+  `rules/territories.py::_proportionality_id_column`, matching this file's own
+  `_proportionality_missing_id` precedent.
 - §2.7 keeps "a soma … deve ser um, mas podem existir exceções quando os dados não estão
   normalizados" — PROP-010 is stricter than the protocol; severity decision filed as PROTO-015.
 - p.13 uses the singular "proporcionalidade.xlsx" once; §2 (p.3) keeps the plural file name — the
   plural remains authoritative.
 
-Last synced with code: ARC-017 Phase 3 Port 7 (PROP-003…010 ported to `rules/proportionality.py`;
-legacy `SpProportionalityValidator` deleted)
+Last synced with code: Phase 6 round N3, 2026-09-13 (PROTO-013: TERR-002 added to
+`rules/territories.py`)

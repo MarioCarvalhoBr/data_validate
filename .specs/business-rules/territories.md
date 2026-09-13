@@ -29,9 +29,19 @@ rules below check the spreadsheets' ids are a **subset** of the registry; full *
 |---|---|
 | File name | `spd_data.json` (input folder, alongside the sheets) |
 | Required | no — optional, server-generated |
-| Format | JSON, UTF-8: `{"values": [{"id": int, "name": str, "region": str}, …]}` |
-| Loading | through the loading layer only (never parsed ad hoc); untrusted input — size-limited, stdlib `json`, specific exceptions |
-| File-structure impact | must be whitelisted so STRUCT-004 does not flag it as "arquivo não esperado" (code change — PROTO-013) |
+| Format | JSON, UTF-8: `{"values": [{"id": int, "name": str, "region": str}, …]}` (extra keys per entry tolerated) |
+| Loading | through the loading layer only (never parsed ad hoc); untrusted input — size-limited (`MAX_INPUT_FILE_BYTES`, SEC-003), stdlib `json`, specific exceptions (`OSError`, `json.JSONDecodeError`, `UnicodeDecodeError`, and a `ValueError` for a well-formed-JSON-but-wrong-shape payload) |
+| File-structure impact | whitelisted so STRUCT-004 does not flag it as "arquivo não esperado" |
+
+Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade._load_territory_registry`
+(returns a `TerritoryRegistry` frozen dataclass — `ids: frozenset[int]`, `loaded: bool`,
+`error: str | None` — on the new `LoadResult.territory_registry` field); the whitelist is
+`specs/sheet_specs.py::EXTRA_INPUT_FILES` (`("spd_data.json",)`), consumed by
+`rules/structure.py::check_no_unexpected_files` (STRUCT-004) via an exact-name match, independent
+of the `<base>.<ext>`/`SHEET_SPECS` shape every declared sheet otherwise follows. Covered by
+tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py::
+TestDataLoaderFacadeTerritoryRegistry`, `tests/unit/rules/test_structure.py::
+TestCheckNoUnexpectedFiles` (whitelist cases).
 
 ## Rules
 
@@ -44,9 +54,14 @@ rules below check the spreadsheets' ids are a **subset** of the registry; full *
   equal the `id` of some entry in the registry's `values` list. Unknown ids are reported per id
   with the row number. When the file is absent, the whole `TERR` verification is reported as
   skipped / not executed.
-- Current message (pt-BR): none — new rule; key `rule.TERR-001.error` in both catalogs
-- Implemented by: none yet (PROTO-013)
-- Covered by tests: none yet — unit + golden fixtures with and without the file
+- Current message (pt-BR): `rule.TERR-001.error` — "{filename}, linha {row}: O identificador
+  '{value}' da coluna 'id' não foi encontrado no cadastro de territórios (spd_data.json)."
+- Implemented by: `rules/territories.py::check_values_ids_in_registry` (`TERRITORY_REGISTRY_RULES`,
+  `RuleSpec.requires_options=("territory_registry_present",)` — an absent/malformed registry
+  engine-skips this rule with `SkipReason.DISABLED_BY_OPTION`, `rules/engine.py`)
+- Covered by tests: `tests/unit/rules/test_territories.py::TestCheckValuesIdsInRegistry`,
+  `::TestTerritoryRegistryEngineGating`; golden fixtures `data_ground_truth_02_registry`
+  (present, valid, zero errors) and `data_errors_16_registry` (present, unknown ids)
 
 ### TERR-002 · Every `proporcionalidades.id` exists in the territory registry
 - Severity: error (maintainer decision — never a warning)
@@ -56,17 +71,34 @@ rules below check the spreadsheets' ids are a **subset** of the registry; full *
 - Statement: when `spd_data.json` is present, every value in the `id` column (level-2 header) of
   `proporcionalidades` must exist among the registry ids; skipped when the file or the sheet is
   absent.
-- Current message (pt-BR): none — new rule; key `rule.TERR-002.error` in both catalogs
-- Implemented by: none yet (PROTO-013)
-- Covered by tests: none yet — unit + golden fixtures with and without the file
+- Current message (pt-BR): `rule.TERR-002.error` — same wording as TERR-001, naming
+  `proporcionalidades.xlsx` and the row (double-header offset, `idx + 3`).
+- Implemented by: `rules/territories.py::check_proportionality_ids_in_registry`. Note: a real
+  bundle's `proporcionalidades.id` column is `("Unnamed: 0_level_0", "id")` under pandas'
+  `header=[0, 1]` read (the top header cell above `id` is blank), never `("id", "id")` — this rule
+  locates the column by level 1 (`_proportionality_id_column`), the same problem
+  `rules/proportionality.py::_proportionality_missing_id` solves for every `PROP-*` rule; a naive
+  `"id" in frame.columns`/`frame[("id", "id")]` lookup silently finds nothing against real data.
+- Covered by tests: `tests/unit/rules/test_territories.py::TestCheckProportionalityIdsInRegistry`
+  (incl. a regression case reproducing the real, blank-top-header column shape); golden fixtures
+  `data_ground_truth_02_registry`/`data_errors_16_registry` (the latter's registry omits an id
+  referenced by both `valores` and `proporcionalidades`, exercising TERR-001 and TERR-002 together)
 
 ## Registry integrity (pre-checks before the rules run)
 
-Malformed registry (invalid JSON, missing `values`, non-int `id`, duplicate ids) is reported as a
-loading error for `spd_data.json` and both TERR rules are skipped — never a crash. Duplicate
-registry ids are a registry defect (server-side) and reported as a warning.
+Malformed registry — invalid JSON, a non-`dict` root, a missing/non-list `values`, or an entry
+whose `id` is not an `int` (a `bool` is rejected too — `isinstance(True, int)` is `True` in
+Python, but a boolean is not a territory id) — is reported as a loading error for `spd_data.json`
+(FS category, `loader_error_registry_invalid`) and both TERR rules are engine-skipped
+(`SkipReason.DISABLED_BY_OPTION`) — never a crash.
 
-Last synced with code: 344fef7
+**Resolved ambiguity (2026-09-13, PROTO-013 implementation)**: duplicate registry ids are *not*
+part of the malformed/fatal case above — they are a registry defect (server-side), reported as a
+**warning** (`loader_warning_registry_duplicate_ids`, FS category), and the registry still loads
+successfully (deduplicated: `TerritoryRegistry.loaded is True`, `.ids` is the unique set) — both
+TERR rules run normally against it.
+
+Last synced with code: PROTO-013/PROTO-018 implementation (Phase 6 round N3, 2026-09-13)
 
 ## JSON summary flag: `spatial_data_validated`
 
@@ -85,5 +117,16 @@ malformed/errors cases — confirm before implementing PROTO-018. The field sits
 the `data_validate` object next to `report` (`{"data_validate": {"version": ...,
 "spatial_data_validated": false, "report": {...}}}`) and is ALWAYS present so the
 platform can rely on its shape. The `--json` file output carries the same field.
-Implementation: PROTO-018 (Phase 6, after PROTO-013). Contract change must be mirrored
-in `.specs/api/cli-contract.md` (JSON schema) and the golden harness summary parser.
+
+**Implemented** (PROTO-018, Phase 6 round N3, 2026-09-13): "passado e validado" was resolved as
+"provided AND validation passed" (the first reading above), matching the maintainer's original
+statement. `GeneralContext.spatial_data_validated` (`controllers/context/general_context.py`) is
+computed by `SpreadsheetProcessor._finalize_territory_registry_status`
+(`controllers/spreadsheet_processor.py`), once `TERRITORY_REGISTRY_RULES` has run, as
+`territory_registry.loaded and not terr_report.has_errors()`; `FileReportGenerator.
+_print_json_summary` (stdout) and `main.py::_build_json_summary` (`--json PATH`) both read it, so
+the two outputs never disagree. Mirrored in `.specs/api/cli-contract.md`'s JSON schema. Covered by
+tests: `tests/unit/controllers/test_spreadsheet_processor.py::TestFinalizeTerritoryRegistryStatus`,
+`tests/unit/controllers/report/test_file_report_generator.py::TestPrintJsonSummary`,
+`tests/unit/test_main.py::TestMainJsonOutput`; golden fixtures `data_ground_truth_02_registry`
+(`true`) and `data_errors_16_registry` (`false`, TERR errors present).

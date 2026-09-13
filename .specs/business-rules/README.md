@@ -39,14 +39,13 @@ backlog `09-protocol-v116.md` (`PROTO-*` items).
 | `LEG-` | `legenda` rules and legend relations | `FC`, `LEG_REL`, `LEG_RANGE` |
 | `PROP-` | `proporcionalidades` rules | `FS`, `IR`, `REP_IND_PROP`, `IND_VAL_PROP`, `IR_PROP`, `SUM_PROP` |
 | `SPELL-` | Spell-check | `SPELL` |
-| `TERR-` | Territory registry `spd_data.json` ↔ `valores`/`proporcionalidades` ids | dedicated new category `TERR` (`verification_name_territory_registry`), errors only, skipped when the file is absent (planned — PROTO-013, sequenced after backlog 01–07) |
+| `TERR-` | Territory registry `spd_data.json` ↔ `valores`/`proporcionalidades` ids | dedicated `TERR` category (`verification_name_territory_registry`), errors only, skipped when the file is absent — **implemented, PROTO-013/PROTO-018, Phase 6 round N3** |
 
 Target message keys follow `rule.<RULE-ID>.<error|warning>` (see `.specs/i18n/catalog.md`).
 
 Planned IDs reserved by the v1.16 alignment and the gap list (not yet implemented): DESC-018
 (meta format — parked, no owner decision), DESC-016 (retired unimplemented — `relacao` removed by
-protocol v1.15), TERR-001, TERR-002 (sequenced last per the scheduling note in
-`09-protocol-v116.md`).
+protocol v1.15).
 
 `DESC-013` (categoria domain, PROTO-004 step 1), `DESC-014` (codes ordered by level, PROTO-008),
 `DESC-015` (cenario domain/propagation, PROTO-009), `DESC-017` (ordem sequence, PROTO-010), and
@@ -58,7 +57,10 @@ charset, PROTO-006, new category `SYMB_SCEN`), **LEG-008** tightened to six-hex-
 (PROTO-012 — an empty `legenda` cell is the protocol's default-legend case, not an error;
 non-empty dangling references remain `LEG-012`'s concern), **TEMP-004**/**TEMP-005** (four-digit
 symbol / single observed reference, PROTO-014, both under `YEARS_TEMP`), and **VAL-006** (`id`
-uniqueness, PROTO-017, new category `UNIQ_VAL`).
+uniqueness, PROTO-017, new category `UNIQ_VAL`). Phase 6 round N3 implements **TERR-001**/
+**TERR-002** (optional `spd_data.json` territory registry, PROTO-013, new category `TERR`,
+sequenced last in the pipeline) and the JSON summary's **`spatial_data_validated`** flag
+(PROTO-018) — see `territories.md`.
 
 ## Severity
 
@@ -74,8 +76,9 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 
 ## Map `NamesEnum` → verification title key → rule IDs
 
-`data_validate/config/names_enum.py` (37 members: PROTO-004 added `CATEG_DESC`; Phase 6 round N2
-added `SYMB_SCEN` (PROTO-006/SCEN-005) and `UNIQ_VAL` (PROTO-017/VAL-006)). Titles are resolved through the i18n catalog
+`data_validate/config/names_enum.py` (38 members: PROTO-004 added `CATEG_DESC`; Phase 6 round N2
+added `SYMB_SCEN` (PROTO-006/SCEN-005) and `UNIQ_VAL` (PROTO-017/VAL-006); Phase 6 round N3 added
+`TERR` (PROTO-013/TERR-001/TERR-002)). Titles are resolved through the i18n catalog
 (`static/locales/<locale>/messages.json`), and every title is pre-registered in the report by
 `SpreadsheetProcessor._prepare_statement`, so unused members still appear as empty sections.
 
@@ -118,6 +121,7 @@ added `SYMB_SCEN` (PROTO-006/SCEN-005) and `UNIQ_VAL` (PROTO-017/VAL-006)). Titl
 | `LEAF_NO_DATA` | `leaf_indicators_without_associated_data` | COMP-005, COMP-006 |
 | `CHILD_LVL` | `child_indicator_levels` | COMP-009, DESC-017 |
 | `CATEG_DESC` | `indicator_category` | DESC-013 |
+| `TERR` | `territory_registry` | TERR-001, TERR-002 |
 
 ## Skipped verifications
 
@@ -127,6 +131,14 @@ deleted entirely (ARC-008, ARC-017 Phase 3 Port 8): every rule now runs through
 `rules/engine.py::Engine`, whose `RuleSpec.requires`/`depends_on` (checked once per rule by
 `Engine._unmet_prerequisite`) record *skipped-with-reason* (`RuleOutcome.status is SKIPPED`,
 `SkipReason`) exactly as ADR-0006 targeted — closing the gap the old placeholder left open.
+PROTO-013 is the first consumer of the engine's third prerequisite kind,
+`RuleSpec.requires_options` (`SkipReason.DISABLED_BY_OPTION`, `engine.skipped.disabled_by_option`
+— sketched but unimplemented in `.specs/architecture/error-model.md` until now): an absent or
+malformed `spd_data.json` engine-skips TERR-001/TERR-002 this way, and
+`SpreadsheetProcessor._finalize_territory_registry_status` additionally lists the `TERR` title in
+`GeneralContext.skipped_validations` (the same list `FileReportGenerator._collect_skipped_tests`
+already reads for `--no-spellchecker`/`--no-warning-titles-length`) so it shows in the report's
+"not executed" list too.
 
 ## Test coverage summary
 
@@ -136,11 +148,12 @@ Phase 3b), `test_description.py` (DESC-001…010 Port 2, plus DESC-013/014/015/0
 alignment — PROTO-004/008/009/010), `test_composition.py` (COMP-001…009, Port
 3), `test_temporal_reference.py`/`test_scenario.py` (TEMP-001…003/SCEN-003…004, Port 4),
 `test_value.py` (VAL-002…005, Port 5), `test_legend.py` (LEG-012…015, Port 6),
-`test_proportionality.py` (PROP-003…010, Port 7), and `test_spell.py` (SPELL-001…005, Port 8, the
-last validator ported — `data_validate/validators/` no longer exists). This closes backlog
-TST-001 (`.specs/quality/backlog/04-testing.md`) for models/validators/controllers; helper
-functions used by rules are covered under `tests/unit/helpers/**`, cited per rule as "helper
+`test_proportionality.py` (PROP-003…010, Port 7), `test_spell.py` (SPELL-001…005, Port 8, the
+last validator ported — `data_validate/validators/` no longer exists), and `test_territories.py`
+(TERR-001…002, Phase 6 round N3 — the first rule module with no legacy validator to port). This
+closes backlog TST-001 (`.specs/quality/backlog/04-testing.md`) for models/validators/controllers;
+helper functions used by rules are covered under `tests/unit/helpers/**`, cited per rule as "helper
 covered by …".
 
-Last synced with code: ARC-017 Phase 3 Port 8 (SPELL-001…005 ported, `data_validate/validators/`
-deleted entirely)
+Last synced with code: Phase 6 round N3 (PROTO-013/PROTO-018 — territory registry,
+`spatial_data_validated`)

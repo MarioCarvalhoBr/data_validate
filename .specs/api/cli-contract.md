@@ -42,9 +42,10 @@ Outputs:
   `Tempo total de execução: N segundos` (unless `--no-time`), and, in `--debug` mode, `Log file
   created at: …` — every one of these moved off stdout in this slice so stdout is never mixed
   with anything but the JSON summary fragment below.
-- stdout: **only** the line `<{"data_validate": {"version": "0.7.65b732", "report": {"errors": E,
-  "warnings": W, "tests": 35}}}>` (built with `json.dumps(summary, ensure_ascii=False)`, so it
-  stays valid JSON even when a value contains a quote or non-ASCII character — BUG-010, fixed).
+- stdout: **only** the line `<{"data_validate": {"version": "0.7.65b732",
+  "spatial_data_validated": false, "report": {"errors": E, "warnings": W, "tests": 38}}}>` (built
+  with `json.dumps(summary, ensure_ascii=False)`, so it stays valid JSON even when a value
+  contains a quote or non-ASCII character — BUG-010, fixed).
   A platform integration that only ever read this one JSON fragment off stdout is unaffected;
   one that also expected the (now-removed) `HTML report created at: …`/`PDF report created
   at: …`/`Tempo total de execução: …` lines interleaved on stdout must read them from stderr
@@ -70,6 +71,14 @@ Outputs:
 
 Totals are read from `SpreadsheetProcessor.validation_reports.get_total_errors()`/
 `get_total_warnings()`; the `tests` count is `len(validation_reports)`.
+
+`data_validate.spatial_data_validated` (PROTO-018, implemented): a boolean, always present, next
+to `version`. `True` only when the optional territory registry (`spd_data.json`,
+`.specs/business-rules/territories.md`) was provided, loaded successfully, and TERR-001/TERR-002
+(PROTO-013) found zero errors; `False` in every other case (absent, malformed, or errors found).
+Computed by `SpreadsheetProcessor._finalize_territory_registry_status` into
+`GeneralContext.spatial_data_validated`, read by both `FileReportGenerator._print_json_summary`
+(stdout) and `main.py::_build_json_summary` (`--json PATH`), so the two outputs always agree.
 
 ## Target contract — still pending
 
@@ -106,9 +115,10 @@ remain open (tracked under ARC-011/ARC-012, follow-on phases):
   "properties": {
     "data_validate": {
       "type": "object",
-      "required": ["version", "report"],
+      "required": ["version", "spatial_data_validated", "report"],
       "properties": {
         "version": { "type": "string" },
+        "spatial_data_validated": { "type": "boolean" },
         "protocol": { "type": "string" },
         "locale": { "type": "string", "enum": ["pt_BR", "en_US"] },
         "exit_code": { "type": "integer", "enum": [0, 1, 2] },
@@ -132,9 +142,10 @@ remain open (tracked under ARC-011/ARC-012, follow-on phases):
 }
 ```
 
-Implemented today: `data_validate.version` and `data_validate.report.{errors,warnings,tests}`
-(both on stdout and in the `--json PATH` file, which write the identical object). `protocol`,
-`locale`, `exit_code`, `skipped`, and `outputs` are not yet populated — still pending.
+Implemented today: `data_validate.version`, `data_validate.spatial_data_validated` (PROTO-018,
+Phase 6 round N3), and `data_validate.report.{errors,warnings,tests}` (both on stdout and in the
+`--json PATH` file, which write the identical object). `protocol`, `locale`, `exit_code`,
+`skipped`, and `outputs` are not yet populated — still pending.
 
 The full report JSON (with categories and issues) is described in `../architecture/error-model.md`.
 
@@ -151,4 +162,5 @@ The full report JSON (with categories and issues) is described in `../architectu
 
 Every deprecation is listed in `../future/deprecations.md` and in `CHANGELOG.md`.
 
-Last synced with code: 344fef7 (ARC-011/SEC-008/PERF-004/ARC-012 slice, uncommitted at spec-sync time).
+Last synced with code: Phase 6 round N3, 2026-09-13 (PROTO-018: `spatial_data_validated` added to
+the JSON summary schema).

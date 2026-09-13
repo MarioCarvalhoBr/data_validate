@@ -89,14 +89,18 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Severity: error
 - NamesEnum: FS
 - Protocol: §2 p.3 (file names are fixed, no accents)
-- Statement: every file must be `<base>.<ext>` with `<base>` in the expected or optional set and `<ext>` in `{.csv, .xlsx}`; anything else (e.g. `Descricao.xlsx`, `legenda.qml`, `arquivo_aleatorio.xlsx`) is an error. Matching is case-sensitive.
+- Statement: every file must be `<base>.<ext>` with `<base>` in the expected or optional set and `<ext>` in `{.csv, .xlsx}`; anything else (e.g. `Descricao.xlsx`, `legenda.qml`, `arquivo_aleatorio.xlsx`) is an error. Matching is case-sensitive. **Exception (PROTO-013)**: an exact-name match against `EXTRA_INPUT_FILES` (`spd_data.json`, the optional territory registry — `.specs/business-rules/territories.md`) is accepted too, even though it is not a declared sheet and does not follow the `<base>.<ext>` shape.
 - Current message (pt-BR): key `validator_structure_error_unexpected_file` — `O arquivo '{file_name}' não é esperado.` (present in both locales)
 - Target message key: `rule.STRUCT-004.error`
 - Implemented by: `rules/structure.py::check_no_unexpected_files` (ARC-017 Phase 3b port of the
   deleted `FileStructureValidator.check_not_expected_files_in_folder_root`; the expected/optional
   stem set now comes from `data_validate.specs.sheet_specs.SHEET_SPECS`/`ALLOWED_EXTENSIONS`, not
-  `SpreadsheetInfo.EXPECTED_FILES`/`OPTIONAL_FILES` — both sources agree today, see ADR-0003)
-- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckNoUnexpectedFiles`
+  `SpreadsheetInfo.EXPECTED_FILES`/`OPTIONAL_FILES` — both sources agree today, see ADR-0003).
+  PROTO-013 (Phase 6 round N3): the `spd_data.json` exception checks
+  `data_validate.specs.sheet_specs.EXTRA_INPUT_FILES` by exact file name, ahead of the
+  `<base>.<ext>`/`SHEET_SPECS` check.
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckNoUnexpectedFiles` (incl. the
+  `spd_data.json` whitelist cases)
 - Notes / known defects: none — the loader no longer scans `.qml` files at all (BUG-015 done); a
   `.qml` file in the input folder is simply not picked up by `FileScanner`, and this rule still
   reports it as an unexpected file via the directory listing.
@@ -303,10 +307,11 @@ Loading facts (`helpers/tools/data_loader/**`):
   worksheet; STRUCT-014 now reports the extra sheets instead of the calamine reader silently
   loading only the first.
 - **Optional `spd_data.json`** (maintainer decision 2026-09-12, see
-  [territories.md](territories.md)): the server-generated territory registry may accompany the
-  bundle; STRUCT-004 must whitelist it instead of reporting "arquivo não esperado" → PROTO-013.
+  [territories.md](territories.md); **resolved, PROTO-013, Phase 6 round N3**): the
+  server-generated territory registry may accompany the bundle; STRUCT-004 whitelists it
+  (`EXTRA_INPUT_FILES`) instead of reporting "arquivo não esperado".
 - UTF-8 proactive check (G-01, resolved PROTO-007): STRUCT-013 implements the v1.16 FAQ's exact
   expected message.
 
-Last synced with code: Phase 6 round N2, 2026-09-13 (PROTO-003/STRUCT-014 and PROTO-007/
-STRUCT-013 implemented in `DataLoaderFacade.load()`)
+Last synced with code: Phase 6 round N3, 2026-09-13 (PROTO-013: STRUCT-004 whitelists
+`spd_data.json`; `DataLoaderFacade` also loads the optional territory registry directly)
