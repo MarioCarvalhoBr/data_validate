@@ -260,16 +260,34 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: ARC-011, ARC-012, BUG-010
 
 ### SEC-009 · Sensitive artefacts tracked in git
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `data/output/**/*_report.{html,pdf}`, `docs/**/*.html`, `assets/coverage/*.svg`
-- Problem: generated reports (which embed dataset content and machine metadata such as OS/version)
-  are committed; history grows with binaries.
-- Proposed fix: move reports to CI artefacts / golden JSON; docs to GitHub Pages; badges from Codecov.
+- Problem (fixed): generated reports (which embed dataset content and machine metadata such as
+  OS/version) were committed; history grew with binaries.
+- Fix shipped: `docs/**/*.html` (pdoc output) was already removed in a prior slice (`docs.yml`
+  publishes to GitHub Pages instead). This slice removes the rest: `git rm -r data/output`
+  (14 committed HTML/PDF reports across 7 fixtures — the e2e golden harness under
+  `tests/e2e/golden/*.json` is the regression net now, not a committed rendered report) and
+  `git rm -r assets/coverage` (2 generated SVG badges — `README.md` already showed the Codecov
+  and CI-status badges, not these local ones). `.gitignore` gained `data/output/` (replacing the
+  narrower `data/output/logs/` entry) and `assets/coverage/` so neither path is re-added by a
+  local `make run`/`make coverage` invocation. `assets/protocolo-*.pdf` (the protocol
+  specification documents) are untouched — intentional, versioned reference material, not
+  generated output.
 - Related: TOOL-006
 
 ### SEC-010 · Path handling for `--input_folder` / `--output_folder`
-- Priority: P3 · Effort: S · Status: open
-- Where: `helpers/base/data_args.py:85-89`, `controllers/report/file_report_generator.py:119,140`
-- Problem: no normalisation (`Path.resolve()`), output path built by string concatenation, report
-  name derived from the last directory component of the input.
-- Proposed fix: `pathlib` end-to-end; refuse to write outside the resolved output directory.
+- Priority: P3 · Effort: S · Status: done
+- Where: `helpers/base/data_args.py::DataFile._validate_arguments`,
+  `controllers/report/file_report_generator.py::FileReportGenerator._resolve_report_path`
+- Problem (fixed): no normalisation (`Path.resolve()`), output path built by string
+  concatenation, report name derived from the last directory component of the input.
+- Fix shipped: `DataFile._validate_arguments` resolves both `input_folder` and `output_folder`
+  to absolute, normalized paths via `Path.resolve()` once, at validation time, and stores the
+  resolved `str` back onto the attributes (every downstream consumer keeps reading a plain
+  `str`, no ripple). `FileReportGenerator._resolve_report_path` builds the report path with
+  `pathlib` (`output_dir / f"{file_name}{html_output_file}"`) and raises `ValueError` when the
+  resolved report path is not `is_relative_to()` the resolved output directory — defence in
+  depth, since `file_name` (`Path(input_folder).name`) cannot itself contain a path separator
+  once `input_folder` is already resolved.
+- Related: BUG-009, SEC-001

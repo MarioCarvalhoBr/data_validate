@@ -9,8 +9,8 @@ Defined in `helpers/base/data_args.py::DataArgs._create_parser` with `allow_abbr
 
 | Flag | Alias | Deprecated alias | Type / default | Notes |
 |---|---|---|---|---|
-| `--input_folder PATH` | `-i`, `--input` | `--i` | required | Must be an existing directory (`DataFile._validate_arguments`); required across all three spellings, enforced with `parser.error()` (not `required=True`, since that cannot span aliases) |
-| `--output_folder PATH` | `-o`, `--output` | `--o` | default `output_data/` | Any path is accepted, including a basename containing `.` (e.g. `run.2026-08`, `v1.2`); rejected only when the path already exists as a regular file (BUG-009); created if missing |
+| `--input_folder PATH` | `-i`, `--input` | `--i` | required | Must be an existing directory (`DataFile._validate_arguments`); required across all three spellings, enforced with `parser.error()` (not `required=True`, since that cannot span aliases); resolved to an absolute, normalized path via `Path.resolve()` (SEC-010) |
+| `--output_folder PATH` | `-o`, `--output` | `--o` | default `output_data/` | Any path is accepted, including a basename containing `.` (e.g. `run.2026-08`, `v1.2`); rejected only when the path already exists as a regular file (BUG-009); created if missing; resolved to an absolute, normalized path via `Path.resolve()` (SEC-010); the report file is then written with `pathlib`, guarded to stay inside the resolved output directory (`FileReportGenerator._resolve_report_path`) |
 | `--locale`, `-l` | | `--l` | `pt_BR` \| `en_US`, default `pt_BR` | Explicit constructor argument threaded through `GeneralContext` into one shared `LanguageManager`; no persistence (BUG-004, fixed) |
 | `--no-spellchecker` | | | flag | Skips `SpellCheckerValidator`; listed as skipped in the report |
 | `--no-warning-titles-length` | | | flag | Skips `TITLES_N`; listed as skipped |

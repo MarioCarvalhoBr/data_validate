@@ -69,11 +69,19 @@
 - Related: BUG-017
 
 ### TOOL-006 · Generated artefacts committed
-- Priority: P2 · Effort: S · Status: in-progress
+- Priority: P2 · Effort: S · Status: done
 - Where: `docs/**` (pdoc HTML), `data/output/**` (reports), `assets/coverage/*.svg`, `dev-reports/`
   (ignored but present), `dist/` (ignored but present).
 - Proposed fix: `docs.yml` publishes to Pages; goldens replace reports; Codecov badge; `make clean`.
-- Done: pdoc HTML removed; `data/output/**` reports and `assets/coverage/*.svg` still tracked; replace by goldens/Codecov
+- Done: pdoc HTML removed (prior slice). `data/output/**` reports (14 files) and
+  `assets/coverage/*.svg` (2 files) removed from git in this slice (SEC-009); `.gitignore` now
+  covers `data/output/` and `assets/coverage/` outright. `Makefile`'s `badges` target (and its
+  `genbadge` invocations) deleted — `README.md` already carries the Codecov/CI badges, so nothing
+  regenerates a local SVG any more; `genbadge` dropped from `[tool.poetry.group.dev.dependencies]`
+  in `pyproject.toml` since nothing else referenced it. `clean`'s `data/output/` handling
+  simplified to `rm -rf data/output/` now that the whole tree is gitignored, instead of only its
+  `temp/`/`logs/` subdirectories. `dev-reports/`/`dist/` were already gitignored and untracked —
+  no further action needed for those two.
 - Related: SEC-009
 
 ### TOOL-007 · Repository scaffolding

@@ -26,8 +26,9 @@
 ## Dev inventory (target)
 
 pytest, pytest-cov, pytest-mock, pytest-xdist, pytest-benchmark, hypothesis, coverage, ruff,
-mypy (+ `types-*`), bandit, pip-audit, pre-commit, pdoc, genbadge (until badges move to Codecov).
-Removed: black, flake8, flake8-html.
+mypy (+ `types-*`), bandit, pip-audit, pre-commit, pdoc.
+Removed: black, flake8, flake8-html, genbadge (SEC-009/TOOL-006: badges are Codecov/CI now, no
+local SVG generation).
 
 ## Upgrade cadence
 

@@ -171,11 +171,28 @@ harness (PERF-009); never optimise without a number.
   unchanged for duplicate/multi-space texts).
 
 ### PERF-007 · No real parallelism where it matters
-- Priority: P2 · Effort: L · Status: open
+- Priority: P2 · Effort: L · Status: wont-fix (for now, measured — see revisit trigger)
 - Where: `middleware/bootstrap.py:105-110` (thread pool for one task); rules run sequentially in
-  `spreadsheet_processor.py:200-215`.
-- Proposed fix: once rules are pure (ARC-001/ARC-017), run independent rule groups with
-  `concurrent.futures.ProcessPoolExecutor` (or threads with Arrow/NumPy releasing the GIL); measure.
+  `data_validate/rules/engine.py::Engine.run`.
+- Proposed fix: once rules are pure (ARC-001/ARC-017 — now done), run independent rule groups with
+  `concurrent.futures.ThreadPoolExecutor` (or a process pool); measure.
+- Measured (PERF-009 slice): profiled `tools/harness/profile_pipeline.py` against the 6-indicator/
+  5-year/3-scenario/5000-row budget bundle, plus a non-profiled wall-clock decomposition
+  (`Engine.run` wrapped to time itself directly, avoiding `cProfile`'s per-call overhead). Rule
+  execution (`Engine.run`, every registry) is ~27.6% of post-import wall time (0.571s/2.066s) and
+  ~19% of full wall time including process start-up (0.571s/3.05s) — well under the "rules
+  dominate" bar. The actual bottleneck is `_report`'s PDF generation (WeasyPrint import ~1.1s +
+  render ~0.4s, ~57% of post-import time) and Python/pandas/networkx process start-up (~32% of
+  full wall time), neither of which rule parallelism touches. Full table and top-5 cumulative
+  functions: `.specs/quality/performance.md`'s "PERF-007 decision" section.
+- Decision: **wont-fix for now** — implementing `Engine.run(ctx, parallel: bool = True)` would add
+  thread-safety surface area (pandas/rule-function reentrancy, deterministic `EngineResult`
+  ordering via gather-then-sort-by-registration-order) for a phase that measured at ~19-28% of
+  wall time, not the dominant cost. Revisit if a future profile shows `Engine.run`'s own share
+  crossing ~30% of total wall time (e.g. after PERF-002/PERF-003/PERF-005 shrink the
+  loading/report share, or on a bundle with many more rule-bearing sheets/rows relative to
+  `valores` column count) — re-run `tools/harness/profile_pipeline.py` and the table before
+  reopening.
 
 ### PERF-008 · Start-up overhead
 - Priority: P3 · Effort: S · Status: done
@@ -211,8 +228,66 @@ harness (PERF-009); never optimise without a number.
   constructing and asserts `'pdfkit'`/`'enchant'` are absent from `sys.modules`).
 
 ### PERF-009 · No benchmark or profiling harness
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Proposed fix: `tools/harness/generate_fixture.py --indicators 5000 --years 5 --scenarios 3`,
   `tools/harness/profile_pipeline.py` (cProfile + `pyinstrument` output to `dev-reports/`),
   `tests/benchmarks/test_bench_pipeline.py` with `pytest-benchmark` and a regression threshold.
-- Related: TST-005
+- Done:
+  - **`generate_fixture.py` correctness fix** (it existed but produced an *invalid* bundle,
+    contradicting its own module docstring — every generated bundle failed real validation): (1)
+    the root indicator (`codigo` 1, `nivel` 1) was getting `valores` columns generated for it,
+    which VAL-003 always flags as unnecessary for a level-1 indicator — fixed by excluding the
+    root from `_build_values` entirely; (2) `valores` column names were built from
+    `referencia_temporal.nome` instead of `.simbolo` (VAL-003's `CombinationsProcessing.
+    generate_combinations` uses `simbolo`) and `simbolo` itself was a 0-based offset instead of
+    an actual calendar year, so TEMP-002 ("scenario years must be in the future") failed on every
+    non-first row — fixed by anchoring `simbolo`/`nome` on `date.today().year` and using
+    `simbolo` for column names; (3) every generated value was an out-of-`[0,1]`-range float
+    (e.g. `1.0`, `2.0`, ...), and LEG-015's protocol-default legend range (`[0, 1]`, applied
+    whenever no `legenda` sheet exists, which this harness never generates) flagged every one —
+    fixed by generating 2-decimal string values in `[0.01, 1.00]`. Verified: a generated 20-
+    indicator/3-year/2-scenario/5-row bundle now validates with **0 errors** (was 579 before the
+    fix), and the 6-indicator/5-year/3-scenario/5000-row budget bundle also validates with 0
+    errors (only 15 spell-check warnings, from the synthetic pt-BR text). Regression tests:
+    `tests/unit/tools/harness/test_generate_fixture.py::TestBuildValues` (root exclusion,
+    `simbolo`-not-`nome` column naming, scenario-suffix-only-after-the-first-year, 2-decimal
+    `[0,1]`-range values).
+  - **`generate_fixture.py` perf fix** (a genuine PERF-001-shaped bug in the harness itself, not
+    the validated pipeline): building the wide `valores` frame via `pd.DataFrame(dict_of_lists)`
+    left every column as its own single-column `ExtensionBlock` (pandas 3's default string dtype
+    never consolidates object/string columns constructed this way into one 2-D block), so
+    `to_csv` called `get_values_for_csv` once per column. At 5000 indicators x ~61 columns
+    (≈305k columns) this made *generating* the fixture alone take ~48s (measured via `cProfile`,
+    85s of which was inside `to_csv`'s per-block iteration). Fix: build one dense
+    `np.ndarray(dtype=object)` up front (one assignment per column into a pre-allocated 2-D
+    array) and hand pandas a single consolidated block via `pd.DataFrame(array, dtype="object")`
+    — cuts the same generation to ~2.5s (~19x).
+  - **`profile_pipeline.py` bug fix**: `profile_pipeline()` ran `data_validate.main` via
+    `runpy.run_module(..., run_name="__main__")`, which always raises `SystemExit` (`main.py`'s
+    own `if __name__ == "__main__": sys.exit(main())`) — uncaught, this `SystemExit` propagated
+    straight out of `profile_pipeline()`, so the `.prof`/top-N text report were **never written**
+    for any run (verified: `dev-reports/profile/` didn't exist anywhere in this repo's history
+    before this fix). Fixed by catching `SystemExit` (only) around the `runpy.run_module` call.
+    Regression tests: `tests/unit/tools/harness/test_profile_pipeline.py::
+    TestProfilePipelineSystemExit` (artifacts written for exit codes 0/1/2; a non-`SystemExit`
+    error still propagates and `sys.argv` is still restored).
+  - **Corrected fixture sizing** (see `.specs/quality/performance.md`'s budget-table note): "5,000
+    indicators" in this backlog and in `.claude/rules/performance.md` means 5,000 `valores`
+    **rows** (territories), not 5,000 indicator codes as columns — `FileStructureValidator`'s own
+    5,000-column structural size limit rejects the literal reading outright (confirmed: 5000
+    indicator codes x 5 rows produces ~305k columns and 2 structural errors, no business rule
+    ever runs). The budget fixture used throughout is 6 indicators (1 root + 5 children) x 5
+    years x 3 scenarios (65 value columns) x 5000 rows (≈325k cells).
+  - **`tests/benchmarks/test_bench_pipeline.py`**: `test_bench_full_pipeline` parametrised over
+    `["small", "large"]` (`data_ground_truth_01` vs. the generated budget bundle, built once per
+    session via a `large_fixture_dir` fixture), still skipped unless `--benchmark-only`;
+    `test_large_bundle_validates_under_budget`, a plain (non-`pytest-benchmark`) timed assertion
+    that the budget bundle validates in < 60s (measured ~3.05s — a ~20x CI margin), independent
+    of `--benchmark-only`. Both marked `slow`.
+  - **Measured numbers** (`make bench`, this machine): small (`data_ground_truth_01`) mean
+    2.20s (min 2.13s, max 2.33s, 5 rounds); large (budget bundle) mean 2.71s (min 2.67s, max
+    2.86s, 5 rounds). `/usr/bin/time -v` on the large bundle (single run, no `pytest-benchmark`
+    overhead): 3.05s wall, 184 MB peak RSS — both well inside the < 10s / < 1GB budget. Full
+    numbers and the profile-derived phase breakdown: `.specs/quality/performance.md`.
+- Related: TST-005, PERF-007 (the profile this item produced is what PERF-007's wont-fix decision
+  is based on)

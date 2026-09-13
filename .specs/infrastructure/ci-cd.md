@@ -56,6 +56,9 @@ files changed.
 ## Badges
 
 README shows: CI status (`ci.yml`), Codecov coverage, PyPI version, Python versions, license.
-The committed SVG badges under `assets/coverage/` are retired (TOOL-006).
+The committed SVG badges under `assets/coverage/` were removed from git (SEC-009/TOOL-006):
+`assets/coverage/` is now gitignored and the `Makefile`'s `badges`/`genbadge` target is gone —
+Codecov's own badge (already in `README.md`) is the single source of truth for the coverage
+number, no local SVG generation step exists any more.
 
 Last synced with code: 09279f4

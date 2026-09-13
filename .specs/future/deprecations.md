@@ -17,7 +17,7 @@
 | Class-level `RequiredColumn` Series mutated with data | Global state | Instance-level typed frames | — | Phase 2 | 2 | BUG-002 |
 | `ConstantBase` | Ad-hoc immutability | `@dataclass(frozen=True)` | — | Phase 5 | 5 | ARC-013 |
 | `MetadataInfo.serial` and `prepare_metadata.sh` | Hand-maintained pre-release serial | `importlib.metadata.version` from `pyproject.toml` | Phase 0 | Phase 1 | 1 | TOOL-005 |
-| Committed `docs/**/*.html`, `data/output/**` reports, `assets/coverage/*.svg` | Generated artefacts in git | Pages workflow, goldens, Codecov badge | Phase 0 | Phase 0/5 | 0 | TOOL-006 |
+| Committed `docs/**/*.html`, `data/output/**` reports, `assets/coverage/*.svg` | Generated artefacts in git | Pages workflow, goldens, Codecov badge | Phase 0 | **Removed 2026-09-13** | 0 | TOOL-006 |
 | Module names with typos (`compostion_graph_validator.py`, `_congifure_language`) | Naming | Renamed during migration with import shims for one minor | 0.8.0 | 1.0.0 | 3 | BUG-024 |
 
 Every removal is announced in `CHANGELOG.md` under *Deprecated* first and *Removed* later.
