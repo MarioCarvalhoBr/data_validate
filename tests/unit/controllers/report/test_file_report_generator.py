@@ -10,6 +10,8 @@ when a value contains a quote or a non-ASCII character.
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 
 from data_validate.controllers.report import file_report_generator as file_report_generator_module
 from data_validate.controllers.report.file_report_generator import FileReportGenerator
@@ -119,3 +121,29 @@ class TestBuildTemplateVariablesVersionLine:
         template_vars = generator._build_template_variables([], [])
 
         assert template_vars["text_display_version_and_os_info"] == ""
+
+
+class TestLazyPdfkitImport:
+    """PERF-008: `pdfkit` must not be imported by merely importing this module.
+
+    `pdfkit` is a heavy/optional dependency needed only by `_save_pdf_file`'s
+    HTML→PDF conversion; HTML-only flows (or a process that never reaches PDF
+    generation) must not pay its import cost.
+    """
+
+    def test_module_import_does_not_import_pdfkit(self) -> None:
+        """Importing the module alone, in a fresh subprocess, must not import `pdfkit`."""
+        result = subprocess.run(  # noqa: S603
+            [
+                sys.executable,
+                "-c",
+                "import data_validate.controllers.report.file_report_generator; "
+                "import sys; "
+                "assert 'pdfkit' not in sys.modules, sys.modules.keys()",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        assert result.returncode == 0, result.stderr

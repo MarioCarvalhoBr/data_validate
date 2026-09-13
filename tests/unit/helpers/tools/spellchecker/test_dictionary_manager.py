@@ -8,6 +8,8 @@ dictionary initialization, validation, word loading, and cleanup operations.
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
 import os
+import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -50,7 +52,7 @@ class TestDictionaryManager:
     def test_initialization(self, mocker) -> None:
         """Test DictionaryManager initialization."""
         mock_broker = mocker.MagicMock()
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
 
@@ -71,7 +73,7 @@ class TestDictionaryManager:
         `os.environ`.
         """
         mock_broker = mocker.MagicMock()
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         before = os.environ.copy()
         DictionaryManager("pt_BR")
@@ -106,7 +108,7 @@ class TestDictionaryManager:
         """Test dictionary validation when dictionary exists."""
         mock_broker = mocker.MagicMock()
         mock_broker.dict_exists.return_value = True
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         errors = manager.validate_dictionary()
@@ -118,7 +120,7 @@ class TestDictionaryManager:
         """Test dictionary validation when dictionary does not exist."""
         mock_broker = mocker.MagicMock()
         mock_broker.dict_exists.return_value = False
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         errors = manager.validate_dictionary()
@@ -130,7 +132,7 @@ class TestDictionaryManager:
         """Test dictionary validation when broker raises exception."""
         mock_broker = mocker.MagicMock()
         mock_broker.dict_exists.side_effect = Exception("Broker error")
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         errors = manager.validate_dictionary()
@@ -143,7 +145,7 @@ class TestDictionaryManager:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -166,7 +168,7 @@ class TestDictionaryManager:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -188,7 +190,7 @@ class TestDictionaryManager:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -210,7 +212,7 @@ class TestDictionaryManager:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         # Don't set manager.broker
@@ -227,7 +229,7 @@ class TestDictionaryManager:
         """Test dictionary initialization when exception occurs."""
         mock_broker = mocker.MagicMock()
         mock_broker.request_dict.side_effect = Exception("Dictionary error")
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -373,7 +375,7 @@ class TestDictionaryManagerEdgeCases:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -392,7 +394,7 @@ class TestDictionaryManagerEdgeCases:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -448,7 +450,7 @@ class TestDictionaryManagerEdgeCases:
         mock_broker = mocker.MagicMock()
         mock_dictionary = mocker.MagicMock()
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
         manager.broker = mock_broker
@@ -474,7 +476,7 @@ class TestDictionaryManagerIntegration:
         mock_dictionary = mocker.MagicMock()
         mock_broker.dict_exists.return_value = True
         mock_broker.request_dict.return_value = mock_dictionary
-        mocker.patch("data_validate.helpers.tools.spellchecker.dictionary_manager.Broker", return_value=mock_broker)
+        mocker.patch("enchant.Broker", return_value=mock_broker)
 
         manager = DictionaryManager("pt_BR")
 
@@ -568,3 +570,48 @@ class TestDictionaryManagerRealEnchant:
         finally:
             manager_one.clean_temporary_files()
             manager_two.clean_temporary_files()
+
+
+class TestLazyEnchantImport:
+    """PERF-008: `enchant` must not be imported by merely importing this module.
+
+    `enchant` (the pyenchant/libenchant native backend) is a heavy/optional
+    dependency needed only when a dictionary is actually validated or
+    initialized; constructing a `DictionaryManager` or importing this module
+    must not pay its import cost.
+    """
+
+    def test_module_import_does_not_import_enchant(self) -> None:
+        """Importing the module alone, in a fresh subprocess, must not import `enchant`."""
+        result = subprocess.run(  # noqa: S603
+            [
+                sys.executable,
+                "-c",
+                "import data_validate.helpers.tools.spellchecker.dictionary_manager; "
+                "import sys; "
+                "assert 'enchant' not in sys.modules, sys.modules.keys()",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        assert result.returncode == 0, result.stderr
+
+    def test_construction_does_not_import_enchant(self) -> None:
+        """Constructing a `DictionaryManager` alone must not import `enchant` either."""
+        result = subprocess.run(  # noqa: S603
+            [
+                sys.executable,
+                "-c",
+                "from data_validate.helpers.tools.spellchecker.dictionary_manager import DictionaryManager; "
+                "DictionaryManager('pt_BR'); "
+                "import sys; "
+                "assert 'enchant' not in sys.modules, sys.modules.keys()",
+            ],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+
+        assert result.returncode == 0, result.stderr

@@ -15,7 +15,6 @@ import re
 import sys
 from typing import List, Dict, Any
 
-import pdfkit
 from jinja2 import Environment, FileSystemLoader
 
 from data_validate.config import NamesEnum
@@ -361,6 +360,9 @@ class FileReportGenerator:
             logger (logging.Logger): Logger instance for status messages.
         """
         try:
+            # Lazy import: heavy/optional dependency, only needed for PDF output (PERF-008).
+            import pdfkit
+
             pdf_file_path = html_file_path.replace(".html", ".pdf")
 
             pdfkit.from_file(html_file_path, pdf_file_path, options=pdf_options)

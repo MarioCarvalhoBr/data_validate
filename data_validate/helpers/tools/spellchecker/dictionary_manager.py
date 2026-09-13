@@ -5,9 +5,10 @@ import contextlib
 import os
 import tempfile
 from pathlib import Path
-from typing import Iterator, List
+from typing import TYPE_CHECKING, Iterator, List
 
-from enchant import Broker, Dict
+if TYPE_CHECKING:
+    from enchant import Broker, Dict
 
 
 class DictionaryManager:
@@ -98,6 +99,9 @@ class DictionaryManager:
             List of validation error messages, empty if valid
         """
         try:
+            # Lazy import: heavy/optional dependency, only needed when spell-check runs (PERF-008).
+            from enchant import Broker
+
             with self._enchant_config_dir_scope():
                 self.broker = Broker()
                 if not self.broker.dict_exists(self.lang_dict_spell):
@@ -121,6 +125,9 @@ class DictionaryManager:
             Enchant dictionary instance or None if initialization failed
         """
         try:
+            # Lazy import: heavy/optional dependency, only needed when spell-check runs (PERF-008).
+            from enchant import Broker
+
             with self._enchant_config_dir_scope():
                 if not self.broker:
                     self.broker = Broker()
