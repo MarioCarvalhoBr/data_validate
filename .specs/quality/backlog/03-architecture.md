@@ -196,7 +196,8 @@ zero global state. Each item below names the current smell, where it lives, and 
   drifting sources of truth any more.
 
 ### ARC-004 · Errors are pre-formatted Portuguese strings
-- Priority: P1 · Effort: L · Status: in-progress
+- Priority: P1 · Effort: L · Status: done
+- Closed 2026-09-13: Issue/Severity/ValidationResult adopted by all 9 rule registries with catalog message keys; ValidationReport/ReportModel are the render-side adapters by design (ADR-0004/0007).
 - Where: everywhere (`f"{self._filename}, linha {idx + 2}: ..."`) — validators, models, helpers;
   `ValidationReport` stores `List[str]`.
 - Problem: no severity/rule/location metadata; cannot sort, deduplicate, translate, export JSON,
@@ -490,7 +491,8 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: done
+- Closed 2026-09-13: Demeter chains gone with the validator deletion; RuleContext carries explicit deps; processor uses a name-keyed model dict; GeneralContext remains the app-level container by design (ADR-0005).
 - Where: `controllers/context/general_context.py` (args + config + i18n + fs + logger), usages like
   `self._data_models_context.context.data_args.data_action.no_spellchecker`
   (`spellchecker_validator.py:195`, `description_validator.py:457`), `DataModelContext.get_instance_of`
@@ -747,7 +749,8 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: TOOL-003
 
 ### ARC-015 · Spellchecker tightly coupled to pyenchant
-- Priority: P2 · Effort: M · Status: in-progress
+- Priority: P2 · Effort: M · Status: done
+- Closed 2026-09-13: public runtime-checkable SpellBackend protocol in rules/spell.py, SpellChecker conforms, word-level cache shipped (PERF-006); pure-Python fallback descoped — skip-when-unavailable plus SPELL-001 surfacing covers absence (TOOL-008 note).
 - Where: `helpers/tools/spellchecker/**` (was also `validators/spell/spellchecker_validator.py`,
   deleted by ARC-017 Phase 3 Port 8 — the rule module is `rules/spell.py` now).
 - Problem: C extension + system hunspell; env-var configuration; tests need the library installed;
