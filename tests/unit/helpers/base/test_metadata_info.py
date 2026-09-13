@@ -4,7 +4,6 @@
 
 import importlib.metadata
 
-import pytest
 
 from data_validate.config.metadata_info import MetadataInfo, METADATA
 
@@ -38,6 +37,9 @@ class TestMetadataInfo:
         assert metadata.__author__ == "Test Author"
         assert metadata.__author_email__ == "test@example.com"
         assert metadata.__url__ == "https://github.com/test/repo.git"
+        # TOOL-005: the version is now read verbatim, not composed from
+        # major/minor/micro + a hand-maintained serial.
+        assert metadata.__version__ == "1.0.0"
 
     def test_init_with_package_not_found(self, mocker, capsys) -> None:
         """Test initialization when package is not found."""
@@ -62,44 +64,31 @@ class TestMetadataInfo:
         captured = capsys.readouterr()
         assert captured.out == ""
 
-    def test_make_version_final(self) -> None:
-        """Test _make_version method with final release level."""
-        version = MetadataInfo._make_version(1, 2, 3, release_level="final", serial=0, dev=0)
-        assert version == "1.2.3"
-
-    def test_make_version_beta(self) -> None:
-        """Test _make_version method with beta release level."""
-        version = MetadataInfo._make_version(1, 2, 3, release_level="beta", serial=5, dev=0)
-        assert version == "1.2.3b5"
-
-    def test_make_version_alpha(self) -> None:
-        """Test _make_version method with alpha release level."""
-        version = MetadataInfo._make_version(1, 2, 3, release_level="alpha", serial=2, dev=0)
-        assert version == "1.2.3a2"
-
-    def test_make_version_candidate(self) -> None:
-        """Test _make_version method with candidate release level."""
-        version = MetadataInfo._make_version(1, 2, 3, release_level="candidate", serial=1, dev=0)
-        assert version == "1.2.3rc1"
-
-    def test_make_version_with_dev(self) -> None:
-        """Test _make_version method with dev status."""
-        version = MetadataInfo._make_version(1, 2, 3, release_level="beta", serial=5, dev=10)
-        assert version == "1.2.3b5.dev10"
-
-    def test_make_version_invalid_release_level(self) -> None:
-        """Test _make_version method with invalid release level.
-
-        BUG-017: `assert` is stripped under `python -O`, so it must raise a real
-        exception instead. This pins the fix by asserting the exception type is
-        `ValueError`, not `AssertionError` (regression test for BUG-017).
-        """
-        with pytest.raises(ValueError, match="invalid release_level"):
-            MetadataInfo._make_version(1, 2, 3, release_level="invalid", serial=0, dev=0)
+        # TOOL-005: no hand-maintained serial composition; a clearly-marked
+        # fallback constant is used instead of a fake "0.0.0" release.
+        assert metadata.__version__ == "0.0.0+unknown"
 
     def test_make_url_removed(self) -> None:
         """Test that the dead `_make_url` static method was removed (BUG-017)."""
         assert not hasattr(MetadataInfo, "_make_url")
+
+    def test_make_version_removed(self) -> None:
+        """TOOL-005: the hand-maintained version-composition helper is gone.
+
+        The version is read verbatim from `importlib.metadata.version(...)`
+        (or the `_FALLBACK_VERSION` constant) — there is no more
+        major/minor/micro + release_level/serial/dev composition.
+        """
+        assert not hasattr(MetadataInfo, "_make_version")
+
+    def test_protocol_version_constant(self) -> None:
+        """DOC-006: the protocol version the validator implements is a stable constant."""
+        assert MetadataInfo.PROTOCOL_VERSION == "1.16"
+
+    def test_protocol_version_attribute_matches_constant(self) -> None:
+        """DOC-006: the instance attribute mirrors the class constant."""
+        metadata = MetadataInfo()
+        assert metadata.__protocol_version__ == MetadataInfo.PROTOCOL_VERSION
 
     def test_metadata_global_instance(self) -> None:
         """Test that METADATA global instance is created."""
@@ -177,6 +166,7 @@ class TestMetadataInfo:
             "__url__",
             "__maintainer_email__",
             "__status__",
+            "__protocol_version__",
             "__welcome__",
         ]
 
@@ -184,13 +174,7 @@ class TestMetadataInfo:
             assert hasattr(metadata, attr)
             assert getattr(metadata, attr) is not None
 
-    def test_status_development_mode(self) -> None:
-        """Test status setting in development mode."""
-        # Test the status logic directly
-        status_dev = 1  # Development mode
-        status_prod = "Production/Stable"
-        status_dev_str = "Development"
-
-        # Test the conditional logic
-        status = status_prod if status_dev == 0 else status_dev_str
-        assert status == "Development"
+    def test_status_is_always_production_stable(self) -> None:
+        """TOOL-005: without a hand-maintained dev/beta serial, status is always 'Production/Stable'."""
+        metadata = MetadataInfo()
+        assert metadata.__status__ == "Production/Stable"

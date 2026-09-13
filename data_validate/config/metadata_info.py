@@ -14,11 +14,14 @@ class MetadataInfo(ConstantBase):
     Class holding immutable metadata and version information for the project.
 
     Retrieves metadata from the installed package (if available) or falls back
-    to default values. It constructs the full version string based on major,
-    minor, micro components, release level, and serial number.
+    to default values. TOOL-005: the version is read verbatim from
+    `importlib.metadata.version(dist_name)` — there is no hand-maintained
+    `serial`/`release_level` composition anymore, so a release only ever needs
+    a `pyproject.toml` version bump.
 
     Attributes:
-        __version__ (str): Full version string (e.g., '1.0.0b1.dev5').
+        __version__ (str): Installed distribution version (e.g., '0.7.65'), or
+            `"0.0.0+unknown"` when the package is not installed.
         __name__ (str): Distribution package name.
         __project_name__ (str): Human-readable project name.
         __description__ (str): Project summary/description.
@@ -27,9 +30,23 @@ class MetadataInfo(ConstantBase):
         __author__ (str): Author's name.
         __author_email__ (str): Author's email address.
         __url__ (str): Project repository URL.
-        __status__ (str): Development status ('Development' or 'Production/Stable').
+        __status__ (str): Development status (always 'Production/Stable' now
+            that there is no hand-maintained dev/beta serial).
+        __protocol_version__ (str): Version of the AdaptaBrasil protocol the
+            validator implements (DOC-006), e.g. '1.16'.
         __welcome__ (str): Standard welcome message string.
     """
+
+    PROTOCOL_VERSION: Final = "1.16"
+    """Version of the AdaptaBrasil protocol this validator implements (DOC-006).
+
+    See `.specs/business-rules/protocol-changelog.md` for the version history
+    and the protocol ↔ code gap list. Bumping this constant is a protocol
+    version change and follows the process documented there (ADR + spec
+    update + reviewed golden re-baseline).
+    """
+
+    _FALLBACK_VERSION: Final = "0.0.0+unknown"
 
     def __init__(self):
         """
@@ -43,11 +60,8 @@ class MetadataInfo(ConstantBase):
 
         project_name: Final = "Canoa"
         dist_name: Final = "canoa_data_validate"
-        release_level: Final = "beta"
-        serial: Final = 732
-        status_dev: Final = 0
 
-        self.__version__ = "0.0.0"
+        self.__version__ = self._FALLBACK_VERSION
         self.__name__ = dist_name
         self.__project_name__ = project_name
         self.__description__ = "DEFAULT DESCRIPTION: This is the default description."
@@ -58,6 +72,7 @@ class MetadataInfo(ConstantBase):
         self.__url__ = "DEFAULT URL: https://github.com/AdaptaBrasil/data_validate.git"
         self.__status_dev__ = "Development"
         self.__status_prod__ = "Production/Stable"
+        self.__protocol_version__ = self.PROTOCOL_VERSION
 
         try:
             meta = importlib.metadata.metadata(dist_name)
@@ -76,59 +91,12 @@ class MetadataInfo(ConstantBase):
         except importlib.metadata.PackageNotFoundError:
             logger.debug('Package "%s" not found. Using default metadata values.', dist_name)
 
-        # CONFIGURE VAR FOR VERSION: MAJOR, MINOR, MICRO
-        map_versions = list(map(int, self.__version__.split(".")))
-        major_version: Final = map_versions[0] if len(map_versions) > 0 else 0
-        minor_version: Final = map_versions[1] if len(map_versions) > 1 else 0
-        micro_version: Final = map_versions[2] if len(map_versions) > 2 else 0
-
-        # Finally, create the full version string
-        self.__version__ = MetadataInfo._make_version(
-            major_version, minor_version, micro_version, release_level=release_level, serial=serial, dev=status_dev
-        )
-
         # CONFIGURE URL, STATUS AND WELCOME MESSAGE
         self.__maintainer_email__ = self.__author_email__
-        self.__status__ = self.__status_prod__ if status_dev == 0 else self.__status_dev__
+        self.__status__ = self.__status_prod__
         self.__welcome__ = f"The {self.__project_name__} {self.__name__} version {self.__version__} initialized.\n"
 
         self._finalize_initialization()
-
-    @staticmethod
-    def _make_version(
-        major: int,
-        minor: int,
-        micro: int,
-        *,
-        release_level: str = "final",
-        serial: int = 0,
-        dev: int = 0,
-    ) -> str:
-        """
-        Create a readable version string from version info components.
-
-        Constructs a PEP 440 compatible version string based on the provided components.
-
-        Args:
-            major (int): Major version number.
-            minor (int): Minor version number.
-            micro (int): Micro (patch) version number.
-            release_level (str, optional): Release level ('alpha', 'beta', 'candidate', 'final'). Defaults to "final".
-            serial (int, optional): Serial number for pre-releases. Defaults to 0.
-            dev (int, optional): Development release number. Defaults to 0.
-
-        Returns:
-            str: The formatted version string.
-        """
-        if release_level not in ("alpha", "beta", "candidate", "final"):
-            raise ValueError(f"invalid release_level: {release_level!r}")
-        version = "%d.%d.%d" % (major, minor, micro)
-        if release_level != "final":
-            short = {"alpha": "a", "beta": "b", "candidate": "rc"}[release_level]
-            version += f"{short}{serial}"
-        if dev != 0:
-            version += f".dev{dev}"
-        return version
 
 
 METADATA = MetadataInfo()

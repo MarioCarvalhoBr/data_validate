@@ -52,6 +52,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with no writes. `--i`/`--o`/`--l`/`--d` (the two-dash abbreviations that only ever worked via
   `allow_abbrev=True` prefix matching) are now explicit, deprecated aliases: they still work, but
   print a one-line deprecation warning to stderr naming their replacement.
+- `MetadataInfo.PROTOCOL_VERSION`/`__protocol_version__` (DOC-006): a stable constant recording
+  which AdaptaBrasil protocol version the validator implements (`"1.16"`); surfaced in the HTML
+  report's version line alongside the validator version and OS. See
+  `.specs/business-rules/protocol-changelog.md`.
 
 ### Changed
 - **CLI exit code (SEC-008, breaking for scripts that assumed "always 0")**: `canoa-data-validate`
@@ -72,6 +76,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   hard-coded version numbers in favour of badges. `CODE_OF_CONDUCT.md` now uses the actual
   Contributor Covenant 2.1 text (it previously contained an internal commit-message style
   guide under a misleading filename).
+- **Versioning (TOOL-005, breaking for anyone parsing the old `X.Y.Zb<serial>` shape)**:
+  `MetadataInfo.__version__` is now read verbatim from `importlib.metadata.version(
+  "canoa_data_validate")` (falling back to `"0.0.0+unknown"` when the package is not installed),
+  instead of being composed from a hand-maintained `release_level`/`serial`/`dev` triplet
+  (`serial: Final = 732`, bumped by `scripts/prepare_metadata.sh` on every commit). A release now
+  only needs a `pyproject.toml` version bump — no more `X.Y.Zb<serial>` strings, no shell script to
+  run. `MetadataInfo._make_version` was removed; `__status__` is now always `"Production/Stable"`.
+  The e2e golden harness already normalised the JSON summary's `version` field to a placeholder
+  before this change (it is machine/commit-specific), so no golden re-baseline was needed.
 
 ### Removed
 - `.github/copilot-instructions.md` (legacy AI-assistant instructions; superseded by

@@ -200,7 +200,10 @@ class FileReportGenerator:
         text_html_version_and_os_info = (
             ""
             if self.context.data_args.data_action.no_version
-            else f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{METADATA.__version__} &ndash; {platform.system()}</strong></strong><br>"
+            else (
+                f"<strong>Vers&atilde;o do validador: <strong class='text-gray'>{METADATA.__version__} "
+                f"&ndash; {platform.system()} &ndash; Protocolo {METADATA.__protocol_version__}</strong></strong><br>"
+            )
         )
         text_html_skipped_tests = f"<ul>{'\n'.join([f'<li>{test_name}</li>' for test_name in skipped_tests])}</ul>"
 

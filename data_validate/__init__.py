@@ -42,6 +42,7 @@ def __getattr__(name: str):
         "__license__": "__license__",
         "__python_version__": "__python_version__",
         "__status__": "__status__",
+        "__protocol_version__": "__protocol_version__",
         "__welcome__": "__welcome__",
     }
 
