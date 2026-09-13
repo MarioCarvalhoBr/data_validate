@@ -16,7 +16,6 @@ to update a golden with a reviewed reason.
 
 from __future__ import annotations
 
-import importlib.util
 import json
 import re
 import shutil
@@ -27,6 +26,8 @@ from pathlib import Path
 from typing import Any
 
 import pytest
+
+from tests.conftest import enchant_pt_br_available
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _GOLDEN_DIR = _REPO_ROOT / "tests" / "e2e" / "golden"
@@ -57,29 +58,11 @@ def _spelling_section_title() -> str:
 _SPELL_SECTION_TITLE = _spelling_section_title()
 
 
-def _spell_backend_available() -> bool:
-    """Detect whether a working pt_BR hunspell dictionary is available via enchant.
-
-    Returns:
-        bool: True when `enchant` is importable and can load a `pt_BR`
-            dictionary; False otherwise (module missing or no word list
-            installed for the language).
-    """
-    if importlib.util.find_spec("enchant") is None:
-        return False
-    try:
-        # Deferred, optional import: pyenchant is a system-dependent runtime extra (see
-        # `.claude/skills/spreadsheet-protocol/SKILL.md`), not guaranteed to be installed, so it
-        # cannot be imported unconditionally at module level without breaking test collection on
-        # environments without it.
-        enchant = importlib.import_module("enchant")
-        enchant.Dict("pt_BR")
-    except Exception:
-        return False
-    return True
-
-
-_SPELL_AVAILABLE = _spell_backend_available()
+# Probe centralised in `tests/conftest.py` (TST-007): shared with
+# `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py` instead of duplicating the
+# `enchant.Dict("pt_BR")` availability check here. The golden-normalisation logic that consumes
+# it (dropping the `SPELL` section, recording `"spell_skipped"`) stays local to this module.
+_SPELL_AVAILABLE = enchant_pt_br_available()
 
 
 def _discover_fixtures() -> list[str]:
