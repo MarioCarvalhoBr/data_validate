@@ -63,7 +63,7 @@ it still runs the full suite minus the dependency-gated cases rather than failin
 
 ## Coverage
 
-- Baseline 54.99 % (measured with the current configuration, ratchet baseline in `tools/coverage_baseline.txt`); measured as 55.97 % with the legacy coverage exclusions (`pass`/`continue`/`break` excluded). Gate is `fail_under = 54` in `pyproject.toml` and `--cov-fail-under=54` in the Makefile.
+- Ratchet baseline in `tools/coverage_baseline.txt` (95.42 % as of 2026-09-13; the migration started from 54.99 % under the current configuration / 55.97 % under the legacy exclusions). Static floor: `fail_under = 65` in `pyproject.toml` and `--cov-fail-under=65` in the Makefile; `tools/coverage_ratchet.py` fails any drop below the baseline.
 - Targets: 70 % end of Phase 1, 85 % end of Phase 3, ≥ 90 % at 1.0.0.
 - New modules: ≥ 95 % lines and branches; every bug fix ships a regression test named after
   the backlog ID (`test_bug_006_missing_id_column_does_not_raise`).

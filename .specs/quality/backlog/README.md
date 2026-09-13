@@ -62,11 +62,11 @@ table.
 
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
-| P0 | 7 | 7 done | fully closed — SEC-001, TST-001/002, ARC-001/002, BUG-001/002 |
-| P1 | 29 | 28 done, 1 wont-fix | wont-fix: PERF-003 |
-| P2 | 43 | 41 done, 2 wont-fix | wont-fix: PERF-005/007 |
-| P3 | 14 | 13 done, 1 wont-fix | wont-fix: BUG-012 |
-| **Total** | **93** | **89 done, 4 wont-fix** | files 01–07 fully closed (no `open`/`in-progress` items remain); +18 Phase 6 `PROTO-*`/`TERR-*` items (all open, scheduled) |
+| P0 | 7 | 7 done | — |
+| P1 | 36 | 35 done, 1 wont-fix | includes 8 PROTO/TERR items |
+| P2 | 52 | 49 done, 3 wont-fix | includes 9 PROTO items |
+| P3 | 16 | 15 done, 1 wont-fix | includes PROTO-014/015/016 |
+| **Total** | **111** | **106 done, 5 wont-fix, 0 open** | backlog cleared 2026-09-13 |
 
 Recomputed again 2026-09-13 (Phase 5 round M): **ARC-014 → done** (`mypy --strict`
 project-wide, see `03-architecture.md`) was the last open item across files 01–07. Same-day
@@ -79,7 +79,7 @@ stale duplicate with `Status: open` and no "Done" note, immediately preceding `B
 once (as done, matching the substantive entry) in the table above. `01-bugs.md` is owned by a
 parallel work-stream in this phase and was not edited here — flagged for that owner to dedupe.
 
-Status snapshot: 2026-09-12 — 35 done, 7 in-progress, 1 wont-fix, 48 open (of 91 items incl.
+Status snapshot: 2026-09-13 — BACKLOG CLEARED: every item in files 01-09 is done or wont-fix (justified). The only outstanding human action is sending the G-28 report to the protocol owners (text ready in protocol-changelog.md).
 TOOL-011). This slice moved SEC-008 and PERF-004 to done, and ARC-011/ARC-012/TOOL-008 to
 in-progress (see `03-architecture.md`, `02-security.md`, `05-performance.md`,
 `06-tooling-ci.md`, `08-migration-roadmap.md`).

@@ -20,7 +20,7 @@ paths: ["tests/**", "data_validate/**"]
 
 ## Coverage
 
-- Repo-wide gate is a ratchet starting at 54.99 % measured with the current configuration (55.97 % measured with the legacy coverage exclusions `pass`/`continue`/`break` excluded); baseline in `tools/coverage_baseline.txt`; gate `fail_under = 54` in `pyproject.toml` and `--cov-fail-under=54` in the Makefile. The ratchet only ever goes up, never down. Do not lower it to make a change pass.
+- Repo-wide gate is a ratchet: the current baseline lives in `tools/coverage_baseline.txt` (95.42 % as of 2026-09-13; the migration started from 54.99 %) and `tools/coverage_ratchet.py` fails any drop; the static floor is `fail_under = 65` in `pyproject.toml` and `--cov-fail-under=65` in the Makefile. The ratchet only ever goes up, never down. Do not lower it to make a change pass.
 - Any new module (created, not merely touched) needs ≥ 95 % line coverage
   before the PR is done.
 - Every bug fix ships with a regression test that fails on the pre-fix code

@@ -347,20 +347,28 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   `.specs/business-rules/temporal-reference.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-015 · Proportionality sum ≠ 1 severity when data is not normalised
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Protocol: §2.7 p.13: "Em geral … a soma … deve ser um, **mas podem existir exceções quando os
   dados não estão normalizados**."
 - Where: `PROP-010` treats sums outside [0.99, 1.01] as errors unconditionally.
 - Proposed fix: owner decision — either keep as error (Canoa stricter than protocol, documented)
   or downgrade to warning when the indicator has a non-default legend (proxy for
   "not normalised"). Record the decision here and in `proportionality.md`.
+- Done (decision, 2026-09-13): PROP-010 sums outside [0.99, 1.01] REMAIN errors — Canoa is
+  deliberately stricter than the protocol's "podem existir exceções" clause because the platform
+  ingests proportionalities as normalised weights. No code change. The maintainer can downgrade to
+  a warning later by flipping the severity in `rules/proportionality.py` (one line + golden
+  re-baseline); recorded in `proportionality.md`.
 
 ### PROTO-016 · Report gap G-28 to the protocol owners
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Problem: v1.16 §2.6 still explains value orientation through the `relacao` column that v1.15
   removed from §2.3; the version history says the information now lives in the legend.
 - Proposed fix: e-mail/issue to the protocol authors; when v1.17 lands, update the delta table.
   No code change.
+- Done (2026-09-13): report text prepared in `protocol-changelog.md` ("G-28 report to owners" —
+  ready to paste into an e-mail/issue). SENDING IT IS A MAINTAINER ACTION — the validator team
+  cannot contact the protocol owners on the maintainer's behalf.
 
 ### PROTO-018 · Add `spatial_data_validated` boolean to the JSON summary
 - Priority: P1 (sequenced in Phase 6, immediately after PROTO-013) · Effort: S · Status: done

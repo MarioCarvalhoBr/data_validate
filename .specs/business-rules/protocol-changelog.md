@@ -134,3 +134,15 @@ duplicate registry id is a warning, the registry still loads — not part of the
 rules skipped" case).
 
 Last synced with code: Phase 6 round N3, 2026-09-13
+
+
+## G-28 report to owners (ready to send — PROTO-016)
+
+> Assunto: Inconsistência interna no Protocolo v1.16 — coluna `relacao`
+>
+> Prezados, na versão 1.16 do protocolo, a seção §2.6 (p. 12) ainda explica a orientação dos
+> valores dos indicadores por meio da coluna `relacao` da planilha de descrição. Entretanto, a
+> própria v1.15 removeu essa coluna da §2.3 ("relacao em descrição é um parâmetro desnecessário"),
+> indicando que a informação passou a residir na legenda. Sugerimos alinhar a §2.6 à remoção
+> (descrevendo a orientação via legenda) na v1.17. O validador (canoa_data_validate) já trata
+> `relacao` como coluna descontinuada aceita silenciosamente.

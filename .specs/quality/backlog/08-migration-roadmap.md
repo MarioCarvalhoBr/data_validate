@@ -191,3 +191,11 @@ Closes: PROTO-001…PROTO-017 (see `09-protocol-v116.md`), including TERR-001/TE
 skipped when the file is absent). Per the maintainer's instruction (2026-09-12), this phase runs
 only AFTER every item in files 01–07 is done or wont-fix. PROTO-001/002 (fontes/relacao column
 removal) are breaking for v1.16 bundles and lead the phase.
+
+## Final status (2026-09-13)
+All phases 0-6 complete. Every backlog item in files 01-09 is done or wont-fix with recorded
+rationale. Metrics at close: 1804 unit tests + 10 golden fixtures, 95.42 % coverage (from
+54.99 %), mypy strict project-wide, zero iterrows, all 12 verifications running on the rules
+engine with catalog messages in both locales, Protocol v1.16 implemented including the optional
+spd_data.json territory registry (TERR, error severity, skip-when-absent) and the
+spatial_data_validated summary flag. Outstanding human action: send the G-28 report (PROTO-016).
