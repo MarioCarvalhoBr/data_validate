@@ -353,8 +353,10 @@ class TestDataLoaderFacade:
         assert "file1" in result.models
         assert result.models["file1"].is_read_successful is False
 
-    def test_load_with_general_exception(self, mocker) -> None:
-        """Test load with general Exception."""
+    def test_load_with_general_exception_propagates(self, mocker) -> None:
+        """SEC-004: `load()` no longer has a final `except Exception` fallback -- a reader failure
+        that isn't one of the specific expected types propagates out of `load()` instead of being
+        downgraded to a per-file error message (it reaches `main()`'s boundary, exit code 2)."""
         mock_scanner = mocker.MagicMock()
         mock_reader = mocker.MagicMock()
 
@@ -362,18 +364,14 @@ class TestDataLoaderFacade:
         fake_specs = {"file1": _fake_spec("file1", HeaderLayout.SINGLE)}
         mocker.patch(f"{FACADE_MODULE}.SHEET_SPECS", fake_specs)
 
-        mock_reader.read.side_effect = Exception("Unexpected error")
+        mock_reader.read.side_effect = RuntimeError("Unexpected error")
         mocker.patch(f"{FACADE_MODULE}.ReaderFactory.get_reader", return_value=mock_reader)
 
         facade = DataLoaderFacade("/test/input", translate=lambda key, **params: key)
         facade.scanner = mock_scanner
 
-        result = facade.load()
-
-        assert len(result.errors) == 1
-        assert "Erro inesperado ao processar o arquivo" in result.errors[0]
-        assert "file1" in result.models
-        assert result.models["file1"].is_read_successful is False
+        with pytest.raises(RuntimeError, match="Unexpected error"):
+            facade.load()
 
     def test_load_missing_files_handling(self, mocker) -> None:
         """Test load handles missing files correctly."""

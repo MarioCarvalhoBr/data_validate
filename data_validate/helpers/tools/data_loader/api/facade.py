@@ -25,6 +25,18 @@ through the constructor (`limits`) — the canonical values live on
 User-facing violation messages go through an injected `translate` callable (falling back to a
 `pt_BR` `MessageCatalog` when none is given) rather than a hardcoded string, per
 `.claude/rules/i18n.md`.
+
+SEC-004: `load()`'s per-file read loop catches only the specific, expected reader failures
+(`FileNotFoundError`, `UnicodeDecodeError`, `pd.errors.ParserError`, `ValueError`, `IOError`, and
+`python_calamine.CalamineError` -- the base of `python-calamine`'s own `ZipError`/`XmlError`/
+`PasswordError`, raised by pandas' `engine="calamine"` for a malformed/corrupt `.xlsx` file, an
+expected failure mode of untrusted input, not a programming error) and converts each into a
+per-file message, leaving the rest of the batch to load. The former final `except Exception`
+fallback (a duplicate: `Exception` already covered every one of those types, so it only ever
+caught something none of the specific handlers anticipated) is gone -- a genuinely unexpected
+reader failure now propagates out of `load()` instead of being downgraded to a per-file error
+string, reaching `main()`'s boundary, which reports it as a fatal error and exits with code 2, per
+`.claude/rules/security.md`.
 """
 
 from __future__ import annotations
@@ -35,6 +47,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 import pandas as pd
+import python_calamine
 
 from data_validate.i18n.catalog import MessageCatalog, default_catalog_dir
 from data_validate.specs.sheet_specs import HeaderLayout, SHEET_SPECS
@@ -231,7 +244,9 @@ class DataLoaderFacade:
                 errors.append(
                     f"{path.name}: Erro de entrada/saída ao ler o arquivo. Verifique se ele não está aberto em outro programa. Detalhes: {e} ({type(e)})"
                 )
-            except Exception as e:
+            except python_calamine.CalamineError as e:
+                # A malformed/corrupt .xlsx (bad zip, bad XML, password-protected, ...) is an
+                # expected failure mode of untrusted input, not a programming error (SEC-004).
                 errors.append(f"{path.name}: Erro inesperado ao processar o arquivo. Detalhes: {e} ({type(e)})")
 
             data_model = DataLoaderModel(

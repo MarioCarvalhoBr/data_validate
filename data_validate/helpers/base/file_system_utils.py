@@ -5,6 +5,14 @@ Module providing file system utility operations with localization support.
 This module defines the `FileSystemUtils` class, which offers methods for
 common file system tasks such as encoding detection, file/directory checks,
 and path manipulation, all returning localized messages managed by `LanguageManager`.
+
+SEC-004: every method catches `OSError` only -- the family that `os.path.*`,
+`open()`, `os.remove()`, `os.makedirs()` and `os.listdir()` can plausibly
+raise (permission denied, missing/broken path, I/O failure). A genuinely
+unexpected exception is no longer converted into a localized "unexpected
+error" string; it propagates to `main()`'s boundary, which reports it as a
+fatal error and exits with code 2 -- the designed behaviour for a
+programming error, per `.claude/rules/security.md`.
 """
 
 import os
@@ -75,8 +83,6 @@ class FileSystemUtils:
                 return True, encoding
         except OSError as e:
             return False, self.language_manager.text("fs_utils_error_encoding_os", error=str(e))
-        except Exception as e:
-            return False, self.language_manager.text("fs_utils_error_unexpected", error=str(e))
 
     def get_last_directory_name(self, path: str) -> str:
         """
@@ -120,8 +126,6 @@ class FileSystemUtils:
             )
         except OSError as e:
             return False, self.language_manager.text("fs_utils_error_remove_file_os", error=str(e))
-        except Exception as e:
-            return False, self.language_manager.text("fs_utils_error_unexpected", error=str(e))
 
     def create_directory(self, dir_name: str) -> Tuple[bool, str]:
         """
@@ -147,8 +151,6 @@ class FileSystemUtils:
             return True, self.language_manager.text("fs_utils_success_dir_created", dir_name=dir_name)
         except OSError as e:
             return False, self.language_manager.text("fs_utils_error_create_dir_os", error=str(e))
-        except Exception as e:
-            return False, self.language_manager.text("fs_utils_error_unexpected", error=str(e))
 
     def check_file_exists(self, file_path: str) -> Tuple[bool, List[str]]:
         """
@@ -175,7 +177,7 @@ class FileSystemUtils:
             if not os.path.isfile(file_path):
                 return False, [self.language_manager.text("fs_utils_error_path_not_file", path=file_path)]
             return True, []
-        except Exception as e:
+        except OSError as e:
             return False, [self.language_manager.text("fs_utils_error_file_check_fail", error=str(e))]
 
     def check_directory_exists(self, dir_path: str) -> Tuple[bool, str]:
@@ -198,7 +200,7 @@ class FileSystemUtils:
             if not os.path.isdir(dir_path):
                 return False, self.language_manager.text("fs_utils_error_path_not_dir", path=dir_path)
             return True, ""
-        except Exception as e:
+        except OSError as e:
             return False, self.language_manager.text("fs_utils_error_dir_check_fail", error=str(e))
 
     def check_directory_is_empty(self, dir_path: str) -> Tuple[bool, str]:
@@ -221,5 +223,5 @@ class FileSystemUtils:
             if not os.listdir(dir_path):
                 return True, self.language_manager.text("fs_utils_error_dir_empty", dir_path=dir_path)
             return False, self.language_manager.text("fs_utils_info_dir_not_empty", dir_path=dir_path)
-        except Exception as e:
+        except OSError as e:
             return False, self.language_manager.text("fs_utils_error_dir_check_fail", error=str(e))

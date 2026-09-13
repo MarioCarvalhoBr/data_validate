@@ -15,7 +15,7 @@ import re
 import sys
 from typing import List, Dict, Any
 
-from jinja2 import Environment, FileSystemLoader
+from jinja2 import Environment, FileSystemLoader, TemplateError
 
 from data_validate.config import NamesEnum
 from data_validate.controllers.context.general_context import GeneralContext
@@ -115,6 +115,11 @@ class FileReportGenerator:
         5. Saves the HTML file and converts it to PDF.
         6. Prints a JSON summary to stdout.
 
+        SEC-004: only `OSError` (writing HTML/PDF to disk) and `jinja2.TemplateError` (rendering
+        the report template) are caught here and reported to stderr/the logger; any other
+        exception is an unexpected programming error and propagates to `main()`'s boundary, which
+        exits with code 2.
+
         Args:
             report_list (ValidationReport): List of validation test reports.
         """
@@ -151,7 +156,7 @@ class FileReportGenerator:
             )
             self._print_json_summary()
 
-        except Exception as error:
+        except (OSError, TemplateError) as error:
             error_message = f"\nError creating HTML report: {error}"
             self.context.logger.info(error_message)
             print(error_message, file=sys.stderr)
@@ -327,6 +332,10 @@ class FileReportGenerator:
 
         Writes the rendered HTML content to the specified file path.
 
+        SEC-004: only `OSError` (the family raised by `open()`/`write()` for a missing directory,
+        a full disk, a permission failure, ...) is caught and reported; any other exception
+        propagates.
+
         Args:
             html_content (str): HTML content to save.
             output_path (str): Path where to save the HTML file.
@@ -340,7 +349,7 @@ class FileReportGenerator:
 
             logger.info(info_message)
             print(info_message, file=sys.stdout)
-        except Exception as error:
+        except OSError as error:
             error_message = f"Error saving HTML report: {error}"
 
             logger.error(error_message)
@@ -353,6 +362,11 @@ class FileReportGenerator:
 
         Uses the `pdfkit` library to convert the saved HTML file into a PDF report.
         The PDF filename is derived from the HTML filename.
+
+        SEC-004: catches `ImportError` (`pdfkit`/its native `wkhtmltopdf` binary not installed --
+        the lazy import above) and `OSError` (`pdfkit` raises a plain `IOError`, an `OSError` alias
+        in Python 3, for every conversion failure it can report -- missing source file,
+        `wkhtmltopdf` exiting non-zero, ...). Any other exception propagates.
 
         Args:
             pdf_options (Dict[str, Any]): Options for PDF generation.
@@ -371,7 +385,7 @@ class FileReportGenerator:
             logger.info(info_message)
             print(info_message, file=sys.stdout)
 
-        except Exception as error:
+        except (ImportError, OSError) as error:
             error_message = f"Error creating PDF report: {error}"
 
             logger.error(error_message)

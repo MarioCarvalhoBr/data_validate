@@ -9,9 +9,13 @@ when a value contains a quote or a non-ASCII character.
 
 from __future__ import annotations
 
+import builtins
 import json
 import subprocess
 import sys
+
+import jinja2
+import pytest
 
 from data_validate.controllers.report import file_report_generator as file_report_generator_module
 from data_validate.controllers.report.file_report_generator import FileReportGenerator
@@ -121,6 +125,124 @@ class TestBuildTemplateVariablesVersionLine:
         template_vars = generator._build_template_variables([], [])
 
         assert template_vars["text_display_version_and_os_info"] == ""
+
+
+class TestBuildReportExceptionHandling:
+    """SEC-004: `build_report`'s except clause narrows to `(OSError, jinja2.TemplateError)`."""
+
+    @staticmethod
+    def _build_generator_for_build_report(mocker) -> FileReportGenerator:
+        generator = _build_generator(mocker, error_count=0, warning_count=0, total_tests=0)
+        generator.input_folder = "/input"
+        generator.output_folder = "/output"
+        generator.locale = "pt_BR"
+        generator.context.file_system_utils.get_last_directory_name.return_value = "bundle"
+        generator.context.config.REPORT_OUTPUT_REPORT_HTML = "_report.html"
+        generator.context.data_args.data_action.no_spellchecker = False
+        generator.context.data_args.data_action.no_warning_titles_length = False
+        return generator
+
+    @staticmethod
+    def _fake_report_list(mocker):
+        report_list = mocker.MagicMock()
+        report_list.get_total_errors.return_value = 0
+        report_list.get_total_warnings.return_value = 0
+        report_list.flatten.return_value = mocker.MagicMock()
+        report_list.reports = {}
+        return report_list
+
+    def test_build_report_catches_template_error(self, mocker, capsys) -> None:
+        """A template-rendering failure is reported, not raised."""
+        generator = self._build_generator_for_build_report(mocker)
+        report_list = self._fake_report_list(mocker)
+        mocker.patch.object(generator, "_generate_html_content", side_effect=jinja2.TemplateError("bad template"))
+
+        generator.build_report(report_list)
+
+        captured = capsys.readouterr()
+        assert "Error creating HTML report" in captured.err
+        generator.context.logger.info.assert_called_once()
+
+    def test_build_report_catches_os_error(self, mocker, capsys) -> None:
+        """A filesystem failure surfacing from the report pipeline is reported, not raised."""
+        generator = self._build_generator_for_build_report(mocker)
+        report_list = self._fake_report_list(mocker)
+        mocker.patch.object(generator, "_generate_html_content", side_effect=OSError("disk full"))
+
+        generator.build_report(report_list)
+
+        captured = capsys.readouterr()
+        assert "Error creating HTML report" in captured.err
+
+    def test_build_report_propagates_unexpected_error(self, mocker) -> None:
+        """A programming error that is neither `OSError` nor `jinja2.TemplateError` propagates."""
+        generator = self._build_generator_for_build_report(mocker)
+        report_list = self._fake_report_list(mocker)
+        mocker.patch.object(generator, "_generate_html_content", side_effect=ValueError("boom"))
+
+        with pytest.raises(ValueError, match="boom"):
+            generator.build_report(report_list)
+
+
+class TestSaveHtmlFileExceptionHandling:
+    """SEC-004: `_save_html_file` catches only `OSError`."""
+
+    def test_save_html_file_catches_os_error(self, mocker, capsys) -> None:
+        mocker.patch("builtins.open", side_effect=OSError("disk full"))
+        logger = mocker.MagicMock()
+
+        FileReportGenerator._save_html_file("<html></html>", "/out/report.html", logger)
+
+        captured = capsys.readouterr()
+        assert "Error saving HTML report" in captured.err
+        logger.error.assert_called_once()
+
+    def test_save_html_file_propagates_unexpected_error(self, mocker) -> None:
+        mocker.patch("builtins.open", side_effect=ValueError("boom"))
+        logger = mocker.MagicMock()
+
+        with pytest.raises(ValueError, match="boom"):
+            FileReportGenerator._save_html_file("<html></html>", "/out/report.html", logger)
+
+
+class TestSavePdfFileExceptionHandling:
+    """SEC-004: `_save_pdf_file` catches only `(ImportError, OSError)`."""
+
+    def test_save_pdf_file_catches_import_error_when_pdfkit_missing(self, mocker, capsys) -> None:
+        real_import = builtins.__import__
+
+        def fake_import(name, *args, **kwargs):
+            if name == "pdfkit":
+                raise ImportError("No module named 'pdfkit'")
+            return real_import(name, *args, **kwargs)
+
+        mocker.patch("builtins.__import__", side_effect=fake_import)
+        logger = mocker.MagicMock()
+
+        FileReportGenerator._save_pdf_file({}, "/out/report.html", logger)
+
+        captured = capsys.readouterr()
+        assert "Error creating PDF report" in captured.err
+
+    def test_save_pdf_file_catches_os_error_from_pdfkit(self, mocker, capsys) -> None:
+        fake_pdfkit = mocker.MagicMock()
+        fake_pdfkit.from_file.side_effect = OSError("wkhtmltopdf exited with non-zero code")
+        mocker.patch.dict(sys.modules, {"pdfkit": fake_pdfkit})
+        logger = mocker.MagicMock()
+
+        FileReportGenerator._save_pdf_file({}, "/out/report.html", logger)
+
+        captured = capsys.readouterr()
+        assert "Error creating PDF report" in captured.err
+
+    def test_save_pdf_file_propagates_unexpected_error(self, mocker) -> None:
+        fake_pdfkit = mocker.MagicMock()
+        fake_pdfkit.from_file.side_effect = TypeError("boom")
+        mocker.patch.dict(sys.modules, {"pdfkit": fake_pdfkit})
+        logger = mocker.MagicMock()
+
+        with pytest.raises(TypeError, match="boom"):
+            FileReportGenerator._save_pdf_file({}, "/out/report.html", logger)
 
 
 class TestLazyPdfkitImport:

@@ -4,6 +4,13 @@
 This module provides functions for validating pandas DataFrames against
 common data quality issues such as vertical bars, unnamed columns,
 punctuation rules, special characters, and text length constraints.
+
+SEC-004: `check_dataframe_vertical_bar` and `check_dataframe_unnamed_columns`
+no longer wrap their pure pandas logic in a broad `except Exception` --
+there is no plausible failure mode in this pure vectorised code path that
+should be reported to the user as a data-quality error, so any failure
+(a genuine programming error) propagates to `main()`'s boundary and exits
+with code 2, per `.claude/rules/security.md`.
 """
 
 from typing import List, Tuple
@@ -37,40 +44,36 @@ class DataFrameProcessing:
         dataframe = dataframe.copy()
         errors: List[str] = []
 
-        try:
-            # Check column names for vertical bars
-            if isinstance(dataframe.columns, pd.MultiIndex):
-                for col_tuple in dataframe.columns:
-                    if "|" in str(col_tuple[0]):
-                        errors.append(
-                            f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'."
-                        )
+        # Check column names for vertical bars
+        if isinstance(dataframe.columns, pd.MultiIndex):
+            for col_tuple in dataframe.columns:
+                if "|" in str(col_tuple[0]):
+                    errors.append(
+                        f"{file_name}: O nome da coluna de nível 0 '{col_tuple[0]}' não pode conter o caracter '|'."
+                    )
 
-                    if len(col_tuple) > 1 and "|" in str(col_tuple[1]):
-                        errors.append(
-                            f"{file_name}: O nome da subcoluna de nível 1 '{col_tuple[1]}' do pai '{col_tuple[0]}' de nível 0 não pode conter o caracter '|'."
-                        )
-            else:
-                for column_name in dataframe.columns:
-                    if "|" in str(column_name):
-                        errors.append(f"{file_name}: A coluna '{column_name}' não pode conter o caractere '|'.")
+                if len(col_tuple) > 1 and "|" in str(col_tuple[1]):
+                    errors.append(
+                        f"{file_name}: O nome da subcoluna de nível 1 '{col_tuple[1]}' do pai '{col_tuple[0]}' de nível 0 não pode conter o caracter '|'."
+                    )
+        else:
+            for column_name in dataframe.columns:
+                if "|" in str(column_name):
+                    errors.append(f"{file_name}: A coluna '{column_name}' não pode conter o caractere '|'.")
 
-            # Check data values for vertical bars using vectorized operations
-            string_data = dataframe.astype(str)
-            mask = string_data.apply(lambda col: col.str.contains(r"\|", na=False))
+        # Check data values for vertical bars using vectorized operations
+        string_data = dataframe.astype(str)
+        mask = string_data.apply(lambda col: col.str.contains(r"\|", na=False))
 
-            for column in mask.columns:
-                if mask[column].any():
-                    error_indices = mask.index[mask[column]].tolist()
-                    col_display_name = str(column) if not isinstance(column, tuple) else ".".join(map(str, column))
+        for column in mask.columns:
+            if mask[column].any():
+                error_indices = mask.index[mask[column]].tolist()
+                col_display_name = str(column) if not isinstance(column, tuple) else ".".join(map(str, column))
 
-                    for row_idx in error_indices:
-                        errors.append(
-                            f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'."
-                        )
-
-        except Exception as e:
-            errors.append(f"{file_name}: Erro ao processar a checagem de barra vertical: {str(e)}")
+                for row_idx in error_indices:
+                    errors.append(
+                        f"{file_name}, linha {row_idx + 2}: A coluna '{col_display_name}' não pode conter o caracter '|'."
+                    )
 
         return not bool(errors), errors
 
@@ -109,33 +112,29 @@ class DataFrameProcessing:
         dataframe = dataframe.copy()
         errors: List[str] = []
 
-        try:
-            columns = dataframe.columns
-            is_multi_level_2 = isinstance(columns, pd.MultiIndex) and columns.nlevels == 2
+        columns = dataframe.columns
+        is_multi_level_2 = isinstance(columns, pd.MultiIndex) and columns.nlevels == 2
 
-            unnamed_indices = []
-            for i, col_identifier in enumerate(columns):
-                col_str = str(col_identifier[1] if is_multi_level_2 else col_identifier).strip().lower()
+        unnamed_indices = []
+        for i, col_identifier in enumerate(columns):
+            col_str = str(col_identifier[1] if is_multi_level_2 else col_identifier).strip().lower()
 
-                if col_str.startswith("unnamed"):
-                    unnamed_indices.append(i)
+            if col_str.startswith("unnamed"):
+                unnamed_indices.append(i)
 
-            valid_columns_count = len(columns) - len(unnamed_indices)
+        valid_columns_count = len(columns) - len(unnamed_indices)
 
-            # Vectorized check for row data consistency
-            non_null_counts = dataframe.notna().sum(axis=1)
-            invalid_rows = non_null_counts > valid_columns_count
+        # Vectorized check for row data consistency
+        non_null_counts = dataframe.notna().sum(axis=1)
+        invalid_rows = non_null_counts > valid_columns_count
 
-            if invalid_rows.any():
-                invalid_indices = invalid_rows[invalid_rows].index
-                for idx in invalid_indices:
-                    text_column = "coluna válida" if valid_columns_count == 1 else "colunas válidas"
-                    errors.append(
-                        f"{file_name}, linha {idx + 2}: A linha possui {non_null_counts[idx]} valores, mas a tabela possui apenas {valid_columns_count} {text_column}."
-                    )
-
-        except Exception as e:
-            errors.append(f"{file_name}: Erro ao processar a checagem de colunas sem nome: {str(e)}")
+        if invalid_rows.any():
+            invalid_indices = invalid_rows[invalid_rows].index
+            for idx in invalid_indices:
+                text_column = "coluna válida" if valid_columns_count == 1 else "colunas válidas"
+                errors.append(
+                    f"{file_name}, linha {idx + 2}: A linha possui {non_null_counts[idx]} valores, mas a tabela possui apenas {valid_columns_count} {text_column}."
+                )
 
         return not bool(errors), errors
 

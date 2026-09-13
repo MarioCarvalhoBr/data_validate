@@ -133,20 +133,15 @@ class TestFileSystemUtils:
         assert result == "os_error_message"
         fs_utils.language_manager.text.assert_called_with("fs_utils_error_encoding_os", error="Permission denied")
 
-    def test_detect_encoding_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
-        """Test detect_encoding with unexpected exception."""
-        fs_utils.language_manager.text.return_value = "unexpected_error_message"
-
-        # Mock os.path.exists and os.path.isfile to return True, then raise ValueError on open
+    def test_detect_encoding_unexpected_error_propagates(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """SEC-004: `detect_encoding` only catches `OSError` -- a non-OSError failure propagates
+        instead of being swallowed into a generic "unexpected error" message."""
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
         mocker.patch("builtins.open", side_effect=ValueError("Unexpected error"))
 
-        success, result = fs_utils.detect_encoding("file.txt")
-
-        assert success is False
-        assert result == "unexpected_error_message"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        with pytest.raises(ValueError, match="Unexpected error"):
+            fs_utils.detect_encoding("file.txt")
 
     def test_detect_encoding_custom_num_bytes(self, fs_utils: FileSystemUtils, temp_file: str, mocker) -> None:
         """Test detect_encoding with custom num_bytes parameter."""
@@ -235,19 +230,14 @@ class TestFileSystemUtils:
         assert message == "remove_file_os_error"
         fs_utils.language_manager.text.assert_called_with("fs_utils_error_remove_file_os", error="Permission denied")
 
-    def test_remove_file_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
-        """Test remove_file with unexpected exception."""
-        fs_utils.language_manager.text.return_value = "unexpected_error"
-
+    def test_remove_file_unexpected_error_propagates(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """SEC-004: `remove_file` only catches `OSError` -- a non-OSError failure propagates."""
         mocker.patch("os.remove", side_effect=ValueError("Unexpected error"))
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
 
-        success, message = fs_utils.remove_file("/some/file.txt")
-
-        assert success is False
-        assert message == "unexpected_error"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        with pytest.raises(ValueError, match="Unexpected error"):
+            fs_utils.remove_file("/some/file.txt")
 
     def test_create_directory_success(self, fs_utils: FileSystemUtils) -> None:
         """Test successful directory creation."""
@@ -306,18 +296,13 @@ class TestFileSystemUtils:
         assert message == "create_dir_os_error"
         fs_utils.language_manager.text.assert_called_with("fs_utils_error_create_dir_os", error="Permission denied")
 
-    def test_create_directory_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
-        """Test create_directory with unexpected exception."""
-        fs_utils.language_manager.text.return_value = "unexpected_error"
-
+    def test_create_directory_unexpected_error_propagates(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """SEC-004: `create_directory` only catches `OSError` -- a non-OSError failure propagates."""
         mocker.patch("os.makedirs", side_effect=ValueError("Unexpected error"))
         mocker.patch("os.path.exists", return_value=False)
 
-        success, message = fs_utils.create_directory("/some/directory")
-
-        assert success is False
-        assert message == "unexpected_error"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_unexpected", error="Unexpected error")
+        with pytest.raises(ValueError, match="Unexpected error"):
+            fs_utils.create_directory("/some/directory")
 
     def test_check_file_exists_success(self, fs_utils: FileSystemUtils, temp_file: str) -> None:
         """Test check_file_exists with existing file."""
@@ -359,17 +344,24 @@ class TestFileSystemUtils:
         assert messages == ["path_not_file_error"]
         fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_file", path=temp_dir)
 
-    def test_check_file_exists_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
-        """Test check_file_exists with unexpected exception."""
+    def test_check_file_exists_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """Test check_file_exists with an `OSError` (e.g. permission denied on stat)."""
         fs_utils.language_manager.text.return_value = "file_check_fail_error"
 
-        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+        mocker.patch("os.path.exists", side_effect=OSError("Permission denied"))
 
         exists, messages = fs_utils.check_file_exists("/some/file.txt")
 
         assert exists is False
         assert messages == ["file_check_fail_error"]
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_check_fail", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_file_check_fail", error="Permission denied")
+
+    def test_check_file_exists_unexpected_error_propagates(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """SEC-004: `check_file_exists` only catches `OSError` -- a non-OSError failure propagates."""
+        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+
+        with pytest.raises(ValueError, match="Unexpected error"):
+            fs_utils.check_file_exists("/some/file.txt")
 
     def test_check_directory_exists_success(self, fs_utils: FileSystemUtils, temp_dir: str) -> None:
         """Test check_directory_exists with existing directory."""
@@ -409,17 +401,24 @@ class TestFileSystemUtils:
         assert message == "path_not_dir_error"
         fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
-    def test_check_directory_exists_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
-        """Test check_directory_exists with unexpected exception."""
+    def test_check_directory_exists_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """Test check_directory_exists with an `OSError` (e.g. permission denied on stat)."""
         fs_utils.language_manager.text.return_value = "dir_check_fail_error"
 
-        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+        mocker.patch("os.path.exists", side_effect=OSError("Permission denied"))
 
         exists, message = fs_utils.check_directory_exists("/some/directory")
 
         assert exists is False
         assert message == "dir_check_fail_error"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_check_fail", error="Permission denied")
+
+    def test_check_directory_exists_unexpected_error_propagates(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """SEC-004: `check_directory_exists` only catches `OSError` -- a non-OSError failure propagates."""
+        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+
+        with pytest.raises(ValueError, match="Unexpected error"):
+            fs_utils.check_directory_exists("/some/directory")
 
     def test_check_directory_is_empty_true(self, fs_utils: FileSystemUtils) -> None:
         """Test check_directory_is_empty with empty directory."""
@@ -468,17 +467,24 @@ class TestFileSystemUtils:
         assert message == "path_not_dir_error"
         fs_utils.language_manager.text.assert_called_with("fs_utils_error_path_not_dir", path=temp_file)
 
-    def test_check_directory_is_empty_unexpected_error(self, fs_utils: FileSystemUtils, mocker) -> None:
-        """Test check_directory_is_empty with unexpected exception."""
+    def test_check_directory_is_empty_os_error(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """Test check_directory_is_empty with an `OSError` (e.g. permission denied on stat)."""
         fs_utils.language_manager.text.return_value = "dir_check_fail_error"
 
-        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+        mocker.patch("os.path.exists", side_effect=OSError("Permission denied"))
 
         is_empty, message = fs_utils.check_directory_is_empty("/some/directory")
 
         assert is_empty is False
         assert message == "dir_check_fail_error"
-        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_check_fail", error="Unexpected error")
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_dir_check_fail", error="Permission denied")
+
+    def test_check_directory_is_empty_unexpected_error_propagates(self, fs_utils: FileSystemUtils, mocker) -> None:
+        """SEC-004: `check_directory_is_empty` only catches `OSError` -- a non-OSError failure propagates."""
+        mocker.patch("os.path.exists", side_effect=ValueError("Unexpected error"))
+
+        with pytest.raises(ValueError, match="Unexpected error"):
+            fs_utils.check_directory_is_empty("/some/directory")
 
 
 class TestFileSystemUtilsDataDrivenTests:
@@ -548,18 +554,16 @@ class TestFileSystemUtilsDataDrivenTests:
                 os.unlink(temp_file_path)
 
     @pytest.mark.parametrize(
-        "exception_type,exception_message,expected_lm_call",
+        "exception_type,exception_message",
         [
-            (OSError, "Permission denied", "fs_utils_error_encoding_os"),
-            (OSError, "Input/output error", "fs_utils_error_encoding_os"),
-            (ValueError, "Invalid value", "fs_utils_error_unexpected"),
-            (RuntimeError, "Runtime error", "fs_utils_error_unexpected"),
+            (OSError, "Permission denied"),
+            (OSError, "Input/output error"),
         ],
     )
-    def test_detect_encoding_exception_handling(
-        self, fs_utils: FileSystemUtils, exception_type: type, exception_message: str, expected_lm_call: str, mocker
+    def test_detect_encoding_os_error_handling(
+        self, fs_utils: FileSystemUtils, exception_type: type, exception_message: str, mocker
     ) -> None:
-        """Test detect_encoding exception handling with various exception types."""
+        """Test detect_encoding exception handling for the `OSError` family."""
         # Mock os.path.exists and os.path.isfile to return True, then raise exception on open
         mocker.patch("os.path.exists", return_value=True)
         mocker.patch("os.path.isfile", return_value=True)
@@ -569,7 +573,25 @@ class TestFileSystemUtilsDataDrivenTests:
 
         assert success is False
         assert result == "mocked_message"
-        fs_utils.language_manager.text.assert_called_with(expected_lm_call, error=exception_message)
+        fs_utils.language_manager.text.assert_called_with("fs_utils_error_encoding_os", error=exception_message)
+
+    @pytest.mark.parametrize(
+        "exception_type,exception_message",
+        [
+            (ValueError, "Invalid value"),
+            (RuntimeError, "Runtime error"),
+        ],
+    )
+    def test_detect_encoding_non_os_error_propagates(
+        self, fs_utils: FileSystemUtils, exception_type: type, exception_message: str, mocker
+    ) -> None:
+        """SEC-004: a non-`OSError` failure is not caught -- it propagates to the caller."""
+        mocker.patch("os.path.exists", return_value=True)
+        mocker.patch("os.path.isfile", return_value=True)
+        mocker.patch("builtins.open", side_effect=exception_type(exception_message))
+
+        with pytest.raises(exception_type, match=exception_message):
+            fs_utils.detect_encoding("file.txt")
 
     @pytest.mark.parametrize(
         "num_bytes_value",
