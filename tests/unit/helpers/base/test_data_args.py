@@ -3,7 +3,7 @@
 Comprehensive unit tests for data_args module.
 
 This module provides complete test coverage for all classes in data_args.py:
-- DataModelABC (abstract base class)
+- CliArgsGroup (abstract base class)
 - DataFile (file-related arguments)
 - DataAction (action-related arguments)
 - DataReport (report-related arguments)
@@ -18,7 +18,7 @@ from typing import Any, Dict, Generator
 import pytest
 
 from data_validate.helpers.base.data_args import (
-    DataModelABC,
+    CliArgsGroup,
     DataFile,
     DataAction,
     DataReport,
@@ -26,29 +26,29 @@ from data_validate.helpers.base.data_args import (
 )
 
 
-class TestDataModelABC:
-    """Test suite for DataModelABC abstract base class."""
+class TestCliArgsGroup:
+    """Test suite for CliArgsGroup abstract base class."""
 
     def test_cannot_instantiate_abstract_class(self) -> None:
-        """Test that DataModelABC cannot be instantiated directly."""
+        """Test that CliArgsGroup cannot be instantiated directly."""
         with pytest.raises(TypeError, match="Can't instantiate abstract class"):
-            DataModelABC()
+            CliArgsGroup()
 
     def test_concrete_subclass_can_be_instantiated(self) -> None:
         """Test that concrete subclass implementing abstract methods can be instantiated."""
 
-        class ConcreteDataModel(DataModelABC):
+        class ConcreteDataModel(CliArgsGroup):
             def _validate_arguments(self) -> None:
                 pass
 
         # Should not raise any exception
         instance = ConcreteDataModel()
-        assert isinstance(instance, DataModelABC)
+        assert isinstance(instance, CliArgsGroup)
 
     def test_subclass_without_implementation_raises_error(self) -> None:
         """Test that subclass without implementing abstract method raises error."""
 
-        class IncompleteDataModel(DataModelABC):
+        class IncompleteDataModel(CliArgsGroup):
             pass
 
         with pytest.raises(TypeError, match="Can't instantiate abstract class"):
@@ -57,7 +57,7 @@ class TestDataModelABC:
     def test_abstract_method_signature(self) -> None:
         """Test that abstract method has correct signature."""
 
-        class TestDataModel(DataModelABC):
+        class TestDataModel(CliArgsGroup):
             def _validate_arguments(self) -> None:
                 return "validated"
 

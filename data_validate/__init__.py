@@ -1,16 +1,9 @@
 """
-# Adapta Parser
+# Data Validate (canoa_data_validate)
 
-This is the main description of the Adapta Parser project.
-Here you can add information such as:
-
-- An overview of the project.
-- How to install and use.
-- Usage examples.
-- License information.
-
-You can even use basic Markdown formatting here,
-although support may vary depending on the pdoc version.
+Validates AdaptaBrasil climate-indicator spreadsheet bundles against Protocol v1.13, producing an
+HTML/PDF report and a JSON summary. See `.specs/00-overview.md` in the source repository for the
+full specification.
 """
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.

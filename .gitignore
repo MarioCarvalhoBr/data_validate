@@ -2,7 +2,6 @@
 local_data/
 data/output/
 code_test.py
-my_codes.py
 
 # Generated coverage/tests badges (SEC-009/TOOL-006: Codecov badge replaces these)
 assets/coverage/

@@ -16,7 +16,7 @@ from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.formatting.message_formatting_processing import MessageFormattingProcessing
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.common.validation.legend_processing import LegendProcessing
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
+from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet
 from data_validate.models.sp_model_abc import SpModelABC
 
 
@@ -28,11 +28,11 @@ class SpLegend(SpModelABC):
     of legends based on codes and validating min/max ranges, colors, and labels.
 
     Attributes:
-        CONSTANTS (INFO): Immutable constants specific to this model.
+        CONSTANTS (Constants): Immutable constants specific to this model.
     """
 
     # CONSTANTS
-    class INFO(ConstantBase):
+    class Constants(ConstantBase):
         """
         Immutable constants for the Legend model.
 
@@ -42,7 +42,7 @@ class SpLegend(SpModelABC):
         """
 
         def __init__(self):
-            """Initialize the INFO constants."""
+            """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_LEGEND
             self.SP_DESCRIPTION = "Legend sheet defining labels, colors, and value ranges for classification."
@@ -51,7 +51,7 @@ class SpLegend(SpModelABC):
             self.MAX_UPPER_LEGEND_DEFAULT = 1
             self._finalize_initialization()
 
-    CONSTANTS = INFO()
+    CONSTANTS = Constants()
 
     # COLUMN SERIES
     class RequiredColumn:
@@ -87,7 +87,7 @@ class SpLegend(SpModelABC):
     def __init__(
         self,
         context: GeneralContext,
-        data_model: DataLoaderModel,
+        data_model: LoadedSheet,
         **kwargs: Dict[str, Any],
     ):
         """
@@ -95,7 +95,7 @@ class SpLegend(SpModelABC):
 
         Args:
             context (GeneralContext): The application general context.
-            data_model (DataLoaderModel): The loaded data model containing the dataframe.
+            data_model (LoadedSheet): The loaded data model containing the dataframe.
             **kwargs: Additional keyword arguments.
         """
         super().__init__(context, data_model, **kwargs)

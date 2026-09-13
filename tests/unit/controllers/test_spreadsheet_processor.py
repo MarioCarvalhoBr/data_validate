@@ -26,22 +26,22 @@ import pandas as pd
 from data_validate.controllers.spreadsheet_processor import SpreadsheetProcessor
 from data_validate import config, models
 from data_validate.controllers.report.validation_report import ValidationReport
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, LoadResult
+from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet, LoadResult
 from data_validate.rules import RuleContext, STRUCTURE_REGISTRY
 
 
-def _fake_raw_data_map() -> dict[str, DataLoaderModel]:
+def _fake_raw_data_map() -> dict[str, LoadedSheet]:
     """Build the minimal raw_data_map `_read_data` reads after loading (scenarios + legend)."""
     scenario_frame = pd.DataFrame({"simbolo": ["O", "P"]})
 
     return {
-        models.SpScenario.CONSTANTS.SP_NAME: DataLoaderModel(
+        models.SpScenario.CONSTANTS.SP_NAME: LoadedSheet(
             input_folder="/tmp/input",
             path=Path("cenarios.csv"),
             raw_data=scenario_frame,
             is_read_successful=True,
         ),
-        models.SpLegend.CONSTANTS.SP_NAME: DataLoaderModel(
+        models.SpLegend.CONSTANTS.SP_NAME: LoadedSheet(
             input_folder="/tmp/input",
             path=Path("legenda"),
             raw_data=pd.DataFrame(),
@@ -94,9 +94,9 @@ class TestReadDataUsesLoad:
 
         assert processor.raw_data_map is raw_data_map
         assert processor.scenarios == ["O", "P"]
-        assert processor.model_configurations[models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS] is True
-        assert processor.model_configurations[models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS] is False
-        assert processor.model_configurations[models.SpModelABC.VAR_CONSTS.SCENARIOS] == ["O", "P"]
+        assert processor.model_configurations[models.SpModelABC.CONFIG_KEYS.SCENARIO_READ_SUCCESS] is True
+        assert processor.model_configurations[models.SpModelABC.CONFIG_KEYS.LEGEND_READ_SUCCESS] is False
+        assert processor.model_configurations[models.SpModelABC.CONFIG_KEYS.SCENARIOS] == ["O", "P"]
 
     def test_read_data_extends_report_with_load_errors(self, mocker) -> None:
         """Errors surfaced by `LoadResult.errors` are extended into the FS report category."""

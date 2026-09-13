@@ -112,7 +112,9 @@ class LegendProcessing:
 
         # 1 - Check column label: Null or empty values
         if label_col in original_dataframe.columns:
-            empty_labels = original_dataframe[original_dataframe[label_col].isnull() | (original_dataframe[label_col] == "")]
+            empty_labels = original_dataframe[
+                original_dataframe[label_col].isnull() | (original_dataframe[label_col] == "")
+            ]
             if not empty_labels.empty:
                 indices_empty_labels = empty_labels.index.tolist()
                 indices_empty_labels = [idx + 2 for idx in indices_empty_labels]  # Adjust for header row
@@ -141,7 +143,11 @@ class LegendProcessing:
         local_dataframe = original_dataframe.copy()
 
         # 2.2 - If the label is 'Dado indisponível', the min, max values must be empty (cannot have any values)
-        if min_col in local_dataframe.columns and max_col in local_dataframe.columns and label_col in local_dataframe.columns:
+        if (
+            min_col in local_dataframe.columns
+            and max_col in local_dataframe.columns
+            and label_col in local_dataframe.columns
+        ):
             unavailable_mask = original_dataframe[label_col] == self.value_data_unavailable
             invalid_min = local_dataframe.loc[unavailable_mask & local_dataframe[min_col].notnull()]
             invalid_max = local_dataframe.loc[unavailable_mask & local_dataframe[max_col].notnull()]
@@ -178,10 +184,10 @@ class LegendProcessing:
             if col in local_dataframe.columns:
                 for index, value in local_dataframe[col].items():
                     valid, message = NumberFormattingProcessing.check_cell_integer(value, min_value=1)
-                    origina_value = original_dataframe.at[index, col]
+                    original_value = original_dataframe.at[index, col]
                     if not valid:
                         errors.append(
-                            f"{self.filename} [código: {code_value}, linha: {index + 2}]: A coluna '{col}' contém um valor inválido: O valor '{origina_value}' não é um número inteiro válido."
+                            f"{self.filename} [código: {code_value}, linha: {index + 2}]: A coluna '{col}' contém um valor inválido: O valor '{original_value}' não é um número inteiro válido."
                         )
         return errors
 
@@ -304,7 +310,8 @@ class LegendProcessing:
         # If any min or max value has more than 2 decimal places, skip the following validations and return errors
 
         if any(
-            NumberFormattingProcessing.check_two_decimals_places(row[min_col]) or NumberFormattingProcessing.check_two_decimals_places(row[max_col])
+            NumberFormattingProcessing.check_two_decimals_places(row[min_col])
+            or NumberFormattingProcessing.check_two_decimals_places(row[max_col])
             for _, row in sorted_group.iterrows()
         ):
             return errors
@@ -327,7 +334,9 @@ class LegendProcessing:
                             f"{self.filename} [código: {code}, linha: {index + 2}]: O intervalo não é contínuo. O valor mínimo {min_val} deveria ser {prev_max_val + 0.01} para seguir o valor máximo anterior."
                         )
                 except InvalidOperation:
-                    errors.append(f"{self.filename} [código: {code}, linha: {index + 2}]: Valor inválido para operação de mínimo/máximo.")
+                    errors.append(
+                        f"{self.filename} [código: {code}, linha: {index + 2}]: Valor inválido para operação de mínimo/máximo."
+                    )
 
             prev_max_val = max_val
 
@@ -376,12 +385,16 @@ class LegendProcessing:
         local_dataframe[code_col] = pd.to_numeric(local_dataframe[code_col], errors="coerce")
 
         if local_dataframe[code_col].isnull().any():
-            errors.append(f"{self.filename}: A coluna '{code_col}' contém valores não numéricos e não pode ser validada para sequencialidade.")
+            errors.append(
+                f"{self.filename}: A coluna '{code_col}' contém valores não numéricos e não pode ser validada para sequencialidade."
+            )
 
             indices_non_numeric_values_local = local_dataframe[local_dataframe[code_col].isnull()].index.tolist()
             non_numeric_values_original = dataframe.loc[indices_non_numeric_values_local, code_col].tolist()
 
-            errors.append(f"{self.filename}: Valores não numéricos encontrados na coluna '{code_col}': {non_numeric_values_original}")
+            errors.append(
+                f"{self.filename}: Valores não numéricos encontrados na coluna '{code_col}': {non_numeric_values_original}"
+            )
 
             return errors
 
@@ -394,8 +407,12 @@ class LegendProcessing:
 
         # Report if the first value of the sequence does not start at 1
         if actual_sequence and actual_sequence[0] != 1:
-            errors.append(f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}")
+            errors.append(
+                f"{self.filename}: A sequência de códigos de legenda deve começar em 1. Código inicial encontrado: {actual_sequence[0]}"
+            )
 
         if not actual_sequence == expected_sequence:
-            errors.append(f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}")
+            errors.append(
+                f"{self.filename}: Os códigos de legenda não são sequenciais. Códigos encontrados: {actual_sequence}"
+            )
         return errors

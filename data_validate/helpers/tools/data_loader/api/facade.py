@@ -63,7 +63,7 @@ _DEFAULT_MAX_SHEET_ROWS = 1_000_000
 _DEFAULT_MAX_SHEET_COLUMNS = 5_000
 
 
-class DataLoaderModel:
+class LoadedSheet:
     """Encapsulates loaded spreadsheet data and file metadata.
 
     Attributes:
@@ -101,7 +101,7 @@ class DataLoaderModel:
 
     def __str__(self):
         return (
-            f"DataLoaderModel({self.name}):\n"
+            f"LoadedSheet({self.name}):\n"
             + f"  input_folder: {self.input_folder}\n"
             + f"  name: {self.name}\n"
             + f"  filename: {self.filename}\n"
@@ -117,18 +117,23 @@ class DataLoaderModel:
         )
 
 
+# deprecated alias (ARC-009/ARC-013): kept one release for any external importer of the old
+# name; `LoadedSheet` is the same class, not a subclass or wrapper.
+DataLoaderModel = LoadedSheet
+
+
 @dataclass(frozen=True)
 class LoadResult:
     """Outcome of `DataLoaderFacade.load()`.
 
     Attributes:
-        models: Sheet name -> `DataLoaderModel`, one entry per sheet declared in `SHEET_SPECS`
+        models: Sheet name -> `LoadedSheet`, one entry per sheet declared in `SHEET_SPECS`
             (present even when the file was absent or failed to read, mirroring `load_all`'s
             historical "missing sheets fill in as empty" behaviour).
         errors: User-facing (translated) messages for read failures and SEC-003 size violations.
     """
 
-    models: dict[str, DataLoaderModel]
+    models: dict[str, LoadedSheet]
     errors: list[str]
 
 
@@ -176,13 +181,13 @@ class DataLoaderFacade:
         """Load every sheet declared in `SHEET_SPECS` from `self.input_dir`.
 
         Returns:
-            LoadResult: one `DataLoaderModel` per declared sheet name, plus any read/size-limit
+            LoadResult: one `LoadedSheet` per declared sheet name, plus any read/size-limit
             error messages collected along the way.
         """
         errors: list[str] = []
         files_map, _ignored, _missing_files = self.scanner.scan()
 
-        data: dict[str, DataLoaderModel] = {}
+        data: dict[str, LoadedSheet] = {}
         for name, path in files_map.items():
             spec = SHEET_SPECS[name]
             strategy = DoubleHeaderStrategy() if spec.header is HeaderLayout.DOUBLE else SingleHeaderStrategy()
@@ -239,7 +244,7 @@ class DataLoaderFacade:
                 # expected failure mode of untrusted input, not a programming error (SEC-004).
                 errors.append(f"{path.name}: Erro inesperado ao processar o arquivo. Detalhes: {e} ({type(e)})")
 
-            data_model = DataLoaderModel(
+            data_model = LoadedSheet(
                 input_folder=str(self.input_dir),
                 path=path,
                 raw_data=df_local if df_local is not None else pd.DataFrame(),
@@ -251,7 +256,7 @@ class DataLoaderFacade:
         # Add missing or non-required files as empty
         for name in SHEET_SPECS:
             if name not in data:
-                data[name] = DataLoaderModel(
+                data[name] = LoadedSheet(
                     input_folder=str(self.input_dir),
                     path=Path(name),
                     raw_data=pd.DataFrame(),
@@ -261,7 +266,7 @@ class DataLoaderFacade:
         return LoadResult(models=data, errors=errors)
 
     @property
-    def load_all(self) -> tuple[dict[str, DataLoaderModel], list[str]]:
+    def load_all(self) -> tuple[dict[str, LoadedSheet], list[str]]:
         """Deprecated alias for `load()`, kept for one release.
 
         Returns:

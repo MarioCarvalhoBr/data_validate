@@ -15,7 +15,7 @@ import pandas as pd
 from data_validate.controllers.context.general_context import GeneralContext
 from data_validate.helpers.base.constant_base import ConstantBase
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
+from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet
 
 
 class SpModelABC(ABC):
@@ -32,11 +32,11 @@ class SpModelABC(ABC):
         data_cleaning_errors (List[str]): List of data cleaning/integrity errors.
         data_cleaning_warnings (List[str]): List of data cleaning/integrity warnings.
         filename (str): Name of the file associated with this model.
-        data_loader_model (DataLoaderModel): Facade for data loading operations.
+        data_loader_model (LoadedSheet): Facade for data loading operations.
         context (GeneralContext): Application context.
     """
 
-    class DEFINITIONS(ConstantBase):
+    class ModelConfigKeys(ConstantBase):
         """
         Global definitions for spreadsheet models.
 
@@ -50,7 +50,7 @@ class SpModelABC(ABC):
         """
 
         def __init__(self):
-            """Initialize the DEFINITIONS constants."""
+            """Initialize the ModelConfigKeys constants."""
             super().__init__()
 
             self.LEGEND_EXISTS_FILE = "legend_exists_file"
@@ -62,14 +62,14 @@ class SpModelABC(ABC):
 
             self._finalize_initialization()
 
-    VAR_CONSTS = DEFINITIONS()
+    CONFIG_KEYS = ModelConfigKeys()
 
     CONSTANTS = None
 
     def __init__(
         self,
         context: GeneralContext,
-        data_model: DataLoaderModel,
+        data_model: LoadedSheet,
         **model_configurations: Dict[str, Any],
     ):
         """
@@ -80,12 +80,12 @@ class SpModelABC(ABC):
 
         Args:
             context (GeneralContext): Application context.
-            data_model (DataLoaderModel): Data loading facade.
+            data_model (LoadedSheet): Data loading facade.
             **model_configurations: Additional configuration parameters.
         """
         # SETUP
         self.context: GeneralContext = context
-        self.data_loader_model: DataLoaderModel = data_model
+        self.data_loader_model: LoadedSheet = data_model
         self._kwargs: Dict[str, Any] = model_configurations
 
         # UNPACKING DATA ARGS
@@ -103,12 +103,12 @@ class SpModelABC(ABC):
         self.frame: pd.DataFrame = self.data_loader_model.raw_data
         self.cleaned: Dict[str, pd.Series] = {}
 
-        self.legend_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_EXISTS_FILE, False)
-        self.legend_read_success: bool = self._kwargs.get(self.VAR_CONSTS.LEGEND_READ_SUCCESS, False)
+        self.legend_exists_file: bool = self._kwargs.get(self.CONFIG_KEYS.LEGEND_EXISTS_FILE, False)
+        self.legend_read_success: bool = self._kwargs.get(self.CONFIG_KEYS.LEGEND_READ_SUCCESS, False)
 
-        self.scenario_exists_file: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_EXISTS_FILE, False)
-        self.scenario_read_success: bool = self._kwargs.get(self.VAR_CONSTS.SCENARIO_READ_SUCCESS, False)
-        self.scenarios: List[str] = self._kwargs.get(self.VAR_CONSTS.SCENARIOS, [])
+        self.scenario_exists_file: bool = self._kwargs.get(self.CONFIG_KEYS.SCENARIO_EXISTS_FILE, False)
+        self.scenario_read_success: bool = self._kwargs.get(self.CONFIG_KEYS.SCENARIO_READ_SUCCESS, False)
+        self.scenarios: List[str] = self._kwargs.get(self.CONFIG_KEYS.SCENARIOS, [])
 
         # CONFIGURE VARIABLES AND LISTS
         self.structural_errors: List[str] = []

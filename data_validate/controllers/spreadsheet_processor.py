@@ -153,17 +153,17 @@ class SpreadsheetProcessor:
             )
         # Setup model_configurations for model initialization
         self.model_configurations = {
-            models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE: self.raw_data_map[
+            models.SpModelABC.CONFIG_KEYS.SCENARIO_EXISTS_FILE: self.raw_data_map[
                 models.SpScenario.CONSTANTS.SP_NAME
             ].does_file_exist,
-            models.SpModelABC.VAR_CONSTS.SCENARIO_READ_SUCCESS: self.raw_data_map[
+            models.SpModelABC.CONFIG_KEYS.SCENARIO_READ_SUCCESS: self.raw_data_map[
                 models.SpScenario.CONSTANTS.SP_NAME
             ].is_read_successful,
-            models.SpModelABC.VAR_CONSTS.SCENARIOS: self.scenarios,
-            models.SpModelABC.VAR_CONSTS.LEGEND_EXISTS_FILE: self.raw_data_map[
+            models.SpModelABC.CONFIG_KEYS.SCENARIOS: self.scenarios,
+            models.SpModelABC.CONFIG_KEYS.LEGEND_EXISTS_FILE: self.raw_data_map[
                 models.SpLegend.CONSTANTS.SP_NAME
             ].does_file_exist,
-            models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS: self.raw_data_map[
+            models.SpModelABC.CONFIG_KEYS.LEGEND_READ_SUCCESS: self.raw_data_map[
                 models.SpLegend.CONSTANTS.SP_NAME
             ].is_read_successful,
         }
@@ -260,9 +260,9 @@ class SpreadsheetProcessor:
             "proportionality_read_successful": self.raw_data_map[
                 models.SpProportionality.CONSTANTS.SP_NAME
             ].is_read_successful,
-            "scenario_exists_file": self.model_configurations[models.SpModelABC.VAR_CONSTS.SCENARIO_EXISTS_FILE],
+            "scenario_exists_file": self.model_configurations[models.SpModelABC.CONFIG_KEYS.SCENARIO_EXISTS_FILE],
             "legend_sanity_ok": legend_model.is_sanity_check_passed if legend_model else False,
-            "legend_read_success": self.model_configurations[models.SpModelABC.VAR_CONSTS.LEGEND_READ_SUCCESS],
+            "legend_read_success": self.model_configurations[models.SpModelABC.CONFIG_KEYS.LEGEND_READ_SUCCESS],
             "min_lower_legend_default": models.SpLegend.CONSTANTS.MIN_LOWER_LEGEND_DEFAULT,
             "max_upper_legend_default": models.SpLegend.CONSTANTS.MAX_UPPER_LEGEND_DEFAULT,
             "label_data_unavailable": self.context.config.LABEL_DATA_UNAVAILABLE,

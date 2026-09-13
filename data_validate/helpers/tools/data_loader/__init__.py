@@ -3,12 +3,13 @@
 Pacote principal que expõe a API de alto nível.
 """
 
-from .api.facade import DataLoaderFacade, DataLoaderModel, LoadResult
+from .api.facade import DataLoaderFacade, DataLoaderModel, LoadedSheet, LoadResult
 from .common.exceptions import ReaderNotFoundError
 
 __all__ = [
     "DataLoaderFacade",
-    "DataLoaderModel",
+    "LoadedSheet",
+    "DataLoaderModel",  # deprecated alias (ARC-009/ARC-013)
     "LoadResult",
     "ReaderNotFoundError",
 ]

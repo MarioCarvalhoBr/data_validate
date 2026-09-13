@@ -30,12 +30,10 @@ from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parents[1]
 _EXCLUDED_DIR_NAMES = {".venv", "local_data", "dev-reports", "node_modules", ".git"}
-# Individual files excluded by exact repo-relative path, regardless of directory. Default: the
-# legacy README generator's input template, retired by ADR-0009 (README.md is now hand-written)
-# and slated for physical deletion in Phase 5 under ARC-010's package-layout cleanup. Its stale
-# `#-features` anchor is known, accepted debt in a file nobody should be editing further, not a
-# regression this checker should keep failing the build on.
-_DEFAULT_EXCLUDED_FILES = frozenset({"data_validate/static/templates/README.TEMPLATE.md"})
+# Individual files excluded by exact repo-relative path, regardless of directory. Empty by
+# default (the legacy README generator's input template that used to need this was deleted in
+# Phase 5, ARC-010/ADR-0009); kept as an extension point for `--exclude-file`.
+_DEFAULT_EXCLUDED_FILES: frozenset[str] = frozenset()
 _LINK_RE = re.compile(r"(?<!!)\[([^\]]*)\]\(([^)\s]+)(?:\s+\"[^\"]*\")?\)")
 _HEADING_RE = re.compile(r"^(#{1,6})\s+(.+?)\s*#*$", re.MULTILINE)
 _SCHEME_RE = re.compile(r"^[a-zA-Z][a-zA-Z0-9+.-]*:")
@@ -79,8 +77,7 @@ def _is_excluded_file(path: Path, root: Path, excluded_files: frozenset[str]) ->
         path: The Markdown file path to check.
         root: The directory `path` was discovered under, used to compute the relative path
             excluded files are matched against.
-        excluded_files: Repo-relative POSIX paths (e.g.
-            `"data_validate/static/templates/README.TEMPLATE.md"`) to exclude.
+        excluded_files: Repo-relative POSIX paths (e.g. `"docs/legacy/notes.md"`) to exclude.
 
     Returns:
         bool: True if `path` should be skipped.

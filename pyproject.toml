@@ -194,7 +194,6 @@ omit = [
     "*/__init__.py",
     "setup.py",
     "conftest.py",
-    "generate_readme.py",
 ]
 
 [tool.coverage.report]

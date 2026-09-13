@@ -101,7 +101,7 @@ class FileSystemUtils:
         Securely remove a file from the filesystem.
 
         Checks if the file exists and is indeed a file before attempting removal.
-        dempotent operation: returns success if the file is already gone.
+        Idempotent operation: returns success if the file is already gone.
 
         Args:
             file_path (str): Path to the file to be removed.

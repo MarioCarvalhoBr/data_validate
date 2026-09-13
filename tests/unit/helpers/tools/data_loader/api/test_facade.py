@@ -1,7 +1,7 @@
 """
 Unit tests for facade.py module.
 
-This module tests the DataLoaderModel and DataLoaderFacade classes functionality
+This module tests the LoadedSheet and DataLoaderFacade classes functionality
 including data model creation, file loading, error handling, and facade operations.
 
 ARC-009/BUG-018/BUG-015: `DataLoaderFacade` no longer reads the deleted
@@ -18,7 +18,7 @@ import pandas as pd
 import pytest
 from pathlib import Path
 
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel, DataLoaderFacade, LoadResult
+from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet, DataLoaderFacade, LoadResult
 from data_validate.specs.sheet_specs import ColumnKind, ColumnSpec, HeaderLayout, SheetSpec
 
 FACADE_MODULE = "data_validate.helpers.tools.data_loader.api.facade"
@@ -36,11 +36,11 @@ def _fake_spec(name: str, header: HeaderLayout, csv_separator: str = "|", requir
     )
 
 
-class TestDataLoaderModel:
-    """Test suite for DataLoaderModel class."""
+class TestLoadedSheet:
+    """Test suite for LoadedSheet class."""
 
     def test_initialization_success(self, mocker) -> None:
-        """Test successful DataLoaderModel initialization."""
+        """Test successful LoadedSheet initialization."""
         mock_path = mocker.MagicMock(spec=Path)
         mock_path.exists.return_value = True
         mock_path.stem = "test_file"
@@ -49,7 +49,7 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
+        model = LoadedSheet(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
 
         assert model.input_folder == "/test/folder"
         assert model.path == mock_path
@@ -62,7 +62,7 @@ class TestDataLoaderModel:
         assert model.header_type == "single"
 
     def test_initialization_with_double_header(self, mocker) -> None:
-        """Test DataLoaderModel initialization with double header DataFrame."""
+        """Test LoadedSheet initialization with double header DataFrame."""
         mock_path = mocker.MagicMock(spec=Path)
         mock_path.exists.return_value = True
         mock_path.stem = "test_file"
@@ -73,17 +73,17 @@ class TestDataLoaderModel:
         df_data = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
         df_data.columns = pd.MultiIndex.from_tuples([("A", "col1"), ("B", "col2")])
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
+        model = LoadedSheet(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
 
         assert model.header_type == "double"
 
     def test_initialization_with_string_path(self, mocker) -> None:
-        """Test DataLoaderModel initialization with string path."""
+        """Test LoadedSheet initialization with string path."""
         string_path = "/test/path/file.csv"
 
         df_data = pd.DataFrame({"col1": [1, 2]})
 
-        model = DataLoaderModel(
+        model = LoadedSheet(
             input_folder="/test/folder", path=Path(string_path), raw_data=df_data, is_read_successful=True
         )
 
@@ -91,7 +91,7 @@ class TestDataLoaderModel:
         assert model.does_file_exist is False  # String path doesn't have exists() method
 
     def test_initialization_with_failed_read(self, mocker) -> None:
-        """Test DataLoaderModel initialization with failed read."""
+        """Test LoadedSheet initialization with failed read."""
         mock_path = mocker.MagicMock(spec=Path)
         mock_path.exists.return_value = False
         mock_path.stem = "test_file"
@@ -100,13 +100,13 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame()
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=False)
+        model = LoadedSheet(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=False)
 
         assert model.is_read_successful is False
         assert model.does_file_exist is False
 
     def test_string_representation(self, mocker) -> None:
-        """Test string representation of DataLoaderModel."""
+        """Test string representation of LoadedSheet."""
         mock_path = mocker.MagicMock(spec=Path)
         mock_path.exists.return_value = True
         mock_path.stem = "test_file"
@@ -115,11 +115,11 @@ class TestDataLoaderModel:
 
         df_data = pd.DataFrame({"col1": [1, 2], "col2": ["a", "b"]})
 
-        model = DataLoaderModel(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
+        model = LoadedSheet(input_folder="/test/folder", path=mock_path, raw_data=df_data, is_read_successful=True)
 
         str_repr = str(model)
 
-        assert "DataLoaderModel(test_file)" in str_repr
+        assert "LoadedSheet(test_file)" in str_repr
         assert "input_folder: /test/folder" in str_repr
         assert "name: test_file" in str_repr
         assert "filename: test_file.csv" in str_repr
@@ -127,6 +127,16 @@ class TestDataLoaderModel:
         assert "header_type: single" in str_repr
         assert "is_read_successful: True" in str_repr
         assert "does_file_exist: True" in str_repr
+
+
+class TestDataLoaderModelDeprecatedAlias:
+    """ARC-009/ARC-013: `DataLoaderModel` is kept one release as a plain alias for `LoadedSheet`."""
+
+    def test_data_loader_model_is_the_same_object_as_loaded_sheet(self) -> None:
+        """The alias is the identical class object, not a subclass or wrapper."""
+        from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
+
+        assert DataLoaderModel is LoadedSheet
 
 
 class TestDataLoaderFacade:
@@ -177,7 +187,7 @@ class TestDataLoaderFacade:
         assert "file1" in result.models
         assert "file2" in result.models  # Missing file added as empty
         assert "qmls" not in result.models  # BUG-015: no QML concept left
-        assert isinstance(result.models["file1"], DataLoaderModel)
+        assert isinstance(result.models["file1"], LoadedSheet)
         assert result.models["file1"].is_read_successful is True
         assert result.models["file2"].is_read_successful is False  # Missing file
 

@@ -25,15 +25,15 @@ from pathlib import Path
 
 import pandas as pd
 
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
+from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet
 from data_validate.models.sp_composition import SpComposition
 from data_validate.models.sp_description import SpDescription
 from data_validate.models.sp_proportionality import SpProportionality
 from data_validate.models.sp_temporal_reference import SpTemporalReference
 
 
-def _build_data_model(tmp_path: Path, raw_data: pd.DataFrame, name: str) -> DataLoaderModel:
-    """Build a real `DataLoaderModel` backed by an on-disk placeholder file.
+def _build_data_model(tmp_path: Path, raw_data: pd.DataFrame, name: str) -> LoadedSheet:
+    """Build a real `LoadedSheet` backed by an on-disk placeholder file.
 
     Args
     ----
@@ -48,12 +48,12 @@ def _build_data_model(tmp_path: Path, raw_data: pd.DataFrame, name: str) -> Data
 
     Returns
     -------
-    DataLoaderModel
+    LoadedSheet
         A model with `does_file_exist=True` and `raw_data` exactly the given dataframe.
     """
     path = tmp_path / name
     path.write_text("")
-    return DataLoaderModel(input_folder=str(tmp_path), path=path, raw_data=raw_data, is_read_successful=True)
+    return LoadedSheet(input_folder=str(tmp_path), path=path, raw_data=raw_data, is_read_successful=True)
 
 
 def _description_raw_data(codes: list[int]) -> pd.DataFrame:

@@ -17,7 +17,7 @@ from data_validate.helpers.common.formatting.message_formatting_processing impor
 from data_validate.helpers.common.processing.data_cleaning_processing import DataCleaningProcessing
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 from data_validate.helpers.tools.data_loader.api.facade import (
-    DataLoaderModel,
+    LoadedSheet,
 )
 from data_validate.models.sp_model_abc import SpModelABC
 
@@ -31,11 +31,11 @@ class SpDescription(SpModelABC):
     to ensure valid codes, levels, and consistent metadata.
 
     Attributes:
-        CONSTANTS (INFO): Immutable constants specific to this model.
+        CONSTANTS (Constants): Immutable constants specific to this model.
     """
 
     # CONSTANTS
-    class INFO(ConstantBase):
+    class Constants(ConstantBase):
         """
         Immutable constants for the Description model.
 
@@ -47,7 +47,7 @@ class SpDescription(SpModelABC):
         """
 
         def __init__(self):
-            """Initialize the INFO constants."""
+            """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_DESCRIPTION
             self.SP_DESCRIPTION = "Description sheet defining indicator metadata, names, and narrative fields."
@@ -55,7 +55,7 @@ class SpDescription(SpModelABC):
             self.MAX_SIMPLE_DESC_LENGTH = 150
             self._finalize_initialization()
 
-    CONSTANTS = INFO()
+    CONSTANTS = Constants()
 
     # COLUMN SERIES
     class RequiredColumn:
@@ -147,7 +147,7 @@ class SpDescription(SpModelABC):
     def __init__(
         self,
         context: GeneralContext,
-        data_model: DataLoaderModel,
+        data_model: LoadedSheet,
         **kwargs: Dict[str, Any],
     ):
         """
@@ -155,7 +155,7 @@ class SpDescription(SpModelABC):
 
         Args:
             context (GeneralContext): The application general context.
-            data_model (DataLoaderModel): The loaded data model containing the dataframe.
+            data_model (LoadedSheet): The loaded data model containing the dataframe.
             **kwargs: Additional keyword arguments.
         """
         super().__init__(context, data_model, **kwargs)

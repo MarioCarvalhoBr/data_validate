@@ -16,7 +16,7 @@ from data_validate.helpers.base.constant_base import ConstantBase
 
 from data_validate.helpers.common.processing.collections_processing import CollectionsProcessing
 
-from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
+from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet
 from data_validate.models.sp_model_abc import SpModelABC
 
 
@@ -28,11 +28,11 @@ class SpProportionality(SpModelABC):
     column structures (ID/Indicator) and verifying calculation integrity.
 
     Attributes:
-        CONSTANTS (INFO): Immutable constants specific to this model.
+        CONSTANTS (Constants): Immutable constants specific to this model.
     """
 
     # CONSTANTS
-    class INFO(ConstantBase):
+    class Constants(ConstantBase):
         """
         Immutable constants for the Proportionality model.
 
@@ -42,13 +42,13 @@ class SpProportionality(SpModelABC):
         """
 
         def __init__(self):
-            """Initialize the INFO constants."""
+            """Initialize the model constants."""
             super().__init__()
             self.SP_NAME = SHEET.SP_NAME_PROPORTIONALITIES
             self.SP_DESCRIPTION = "Proportionality sheet with influence weights between indicators."
             self._finalize_initialization()
 
-    CONSTANTS = INFO()
+    CONSTANTS = Constants()
 
     # COLUMN SERIES
     class RequiredColumn:
@@ -69,7 +69,7 @@ class SpProportionality(SpModelABC):
     def __init__(
         self,
         context: GeneralContext,
-        data_model: DataLoaderModel,
+        data_model: LoadedSheet,
         **kwargs: Dict[str, Any],
     ):
         """
@@ -77,7 +77,7 @@ class SpProportionality(SpModelABC):
 
         Args:
             context (GeneralContext): The application general context.
-            data_model (DataLoaderModel): The loaded data model containing the dataframe.
+            data_model (LoadedSheet): The loaded data model containing the dataframe.
             **kwargs: Additional keyword arguments.
         """
         super().__init__(context, data_model, **kwargs)
@@ -85,7 +85,7 @@ class SpProportionality(SpModelABC):
         # BUG-003: set once a structural error invalidates the sheet's header layout
         # (`post_processing`); replaces mutating `data_loader_model.header_type` to
         # `"invalid"`, which every other model/validator sharing that same
-        # `DataLoaderModel` instance would also observe.
+        # `LoadedSheet` instance would also observe.
         self.header_layout_invalid: bool = False
 
     def pre_processing(self):
@@ -175,7 +175,7 @@ class SpProportionality(SpModelABC):
         BUG-003: reassigns `self.frame` to a fresh empty `DataFrame` and sets
         `self.header_layout_invalid` instead of writing `pd.DataFrame()` into
         `data_loader_model.raw_data` and `"invalid"` into `data_loader_model.header_type` —
-        both shared with every other model/validator that reads the same `DataLoaderModel`.
+        both shared with every other model/validator that reads the same `LoadedSheet`.
         Consumers that used to check `data_loader_model.raw_data.empty` /
         `header_type == "invalid"` for this sheet must check `model.frame.empty` /
         `model.header_layout_invalid` instead.

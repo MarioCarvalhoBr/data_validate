@@ -59,7 +59,7 @@ def _make_deprecated_alias_action(replacement: str) -> type[argparse.Action]:
     return _DeprecatedAliasAction
 
 
-class DataModelABC(ABC):
+class CliArgsGroup(ABC):
     """
     Abstract base class for argument parsing and validation.
 
@@ -71,7 +71,7 @@ class DataModelABC(ABC):
     """
 
     def __init__(self):
-        """Initialize the DataModelABC class."""
+        """Initialize the CliArgsGroup class."""
         pass
 
     @abstractmethod
@@ -85,7 +85,7 @@ class DataModelABC(ABC):
         raise NotImplementedError("Subclasses should implement this method.")
 
 
-class DataFile(DataModelABC):
+class DataFile(CliArgsGroup):
     """
     Handles file-related arguments and operations.
 
@@ -152,7 +152,7 @@ class DataFile(DataModelABC):
         self._validate_arguments()
 
 
-class DataAction(DataModelABC):
+class DataAction(CliArgsGroup):
     """
     Handles action-related arguments and operations settings.
 
@@ -220,7 +220,7 @@ class DataAction(DataModelABC):
         self._validate_arguments()
 
 
-class DataReport(DataModelABC):
+class DataReport(CliArgsGroup):
     """
     Handles report-related metadata arguments.
 
@@ -260,7 +260,7 @@ class DataReport(DataModelABC):
         Currently performs no specific validation (placeholder for future rules).
 
         Raises:
-            ValueError: If any validaton rule fails.
+            ValueError: If any validation rule fails.
         """
         pass
 
