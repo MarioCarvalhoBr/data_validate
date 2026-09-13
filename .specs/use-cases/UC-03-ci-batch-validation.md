@@ -9,8 +9,8 @@
 ## Main flow
 1. Operator runs `python tools/harness/run_fixtures.py --input data/input --output data/output
    --locale pt_BR [--fixtures NAME ...] [--timeout 600]` (also wired to `make run-all`; replaces
-   the legacy `tools/legacy/run_main_pipeline.sh`/`.bat`). `--input`/`--output` default to
-   `data/input`/`data/output`; `--fixtures` restricts the run to named subfolders instead of every
+   the former `scripts/run_main_pipeline.sh`/`.bat`, retired in TOOL-009). `--input`/`--output`
+   default to `data/input`/`data/output`; `--fixtures` restricts the run to named subfolders instead of every
    folder under `--input`.
 2. For each fixture the harness invokes the CLI once, with `--no-time --no-version --sector
    "Setor A" --protocol "Protocolo B" --user "Usuário C"` and the given `--locale`, capturing

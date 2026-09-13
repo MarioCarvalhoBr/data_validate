@@ -212,8 +212,17 @@ Every fix here must land with a regression test under `tests/` that fails before
   guard reports the missing column and returns early. Added a third test that patches
   `check_columns_in_models_dataframes` to bypass the guard and feeds frames without `id`
   directly into the method, which does reproduce the pre-fix `ValueError` and is green after
-  the comprehension fix. Regression tests:
+  the comprehension fix. Regression tests (superseded — see the note below):
   `tests/unit/validators/spreadsheets/proportionality/test_proportionality_validator.py`.
+- Note (ARC-017 Phase 3 Port 7, path moved): `SpProportionalityValidator`/
+  `proportionality_validator.py` is deleted; the fix's shape is preserved in
+  `rules/proportionality.py::check_relation_indicators_in_value_and_proportionality` (PROP-005) —
+  both the `proporcionalidades` `id` (level 2) and `valores` `id` columns are checked, as an
+  abort `Issue`, before any column-name set is built, so a missing `id` can never reach a
+  `list.remove`-shaped crash. The regression tests above are deleted along with the validator;
+  their scenarios (missing `id` in `proporcionalidades`'s level 2, missing `id` in `valores`) are
+  now `tests/unit/rules/test_proportionality.py::TestCheckRelationIndicatorsInValueAndProportionality
+  ::test_missing_proportionality_id_reports_the_level2_abort`/`::test_missing_values_id_reports_the_abort`.
 
 ### BUG-007 · `int(year)` on raw cell text in `validate_reference_years`
 - Priority: P1 · Effort: S · Status: done

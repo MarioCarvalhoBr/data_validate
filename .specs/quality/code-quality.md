@@ -7,7 +7,7 @@
 | `ruff check` | `[tool.ruff]` line-length 120, target py312, rules `E,F,W,I,B,UP,SIM,PD,PL,S,N,RUF,C4,PTH,RET` | whole repo | CI `lint`, pre-commit |
 | `ruff format` | double quotes | whole repo | CI `lint --check`, PostToolUse hook |
 | `mypy` | `strict = true`; `ignore_errors` overrides for the explicit list of legacy modules (shrinks every phase) | `data_validate`, `tests/e2e`, `tools` | CI `typecheck` |
-| `bandit` | `[tool.bandit]` exclude `tests`, `tools/legacy` | `data_validate` | CI `security` |
+| `bandit` | `[tool.bandit]` exclude `tests` | `data_validate` | CI `security` |
 | `pip-audit` | lock file | dependencies | CI `security` |
 | `pytest` + coverage ratchet | see `testing-strategy.md` | tests | CI `test` |
 

@@ -74,13 +74,21 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Priority: P1 · Effort: M · Status: open
 - Where: `validators/spreadsheets/base/base_validator.py:290-295`,
   `helpers/tools/spellchecker/spellchecker.py:64-65`, `helpers/base/file_system_utils.py:75,116,143,171,194,217`,
-  `helpers/common/validation/dataframe_processing.py:68,131`, `helpers/common/validation/proportionality_processing.py:242-243`
-  (`except (ValueError, TypeError, Exception): pass`), `controllers/report/file_report_generator.py:150-153`,
+  `helpers/common/validation/dataframe_processing.py:68,131`,
+  `controllers/report/file_report_generator.py:150-153`,
   `helpers/tools/data_loader/api/facade.py:126`.
+  (`helpers/common/validation/proportionality_processing.py`'s `except (ValueError, TypeError,
+  Exception): pass` removed — see the note below.)
 - Problem: programming errors are converted into user-facing Portuguese strings (or swallowed
   entirely), the process exits 0, and the platform records the run as successful.
 - Proposed fix: catch only expected domain exceptions; unexpected ones abort with exit code 2 and a
   structured error; add `--strict`.
+- Done (proportionality site, ARC-017 Phase 3 Port 7): `ProportionalityProcessing
+  .find_zero_sum_violations` (formerly `validate_zero_sum_rows`) now catches
+  `except (ValueError, TypeError): continue` — the redundant `Exception` member (a bare
+  `except Exception` in disguise, since `Exception` already covers `ValueError`/`TypeError`) is
+  gone; `float(str(val).replace(",", "."))` cannot raise anything else on this input shape.
+  Every other site this item names is still open.
 - Related: ARC-011
 
 ### SEC-005 · Supply-chain and CI hygiene

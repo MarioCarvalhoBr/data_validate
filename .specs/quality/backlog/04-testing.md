@@ -80,7 +80,25 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   empty-sheet skip for the whole registry), including the BUG-014 (`nivel = "1.0"`/`"2.0"` still
   recognised numerically) regressions migrated from the deleted
   `tests/unit/validators/spreadsheets/legend/test_legend_validator.py`. Eighth validator closed
-  under this item; the rest of the list (`spreadsheet_processor.py`'s remaining
+  under this item; the rest of the list (proportionality, `spreadsheet_processor.py`'s remaining
+  validator-construction lines, spellchecker, `file_report_generator.py`,
+  `validation_report.py`, models) is still open.
+- Done (proportionality): `SpProportionalityValidator`/`proportionality_validator.py` (10.3 %
+  coverage, 0 dedicated rule tests) is deleted; its eight ported PROP-003…010 rules
+  (`rules/proportionality.py`) are 97.84 % covered by `tests/unit/rules/test_proportionality.py`
+  (table-driven per rule: valid bundle, every failure mode, missing-required-column/missing-`id`
+  aborts in legacy check order, PROP-007…010's four statements isolated from one another by
+  construction — a fixture that would trigger two at once is deliberately avoided per case, the
+  PROP-006 three-message-shape bucket ordering, and the engine-level empty-sheet skip for the
+  whole registry), including the BUG-006 (missing `id` no longer crashes past the column guard)
+  and BUG-014 (`nivel = "1.0"` still recognised numerically) regressions migrated from the
+  deleted `tests/unit/validators/spreadsheets/proportionality/test_proportionality_validator.py`.
+  Its helper, `ProportionalityProcessing`/`proportionality_processing.py` (0 tests), is not
+  deleted (every method is pure, frame-level, and reused) but is refactored to stop building
+  message text itself (matching `rules/value.py`'s precedent for not reusing a deleted
+  message-building helper) and is now 98.68 % covered by
+  `tests/unit/helpers/common/validation/test_proportionality_processing.py`. Ninth validator
+  closed under this item; the rest of the list (`spreadsheet_processor.py`'s remaining
   validator-construction lines, spellchecker, `file_report_generator.py`,
   `validation_report.py`, models) is still open.
 - Related: TST-002

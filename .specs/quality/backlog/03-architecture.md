@@ -203,6 +203,18 @@ zero global state. Each item below names the current smell, where it lives, and 
   distinct keys (`error_default`/`error_coded`) for its "padrão"/"de código 'X'" branch rather
   than one key with a pre-formatted-fragment param, so the en_US locale renders a genuine English
   sentence in both cases instead of an English template around Portuguese connector words.
+- Note (Phase 3 Port 7 slice, ARC-017): `SpProportionalityValidator`
+  (`proportionality_validator.py`) is deleted; its eight ported rules (`rules/proportionality.py`'s
+  PROP-003…010) render every message through `ctx.translate(message_key, **params)` — 15 new
+  catalog keys added to both `static/locales/{pt_BR,en_US}/messages.json`
+  (`rule.proportionality.missing_required_column`/`_level2` shared by every rule's "required
+  column is missing" abort case, plus one-or-more `rule.PROP-0XX.<slug>` keys per rule — e.g.
+  PROP-006 has three: `parent_missing`/`child_mismatch`/`child_missing`), all pt-BR values copied
+  verbatim from the legacy f-strings (verified byte-identical by the e2e golden harness run
+  twice). PROP-007…010 share one `RuleSpec` (a legacy quirk this port's design brief chose to
+  keep, since all four already came from one legacy method and share one category, `SUM_PROP`)
+  but still tag each `Issue` with its own specific `PROP-0XX` id, so the catalog/spec traceability
+  is unaffected by that grouping.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains

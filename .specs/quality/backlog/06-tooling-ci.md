@@ -97,11 +97,22 @@
   `pip install canoa_data_validate` work without those system dependencies at all.
 
 ### TOOL-009 · Scripts
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `scripts/run_main_pipeline.bat` uses `--d` (abbreviation of `--debug`),
   `scripts/*.sh` `source .venv/bin/activate` (assumes venv location), Portuguese echo messages.
 - Proposed fix: replace with `tools/harness/run_fixtures.py` (cross-platform, Python) and Make
   targets.
+- Done: `tools/legacy/` (the 8 scripts + README, already unused by any `make`/CI target since
+  TOOL-002) deleted outright — `tools/harness/run_fixtures.py` + `make run-all`/`make run` are the
+  only supported way to run the pipeline now. Dangling references fixed: `Makefile`'s `typecheck`
+  target no longer excludes a `tools/legacy/*` path that doesn't exist;
+  `[tool.bandit] exclude_dirs` in `pyproject.toml` no longer lists `tools/legacy`;
+  `.specs/quality/code-quality.md`'s tooling-baseline table and
+  `.specs/use-cases/UC-03-ci-batch-validation.md`'s main flow updated to match;
+  `.specs/future/deprecations.md`'s `scripts/*` row marked **Removed 2026-09-12**. Historical
+  "Where"/"Done" evidence in `02-security.md` (SEC-006), `03-architecture.md` (ARC-011), and
+  `docs/adrs/0010-tooling-baseline.md` left untouched — they describe the repository state at the
+  time those items were filed/decided, not a live instruction.
 
 ### TOOL-010 · Dependency policy
 - Priority: P3 · Effort: S · Status: open
@@ -111,7 +122,7 @@
   weekly; `pip-audit` in CI.
 
 ### TOOL-011 · guard-bash hook rejects quoted multi-line arguments and heredoc bodies
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `.claude/hooks/guard-bash.sh` (segment splitter)
 - Problem: the hook splits the command on newlines *before* tokenizing, so a quoted multi-line
   argument (e.g. a `git commit -m` message with a body) or a heredoc body line that mentions `git`
@@ -123,3 +134,16 @@
   segments on operator tokens (`&&`, `;`, `|`, `||`) — never on raw newlines inside quotes; treat
   heredoc bodies as data, not commands; keep fail-closed for genuine tokenization errors; extend
   `--self-test` with multi-line `-m` and heredoc cases.
+- Done: `split_segments` now tokenizes the *entire* command in one `shlex.shlex(text, posix=True,
+  punctuation_chars="|&;")` pass (quotes intact, `whitespace_split=True`), then splits the token
+  stream on the operator tokens `&&`/`||`/`;`/`|` that pass produces — a quoted multi-line `-m`
+  argument or a `;`/`|` inside quotes stays one token and is never mistaken for a segment boundary.
+  A new `strip_heredoc_bodies` runs before nested-command extraction and segmentation: it detects
+  `<<WORD`/`<<-WORD` (optionally quoted `WORD`) markers and drops every following line up to (and
+  excluding trailing text on) the line that starts with `WORD`, so heredoc bodies are pure data —
+  a `git`/`rm`/etc. mention inside one never reaches the analyzer. Fail-closed is kept only for a
+  genuine tokenization error of the command line itself (an unbalanced quote outside any heredoc).
+  `--self-test` grew from 44 to 48 cases (multi-line `-m`, `;` inside quotes, an allowed heredoc
+  body mentioning `git push`, and a `cat <<EOF ... EOF && git push` case that still blocks because
+  the `git push` is outside the body) — all 48 pass. Manually verified both historical false
+  positives from the evidence above now exit 0 through the real hook (not just `--self-test`).

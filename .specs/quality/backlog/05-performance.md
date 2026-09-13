@@ -6,13 +6,13 @@ harness (PERF-009); never optimise without a number.
 
 ### PERF-001 · Row-by-row `iterrows()` / cell loops in hot paths
 - Priority: P1 · Effort: M · Status: open
-- Where: `validators/spreadsheets/proportionality/proportionality_validator.py:584`,
-  `helpers/common/validation/legend_processing.py:202,249,313`,
+- Where: `helpers/common/validation/legend_processing.py:202,249,313`,
   `helpers/tools/spellchecker/dataframe_processor.py:42-45`.
   (`validators/spreadsheets/value/value_validator.py:316` and
   `helpers/common/validation/value_processing.py:125` removed — see the "Done (value slice)"
   note below; `validators/spreadsheets/legend/legend_validator.py:514-527` removed — see the
-  "Done (legend slice)" note below.)
+  "Done (legend slice)" note below; `validators/spreadsheets/proportionality/
+  proportionality_validator.py:584` removed — see the "Done (proportionality slice)" note below.)
 - Proposed fix: vectorised masks (`pd.to_numeric(errors="coerce")`, `str.contains`, `isin`,
   `merge`), `nx.from_pandas_edgelist`, `groupby` aggregations; produce issues from mask indices.
 - Done (description slice, ARC-017 Phase 3 Port 2): the two `description_validator.py` sites
@@ -64,6 +64,17 @@ harness (PERF-009); never optimise without a number.
   indicator → legend → min/max mapping loop stays a Python `for` (it iterates over the handful of
   matching columns, not over rows, same as the legacy code). Regression/behaviour coverage:
   `tests/unit/rules/test_legend.py`.
+- Done (proportionality slice, ARC-017 Phase 3 Port 7): `proportionality_validator.py:584`'s
+  `for __, row in df_composition.iterrows(): parent = row[...]; child = row[...]; ...` (building a
+  `codigo_pai -> [codigo_filho, …]` dict) is gone — the file was deleted along with the rest of
+  `SpProportionalityValidator` when PROP-003…010 moved onto the rules engine. It is now
+  `rules/proportionality.py::check_parent_child_relationships`'s
+  `df_composition.groupby("codigo_pai", sort=False)["codigo_filho"].apply(list)`. Every other
+  `ProportionalityProcessing` method (build_subdatasets, decimal truncation/summation, mask
+  building) was already frame-level, not per-cell/per-row, and stays that way — only its
+  message-building was removed (see `.specs/business-rules/proportionality.md`'s PROP-007…010
+  entries). Regression/behaviour coverage: `tests/unit/rules/test_proportionality.py`,
+  `tests/unit/helpers/common/validation/test_proportionality_processing.py`.
 
 ### PERF-002 · Defensive full-frame copies everywhere
 - Priority: P1 · Effort: S · Status: open
