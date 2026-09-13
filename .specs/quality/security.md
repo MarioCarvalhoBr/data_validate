@@ -4,9 +4,9 @@
 
 | Asset | Threat | Vector | Impact |
 |---|---|---|---|
-| Analyst's browser / INPE workstation | Stored XSS | Cell content rendered unescaped in the HTML report (SEC-001) | Session/credential theft, pivot into intranet |
+| Analyst's browser / INPE workstation | Stored XSS | Cell content rendered unescaped in the HTML report (**SEC-001, fixed** — Jinja2 `autoescape=True`) | Session/credential theft, pivot into intranet |
 | Validator host | Resource exhaustion | Oversized/zip-bomb `.xlsx`, huge CSV (SEC-003) | DoS of the ingestion server |
-| Validator host | Arbitrary file read / SSRF | wkhtmltopdf rendering attacker-controlled HTML (SEC-002) | Data exfiltration |
+| Validator host | Arbitrary file read / SSRF | wkhtmltopdf rendering attacker-controlled HTML (**SEC-002, mitigated** — WeasyPrint is now the primary PDF backend; `wkhtmltopdf` is an opt-in compatibility fallback only) | Data exfiltration |
 | Platform decisions | Wrong acceptance | Crashes swallowed, exit code 0 (SEC-004, SEC-008) | Invalid data ingested |
 | Supply chain | Malicious/vulnerable dependency, CI tampering | Unpinned actions, lock ignored, no audit (SEC-005) | Compromised releases |
 | Repository | Secret / data leak | Hooks staging the whole tree (SEC-006), reports committed (SEC-009) | Exposure of sector data |
@@ -19,15 +19,15 @@ trusted, still escaped); the package's own `static/` files are trusted.
 
 | Control | Where | Status |
 |---|---|---|
-| Jinja2 `autoescape=True`, template from `PackageLoader`, no HTML built in Python | `reporting/html.py` | target (Phase 4) |
-| `markupsafe.escape` for CLI metadata in report header | idem | target |
+| Jinja2 `autoescape=True`, template from `PackageLoader`, no HTML built in Python | `controllers/report/file_report_generator.py`, `report_model.py` | done (Phase 4, ADR-0007) |
+| CLI metadata (`--sector`/`--protocol`/`--user`/`--file`) flows as a plain `ReportModel` value, escaped by the template's own `autoescape=True` (no separate `markupsafe.escape` call needed) | idem | done (Phase 4) |
 | Input limits: `max_file_size`, `max_rows`, `max_columns`; reject early with `STRUCT-*` issue | `loading/` | target (Phase 2) |
-| PDF optional, WeasyPrint (no browser engine), never with attacker-controlled network access | `reporting/pdf.py` | target (Phase 4) |
+| PDF optional, WeasyPrint (no browser engine) primary, `pdfkit`/`wkhtmltopdf` an opt-in compatibility fallback only, never with attacker-controlled network access | `controllers/report/file_report_generator.py` | done (Phase 4, ADR-0007) |
 | Specific exceptions only; unexpected → exit 2 | everywhere | target (Phase 1) |
 | Exit codes 0/1/2; stdout reserved for machine output | `cli.py` | target (Phase 1) |
 | No writes outside the output folder; no `os.environ` mutation; temp dirs via `tempfile` | `spell/`, `app/` | target (Phase 5) |
 | `bandit -c pyproject.toml -r data_validate tools`, clean | Makefile `security`/`security-offline`, CI `security` job | done |
-| `pip-audit --strict`, clean except `pdfkit` (PYSEC-2026-2860/GHSA-9g3x-6x24-vf9f, no fix upstream, tracked SEC-002) | Makefile `security`, CI `security` job | done |
+| `pip-audit`, clean — `pdfkit` (PYSEC-2026-2860/GHSA-9g3x-6x24-vf9f, no fix upstream) is no longer a declared dependency (SEC-002, Phase 4), so the `--ignore-vuln` escape hatch this row used to need is removed, not silenced | Makefile `security`, CI `security` job | done |
 | CodeQL (Python), on push/PR to `main` and weekly schedule | `.github/workflows/codeql.yml` | done |
 | Dependabot (pip + actions) | `.github/dependabot.yml` | done |
 | Actions pinned by full commit SHA with a version comment | `.github/workflows/*.yml` | done |

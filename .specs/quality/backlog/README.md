@@ -93,3 +93,20 @@ ID now has a dedicated, table-driven unit test module; models/controllers/CLI ar
 ~15 hardcoded pt-BR f-strings remain in `models/sp_*.py`'s structural/cleaning checks and in
 `controllers/report/file_report_generator.py`'s report labels). See `03-architecture.md`,
 `04-testing.md`, `.specs/business-rules/spelling.md`.
+
+Status snapshot: 2026-09-13 (Phase 4 report-rendering slice, ADR-0007). Moves **SEC-001 → done**
+(the P0 stored-XSS item), **SEC-002 → done**, and **ARC-016 → done**. `FileReportGenerator` is
+rebuilt on `Environment(loader=PackageLoader("data_validate", "static/report"),
+autoescape=select_autoescape(["html"]))`; `report_template.html` loops over
+`ReportModel.sections`/`skipped_tests` (`controllers/report/report_model.py`, new, ARC-016)
+instead of receiving Python-built HTML strings; `_format_messages_as_html`/
+`_get_optional_field_text`/the regex template validator and its fallback constant are all
+deleted. PDF generation is now optional and pluggable (WeasyPrint primary via the `[pdf]` extra,
+`pdfkit`/`wkhtmltopdf` a compatibility fallback, graceful skip when neither is usable) — `pdfkit`
+is removed from `[project].dependencies`, closing `pip-audit`'s last `--ignore-vuln`'d finding
+(`make security` runs a plain `pip-audit`, no escape hatch). e2e: 7/8 golden fixtures stayed
+byte-identical; `data_errors_01` gained one reviewed line change (escaping now preserves content
+a previous non-escaping render let the harness's naive HTML extractor mangle); one new fixture,
+`data_errors_xss`, added additively with its own golden. See `02-security.md`, `03-architecture.md`,
+`docs/adrs/0007-report-rendering-jinja2-autoescape-weasyprint.md`,
+`tests/e2e/golden/CHANGELOG.md`.

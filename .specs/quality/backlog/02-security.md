@@ -5,36 +5,74 @@ platform; the output is an HTML/PDF report opened in a browser by INPE staff, pl
 parsed by the platform. The validator runs as a CLI on a shared server.
 
 ### SEC-001 · Stored XSS in the HTML/PDF report (Jinja2 without autoescape)
-- Priority: P0 · Effort: M · Status: open
-- Where: `controllers/report/file_report_generator.py:68` (`Environment(loader=FileSystemLoader(output_folder))`,
-  no `autoescape`), `:187-188,237,284-288` (messages and CLI metadata concatenated as raw HTML).
-- Problem: every validation message embeds raw cell content (`nome_simples`, labels, column names,
-  values). A cell containing `<img src=x onerror=...>` or `<script>` is rendered verbatim in the
-  report and executed when opened in a browser; `--user/--sector/--protocol/--file` are also
-  injected unescaped. The template loader points at the *output* directory, so a pre-existing
-  `default.html` there could be used as a template.
-- Proposed fix: `Environment(autoescape=select_autoescape(["html"]), loader=PackageLoader(...))`;
-  render message lists from the template (`{% for %}`) instead of building HTML strings in Python;
-  escape everything with `markupsafe.escape`; only whitelist HTML entities produced by the
-  template itself.
-- Tests: golden test with a cell `<script>alert(1)</script>` asserting the report contains
-  `&lt;script&gt;`.
-- Related: ARC-016
+- Priority: P0 · Effort: M · Status: done
+- Where: `controllers/report/file_report_generator.py` (was `:68`
+  `Environment(loader=FileSystemLoader(output_folder))`, no `autoescape`; `:187-188,237,284-288`
+  messages and CLI metadata concatenated as raw HTML — both gone).
+- Problem (fixed): every validation message embedded raw cell content (`nome_simples`, labels,
+  column names, values). A cell containing `<img src=x onerror=...>` or `<script>` rendered
+  verbatim in the report and executed when opened in a browser; `--user/--sector/--protocol/--file`
+  were also injected unescaped. The template loader pointed at the *output* directory, so a
+  pre-existing `default.html` there could have been used as a template.
+- Fix shipped (migration Phase 4, ADR-0007): `Environment(loader=PackageLoader("data_validate",
+  "static/report"), autoescape=select_autoescape(["html"]))` — templates load only from the
+  package's own `static/report/` directory, never the user-writable output folder, closing the
+  template-planting hole. `report_template.html` loops over `ReportModel.sections`/
+  `skipped_tests` itself (`{% for %}`); `_format_messages_as_html`, `_get_optional_field_text`,
+  and the two `f"<strong>...` string-building blocks in `_build_template_variables` are deleted —
+  `sector`/`protocol`/`user`/`file`/every message now flow into the template as plain Python
+  values via `ReportModel` (ARC-016) and are escaped by `autoescape=True`; nothing is ever marked
+  `|safe`. The hand-rolled regex template-variable validator (`_validate_html_template`) and its
+  fallback constant (`ApplicationConfig.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS`) are both deleted —
+  a missing/broken template now raises `jinja2.TemplateNotFound`/`TemplateError`, already caught
+  by `build_report`'s existing `except (OSError, TemplateError)` (SEC-004), instead of silently
+  falling back to a second template that could itself drift out of sync.
+- Tests: `tests/unit/controllers/report/test_file_report_generator.py::TestXssEscaping` (a
+  `<script>alert(1)</script>` message renders as `&lt;script&gt;alert(1)&lt;/script&gt;`, never a
+  raw tag; `--user`/`--sector` CLI metadata and a skipped-test label are escaped the same way;
+  the loader is asserted to be a `PackageLoader`), `TestBuildReportModel` (ARC-016's
+  `ReportModel`/`ReportSection` carry plain values, not HTML), `TestBuildReportEndToEnd` (the
+  real `__init__`→`build_report` path, writing an actual HTML file, exercised once end to end).
+  New e2e fixture `data/input/data_errors_xss/` (a `data_ground_truth_01` copy with one
+  `descricao` cell mutated to embed `<Script>Alert(1)</Script>`, tripping `DESC-004`'s
+  capitalisation-mismatch warning) plus its golden, `tests/e2e/golden/data_errors_xss.json`
+  (additive); `data_errors_01`'s golden gained one reviewed line change because escaping now
+  *preserves* content a previous, non-escaping render had let the naive golden HTML-extractor
+  mangle — see `tests/e2e/golden/CHANGELOG.md`'s 2026-09-13 entry for the full before/after.
+- Related: ARC-016, SEC-002
 
 ### SEC-002 · PDF generation depends on wkhtmltopdf (archived upstream, old QtWebKit)
-- Priority: P1 · Effort: M · Status: open
-- Where: `controllers/report/file_report_generator.py:17,343-368`, `pyproject.toml` (`pdfkit`),
-  README installation section.
-- Problem: wkhtmltopdf has been archived since 2023, ships an unpatched WebKit, and is a native
-  binary that must be installed system-wide (Windows/Linux instructions in README). Any HTML injection
-  (SEC-001) becomes SSRF/local-file read inside the renderer.
-- Proposed fix: make PDF optional (`--pdf`), render with WeasyPrint (pure Python + pango) or a
-  headless Chromium via Playwright in CI only; keep HTML as the primary artefact.
-- Interim: `pip-audit`'s only remaining finding, `pdfkit` PYSEC-2026-2860 (alias
-  GHSA-9g3x-6x24-vf9f, no fixed version exists), is explicitly `--ignore-vuln`'d in
-  `make security` and CI (comment points back here) so the gate stays honest instead of either
-  failing forever or silently suppressing the whole tool — closing this item removes the ignore.
-- Related: TOOL-008
+- Priority: P1 · Effort: M · Status: done
+- Where: `controllers/report/file_report_generator.py` (was `:17,343-368`), `pyproject.toml`
+  (`pdfkit` moved out of `[project].dependencies`), README installation section.
+- Problem (fixed): wkhtmltopdf has been archived since 2023, ships an unpatched WebKit, and is a
+  native binary that had to be installed system-wide (Windows/Linux instructions in README). Any
+  HTML injection (SEC-001) became SSRF/local-file read inside the renderer.
+- Fix shipped (migration Phase 4, ADR-0007): `pdfkit` is removed from `[project].dependencies`;
+  `[project.optional-dependencies] pdf = ["weasyprint (>=70,<80)"]` is the supported PDF backend
+  (pure Python + pango, no native daemon, actively maintained; `>=70` specifically to clear
+  `PYSEC-2026-3940`, fixed in 70.0). `FileReportGenerator._save_pdf_file` tries WeasyPrint first
+  (`from weasyprint import HTML`; both `ImportError` — not installed — and `OSError` — installed
+  but its native pango/cairo/gdk-pixbuf libraries are missing — fall through to the next
+  backend); then `pdfkit`/`wkhtmltopdf` only as a compatibility path for hosts that already have
+  it (not a declared dependency any more); if neither is usable, PDF generation is skipped with
+  `"PDF generation skipped: install canoa-data-validate[pdf] for PDF output."` on stderr and the
+  run continues — HTML remains the always-produced primary artefact, exit code unaffected. A
+  genuine conversion failure (either backend's own `OSError` from the actual render call, not the
+  import) is still reported as an error, matching the pre-existing SEC-004 narrowing.
+- Tests: `TestSavePdfFileExceptionHandling` (WeasyPrint success; WeasyPrint `OSError` at
+  conversion time reported; WeasyPrint import raising `OSError` — native libs missing — or
+  `ImportError` — not installed — both fall back to `pdfkit`; no backend available skips with the
+  `[pdf]` install message; `pdfkit`'s own `OSError`/unexpected-exception handling unchanged),
+  `TestLazyPdfImports` (importing the module alone imports neither `pdfkit` nor `weasyprint`,
+  PERF-008). e2e: `pdf_backend_available()` (`tests/conftest.py`) probes WeasyPrint-importable
+  OR `wkhtmltopdf`-on-`PATH` so `requires_pdf`/the golden harness's PDF assertion accept either
+  backend, not only the legacy binary.
+- Closed: `pip-audit`'s `pdfkit` finding (`PYSEC-2026-2860`/`GHSA-9g3x-6x24-vf9f`) is gone from
+  the lock now that `pdfkit` is no longer a declared dependency; the `--ignore-vuln` escape hatch
+  in `make security`/CI is removed (not silenced) — `make security` runs a plain `poetry run
+  pip-audit` and stays clean.
+- Related: TOOL-008, SEC-001
 
 ### SEC-003 · Unbounded input sizes (zip-bomb / memory exhaustion)
 - Priority: P2 · Effort: M · Status: done
@@ -136,8 +174,11 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   hook used a small regex denylist that a wrapped/piped/subshelled command could slip past.
 - Fix: lock committed and respected (`poetry install --sync`); `bandit -c pyproject.toml -r
   data_validate tools` and `pip-audit --strict` both run clean in `make security` and CI's
-  `security` job; `pdfkit` (PYSEC-2026-2860 / GHSA-9g3x-6x24-vf9f, no fixed version) is explicitly
-  `--ignore-vuln`'d with a comment pointing at SEC-002 (the WeasyPrint migration that removes it);
+  `security` job; `pdfkit` (PYSEC-2026-2860 / GHSA-9g3x-6x24-vf9f, no fixed version) was
+  explicitly `--ignore-vuln`'d with a comment pointing at SEC-002 (the WeasyPrint migration that
+  removes it) — **superseded**: SEC-002 (migration Phase 4) removed `pdfkit` from
+  `[project].dependencies` entirely, so this finding is gone from the lock and the
+  `--ignore-vuln` flags are removed from `make security`, not just still-present-but-unused;
   `pillow`, `click`, `idna`, `pygments`, `pytest`, `requests`, `setuptools`, `urllib3`, `certifi`
   updated via `poetry update` (lockfile only, no `pyproject.toml` constraint changes needed);
   `.github/workflows/codeql.yml` added (Python, push/PR to `main` + weekly schedule); Dependabot

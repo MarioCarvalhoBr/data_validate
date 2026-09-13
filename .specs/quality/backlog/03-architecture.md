@@ -418,11 +418,30 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: PERF-006
 
 ### ARC-016 · Report generation builds HTML in Python
-- Priority: P2 · Effort: M · Status: open
-- Where: `controllers/report/file_report_generator.py:187-217,266-291`, `config/application_config.py:62-96`
-  (fallback template as a class constant), regex-based template validation (`:91-102`).
+- Priority: P2 · Effort: M · Status: done
+- Where: `controllers/report/file_report_generator.py` (was `:187-217,266-291`),
+  `config/application_config.py` (was `:62-96`, fallback template as a class constant), regex-based
+  template validation (was `:91-102` — all three now deleted).
 - Target: `ReportModel` (dataclass) + Jinja templates with autoescape and i18n filters; PDF renderer
   pluggable.
+- Done (migration Phase 4, ADR-0007 — implemented together with SEC-001/SEC-002):
+  `controllers/report/report_model.py` declares `ReportSection` (`title`/`errors`/`warnings`,
+  frozen, slotted) and `ReportModel` (frozen, slotted — name, formatted error/warning counts,
+  total tests, `sections`, `skipped_tests`, date/version display flags and values,
+  sector/protocol/user/file). `FileReportGenerator._build_report_model` builds one from a
+  `ValidationReport` + the CLI args on `context`, replacing the deleted
+  `_build_template_variables`/`_format_messages_as_html`/`_get_optional_field_text`; every field
+  is a plain value, never a pre-built HTML fragment. `report_template.html` loops over
+  `report.sections`/`report.skipped_tests` itself (`{% for %}`) instead of receiving
+  pre-rendered HTML strings; the hand-rolled regex "does the template contain every required
+  `{{ var }}`" validator (`_validate_html_template`) and its fallback constant
+  (`ApplicationConfig.REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS`) are both deleted — Jinja's own
+  `TemplateNotFound`/`UndefinedError` (a subclass of `jinja2.TemplateError`) now reports a broken
+  template through `build_report`'s existing SEC-004 exception handling instead. PDF renderer is
+  pluggable per SEC-002 (WeasyPrint primary, `pdfkit` compatibility fallback, graceful skip).
+  i18n filters/catalog-key labels are **not** part of this slice — see ADR-0007's "Implementation
+  note" for why report labels stay hardcoded pt-BR HTML in the template for now (tracked under
+  ARC-005/DOC-003 as a follow-up, not silently dropped).
 - Related: SEC-001, SEC-002
 
 ### ARC-017 · Rule execution order and dependencies are implicit

@@ -127,6 +127,19 @@ Closes: SEC-001, SEC-002, ARC-016, BUG-016, BUG-020, DOC-004, DOC-006
    behind `[pdf]` extra — ADR-0007.
 2. Localised report template; catalog parity test; `PROTOCOL_VERSION` in report.
 Gate: XSS golden test; goldens re-baselined once (reviewed diff), then stable.
+- Done (report-rendering slice, 2026-09-13): item 1 above (`ReportModel` + autoescaped Jinja
+  templates + WeasyPrint-behind-`[pdf]`-extra) — closes **SEC-001**, **SEC-002**, **ARC-016** in
+  full; see their entries in `02-security.md`/`03-architecture.md` and
+  `docs/adrs/0007-report-rendering-jinja2-autoescape-weasyprint.md`'s "Implementation note". Item
+  2 (localised report *labels* via catalog keys, `PROTOCOL_VERSION` display — the latter already
+  present since DOC-006) is **not** part of this slice: report labels stay hardcoded pt-BR HTML
+  inside `report_template.html` for now (a deliberate scope decision, not an oversight — see the
+  ADR's "Implementation note"). BUG-016/BUG-020/DOC-004 are untouched by this slice (DOC-004 was
+  being handled by a parallel agent touching `helpers/tools/{data_loader,spellchecker,locale}/**`
+  docstrings and `docs.yml` at the same time, deliberately out of this slice's file ownership).
+  Gate met: XSS regression test (`TestXssEscaping`) plus a new e2e fixture/golden
+  (`data_errors_xss`); the 7 pre-existing goldens stayed byte-identical except one reviewed line
+  in `data_errors_01` (see `tests/e2e/golden/CHANGELOG.md`).
 
 ## Phase 5 — Spell-check, performance, release
 Closes: ARC-015, BUG-022, SEC-007, PERF-006, PERF-008, PERF-009, TST-005, TST-007, TOOL-006,

@@ -1,6 +1,6 @@
 # ADR-0007: Report rendering with Jinja2 autoescape; PDF optional via WeasyPrint (drop wkhtmltopdf)
 
-- Status: Proposed
+- Status: Accepted — implemented (migration Phase 4, 2026-09-13)
 - Date: 2026-08-25
 - Deciders: Mário de Araújo Carvalho (INPE) with the AI orchestrator
 
@@ -94,6 +94,39 @@ had ad hoc opportunities to escape and didn't, in `_format_messages_as_html`,
 Manual escaping requires remembering to do it at every single interpolation site forever; Jinja's
 `autoescape=True` makes forgetting structurally impossible instead of relying on developer
 vigilance at each of dozens of call sites.
+
+## Implementation note (Phase 4, 2026-09-13)
+
+Shipped mostly as designed, with two adjustments made during implementation:
+
+- **`ReportModel` stays in `controllers/report/`, not a new `reporting/` package.** The target
+  layering (`reporting/html.py`, `reporting/pdf.py`) named in "Links" below is the eventual
+  strangler-fig destination (`.specs/architecture/target-architecture.md`), not this slice's
+  scope — `data_validate/controllers/report/report_model.py` (`ReportModel`/`ReportSection`,
+  frozen dataclasses) is the ARC-016 deliverable for Phase 4; the `loading`/`normalizing` →
+  `rules` → `reporting` layer split is a later migration step.
+- **Report labels stay hardcoded pt-BR HTML in the template, not catalog keys.** `report-ui.md`'s
+  `UI-6` ("all labels localised via `report.label.*` catalog keys") remains a target, not part of
+  this slice: moving "Usuário"/"Setor estratégico"/"Data e hora do processo"/etc. into the message
+  catalog is a distinct i18n change (new keys in both locales, a `t()` Jinja filter) with its own
+  review surface, and ADR-0007's actual security/architecture scope (autoescape, `PackageLoader`,
+  `ReportModel`, WeasyPrint) does not require it — the labels were already only ever pt-BR
+  literals, and autoescaping them (they now flow as plain strings through `{{ }}` like everything
+  else) does not change that. Tracked as a follow-up under `ARC-005`/`DOC-003`.
+- **`pdfkit`/`wkhtmltopdf` is a runtime fallback, not deleted outright.** `_save_pdf_file` tries
+  WeasyPrint first, then `pdfkit` only if already importable (never a declared dependency any
+  more — SEC-002), then skips PDF with a message; this is slightly more permissive than "drop
+  wkhtmltopdf" literally reads, but matches the ADR's own "Positive" bullet ("PDF becomes truly
+  optional") better than a hard removal would: an operator who already has `wkhtmltopdf` installed
+  keeps working PDF output without needing to add the `[pdf]` extra immediately.
+
+Golden harness: 7 pre-existing fixtures stayed byte-identical except `data_errors_01`, whose one
+line changed because escaping now *preserves* content the previous, non-escaping renderer had
+silently mangled (a raw `<class '...'>` in an error message was misread as an HTML tag by the
+naive golden extractor); see `tests/e2e/golden/CHANGELOG.md`'s 2026-09-13 entry for the full
+before/after. One new fixture, `data_errors_xss`, was added (additive golden) with a regression
+test unit-testing the escaping directly
+(`tests/unit/controllers/report/test_file_report_generator.py::TestXssEscaping`).
 
 ## Links
 
