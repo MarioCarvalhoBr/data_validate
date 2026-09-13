@@ -167,6 +167,30 @@
   "rule.COMP-009.level_mismatch": {
     "message": "{filename}: Indicadores filhos do pai {parent} não estão no mesmo nível: [{children}]."
   },
+  "rule.temporal_reference.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.TEMP-001.warning": {
+    "message": "{filename}, linha {row}: O valor da coluna '{column}' deve terminar com ponto."
+  },
+  "rule.TEMP-002.error": {
+    "message": "{filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro."
+  },
+  "rule.TEMP-003.error": {
+    "message": "{filename}: A coluna '{column}' não deve conter valores repetidos."
+  },
+  "rule.scenario.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.SCEN-003.no_punctuation": {
+    "message": "{filename}, linha {row}: O valor da coluna '{column}' não deve terminar com pontuação."
+  },
+  "rule.SCEN-003.must_end_with_dot": {
+    "message": "{filename}, linha {row}: O valor da coluna '{column}' deve terminar com ponto."
+  },
+  "rule.SCEN-004.error": {
+    "message": "{filename}: A coluna '{column}' não deve conter valores repetidos."
+  },
    "verification_name_file_structure": {
     "message": "Estrutura dos arquivos da pasta de entrada"
   },

@@ -24,7 +24,9 @@ from data_validate.rules import (
     Engine,
     RuleContext,
     RuleRegistry,
+    SCENARIO_REGISTRY,
     STRUCTURE_REGISTRY,
+    TEMPORAL_REGISTRY,
     compute_composition_facts,
     extend_report_from_outcomes,
 )
@@ -297,8 +299,8 @@ class SpreadsheetProcessor:
         a sequence of validators:
         1. **Structure**: File structure checks.
         2. **Spelling**: Spell checking on text fields.
-        3. **Mandatory**: Core business rules (Description, Composition, Timing).
-        4. **Optional**: Secondary business rules (Values, Scenarios, Legends).
+        3. **Mandatory**: Core business rules (Description, Composition, Temporal Reference).
+        4. **Optional**: Secondary business rules (Proportionality, Values, Scenarios, Legends).
         """
         self.context.logger.info("Building validation pipeline...")
 
@@ -322,22 +324,21 @@ class SpreadsheetProcessor:
 
         # 3. Validate spreadsheet data mandatory (description: ARC-017 Phase 3 Port 2;
         # composition: ARC-017 Phase 3 Port 3, ported to the rules engine, replacing the
-        # deleted `validators.SpCompositionGraphValidator`/`SpCompositionTreeValidator`)
+        # deleted `validators.SpCompositionGraphValidator`/`SpCompositionTreeValidator`;
+        # temporal reference: ARC-017 Phase 3 Port 4, replacing the deleted
+        # `validators.SpTemporalReferenceValidator`)
         self._run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], rule_context)
-        validators.SpTemporalReferenceValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        self._run_rule_registries([TEMPORAL_REGISTRY], rule_context)
 
-        # 4. Validate spreadsheet data optional
+        # 4. Validate spreadsheet data optional (scenario: ARC-017 Phase 3 Port 4, ported to the
+        # rules engine, replacing the deleted `validators.SpScenarioValidator`)
         validators.SpProportionalityValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
         validators.SpValueValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
-        validators.SpScenarioValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        self._run_rule_registries([SCENARIO_REGISTRY], rule_context)
         validators.SpLegendValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )

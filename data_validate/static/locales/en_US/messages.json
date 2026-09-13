@@ -167,6 +167,30 @@
   "rule.COMP-009.level_mismatch": {
     "message": "{filename}: Children indicators of parent {parent} are not at the same level: [{children}]."
   },
+  "rule.temporal_reference.missing_required_column": {
+    "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
+  },
+  "rule.TEMP-001.warning": {
+    "message": "{filename}, line {row}: The value in column '{column}' must end with a period."
+  },
+  "rule.TEMP-002.error": {
+    "message": "{filename}: Year {year} cannot be associated with scenarios because it is not a future year."
+  },
+  "rule.TEMP-003.error": {
+    "message": "{filename}: Column '{column}' must not contain duplicated values."
+  },
+  "rule.scenario.missing_required_column": {
+    "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
+  },
+  "rule.SCEN-003.no_punctuation": {
+    "message": "{filename}, line {row}: The value in column '{column}' must not end with punctuation."
+  },
+  "rule.SCEN-003.must_end_with_dot": {
+    "message": "{filename}, line {row}: The value in column '{column}' must end with a period."
+  },
+  "rule.SCEN-004.error": {
+    "message": "{filename}: Column '{column}' must not contain duplicated values."
+  },
   "verification_name_file_structure": {
     "message": "Structure of the input folder files"
   },
