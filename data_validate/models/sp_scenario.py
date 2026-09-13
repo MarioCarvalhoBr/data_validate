@@ -89,8 +89,6 @@ class SpScenario(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-        self.run()
-
     def pre_processing(self):
         """Run pre-processing steps."""
         if self.scenario_exists_file and not self.scenarios:
@@ -145,6 +143,8 @@ class SpScenario(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
+
         if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()

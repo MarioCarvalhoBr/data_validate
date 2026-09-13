@@ -13,6 +13,10 @@ BUG-003: `SpDescription.pre_processing` used to write dropped/injected columns s
 `SpModelABC.frame` (and `SpProportionality.post_processing`) replace that with a
 per-instance working frame; these tests assert `data_loader_model.raw_data` is never mutated
 by model construction.
+
+ARC-001 (Phase 3 Port 8): construction no longer runs the pipeline automatically — every model
+built here calls `.run()` explicitly, exactly as `SpreadsheetProcessor._configure` does, so the
+BUG-002/BUG-003 behaviour under test still actually executes.
 """
 
 from __future__ import annotations
@@ -21,12 +25,6 @@ from pathlib import Path
 
 import pandas as pd
 
-# Import order matters: `data_validate.models` and `data_validate.controllers` share a circular
-# import at package-init time (spellchecker_validator imports from `data_validate.models` while
-# `data_validate.controllers` imports the validators package); importing `controllers` first
-# forces full initialisation before `models` is imported directly (see
-# `tests/unit/models/test_column_declarations.py` for the same workaround).
-from data_validate.controllers.report.validation_report import ValidationReport  # noqa: F401
 from data_validate.helpers.tools.data_loader.api.facade import DataLoaderModel
 from data_validate.models.sp_composition import SpComposition
 from data_validate.models.sp_description import SpDescription
@@ -87,10 +85,12 @@ class TestSpDescriptionInstanceIsolation:
             context=context,
             data_model=_build_data_model(tmp_path, _description_raw_data([1, 2]), "first.csv"),
         )
+        first_model.run()
         second_model = SpDescription(
             context=context,
             data_model=_build_data_model(tmp_path, _description_raw_data([1, 2, 3]), "second.csv"),
         )
+        second_model.run()
 
         assert SpDescription.RequiredColumn.COLUMN_CODE is pristine_code_column
         assert SpDescription.RequiredColumn.COLUMN_CODE.empty
@@ -104,10 +104,12 @@ class TestSpDescriptionInstanceIsolation:
             context=context,
             data_model=_build_data_model(tmp_path, _description_raw_data([1, 2]), "first.csv"),
         )
+        first_model.run()
         second_model = SpDescription(
             context=context,
             data_model=_build_data_model(tmp_path, _description_raw_data([1, 2, 3]), "second.csv"),
         )
+        second_model.run()
 
         assert first_model.cleaned_column("codigo").tolist() == [1, 2]
         assert second_model.cleaned_column("codigo").tolist() == [1, 2, 3]
@@ -119,6 +121,7 @@ class TestSpDescriptionInstanceIsolation:
             context=context,
             data_model=_build_data_model(tmp_path, _description_raw_data([1]), "only.csv"),
         )
+        model.run()
 
         result = model.cleaned_column("does_not_exist")
 
@@ -136,7 +139,7 @@ class TestSpDescriptionRawDataImmutability:
         expected = original.copy()
         data_model = _build_data_model(tmp_path, original, "descricao.csv")
 
-        SpDescription(context=context, data_model=data_model)
+        SpDescription(context=context, data_model=data_model).run()
 
         pd.testing.assert_frame_equal(data_model.raw_data, expected)
         assert "relacao" not in data_model.raw_data.columns
@@ -148,6 +151,7 @@ class TestSpDescriptionRawDataImmutability:
         data_model = _build_data_model(tmp_path, _description_raw_data([1]), "descricao.csv")
 
         model = SpDescription(context=context, data_model=data_model)
+        model.run()
 
         assert "relacao" in model.frame.columns
         assert "unidade" in model.frame.columns
@@ -167,13 +171,13 @@ class TestSpCompositionInstanceIsolation:
         SpComposition(
             context=context,
             data_model=_build_data_model(tmp_path, pd.DataFrame({"codigo_pai": [1], "codigo_filho": [2]}), "first.csv"),
-        )
+        ).run()
         SpComposition(
             context=context,
             data_model=_build_data_model(
                 tmp_path, pd.DataFrame({"codigo_pai": [1, 1], "codigo_filho": [2, 3]}), "second.csv"
             ),
-        )
+        ).run()
 
         assert SpComposition.RequiredColumn.COLUMN_PARENT_CODE is pristine_parent_column
         assert SpComposition.RequiredColumn.COLUMN_PARENT_CODE.empty
@@ -185,12 +189,14 @@ class TestSpCompositionInstanceIsolation:
             context=context,
             data_model=_build_data_model(tmp_path, pd.DataFrame({"codigo_pai": [1], "codigo_filho": [2]}), "first.csv"),
         )
+        first_model.run()
         second_model = SpComposition(
             context=context,
             data_model=_build_data_model(
                 tmp_path, pd.DataFrame({"codigo_pai": [1, 1], "codigo_filho": [2, 3]}), "second.csv"
             ),
         )
+        second_model.run()
 
         assert first_model.cleaned_column("codigo_filho").tolist() == [2]
         assert second_model.cleaned_column("codigo_filho").tolist() == [2, 3]
@@ -211,7 +217,7 @@ class TestSpTemporalReferenceInstanceIsolation:
                 "first.csv",
             ),
             scenarios=["O"],
-        )
+        ).run()
         SpTemporalReference(
             context=context,
             data_model=_build_data_model(
@@ -220,7 +226,7 @@ class TestSpTemporalReferenceInstanceIsolation:
                 "second.csv",
             ),
             scenarios=["O"],
-        )
+        ).run()
 
         assert SpTemporalReference.RequiredColumn.COLUMN_SYMBOL is pristine_symbol_column
         assert SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.empty
@@ -237,6 +243,7 @@ class TestSpTemporalReferenceInstanceIsolation:
             ),
             scenarios=["O"],
         )
+        first_model.run()
         second_model = SpTemporalReference(
             context=context,
             data_model=_build_data_model(
@@ -246,6 +253,7 @@ class TestSpTemporalReferenceInstanceIsolation:
             ),
             scenarios=["O"],
         )
+        second_model.run()
 
         assert first_model.cleaned_column("simbolo").tolist() == [2020]
         assert second_model.cleaned_column("simbolo").tolist() == [2020, 2030]
@@ -263,6 +271,7 @@ class TestSpProportionalityFrameInvalidation:
         data_model = _build_data_model(tmp_path, original, "proporcionalidades.csv")
 
         model = SpProportionality(context=context, data_model=data_model)
+        model.run()
 
         assert model.structural_errors
         assert model.frame.empty

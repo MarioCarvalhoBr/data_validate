@@ -88,8 +88,6 @@ class SpProportionality(SpModelABC):
         # `DataLoaderModel` instance would also observe.
         self.header_layout_invalid: bool = False
 
-        self.run()
-
     def pre_processing(self):
         """
         Run pre-processing steps.
@@ -192,6 +190,8 @@ class SpProportionality(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
+
         if (
             self.data_loader_model.does_file_exist
             and not self.data_loader_model.raw_data.empty

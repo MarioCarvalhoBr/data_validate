@@ -80,8 +80,6 @@ class SpValue(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-        self.run()
-
     def pre_processing(self):
         """Run pre-processing steps."""
         self.EXPECTED_COLUMNS = list(self.RequiredColumn.ALL)
@@ -135,6 +133,8 @@ class SpValue(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
+
         if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.data_cleaning()

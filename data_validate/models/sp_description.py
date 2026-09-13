@@ -159,7 +159,6 @@ class SpDescription(SpModelABC):
             **kwargs: Additional keyword arguments.
         """
         super().__init__(context, data_model, **kwargs)
-        self.run()
 
     def pre_processing(self):
         """
@@ -288,6 +287,8 @@ class SpDescription(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
+
         # If dataframe is empty, it doesn't make sense to continue
         if self.data_loader_model.does_file_exist:
             self.pre_processing()

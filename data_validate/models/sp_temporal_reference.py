@@ -86,8 +86,6 @@ class SpTemporalReference(SpModelABC):
         """
         super().__init__(context, data_model, **kwargs)
 
-        self.run()
-
     def pre_processing(self):
         """Run pre-processing steps (currently empty)."""
         pass
@@ -152,6 +150,8 @@ class SpTemporalReference(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
+
         if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()

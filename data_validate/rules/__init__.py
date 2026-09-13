@@ -19,7 +19,11 @@ Phase 3 Port 4 adds `temporal_reference.py` (`TEMPORAL_REGISTRY`, `TEMP-001`…`
 Phase 3 Port 6 adds `legend.py` (`LEGEND_REGISTRY`, `LEG-012`…`LEG-015`), replacing the deleted
 `validators.SpLegendValidator`. Phase 3 Port 7 adds `proportionality.py`
 (`PROPORTIONALITY_REGISTRY`, `PROP-003`…`PROP-010`), replacing the deleted
-`validators.SpProportionalityValidator`. See
+`validators.SpProportionalityValidator`. Phase 3 Port 8 (the migration's last validator port)
+adds `spell.py` (`SPELL_REGISTRY`, `SPELL-001`…`SPELL-005`), replacing the deleted
+`validators.SpellCheckerValidator` — with it, `data_validate/validators/` is deleted entirely
+(ARC-008) and every model's `run()`/`SpreadsheetProcessor.run()` is called explicitly by its
+caller instead of automatically from `__init__` (ARC-001). See
 `.specs/architecture/target-architecture.md` (`Rule`, `RuleContext`, `RuleOutcome` sketches) and
 `docs/adrs/0006-rule-registry-with-prerequisites.md`.
 """
@@ -35,6 +39,7 @@ from data_validate.rules.legend import LEGEND_REGISTRY
 from data_validate.rules.proportionality import PROPORTIONALITY_REGISTRY
 from data_validate.rules.registry import RegistryCycleError, RuleRegistry, RuleSpec
 from data_validate.rules.scenario import SCENARIO_REGISTRY
+from data_validate.rules.spell import SPELL_REGISTRY
 from data_validate.rules.structure import STRUCTURE_REGISTRY
 from data_validate.rules.temporal_reference import TEMPORAL_REGISTRY
 from data_validate.rules.value import VALUE_REGISTRY
@@ -54,6 +59,7 @@ __all__ = [
     "RuleSpec",
     "RuleStatus",
     "SCENARIO_REGISTRY",
+    "SPELL_REGISTRY",
     "STRUCTURE_REGISTRY",
     "SkipReason",
     "TEMPORAL_REGISTRY",

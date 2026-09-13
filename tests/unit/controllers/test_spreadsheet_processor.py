@@ -4,10 +4,11 @@ Unit tests for `SpreadsheetProcessor._read_data`/`_run_rule_registries` (ARC-009
 migration; ARC-017 Phase 3b/Phase 3 Port 2 rules-engine port).
 
 BUG-018/ARC-009: `_read_data` now calls `DataLoaderFacade.load()` (returning a `LoadResult`)
-instead of the deprecated `load_all` property. `SpreadsheetProcessor.__init__` runs the whole
-pipeline as a side effect (ARC-001, a pre-existing debt this test does not attempt to fix), so
-`_read_data`/`_run_rule_registries` are exercised in isolation on a bare instance built via
-`__new__`, with only the attributes each method itself reads pre-populated.
+instead of the deprecated `load_all` property. Since ARC-001 (Phase 3 Port 8),
+`SpreadsheetProcessor.__init__` no longer runs the whole pipeline as a side effect — `run()` must
+be called explicitly — but `_read_data`/`_run_rule_registries` are still exercised in isolation on
+a bare instance built via `__new__`, with only the attributes each method itself reads
+pre-populated, rather than going through a full `run()`.
 
 `_run_structure_rules` (a single-registry, folder-listing-only helper) was generalised into
 `_run_rule_registries(registries, ctx)` when the description rules were ported (ARC-017 Phase 3
@@ -22,11 +23,6 @@ from pathlib import Path
 
 import pandas as pd
 
-# Import order matters: `data_validate.models` and `data_validate.controllers` share a circular
-# import at package-init time (spellchecker_validator imports from `data_validate.models` while
-# `data_validate.controllers` imports the validators package); importing `controllers` first
-# forces full initialisation before `models` is imported directly (see
-# `tests/unit/specs/test_sheet_specs.py` for the same workaround).
 from data_validate.controllers.spreadsheet_processor import SpreadsheetProcessor
 from data_validate import config, models
 from data_validate.controllers.report.validation_report import ValidationReport
@@ -178,3 +174,39 @@ class TestRunStructureRulesUsesTheEngine:
         errors = processor.validation_reports[fs_title].errors
         assert errors.count("validator_structure_error_empty_directory") == 1
         assert errors.count("validator_structure_error_missing_file") == 4
+
+
+class _FakeModel:
+    """Minimal `SpModelABC`-shaped double: construction never runs anything (ARC-001)."""
+
+    class CONSTANTS:
+        SP_NAME = "descricao"
+
+    def __init__(self, context, data_model, **kwargs) -> None:
+        self.context = context
+        self.data_model = data_model
+        self.kwargs = kwargs
+        self.ran = False
+        self.structural_errors: list[str] = []
+        self.structural_warnings: list[str] = []
+        self.data_cleaning_errors: list[str] = []
+        self.data_cleaning_warnings: list[str] = []
+
+    def run(self) -> None:
+        self.ran = True
+
+
+class TestConfigureCallsRunExplicitly:
+    """ARC-001 (Phase 3 Port 8): `_configure` calls `model.run()` right after construction."""
+
+    def test_each_constructed_model_has_run_called_on_it(self, mocker) -> None:
+        processor = _build_bare_processor(mocker)
+        processor.raw_data_map = {"descricao": mocker.MagicMock()}
+        processor.model_configurations = {}
+        processor.initialized_models = []
+        processor.target_model_classes = [_FakeModel]
+
+        processor._configure()
+
+        assert processor.sp_descricao.ran is True
+        assert processor.initialized_models[0].ran is True

@@ -124,14 +124,16 @@ class SpModelABC(ABC):
         # Additional variables
         self.all_ok: bool = True
 
-        self.initialize()
-
     def initialize(self):
         """
         Initialize the verification process by performing basic sanity checks.
 
         This method removes duplicates from the scenario list, checks if the data frame is empty,
         and performs initial validations like vertical bar checks and unnamed column checks.
+
+        ARC-001: no longer called from `__init__` — every concrete `run()` calls this as its
+        first statement instead, so construction never performs I/O/validation work
+        (`.claude/rules/coding-standards.md` "no work in `__init__`").
         """
         self.scenarios = list(set(self.scenarios))
 
@@ -237,8 +239,10 @@ class SpModelABC(ABC):
         """
         Abstract method to execute the validation pipeline.
 
-        Should orchestrate the calling of `pre_processing`, `expected_structure_columns`,
-        `data_cleaning`, and `post_processing`.
+        Should call `self.initialize()` first (ARC-001: this used to run automatically from
+        `SpModelABC.__init__`), then orchestrate `pre_processing`, `expected_structure_columns`,
+        `data_cleaning`, and `post_processing`. Callers construct a model, then explicitly call
+        `run()` — never the other way around (`SpreadsheetProcessor._configure`).
         """
         pass
 

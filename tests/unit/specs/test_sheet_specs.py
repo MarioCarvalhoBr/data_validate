@@ -22,11 +22,6 @@ from typing import ClassVar
 
 import pytest
 
-# Import order matters: `data_validate.models` and `data_validate.controllers` share a circular
-# import at package-init time (spellchecker_validator imports from `data_validate.models` while
-# `data_validate.controllers` imports the validators package); importing `controllers` first
-# forces full initialisation before `models` is imported directly.
-from data_validate.controllers.report.validation_report import ValidationReport  # noqa: F401
 from data_validate.models import (
     SpComposition,
     SpDescription,

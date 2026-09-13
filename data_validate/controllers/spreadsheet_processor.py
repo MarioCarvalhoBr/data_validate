@@ -17,7 +17,6 @@ import data_validate.config as config
 import data_validate.controllers as controllers
 import data_validate.helpers.tools as tools
 import data_validate.models as models
-import data_validate.validators as validators
 from data_validate.rules import (
     COMPOSITION_REGISTRY,
     DESCRIPTION_REGISTRY,
@@ -27,6 +26,7 @@ from data_validate.rules import (
     RuleContext,
     RuleRegistry,
     SCENARIO_REGISTRY,
+    SPELL_REGISTRY,
     STRUCTURE_REGISTRY,
     TEMPORAL_REGISTRY,
     VALUE_REGISTRY,
@@ -61,10 +61,11 @@ class SpreadsheetProcessor:
 
     def __init__(self, context: controllers.GeneralContext):
         """
-        Initialize the processor and start the pipeline globally.
+        Initialize the processor: store dependencies and prepare report structures.
 
-        Sets up the environment, initializes contexts, prepares report structures,
-        and automatically triggers the `run()` pipeline execution.
+        ARC-001: construction no longer triggers the `run()` pipeline as a side effect —
+        callers construct a `SpreadsheetProcessor`, then explicitly call `run()`
+        (`data_validate/main.py::main`).
 
         Args:
             context (GeneralContext): The main application context.
@@ -102,18 +103,7 @@ class SpreadsheetProcessor:
         ]
         self.validation_reports = controllers.ValidationReport(context=self.context)
 
-        # Running the main processing function
-        self.context.logger.info(data_validate.__welcome__)
-
-        # Start time measurement
-        start_time = time.time()
-
-        # RUN ALL PROCESS: ETL, VALIDATIONS, REPORTS
-        self.run()
-
-        # End time measurement if --no-time is not set
-        if not self.context.data_args.data_action.no_time:
-            print("Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos")
+        self._spell_backend = None
 
     def _prepare_statement(self) -> None:
         """
@@ -197,12 +187,14 @@ class SpreadsheetProcessor:
             # Dynamically create the attribute name, e.g., "sp_description"
             attribute_name = f"sp_{sp_name_key.lower()}"
 
-            # Model instance creation and initialization
+            # Model instance creation; ARC-001: construction no longer runs the pipeline as a
+            # side effect, so `run()` is called explicitly right after construction.
             model_instance = model_class(
                 context=self.context,
                 data_model=self.raw_data_map.get(sp_name_key),
                 **self.model_configurations,
             )
+            model_instance.run()
             setattr(self, attribute_name, model_instance)
             self.initialized_models.append(model_instance)
 
@@ -234,11 +226,25 @@ class SpreadsheetProcessor:
         `RuleContext` is returned with that result injected into `options`. Neither build copies
         any sheet/cleaned data; both are cheap mapping-shell constructions.
 
+        Also constructs the `SpellChecker` backend once (ARC-017 Phase 3 Port 8), stored on
+        `self._spell_backend` (so `_build_pipeline` can release its resources after the SPELL
+        registry runs) and injected into `options["spell_backend"]` for `rules/spell.py`'s
+        `SPELL-002`…`004` to call; built unconditionally, matching the legacy
+        `SpellCheckerValidator.__init__`'s own unconditional `SpellChecker(...)` construction —
+        `--no-spellchecker` only skips the per-model column checks (BUG-027: the dictionary/
+        backend errors must still surface).
+
         Returns:
             RuleContext: The shared context for this run.
         """
         description_model = self.data_models_context.get_instance_of(models.SpDescription)
         legend_model = self.data_models_context.get_instance_of(models.SpLegend)
+        dictionary_model = self.data_models_context.get_instance_of(models.SpDictionary)
+
+        self._spell_backend = tools.SpellChecker(
+            self.context.data_args.data_file.locale,
+            dictionary_model.words_to_ignore if dictionary_model else [],
+        )
 
         sheets = {model.CONSTANTS.SP_NAME: model.frame for model in self.initialized_models}
         cleaned = {model.CONSTANTS.SP_NAME: dict(model.cleaned) for model in self.initialized_models}
@@ -263,6 +269,8 @@ class SpreadsheetProcessor:
             "value_data_unavailable": self.context.config.VALUE_DATA_UNAVAILABLE,
             "precision_decimal_place_truncate": self.context.config.PRECISION_DECIMAL_PLACE_TRUNCATE,
             "current_language": self.language_manager.current_language,
+            "spell_backend": self._spell_backend,
+            "no_spellchecker": self.context.data_args.data_action.no_spellchecker,
         }
 
         preliminary_context = RuleContext(
@@ -330,10 +338,10 @@ class SpreadsheetProcessor:
         # 1. Validate the structure of the data (ARC-017 Phase 3b: ported to the rules engine)
         self._run_rule_registries([STRUCTURE_REGISTRY], rule_context)
 
-        # 2. Validate the spelling of the data
-        validators.SpellCheckerValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        # 2. Validate the spelling of the data (ARC-017 Phase 3 Port 8, ported to the rules
+        # engine, replacing the deleted `validators.SpellCheckerValidator`)
+        self._run_rule_registries([SPELL_REGISTRY], rule_context)
+        self._spell_backend.clean_files_generated()
 
         # 3. Validate spreadsheet data mandatory (description: ARC-017 Phase 3 Port 2;
         # composition: ARC-017 Phase 3 Port 3, ported to the rules engine, replacing the
@@ -400,7 +408,15 @@ class SpreadsheetProcessor:
         3. `_configure()`: Model initialization and cleaning.
         4. `_build_pipeline()`: Core validation logic.
         5. `_report()`: Output generation.
+
+        ARC-001: this used to run automatically from `__init__`; callers (`main.py::main`) now
+        construct a `SpreadsheetProcessor`, then call `run()` explicitly. The welcome banner and
+        the total-execution-time print (both previously in `__init__`, around the old
+        `self.run()` call) moved here unchanged, so timing still covers exactly the same work.
         """
+        self.context.logger.info(data_validate.__welcome__)
+        start_time = time.time()
+
         self.context.logger.info("Starting processing...")
 
         self._prepare_statement()
@@ -408,3 +424,7 @@ class SpreadsheetProcessor:
         self._configure()
         self._build_pipeline()
         self._report()
+
+        # End time measurement if --no-time is not set
+        if not self.context.data_args.data_action.no_time:
+            print("Tempo total de execução: " + str(round(time.time() - start_time, 1)) + " segundos")

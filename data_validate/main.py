@@ -80,6 +80,7 @@ def main() -> int:
         data_args = DataArgs()
         general_context = GeneralContext(data_args=data_args)
         processor = SpreadsheetProcessor(context=general_context)
+        processor.run()
         general_context.finalize()
     except Exception as exc:
         print(f"Fatal error: {exc}", file=sys.stderr)

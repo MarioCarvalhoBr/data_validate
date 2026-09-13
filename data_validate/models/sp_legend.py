@@ -108,8 +108,6 @@ class SpLegend(SpModelABC):
         self.column_name_maximum = str(self.RequiredColumn.COLUMN_MAXIMUM.name)
         self.column_name_order = str(self.RequiredColumn.COLUMN_ORDER.name)
 
-        self.run()
-
     def pre_processing(self):
         """Run pre-processing steps (currently empty)."""
         pass
@@ -201,6 +199,7 @@ class SpLegend(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
 
         if self.data_loader_model.does_file_exist:
             self.pre_processing()

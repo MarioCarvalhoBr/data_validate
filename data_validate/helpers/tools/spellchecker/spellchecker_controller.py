@@ -66,6 +66,41 @@ class SpellCheckerController:
         spelling_errors = self.find_spelling_errors(text)
         return has_multiple_spaces, spelling_errors
 
+    def build_quality_findings(
+        self,
+        has_multiple_spaces: bool,
+        spelling_errors: List[str],
+        column: str,
+        row_index: int,
+    ) -> List[Tuple[int, str, str, List[str] | None]]:
+        """Turn precomputed quality signals into structured `(row, column, kind, payload)` findings.
+
+        ARC-017 Phase 3 Port 8: this is the structured counterpart of
+        `format_quality_warnings` — `rules/spell.py`'s `SPELL-002`…`004` consume this instead of
+        a pre-formatted Portuguese string, so the rule (not this backend module) chooses the
+        catalog key and renders the final message (`.claude/rules/i18n.md`).
+
+        Args:
+            has_multiple_spaces: Whether the text has two or more consecutive spaces.
+            spelling_errors: Misspelled words found in the text, in the order
+                `find_spelling_errors` produced them (duplicates and order preserved).
+            column: Column name the text came from.
+            row_index: Zero-based row index.
+
+        Returns:
+            List of `(row_index, column, kind, payload)` tuples, `kind` one of
+            `"multiple_spaces"` (`payload` is `None`) or `"misspelled_words"` (`payload` is the
+            `spelling_errors` list); empty when neither signal is set; both entries are present,
+            multiple-spaces first, when both signals are set for the same row/column (matching
+            `format_quality_warnings`'s own append order).
+        """
+        findings: List[Tuple[int, str, str, List[str] | None]] = []
+        if has_multiple_spaces:
+            findings.append((row_index, column, "multiple_spaces", None))
+        if spelling_errors:
+            findings.append((row_index, column, "misspelled_words", list(spelling_errors)))
+        return findings
+
     def format_quality_warnings(
         self,
         has_multiple_spaces: bool,
@@ -75,6 +110,11 @@ class SpellCheckerController:
         sheet_name: str,
     ) -> List[str]:
         """Format row-specific warning messages from precomputed quality signals.
+
+        Kept as a thin, string-returning compatibility wrapper over `build_quality_findings`
+        (ARC-017 Phase 3 Port 8) for `DataFrameProcessor.process_dataframe`/`check_text_quality`
+        and their existing tests; the structured `rules/spell.py` path calls
+        `build_quality_findings` directly instead.
 
         Args:
             has_multiple_spaces: Whether the text has two or more consecutive spaces.
@@ -88,17 +128,16 @@ class SpellCheckerController:
             List of formatted warning messages, empty if there is nothing to report.
         """
         warnings = []
-
-        if has_multiple_spaces:
-            warnings.append(
-                f"{sheet_name}, linha {row_index + 2}: Há dois ou mais espaços seguidos na coluna {column}."
-            )
-
-        if spelling_errors:
-            warnings.append(
-                f"{sheet_name}, linha {row_index + 2}: "
-                f"Palavras com possíveis erros ortográficos na coluna {column}: {spelling_errors}."
-            )
+        for _, _, kind, payload in self.build_quality_findings(has_multiple_spaces, spelling_errors, column, row_index):
+            if kind == "multiple_spaces":
+                warnings.append(
+                    f"{sheet_name}, linha {row_index + 2}: Há dois ou mais espaços seguidos na coluna {column}."
+                )
+            else:
+                warnings.append(
+                    f"{sheet_name}, linha {row_index + 2}: "
+                    f"Palavras com possíveis erros ortográficos na coluna {column}: {payload}."
+                )
 
         return warnings
 

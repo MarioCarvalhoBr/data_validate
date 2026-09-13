@@ -86,8 +86,6 @@ class SpDictionary(SpModelABC):
 
         self.words_to_ignore: List[str] = []
 
-        self.run()
-
     def pre_processing(self):
         """
         Pre-process the dictionary file to extract words.
@@ -146,6 +144,8 @@ class SpDictionary(SpModelABC):
 
         Runs pre-processing, structure validation, and data cleaning if the file exists.
         """
+        self.initialize()
+
         if self.data_loader_model.does_file_exist:
             self.pre_processing()
             self.expected_structure_columns()

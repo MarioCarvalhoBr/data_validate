@@ -394,5 +394,20 @@
   },
   "rule.PROP-010.warning": {
     "message": "{filename}, linha {row}: A soma dos valores para o indicador pai {parent} é {sum}, e não 1."
+  },
+  "rule.spelling.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.SPELL-001.backend_error": {
+    "message": "{message}"
+  },
+  "rule.SPELL-003.warning": {
+    "message": "{filename}, linha {row}: Há dois ou mais espaços seguidos na coluna {column}."
+  },
+  "rule.SPELL-004.warning": {
+    "message": "{filename}, linha {row}: Palavras com possíveis erros ortográficos na coluna {column}: {words}."
+  },
+  "rule.SPELL-005.error": {
+    "message": "Erro ao processar o arquivo {filename}: {message}"
   }
 }

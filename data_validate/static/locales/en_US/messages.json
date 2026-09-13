@@ -394,5 +394,20 @@
   },
   "rule.PROP-010.warning": {
     "message": "{filename}, line {row}: The sum of values for parent indicator {parent} is {sum}, not 1."
+  },
+  "rule.spelling.missing_required_column": {
+    "message": "{filename}: The check was aborted for the required column '{column}', which is missing."
+  },
+  "rule.SPELL-001.backend_error": {
+    "message": "{message}"
+  },
+  "rule.SPELL-003.warning": {
+    "message": "{filename}, line {row}: There are two or more consecutive spaces in column '{column}'."
+  },
+  "rule.SPELL-004.warning": {
+    "message": "{filename}, line {row}: Possible spelling errors in column '{column}': {words}."
+  },
+  "rule.SPELL-005.error": {
+    "message": "Error processing file {filename}: {message}"
   }
 }

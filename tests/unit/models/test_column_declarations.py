@@ -12,12 +12,6 @@ only place the corrected dtype is actually exercised until the ``ColumnSpec`` re
 
 from __future__ import annotations
 
-# Import order matters: `data_validate.models` and `data_validate.controllers` share a circular
-# import at package-init time (spellchecker_validator imports from `data_validate.models` while
-# `data_validate.controllers` imports the validators package); importing `controllers` first
-# forces full initialisation before `models` is imported directly (see
-# `tests/unit/specs/test_sheet_specs.py` for the same workaround).
-from data_validate.controllers.report.validation_report import ValidationReport  # noqa: F401
 from data_validate.models.sp_description import SpDescription
 from data_validate.models.sp_scenario import SpScenario
 from data_validate.models.sp_temporal_reference import SpTemporalReference
