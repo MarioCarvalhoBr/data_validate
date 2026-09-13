@@ -73,7 +73,6 @@ _PARENT = "codigo_pai"
 _CHILD = "codigo_filho"
 _CODE = "codigo"
 _LEVEL = "nivel"
-_RELATION = "relacao"
 _SIMPLE_NAME = "nome_simples"
 _COMPLETE_NAME = "nome_completo"
 _ID = "id"
@@ -668,9 +667,10 @@ def check_leaf_indicators_have_proportionality(ctx: RuleContext) -> list[Issue]:
 def _tree_required_column_issues(ctx: RuleContext, rule_id: str, category: str) -> list[Issue]:
     """The shared composicao+descricao required-column check for COMP-007/008/009.
 
-    Reproduces `SpCompositionTreeValidator.global_required_columns` exactly, including
-    `descricao.relacao` — vestigial (the model always injects a default `relacao` column, see
-    `.specs/business-rules/composition.md`'s COMP-008 entry) but part of the legacy check.
+    Reproduces `SpCompositionTreeValidator.global_required_columns`, minus `descricao.relacao`
+    (PROTO-002): the column was removed from the protocol (v1.15, "parâmetro desnecessário") and
+    is no longer injected by `SpDescription.pre_processing`, so requiring it here would abort
+    every one of these rules on a v1.16-compliant bundle.
     """
     composition_frame = ctx.sheet(_COMPOSITION_SHEET)
     description_frame = ctx.sheet(_DESCRIPTION_SHEET)
@@ -681,7 +681,7 @@ def _tree_required_column_issues(ctx: RuleContext, rule_id: str, category: str) 
         _missing_column_issue(rule_id, Severity.ERROR, category, composition_filename, column)
         for column in _missing_composition_columns(composition_frame)
     ]
-    for column in (_CODE, _LEVEL, _RELATION):
+    for column in (_CODE, _LEVEL):
         if column not in description_frame.columns:
             issues.append(_missing_column_issue(rule_id, Severity.ERROR, category, description_filename, column))
     return issues
@@ -696,9 +696,8 @@ def check_composition_tree_acyclic(ctx: RuleContext) -> list[Issue]:
     """COMP-007: the composition tree (adjacency-dict view of `composicao`) must be acyclic.
 
     A DFS-based duplicate of COMP-002 under a different message shape (protocol gap, see
-    `.specs/business-rules/composition.md`); requires `descricao`'s `codigo`/`nivel`/`relacao`
-    in addition to `composicao`'s columns, matching `validate_hierarchy_with_tree`'s own
-    combined required-columns check.
+    `.specs/business-rules/composition.md`); requires `descricao`'s `codigo`/`nivel` in addition
+    to `composicao`'s columns (PROTO-002 dropped `relacao` from this check).
     """
     issues = _tree_required_column_issues(ctx, "COMP-007", NamesEnum.TH.value)
     if issues:

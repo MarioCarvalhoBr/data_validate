@@ -106,13 +106,17 @@ def make_description_frame(
         "nivel": [str(level) for level in resolved_levels],
         "nome_simples": [f"Indicador {code}" for code in codes],
         "nome_completo": [f"Indicador completo {code}" for code in codes],
-        "desc_simples": [f"Descrição simples do indicador {code}." for code in codes],
+        # PROTO-005: the protocol forbids a trailing period on `desc_simples` (DESC-006).
+        "desc_simples": [f"Descrição simples do indicador {code}" for code in codes],
         "desc_completa": [f"Descrição completa do indicador {code}." for code in codes],
         "fontes": [f"Fonte sintética {code}" for code in codes],
         "meta": ["0.0" for _ in codes],
         "unidade": ["" for _ in codes],
         "relacao": ["1" for _ in codes],
         "ordem": [str(code) for code in codes],
+        # PROTO-004/DESC-013: a valid `categoria` domain value by default so a caller must
+        # explicitly `.drop(columns=["categoria"])` to exercise the absence-warning path.
+        "categoria": ["social" for _ in codes],
     }
     if with_scenario_column:
         columns["cenario"] = ["0" for _ in codes]

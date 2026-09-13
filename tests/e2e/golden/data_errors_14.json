@@ -1,12 +1,12 @@
 {
-  "exit_code": 0,
+  "exit_code": 1,
   "fixture": "data_errors_14",
   "json_summary": {
     "data_validate": {
       "report": {
         "errors": 9,
-        "tests": 34,
-        "warnings": 5
+        "tests": 35,
+        "warnings": 16
       },
       "version": "<version>"
     }
@@ -44,7 +44,8 @@
     "Relações de indicadores em proporcionalidades",
     "Indicadores em valores e proporcionalidades",
     "Indicadores folhas sem dados associados",
-    "Níveis dos indicadores filhos"
+    "Níveis dos indicadores filhos",
+    "Categoria do indicador"
   ],
   "sections": {
     "Anos em referência temporal": {
@@ -54,6 +55,12 @@
     "Campos vazios": {
       "errors": [],
       "warnings": []
+    },
+    "Categoria do indicador": {
+      "errors": [],
+      "warnings": [
+        "descricao.xlsx: A coluna 'categoria' está ausente; o protocolo exige uma categoria (social, economico, ambiental ou climatico) para cada indicador."
+      ]
     },
     "Códigos HTML nas descrições simples": {
       "errors": [],
@@ -81,7 +88,9 @@
     },
     "Hierarquia como árvore": {
       "errors": [],
-      "warnings": []
+      "warnings": [
+        "composicao.xlsx, linha 4: O indicador pai 2 (cenario 1) e o indicador filho 4 (cenario 0) devem compartilhar o mesmo valor de 'cenario'."
+      ]
     },
     "Indicadores em valores e proporcionalidades": {
       "errors": [],
@@ -123,7 +132,17 @@
     },
     "Pontuações obrigatórias e proibidas em descrições": {
       "errors": [],
-      "warnings": []
+      "warnings": [
+        "descricao.xlsx, linha 10: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 2: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 3: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 4: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 5: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 6: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 7: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 8: O valor da coluna 'desc_simples' não deve terminar com pontuação.",
+        "descricao.xlsx, linha 9: O valor da coluna 'desc_simples' não deve terminar com pontuação."
+      ]
     },
     "Pontuações obrigatórias e proibidas em referência temporal": {
       "errors": [],

@@ -407,6 +407,9 @@
   "verification_name_child_indicator_levels": {
     "message": "Níveis dos indicadores filhos"
   },
+  "verification_name_indicator_category": {
+    "message": "Categoria do indicador"
+  },
   "rule.proportionality.missing_required_column": {
     "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
   },
@@ -532,6 +535,27 @@
   },
   "rule.DESC-012.error": {
     "message": "{filename}: A coluna '{column}' não pode existir se o arquivo de legenda não estiver configurado ou não existir."
+  },
+  "rule.DESC-013.error": {
+    "message": "{filename}, linha {row}: O valor '{value}' da coluna '{column}' deve ser um dos seguintes: {allowed_values}."
+  },
+  "rule.DESC-013.warning": {
+    "message": "{filename}: A coluna '{column}' está ausente; o protocolo exige uma categoria (social, economico, ambiental ou climatico) para cada indicador."
+  },
+  "rule.DESC-014.error": {
+    "message": "{filename}, linha {row}: O indicador {codigo} (nível {nivel}) não pode ter um nível menor que o indicador anterior {previous_codigo} (nível {previous_nivel}); os níveis devem ser não decrescentes em ordem crescente de código."
+  },
+  "rule.DESC-015.domain_error": {
+    "message": "{filename}, linha {row}: O valor '{value}' da coluna '{column}' deve ser 0 ou 1."
+  },
+  "rule.DESC-015.propagation_warning": {
+    "message": "{filename}, linha {row}: O indicador pai {parent} (cenario {parent_cenario}) e o indicador filho {child} (cenario {child_cenario}) devem compartilhar o mesmo valor de 'cenario'."
+  },
+  "rule.DESC-017.error": {
+    "message": "{filename}: Os indicadores filhos do pai {parent} devem ter a coluna 'ordem' com valores sequenciais de 1 a n; valores encontrados: {observed_orders}."
+  },
+  "rule.DESC-019.warning": {
+    "message": "{filename}, linha {row}: O texto da coluna 'nome_completo' ({complete_length} caracteres) deve ter pelo menos o tamanho do texto da coluna 'nome_simples' ({simple_length} caracteres)."
   },
   "rule.SCEN-001.error": {
     "message": "{filename}: Arquivo de cenários com configuração incorreta. Consulte a especificação do modelo de dados."

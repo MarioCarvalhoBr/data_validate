@@ -38,13 +38,16 @@ per `.claude/rules/architecture-boundaries.md`; those helpers stay in place for 
 
 from __future__ import annotations
 
+import math
 import re
 from collections.abc import Iterable, Mapping
+from typing import cast
 
 import pandas as pd
 
 from data_validate.config import NamesEnum
 from data_validate.helpers.common.formatting.text_formatting_processing import TextFormattingProcessing
+from data_validate.rules.composition import CompositionFacts, compute_composition_facts
 from data_validate.rules.context import RuleContext
 from data_validate.rules.registry import RuleRegistry
 from data_validate.specs.issues import Issue, Severity
@@ -53,6 +56,7 @@ DESCRIPTION_REGISTRY = RuleRegistry()
 """Every `DESC-*` rule ported from `SpDescriptionValidator`, in the legacy check order."""
 
 _SHEET = "descricao"
+_COMPOSITION_SHEET = "composicao"
 
 _CODE = "codigo"
 _LEVEL = "nivel"
@@ -60,9 +64,25 @@ _SIMPLE_NAME = "nome_simples"
 _COMPLETE_NAME = "nome_completo"
 _SIMPLE_DESC = "desc_simples"
 _COMPLETE_DESC = "desc_completa"
+_CATEGORY = "categoria"
+_SCENARIO = "cenario"
+_ORDER = "ordem"
+_PARENT_CODE = "codigo_pai"
+_CHILD_CODE = "codigo_filho"
 
-_NO_PUNCTUATION_COLUMNS: tuple[str, ...] = (_SIMPLE_NAME, _COMPLETE_NAME)
-_MUST_END_WITH_DOT_COLUMNS: tuple[str, ...] = (_SIMPLE_DESC, _COMPLETE_DESC)
+_CATEGORY_DOMAIN: tuple[str, ...] = ("social", "economico", "ambiental", "climatico")
+"""PROTO-004 (protocol §2.3 p.8, since v1.13): `categoria`'s exact, unaccented domain."""
+
+_SCENARIO_DOMAIN: tuple[int, ...] = (0, 1)
+"""PROTO-009 (protocol §2.3 p.8): `cenario`'s domain per the protocol (the model's own
+`CLEAN-002` cleaning stays permissive, accepting any integer >= -1; DESC-015 is the rule layer
+that flags values outside {0, 1})."""
+
+# PROTO-005 (protocol §2.3 p.7, v1.13 and v1.16 agree): "Toda descrição simples não pode
+# terminar com um caractere especial como o ponto." `desc_simples` moved here from
+# `_MUST_END_WITH_DOT_COLUMNS` — only `desc_completa` still requires a trailing period.
+_NO_PUNCTUATION_COLUMNS: tuple[str, ...] = (_SIMPLE_NAME, _COMPLETE_NAME, _SIMPLE_DESC)
+_MUST_END_WITH_DOT_COLUMNS: tuple[str, ...] = (_COMPLETE_DESC,)
 _PUNCTUATION_CHARS = frozenset(",.;:!?")
 
 _CR = "\x0d"
@@ -114,12 +134,22 @@ def _option_int(ctx: RuleContext, key: str, default: int) -> int:
         return default
 
 
+def _sheet_filename(ctx: RuleContext, sheet: str) -> str:
+    """Return `sheet`'s display file name, as delivered (e.g. `"composicao.xlsx"`).
+
+    Shared by DESC-015/DESC-017 (PROTO-009/PROTO-010), the first rules in this module that
+    report an issue against a sheet other than `descricao` (`composicao`, to read/report against
+    its own filename when checking a cross-sheet property).
+    """
+    filenames = ctx.options.get("filenames", {})
+    if isinstance(filenames, Mapping) and sheet in filenames:
+        return str(filenames[sheet])
+    return sheet
+
+
 def _filename(ctx: RuleContext) -> str:
     """Return the `descricao` file name as delivered (e.g. `"descricao.xlsx"`)."""
-    filenames = ctx.options.get("filenames", {})
-    if isinstance(filenames, Mapping) and _SHEET in filenames:
-        return str(filenames[_SHEET])
-    return _SHEET
+    return _sheet_filename(ctx, _SHEET)
 
 
 def _cleaned_column(ctx: RuleContext, column: str) -> pd.Series:
@@ -392,7 +422,11 @@ def check_indicator_levels(ctx: RuleContext) -> list[Issue]:
 
 @DESCRIPTION_REGISTRY.rule(rule_id="DESC-006", category=NamesEnum.MAND_PUNC_DESC.value, requires={_SHEET: ()})
 def check_punctuation(ctx: RuleContext) -> list[Issue]:
-    """DESC-006: names never end with punctuation; descriptions end with a period.
+    """DESC-006: names and `desc_simples` never end with punctuation; `desc_completa` ends with a period.
+
+    PROTO-005 (protocol §2.3 p.7, v1.13/v1.16): "Toda descrição simples não pode terminar com um
+    caractere especial como o ponto." — `desc_simples` moved from `_MUST_END_WITH_DOT_COLUMNS` to
+    `_NO_PUNCTUATION_COLUMNS`; only `desc_completa` still requires a trailing period.
 
     Missing columns are reported first, for all four columns in
     `_NO_PUNCTUATION_COLUMNS + _MUST_END_WITH_DOT_COLUMNS` order, before any violation is
@@ -666,3 +700,331 @@ def check_title_length(ctx: RuleContext) -> list[Issue]:
         max_length_option="title_max_length",
         message_key="rule.DESC-010.warning",
     )
+
+
+@DESCRIPTION_REGISTRY.rule(rule_id="DESC-013", category=NamesEnum.CATEG_DESC.value, requires={_SHEET: ()})
+def check_category_domain(ctx: RuleContext) -> list[Issue]:
+    """DESC-013: `categoria` must be one of `social`/`economico`/`ambiental`/`climatico` (PROTO-004).
+
+    Protocol §2.3 p.8 (since v1.13): the column's domain is exactly these four unaccented
+    values (an accented/mis-cased variant does not match and is reported as an error).
+
+    Staged rollout (PROTO-004 step 1): the column absent from the bundle is reported as a
+    single sheet-level **warning** (`rule.DESC-013.warning`), not a missing-required-column
+    error — a future re-baseline (Phase 4) promotes the absence case to an error once sectors
+    have had time to add the column. When present, every row whose value falls outside the
+    domain is reported as an **error** (`rule.DESC-013.error`), naming the offending value and
+    the accepted set.
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _CATEGORY not in frame.columns:
+        return [
+            Issue(
+                rule_id="DESC-013",
+                severity=Severity.WARNING,
+                sheet=filename,
+                row=None,
+                column=_CATEGORY,
+                message_key="rule.DESC-013.warning",
+                params={"filename": filename, "column": _CATEGORY},
+                category=NamesEnum.CATEG_DESC.value,
+            )
+        ]
+
+    series = frame[_CATEGORY]
+    mask = series.notna() & (series != "")
+    invalid_mask = mask & ~series.isin(_CATEGORY_DOMAIN)
+
+    return [
+        Issue(
+            rule_id="DESC-013",
+            severity=Severity.ERROR,
+            sheet=filename,
+            row=int(idx),
+            column=_CATEGORY,
+            message_key="rule.DESC-013.error",
+            params={
+                "filename": filename,
+                "row": _excel_row(idx),
+                "column": _CATEGORY,
+                "value": series.loc[idx],
+                "allowed_values": ", ".join(_CATEGORY_DOMAIN),
+            },
+            category=NamesEnum.CATEG_DESC.value,
+        )
+        for idx in series.index[invalid_mask]
+    ]
+
+
+@DESCRIPTION_REGISTRY.rule(rule_id="DESC-014", category=NamesEnum.IL.value, requires={_SHEET: ()})
+def check_codes_ordered_by_level(ctx: RuleContext) -> list[Issue]:
+    """DESC-014 (PROTO-008, gap G-06): `nivel` must be non-decreasing along ascending `codigo`.
+
+    Protocol §2.3 p.6: "Não inserir um codigo de menor nível entre codigos de níveis
+    superiores." Reads the model's own cleaned `codigo`/`nivel` (`ctx.cleaned["descricao"]`,
+    `SpDescription.data_cleaning`); when either cleaned column is a different length than the
+    raw frame (at least one cell failed cleaning), this rule reports nothing — DESC-002/
+    CLEAN-001 already report that underlying failure. Vectorised via `.sort_values()` + `.shift()`
+    (PERF-001-style, no `iterrows()`): sorts by `codigo`, then flags every row whose `nivel` is
+    lower than the immediately preceding (in code order) row's `nivel`.
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _CODE not in frame.columns:
+        return [_missing_column_issue("DESC-014", Severity.ERROR, NamesEnum.IL.value, filename, _CODE)]
+    if _LEVEL not in frame.columns:
+        return [_missing_column_issue("DESC-014", Severity.ERROR, NamesEnum.IL.value, filename, _LEVEL)]
+
+    cleaned_code = _cleaned_column(ctx, _CODE)
+    cleaned_level = _cleaned_column(ctx, _LEVEL)
+    if len(cleaned_code) != len(frame) or len(cleaned_level) != len(frame):
+        return []
+
+    order = cleaned_code.sort_values().index
+    ordered_code = cleaned_code.loc[order]
+    ordered_level = cleaned_level.loc[order]
+    previous_code = ordered_code.shift(1)
+    previous_level = ordered_level.shift(1)
+    violation_mask = previous_level.notna() & (ordered_level < previous_level)
+
+    return [
+        Issue(
+            rule_id="DESC-014",
+            severity=Severity.ERROR,
+            sheet=filename,
+            row=int(idx),
+            column=_LEVEL,
+            message_key="rule.DESC-014.error",
+            params={
+                "filename": filename,
+                "row": _excel_row(idx),
+                "column": _LEVEL,
+                "codigo": int(ordered_code.loc[idx]),
+                "nivel": int(ordered_level.loc[idx]),
+                "previous_codigo": int(previous_code.loc[idx]),
+                "previous_nivel": int(previous_level.loc[idx]),
+            },
+            category=NamesEnum.IL.value,
+        )
+        for idx in ordered_level.index[violation_mask]
+    ]
+
+
+def _composition_facts(ctx: RuleContext) -> CompositionFacts:
+    """Read `ctx.options["composition_facts"]`, computing it on the fly if a caller forgot to.
+
+    Mirrors `rules/composition.py::_facts`'s own fallback precedent (BUG-019): the real
+    pipeline (`SpreadsheetProcessor._build_rule_context`) always injects a pre-computed
+    `CompositionFacts` so every registry — including this one — reads it, never recomputes it;
+    this fallback only matters for a rule-level test/caller that builds a bare `RuleContext`
+    directly.
+    """
+    facts = ctx.options.get("composition_facts")
+    if isinstance(facts, CompositionFacts):
+        return facts
+    return compute_composition_facts(ctx)
+
+
+@DESCRIPTION_REGISTRY.rule(
+    rule_id="DESC-015",
+    category=NamesEnum.TH.value,
+    requires={_SHEET: (), _COMPOSITION_SHEET: ()},
+)
+def check_scenario_domain_and_propagation(ctx: RuleContext) -> list[Issue]:
+    """DESC-015 (PROTO-009, gap G-09): `cenario` domain {0, 1}, plus downward propagation.
+
+    Protocol §2.3 p.8: `cenario` is 0 or 1 (the model's own `CLEAN-002` cleaning stays
+    permissive, accepting any integer >= -1 — this rule is the one that flags values outside
+    {0, 1} as an **error**) — "hierarchy propagation" ("se um índice possui cenário, todos os
+    índices construídos a partir deste também deverão"). Directional, matching the backlog's
+    own worked example (`.specs/quality/backlog/09-protocol-v116.md`'s PROTO-009: "parent with
+    scenario whose child lacks it → error"): for every DIRECT `composicao` edge, a parent with
+    `cenario == 1` must have a child that also has `cenario == 1`; a child with `cenario == 1`
+    whose parent lacks it is NOT flagged by this rule — a documented, one-directional scope
+    decision (see `.specs/business-rules/description.md`'s DESC-015 entry). Scoped to direct
+    edges, not the full transitive ancestor/descendant closure, matching
+    `rules/composition.py::check_parent_level_below_child_level` (COMP-008)'s own direct-edge
+    precedent for a hierarchy-consistency check. Returns nothing when `cenario` itself is
+    absent (no `cenarios` file — DESC-011 already reports/handles that gate).
+
+    Staged severity split (orchestrator decision, 2026-09-13, matching the PROTO-004 staging
+    precedent): the propagation half is reported as a **warning**
+    (`rule.DESC-015.propagation_warning`), not an error, because it flipped the canonical
+    "clean" fixture `data_ground_truth_01`'s exit code from 0 to 1 — an unacceptable regression
+    risk for production bundles whose `descricao`/`composicao` data predates this rule. The
+    domain half (`rule.DESC-015.domain_error`, `cenario` outside {0, 1}) is unaffected and
+    stays an error. See `.specs/business-rules/protocol-changelog.md`'s PROTO-009/DESC-015
+    maintainer note for the staging record and the future-owner decision this defers.
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _SCENARIO not in frame.columns:
+        return []
+
+    cleaned_cenario = _cleaned_column(ctx, _SCENARIO)
+    issues: list[Issue] = []
+
+    domain_mask = cleaned_cenario.notna() & ~cleaned_cenario.isin(_SCENARIO_DOMAIN)
+    for idx in cleaned_cenario.index[domain_mask]:
+        issues.append(
+            Issue(
+                rule_id="DESC-015",
+                severity=Severity.ERROR,
+                sheet=filename,
+                row=int(idx),
+                column=_SCENARIO,
+                message_key="rule.DESC-015.domain_error",
+                params={
+                    "filename": filename,
+                    "row": _excel_row(idx),
+                    "column": _SCENARIO,
+                    "value": int(cleaned_cenario.loc[idx]),
+                },
+                category=NamesEnum.TH.value,
+            )
+        )
+
+    cleaned_code = _cleaned_column(ctx, _CODE)
+    if cleaned_code.empty or cleaned_cenario.empty:
+        return issues
+
+    code_to_cenario = dict(zip(cleaned_code.tolist(), cleaned_cenario.reindex(cleaned_code.index).tolist()))
+
+    facts = _composition_facts(ctx)
+    if not facts.available or facts.edges.empty:
+        return issues
+
+    composition_filename = _sheet_filename(ctx, _COMPOSITION_SHEET)
+    edges = facts.edges
+    parent_cenario = edges[_PARENT_CODE].map(code_to_cenario)
+    child_cenario = edges[_CHILD_CODE].map(code_to_cenario)
+    # Directional (backlog PROTO-009's own worked example: "parent with scenario whose child
+    # lacks it → error"): a parent with `cenario == 1` propagates DOWN to every direct child,
+    # which must also be `1`; a child with `cenario == 1` whose parent is `0` is NOT flagged
+    # here — that asymmetry is a documented scope decision, see this rule's docstring and
+    # `.specs/business-rules/description.md`'s DESC-015 entry.
+    mismatch_mask = parent_cenario.notna() & child_cenario.notna() & (parent_cenario == 1) & (child_cenario == 0)
+
+    for idx in edges.index[mismatch_mask]:
+        issues.append(
+            Issue(
+                rule_id="DESC-015",
+                severity=Severity.WARNING,
+                sheet=composition_filename,
+                row=int(idx),
+                column=None,
+                message_key="rule.DESC-015.propagation_warning",
+                params={
+                    "filename": composition_filename,
+                    "row": _excel_row(idx),
+                    "parent": int(edges.loc[idx, _PARENT_CODE]),
+                    "parent_cenario": int(parent_cenario.loc[idx]),
+                    "child": int(edges.loc[idx, _CHILD_CODE]),
+                    "child_cenario": int(child_cenario.loc[idx]),
+                },
+                category=NamesEnum.TH.value,
+            )
+        )
+    return issues
+
+
+@DESCRIPTION_REGISTRY.rule(
+    rule_id="DESC-017",
+    category=NamesEnum.CHILD_LVL.value,
+    requires={_SHEET: (), _COMPOSITION_SHEET: ()},
+)
+def check_order_sibling_sequence(ctx: RuleContext) -> list[Issue]:
+    """DESC-017 (PROTO-010, gap G-10): `ordem`, when present, must form `1..n` per parent group.
+
+    Protocol §2.3 pp.7-8 / `#202`: sibling display order. Returns nothing when `ordem` itself is
+    absent (optional column) or when `codigo`'s cleaning failed (`cleaned_code` empty). A parent
+    group is only checked when every one of its children resolves to a parseable integer
+    `ordem` — a group with any missing/non-numeric `ordem` is silently skipped by this rule
+    (a documented scope decision; that cell may still be reported by other checks).
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    if _ORDER not in frame.columns:
+        return []
+
+    cleaned_code = _cleaned_column(ctx, _CODE)
+    if cleaned_code.empty:
+        return []
+
+    order_numeric = pd.to_numeric(frame[_ORDER], errors="coerce")
+    code_to_order: dict[int, float] = dict(
+        zip(cleaned_code.tolist(), order_numeric.reindex(cleaned_code.index).tolist())
+    )
+
+    facts = _composition_facts(ctx)
+    if not facts.available or facts.edges.empty:
+        return []
+
+    issues: list[Issue] = []
+    for parent, group in facts.edges.groupby(_PARENT_CODE)[_CHILD_CODE]:
+        child_orders = [code_to_order.get(int(child), math.nan) for child in group]
+        if any(math.isnan(value) or value != int(value) for value in child_orders):
+            continue
+        observed = sorted(int(value) for value in child_orders)
+        expected = list(range(1, len(observed) + 1))
+        if observed != expected:
+            issues.append(
+                Issue(
+                    rule_id="DESC-017",
+                    severity=Severity.ERROR,
+                    sheet=filename,
+                    row=None,
+                    column=_ORDER,
+                    message_key="rule.DESC-017.error",
+                    params={"filename": filename, "parent": int(cast(int, parent)), "observed_orders": str(observed)},
+                    category=NamesEnum.CHILD_LVL.value,
+                )
+            )
+    return issues
+
+
+@DESCRIPTION_REGISTRY.rule(rule_id="DESC-019", category=NamesEnum.INP.value, requires={_SHEET: ()})
+def check_complete_name_length(ctx: RuleContext) -> list[Issue]:
+    """DESC-019 (PROTO-010, gap G-10): `nome_completo` must be at least as long as `nome_simples`.
+
+    Protocol p.7. Missing-column abort mirrors DESC-004's own two-column shape (both columns'
+    missing-column issues reported before any length is compared).
+    """
+    frame = ctx.sheet(_SHEET)
+    filename = _filename(ctx)
+
+    issues: list[Issue] = []
+    for column in (_SIMPLE_NAME, _COMPLETE_NAME):
+        if column not in frame.columns:
+            issues.append(_missing_column_issue("DESC-019", Severity.WARNING, NamesEnum.INP.value, filename, column))
+    if issues:
+        return issues
+
+    simple = frame[_SIMPLE_NAME].astype(str)
+    complete = frame[_COMPLETE_NAME].astype(str)
+    violation_mask = complete.str.len() < simple.str.len()
+
+    return [
+        Issue(
+            rule_id="DESC-019",
+            severity=Severity.WARNING,
+            sheet=filename,
+            row=int(idx),
+            column=_COMPLETE_NAME,
+            message_key="rule.DESC-019.warning",
+            params={
+                "filename": filename,
+                "row": _excel_row(idx),
+                "column": _COMPLETE_NAME,
+                "simple_length": len(simple.loc[idx]),
+                "complete_length": len(complete.loc[idx]),
+            },
+            category=NamesEnum.INP.value,
+        )
+        for idx in simple.index[violation_mask]
+    ]

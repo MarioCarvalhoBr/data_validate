@@ -57,6 +57,10 @@ class ColumnKind(StrEnum):
     REQUIRED = "required"
     OPTIONAL = "optional"
     DYNAMIC = "dynamic"
+    DEPRECATED = "deprecated"
+    """Column the protocol no longer defines (PROTO-001/PROTO-002): never required, never
+    flagged as an unexpected/extra column when present, and never injected with a default value
+    when absent. Accepted silently for backward compatibility with pre-v1.15/v1.16 bundles."""
 
 
 class HeaderLayout(StrEnum):
@@ -129,6 +133,11 @@ class SheetSpec:
         return tuple(column for column in self.columns if column.kind is ColumnKind.DYNAMIC)
 
     @property
+    def deprecated_columns(self) -> tuple[ColumnSpec, ...]:
+        """Columns the protocol no longer defines (PROTO-001/PROTO-002); accepted silently."""
+        return tuple(column for column in self.columns if column.kind is ColumnKind.DEPRECATED)
+
+    @property
     def column_names(self) -> tuple[str, ...]:
         """Every declared column name, in declaration order."""
         return tuple(column.name for column in self.columns)
@@ -151,11 +160,19 @@ _DESCRICAO = SheetSpec(
         ColumnSpec(name="nome_completo", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="desc_simples", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="desc_completa", dtype="str", kind=ColumnKind.REQUIRED),
-        ColumnSpec(name="fontes", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="meta", dtype="str", kind=ColumnKind.REQUIRED),
         ColumnSpec(name="unidade", dtype="str", kind=ColumnKind.OPTIONAL),
-        ColumnSpec(name="relacao", dtype="int", kind=ColumnKind.OPTIONAL),
         ColumnSpec(name="ordem", dtype="int", kind=ColumnKind.OPTIONAL),
+        # PROTO-004/DESC-013 (protocol §2.3 p.8, since v1.13): domain validated by the rule
+        # layer (`social`/`economico`/`ambiental`/`climatico`), not by `ColumnSpec` (a string
+        # domain, not a `min_value`); staged as OPTIONAL — a bundle without it gets a warning
+        # (not a missing-column error) until a future re-baseline makes it required.
+        ColumnSpec(name="categoria", dtype="str", kind=ColumnKind.OPTIONAL),
+        # PROTO-001 (v1.16 history: "não é usada") / PROTO-002 (v1.15 history: "parâmetro
+        # desnecessário"): both columns were removed from the protocol; accepted silently when
+        # a bundle still carries them, never required, never injected with a default.
+        ColumnSpec(name="fontes", dtype="str", kind=ColumnKind.DEPRECATED),
+        ColumnSpec(name="relacao", dtype="int", kind=ColumnKind.DEPRECATED),
         ColumnSpec(name="cenario", dtype="int", kind=ColumnKind.DYNAMIC, min_value=-1),
         # Declared dtype="Int64" (nullable int) in SpDescription.DynamicColumn, cleaned as an
         # integer (min 1, empty allowed) — resolved BUG-013 divergence, see module docstring.

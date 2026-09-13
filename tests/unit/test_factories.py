@@ -66,9 +66,10 @@ class TestMakeDescriptionFrame:
         assert frame["nome_simples"].is_unique
         assert frame["nome_completo"].is_unique
 
-    def test_descriptions_end_with_a_period(self) -> None:
+    def test_desc_completa_ends_with_a_period_desc_simples_does_not(self) -> None:
+        """PROTO-005: the protocol forbids a trailing period on `desc_simples` (DESC-006)."""
         frame = make_description_frame(3)
-        assert frame["desc_simples"].str.endswith(".").all()
+        assert not frame["desc_simples"].str.endswith(".").any()
         assert frame["desc_completa"].str.endswith(".").all()
 
     def test_with_scenario_column_adds_cenario(self) -> None:

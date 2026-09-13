@@ -4,6 +4,105 @@ Every regeneration of `tests/e2e/golden/*.json` is recorded here: date, fixture(
 the commit/PR it shipped with. See `.claude/skills/golden-harness/SKILL.md` for the update
 process — regenerate only via `make harness-update`, with the diff reviewed.
 
+## 2026-09-13 (PROTO-008/PROTO-009/PROTO-010: DESC-014/DESC-015/DESC-017/DESC-019)
+
+- **Fixtures re-baselined**: `data_errors_01`, `data_errors_09`, `data_errors_11`,
+  `data_errors_13`, `data_errors_14`, `data_errors_15`, `data_errors_xss`, `data_ground_truth_01`
+  (`data_errors_09`/`data_errors_11` change for DESC-014 too; every fixture changes for DESC-015
+  because every current `descricao` sheet has a level-1 indicator with `cenario=1` whose direct
+  children lack it — see the "IMPORTANT" note below; `data_errors_xss` changes for DESC-019 too;
+  DESC-017 fires in none of the eight fixtures — every fixture's `ordem` values already form a
+  valid `1..n` sequence per parent).
+- **Reason**: PROTO-008 (`.specs/quality/backlog/09-protocol-v116.md`) implements DESC-014,
+  protocol §2.3 p.6: "Não inserir um codigo de menor nível entre codigos de níveis superiores."
+  PROTO-009 implements DESC-015, protocol §2.3 p.8: `cenario` ∈ {0, 1} plus "se um índice possui
+  cenário, todos os índices construídos a partir deste também deverão" (hierarchy propagation).
+  PROTO-010 implements DESC-017 (`ordem` sibling sequence, protocol §2.3 pp.7-8 / `#202`) and
+  DESC-019 (`nome_completo` ≥ `nome_simples` length, protocol p.7).
+- **Content diff (every fixture, reviewed line-by-line)**:
+  - New section **"Categoria do indicador"** is NOT part of this entry (already added by the
+    PROTO-004 entry above); the diff below is additional to that one.
+  - **DESC-014** (`data_errors_09`, `data_errors_11` only): one new error each in "Níveis de
+    indicadores" — `data_errors_09`'s `codigo=6` has `nivel=2` right after `codigo=5`'s `nivel=3`
+    (a known, pre-existing defect in that fixture, previously undetected); `data_errors_11`'s
+    `codigo=9` has `nivel=1` right after `codigo=8`'s `nivel=5` (same kind of defect). No other
+    fixture's `codigo`/`nivel` pairs violate non-decreasing order.
+  - **DESC-015** (every fixture): every fixture's `descricao` has `codigo=2` (`nivel=2`) with
+    `cenario=1`, and its two direct `composicao` children (`codigo=3`/`codigo=4` in the clean
+    fixtures; different codes in the error fixtures with a scrambled tree) both have `cenario=0`
+    — each such edge gains one new **warning** in "Hierarquia como árvore": `"…: O indicador pai
+    {N} (cenario 1) e o indicador filho {M} (cenario 0) devem compartilhar o mesmo valor de
+    'cenario'."` (`rule.DESC-015.propagation_warning`). The check is **directional** (parent
+    `cenario=1` → child must be `1` too; the reverse, a child with `cenario=1` whose parent lacks
+    it, is NOT flagged — see `rules/description.py::check_scenario_domain_and_propagation`'s
+    docstring), matching the backlog's own worked example; a fully bidirectional/
+    transitive-closure reading would report even more (rejected as out of scope for this slice,
+    documented in `.specs/business-rules/description.md`). The domain half (`cenario` outside
+    `{0, 1}`, `rule.DESC-015.domain_error`) is unaffected and stays an **error** — none of the
+    eight fixtures currently trigger it.
+  - **Amendment, same day (orchestrator staging decision)**: this entry originally shipped with
+    the propagation half as an **error**, which flipped `data_ground_truth_01`'s `exit_code` from
+    `0` to `1` (`errors` `0` → `2`) — the first time the canonical "clean"/"everything passes"
+    fixture (`CLAUDE.md`'s `make run FIXTURE=data_ground_truth_01`) reported a failure. Before
+    that change reached a commit, it was staged down to a **warning** (matching the PROTO-004
+    staging precedent for `categoria`): the message text is unchanged, only the severity and
+    message key (`rule.DESC-015.propagation_error` → `rule.DESC-015.propagation_warning`) moved.
+    `data_ground_truth_01`'s `exit_code` is back to `0` (`errors` unchanged at `0`, `warnings`
+    `+2`); every other fixture keeps the same `errors` count it had before DESC-015 existed, with
+    the two propagation lines counted as `warnings` instead. See
+    `.specs/business-rules/protocol-changelog.md`'s PROTO-009/DESC-015 maintainer note for the
+    full staging record — promoting the propagation half back to an error is left to a future
+    owner decision.
+  - **DESC-019** (`data_errors_xss` only): one new warning in "Padrão para nomes dos
+    indicadores" — this fixture's known mutation (an `<Script>Alert(1)</Script>` payload
+    appended to row 1's `nome_simples`) makes `nome_simples` (45 characters) longer than
+    `nome_completo` (33 characters), which the pre-existing mutation never triggered before this
+    rule existed.
+  - No other section, and no other fixture's `errors`/`warnings` counts beyond the above, changed.
+
+## 2026-09-13 (PROTO-004: DESC-013 `categoria` domain + staged absence warning)
+
+- **Fixtures re-baselined**: all eight — `data_errors_01`, `data_errors_09`, `data_errors_11`,
+  `data_errors_13`, `data_errors_14`, `data_errors_15`, `data_errors_xss`, `data_ground_truth_01`.
+- **Reason**: PROTO-004 (`.specs/quality/backlog/09-protocol-v116.md`) implements DESC-013 per
+  protocol §2.3 p.8 (since v1.13): `descricao.categoria` must be one of `social`/`economico`/
+  `ambiental`/`climatico`. Staged rollout, step 1: the column's absence is a **warning**, not a
+  missing-required-column error (a future re-baseline promotes it to an error once sectors have
+  had time to add the column); `specs/sheet_specs.py` gains `categoria` as `ColumnKind.OPTIONAL`,
+  and `NamesEnum.CATEG_DESC` (`verification_name_indicator_category`) is a new report category.
+- **Content diff (every fixture, reviewed line-by-line)**: strictly additive —
+  - New section **"Categoria do indicador"** appears in `section_order`/`sections` for every
+    fixture (none of the eight fixtures' `descricao` sheets carry a `categoria` column), each
+    with exactly one warning: `"{filename}: A coluna 'categoria' está ausente; o protocolo exige
+    uma categoria (social, economico, ambiental ou climatico) para cada indicador."`.
+  - `json_summary.data_validate.report.tests`: `34` → `35` (one new registered category,
+    `SpreadsheetProcessor._prepare_statement` pre-populates every `NamesEnum` member); `warnings`
+    `+1` per fixture; `errors` unchanged.
+  - No other section, and no other field, changed in any fixture.
+
+## 2026-09-13 (PROTO-005: `desc_simples` no longer requires a trailing period)
+
+- **Fixtures re-baselined**: all eight — `data_errors_01`, `data_errors_09`, `data_errors_11`,
+  `data_errors_13`, `data_errors_14`, `data_errors_15`, `data_errors_xss`, `data_ground_truth_01`.
+- **Reason**: PROTO-005 (`.specs/quality/backlog/09-protocol-v116.md`) flips DESC-006 for
+  `desc_simples` per protocol §2.3 p.7 (v1.13 and v1.16 agree): "Toda descrição simples não pode
+  terminar com um caractere especial como o ponto." `desc_simples` moved from
+  `_MUST_END_WITH_DOT_COLUMNS` to `_NO_PUNCTUATION_COLUMNS` in `rules/description.py`; only
+  `desc_completa` still requires a trailing period.
+- **Content diff (every fixture, reviewed line-by-line)**: strictly confined to the
+  "Pontuações obrigatórias e proibidas em descrições" section and the derived `warnings` count in
+  `json_summary`/CLI `tests`/`errors` fields unaffected:
+  - Every `descricao` row whose `desc_simples` cell ends with `.` (every fixture's `descricao`
+    sheet happened to end every `desc_simples` cell with a period, matching the *old*,
+    now-reversed rule) gains one new warning: `"…, linha {row}: O valor da coluna 'desc_simples'
+    não deve terminar com pontuação."`.
+  - `data_errors_01` additionally **loses** its pre-existing `"…, linha 3: O valor da coluna
+    'desc_simples' deve terminar com ponto."` warning (that row's `desc_simples` cell does not end
+    with `.`, which used to violate the old "must end with dot" rule and now satisfies the new
+    "must not end with dot" rule).
+  - No other section, no `errors` count, and no other fixture field changed.
+- No new/removed fixture in this entry (unlike the entry below, which added `data_errors_xss`).
+
 ## 2026-09-13
 
 - **Fixtures re-baselined**: `data_errors_01` (one line changed, everything else byte-identical).

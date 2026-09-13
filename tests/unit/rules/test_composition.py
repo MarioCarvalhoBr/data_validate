@@ -494,14 +494,16 @@ class TestCheckCompositionTreeAcyclic:
         assert issue.message_key == "rule.COMP-007.error"
         assert issue.params["cycle_path"] in ("1 -> 2 -> 1", "2 -> 1 -> 2")
 
-    def test_missing_relacao_column_is_reported(self) -> None:
+    def test_missing_relacao_column_is_no_longer_required_proto_002(self) -> None:
+        """PROTO-002: `relacao` was removed from the protocol; it must not be required here."""
         composicao = make_composition_frame(edges=[(1, 2)])
         descricao = make_description_frame(2).drop(columns=["relacao"])
         ctx = _make_context(composicao=composicao, descricao=descricao)
 
         issues = check_composition_tree_acyclic(ctx)
 
-        assert any(issue.params["column"] == "relacao" for issue in issues)
+        assert not any(issue.params.get("column") == "relacao" for issue in issues)
+        assert issues == []
 
 
 class TestCheckParentLevelBelowChildLevel:

@@ -140,6 +140,14 @@ class TestSheetSpecsMatchModelColumns:
 
         assert dynamic_names == list(SpDescription.DynamicColumn.ALL)
 
+    def test_deprecated_columns_match_description_model(self):
+        """PROTO-001/PROTO-002: `fontes`/`relacao` are declared `ColumnKind.DEPRECATED`."""
+        spec = SHEET_SPECS["descricao"]
+        deprecated_names = [column.name for column in spec.deprecated_columns]
+
+        assert deprecated_names == list(SpDescription.DeprecatedColumn.ALL)
+        assert deprecated_names == ["fontes", "relacao"]
+
     def test_plural_name_pairs_match_description_model(self):
         spec = SHEET_SPECS["descricao"]
         plural_names = [pair[1] for pair in spec.plural_name_pairs]
@@ -155,6 +163,7 @@ class TestSheetSpecsMatchModelColumns:
 
         assert spec.optional_columns == ()
         assert spec.dynamic_columns == ()
+        assert spec.deprecated_columns == ()
         assert spec.plural_name_pairs == ()
 
 

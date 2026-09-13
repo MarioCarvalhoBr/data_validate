@@ -146,19 +146,28 @@ class TestSpDescriptionRawDataImmutability:
         assert "unidade" not in data_model.raw_data.columns
 
     def test_injected_defaults_are_visible_on_frame_but_not_on_raw_data(self, mocker, tmp_path):
-        """`relacao`/`unidade` defaults must land on `model.frame`, never on `raw_data`."""
+        """`unidade`'s default must land on `model.frame`, never on `raw_data`."""
         context = mocker.MagicMock()
         data_model = _build_data_model(tmp_path, _description_raw_data([1]), "descricao.csv")
 
         model = SpDescription(context=context, data_model=data_model)
         model.run()
 
-        assert "relacao" in model.frame.columns
         assert "unidade" in model.frame.columns
-        assert "relacao" not in data_model.raw_data.columns
         assert "unidade" not in data_model.raw_data.columns
-        assert model.frame["relacao"].tolist() == [1]
         assert model.frame["unidade"].tolist() == [""]
+
+    def test_relacao_is_no_longer_injected_proto_002(self, mocker, tmp_path):
+        """PROTO-002: `relacao` is a deprecated column, never injected with a default value."""
+        context = mocker.MagicMock()
+        data_model = _build_data_model(tmp_path, _description_raw_data([1]), "descricao.csv")
+
+        model = SpDescription(context=context, data_model=data_model)
+        model.run()
+
+        assert "relacao" not in model.frame.columns
+        assert model.structural_errors == []
+        assert model.structural_warnings == []
 
 
 class TestSpCompositionInstanceIsolation:

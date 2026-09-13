@@ -407,6 +407,9 @@
   "verification_name_child_indicator_levels": {
     "message": "Child indicator levels"
   },
+  "verification_name_indicator_category": {
+    "message": "Indicator category"
+  },
   "rule.proportionality.missing_required_column": {
     "message": "{filename}: The check was aborted because the required column '{column}' is missing."
   },
@@ -532,6 +535,27 @@
   },
   "rule.DESC-012.error": {
     "message": "{filename}: Column '{column}' must not exist if the legend file is not configured or does not exist."
+  },
+  "rule.DESC-013.error": {
+    "message": "{filename}, line {row}: The value '{value}' in column '{column}' must be one of: {allowed_values}."
+  },
+  "rule.DESC-013.warning": {
+    "message": "{filename}: Column '{column}' is missing; the protocol requires a category (social, economico, ambiental, or climatico) for each indicator."
+  },
+  "rule.DESC-014.error": {
+    "message": "{filename}, line {row}: Indicator {codigo} (level {nivel}) must not have a lower level than the preceding indicator {previous_codigo} (level {previous_nivel}); levels must be non-decreasing in ascending code order."
+  },
+  "rule.DESC-015.domain_error": {
+    "message": "{filename}, line {row}: The value '{value}' in column '{column}' must be 0 or 1."
+  },
+  "rule.DESC-015.propagation_warning": {
+    "message": "{filename}, line {row}: Parent indicator {parent} (cenario {parent_cenario}) and child indicator {child} (cenario {child_cenario}) must share the same 'cenario' value."
+  },
+  "rule.DESC-017.error": {
+    "message": "{filename}: The children of parent {parent} must have column 'ordem' with sequential values from 1 to n; values found: {observed_orders}."
+  },
+  "rule.DESC-019.warning": {
+    "message": "{filename}, line {row}: The text in column 'nome_completo' ({complete_length} characters) must be at least as long as the text in column 'nome_simples' ({simple_length} characters)."
   },
   "rule.SCEN-001.error": {
     "message": "{filename}: Scenarios file has an incorrect configuration. Refer to the data model specification."

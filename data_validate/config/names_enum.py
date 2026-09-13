@@ -45,3 +45,6 @@ class NamesEnum(Enum):
     IND_VAL_PROP = "verification_name_indicators_in_values_and_proportionalities"
     LEAF_NO_DATA = "verification_name_leaf_indicators_without_associated_data"
     CHILD_LVL = "verification_name_child_indicator_levels"
+    CATEG_DESC = "verification_name_indicator_category"
+    """PROTO-004/DESC-013: `descricao.categoria` domain (`social`/`economico`/`ambiental`/
+    `climatico`) and its staged absence warning."""

@@ -45,7 +45,7 @@ class TestApplicationConfigClock:
         # Format is fixed: dd/mm/yyyy HH:MM:SS.
         datetime.strptime(config.DATE_NOW, "%d/%m/%Y %H:%M:%S")
 
-    def test_get_verify_names_returns_all_34_titles(self, mocker) -> None:
+    def test_get_verify_names_returns_all_titles(self, mocker) -> None:
         """`get_verify_names()` still returns a localized title per `NamesEnum` member.
 
         Also documents the `TITLES_N`/`SIMP_DESC_N` interpolation: those two keys
@@ -62,7 +62,7 @@ class TestApplicationConfigClock:
         verify_names = config.get_verify_names()
 
         assert isinstance(verify_names, MappingProxyType)
-        assert len(verify_names) == 34
+        assert len(verify_names) == len(NamesEnum)
         assert set(verify_names.keys()) == {element.value for element in NamesEnum}
 
         # TITLES_N and SIMP_DESC_N are interpolated with the configured limits.
@@ -81,8 +81,9 @@ class TestApplicationConfigClock:
 
         `base_validator.py` calls `get_verify_names()` once per validator and
         `FileReportGenerator` calls it twice more per run, so without caching
-        the same 34 lookups repeat on every call. Calling it twice here must
-        still only cost 34 `LanguageManager.text` calls in total (not 68).
+        the same `len(NamesEnum)` lookups repeat on every call. Calling it twice
+        here must still only cost `len(NamesEnum)` `LanguageManager.text` calls in
+        total (not double that).
         """
         mock_language_manager_cls = mocker.patch(
             "data_validate.config.application_config.LanguageManager",
@@ -93,10 +94,10 @@ class TestApplicationConfigClock:
         config = ApplicationConfig(clock=lambda: datetime(2024, 1, 1))
 
         first_result = config.get_verify_names()
-        assert mock_language_manager.text.call_count == 34
+        assert mock_language_manager.text.call_count == len(NamesEnum)
 
         second_result = config.get_verify_names()
-        assert mock_language_manager.text.call_count == 34
+        assert mock_language_manager.text.call_count == len(NamesEnum)
 
         assert second_result is first_result
 

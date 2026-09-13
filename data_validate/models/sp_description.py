@@ -69,7 +69,6 @@ class SpDescription(SpModelABC):
             COLUMN_COMPLETE_NAME (Series): Column definition for the complete name (string).
             COLUMN_SIMPLE_DESC (Series): Column definition for the simple description (string).
             COLUMN_COMPLETE_DESC (Series): Column definition for the complete description (string).
-            COLUMN_SOURCES (Series): Column definition for the sources (string).
             COLUMN_META (Series): Column definition for the meta information (string).
             ALL (List[str]): List of all required column names.
         """
@@ -80,7 +79,6 @@ class SpDescription(SpModelABC):
         COLUMN_COMPLETE_NAME = pd.Series(dtype="str", name="nome_completo")
         COLUMN_SIMPLE_DESC = pd.Series(dtype="str", name="desc_simples")
         COLUMN_COMPLETE_DESC = pd.Series(dtype="str", name="desc_completa")
-        COLUMN_SOURCES = pd.Series(dtype="str", name="fontes")
         COLUMN_META = pd.Series(dtype="str", name="meta")
 
         ALL: List[str] = [
@@ -90,7 +88,6 @@ class SpDescription(SpModelABC):
             str(COLUMN_COMPLETE_NAME.name),
             str(COLUMN_SIMPLE_DESC.name),
             str(COLUMN_COMPLETE_DESC.name),
-            str(COLUMN_SOURCES.name),
             str(COLUMN_META.name),
         ]
 
@@ -115,19 +112,45 @@ class SpDescription(SpModelABC):
 
         Attributes:
             COLUMN_UNIT (Series): Column definition for the unit.
-            COLUMN_RELATION (Series): Column definition for the relation.
             COLUMN_ORDER (Series): Column definition for the order.
+            COLUMN_CATEGORY (Series): Column definition for the category (`social`/`economico`/
+                `ambiental`/`climatico` — domain validated by `rules/description.py::DESC-013`,
+                PROTO-004; staged as optional until a future re-baseline makes it required).
             ALL (List[str]): List of all optional column names.
         """
 
         COLUMN_UNIT = pd.Series(dtype="str", name="unidade")
-        COLUMN_RELATION = pd.Series(dtype="int64", name="relacao")
         COLUMN_ORDER = pd.Series(dtype="int64", name="ordem")
+        COLUMN_CATEGORY = pd.Series(dtype="str", name="categoria")
 
         ALL: List[str] = [
             str(COLUMN_UNIT.name),
-            str(COLUMN_RELATION.name),
             str(COLUMN_ORDER.name),
+            str(COLUMN_CATEGORY.name),
+        ]
+
+    class DeprecatedColumn:
+        """
+        Definitions of columns the protocol no longer defines (PROTO-001/PROTO-002).
+
+        Never required, never injected with a default value when absent, and never flagged
+        as an unexpected/extra column when present — accepted silently for bundles still
+        carrying them from a pre-v1.15/v1.16 delivery.
+
+        Attributes:
+            COLUMN_SOURCES (Series): Column definition for the sources (`fontes`, removed by
+                protocol v1.16: "não é usada").
+            COLUMN_RELATION (Series): Column definition for the relation (`relacao`, removed by
+                protocol v1.15: "parâmetro desnecessário").
+            ALL (List[str]): List of all deprecated column names.
+        """
+
+        COLUMN_SOURCES = pd.Series(dtype="str", name="fontes")
+        COLUMN_RELATION = pd.Series(dtype="int64", name="relacao")
+
+        ALL: List[str] = [
+            str(COLUMN_SOURCES.name),
+            str(COLUMN_RELATION.name),
         ]
 
     class PluralColumn:
@@ -165,8 +188,10 @@ class SpDescription(SpModelABC):
         Run pre-processing steps including dynamic column handling and filling optional columns.
 
         1. Handles dynamic columns 'cenario' and 'legenda' based on file existence/read success.
-        2. Fills optional columns with default values if missing ('relacao' -> 1, 'unidade' -> "").
-        3. Updates EXPECTED_COLUMNS list to include found optional columns.
+        2. Fills optional columns with default values if missing ('unidade' -> "").
+        3. Updates EXPECTED_COLUMNS list to include found optional columns and any deprecated
+           column ('fontes', 'relacao' — PROTO-001/PROTO-002) that happens to be present, so it
+           is accepted silently: never reported missing, never reported as an unexpected column.
         """
         translate = self.context.language_manager.text
         local_expected_columns = list(self.RequiredColumn.ALL)
@@ -199,14 +224,24 @@ class SpDescription(SpModelABC):
 
         # 2. Handling optional columns. `.assign` returns a new frame rather than mutating
         # `self.frame`/`raw_data` in place (BUG-003).
-        if self.OptionalColumn.COLUMN_RELATION.name not in self.frame.columns:
-            self.frame = self.frame.assign(**{str(self.OptionalColumn.COLUMN_RELATION.name): 1})
         if self.OptionalColumn.COLUMN_UNIT.name not in self.frame.columns:
             self.frame = self.frame.assign(**{str(self.OptionalColumn.COLUMN_UNIT.name): ""})
 
         for opt_column_name in self.OptionalColumn.ALL:
             if (opt_column_name in self.frame.columns) and (opt_column_name not in local_expected_columns):
                 local_expected_columns.append(opt_column_name)
+
+        # 3. Deprecated columns (PROTO-001/PROTO-002): no default injection, only added to
+        # EXPECTED_COLUMNS when the bundle still carries them, so `expected_structure_columns`
+        # neither reports them missing (they are simply absent from EXPECTED_COLUMNS when the
+        # bundle omits them) nor reports them as an unexpected extra column (they are present in
+        # EXPECTED_COLUMNS whenever the bundle carries them).
+        for deprecated_column_name in self.DeprecatedColumn.ALL:
+            if (deprecated_column_name in self.frame.columns) and (
+                deprecated_column_name not in local_expected_columns
+            ):
+                local_expected_columns.append(deprecated_column_name)
+
         self.EXPECTED_COLUMNS = local_expected_columns
 
     def expected_structure_columns(self, *args: Any, **kwargs: Any) -> None:
