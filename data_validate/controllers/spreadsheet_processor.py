@@ -19,11 +19,13 @@ import data_validate.helpers.tools as tools
 import data_validate.models as models
 import data_validate.validators as validators
 from data_validate.rules import (
+    COMPOSITION_REGISTRY,
     DESCRIPTION_REGISTRY,
     Engine,
     RuleContext,
     RuleRegistry,
     STRUCTURE_REGISTRY,
+    compute_composition_facts,
     extend_report_from_outcomes,
 )
 
@@ -221,24 +223,46 @@ class SpreadsheetProcessor:
         unchanged, by every `_run_rule_registries` call in `_build_pipeline` — one `RuleContext`
         per run, not one per registry.
 
+        Builds the context twice (BUG-019): a first, otherwise-complete `RuleContext` is used to
+        compute `composition_facts` once (`compute_composition_facts`) — the graph/tree/relation
+        facts every `COMP-*` rule reads instead of recomputing — then a second, final
+        `RuleContext` is returned with that result injected into `options`. Neither build copies
+        any sheet/cleaned data; both are cheap mapping-shell constructions.
+
         Returns:
             RuleContext: The shared context for this run.
         """
         description_model = self.data_models_context.get_instance_of(models.SpDescription)
 
+        sheets = {model.CONSTANTS.SP_NAME: model.frame for model in self.initialized_models}
+        cleaned = {model.CONSTANTS.SP_NAME: dict(model.cleaned) for model in self.initialized_models}
+        base_options = {
+            "input_folder": Path(self.input_folder),
+            "dir_entries": os.listdir(self.input_folder),
+            "scenarios": self.scenarios,
+            "filenames": {model.CONSTANTS.SP_NAME: model.filename for model in self.initialized_models},
+            "no_warning_titles_length": self.context.data_args.data_action.no_warning_titles_length,
+            "expected_columns": tuple(description_model.EXPECTED_COLUMNS) if description_model else (),
+            "title_max_length": self.context.config.TITLE_OVER_N_CHARS,
+            "simple_desc_max_length": self.context.config.SIMPLE_DESCRIPTIONS_OVER_N_CHARS,
+            "proportionality_read_successful": self.raw_data_map[
+                models.SpProportionality.CONSTANTS.SP_NAME
+            ].is_read_successful,
+        }
+
+        preliminary_context = RuleContext(
+            sheets=sheets,
+            cleaned=cleaned,
+            options=base_options,
+            translate=self.language_manager.text,
+            clock=datetime.now,
+        )
+        composition_facts = compute_composition_facts(preliminary_context)
+
         return RuleContext(
-            sheets={model.CONSTANTS.SP_NAME: model.frame for model in self.initialized_models},
-            cleaned={model.CONSTANTS.SP_NAME: dict(model.cleaned) for model in self.initialized_models},
-            options={
-                "input_folder": Path(self.input_folder),
-                "dir_entries": os.listdir(self.input_folder),
-                "scenarios": self.scenarios,
-                "filenames": {model.CONSTANTS.SP_NAME: model.filename for model in self.initialized_models},
-                "no_warning_titles_length": self.context.data_args.data_action.no_warning_titles_length,
-                "expected_columns": tuple(description_model.EXPECTED_COLUMNS) if description_model else (),
-                "title_max_length": self.context.config.TITLE_OVER_N_CHARS,
-                "simple_desc_max_length": self.context.config.SIMPLE_DESCRIPTIONS_OVER_N_CHARS,
-            },
+            sheets=sheets,
+            cleaned=cleaned,
+            options={**base_options, "composition_facts": composition_facts},
             translate=self.language_manager.text,
             clock=datetime.now,
         )
@@ -296,15 +320,10 @@ class SpreadsheetProcessor:
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )
 
-        # 3. Validate spreadsheet data mandatory (description: ARC-017 Phase 3 Port 2, ported to
-        # the rules engine, replacing the deleted `validators.SpDescriptionValidator`)
-        self._run_rule_registries([DESCRIPTION_REGISTRY], rule_context)
-        validators.SpCompositionGraphValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
-        validators.SpCompositionTreeValidator(
-            data_models_context=self.data_models_context, validation_reports=self.validation_reports
-        )
+        # 3. Validate spreadsheet data mandatory (description: ARC-017 Phase 3 Port 2;
+        # composition: ARC-017 Phase 3 Port 3, ported to the rules engine, replacing the
+        # deleted `validators.SpCompositionGraphValidator`/`SpCompositionTreeValidator`)
+        self._run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], rule_context)
         validators.SpTemporalReferenceValidator(
             data_models_context=self.data_models_context, validation_reports=self.validation_reports
         )

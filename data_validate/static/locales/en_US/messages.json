@@ -125,6 +125,48 @@
   "rule.DESC-010.warning": {
     "message": "{filename}, line {row}: The text in column \"{column}\" exceeds the limit of {max_length} characters (found: {actual_length})."
   },
+  "rule.composition.missing_required_column": {
+    "message": "{filename}: The check was aborted because the required column '{column}' is missing."
+  },
+  "rule.composition.missing_required_column_level2": {
+    "message": "{filename}: The check was aborted because the required level-2 column '{column}' is missing."
+  },
+  "rule.composition.leaf_without_data": {
+    "message": "{filename}: Leaf indicator '{leaf}' has no associated data."
+  },
+  "rule.COMP-001.missing_codes": {
+    "message": "{label_from}: Indicator codes missing from {label_to}: {missing_codes}."
+  },
+  "rule.COMP-002.error": {
+    "message": "{filename}: Cycle found: [{cycle}]."
+  },
+  "rule.COMP-003.error": {
+    "message": "{filename}: Disconnected indicators found: {disconnected}."
+  },
+  "rule.COMP-004.root_missing.error": {
+    "message": "{filename}: Root node '{root}' not found."
+  },
+  "rule.COMP-004.warning.simple_name": {
+    "message": "{filename}: There are duplicated simple names: {duplicated_values}."
+  },
+  "rule.COMP-004.warning.complete_name": {
+    "message": "{filename}: There are duplicated complete names: {duplicated_values}."
+  },
+  "rule.COMP-007.error": {
+    "message": "{filename}: Cycle found: [{cycle_path}]."
+  },
+  "rule.COMP-008.error": {
+    "message": "{filename}, line {row}: Indicator {parent} (level {parent_level}) cannot be the parent of indicator {child} (level {child_level}). Update the levels in the description file."
+  },
+  "rule.COMP-009.parent_missing": {
+    "message": "{filename}: Parent code {parent} not found in the description."
+  },
+  "rule.COMP-009.child_missing": {
+    "message": "{filename}: Child code {child} not found in the description."
+  },
+  "rule.COMP-009.level_mismatch": {
+    "message": "{filename}: Children indicators of parent {parent} are not at the same level: [{children}]."
+  },
   "verification_name_file_structure": {
     "message": "Structure of the input folder files"
   },

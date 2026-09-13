@@ -19,7 +19,12 @@ class GraphProcessing:
         graph: The directed graph structure created from input data
     """
 
-    def __init__(self, dataframe: Optional[pd.DataFrame] = None, parent_column: Optional[str] = None, child_column: Optional[str] = None) -> None:
+    def __init__(
+        self,
+        dataframe: Optional[pd.DataFrame] = None,
+        parent_column: Optional[str] = None,
+        child_column: Optional[str] = None,
+    ) -> None:
         """
         Initialize GraphProcessing with optional DataFrame.
 
@@ -45,6 +50,13 @@ class GraphProcessing:
         """
         Create a directed graph from DataFrame with parent-child relationships.
 
+        Vectorised (PERF-001) via `nx.from_pandas_edgelist`: the whole edge list is built in
+        one call instead of an `iterrows()` loop calling `add_edge` per row. Node ids are
+        still produced with `str(value)` per cell (via `.map(str)`, not `.astype(str)` — the
+        latter leaves a `NaN` cell as `float('nan')` instead of stringifying it), preserving
+        the exact string coercion the old per-row `str(row[column])` used, including for
+        `NaN`/mixed-type columns and for `parent_column == child_column` (self-loops).
+
         Args:
             dataframe: DataFrame containing the data
             parent_column: Name of the column containing parent nodes
@@ -53,10 +65,15 @@ class GraphProcessing:
         Returns:
             Directed graph representing the hierarchical structure
         """
-        directed_graph: nx.DiGraph = nx.DiGraph()
-        for _, row in dataframe.iterrows():
-            directed_graph.add_edge(str(row[parent_column]), str(row[child_column]))
-
+        edges = pd.DataFrame(
+            {
+                "source": dataframe[parent_column].map(str),
+                "target": dataframe[child_column].map(str),
+            }
+        )
+        directed_graph: nx.DiGraph = nx.from_pandas_edgelist(
+            edges, source="source", target="target", create_using=nx.DiGraph
+        )
         self.graph = directed_graph
         return directed_graph
 

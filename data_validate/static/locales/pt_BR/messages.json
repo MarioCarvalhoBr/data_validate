@@ -125,6 +125,48 @@
   "rule.DESC-010.warning": {
     "message": "{filename}, linha {row}: O texto da coluna \"{column}\" excede o limite de {max_length} caracteres (encontrado: {actual_length})."
   },
+  "rule.composition.missing_required_column": {
+    "message": "{filename}: A verificação foi abortada para a coluna obrigatória '{column}' que está ausente."
+  },
+  "rule.composition.missing_required_column_level2": {
+    "message": "{filename}: A verificação foi abortada para a coluna nível 2 obrigatória '{column}' que está ausente."
+  },
+  "rule.composition.leaf_without_data": {
+    "message": "{filename}: Indicador folha '{leaf}' não possui dados associados."
+  },
+  "rule.COMP-001.missing_codes": {
+    "message": "{label_from}: Códigos dos indicadores ausentes em {label_to}: {missing_codes}."
+  },
+  "rule.COMP-002.error": {
+    "message": "{filename}: Ciclo encontrado: [{cycle}]."
+  },
+  "rule.COMP-003.error": {
+    "message": "{filename}: Indicadores desconectados encontrados: {disconnected}."
+  },
+  "rule.COMP-004.root_missing.error": {
+    "message": "{filename}: Nó raiz '{root}' não encontrado."
+  },
+  "rule.COMP-004.warning.simple_name": {
+    "message": "{filename}: Existem nomes simples duplicados: {duplicated_values}."
+  },
+  "rule.COMP-004.warning.complete_name": {
+    "message": "{filename}: Existem nomes completos duplicados: {duplicated_values}."
+  },
+  "rule.COMP-007.error": {
+    "message": "{filename}: Ciclo encontrado: [{cycle_path}]."
+  },
+  "rule.COMP-008.error": {
+    "message": "{filename}, linha {row}: O indicador {parent} (nível {parent_level}) não pode ser pai do indicador {child} (nível {child_level}). Atualize os níveis no arquivo de descrição."
+  },
+  "rule.COMP-009.parent_missing": {
+    "message": "{filename}: Código pai {parent} não encontrado na descrição."
+  },
+  "rule.COMP-009.child_missing": {
+    "message": "{filename}: Código filho {child} não encontrado na descrição."
+  },
+  "rule.COMP-009.level_mismatch": {
+    "message": "{filename}: Indicadores filhos do pai {parent} não estão no mesmo nível: [{children}]."
+  },
    "verification_name_file_structure": {
     "message": "Estrutura dos arquivos da pasta de entrada"
   },

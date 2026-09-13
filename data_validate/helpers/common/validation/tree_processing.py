@@ -1,7 +1,7 @@
 #  Copyright (c) 2025-2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 """Tree data validation utilities for hierarchical structure validation."""
 
-from typing import List, Tuple, Dict, Any, Set
+from typing import List, Tuple, Dict, Set
 
 import pandas as pd
 
@@ -24,6 +24,13 @@ class TreeProcessing:
         """
         Create a tree structure from parent-child relationships.
 
+        Vectorised (PERF-001) via `groupby(..., sort=False)` + `.apply(list)` instead of an
+        `iterrows()` loop appending to a dict: `sort=False` preserves each parent's
+        first-seen order (matching the old loop's insertion order), and each group's
+        `.apply(list)` keeps that parent's children in their original row order, including
+        duplicates. Distinct temporary column names are used so `parent_column ==
+        child_column` (self-referencing edges) still works.
+
         Args:
             dataframe: DataFrame containing parent-child relationships
             parent_column: Name of the parent code column
@@ -32,101 +39,22 @@ class TreeProcessing:
         Returns:
             Dictionary mapping parent codes to lists of child codes
         """
-        tree: Dict[str, List[str]] = {}
+        if dataframe.empty:
+            return {}
 
-        for _, row in dataframe.iterrows():
-            parent = str(row[parent_column])
-            child = str(row[child_column])
-
-            if parent not in tree:
-                tree[parent] = []
-            tree[parent].append(child)
-
-        return tree
-
-    @staticmethod
-    def validate_level_hierarchy(
-        composition_df: pd.DataFrame,
-        description_df: pd.DataFrame,
-        code_column: str,
-        level_column: str,
-        parent_column: str,
-        child_column: str,
-    ) -> List[Tuple[Any, Any]]:
-        """
-        Validate that parent nodes have lower levels than their children.
-
-        Args:
-            composition_df: DataFrame with parent-child relationships
-            description_df: DataFrame with code-level mappings
-            code_column: Name of the code column in description
-            level_column: Name of the level column in description
-            parent_column: Name of the parent code column in composition
-            child_column: Name of the child code column in composition
-
-        Returns:
-            List of tuples containing (parent, child) pairs with level errors
-        """
-        errors: List[Tuple[Any, Any]] = []
-
-        # Create level mapping
-        levels = {row[code_column]: row[level_column] for _, row in description_df.iterrows()}
-
-        for _, row in composition_df.iterrows():
-            parent = row[parent_column]
-            child = row[child_column]
-            parent_level = levels.get(parent, None)
-            child_level = levels.get(child, None)
-
-            if parent_level is None:
-                errors.append((parent, None))
-            elif child_level is None:
-                errors.append((None, child))
-            elif parent_level >= child_level:
-                errors.append((parent, child))
-
-        return errors
+        edges = pd.DataFrame(
+            {
+                "__parent__": dataframe[parent_column].map(str),
+                "__child__": dataframe[child_column].map(str),
+            }
+        )
+        grouped = edges.groupby("__parent__", sort=False)["__child__"].apply(list)
+        return grouped.to_dict()
 
     @staticmethod
-    def validate_missing_codes_in_description(
-        composition_df: pd.DataFrame,
-        description_df: pd.DataFrame,
-        code_column: str,
-        parent_column: str,
-        child_column: str,
-    ) -> List[Tuple[str, Any]]:
-        """
-        Validate that all parent and child codes exist in description.
-
-        Args:
-            composition_df: DataFrame with parent-child relationships
-            description_df: DataFrame with code-level mappings
-            code_column: Name of the code column in description
-            parent_column: Name of the parent code column in composition
-            child_column: Name of the child code column in composition
-
-        Returns:
-            List of tuples containing (error_type, code) pairs for missing codes
-        """
-        errors: List[Tuple[str, Any]] = []
-
-        # Get all codes from description
-        description_codes = set(description_df[code_column].values)
-
-        # Check for missing parent codes
-        for _, row in composition_df.iterrows():
-            parent = row[parent_column]
-            child = row[child_column]
-
-            if parent not in description_codes:
-                errors.append(("parent", parent))
-            if child not in description_codes:
-                errors.append(("child", child))
-
-        return errors
-
-    @staticmethod
-    def detect_cycles_dfs(tree: Dict[str, List[str]], node: str, visited: Set[str], current_path: List[str]) -> Tuple[bool, List[str]]:
+    def detect_cycles_dfs(
+        tree: Dict[str, List[str]], node: str, visited: Set[str], current_path: List[str]
+    ) -> Tuple[bool, List[str]]:
         """
         Detect cycles in tree using depth-first search.
 

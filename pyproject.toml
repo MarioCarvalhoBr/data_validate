@@ -157,6 +157,15 @@ module = ["data_validate.rules.*"]
 ignore_errors = false
 strict = true
 
+[[tool.mypy.overrides]]
+# ARC-017 Phase 3 Port 3: networkx ships no inline type hints and no `types-networkx` stub
+# package is packaged for this project; without this, every `nx.*` call site in the (strict)
+# `data_validate.rules.*`/legacy `helpers.common.validation.graph_processing` modules would
+# fail with `import-untyped`. Scoped to the one untyped third-party library, not a code
+# suppression.
+module = ["networkx.*"]
+ignore_missing_imports = true
+
 [tool.bandit]
 exclude_dirs = ["tests", "tools/legacy"]
 # Skips are justified per-rule, not blanket-disabled. Each one is a known, tracked backlog item —

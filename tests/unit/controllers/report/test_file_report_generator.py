@@ -72,3 +72,50 @@ class TestPrintJsonSummary:
         expected = f"<{str(summary).replace(chr(39), chr(34))}>"
 
         assert fragment == expected
+
+
+class TestBuildTemplateVariablesVersionLine:
+    """Test suite for the version/protocol line built by `_build_template_variables` (DOC-006)."""
+
+    @staticmethod
+    def _build_generator_for_html(mocker) -> FileReportGenerator:
+        generator = _build_generator(mocker, error_count=0, warning_count=0, total_tests=0)
+        generator.context.data_args.data_action.no_time = True
+        generator.context.data_args.data_report.sector = None
+        generator.context.data_args.data_report.protocol = None
+        generator.context.data_args.data_report.user = None
+        generator.context.data_args.data_report.file = None
+        return generator
+
+    def test_version_line_includes_validator_version_and_protocol_version(self, mocker) -> None:
+        """DOC-006: the report header surfaces both the validator and the protocol version."""
+        generator = self._build_generator_for_html(mocker)
+        generator.context.data_args.data_action.no_version = False
+
+        fake_metadata = mocker.MagicMock()
+        fake_metadata.__version__ = "0.7.65"
+        fake_metadata.__protocol_version__ = "1.16"
+        fake_metadata.__project_name__ = "Canoa"
+        mocker.patch.object(file_report_generator_module, "METADATA", fake_metadata)
+
+        template_vars = generator._build_template_variables([], [])
+        version_line = template_vars["text_display_version_and_os_info"]
+
+        assert "0.7.65" in version_line
+        assert "1.16" in version_line
+        assert "Protocolo" in version_line
+
+    def test_version_line_empty_when_no_version_flag_set(self, mocker) -> None:
+        """`--no-version` still suppresses the whole line, protocol version included."""
+        generator = self._build_generator_for_html(mocker)
+        generator.context.data_args.data_action.no_version = True
+
+        fake_metadata = mocker.MagicMock()
+        fake_metadata.__version__ = "0.7.65"
+        fake_metadata.__protocol_version__ = "1.16"
+        fake_metadata.__project_name__ = "Canoa"
+        mocker.patch.object(file_report_generator_module, "METADATA", fake_metadata)
+
+        template_vars = generator._build_template_variables([], [])
+
+        assert template_vars["text_display_version_and_os_info"] == ""
