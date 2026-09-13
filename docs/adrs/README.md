@@ -26,6 +26,7 @@ building toward), `Accepted` (implemented and in force today), `Rejected`, `Depr
 | [0012](0012-multi-agent-development-workflow.md) | Multi-agent development workflow (orchestrator + specialised subagents) governed by `.claude/rules/` | Accepted | 2026-08-25 |
 | [0013](0013-pandas-3-copy-on-write-nullable-dtypes.md) | pandas 3 with Copy-on-Write and nullable/pyarrow dtypes as the DataFrame baseline | Proposed | 2026-08-25 |
 | [0014](0014-i18n-json-catalogs-keyed-by-rule-id.md) | i18n via JSON catalogs keyed by rule ID; pt_BR default, en_US required parity | Accepted (partially implemented) | 2026-08-25 |
+| [0015](0015-descope-standalone-normalizer.md) | Descope the standalone `Normalizer`/`SheetFrame` layer; models are the normalizing layer | Accepted (implemented) | 2026-09-13 |
 
 ---
-Last synced with code: a4f76c7
+Last synced with code: 1195fd1

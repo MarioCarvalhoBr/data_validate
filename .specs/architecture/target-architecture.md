@@ -11,24 +11,33 @@ and 0013.
 flowchart TD
   CLI[cli<br/>argument parsing, exit codes, output selection] --> APP[app<br/>AppContext, Pipeline, options]
   APP --> LOAD[loading<br/>SheetLoader, readers]
-  APP --> NORM[normalizing<br/>Normalizer → SheetFrame]
+  APP --> MODELS["models/ (normalizing layer — ADR-0015)<br/>SpModelABC subclasses: structural checks + typed cleaning"]
   APP --> ENGINE[rules<br/>registry, engine, rule modules per sheet]
   APP --> REP[reporting<br/>ReportModel, renderers html/json/console/pdf]
   LOAD --> SPECS[specs<br/>SheetSpec, ColumnSpec, registry]
-  NORM --> SPECS
+  MODELS --> SPECS
   ENGINE --> SPECS
   ENGINE --> I18N[i18n<br/>MessageCatalog]
   REP --> I18N
   ENGINE --> SPELL[spell<br/>SpellBackend protocol, enchant, pure-python]
   LOAD --> UTIL[util<br/>paths, clock, logging, numbers]
-  NORM --> UTIL
+  MODELS --> UTIL
   ENGINE --> UTIL
   REP --> UTIL
 ```
 
+**ARC-007 (Phase 5, 2026-09-13, ADR-0015)**: the standalone `normalizing/` package/`Normalizer`
+class this diagram originally sketched (see the commented-out dataclass/Protocol in "Core
+interfaces" below) is descoped, not implemented — `models/sp_*.py` plays that role today by
+design: one `SpModelABC` subclass per sheet owns both the structural check and the typed-cleaning
+pass (`self.cleaned`/`cleaned_column()`), and every rule reads the resulting typed columns through
+`RuleContext` without re-parsing them. A second, parallel abstraction over the same
+responsibility was not justified once ARC-005 (catalog-only messages) and the ARC-017 rule ports
+were both done — see ADR-0015 for the full rationale.
+
 Allowed imports (enforced by `.claude/rules/architecture-boundaries.md` and a future
-import-linter contract): `cli → app`; `app → loading, normalizing, rules, reporting`;
-`loading/normalizing/rules/reporting → specs, i18n, util`; `rules → spell`; `specs, i18n, util,
+import-linter contract): `cli → app`; `app → loading, models, rules, reporting`;
+`loading/models/rules/reporting → specs, i18n, util`; `rules → spell`; `specs, i18n, util,
 spell` import nothing from the other layers.
 
 Package layout:
@@ -39,7 +48,8 @@ data_validate/
   app/                   # AppContext, Options, Pipeline, ValidationResult
   specs/                 # SheetSpec registry (the only place sheet names/columns/headers live)
   loading/               # SheetLoader, readers (csv, xlsx), LoadResult
-  normalizing/           # Normalizer, SheetFrame, typed columns, invalid masks
+  models/                # SpModelABC subclasses — the normalizing layer (ADR-0015); no separate
+                          # normalizing/ package
   rules/                 # engine.py, registry.py, <sheet>/<RULE_ID>.py
   reporting/             # ReportModel, html.py, json.py, console.py, pdf.py (optional extra)
   i18n/                  # MessageCatalog, locales/*.json
@@ -89,18 +99,27 @@ class LoadResult:
 class SheetLoader(Protocol):
     def load(self, folder: Path, options: LoadOptions) -> LoadResult: ...
 
-# normalizing
-@dataclass(frozen=True)
-class SheetFrame:
-    spec: SheetSpec
-    raw: pd.DataFrame              # never mutated
-    typed: pd.DataFrame            # nullable Int64/Float64/string[pyarrow]
-    invalid: Mapping[str, pd.Series]   # column -> boolean mask of cells that failed typing
-    exists: bool
-    readable: bool
-
-class Normalizer(Protocol):
-    def normalize(self, sheet: LoadedSheet, ctx: RuleContext) -> tuple[SheetFrame, tuple[Issue, ...]]: ...
+# normalizing — DESCOPED (ARC-007, Phase 5, 2026-09-13, ADR-0015): this sketch (a standalone
+# `Normalizer`/`SheetFrame` layer separate from the models) is retired, not implemented. See
+# ADR-0015 for the full rationale; in one line — `models/sp_*.py` already *is* the normalizing
+# layer (structural checks + typed cleaning, one instance per sheet, `self.cleaned`/
+# `cleaned_column()` as the typed-column store), and a second parallel abstraction over the
+# same responsibility was not justified by any measured or structural gap once ARC-005
+# (catalog-only messages) and the ARC-017 rule ports (pure `check_*` functions reading typed
+# columns via `RuleContext`) were both done. The dataclass/Protocol sketch below is kept as a
+# historical record of the alternative considered, not a pending TODO.
+#
+# @dataclass(frozen=True)
+# class SheetFrame:
+#     spec: SheetSpec
+#     raw: pd.DataFrame              # never mutated
+#     typed: pd.DataFrame            # nullable Int64/Float64/string[pyarrow]
+#     invalid: Mapping[str, pd.Series]   # column -> boolean mask of cells that failed typing
+#     exists: bool
+#     readable: bool
+#
+# class Normalizer(Protocol):
+#     def normalize(self, sheet: LoadedSheet, ctx: RuleContext) -> tuple[SheetFrame, tuple[Issue, ...]]: ...
 
 # errors (see error-model.md)
 class Severity(StrEnum):
@@ -189,6 +208,11 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 
 ## Current module → target module
 
+Note (ADR-0015): any `normalizing/` cell below predates the ARC-007 closure decision to descope
+the standalone `Normalizer`/`SheetFrame` package — read every such cell as "the typed-cleaning
+responsibility stays in the corresponding `models/sp_*.py`", not as a still-pending destination
+folder.
+
 | Current | Target | Notes |
 |---|---|---|
 | `main.py` | `cli.py` | banner removed; `main()` returns exit code |
@@ -217,19 +241,19 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 | `helpers/common/formatting/text_formatting_processing.py` | `rules/description/_text.py` | — |
 | `helpers/common/formatting/message_formatting_processing.py` | — (catalog) | — |
 | `helpers/common/generation/combinations_processing.py` | `rules/values/_combinations.py` | — |
-| `helpers/common/processing/collections_processing.py` | `specs/patterns.py` + `util/collections.py` | ID pattern compiled once from spec |
+| `helpers/common/processing/collections_processing.py` | `specs/patterns.py` + `util/collections.py` | ID pattern compiled once from spec; `find_differences_in_two_set_with_message` (dead — zero production callers) deleted Phase 5, 2026-09-13, keeping only the live `find_differences_in_two_set` |
 | `helpers/common/processing/data_cleaning_processing.py` | `normalizing/normalizer.py` | one pass per sheet |
 | `helpers/common/validation/dataframe_processing.py` | `rules/structure/*.py` (`STRUCT-*`) + `normalizing/` | — |
-| `helpers/common/validation/character_processing.py` | `rules/_shared/text_checks.py` | vectorised |
+| `helpers/common/validation/character_processing.py` | — (deleted) | **Done** (ARC-005/ARC-010, Phase 5, 2026-09-13): the module had zero live production importers (only prose mentions of its old method names in `rules/description.py`/`rules/scenario.py`/`rules/temporal_reference.py` docstrings, explaining what each rule replaced) — deleted outright as dead code instead of migrated |
 | `helpers/common/validation/description_processing.py` | `rules/description/_codes.py` | — |
 | `helpers/common/validation/graph_processing.py` | `rules/composition/_graph.py` | `nx.from_pandas_edgelist` |
 | `helpers/common/validation/tree_processing.py` | `rules/composition/_graph.py` | merged with graph |
-| `helpers/common/validation/legend_processing.py` | `rules/legend/*.py` | one rule per check |
+| `helpers/common/validation/legend_processing.py` | `rules/legend/*.py` | one rule per check; not yet ported (still called from `models/sp_legend.py::data_cleaning`) — Phase 5 (2026-09-13) closed its i18n gap (every message is a `rule.LEG-001…011.*` catalog key, ARC-005) and vectorised its four `.iterrows()` loops (PERF-001); the port to a standalone `rules/legend/*.py` registry is unaffected by this and remains open |
 | `helpers/common/validation/proportionality_processing.py` | `rules/proportionality/*.py` | — |
 | `helpers/common/validation/value_processing.py` | `rules/values/*.py` | vectorised |
 | `helpers/tools/spellchecker/*` | `spell/` | `SpellBackend` |
 | `helpers/tools/readme/generate_readme.py` | — (deleted, ADR-0009) | — |
-| `models/sp_model_abc.py`, `models/sp_*.py` | `specs/sheet_specs.py` (definitions) + `normalizing/` (cleaning) + `rules/structure/` (checks) | models disappear as classes; column/dtype definitions already mirrored into `specs/sheet_specs.py` (ARC-003), models still own cleaning/behaviour |
+| `models/sp_model_abc.py`, `models/sp_*.py` | itself — the normalizing layer (ADR-0015) | **Done (ARC-007, Phase 5, 2026-09-13 — descoped, not migrated away)**: kept as the normalizing layer by design, not replaced by a separate `normalizing/`/`Normalizer` package; column/dtype definitions are proof-checked against `specs/sheet_specs.py` (ARC-003), structural checks moved to `rules/structure/*.py` (ARC-017), and every message renders through the catalog (ARC-005) — models still own the typed-cleaning pass (`self.cleaned`/`cleaned_column()`) that `rules/*.py` reads from |
 | `validators/structure/file_structure_validator.py` | `rules/structure/STRUCT-00x.py` | — |
 | `validators/spell/spellchecker_validator.py` | `rules/spelling/SPELL-00x.py` | — |
 | `validators/spreadsheets/base/base_validator.py` | `rules/engine.py` | **Done (core, Phase 3a, ADR-0006)**: `RuleContext`/`RuleSpec`/`RuleRegistry`/`Engine` implement prerequisite checks (`requires`/`depends_on`), topological execution, skipped-with-reason (`RuleOutcome.status is SKIPPED`, `SkipReason`), and crash isolation (`FAILED`), 100 % covered by `tests/unit/rules/`; `base_validator.py` itself is untouched, no validator reads from this package yet |
@@ -242,5 +266,8 @@ def validate(folder: Path, options: Options) -> ValidationResult:
 - No plugin loading from arbitrary paths (rules ship with the package; sector-specific rule packs
   are a `future/ideas.md` item).
 - No change to the report's visual identity during Phases 1–3 (goldens must stay identical).
+- No standalone `normalizing/`/`Normalizer` package (ARC-007, ADR-0015) — `models/sp_*.py`
+  fills that role by design; introducing a second, parallel abstraction over the same
+  structural-check-plus-typed-cleaning responsibility was considered and rejected.
 
-Last synced with code: 228ae09
+Last synced with code: 1195fd1

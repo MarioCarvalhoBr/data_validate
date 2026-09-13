@@ -49,19 +49,24 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 
 ## Priority summary
 
-Recomputed 2026-09-13 from a fresh `grep` of every `Status:` line in files 01–07 (93 unique items
-— see the note below on a duplicate `BUG-003` heading found in `01-bugs.md`, counted once here).
-`09-protocol-v116.md`'s 18 `PROTO-*`/`TERR-*` items are tracked separately as **Phase 6
-scheduled** (all `open` by design — Phase 6 runs only after files 01–07 are done/wont-fix, per
-`08-migration-roadmap.md`) and are not part of this table.
+Recomputed 2026-09-13 (Phase 5 round L2) from a fresh `grep -n "^- Priority:"` of every item in
+files 01–07 (93 unique items — see the note below on a duplicate `BUG-003` heading found in
+`01-bugs.md`, counted once here). This recompute supersedes the previous one (also dated
+2026-09-13): several items closed by earlier same-day slices (ARC-010/011/012/013/016/017 among
+others) had already flipped their own header's `Status:` line without the table below being
+recomputed afterward — this pass re-derives every count directly from the current per-item
+headers, not from the previous table's numbers. `09-protocol-v116.md`'s 18 `PROTO-*`/`TERR-*`
+items are tracked separately as **Phase 6 scheduled** (all `open` by design — Phase 6 runs only
+after files 01–07 are done/wont-fix, per `08-migration-roadmap.md`) and are not part of this
+table.
 
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
 | P0 | 7 | 7 done | fully closed — SEC-001, TST-001/002, ARC-001/002, BUG-001/002 |
-| P1 | 29 | 20 done, 6 in-progress, 2 open, 1 wont-fix | open: ARC-005, PERF-001 |
-| P2 | 43 | 34 done, 2 in-progress, 5 open, 2 wont-fix | open: ARC-010/013/014/015, DOC-004 |
-| P3 | 14 | 11 done, 2 open, 1 wont-fix | open: BUG-024, DOC-007 |
-| **Total** | **93** | **72 done, 8 in-progress, 9 open, 4 wont-fix** | +18 Phase 6 `PROTO-*`/`TERR-*` items (all open, scheduled) |
+| P1 | 29 | 26 done, 2 in-progress, 1 wont-fix | in-progress: ARC-004, ARC-006; wont-fix: PERF-003 |
+| P2 | 43 | 39 done, 1 in-progress, 1 open, 2 wont-fix | open: ARC-014; in-progress: ARC-015; wont-fix: PERF-005/007 |
+| P3 | 14 | 13 done, 1 wont-fix | wont-fix: BUG-012 |
+| **Total** | **93** | **85 done, 3 in-progress, 1 open, 4 wont-fix** | +18 Phase 6 `PROTO-*`/`TERR-*` items (all open, scheduled) |
 
 Note: `01-bugs.md` contains two `### BUG-003` headings (one with a full "Done" write-up, one a
 stale duplicate with `Status: open` and no "Done" note, immediately preceding `BUG-004`). Counted
@@ -146,3 +151,33 @@ summary table above from a fresh `grep` of every `Status:` line (93 unique items
 work-stream). See `03-architecture.md`, `04-testing.md`, `05-performance.md`, `06-tooling-ci.md`,
 `07-docs-i18n.md`, `08-migration-roadmap.md`, `.specs/infrastructure/dependencies.md`,
 `.specs/i18n/catalog.md`.
+
+Status snapshot: 2026-09-13 (Phase 5 round L2 — legend i18n/vectorisation, dead-code cleanup,
+SEC-004 narrowing, ARC-007 closure). Moves **ARC-005 → done** (the last open gap,
+`legend_processing.py`'s LEG-001…011, is now catalog-keyed via a `translate` parameter threaded
+from `models/sp_legend.py`; the only remaining pt-BR literals anywhere in `models/`/
+`helpers/common/` are 3 hits in `dataframe_processing.py`'s dead
+`check_dataframe_unique_values`/`column_exists`, unreachable in production, tracked as residual
+debt rather than reopening this item), **PERF-001 → done** (the same four `.iterrows()` loops in
+`legend_processing.py` are vectorised — masks, `Series.apply`, `Series.shift(1)` — leaving zero
+executable `.iterrows()` calls anywhere in `data_validate/`), **SEC-004 → done** (the two sites
+this item's own prior note flagged for follow-up are both fixed: `dictionary_manager.py`'s three
+enchant-boundary broad catches narrowed to `(enchant.errors.Error, OSError, ImportError)`;
+`spellchecker.py::check_spelling_text`, dead in production, deleted along with its broad catch),
+and **ARC-007 → done** (a descope decision, not a migration: the standalone `Normalizer`/
+`SheetFrame` layer the target architecture sketched is retired — `models/sp_*.py` already is the
+normalizing layer by design, every concern this item named is independently resolved by
+BUG-002/BUG-003/ARC-005/ARC-008/ARC-017, see **ADR-0015** and the updated
+`.specs/architecture/target-architecture.md`). Two dead-code symbols this round's dead-code sweep
+flagged are deleted: `helpers/common/validation/character_processing.py` (whole module, zero
+production callers) and `helpers/common/processing/collections_processing.py::
+find_differences_in_two_set_with_message` (zero callers); the deleted module's test file
+(`test_dataframe_character_processing.py`) also covered the *live* `DataFrameProcessing` class
+sharing that file, so its `DataFrameProcessing`-only tests were preserved, not deleted, under a
+new name (`test_dataframe_processing.py`) rather than lost. Full unit suite: 1672 passed (up from
+1605 mid-slice, before that test-file split was corrected), 4 skipped, 95.07 % coverage;
+`tests/e2e` 8/8 twice, byte-identical; `ruff`/`mypy --strict`/`bandit` clean. This slice also fully
+recomputed the priority summary table above (see its own methodology note) — several items closed
+by other same-day slices had not been reflected in the table before this recompute. See
+`02-security.md`, `03-architecture.md`, `05-performance.md`, `.specs/business-rules/legend.md`,
+`.specs/architecture/target-architecture.md`, `docs/adrs/0015-descope-standalone-normalizer.md`.

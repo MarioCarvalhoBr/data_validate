@@ -109,7 +109,7 @@ parsed by the platform. The validator runs as a CLI on a shared server.
 - Related: PERF-005
 
 ### SEC-004 · Broad `except Exception` masks failures as "valid" runs
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: done
 - Where (remaining, not yet ported — outside this slice's scope):
   `validators/spreadsheets/base/base_validator.py:296` (`except Exception as e:`),
   `helpers/tools/spellchecker/spellchecker.py:64` (`except Exception as e:`).
@@ -203,7 +203,8 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   Tests: `tests/unit/helpers/base/test_file_system_utils.py` (six `*_unexpected_error_propagates`
   tests replacing the old `*_unexpected_error` assertions, plus new `OSError`-path regression tests
   for the three sites that previously had no dedicated `OSError` branch),
-  `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
+  `tests/unit/helpers/common/validation/test_dataframe_character_processing.py` (renamed to
+  `test_dataframe_processing.py` in the Phase 5 round L2 slice below, same test bodies)
   (`test_check_vertical_bar_unexpected_error_propagates`,
   `test_check_unnamed_columns_unexpected_error_propagates`),
   `tests/unit/helpers/tools/data_loader/api/test_facade.py`
@@ -215,6 +216,49 @@ parsed by the platform. The validator runs as a CLI on a shared server.
   detached-HEAD worktree with only these four production + four test files applied on top of the
   last commit), since the shared working tree had unrelated, uncommitted, in-progress changes from
   a parallel migration effort (`models/`, `spreadsheet_processor.py`) at the time of this slice.
+- Done (closes this item, Phase 5 round L2, 2026-09-13 — the two flagged-not-fixed sites): both
+  sites this item's own prior note flagged for follow-up are resolved.
+  - `dictionary_manager.py`'s `validate_dictionary`/`initialize_dictionary`/`_load_extra_words` (3
+    sites): narrowed from `except Exception` to `except (enchant.errors.Error, OSError,
+    ImportError)` — `enchant.errors.Error` is the base of every enchant-specific failure
+    (`DictNotFoundError`, `TokenizerNotFoundError`, `DefaultLanguageNotFoundError`, confirmed via
+    `enchant.errors`' own class hierarchy), `OSError` covers a missing/unreadable native
+    libenchant/hunspell backend and `_load_extra_words`'s own `open(...)` failure modes,
+    `ImportError` covers the lazy `from enchant import Broker`/`import enchant.errors` when
+    `pyenchant` is not installed. Messages are byte-identical (same f-string, same variable
+    interpolation — only the `except` clause's matched types changed). Tests: the three
+    pre-existing tests that used a bare `Exception("...")` `side_effect`
+    (`test_validate_dictionary_broker_exception`, `test_initialize_dictionary_exception`) now use
+    `enchant.errors.Error("...")` instead (the narrowed clause's premise); three new
+    `*_unexpected_error_propagates` tests (one per site, `ValueError` side effect) assert a
+    non-enchant, non-`OSError` failure now propagates instead of being downgraded to a recorded
+    `_errors` entry; `test_initialize_dictionary_with_none_words` (passing `None` where
+    `SpellChecker.__init__` already guarantees a list, an artificial call bypassing that guard) is
+    renamed `..._raises` and now asserts `pytest.raises(TypeError)` — the narrowed clause
+    correctly no longer swallows this as a "handled" case, since it is a programming error, not an
+    enchant/OS failure, matching this item's own "unexpected ones abort" target.
+  - `spellchecker.py::check_spelling_text` (the legacy string-returning API, dead in production —
+    only `check_spelling_text_structured`, called by `rules/spell.py`, is live): deleted outright,
+    taking its broad `except Exception` with it. `tests/unit/helpers/tools/spellchecker/
+    test_spellchecker.py` (18 tests across 3 classes, all built around
+    `check_spelling_text`, before this slice) is rewritten (18 → 9): construction/
+    collaborator-wiring tests are kept
+    (`TestSpellChecker`'s init variants, a new `test_initialization_collects_dictionary_
+    validation_errors`, a new `test_clean_files_generated_delegates_to_dictionary_manager`,
+    `TestSpellCheckerEdgeCases::test_initialization_with_different_languages`), every
+    `check_spelling_text`-specific test is removed, and a new `TestCheckSpellingTextStructured`
+    class (3 tests) covers the live `check_spelling_text_structured` method directly (empty
+    frame, SPELL-005's deliberate-broad-catch path via a `ValueError` side effect, and a
+    `SpellingFinding`-wrapping happy path) — closing this item's own concern (a real failure mode
+    exercised, not left implicit) for the method that actually runs in production.
+  Final inventory (`grep -rn "except Exception" data_validate/`, every survivor re-judged): only
+  `main.py` (SEC-008 exit-code boundary), `rules/engine.py::Engine.run` (crash isolation, this
+  item's own fix pattern applied at the one seam that must stay generic), `spellchecker.py::
+  check_spelling_text_structured` (SPELL-005, documented, sanctioned), and
+  `language_manager.py`'s `_load_translations`/`text()` (the i18n subsystem's own last-resort
+  fallback, reviewed and left as-is by the prior slice) remain — the exact four-site inventory
+  this item's prior "Final inventory" note already enumerated as sanctioned, now with zero
+  newly-discovered, unfixed sites left. **SEC-004 is now done.**
 - Related: ARC-011
 
 ### SEC-005 · Supply-chain and CI hygiene

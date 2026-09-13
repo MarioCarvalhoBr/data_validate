@@ -5,7 +5,7 @@ Target: validate a sector bundle with 5 000 indicators × 60 value columns (≈ 
 harness (PERF-009); never optimise without a number.
 
 ### PERF-001 · Row-by-row `iterrows()` / cell loops in hot paths
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: done
 - Where (re-verified by grep, Phase 5, 2026-09-13 — line numbers drifted from this item's
   original text, current file confirmed):
   `helpers/common/validation/legend_processing.py:208` (`validate_color_format`, LEG-008),
@@ -36,6 +36,47 @@ harness (PERF-009); never optimise without a number.
   this specific residual (the existing PERF-002/PERF-003 budget numbers cover overall wall time,
   not this one function in isolation) — left honestly **in-progress**, not marked done or
   wont-fix without a number behind either claim (`.claude/rules/performance.md`).
+- Done (closes this item, Phase 5 round L2, 2026-09-13): the four `legend_processing.py`
+  `.iterrows()` sites named above are vectorised, exactly as the prior note's own "likely shape"
+  predicted:
+  - `validate_color_format` (LEG-008): `dataframe[color_col].astype(str)` once, then a single
+    `~Series.str.match(hex_color_pattern)` boolean mask (`.claude/skills/pandas-vectorization`
+    pattern 1); the remaining loop only formats a message per already-known invalid index.
+  - `validate_min_max_has_excessive_decimals` (LEG-009): `Series.apply(NumberFormattingProcessing
+    .check_two_decimals_places)` once per column (`min_excessive_mask`/`max_excessive_mask`)
+    replaces the per-row `.iterrows()` loop that boxed a whole `Series` per row just to read two
+    cells; the remaining `zip()` loop over plain values (never `.iterrows()`) preserves the
+    historical min-then-max-per-row message order.
+  - `validate_min_max_values` (LEG-010): the read-only "any row has excessive decimals" check
+    becomes `sorted_group[min_col].apply(...).any() or sorted_group[max_col].apply(...).any()`
+    (was a generator expression over `.iterrows()`); the stateful continuity check's
+    `prev_max_val` carried by hand across iterations becomes `sorted_group[max_col].shift(1)`
+    (a true `Series.shift(1)`, exactly the shape this item's own prior note predicted) zipped
+    together with the min/max columns and the `min >= max` mask (`invalid_range_mask =
+    sorted_group[min_col] >= sorted_group[max_col]`) — the remaining loop iterates `zip()`-ed
+    plain values, never `.iterrows()`/a boxed row, and was verified (new regression test,
+    `test_validate_min_max_values_interleaved_order_preserved`) to still interleave the
+    range-error-then-continuity-error-per-row order the legacy `.iterrows()` loop produced, not
+    "all range errors, then all continuity errors" (a real risk a naive two-pass mask split would
+    have introduced).
+  Final grep-verified zero-iterrows check: `grep -n "iterrows" data_validate/helpers/common/
+  validation/legend_processing.py` returns only prose (the module's own updated docstring and
+  inline comments explaining the vectorisation, quoting `.iterrows()` as the *replaced* pattern) —
+  no executable `.iterrows()` call remains in the file. Coverage: the file reaches 100 % line
+  coverage (`tests/unit/helpers/common/validation/test_legend_processing.py`, 76 tests, up from
+  59 — LEG-009 in particular had zero direct test coverage before this slice, closed here).
+  `tests/e2e/test_golden.py` 8/8 twice, byte-identical (no current fixture trips LEG-008…010's
+  specific message text, so this is "nothing else broke", not "these renders are pinned" — the
+  new unit tests are what pin the renders directly). No fresh `profile_pipeline.py` number was
+  taken for this specific residual either — the `legenda` sheet's row count is a handful of
+  slices per legend code (this item's own earlier note already established these are
+  per-legend-code-group loops, not whole-sheet loops), so the measurable wall-time delta at
+  current bundle sizes is expected to be near profiler noise, same reasoning PERF-002/PERF-003's
+  own "wont-fix, budget-immaterial" decisions used — the fix here closes the `.iterrows()`
+  convention violation (`.claude/rules/dataframe-conventions.md`) and its associated row-boxing
+  overhead, not a measured regression. **PERF-001 is now done**: zero `.iterrows()` calls remain
+  anywhere in `data_validate/` (repo-wide grep re-confirmed empty for every file this item or its
+  "Done" sub-notes ever named).
 - Proposed fix: vectorised masks (`pd.to_numeric(errors="coerce")`, `str.contains`, `isin`,
   `merge`), `nx.from_pandas_edgelist`, `groupby` aggregations; produce issues from mask indices.
 - Done (description slice, ARC-017 Phase 3 Port 2): the two `description_validator.py` sites

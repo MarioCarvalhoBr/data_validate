@@ -245,7 +245,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   done.**
 
 ### ARC-005 · i18n is inconsistent (≈95 % of messages hard-coded in pt-BR)
-- Priority: P1 · Effort: L · Status: open
+- Priority: P1 · Effort: L · Status: done
 - Where: only `FileSystemUtils` and (until ARC-017 Phase 3b) `FileStructureValidator` used
   `language_manager.text()`; all other messages are f-strings (models, validators,
   `helpers/common/**`, `spellchecker/**`, `file_report_generator.py` labels,
@@ -409,6 +409,84 @@ zero global state. Each item below names the current smell, where it lives, and 
   during this slice, left untouched to keep the diff scoped to the explicitly-named targets);
   `file_report_generator.py`'s report labels/section titles (unchanged, per (b) above). ARC-005
   **stays in-progress** — real, measured progress, not closed.
+- Done (closes this item, Phase 5 round L2, 2026-09-13 — the `legend_processing.py` gap): every
+  hardcoded pt-BR literal in `helpers/common/validation/legend_processing.py::LegendProcessing`
+  (LEG-001…011: code sequence, dtypes/DI-row rules, labels, colours, decimal precision,
+  min/max/continuity, order sequence — 25 message sites across the class's eight `validate_*`
+  methods) is now a catalog key (`rule.LEG-001.non_numeric`/`.non_numeric_values`/
+  `.must_start_at_one`/`.not_sequential`, `rule.LEG-002.error` … `rule.LEG-011.non_numeric`/
+  `.not_sequential` — 19 new keys, full list in `data_validate/static/locales/{pt_BR,en_US}/
+  messages.json`), rendered through a new `translate: Optional[Callable[..., str]] = None`
+  parameter on every `validate_*` method (defaulting to `get_default_translate()`, the same
+  process-wide cached pt-BR `LanguageManager` the Phase 5 models/helpers slice introduced —
+  `.claude/rules/i18n.md`). `models/sp_legend.py::data_cleaning` threads
+  `self.context.language_manager.text` into every `LegendProcessing` call. LEG-004's
+  min-empty/max-empty pair and LEG-009's minimum/maximum-decimal pair each share one
+  parameterised key (`column`/`value` params) rather than one key per column, matching the
+  precedent of DESC-002/PROP-006's multi-branch, single-shared-template keys; LEG-001's four
+  distinct templates and LEG-005's two distinct templates each get their own key, matching the
+  precedent of DESC-002/LEG-015's "two keys, not one templated fragment" rule for branches whose
+  English wording genuinely differs (`.claude/rules/i18n.md`). Regression tests: every
+  pre-existing test in `tests/unit/helpers/common/validation/test_legend_processing.py` (59
+  tests) passes unchanged against the new default-translate fallback (proving the historical
+  pt-BR strings are byte-identical); 17 new tests added there (59 → 76): 11 assert a custom
+  `translate` callable is actually honoured (one per rule id family: LEG-001, LEG-002…006,
+  LEG-007, LEG-008, LEG-009, LEG-010, LEG-011) and 6 close LEG-009's pre-existing zero direct
+  coverage (`validate_min_max_has_excessive_decimals` had no dedicated test at all before this
+  slice) plus an interleaved-ordering regression pinning that LEG-010's PERF-001 vectorisation
+  preserves the legacy range-then-continuity per-row order; `tests/unit/models/test_sp_legend.py`
+  (new module) proves the
+  *wiring* specifically — a real `LanguageManager` end to end (historical text unchanged) and a
+  recording fake `language_manager.text` (proving `SpLegend.data_cleaning` forwards its own
+  translator rather than relying on the helper's cached default, which the helper-level tests
+  alone cannot distinguish). Final grep-verified inventory of pt-BR literals in `models/` +
+  `helpers/common/` (`grep -rn '"' data_validate/models data_validate/helpers/common | grep -P
+  "[áéíóãçõêâ]"`, the same proxy this item's prior note used): **31 → 3**, and all three
+  remaining hits are in `helpers/common/validation/dataframe_processing.py`'s
+  `check_dataframe_unique_values`/`column_exists` — grep-checked, same as
+  `character_processing.py` above: **zero production callers** anywhere in `data_validate/`
+  (`column_exists` is only called by `check_dataframe_titles_uniques`, itself never called by
+  any model/rule; `check_dataframe_unique_values`/`check_dataframe_text_length` are never called
+  at all outside their own tests). This is unreachable dead code, not a live i18n gap — no user
+  ever sees these three literals, since the methods never execute in a real run — so it does not
+  block closing *this* item (ARC-005 is about messages a user can see); it is the same
+  already-flagged residual this item's prior note named ("not named in this item's original
+  'Where' list, discovered during this slice, left untouched to keep the diff scoped") and is
+  carried forward as a candidate for a future ARC-010-shaped deletion pass, not re-scoped into
+  this slice. `file_report_generator.py`'s report labels/section titles remain out of scope, per
+  this item's own "(b)" carve-out — that is DOC-003's follow-up, not this item's. **ARC-005 is
+  now done**: every hardcoded pt-BR literal reachable from a real validation run is a catalog key.
+- Done (dead-code deletion, Phase 5 round L2, 2026-09-13 — the two symbols this item's prior note
+  flagged as candidates): both are deleted, with their pt-BR literals gone along with them.
+  - `helpers/common/validation/character_processing.py` (the whole `CharacterProcessing` class):
+    re-confirmed by grep — zero production importers (`grep -rn "^from.*character_processing\|
+    ^import.*character_processing" data_validate/` returns nothing; the only remaining
+    `character_processing`/`CharacterProcessing` mentions anywhere in `data_validate/` are prose
+    in `rules/description.py`/`rules/scenario.py`/`rules/temporal_reference.py` docstrings,
+    explaining what each rule replaced when ported off the legacy validator). The module and its
+    dedicated test file (`tests/unit/helpers/common/validation/
+    test_dataframe_character_processing.py`) are deleted. That test file also contained
+    `DataFrameProcessing`-only test classes (`TestCheckVerticalBar`, `TestCheckUnnamedColumns`,
+    `TestCheckUniqueValues`, `TestColumnExists`, `TestCheckTextLength`,
+    `TestCheckDataframeTitlesUniques`, `TestColumnExistsMultiIndex`, plus a
+    `TestDataValidationIntegration` class exercising both classes together) — those are **not**
+    dead code (`check_dataframe_vertical_bar`/`check_dataframe_unnamed_columns` are this item's
+    own SEC-004 regression tests, called from every model's `initialize()`), so deleting the
+    whole file outright would have silently dropped live coverage. They are preserved verbatim
+    (integration test's two `CharacterProcessing` calls removed, everything else byte-identical)
+    in a new file, `tests/unit/helpers/common/validation/test_dataframe_processing.py`
+    (mirroring `dataframe_processing.py`'s own name, per `.claude/rules/testing.md`) — 67 tests,
+    100 % passing.
+  - `helpers/common/processing/collections_processing.py::find_differences_in_two_set_with_message`:
+    re-confirmed by grep — zero callers anywhere in `data_validate/` (only its own 5 tests in
+    `tests/unit/helpers/common/processing/test_collections_processing.py` called it;
+    `CollectionsProcessing.find_differences_in_two_set`, the method it wrapped, is itself
+    actively used by `rules/legend.py`/`rules/proportionality.py`, so it and the rest of
+    `CollectionsProcessing` are untouched). Deleted along with its 5 dedicated tests (30 → 25);
+    every other test in that file is unaffected.
+  Both deletions verified: full unit suite green (1672 passed, 4 skipped — up from 1605 before
+  this slice's test-file split restored the `DataFrameProcessing` coverage that a naive
+  whole-file deletion would have lost), `ruff`/`mypy`/`bandit` clean, `tests/e2e` 8/8 twice.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
@@ -440,7 +518,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   slice so far.
 
 ### ARC-007 · Models validate, clean and mutate; "Processing" classes are procedural namespaces
-- Priority: P1 · Effort: L · Status: in-progress
+- Priority: P1 · Effort: L · Status: done
 - Where: `models/sp_*.py` (structure checks + cleaning + raw mutation), `helpers/common/**` classes
   with only `@staticmethod` and an empty `__init__` (`dataframe_processing.py:22`,
   `character_processing.py:23`, …), overlap between `helpers/common/validation/*` and `validators/*`.
@@ -457,6 +535,25 @@ zero global state. Each item below names the current smell, where it lives, and 
   `helpers/common/**` "Processing" classes are still `@staticmethod`-only namespaces; no rule
   lives under `rules/<sheet>/<rule_id>.py` yet — that extraction is Phase 3+ of the migration
   roadmap.
+- Done (closes this item, Phase 5 round L2, 2026-09-13 — descope decision, ADR-0015): the
+  remaining "Still open" gap above — a `Normalizer` extraction splitting the structural-check
+  half from the typed-cleaning half of each model's `run()` — is descoped, not built. By this
+  slice, every concern this item's own "Target"/"Where" text actually named is independently
+  resolved: structural checks moved to `rules/structure.py` (`STRUCT-001`…`STRUCT-015`,
+  ARC-017); every model message renders through the i18n catalog (ARC-005, closed in this same
+  slice for `legend_processing.py`'s remaining gap); `character_processing.py` (named in this
+  item's own "Where" as a `@staticmethod`-only namespace example) is deleted outright as dead
+  code (zero production callers, confirmed by grep) rather than migrated into a `Normalizer`;
+  `rules/*.py` already reads each model's typed, cleaned columns via `RuleContext` without
+  re-parsing raw strings — the actual behavioural guarantee a `Normalizer`/`SheetFrame` split was
+  meant to provide. A model owning both "check this sheet's shape" and "produce its typed
+  columns" for one sheet, once every other smell this item named is fixed, is one cohesive
+  responsibility rather than the "validates, clean and mutate" tangle this item opened against —
+  introducing a second, parallel `SheetFrame`/`Normalizer` abstraction over the same
+  responsibility was evaluated and rejected as not earning its migration cost at this point (no
+  mutation left to fix, no hardcoded string left to move, no rule left re-parsing raw data).
+  Full rationale, alternatives considered, and the updated `.specs/architecture/
+  target-architecture.md` diagram/table: **ADR-0015**. **ARC-007 is now done.**
 
 ### ARC-008 · Validator base class carries dead code and triplicated helpers
 - Priority: P1 · Effort: S · Status: done
