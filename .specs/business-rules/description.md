@@ -26,7 +26,7 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 `EXPECTED_COLUMNS` is computed at runtime: required + `cenario` (if `cenarios` file exists) +
 `legenda` (if `legenda` file exists) + whichever optional columns are present
 (`SpDescription.pre_processing`). Pre-processing drops/injects columns on `self.frame`, this
-instance's own working copy — not the shared `DataLoaderModel.raw_data` (BUG-003, fixed).
+instance's own working copy — not the shared `LoadedSheet.raw_data` (BUG-003, fixed).
 
 ## Rules
 
@@ -160,7 +160,7 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - Implemented by: `models/sp_description.py::SpDescription.pre_processing`
 - Covered by tests: none — TST-001
 - Notes / known defects: none (BUG-003 fixed — mutates this instance's own `self.frame`, not
-  the shared `DataLoaderModel.raw_data`).
+  the shared `LoadedSheet.raw_data`).
 
 ### DESC-012 · `legenda` column requires the legend file
 - Severity: error

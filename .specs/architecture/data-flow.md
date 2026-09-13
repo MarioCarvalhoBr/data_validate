@@ -13,7 +13,7 @@ sequenceDiagram
   participant G as FileReportGenerator
   U->>M: --input_folder --output_folder --locale ...
   M->>L: load_all (scan, read csv/xlsx as str)
-  L-->>M: {stem: DataLoaderModel}, load_errors
+  L-->>M: {stem: LoadedSheet}, load_errors
   M->>Mo: instantiate 8 models (initialize + run in __init__)
   Mo-->>R: structural_* → FS, data_cleaning_* → FC
   M->>V: instantiate 10 validators (run in __init__)

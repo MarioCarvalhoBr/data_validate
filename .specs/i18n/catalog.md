@@ -3,24 +3,47 @@
 ## Current implementation
 
 - Files: `data_validate/static/locales/{pt_BR,en_US}/messages.json`, shape
-  `{"<key>": {"message": "<text with {placeholders}>"}}`.
-- Loader: `helpers/tools/locale/language_manager.py::LanguageManager` — language decided by
-  `<repo>/.config/store.locale` (BUG-004), `text(key, **kwargs)` does `str.format`; missing key
-  returns `<'key' missing or invalid structure in 'lang'>`; missing placeholder prints a warning
-  and returns the raw template.
-- Consumers: `FileSystemUtils`, `FileStructureValidator`, `ApplicationConfig.get_verify_names`
-  (35 `verification_name_*` titles), `ValidationReport.flatten` (`model_report_msg_*_omitted`).
-- Everything else (models, validators, helpers, spell-check, report labels) uses hard-coded
-  pt-BR f-strings (ARC-005).
+  `{"<key>": {"message": "<text with {placeholders}>"}}`. As of this sync each locale file has
+  **137 keys**, byte-parity confirmed (`grep -c` over both files agrees; `tests/unit/i18n/
+  test_catalog_parity.py` guards key-set/placeholder/shape parity in CI).
+- Loader: `helpers/tools/locale/language_manager.py::LanguageManager` — takes an explicit `locale`
+  constructor argument (no more `.config/store.locale` file I/O, BUG-004); `text(key, **kwargs)`
+  does `str.format`; missing key returns `<'key' missing or invalid structure in 'lang'>`; missing
+  placeholder logs a warning (`logging`, not `print` — ARC-012) and returns the raw template.
+- Consumers today: every one of the nine `rules/*.py` registries (structure, description,
+  composition, temporal reference, value, scenario, legend, proportionality, spell — ARC-017
+  Phase 3, all ports complete) renders through `ctx.translate(message_key, **params)` against the
+  `rule.<RULE-ID>.<kind>` keys below; `ApplicationConfig.get_verify_names` (34
+  `verification_name_*` titles), `ValidationReport.flatten` (`model_report_msg_*_omitted`),
+  `FileSystemUtils`/loader size-limit errors (`loader_error_file_too_large`,
+  `loader_error_sheet_too_big` — SEC-003), and `LanguageManager`'s own `invalid_language`/
+  `lang_load_error` keys are unchanged legacy consumers.
+- Not yet catalog-backed (ARC-005, in-progress): ~15 hardcoded pt-BR f-strings inside
+  `models/sp_*.py`'s structural/data-cleaning checks (`SpModelABC.initialize`,
+  `pre_processing`/`data_cleaning` across the eight models) and the report labels/section titles
+  in `controllers/report/file_report_generator.py`'s Jinja template — both a deliberately deferred
+  follow-up per ARC-016/ADR-0007's "Implementation note", not an oversight.
 
-### Inventory issues (BUG-016 — parity and junk keys fixed)
+### Key inventory by prefix (DOC-003 — closed; grep-verified 2026-09-13)
 
-| Issue | Detail |
-|---|---|
-| Parity (fixed) | `en_US` now has `validator_structure_error_conflicting_files`, `validator_structure_error_files_not_in_folder`, `validator_structure_error_missing_file`, `validator_structure_error_unexpected_folder`; `tests/unit/i18n/test_catalog_parity.py` guards key-set, placeholder, and shape parity going forward |
-| Junk (fixed) | The 18 unused calculator-demo keys (`welcome`, `menu_title`, `add_option`, `subtract_option`, `multiply_option`, `divide_option`, `exit_option`, `enter_choice`, `enter_num1`, `enter_num2`, `result`, `invalid_option`, `invalid_input`, `zero_division`, `goodbye`, `error_unexpected`, `lorem_ipsum`, `choose_language`) were removed from both catalogs; `invalid_language`/`lang_load_error` were kept (used by `LanguageManager`) |
-| Naming | Mixed prefixes (`fs_utils_*`, `validator_structure_*`, `verification_name_*`, `model_report_*`) with no documented convention — still pending, see DOC-003 |
-| Placeholders | Now covered per key by `tests/unit/i18n/test_catalog_parity.py`, which asserts the same named `str.format` fields across locales for every key |
+| Prefix | Count (each locale) | Status |
+|---|---|---|
+| `rule.*` | **77** | Target convention (`rule.<RULE-ID>.<kind>` / `rule.<area>.<slug>` for shared abort-case keys), live for every ported validation rule — DESC/COMP/TEMP/SCEN/VAL/LEG/PROP/SPELL/STRUCT all render through it (ARC-005/ARC-017 Phase 3) |
+| `verification_name_*` | 34 | Legacy — the `NamesEnum`-keyed category titles shown in the report's section headings; kept by design, not a rule-ID key (one per verification category, not per rule) |
+| `fs_utils_*` | 14 | Legacy — `FileSystemUtils`/loader size-limit and filesystem error strings; kept by design (utility-layer errors, not business rules) |
+| `validator_structure_*` | 6 | Legacy naming surviving on `STRUCT-*` keys' shared abort message (structure rules were the first port, before the `rule.` convention existed); functionally equivalent to a `rule.structure.*` key, renamed only if a future slice touches `rules/structure.py`'s message keys — not scheduled |
+| `model_report_*` | 2 | Legacy — `ValidationReport.flatten`'s per-category/per-severity omitted-count notices |
+| `loader_error_*` | 2 | Legacy — `SheetLoader`/reader size-limit errors (SEC-003); named `loader_error_*` rather than `fs_utils_*`, a second legacy prefix this sync found and is recording here for the first time |
+| `invalid_language`, `lang_load_error` | 2 | Legacy — `LanguageManager`'s own bootstrap errors (kept intentionally per BUG-016's note; used before a locale is even resolved, so a `rule.`/`load.` key would be circular) |
+| **Total** | **137** | — |
+
+The mixed-prefix legacy keys (`fs_utils_*`, `validator_structure_*`, `verification_name_*`,
+`model_report_*`, `loader_error_*`, plus the two `LanguageManager` bootstrap keys) remain **by
+design**: they are titles (`verification_name_*`), utility/loader-layer errors
+(`fs_utils_*`/`loader_error_*`), or bootstrap-time strings that predate rule-ID keys, not business
+rules with a `RULE-ID` to key on. Migrating them to the `<area>.<identifier>.<kind>` convention
+below is optional polish, not a blocking gap — DOC-003 is closed on the strength of "every rule ID
+has a catalog key in both locales", not "every string is `rule.`-prefixed".
 
 ## Target
 
@@ -71,4 +94,4 @@ message per key (no nested `message` object). A migration script converts the cu
 pt_BR is authored first (protocol language); en_US must be complete before a release. Reviewers
 for en_US listed in `CODEOWNERS` for `i18n/locales/en_US.json`.
 
-Last synced with code: 09279f4
+Last synced with code: 1325b48

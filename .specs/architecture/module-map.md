@@ -66,7 +66,7 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 
 | Module | Responsibility | Key symbols | Tests | Destination | Backlog |
 |---|---|---|---|---|---|
-| `data_loader/api/facade.py` | Load all sheets | `DataLoaderFacade` (`.load()` → `LoadResult`, deprecated `.load_all` shim), `DataLoaderModel`, `LoadResult` | `tools/data_loader/api/test_facade.py` | `loading/loader.py` | ARC-009 (in-progress) |
+| `data_loader/api/facade.py` | Load all sheets | `DataLoaderFacade` (`.load()` → `LoadResult`, deprecated `.load_all` shim), `LoadedSheet` (renamed from `DataLoaderModel` in Phase 5, ARC-009/ARC-013; `DataLoaderModel` kept one release as a plain class alias), `LoadResult` | `tools/data_loader/api/test_facade.py` | `loading/loader.py` | ARC-009 (done) |
 | `data_loader/engine/scanner.py` | Folder scan, spec-driven | `FileScanner` (reads `SHEET_SPECS`/`ALLOWED_EXTENSIONS`) | `tools/data_loader/engine/test_scanner.py` | `loading/scan.py` | — (BUG-015 done) |
 | `data_loader/engine/factory.py` | Reader by extension | `ReaderFactory` (`.csv`/`.xlsx` only, explicit `sep`) | `tools/data_loader/engine/test_factory.py` | `loading/readers/__init__.py` | — |
 | `data_loader/readers/base_reader.py` | Template method | `BaseReader` | `tools/data_loader/readers/test_base_reader.py` | `loading/readers/base.py` | — |
@@ -76,13 +76,13 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 | `data_loader/common/exceptions.py` | `ReaderNotFoundError` | — | none | `loading/errors.py` | — |
 | `locale/language_manager.py` | Explicit-`locale` constructor (no file I/O), catalog loading, `text()` | `LanguageManager` | `tools/locale/test_language_manager.py` | `i18n/catalog.py` | — (BUG-004 done) |
 | `locale/language_enum.py` | Supported languages | `LanguageEnum` | `tools/locale/test_language_enum.py` | `i18n/locale.py` | BUG-012 |
-| `readme/generate_readme.py` | README from template | — | none | deleted (ADR-0009) | ARC-010 |
+| ~~`readme/generate_readme.py`~~ | ~~README from template~~ | — | none | **deleted (ADR-0009, ARC-010 — physically removed in Phase 5, along with `readme/__init__.py`)** | ARC-010 (done) |
 | `spellchecker/spellchecker.py` | Facade | `SpellChecker` | `spellchecker/test_spellchecker.py` | `spell/service.py` | ARC-015 |
 | `spellchecker/spellchecker_controller.py` | Word checks, quality warnings | `SpellCheckerController` | `spellchecker/test_spellchecker_controller.py` | `rules/spelling/` | PERF-006 |
 | `spellchecker/dictionary_manager.py` | enchant broker, personal words, temp cleanup | `DictionaryManager` | `spellchecker/test_dictionary_manager.py` | `spell/enchant_backend.py` | BUG-022 |
 | `spellchecker/text_processor.py` | Sanitising text | `TextProcessor` | `spellchecker/test_text_processor.py` | `spell/text.py` | — |
 | `spellchecker/dataframe_processor.py` | Column iteration | `DataFrameProcessor` | `spellchecker/test_dataframe_processor.py` | `rules/spelling/` | PERF-006 |
-| `spellchecker/main.py` | Demo | — | `spellchecker/test_main.py` | deleted | ARC-010 |
+| ~~`spellchecker/main.py`~~ | ~~Demo~~ | — | none | **deleted (ARC-010 — physically removed in Phase 5, along with its `test_main.py`)** | ARC-010 (done) |
 
 ## `models/`
 
@@ -93,7 +93,7 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 | `sp_composition.py` | `composicao` | `test_model_isolation.py` | idem | ARC-007 |
 | `sp_value.py` | `valores` | none | idem | BUG-013 |
 | `sp_temporal_reference.py` | `referencia_temporal` | `test_column_declarations.py`, `test_model_isolation.py` | idem | ARC-007 |
-| `sp_proportionality.py` | `proporcionalidades` | `test_model_isolation.py` | idem | ARC-009 (in-progress — `header_type` mutation resolved) |
+| `sp_proportionality.py` | `proporcionalidades` | `test_model_isolation.py` | idem | ARC-009 (done — `header_type` mutation resolved, `LoadedSheet` naming resolved) |
 | `sp_scenario.py` | `cenarios` | none | idem | — |
 | `sp_legend.py` | `legenda` | none | idem + `rules/legend.py` (LEG-012…015) | — |
 | `sp_dictionary.py` | `dicionario` | none | `spell/` | — |
@@ -125,7 +125,7 @@ replaced it.
 | `locales/{pt_BR,en_US}/messages.json` | Message catalogs | `i18n/locales/` |
 | `report/report_template.html`, `microstrap_style.css` | Report template/CSS | kept |
 | `dictionaries/hunspell/*.{aff,dic}`, `extra-words.dic` | Spell dictionaries | kept |
-| `templates/README.TEMPLATE.md` | README generator template | removed (ADR-0009) |
+| ~~`templates/README.TEMPLATE.md`~~ | ~~README generator template~~ | **deleted (ADR-0009, ARC-010 — physically removed in Phase 5; the now-empty `static/templates/` directory is gone too)** |
 
 ## `specs/` and `i18n/` (target modules implemented ahead of their consumers)
 

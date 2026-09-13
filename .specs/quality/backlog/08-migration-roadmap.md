@@ -149,6 +149,24 @@ TOOL-009, TOOL-010, ARC-010, ARC-013, ARC-014, BUG-024, DOC-007
 3. Release automation (tag → PyPI), docs to Pages, remove committed artefacts.
 4. Final layout cleanup and renames; `mypy --strict` project-wide; coverage ≥ 90 %.
 Gate: 1.0.0 release candidate.
+Status (2026-09-13, documentation-closure slice): Done — TOOL-010 (dependency policy documented in
+`.specs/infrastructure/dependencies.md`), TOOL-008 (installed-package experience closed with a
+note: `pyenchant` deliberately stays a main dependency, not a `[spell]` extra — see
+`06-tooling-ci.md`), DOC-003 (`rule.<RULE-ID>.<kind>` catalog convention confirmed live for every
+ported rule — 77 `rule.*` keys per locale — see `07-docs-i18n.md`/`.specs/i18n/catalog.md`),
+ARC-002 (module singletons `SHEET`/`METADATA` confirmed immutable-after-import; ARC-002 was
+Phase 1-scoped but only fully closable once its "still open" module-singleton half was reviewed
+here), TST-006 (rule tests assert on `Issue.rule_id`/`message_key`/`params`, not rendered text —
+`04-testing.md`), PERF-002 (residual defensive `.copy()` calls judged budget-immaterial), PERF-005
+(wont-fix, same budget margin). PERF-003 moves to wont-fix (residual, same measured margin as
+PERF-005/PERF-007). Remaining open/in-progress in this phase's own closes-list: ARC-010, ARC-013,
+ARC-014, BUG-024, DOC-007 (not touched by this slice — see each item's own file for status); note
+ARC-002/PERF-002/003/005/TST-006/DOC-003/TOOL-008/TOOL-010 were not originally listed under this
+phase's "Closes:" line (several are Phase 1/2/3 items) but are resolved here because Phase 6
+(`09-protocol-v116.md`) is gated on "every item in files 01-07 done or wont-fix" — this slice
+closes the remaining documentation/evaluation-only items that gate was blocking on. ARC-006
+(Phase 1) stays in-progress: the Demeter chain into rule code is gone, but
+`DataModelContext.get_instance_of`'s linear scan is still used by the report step.
 
 ## Working agreement per item
 1. Pick an item → `/backlog <ID>` (creates a branch `feat/<ID>-slug` or `fix/<ID>-slug`).

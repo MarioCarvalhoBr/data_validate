@@ -20,7 +20,7 @@
 - Done: (c67f983: `.specs/business-rules/` with 81 rules and 27 protocol/code gaps; note the `desc_simples` trailing-period contradiction G-07 as an open decision)
 
 ### DOC-003 · i18n catalog quality
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: done
 - Where: `static/locales/{pt_BR,en_US}/messages.json` — missing keys in en_US, demo leftovers, no
   naming convention, no placeholders documentation, no parity test, messages hard-coded in code
   (ARC-005).
@@ -30,10 +30,12 @@
 - Done (partial, via BUG-016): parity restored (`en_US` no longer missing the 4
   `validator_structure_error_*` keys) and the 18 unused calculator-demo keys purged from both
   catalogs; `tests/unit/i18n/test_catalog_parity.py` now guards key-set, placeholder, and
-  `{"message": str}`-shape parity in CI. Still open: the `<area>.<rule_id>.<kind>` naming
-  convention/migration, the mixed-prefix cleanup (`fs_utils_*`, `validator_structure_*`,
-  `verification_name_*`, `model_report_*`), and moving hard-coded pt-BR strings into the catalog
-  (ARC-005) — this item stays `open`.
+  `{"message": str}`-shape parity in CI. At the time of this note, still open: the naming
+  convention/migration (`rule.<rule_id>.<kind>`), the mixed-prefix cleanup (`fs_utils_*`,
+  `validator_structure_*`, `verification_name_*`, `model_report_*`), and moving hard-coded pt-BR
+  strings into the catalog (ARC-005) — since resolved for the naming-convention/migration half,
+  see the final "Done" entry below (the mixed-prefix cleanup and ARC-005's own tail are still open,
+  by design, per that entry).
 - Note (Phase 3 Port 2 slice, ARC-017): the `rule.<rule-id>.<kind>` naming convention (the
   `rule.` variant of this item's proposed `<area>.<rule_id>.<kind>`, already used by
   `.specs/business-rules/README.md`'s "Target message keys follow `rule.<RULE-ID>.<error|
@@ -44,9 +46,30 @@
   template that rule emits (e.g. DESC-002's `non_numeric`/`must_start_at_one`/
   `must_be_sequential`; DESC-008's `end`/`start`/`anywhere`). Every key added to both
   `pt_BR`/`en_US` in the same change, pt-BR text copied verbatim from the deleted
-  `description_validator.py`'s f-strings. This item stays `open` — every other domain
-  (composition, values, temporal reference, scenarios, legend, proportionality) still hard-codes
-  its messages.
+  `description_validator.py`'s f-strings. At the time of this note every other domain
+  (composition, values, temporal reference, scenarios, legend, proportionality) still hard-coded
+  its messages — since resolved, see the "Done" entry below.
+- Done (closes this item, Phase 5, 2026-09-13 — ARC-017 Phase 3 completed the migration this item
+  was waiting on): with every validator ported to the rules engine (structure, description,
+  composition, temporal reference, value, scenario, legend, proportionality, spell — see
+  `03-architecture.md`'s ARC-005/ARC-017 entries), the `rule.<RULE-ID>.<kind>` convention is now
+  live for **every** ported business rule, not just description's ten. Grep-verified
+  (`data_validate/static/locales/{pt_BR,en_US}/messages.json`, both files, 2026-09-13): **77**
+  `rule.*` keys in each locale (parity confirmed), out of **137** total keys per locale. The
+  remaining 60 keys per locale are legacy prefixes that stay **by design**, not a migration gap:
+  `verification_name_*` (34 — report-section titles, one per `NamesEnum` category, not a rule ID),
+  `fs_utils_*` (14 — filesystem/loader utility errors), `validator_structure_*` (6 — the
+  STRUCT-* shared abort message, named before the `rule.` convention existed, functionally
+  equivalent), `model_report_*` (2 — omitted-count notices), `loader_error_*` (2 — SEC-003 size
+  limits), and `LanguageManager`'s own `invalid_language`/`lang_load_error` (2 — bootstrap-time,
+  used before a locale is resolvable). Full breakdown and rationale per prefix:
+  `.specs/i18n/catalog.md`'s "Key inventory by prefix" table. `tests/unit/i18n/
+  test_catalog_parity.py` continues to guard key-set/placeholder/shape parity for all 137 keys.
+  The other original scope items — mixed-prefix *cleanup* (renaming the legacy prefixes) and
+  moving `models/sp_*.py`'s ~15 structural f-strings plus the report template's labels into the
+  catalog (ARC-005's own still-open tail) — are deliberately left open under ARC-005/DOC-004, not
+  silently dropped: DOC-003's own scope ("every rule has a catalog key, parity, naming convention
+  documented and in live use") is met in full.
 
 ### DOC-004 · API docs
 - Priority: P2 · Effort: S · Status: open

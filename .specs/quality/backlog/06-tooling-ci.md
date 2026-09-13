@@ -93,16 +93,31 @@
 - Done: (d1ae7c1)
 
 ### TOOL-008 · Installed-package experience
-- Priority: P2 · Effort: M · Status: in-progress
+- Priority: P2 · Effort: M · Status: done (with note — see the `[spell]`-extra decision below)
 - Where: `main.py:8` prints at import; `.config` lookups (BUG-004); enchant temp files inside the
   package (BUG-022); `wkhtmltopdf` hard requirement (SEC-002); `static/` must be shipped (OK today).
 - Done: `canoa-data-validate --version` works fully offline (reads only the already-imported
   `METADATA` singleton, no file/network I/O) and exits 0 with no writes anywhere, including inside
   the package (ARC-011/SEC-008); `main.py:8`'s import-time print is gone (ARC-012); `.config`
-  lookups were already removed by BUG-004 (prior slice).
-- Still open: enchant temp files inside the package (BUG-022), `wkhtmltopdf` hard requirement
-  (SEC-002), and the optional `[pdf]`/`[spell]` extras in `pyproject.toml` that would let
-  `pip install canoa_data_validate` work without those system dependencies at all.
+  lookups were already removed by BUG-004 (prior slice); enchant temp files inside the package are
+  gone (BUG-022 — session-only word list, `ENCHANT_CONFIG_DIR` scoped to a temp dir, SEC-007);
+  `wkhtmltopdf` is no longer a hard requirement (`[pdf]` extra ships WeasyPrint as the primary
+  renderer, `pdfkit`/`wkhtmltopdf` is an opportunistic fallback only when already present on the
+  host, Phase 4/ADR-0007).
+- Decision (Phase 5 close, 2026-09-13): `pyenchant` stays a main dependency, **not** moved to a
+  `[spell]` extra — evidence: `pyproject.toml`'s `[project].dependencies` still lists
+  `pyenchant (>=3.3.0,<4.0.0)`; unlike the PDF case (an external binary, `wkhtmltopdf`, that can
+  simply be absent), pyenchant already degrades gracefully when unusable —
+  `dictionary_manager.py::validate_dictionary`/`initialize_dictionary` both do the (already lazy,
+  PERF-008) `from enchant import Broker` import *inside* a `try/except Exception` block, so even a
+  hypothetical "package not installed" `ModuleNotFoundError` would be caught the same way a broken
+  system hunspell install is caught today, surfacing as a `SPELL-001` business-rule error
+  (`rule.SPELL-001.backend_error`) rather than crashing the run; `--no-spellchecker` already lets a
+  caller skip the whole registry regardless. Turning it into a true `[spell]` extra would only
+  change *install-time* behaviour (whether `pip install canoa_data_validate` pulls the C-extension
+  wheel by default), which is a real, but now clearly-scoped and non-blocking, packaging-hygiene
+  item — reopen as a fresh, narrower TOOL item if a maintainer wants the smaller default install
+  footprint; not reopening TOOL-008 itself for it.
 
 ### TOOL-009 · Scripts
 - Priority: P3 · Effort: S · Status: done
@@ -123,11 +138,22 @@
   time those items were filed/decided, not a live instruction.
 
 ### TOOL-010 · Dependency policy
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `pyproject.toml` caret ranges on everything, `pandas>=3.0.1` (very new; verify calamine and
   pandas-stubs compatibility), `poetry.lock` 157 kB.
 - Proposed fix: document upgrade cadence in `.specs/infrastructure/dependencies.md`; Dependabot
   weekly; `pip-audit` in CI.
+- Done: `.specs/infrastructure/dependencies.md` now documents the full cadence — Dependabot weekly
+  grouped minor/patch PRs (merge gate: green `make check` + `make test-e2e`), majors reviewed
+  individually via `poetry update <package>` with the changelog read (pandas/numpy majors
+  additionally gated on `make bench` staying inside the PERF-009 budget), security advisories fixed
+  within one week via a targeted `poetry update <affected-package>` (or a documented accepted risk
+  in `SECURITY.md` when no patch exists yet), and lock discipline (`poetry install --sync`/
+  `poetry update`, never a hand-edit or delete-to-refresh). A new "Caret-range rationale" section
+  explains why every dependency is range-declared rather than pinned (Dependabot automation +
+  `poetry.lock` reproducibility) and why the range's upper bound is the next major (semver
+  contract). `pip-audit` in CI was already shipped by TOOL-001/SEC-005; nothing further needed
+  there for this item.
 
 ### TOOL-011 · guard-bash hook rejects quoted multi-line arguments and heredoc bodies
 - Priority: P3 · Effort: S · Status: done

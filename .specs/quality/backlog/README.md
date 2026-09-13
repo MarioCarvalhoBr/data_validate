@@ -49,13 +49,24 @@ IDs are stable; never renumber. New findings are appended at the end of the rele
 
 ## Priority summary
 
+Recomputed 2026-09-13 from a fresh `grep` of every `Status:` line in files 01–07 (93 unique items
+— see the note below on a duplicate `BUG-003` heading found in `01-bugs.md`, counted once here).
+`09-protocol-v116.md`'s 18 `PROTO-*`/`TERR-*` items are tracked separately as **Phase 6
+scheduled** (all `open` by design — Phase 6 runs only after files 01–07 are done/wont-fix, per
+`08-migration-roadmap.md`) and are not part of this table.
+
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
-| P0 | 7 | 3 done, 4 open | remaining: SEC-001, TST-001, ARC-001, ARC-002 |
-| P1 | 28 | 13 done, 5 in-progress, 10 open | |
-| P2 | 43 | 17 done, 5 in-progress, 21 open | |
-| P3 | 13 | 4 done, 1 wont-fix, 8 open | |
-| **Total** | **91** | **37 done, 10 in-progress, 1 wont-fix, 43 open** | |
+| P0 | 7 | 7 done | fully closed — SEC-001, TST-001/002, ARC-001/002, BUG-001/002 |
+| P1 | 29 | 20 done, 6 in-progress, 2 open, 1 wont-fix | open: ARC-005, PERF-001 |
+| P2 | 43 | 34 done, 2 in-progress, 5 open, 2 wont-fix | open: ARC-010/013/014/015, DOC-004 |
+| P3 | 14 | 11 done, 2 open, 1 wont-fix | open: BUG-024, DOC-007 |
+| **Total** | **93** | **72 done, 8 in-progress, 9 open, 4 wont-fix** | +18 Phase 6 `PROTO-*`/`TERR-*` items (all open, scheduled) |
+
+Note: `01-bugs.md` contains two `### BUG-003` headings (one with a full "Done" write-up, one a
+stale duplicate with `Status: open` and no "Done" note, immediately preceding `BUG-004`). Counted
+once (as done, matching the substantive entry) in the table above. `01-bugs.md` is owned by a
+parallel work-stream in this phase and was not edited here — flagged for that owner to dedupe.
 
 Status snapshot: 2026-09-12 — 35 done, 7 in-progress, 1 wont-fix, 48 open (of 91 items incl.
 TOOL-011). This slice moved SEC-008 and PERF-004 to done, and ARC-011/ARC-012/TOOL-008 to
@@ -110,3 +121,28 @@ a previous non-escaping render let the harness's naive HTML extractor mangle); o
 `data_errors_xss`, added additively with its own golden. See `02-security.md`, `03-architecture.md`,
 `docs/adrs/0007-report-rendering-jinja2-autoescape-weasyprint.md`,
 `tests/e2e/golden/CHANGELOG.md`.
+
+Status snapshot: 2026-09-13 (Phase 5 documentation-closure slice). Moves **TOOL-010 → done**
+(dependency upgrade-cadence/caret-range policy written in `.specs/infrastructure/dependencies.md`),
+**DOC-003 → done** (`rule.<RULE-ID>.<kind>` convention confirmed live for all 77 `rule.*` keys per
+locale, out of 137 total; remaining legacy prefixes documented as by-design in
+`.specs/i18n/catalog.md`), **ARC-002 → done** (module singletons `SHEET`/`METADATA` confirmed
+immutable-after-init and side-effect-free at import; the `data_loader` `Config`/`SingletonMeta`
+singleton and the `os.environ` mutation (BUG-022) were already resolved by earlier slices),
+**TST-006 → done** (every `tests/unit/rules/test_*.py` module asserts on `Issue.rule_id`/
+`message_key`/`params` against an identity `translate` stub, never a rendered pt-BR string),
+**PERF-002 → done (with note)** and **PERF-003 → wont-fix (residual)** (both measured
+budget-immaterial against the PERF-009 numbers — 3.05s/184MB vs. the 10s/1GB budget), **PERF-005 →
+wont-fix** (same budget margin; revisit trigger is a budget breach or ~10x data growth, matching
+PERF-007's precedent), and **TOOL-008 → done (with note)** (`pyenchant` stays a main dependency,
+not moved to a `[spell]` extra — its already-lazy import is wrapped in a `try/except Exception`
+that would surface a missing package the same way a broken system hunspell install is surfaced
+today, as a `SPELL-001` business-rule error, not a crash). **ARC-006 stays in-progress**: the
+Demeter chain into rule code is gone (`data_models_context.context.` is a zero-hit grep in
+production code), but `DataModelContext.get_instance_of`'s linear `isinstance` scan is still used
+by the report-building step in `spreadsheet_processor.py`. This slice also recomputed the priority
+summary table above from a fresh `grep` of every `Status:` line (93 unique items across files
+01-07, one duplicate `BUG-003` heading found and noted, not fixed — owned by a parallel
+work-stream). See `03-architecture.md`, `04-testing.md`, `05-performance.md`, `06-tooling-ci.md`,
+`07-docs-i18n.md`, `08-migration-roadmap.md`, `.specs/infrastructure/dependencies.md`,
+`.specs/i18n/catalog.md`.

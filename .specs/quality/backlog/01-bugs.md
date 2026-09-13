@@ -135,19 +135,6 @@ Every fix here must land with a regression test under `tests/` that fails before
   open (CoW already protects; the remaining copies are a separate, deliberate call, not this
   bug).
 
-### BUG-003 · `SpDescription.pre_processing` mutates the shared raw DataFrame
-- Priority: P1 · Effort: M · Status: open
-- Where: `models/sp_description.py:178,187,193,195`
-- Problem: drops `cenario`/`legenda` and injects `relacao=1`, `unidade=""` into
-  `data_loader_model.raw_data`, the same object every validator later reads. Injected columns then
-  show up in `EXPECTED_COLUMNS` and are scanned by `validate_cr_lf_characters`
-  (`description_validator.py:352`); the extra-column warning logic sees a different frame than the
-  file the user sent.
-- Proposed fix: treat `raw_data` as immutable; derive a `normalized` frame on the model and expose
-  defaults through accessors, not by writing columns.
-- Tests: assert `raw_data` is unchanged after model construction.
-- Related: ARC-007
-
 ### BUG-004 · Locale is resolved from two different `.config/store.locale` paths, in the wrong order
 - Priority: P1 · Effort: M · Status: done
 - Where: `middleware/bootstrap.py:41-42` (`os.path.expanduser(".config")` → relative to CWD),
@@ -617,7 +604,7 @@ Every fix here must land with a regression test under `tests/` that fails before
   `tests/unit/controllers/context/test_general_context.py::TestGeneralContextLocale`.
 
 ### BUG-024 · Typos in identifiers and filenames
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `legend_processing.py:181` (`origina_value`), `data_args.py:204` ("validaton"),
   `file_system_utils.py:95` ("dempotent").
 - Proposed fix: rename during the module migration; keep a compatibility import for one release.
@@ -631,6 +618,13 @@ Every fix here must land with a regression test under `tests/` that fails before
   anywhere in the tree. The remaining typos (`legend_processing.py:181`'s `origina_value`,
   `data_args.py:204`'s "validaton", `file_system_utils.py:95`'s "dempotent") are untouched — out
   of this item's scope.
+- Done (Phase 5 slice, ARC-013's typo cleanup — closes this item): `legend_processing.py`'s
+  `origina_value` local variable is renamed to `original_value` (pure internal variable name —
+  the f-string it feeds, and thus every user-facing message, is byte-identical); `data_args.py`'s
+  docstring "If any validaton rule fails." is fixed to "validation"; `file_system_utils.py`'s
+  docstring "dempotent operation" is fixed to "Idempotent operation". No compatibility import was
+  needed for any of the three — all three are internal variable/docstring text, not an
+  importable symbol. **BUG-024 is now done.**
 
 ### BUG-025 · `check_columns_in_models_dataframes` KeyError on unknown model name
 - Priority: P3 · Effort: S · Status: done

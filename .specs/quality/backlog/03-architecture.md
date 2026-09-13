@@ -77,7 +77,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   constructed model). **ARC-001 is now done.**
 
 ### ARC-002 · Global mutable state
-- Priority: P0 · Effort: L · Status: open
+- Priority: P0 · Effort: L · Status: done
 - Where: class-level Series mutation (BUG-002, fixed — see the "Done" note below); module singletons `SHEET`
   (`config/spreadsheet_info.py:53`), `METADATA` (`config/metadata_info.py:152`), `config = Config()`
   + `SingletonMeta` (`data_loader/common/config.py`); locale persisted in `.config/store.locale`
@@ -101,6 +101,33 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Done (Phase 2c slice, BUG-002): class-level `RequiredColumn`/`OptionalColumn`/`DynamicColumn`
   Series mutation is fixed — see BUG-002's "Done" entry in `01-bugs.md` for the full detail
   (`SpModelABC.cleaned`/`cleaned_column()` replace `setattr` on the class).
+- Done (closes this item, Phase 5, 2026-09-13): every remaining "Where" item is now resolved or
+  judged acceptable. Evidence, grep-verified: (a) `data_loader/common/config.py`'s `Config`/
+  `SingletonMeta` singleton — confirmed deleted (the path does not exist; `grep -rn
+  "SingletonMeta" data_validate/` returns nothing), already noted under ARC-003's loader-consumer
+  slice; (b) `os.environ` mutation (BUG-022) — confirmed already fixed: `dictionary_manager.py`'s
+  `_enchant_config_dir_scope` context manager reads the previous `ENCHANT_CONFIG_DIR` value,
+  writes a session-scoped temp-dir value, and restores the previous value (or removes the key) in
+  a `finally` block — it is scoped and reverted around one call, not a persistent process-wide
+  mutation, so it does not count as unresolved global state; (c) the module singletons `SHEET`
+  (`config/spreadsheet_info.py:53`) and `METADATA` (`config/metadata_info.py:102`) — both remain,
+  by design, and both are read-only after construction: both classes extend `ConstantBase`, whose
+  `__setattr__` raises `AttributeError` on any reassignment once `_finalize_initialization()` runs
+  (called as the last statement of each `__init__`), and both `__init__` bodies do only attribute
+  assignment plus (for `METADATA`) a read-only `importlib.metadata.metadata(...)` lookup wrapped in
+  `try/except importlib.metadata.PackageNotFoundError` — no `os.environ` write, no `open(...)`, no
+  `print()` at module scope in either file (grep-confirmed for both files and for `os.environ`/
+  `open(`/`print(` at module scope across `data_validate/config/**`). (d) `LanguageManager()`
+  independently instantiated in `DataArgs`/`GeneralContext`/`ApplicationConfig`/`FileSystemUtils`
+  — already fixed in the Phase 1 locale/context slice noted above (one shared instance built by
+  `GeneralContext`, injected into the others). **Justification for keeping `SHEET`/`METADATA` as
+  module-level instances**: they are immutable constants once constructed (enforced at the
+  language level via `ConstantBase`, not by convention alone) with no I/O, environment, or
+  filesystem side effects at import time — this satisfies `.claude/rules/coding-standards.md`'s
+  "no global/module-level **mutable** state" bar; a plain `SpreadsheetInfo`/`MetadataInfo` class
+  attribute exposed as a frozen singleton is architecturally equivalent to a frozen dataclass
+  constant module and does not need a further refactor to close this item. **ARC-002 is now done**
+  for its full original scope.
 
 ### ARC-003 · Three competing sources of truth for sheet definitions
 - Priority: P1 · Effort: M · Status: in-progress
@@ -265,13 +292,32 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: in-progress
 - Where: `controllers/context/general_context.py` (args + config + i18n + fs + logger), usages like
   `self._data_models_context.context.data_args.data_action.no_spellchecker`
   (`spellchecker_validator.py:195`, `description_validator.py:457`), `DataModelContext.get_instance_of`
   linear `isinstance` scan (`data_model_context.py:55-61`).
 - Target: small explicit dependencies (`RuleContext(sheets, options, catalog, clock)`), typed
   `SheetBundle["descricao"]` lookup by key.
+- Evidence (Phase 5 review, 2026-09-13): the specific Demeter chain named above is gone —
+  `spellchecker_validator.py`/`description_validator.py` no longer exist (both deleted by ARC-017's
+  Phase 3 ports), and `grep -rn "data_models_context\.context\." data_validate/` returns zero
+  hits anywhere in production code. Every one of the nine rule registries now receives the small,
+  explicit `RuleContext(sheets, cleaned, options, translate, clock)` this item's target names —
+  confirmed by every `tests/unit/rules/test_*.py` module building one directly, with no
+  `GeneralContext`/`DataModelContext` involved at all. **Not yet resolved**: `DataModelContext`
+  itself is not dead code — `controllers/spreadsheet_processor.py:240-242` still calls
+  `self.data_models_context.get_instance_of(models.SpDescription)` (and `SpLegend`,
+  `SpDictionary`) to hand specific model instances to the report-building step, i.e. the linear
+  `isinstance` scan this item also names is still there and still load-bearing (it is how the
+  report step reaches the description/legend/dictionary models directly, outside the rules
+  engine). `GeneralContext` itself remains the app-level container by design (args + config + i18n
+  + fs + logger in one object is the accepted `AppContext`-shaped role for the legacy pipeline —
+  ADR territory, not a defect this item asks to fix). **Stays in-progress**: the rule-facing half
+  of this item (the Demeter chain into rule code) is done; the model-lookup half
+  (`DataModelContext.get_instance_of`'s linear scan, still used by the report step) is not — a
+  typed `SheetBundle`-shaped replacement for that lookup is follow-up work, not folded into any
+  slice so far.
 
 ### ARC-007 · Models validate, clean and mutate; "Processing" classes are procedural namespaces
 - Priority: P1 · Effort: L · Status: in-progress
@@ -318,7 +364,7 @@ zero global state. Each item below names the current smell, where it lives, and 
   **ARC-008 is now done.**
 
 ### ARC-009 · Data loader: property with side effects, mixed result types
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: done
 - Where: `helpers/tools/data_loader/api/facade.py:91-151` (`@property load_all` performs I/O and
   returns a tuple), `DataLoaderModel.header_type` mutated to `"invalid"` by
   `models/sp_proportionality.py:163`, `data["qmls"]` list (BUG-015).
@@ -333,8 +379,8 @@ zero global state. Each item below names the current smell, where it lives, and 
   key is gone (BUG-015 — nothing in `data_validate/` consumed it). Header layout and CSV separator
   now come from `SHEET_SPECS` (`HeaderLayout`, `SheetSpec.csv_separator`) instead of the deleted
   `Config` singleton, closing the "mixed result types"/"guessed separator" half of this item.
-  Remaining open: `DataLoaderModel` itself keeps its current name/attributes (a rename to
-  `LoadedSheet`-shaped value object is ARC-013's naming pass, Phase 5).
+  Remaining open (as of that slice): `DataLoaderModel` itself keeps its current name/attributes (a
+  rename to `LoadedSheet`-shaped value object is ARC-013's naming pass, Phase 5).
 - Done (BUG-002/BUG-003 Phase 2c slice): the "`DataLoaderModel.header_type` mutated to
   `\"invalid\"`" half of this item is now fixed — `SpProportionality.post_processing` sets
   `self.header_layout_invalid = True` (a new instance attribute) instead, and
@@ -342,9 +388,17 @@ zero global state. Each item below names the current smell, where it lives, and 
   (grep-confirmed zero remaining writers). Consumers that used to infer proportionality validity
   from the shared `raw_data`/`header_type` now read `model.frame`/`model.header_layout_invalid`
   instead (see BUG-003's "Done" entry in `01-bugs.md`).
+- Done (Phase 5 slice, ARC-013's naming pass — closes this item): `DataLoaderModel` is renamed to
+  `LoadedSheet` in `helpers/tools/data_loader/api/facade.py`; every internal consumer (`models/sp_*.py`,
+  `sp_model_abc.py`, `helpers/tools/__init__.py`, `helpers/tools/data_loader/__init__.py`, and every
+  test that referenced the old name) now imports/uses `LoadedSheet`. `DataLoaderModel = LoadedSheet`
+  is kept as a plain class-object alias for one release (grep-confirmed: the alias is the identical
+  class, not a subclass or wrapper; regression test:
+  `tests/unit/helpers/tools/data_loader/api/test_facade.py::TestDataLoaderModelDeprecatedAlias`).
+  **ARC-009 is now done.**
 
 ### ARC-010 · Package layout mixes tooling, demos and runtime
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `helpers/tools/readme/generate_readme.py` (build script inside the package, prints at
   import), `helpers/tools/spellchecker/main.py` (demo), `data_validate/__init__.py:1-14` ("Adapta
   Parser" placeholder docstring), root scratch (`my_codes.py`, `local_data/`), committed `docs/`,
@@ -352,6 +406,21 @@ zero global state. Each item below names the current smell, where it lives, and 
 - Target layout (proposal, see `.specs/architecture/target-architecture.md`):
   `data_validate/{cli,app,config,specs,loading,normalizing,rules,reporting,i18n,spell,util}`;
   tooling under `tools/`; docs generated in CI.
+- Done (Phase 5 slice — closes this item): `helpers/tools/readme/` (both `generate_readme.py` and
+  its `__init__.py`) and `static/templates/README.TEMPLATE.md` are physically deleted (ADR-0009,
+  now "Accepted (implemented)" instead of "partially implemented"), along with the now-empty
+  `static/templates/` directory; `pyproject.toml`'s `[tool.coverage.run] omit` no longer lists
+  `generate_readme.py` (nothing left to omit) and `tools/check_links.py`'s
+  `_DEFAULT_EXCLUDED_FILES` is now an empty `frozenset` (its only entry was that template).
+  `helpers/tools/spellchecker/main.py` (the demo script) and its
+  `tests/unit/helpers/tools/spellchecker/test_main.py` are deleted — nothing in `data_validate/`
+  imported the module. `data_validate/__init__.py`'s "Adapta Parser" placeholder docstring is
+  replaced with a 3-line package description naming the real project (`canoa_data_validate`) and
+  pointing at `.specs/00-overview.md`; its lazy-`__getattr__` metadata behaviour is unchanged. Root
+  scratch `my_codes.py` (already `.gitignore`d, never tracked) is deleted from disk and its
+  `.gitignore` line removed (nothing left to ignore). `local_data/`/`dist/` were already untracked
+  (0 files under git) and committed `docs/` already contains only `docs/adrs/` — both already
+  satisfied this item's intent before this slice, so neither needed a change here.
 
 ### ARC-011 · CLI contract
 - Priority: P2 · Effort: M · Status: in-progress
@@ -390,13 +459,31 @@ zero global state. Each item below names the current smell, where it lives, and 
   here) — only the banner was in scope for this slice.
 
 ### ARC-013 · Naming
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Where: `DataModelABC` in `data_args.py:19` (it is an args class), nested `INFO(ConstantBase)` per
   model, `VAR_CONSTS`/`DEFINITIONS` (`sp_model_abc.py:37-63`), `ModelMappingLegend`,
   `SpreadsheetProcessor` vs `Processing` helpers, typos (BUG-024). `TestReportItem` was renamed to
   `ReportItem` (BUG-020, done).
 - Target: naming guide in `.claude/rules/coding-standards.md`; rename during migration with
   deprecation shims.
+- Done (Phase 5 slice — closes this item, along with `DataLoaderModel` → `LoadedSheet` under
+  ARC-009). Every candidate this item names was individually judged renamed-or-kept by grep count
+  (cheap and clearly internal → renamed with no deprecation shim needed; wide-surface → kept, noted
+  here instead of churned):
+
+  | Name | Grep count (definitions + call sites) | Decision | Rationale |
+  |---|---|---|---|
+  | `DataModelABC` → `CliArgsGroup` | 15 (2 files: `data_args.py`, its test) | **Renamed** | It is the ABC for CLI argument-group classes (`DataFile`/`DataAction`/`DataReport`), not a "data model" in the `models/sp_*.py` sense — the old name actively misled. No plain-alias shim: this is a private-to-the-module ABC, `git grep` confirms zero importers outside `data_args.py`/its test. |
+  | `SpModelABC.DEFINITIONS`/`VAR_CONSTS` → `SpModelABC.ModelConfigKeys`/`CONFIG_KEYS` | 19 (3 files: `sp_model_abc.py`, `spreadsheet_processor.py`, its test) | **Renamed** | `DEFINITIONS`/`VAR_CONSTS` read as generic placeholders; `ModelConfigKeys`/`CONFIG_KEYS` names what they actually are — the `model_configurations` kwarg keys (`LEGEND_EXISTS_FILE`, `SCENARIO_EXISTS_FILE`, …). |
+  | Per-model nested `class INFO(ConstantBase)` (8 models: `sp_legend`/`sp_composition`/`sp_scenario`/`sp_value`/`sp_description`/`sp_dictionary`/`sp_temporal_reference`/`sp_proportionality`) → `class Constants(ConstantBase)` | 8 definitions, 0 external references (each is only ever read as `self.CONSTANTS`/`Model.CONSTANTS`, never by its class name `INFO` from outside its own file) | **Renamed** | `INFO` reads like a logging level, not "this model's constants"; `Constants` matches the `CONSTANTS = Constants()` attribute it backs, and being purely local to each file made the rename free of any external call-site risk. |
+  | `ModelMappingLegend` | 2 (both historical docstring/comment mentions in `rules/legend.py`/`tests/unit/rules/test_legend.py`, explaining behaviour parity with a since-deleted class) | **N/A — already gone** | The class itself was deleted in ARC-017 Phase 3 Port 6 (`SpLegendValidator`/`ModelMappingLegend` → `rules/legend.py`); the two remaining mentions are historical-parity prose, not a live identifier, so there is nothing left to rename. |
+  | `SpreadsheetProcessor` vs `*Processing` helpers (`MessageFormattingProcessing`, `DataFrameProcessing`, `LegendProcessing`, `TreeProcessing`, and 9 others) | 665 (13 classes across `data_validate/`+`tests/`) | **Kept, noted** | Two distinct, both internally consistent conventions: `*Processing` names a stateless namespace of `@staticmethod` helpers (ARC-007's "procedural namespace" smell is tracked there, not here), `SpreadsheetProcessor` names the one stateful pipeline orchestrator. Renaming either family to remove the surface-level `-or`/`-ing` mismatch would touch 665 call sites for a cosmetic gain — out of proportion to a naming item; deferred to whenever ARC-007 actually restructures the `*Processing` helpers into plain modules (at which point the class names disappear entirely, not just get renamed). |
+  | `DataLoaderModel` → `LoadedSheet` | 69 (14 files: production + tests) | **Renamed** (tracked as ARC-009's naming half, done together with this item) | See ARC-009's "Done" entry above — `DataLoaderModel` kept as a plain class alias for one release. |
+
+  Typos (BUG-024's share of this item): see `01-bugs.md::BUG-024` — `legend_processing.py`'s
+  `origina_value` → `original_value`, `data_args.py`'s "validaton" → "validation" docstring typo,
+  `file_system_utils.py`'s "dempotent" → "Idempotent" docstring typo are all fixed in this slice.
+  **ARC-013 is now done.**
 
 ### ARC-014 · Typing discipline
 - Priority: P2 · Effort: M · Status: open

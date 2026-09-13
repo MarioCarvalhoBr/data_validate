@@ -77,7 +77,7 @@ harness (PERF-009); never optimise without a number.
   `tests/unit/helpers/common/validation/test_proportionality_processing.py`.
 
 ### PERF-002 · Defensive full-frame copies everywhere
-- Priority: P1 · Effort: S · Status: open
+- Priority: P1 · Effort: S · Status: done (with note — residual copies kept, budget-immaterial)
 - Where: `validators/spreadsheets/base/base_validator.py:80` (copy per validator),
   `helpers/common/validation/dataframe_processing.py:37,103,156,196,251`,
   `helpers/common/validation/character_processing.py:45,93,153,203`,
@@ -92,9 +92,29 @@ harness (PERF-009); never optimise without a number.
   `legend_validator.py`'s three `.copy()` calls were deliberately *kept* in this slice (only their
   source switched from `data_loader_model.raw_data` to `self._data_model.frame`) per this item's
   own instruction to defer the copy removal; this item stays open for that follow-up.
+- Done (Phase 5 close, 2026-09-13 — with note): the two exact sites named above no longer exist —
+  `base_validator.py` and `legend_validator.py` are both deleted (ARC-008/ARC-017 Phase 3 Port 8,
+  Port 6 respectively; every validator was ported off `base_validator.py` and the legend copies
+  went with `SpLegendValidator`). A fresh repo-wide grep (`grep -rn "\.copy(" data_validate/`)
+  finds 23 remaining `.copy()` calls, all inside pure `helpers/common/{validation,processing}/*.py`
+  frame-level functions (`dataframe_processing.py`, `character_processing.py`,
+  `legend_processing.py`, `proportionality_processing.py`, `graph_processing.py`,
+  `data_cleaning_processing.py`, `description_processing.py`) and
+  `helpers/tools/spellchecker/spellchecker.py` — each is a defensive copy at the top of a function
+  that goes on to build/mutate a *local* working frame, still reused by one or more `rules/*.py`
+  modules per each port's own docstring (not dead code to delete outright). Measured cost: the
+  PERF-009 budget run (6-indicator/5-year/3-scenario/5000-row bundle, ≈325k cells) completes in
+  3.05s wall / 184MB peak RSS against a < 10s / < 1GB budget — a ≥3.2x time and ≥5.4x memory
+  margin — so these 23 residual copies (each at most one extra frame-sized allocation, on sheets
+  far smaller than the wide `valores` frame the budget number is dominated by) are not a threat to
+  the budget at current or several-times-larger scale. Removing them fully would require auditing
+  each function's internal mutation pattern one by one (a nontrivial, low-value refactor at this
+  margin) rather than a drive-by deletion — left as accepted residual debt, not reopened as blocking.
+  Revisit if a future profile shows frame copies as a material fraction of wall time/memory (see
+  PERF-005's/PERF-007's revisit triggers for the same "budget breach or 10x data growth" bar).
 
 ### PERF-003 · The same columns are cleaned repeatedly
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: wont-fix (residual — measured budget-immaterial, see revisit trigger)
 - Where: `DataCleaningProcessing.clean_dataframe_integers` is called for `descricao.codigo` in
   `sp_description.py`, `compostion_graph_validator.py:379`, `composition_tree_validator.py:179`,
   `legend_validator.py:246,419`, `proportionality_validator.py:352`, `value_validator.py:199,299`
@@ -125,6 +145,24 @@ harness (PERF-009); never optimise without a number.
   This item stays in-progress: the `cleaned_column()` accessor this optimisation needs now exists
   (BUG-002), but applying it safely to any of the sites above is follow-up work, not a drive-by
   change bundled with BUG-002/BUG-003.
+- Decision (Phase 5 close, 2026-09-13 — wont-fix, residual): note the table above already reviewed
+  every call site named in this item's original "Where" (it predates the ARC-017 rule ports, so
+  the file names are stale — `compostion_graph_validator.py`/`composition_tree_validator.py`/
+  `legend_validator.py`/`proportionality_validator.py`/`value_validator.py` are all deleted; the
+  same cleaning parameters and pipeline shapes now live in the corresponding `rules/*.py` modules,
+  the table's per-site verdicts are unaffected by the file rename since the *reason* each site
+  stays local — different `min_value`, or row-alignment with a locally-filtered frame — is a data
+  shape argument, not a file-location one). Measured cost of leaving the ≥7 re-cleaning passes as
+  they are: the PERF-009 budget run (≈325k cells) validates in 3.05s wall / 184MB peak RSS against
+  a < 10s / < 1GB budget (≥3.2x/≥5.4x margin); `descricao.codigo` (the most-repeated column) is a
+  single indicator-count-sized column re-cleaned a handful of times, not a `valores`-sized column,
+  so its contribution to that 3.05s is not separately measurable above profiler noise in
+  `tools/harness/profile_pipeline.py`'s existing trace (PERF-007's decision note). Building a
+  proper per-sheet `Normalizer`/typed `SheetFrame` (this item's actual proposed fix) is Phase 2
+  roadmap scope that was never done, and is not justified by the numbers above at current scale —
+  **wont-fix for now**, matching PERF-007's precedent. Revisit trigger (shared with PERF-005): a
+  future profile showing cleaning/normalisation as a material fraction of wall time, a budget
+  breach, or roughly a 10x data-volume increase over the PERF-009 fixture.
 
 ### PERF-004 · Repeated translation / config work
 - Priority: P2 · Effort: S · Status: done
@@ -139,13 +177,26 @@ harness (PERF-009); never optimise without a number.
   without the cache).
 
 ### PERF-005 · Memory: everything loaded as Python `str` objects
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: wont-fix (for now, measured — see revisit trigger)
 - Where: `readers/csv_reader.py:23` (`dtype=str, low_memory=False`), `readers/excel_reader.py:16`
   (`dtype=str`).
 - Proposed fix: `dtype_backend="pyarrow"` / `pd.StringDtype("pyarrow")`; chunked validation for
   `valores` (row-independent rules can stream); optional Polars backend behind the `SheetFrame`
   Protocol for very large sectors.
 - Related: SEC-003
+- Decision (Phase 5 close, 2026-09-13): measured against the same PERF-009 budget bundle (≈325k
+  cells, every cell a Python `str`): 3.05s wall, 184MB peak RSS versus the < 10s / < 1GB target —
+  a ≥5.4x memory margin at the size this backlog's own budget defines as "large". Switching the
+  reader dtype to `pyarrow`-backed strings or a Polars backend is a real, correctly-identified
+  future lever, but implementing it now (a change that touches every reader, every model's
+  cleaning code that assumes plain Python `str`/`object` columns, and the `SheetSpec` dtype
+  declarations) is not justified by any measured pressure at the current or a several-times-larger
+  bundle size — no evidence this backlog requires "why did you optimise a thing with no number
+  behind it" (`.claude/rules/performance.md`). **Wont-fix for now**, not open, so it stops
+  appearing as unaddressed migration debt. Revisit trigger: a real bundle breaches the < 10s / <
+  1GB budget, or sector data grows roughly 10x past the PERF-009 fixture's ≈325k cells — re-run
+  `make bench`/`tools/harness/profile_pipeline.py` and reopen with the new numbers before starting
+  the `pyarrow`/Polars work, per the same discipline `PERF-007`'s wont-fix decision documents.
 
 ### PERF-006 · Spell-check calls enchant per token without caching
 - Priority: P2 · Effort: S · Status: done

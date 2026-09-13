@@ -14,7 +14,7 @@ across its span → forward-filled), row 2 = child column names in the same form
 | 1 (row 2) | `<child>-<ano>[-<cenario>]` | dynamic | numeric (≤ 3 decimals) or `DI` | child of the parent above per `composicao` | same |
 
 The model runs only when the frame is non-empty and the header is double
-(`DataLoaderModel.header_type == "double"`); when structural errors occur the frame is cleared
+(`LoadedSheet.header_type == "double"`); when structural errors occur the frame is cleared
 and `header_type` set to `"invalid"` so validators skip (ARC-009). Sub-datasets per parent are built
 by `helpers/common/validation/proportionality_processing.py::ProportionalityProcessing.build_subdatasets`
 (id column + the parent's child columns). Row numbers in messages use `index + 3`.

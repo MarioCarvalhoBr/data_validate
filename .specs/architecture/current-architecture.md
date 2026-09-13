@@ -28,7 +28,7 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 | Step | Method | What happens | Report bucket |
 |---|---|---|---|
 | 0 | `_prepare_statement` | `ValidationReport.add_by_name` for every `NamesEnum` title (fixed order in the report) | all |
-| 1 | `_read_data` | `DataLoaderFacade(input_folder).load()` → `raw_data_map: dict[str, DataLoaderModel]` + load errors; extracts `scenarios` from `cenarios.simbolo`; builds `model_configurations` (`scenario_exists_file`, `scenario_read_success`, `scenarios`, `legend_exists_file`, `legend_read_success`) | FS |
+| 1 | `_read_data` | `DataLoaderFacade(input_folder).load()` → `raw_data_map: dict[str, LoadedSheet]` + load errors; extracts `scenarios` from `cenarios.simbolo`; builds `model_configurations` (`scenario_exists_file`, `scenario_read_success`, `scenarios`, `legend_exists_file`, `legend_read_success`) | FS |
 | 2 | `_configure` | For each class in `target_model_classes` (`SpDescription, SpComposition, SpValue, SpTemporalReference, SpProportionality, SpScenario, SpLegend, SpDictionary`) instantiate the model (constructor only stores dependencies, ARC-001 Phase 3 Port 8), then call `model_instance.run()` explicitly (`initialize()` + `pre_processing()`/`expected_structure_columns()`/`data_cleaning()`), then copy `structural_errors/warnings` → FS and `data_cleaning_errors/warnings` → FC | FS, FC |
 | 3 | `_build_pipeline` | `DataModelContext(context, initialized_models)`; builds one shared `RuleContext` (`_build_rule_context`, which also computes `composition_facts` once via `compute_composition_facts` — BUG-019, and constructs the `SpellChecker` backend once, injected as `ctx.options["spell_backend"]`), then calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)` (ARC-017 Phase 3b), then `_run_rule_registries([SPELL_REGISTRY], ctx)` + `self._spell_backend.clean_files_generated()` (ARC-017 Phase 3 Port 8, replacing the deleted `SpellCheckerValidator` — the last validator ported, `data_validate/validators/` is now deleted entirely, ARC-008), then `_run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` (ARC-017 Phase 3 Port 2/3), then `_run_rule_registries([TEMPORAL_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([PROPORTIONALITY_REGISTRY], ctx)` (ARC-017 Phase 3 Port 7), then `_run_rule_registries([VALUE_REGISTRY], ctx)` (ARC-017 Phase 3 Port 5), then `_run_rule_registries([SCENARIO_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([LEGEND_REGISTRY], ctx)` (ARC-017 Phase 3 Port 6) — every `_run_rule_registries` call builds `Engine(registry).run(ctx)` and renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes`; no constructor-runs-pipeline involved anywhere in this step | per `NamesEnum` |
 | 4 | `_report` | debug dump to logger; `FileReportGenerator(context).build_report(validation_reports)` | — |
@@ -57,10 +57,10 @@ behaviour, just moved out of `__init__`).
 
 | Component | File | Responsibility | Smells |
 |---|---|---|---|
-| `DataLoaderFacade.load()` (method) | `helpers/tools/data_loader/api/facade.py` | Scan folder, pick reader + header strategy per stem (from `SHEET_SPECS`), read into `DataLoaderModel`, collect read errors, fill missing sheets with empty models, return `LoadResult(models, errors)` | ARC-009 (in-progress) |
+| `DataLoaderFacade.load()` (method) | `helpers/tools/data_loader/api/facade.py` | Scan folder, pick reader + header strategy per stem (from `SHEET_SPECS`), read into `LoadedSheet`, collect read errors, fill missing sheets with empty models, return `LoadResult(models, errors)` | ARC-009 (done) |
 | `DataLoaderFacade.load_all` (property) | same file | Deprecated one-release shim: warns `DeprecationWarning`, returns `(result.models, result.errors)` | ARC-009 |
-| `LoadResult` | same file | Frozen dataclass: `models: dict[str, DataLoaderModel]`, `errors: list[str]` | — |
-| `DataLoaderModel` | same file | `path`, `raw_data`, `is_read_successful`, `does_file_exist`, `header_type` | ARC-009, ARC-013 (naming) |
+| `LoadResult` | same file | Frozen dataclass: `models: dict[str, LoadedSheet]`, `errors: list[str]` | — |
+| `LoadedSheet` | same file | `path`, `raw_data`, `is_read_successful`, `does_file_exist`, `header_type`; renamed from `DataLoaderModel` in Phase 5 (ARC-009/ARC-013), which is kept as a plain class alias for one release | ARC-009 (done), ARC-013 (done) |
 | `FileScanner.scan` | `.../engine/scanner.py` | Finds stems declared in `SHEET_SPECS`/`ALLOWED_EXTENSIONS`; CSV wins over XLSX (documented policy), returns `(found, ignored, missing)` | — |
 | `ReaderFactory` | `.../engine/factory.py` | `.csv → CSVReader(sep=...)`, `.xlsx → ExcelReader` | — |
 | `CSVReader`, `ExcelReader` | `.../readers/*.py` | `read_csv(sep from constructor param, dtype=str)` with MultiIndex forward-fill; `read_excel(engine="calamine", dtype=str)` | SEC-003 |
@@ -147,7 +147,7 @@ kept for backward compatibility.
 
 ```mermaid
 flowchart LR
-  F[(files)] --> L[DataLoaderModel.raw_data<br/>one DataFrame per sheet, never mutated after load]
+  F[(files)] --> L[LoadedSheet.raw_data<br/>one DataFrame per sheet, never mutated after load]
   L --> FR[Sp*.frame<br/>per-instance working copy]
   FR -->|SpDescription.pre_processing drops/injects via .drop/.assign, reassigning self.frame| FR
   FR -->|SpProportionality.post_processing empties self.frame,<br/>sets self.header_layout_invalid| FR

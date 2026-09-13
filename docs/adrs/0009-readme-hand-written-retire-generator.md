@@ -1,8 +1,8 @@
 # ADR-0009: README maintained by hand; retire the template generator
 
-- Status: Accepted (partially implemented) — `README.md` has been hand-written since 4b801ae and
-  the Makefile's `readme` target has been removed; `generate_readme.py` and
-  `README.TEMPLATE.md` were deleted in Phase 5 (ARC-010).
+- Status: Accepted (implemented) — `README.md` has been hand-written since 4b801ae and the
+  Makefile's `readme` target has been removed; `generate_readme.py` and `README.TEMPLATE.md` (plus
+  the now-empty `static/templates/` directory) were physically deleted in Phase 5 (ARC-010).
 - Date: 2026-08-25
 - Deciders: Mário de Araújo Carvalho (INPE) with the AI orchestrator
 
@@ -59,9 +59,10 @@ are removed **now**, in this execution, since `publish` itself is being replaced
   doesn't need updating (e.g. "see the latest release on PyPI" instead of a literal version
   string) — a small ongoing discipline cost, mitigated by relying on badges for anything that
   changes per release.
-- Until Phase 5 physically deletes the files, `generate_readme.py` and `README.TEMPLATE.md` remain
-  in the tree unused by any Make target — a temporary, clearly-dead artifact accepted as the cost
-  of not breaking anything mid-migration; tracked so Phase 5 doesn't forget to remove it.
+- (Resolved) Between this decision and Phase 5's physical deletion, `generate_readme.py` and
+  `README.TEMPLATE.md` sat in the tree unused by any Make target — a temporary, clearly-dead
+  artifact accepted as the cost of not breaking anything mid-migration. Phase 5 (ARC-010) deleted
+  both files (plus the now-empty `static/templates/` directory), closing this gap.
 
 ## Alternatives considered
 

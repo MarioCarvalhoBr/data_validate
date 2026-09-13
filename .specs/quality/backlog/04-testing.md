@@ -211,10 +211,23 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
 - Related: PERF-009
 
 ### TST-006 · Assertions bound to Portuguese message text
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Problem: once messages come from a catalog (ARC-004), tests must assert on `Issue.rule_id`,
   `row`, `column`, `params`, not on rendered strings; rendered strings are covered by catalog tests
   and goldens.
+- Done (Phase 5 review, 2026-09-13): sampled every `tests/unit/rules/test_*.py` module (the tests
+  that replaced the deleted validators — description, composition, value, legend, spell,
+  proportionality, structure, scenario, temporal reference). Every one builds its `RuleContext`
+  with `translate=lambda key, **params: key` (an identity stub — `_make_context`'s `translate`
+  parameter in each module), so a rendered "message" in these tests is literally the key string,
+  never real pt-BR text; assertions are exclusively on `issue.rule_id`, `issue.message_key`, and
+  `issue.params` (grep-confirmed: `.message_key`/`.rule_id`/`.params` assertions present in every
+  module — 16 to 62 occurrences per file — and zero assertions matching a rendered/Portuguese
+  string pattern in any of them). Rendered-text coverage lives exactly where the problem statement
+  says it should: `tests/unit/i18n/test_catalog_parity.py` (catalog shape/placeholder parity) and
+  `tests/e2e/test_golden.py` (byte-identical rendered pt-BR/en-US output against
+  `tests/e2e/golden/*.json`). No mixed/legacy-style test asserting on a hardcoded rendered string
+  was found in `tests/unit/rules/` — this item closes without a "done-with-note" qualifier.
 
 ### TST-007 · CI runners lack system dependencies for real spell-check / PDF tests
 - Priority: P2 · Effort: S · Status: done
