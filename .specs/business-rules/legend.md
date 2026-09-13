@@ -154,8 +154,8 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Statement: preconditions — legend sanity passed and `descricao` has `codigo`, `nivel`, `legenda`. Let A = numeric `legenda` values of description rows with level ≠ 1; B = distinct `legenda.codigo`. A − B → error; B − A → warning.
 - Current message (pt-BR): `{descricao}: Códigos de legenda ausentes em {legenda}: [..].` · `{legenda}: Códigos de legenda não referenciados em {descricao}: [..].` · missing column → error with the abort text
 - Target message key: `rule.LEG-012.error`, `rule.LEG-012.warning`
-- Implemented by: `validators/spreadsheets/legend/legend_validator.py::SpLegendValidator.validate_relation_indicators_in_legend`
-- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 cases only) — broader coverage is TST-001
+- Implemented by: `rules/legend.py::check_relation_missing_and_unreferenced_codes`/`_analyze_relation_indicators` (ARC-017 Phase 3 Port 6; owns the shared `rule.legend.missing_required_column` abort for LEG-012…014)
+- Covered by tests: `tests/unit/rules/test_legend.py` (table-driven: missing code, unreferenced code, missing-column abort, `legend_sanity_ok` gate)
 - Notes / known defects: none. BUG-014 (string comparison of `nivel`, e.g. `"1.0"` silently not
   matching `"1"`) fixed — `nivel` is now compared via
   `DataFrameProcessing.numeric_equals_mask`/`numeric_not_equals_mask`.
@@ -167,8 +167,8 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Statement: no description row with level 1 has a non-empty `legenda`.
 - Current message (pt-BR): `{descricao}: Indicadores de nível 1 não podem ter referência de legenda. Códigos com referência em {legenda}: [..].`
 - Target message key: `rule.LEG-013.error`
-- Implemented by: `legend_validator.py::SpLegendValidator.validate_relation_indicators_in_legend`
-- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 case only) — broader coverage is TST-001
+- Implemented by: `rules/legend.py::check_level_one_must_not_reference_legend`/`_analyze_relation_indicators` (ARC-017 Phase 3 Port 6; silent when LEG-012's shared abort fired)
+- Covered by tests: `tests/unit/rules/test_legend.py` (table-driven: no legend reference, BUG-014 float-level regression, missing-column silence)
 - Notes / known defects: the message lists *all* level-1 codes, not only the offending ones.
   BUG-014 (string comparison of `nivel`, e.g. `"1.0"` silently not matching `"1"` and skipping this
   rule entirely) fixed.
@@ -180,8 +180,8 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Statement: every description row with level ∉ {1, 2} has a non-empty `legenda`.
 - Current message (pt-BR): `{descricao}: Indicadores de níveis diferentes de 1 e 2 devem ter referência de legenda. Indicadores sem referência em {legenda}: [..].`
 - Target message key: `rule.LEG-014.error`
-- Implemented by: `legend_validator.py::SpLegendValidator.validate_relation_indicators_in_legend`
-- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 case only) — broader coverage is TST-001
+- Implemented by: `rules/legend.py::check_other_levels_must_reference_legend`/`_analyze_relation_indicators` (ARC-017 Phase 3 Port 6; silent when LEG-012's shared abort fired)
+- Covered by tests: `tests/unit/rules/test_legend.py` (table-driven: missing reference, has reference, BUG-014 float-level regression, missing-column silence)
 - Notes / known defects: conflicts with protocol §2.3 p.9 "todos os valores vazios serão associados à legenda default" (gap G-20).
   BUG-014 (compound `nivel != "1" & nivel != "2"` string comparison, e.g. `"2.0"` wrongly treated
   as "some other level") fixed — both sides now use `DataFrameProcessing.numeric_not_equals_mask`.
@@ -192,11 +192,16 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - Protocol: §2.5 p.11 ("a legenda deverá contemplar os valores máximo e mínimo dos dados para todos os tempos disponíveis"), §2.6 p.13 (normalised values in [0, 1])
 - Statement: for each pattern-matching `valores` column whose indicator is not level 1: resolve the indicator's `legenda` code → [min(minimo), max(maximo)] over non-DI slices; without a legend (or unparsable bounds) use [0, 1]. Every numeric cell (skipping `DI` and non-numeric) must satisfy min ≤ value ≤ max. Runs even when the legend file is absent. Skipped when `valores` or `descricao` is empty.
 - Current message (pt-BR): `{valores}, linha {index + 2}: O valor {value} está fora do intervalo da legenda de código '{legend_id}' ({min} a {max}) para a coluna '{column}'.` · `… fora do intervalo da legenda padrão (0 a 1) …`
-- Target message key: `rule.LEG-015.error`
-- Implemented by: `legend_validator.py::SpLegendValidator.validate_range_multiple_legend` (`ModelMappingLegend`)
-- Covered by tests: `tests/unit/validators/spreadsheets/legend/test_legend_validator.py` (BUG-014 case only) — broader coverage is TST-001
-- Notes / known defects: cell-by-cell loop (PERF-001). BUG-014 (string comparison of `nivel`) fixed
-  — level 1 exclusion now uses `DataFrameProcessing.numeric_equals_mask`.
+- Target message key: `rule.LEG-015.error_coded` (named-legend branch), `rule.LEG-015.error_default`
+  (default-range branch) — two catalog keys, not one key with a pre-formatted "de código
+  'X'"/"padrão" fragment param, so `en_US` renders a genuine English sentence in both cases
+  (`.claude/rules/i18n.md`)
+- Implemented by: `rules/legend.py::check_value_range_within_legend`/`_legend_range_for_column` (ARC-017 Phase 3 Port 6, replacing `ModelMappingLegend`)
+- Covered by tests: `tests/unit/rules/test_legend.py` (table-driven: default range, coded range, `DI` cells, missing column, `legend_read_success`/`legend_sanity_ok` gates, BUG-014 float-level regression)
+- Notes / known defects: cell-by-cell loop resolved (PERF-001) — `rules/legend.py`'s
+  `out_of_range_mask` is one `pd.to_numeric(errors="coerce")` mask per matching column. BUG-014
+  (string comparison of `nivel`) fixed — level 1 exclusion now uses
+  `DataFrameProcessing.numeric_equals_mask`.
 
 ## Gaps (protocol ↔ code)
 
@@ -205,4 +210,5 @@ Model-level checks (LEG-001…011) run in `SpLegend.data_cleaning` only when
 - **G-21 grey for DI** and **max 11 slices / 5–7 advised**: not validated.
 - **G-22 legend ≤ data minimum**: protocol demands the smallest `minimo` be ≤ the indicator's minimum; code reports out-of-range values (LEG-015) — equivalent in effect, different wording.
 
-Last synced with code: 09279f4
+Last synced with code: ARC-017 Phase 3 Port 6 (LEG-012…015 ported to `rules/legend.py`; legacy
+`SpLegendValidator`/`ModelMappingLegend` deleted)

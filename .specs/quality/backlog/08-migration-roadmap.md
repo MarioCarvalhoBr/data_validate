@@ -19,6 +19,9 @@ SEC-005, SEC-006, DOC-001, DOC-005
 5. Rewrite root docs; delete `copilot-instructions.md`; `.claude/`, `.specs/`, `docs/adrs/` in place.
 Gate: `make check` green on Linux and Windows; goldens byte-stable across 3 runs.
 Status (2026-08-25): Done — TST-002, TST-004, TST-008, TOOL-001, TOOL-002, TOOL-003, TOOL-004, TOOL-007, SEC-006, DOC-001, DOC-005 (11 items). In-progress — TST-003, TOOL-006, SEC-005 (3 items). Remaining — run `pre-commit install`, TOOL-006 artefacts, SEC-005 dependency upgrades, TST-003 autouse isolation.
+Status (2026-09-12, TST-003 slice): Done — TST-003 (autouse `tests/unit/**` CWD isolation, unblocked
+by BUG-004/BUG-021 landing; see `04-testing.md`). Remaining in this phase — TOOL-006 artefacts,
+SEC-005 dependency upgrades.
 
 ## Phase 1 — Foundations: context, config, issues, CLI
 Closes: BUG-001, BUG-004, BUG-005, BUG-008, BUG-009, BUG-010, BUG-011, BUG-017, BUG-021, BUG-023,

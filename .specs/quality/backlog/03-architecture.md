@@ -193,6 +193,16 @@ zero global state. Each item below names the current smell, where it lives, and 
   `silent` key renders to the empty string, preserving the legacy
   `ValueProcessing.check_numeric_value`'s literal-infinity branch (`return False, "", False`)
   rather than "fixing" it.
+- Note (Phase 3 Port 6 slice, ARC-017): `SpLegendValidator`/`ModelMappingLegend`
+  (`legend_validator.py`) is deleted; its four ported rules (`rules/legend.py`'s LEG-012…015)
+  render every message through `ctx.translate(message_key, **params)` — 7 new catalog keys added
+  to both `static/locales/{pt_BR,en_US}/messages.json` (`rule.legend.missing_required_column`
+  shared by every rule's "required column is missing" abort case, plus one-or-more
+  `rule.LEG-0XX.<slug>` keys per rule), all pt-BR values copied verbatim from the legacy
+  f-strings (verified byte-identical by the e2e golden harness run twice). LEG-015 uses two
+  distinct keys (`error_default`/`error_coded`) for its "padrão"/"de código 'X'" branch rather
+  than one key with a pre-formatted-fragment param, so the en_US locale renders a genuine English
+  sentence in both cases instead of an English template around Portuguese connector words.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains

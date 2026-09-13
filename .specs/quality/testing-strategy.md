@@ -39,7 +39,8 @@ it still runs the full suite minus the dependency-gated cases rather than failin
 |---|---|
 | `repo_root` | `Path` of the repository |
 | `fixture_folder(name)` | `data/input/<name>` |
-| `tmp_cwd` (autouse) | `monkeypatch.chdir(tmp_path)` so no test writes `.config/`, `data/output/logs` in the repo; opt-out with `@pytest.mark.keep_cwd` |
+| `tmp_cwd` (opt-in, `tests/conftest.py`) | `monkeypatch.chdir(tmp_path)`, requestable repo-wide (e.g. a single `tests/e2e/` case); a no-op re-chdir when requested inside `tests/unit/**` |
+| `_isolate_unit_test_cwd` (autouse, `tests/unit/conftest.py`) | Chdirs every `tests/unit/**` test into an isolated `tmp_path` so none writes `.config/`, `data/output/logs` in the repo (TST-003); scoped to `tests/unit/` only so `tests/e2e/`/`tests/benchmarks/` keep running from the repo root (relative `data/input/<fixture>` CLI paths); opt-out per test with `@pytest.mark.keep_cwd` |
 | `app_context` (target) | `AppContext` with fake catalog (returns keys), frozen clock, null logger |
 | `sheet_bundle` / `BundleBuilder` (target, `tests/factories.py`) | Minimal valid bundle as DataFrames with helpers to inject one defect |
 | `catalog` | Real pt_BR catalog for message rendering tests |

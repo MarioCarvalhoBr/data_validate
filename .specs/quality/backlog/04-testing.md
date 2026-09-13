@@ -71,6 +71,18 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   under this item; the rest of the list (legend, `spreadsheet_processor.py`'s remaining
   validator-construction lines, spellchecker, `file_report_generator.py`,
   `validation_report.py`, models) is still open.
+- Done (legend): `SpLegendValidator`/`legend_validator.py` (11.7 % coverage, 0 dedicated rule
+  tests) is deleted; its four ported LEG-012…015 rules (`rules/legend.py`) are 98.93 % covered
+  by `tests/unit/rules/test_legend.py` (table-driven per rule: valid case, every failure mode,
+  the shared missing-column abort owned by `LEG-012` alone, the `legend_sanity_ok` option gate
+  for `LEG-012`/`LEG-013`/`LEG-014`, the `legend_read_success` conditional column requirement and
+  the `legend_sanity_ok`-gated default-range fallback for `LEG-015`, and the engine-level
+  empty-sheet skip for the whole registry), including the BUG-014 (`nivel = "1.0"`/`"2.0"` still
+  recognised numerically) regressions migrated from the deleted
+  `tests/unit/validators/spreadsheets/legend/test_legend_validator.py`. Eighth validator closed
+  under this item; the rest of the list (`spreadsheet_processor.py`'s remaining
+  validator-construction lines, spellchecker, `file_report_generator.py`,
+  `validation_report.py`, models) is still open.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration
@@ -86,13 +98,30 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
 - Related: 08-migration-roadmap Phase 0
 
 ### TST-003 · Empty `conftest.py`, no shared fixtures, tests touch the real filesystem
-- Priority: P1 · Effort: M · Status: in-progress
+- Priority: P1 · Effort: M · Status: done
 - Where: `tests/conftest.py`, `LanguageManager` writes `<repo>/.config/store.locale` during tests,
   `LoggerManager` creates `data/output/logs`.
 - Proposed fix: fixtures `app_context`, `sheet_bundle` (builder from dict → typed frames),
   `catalog` (fake translator returning keys), `tmp_input_folder`, `freeze_clock`; autouse fixture
   that isolates CWD in `tmp_path`.
 - Done: conftest fixtures added; `tmp_cwd` is opt-in because legacy unit tests depend on CWD; autouse isolation waits for BUG-004/BUG-021
+- Done: with BUG-004 (no more `.config/store.locale` file I/O in `LanguageManager`) and BUG-021
+  (file logger only created under an explicit `<output_folder>/logs`, never a CWD-relative
+  `logs/`) both landed, the blocker is gone. New `tests/unit/conftest.py` adds an autouse
+  `_isolate_unit_test_cwd` fixture (`monkeypatch.chdir(tmp_path)`) scoped to `tests/unit/**` only
+  — `tests/e2e/`/`tests/benchmarks/` are untouched and keep running from the repo root, since they
+  invoke the CLI via subprocess with relative `data/input/<fixture>` paths. Opt-out per test via
+  `@pytest.mark.keep_cwd` (registered in `pyproject.toml`). The previously-opt-in `tmp_cwd` fixture
+  in `tests/conftest.py` is unchanged and still available repo-wide (harmless no-op re-chdir when
+  requested inside `tests/unit/**` on top of the autouse isolation). All 1534 existing
+  `tests/unit/**` tests (1529 before the new proof-of-isolation module, `tests/unit/test_cwd_isolation.py`,
+  added 5 more) passed unmodified under the new autouse fixture — no test needed a fix or a
+  `keep_cwd` opt-out. Verified: full `tests/unit` suite green under both `-n auto` and
+  single-process (1534 passed, 4 skipped in each mode), `tests/e2e` 7/7 unaffected, and
+  `git status --porcelain` plus file-mtime inspection after the runs show no new
+  `.config/store.locale` or `data/output/logs/*.log` created at the repo root (pre-existing,
+  gitignored leftovers from earlier manual runs were left untouched, confirmed by their
+  unchanged mtimes).
 
 ### TST-004 · Coverage gate too low and not ratcheted
 - Priority: P1 · Effort: S · Status: done
