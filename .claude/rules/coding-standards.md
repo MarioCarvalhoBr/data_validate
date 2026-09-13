@@ -35,8 +35,10 @@ that as an excuse to write new code below this bar.
 - `@dataclass(frozen=True)` for value objects; `typing.Protocol` for
   structural interfaces instead of ABCs when you only need a shape.
 - Type hints on every new function signature; `ruff` clean and
-  `mypy --strict` clean for new/modified modules (see `pyproject.toml`
-  overrides for the legacy exemption list).
+  `mypy --strict` clean project-wide (ARC-014, closed 2026-09-13): `strict = true`
+  is the global `[tool.mypy]` setting with no `ignore_errors` override left anywhere
+  in `pyproject.toml` — only narrowly-scoped `ignore_missing_imports` entries for
+  untyped third-party libraries (`networkx`, `enchant`, `weasyprint`, `pdfkit`).
 
 ## Discipline
 

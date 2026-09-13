@@ -63,10 +63,16 @@ table.
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
 | P0 | 7 | 7 done | fully closed — SEC-001, TST-001/002, ARC-001/002, BUG-001/002 |
-| P1 | 29 | 26 done, 2 in-progress, 1 wont-fix | in-progress: ARC-004, ARC-006; wont-fix: PERF-003 |
-| P2 | 43 | 39 done, 1 in-progress, 1 open, 2 wont-fix | open: ARC-014; in-progress: ARC-015; wont-fix: PERF-005/007 |
+| P1 | 29 | 28 done, 1 wont-fix | wont-fix: PERF-003 |
+| P2 | 43 | 41 done, 2 wont-fix | wont-fix: PERF-005/007 |
 | P3 | 14 | 13 done, 1 wont-fix | wont-fix: BUG-012 |
-| **Total** | **93** | **85 done, 3 in-progress, 1 open, 4 wont-fix** | +18 Phase 6 `PROTO-*`/`TERR-*` items (all open, scheduled) |
+| **Total** | **93** | **89 done, 4 wont-fix** | files 01–07 fully closed (no `open`/`in-progress` items remain); +18 Phase 6 `PROTO-*`/`TERR-*` items (all open, scheduled) |
+
+Recomputed again 2026-09-13 (Phase 5 round M): **ARC-014 → done** (`mypy --strict`
+project-wide, see `03-architecture.md`) was the last open item across files 01–07. Same-day
+parallel slices had already closed ARC-004/ARC-006/ARC-015 without this table being
+recomputed — this pass re-derives every count from a fresh scan of every item's own `Status:`
+line, same method as the previous recompute below.
 
 Note: `01-bugs.md` contains two `### BUG-003` headings (one with a full "Done" write-up, one a
 stale duplicate with `Status: open` and no "Done" note, immediately preceding `BUG-004`). Counted

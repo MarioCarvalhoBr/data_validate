@@ -739,13 +739,41 @@ zero global state. Each item below names the current smell, where it lives, and 
   **ARC-013 is now done.**
 
 ### ARC-014 · Typing discipline
-- Priority: P2 · Effort: M · Status: open
-- Where: `**kwargs: Dict[str, Any]` everywhere, `context: GeneralContext = None` (implicit
+- Priority: P2 · Effort: M · Status: done
+- Closed 2026-09-13: `mypy --strict` is now project-wide (`[tool.mypy] strict = true`, no
+  `ignore_errors` override anywhere in `pyproject.toml`) — verified with
+  `poetry run mypy data_validate tools tests/e2e` (0 errors, 104 source files) and `make check`
+  green (lint, typecheck, bandit, 1673 unit tests) plus `tests/e2e` 8/8 goldens unchanged
+  (behaviour-preserving: typing/casts/annotations only). Before/after inventory: 477 errors
+  across 42 files with the blanket override removed locally at the start of this slice, down to
+  0 as each package (`config`, `helpers.base`, `helpers.common`, `helpers.tools.locale`,
+  `helpers.tools.data_loader`, `helpers.tools.spellchecker`, `models`, `controllers`, `main`) was
+  migrated and its ratchet entry dropped. `**kwargs: Dict[str, Any]` (the exact anti-pattern this
+  item named) is gone from every `SpModelABC` subclass's constructor, replaced by
+  `**kwargs: object` plus explicit `cast(...)` at each read (`sp_model_abc.py`'s
+  `_kwargs.get(...)` calls); every `context: X = None` (implicit-Optional) constructor parameter
+  either became a required parameter (`GeneralContext.__init__`'s `data_args`,
+  `FileReportGenerator.__init__`'s `context` — neither had a real `None` caller) or an explicit
+  `X | None = None`. Two justified `ignore_missing_imports` overrides were added alongside the
+  pre-existing `networkx.*` one, for the same reason: `enchant.*` (pyenchant, no stub package)
+  and `weasyprint.*`/`pdfkit.*` (optional PDF backends, no stub packages). One real (very minor,
+  pre-existing) bug surfaced by strict mode and fixed with a regression test:
+  `NumberFormattingProcessing.check_n_decimals_places` raised an uncaught `TypeError` instead of
+  returning `False` for a cell containing the literal text `"Infinity"` (`Decimal("Infinity")
+  .as_tuple().exponent` is the string `"F"`, not an `int` — see
+  `tests/unit/helpers/common/formatting/test_number_formatting.py`
+  ::TestNumberFormatting::test_check_n_decimals_places`). Final override list (all in
+  `pyproject.toml`): `[tool.mypy] strict = true` (global) · `tests.e2e.*`/`tools.*` → `strict =
+  true` (explicit, redundant with the global setting, kept because these trees sit outside the
+  `data_validate` package the global setting names) · `networkx.*`, `enchant.*`/`enchant`,
+  `weasyprint.*`/`weasyprint`, `pdfkit.*`/`pdfkit` → `ignore_missing_imports = true` (four
+  untyped third-party libraries, not code suppressions). Zero `ignore_errors` overrides remain.
+- Where (fixed): `**kwargs: Dict[str, Any]` everywhere, `context: GeneralContext = None` (implicit
   Optional), `Tuple[bool, str]` / `Tuple[bool, List[str]]` return codes (`file_system_utils.py`,
   `dataframe_processing.py`) contradicting the project's own Clean-Code rule #6, `typing.List/Dict`
   instead of builtins.
-- Target: `mypy --strict` on new modules, `from __future__ import annotations`, `TypedDict`/dataclasses
-  for kwargs, exceptions for failures.
+- Target (met): `mypy --strict` project-wide, `from __future__ import annotations`, casts/explicit
+  keyword params for kwargs, exceptions for failures.
 - Related: TOOL-003
 
 ### ARC-015 · Spellchecker tightly coupled to pyenchant
