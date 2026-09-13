@@ -15,7 +15,7 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
 `tests/e2e/golden/CHANGELOG.md`) — never silent.
 
 ### PROTO-001 · Stop requiring the removed `fontes` column in `descricao`
-- Priority: P1 · Effort: S · Status: open
+- Priority: P1 · Effort: S · Status: done
 - Protocol: v1.16 history ("Removendo fonte da descricao dos indicadores, pois não é usada"); §2.3
   no longer lists `fontes`.
 - Where: `models/sp_description.py::RequiredColumn` (COLUMN_SOURCES), `specs/sheet_specs.py`
@@ -28,9 +28,15 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
 - Tests: unit (bundle without `fontes` → no missing-column error; with `fontes` → no warning);
   goldens unchanged.
 - Related: PROTO-002, BUG-003
+- Done: `fontes` is `ColumnKind.DEPRECATED` in `specs/sheet_specs.py` and
+  `SpDescription.DeprecatedColumn` (`models/sp_description.py`); `pre_processing` only adds it to
+  `EXPECTED_COLUMNS` when present, no default injection. Tests:
+  `tests/unit/models/test_sp_description.py`, `tests/unit/specs/test_sheet_specs.py`. Goldens
+  byte-identical (`make test-e2e` green). Spec: `.specs/business-rules/description.md`,
+  `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-002 · Stop injecting/expecting the removed `relacao` column
-- Priority: P1 · Effort: S · Status: open
+- Priority: P1 · Effort: S · Status: done
 - Protocol: v1.15 history ("relacao em descrição é um parâmetro desnecessário…").
 - Where: `models/sp_description.py::pre_processing` (injects `relacao=1` into raw_data — also
   BUG-003), `OptionalColumn.COLUMN_RELATION`, `validators/spreadsheets/composition/
@@ -41,6 +47,12 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
 - Tests: unit (bundle without `relacao` passes the tree validator's column check); goldens
   unchanged (fixtures may still carry the column — silently accepted).
 - Related: G-10 (the `relacao ∈ {1,−1}` sub-gap dies with the column), G-28
+- Done: `relacao` is `ColumnKind.DEPRECATED`; the `relacao=1` injection is deleted from
+  `SpDescription.pre_processing`; `rules/composition.py::_tree_required_column_issues`
+  (COMP-007/008/009) no longer requires it. Tests: `tests/unit/models/test_sp_description.py`,
+  `tests/unit/models/test_model_isolation.py`, `tests/unit/rules/test_composition.py`. Goldens
+  byte-identical (`make test-e2e` green). Spec: `.specs/business-rules/description.md`,
+  `.specs/business-rules/composition.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-003 · STRUCT-014: each `.xlsx` must contain exactly one worksheet
 - Priority: P1 · Effort: M · Status: open
@@ -53,7 +65,7 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   data_errors fixture (new fixture folder or extend an existing one — reviewed re-baseline).
 
 ### PROTO-004 · DESC-013: require `categoria` and validate its domain
-- Priority: P1 · Effort: M · Status: open
+- Priority: P1 · Effort: M · Status: done (step 1 — see Done note; step 2, absence → error, stays open for a future re-baseline)
 - Protocol: §2.3 p.8 (since v1.13): one of `social`, `economico`, `ambiental`, `climatico`.
 - Where: `models/sp_description.py` (unknown column today → unexpected-column warning),
   `specs/sheet_specs.py`, new rule DESC-013.
@@ -63,9 +75,19 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   `description.md`.
 - Tests: table-driven domain cases incl. accented variants rejected; goldens: current fixtures
   lack `categoria` → the new absence-warning changes goldens — reviewed re-baseline required.
+- Done: `specs/sheet_specs.py` gains `categoria` as `ColumnKind.OPTIONAL`;
+  `SpDescription.OptionalColumn.COLUMN_CATEGORY`; new rule `rules/description.py::
+  check_category_domain` (DESC-013), new category `NamesEnum.CATEG_DESC`
+  (`verification_name_indicator_category`, both locales). Tests:
+  `tests/unit/rules/test_description.py::TestCheckCategoryDomain`,
+  `tests/unit/specs/test_sheet_specs.py`. Goldens re-baselined (all 8 fixtures gain the
+  "Categoria do indicador" section with one absence warning each; `tests` 34→35) — reviewed
+  diff and quote in `tests/e2e/golden/CHANGELOG.md`'s "PROTO-004" entry. Spec:
+  `.specs/business-rules/description.md`, `.specs/business-rules/README.md`,
+  `.specs/business-rules/protocol-changelog.md`, `.specs/00-overview.md`.
 
 ### PROTO-005 · Flip DESC-006 for `desc_simples`: forbid the trailing period (G-07)
-- Priority: P2 · Effort: S · Status: open
+- Priority: P2 · Effort: S · Status: done
 - Protocol: §2.3 p.7 (v1.13 and v1.16 agree): "Toda descrição simples não pode terminar com um
   caractere especial como o ponto." The code requires the period.
 - Proposed fix: `desc_simples` moves from `columns_must_end_with_dot` to
@@ -73,6 +95,14 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
   the catalog-consistent "não deve terminar com pontuação".
 - Tests: unit; goldens change wherever fixtures end `desc_simples` with "." — reviewed
   re-baseline with the protocol quote in the golden CHANGELOG.
+- Done: `rules/description.py` moves `desc_simples` from `_MUST_END_WITH_DOT_COLUMNS` to
+  `_NO_PUNCTUATION_COLUMNS` (message key unchanged: `rule.DESC-006.no_punctuation`); factory
+  default (`tests/factories.py::make_description_frame`) no longer ends `desc_simples` with a
+  period. Tests: `tests/unit/rules/test_description.py::TestCheckPunctuation`,
+  `tests/unit/test_factories.py`. Goldens re-baselined (all 8 fixtures — every fixture's
+  `descricao.desc_simples` cells ended with `.` under the old rule); reviewed diff and quote in
+  `tests/e2e/golden/CHANGELOG.md`'s "PROTO-005" entry. Spec:
+  `.specs/business-rules/description.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-006 · SCEN-005: scenario symbol is one character, letters/digits only (G-17)
 - Priority: P2 · Effort: S · Status: open
@@ -89,26 +119,58 @@ a **reviewed** golden re-baseline (`make harness-update` + entry in
 - Tests: latin-1 fixture file; golden case.
 
 ### PROTO-008 · DESC-014: codes ordered by hierarchy level (G-06)
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Protocol: §2.3 p.6: codes sequential AND grouped from level 1 downwards; "Não inserir um codigo
   de menor nível entre codigos de níveis superiores."
 - Proposed fix: after cleaning, assert `nivel` is non-decreasing along ascending `codigo`.
 - Tests: unit; golden case.
+- Done: `rules/description.py::check_codes_ordered_by_level` (category `IL`), vectorised
+  `.sort_values()` + `.shift()`. Tests:
+  `tests/unit/rules/test_description.py::TestCheckCodesOrderedByLevel`. Goldens re-baselined:
+  `data_errors_09`/`data_errors_11` each gain one new error (pre-existing level-ordering
+  defects); no other fixture affected — reviewed diff in `tests/e2e/golden/CHANGELOG.md`'s
+  PROTO-008/009/010 entry. Spec: `.specs/business-rules/description.md`,
+  `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-009 · DESC-015: `cenario` ∈ {0,1} plus hierarchy propagation (G-09)
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Protocol: §2.3 p.8: values 0/1; scenario membership propagates up and down the composition.
 - Where: `models/sp_description.py::data_cleaning` currently cleans `cenario` with
   `min_value=-1` (accepts −1).
 - Proposed fix: domain {0,1}; propagation check joins description with the composition tree.
 - Tests: unit (−1 rejected; parent with scenario whose child lacks it → error); golden case.
+- Done: `rules/description.py::check_scenario_domain_and_propagation` (category `TH`); domain
+  check flags cleaned `cenario` values outside {0,1} as an **error** (`CLEAN-002` itself stays
+  permissive at ≥ −1); propagation check is directional, scoped to direct `composicao` edges
+  (parent `cenario=1` requires child `=1`; the reverse is not flagged) — matches this item's own
+  worked example exactly, not a full transitive ancestor/descendant closure. Tests:
+  `tests/unit/rules/test_description.py::TestCheckScenarioDomainAndPropagation`. Goldens
+  re-baselined: **every** fixture gains two new **warnings** (a level-2 indicator with
+  `cenario=1` whose two direct children lack it). **Staged same day (orchestrator decision)**:
+  the propagation half first shipped as an error, which flipped `data_ground_truth_01`'s
+  `exit_code` from `0` → `1` for the first time — an unacceptable regression risk for
+  production bundles; before that reached a commit, it was staged down to `Severity.WARNING`
+  (message text unchanged, `rule.DESC-015.propagation_error` → `rule.DESC-015.propagation_warning`),
+  matching the PROTO-004 staging precedent, so `data_ground_truth_01`'s `exit_code` stays `0`;
+  the domain half is unaffected and stays an error; promoting the propagation half back to an
+  error is a future owner decision. See `tests/e2e/golden/CHANGELOG.md`'s PROTO-008/009/010
+  entry (and its same-day amendment) and `.specs/business-rules/protocol-changelog.md`'s
+  "PROTO-009/DESC-015 maintainer note". Spec: `.specs/business-rules/description.md`.
 
 ### PROTO-010 · DESC-017/DESC-019: `ordem` sibling sequence and `nome_completo` length (G-10)
-- Priority: P2 · Effort: M · Status: open
+- Priority: P2 · Effort: M · Status: done
 - Protocol: §2.3 pp.7–8: `ordem` integers 1..n per parent (`#202`); `nome_completo` at least as
   long as `nome_simples`. (`DESC-016` for `relacao` is retired unimplemented — column removed;
   `DESC-018` `meta` format stays parked until owners specify it formally.)
 - Tests: unit per rule; golden cases.
+- Done: `rules/description.py::check_order_sibling_sequence` (DESC-017, category `CHILD_LVL`) and
+  `::check_complete_name_length` (DESC-019, category `INP`). Tests:
+  `tests/unit/rules/test_description.py::TestCheckOrderSiblingSequence`/
+  `TestCheckCompleteNameLength`. Goldens: DESC-017 fires in none of the eight fixtures (every
+  `ordem` sequence is already valid); DESC-019 adds one new warning to `data_errors_xss` only
+  (its known `<Script>` payload lengthens `nome_simples` past `nome_completo`) — reviewed diff in
+  `tests/e2e/golden/CHANGELOG.md`'s PROTO-008/009/010 entry. Spec:
+  `.specs/business-rules/description.md`, `.specs/business-rules/protocol-changelog.md`.
 
 ### PROTO-011 · Legend tightening: six-hex colours, ≤ 11 slices (G-19, G-21 → LEG-016)
 - Priority: P2 · Effort: S · Status: open

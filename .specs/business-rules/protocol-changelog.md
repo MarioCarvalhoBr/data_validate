@@ -15,9 +15,9 @@ backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 | Change | Protocol | Affected rules | Code status |
 |---|---|---|---|
 | Each `.xlsx` file must contain exactly one worksheet | §2 p.3 (v1.14) | planned STRUCT-014 | **needs-change** — calamine reads the first sheet silently, extra sheets undetected (PROTO-003) |
-| `relacao` column removed from `descricao` ("esta informação já esta na legenda") | §2.3 (v1.15 history) | DESC-011/12 column set, COMP tree prerequisites | **needs-change** — code injects `relacao=1` and lists it among expected/required columns (PROTO-002) |
-| `fontes` column removed from `descricao` ("não é usada") | §2.3 (v1.16 history) | DESC-011 required-column set, SPELL exception | **needs-change (breaking)** — `fontes` is a required column today, so a v1.16-compliant bundle fails validation (PROTO-001) |
-| `categoria` domain restated (social, economico, ambiental, climatico) | §2.3 p.8 | planned DESC-013 | unchanged since v1.13 — still **not implemented** (G-05, PROTO-004); today it triggers an unexpected-column warning |
+| `relacao` column removed from `descricao` ("esta informação já esta na legenda") | §2.3 (v1.15 history) | DESC-011/12 column set, COMP tree prerequisites | **implemented** — `relacao` is `ColumnKind.DEPRECATED`, no longer injected, no longer required by the composition tree checks (PROTO-002, done) |
+| `fontes` column removed from `descricao` ("não é usada") | §2.3 (v1.16 history) | DESC-011 required-column set, SPELL exception | **implemented** — `fontes` is `ColumnKind.DEPRECATED`, accepted silently, no longer required (PROTO-001, done) |
+| `categoria` domain restated (social, economico, ambiental, climatico) | §2.3 p.8 | DESC-013 | **implemented** (G-05, PROTO-004 step 1, done) — domain validated when present; absence is a staged warning, not yet an error |
 | Scenario `simbolo` explicitly "Um único caractere", letters/digits | §2.1 p.4 | planned SCEN-005 | clarification of G-17 (PROTO-006) |
 | §2.6 still explains value orientation via `relacao` although §2.3 removed it | §2.6 p.12 vs §2.3 | — | **protocol internal inconsistency** (new gap G-28) — report to the protocol owners |
 | `#…#` spell-ignore delimiter absent from the v1.16 FAQ | §"6)" p.16–17 | SPELL | G-25 downgraded to historical; confirm with owners before implementing |
@@ -26,10 +26,10 @@ backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 
 | Version | Date | Change | Code status |
 |---|---|---|---|
-| 1.16 | 2026-08-21 | `fontes` removed from `descricao` | **needs-change** (PROTO-001) |
-| 1.15 | 2026-08-11 | Editorial fixes; `relacao` removed from `descricao` | **needs-change** (PROTO-002) |
+| 1.16 | 2026-08-21 | `fontes` removed from `descricao` | **implemented** (PROTO-001, done) |
+| 1.15 | 2026-08-11 | Editorial fixes; `relacao` removed from `descricao` | **implemented** (PROTO-002, done) |
 | 1.14 | 2025-10-02 | Each xlsx file must have exactly one worksheet | **not implemented** (PROTO-003) |
-| 1.13 | 2025-08-05 | New `categoria` column in `descricao` | **not implemented** (G-05, PROTO-004) |
+| 1.13 | 2025-08-05 | New `categoria` column in `descricao` | **implemented** (G-05, PROTO-004 step 1, done) |
 | 1.12 | 2025-07-22 | Better description of the `legenda` column in `descricao` | n/a (documentation) |
 | 1.11 | 2025-05-23 | Legends only through the optional `legenda.xlsx` (QML dropped) | implemented; `.qml` still scanned by the loader (G-04) |
 | 1.10 | 2025-03-21 | Scenario `simbolo` letters/digits only; optional `dicionario.xlsx` | dictionary implemented; charset **not validated** (G-17) |
@@ -38,7 +38,7 @@ backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 | 1.7 | 2024-10-07 | `#…#` delimiter ignored by the spell-checker; legend format update | delimiter **not implemented** (G-25) |
 | 1.6 | 2024-09-25 | Figure 3; `cenario` description | n/a |
 | 1.5 | 2024-08-07 | Zero/NI composition ⇒ factors zero, sum zero | PROP-009 |
-| 1.4 | 2024-07-31 | Optional `ordem` column | accepted as optional; **sequence not validated** (G-10) |
+| 1.4 | 2024-07-31 | Optional `ordem` column | accepted as optional; **sequence validated** (G-10, DESC-017, PROTO-010, done) |
 | 1.3 | 2024-07-16 | §4 error explanations; UTF-8 requirement; FAQ | UTF-8 check **not proactive** (G-01) |
 | 1.2 | 2024-06-28 | `DI` in proportionalities | PROP-007 |
 | 1.1 | 2024-06-14 | `DI` in values; version history; unique identifiers | VAL-004 |
@@ -62,12 +62,12 @@ backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 | G-02 | file-structure | `\|` inside CSV cannot be detected after parsing | pre-parse raw scan for CSV |
 | G-03 | file-structure | decimal comma mandated for CSV; code accepts `.` too | keep lenient, document |
 | G-04 | file-structure | `.qml` still scanned | remove from loader config |
-| G-05 | description | `categoria` (v1.13) unknown to the code | new rule DESC-013 (domain check) |
-| G-06 | description | codes must be ordered by level | new rule DESC-014 |
-| G-07 | description | `desc_simples` trailing `.`: code requires, protocol forbids | decide with protocol owners; adjust DESC-006 + goldens |
+| G-05 | description | `categoria` (v1.13) unknown to the code | **resolved** — DESC-013 (domain check), step 1 (PROTO-004, done); step 2 (absence → error) still open |
+| G-06 | description | codes must be ordered by level | **resolved** — DESC-014 (PROTO-008, done) |
+| G-07 | description | `desc_simples` trailing `.`: code requires, protocol forbids | **resolved** (PROTO-005, done, 2026-09-13) — DESC-006 now forbids it, goldens re-baselined |
 | G-08 | several | `LB_SCEN`, `LB_TEMP`, `LEG_OVER` titles registered but never emitted | either implement CR/LF checks for scenarios/temporal reference and map overlap to LEG-010, or drop the titles |
-| G-09 | description/values | `cenario` domain {0,1} and hierarchy propagation | new rule DESC-015 |
-| G-10 | description | `relacao ∈ {1,−1}`, `ordem` sibling sequence, `meta` format, `nome_completo` length | new rules DESC-016…019 |
+| G-09 | description/values | `cenario` domain {0,1} and hierarchy propagation | **resolved** — DESC-015 (PROTO-009, done); domain half is an error, propagation half is staged as a **warning** (see the maintainer note below); scoped to direct `composicao` edges, not the full transitive closure |
+| G-10 | description | `relacao ∈ {1,−1}`, `ordem` sibling sequence, `meta` format, `nome_completo` length | `relacao` sub-gap retired unimplemented (column removed, PROTO-002); **`ordem` sequence resolved** — DESC-017 (PROTO-010, done); `meta` format still parked (DESC-018, no owner decision); **`nome_completo` length resolved** — DESC-019 (PROTO-010, done) |
 | G-11 | description/composition | global uniqueness of names vs per-subtree | clarify; possibly a second UT variant |
 | G-12 | composition | root semantics (code `0` vs node `"1"`) | unify in `SheetSpec` |
 | G-13 | values | `id` completeness/uniqueness | uniqueness rule VAL-006; completeness out of scope |
@@ -89,8 +89,24 @@ backlog items `PROTO-001…` in `.specs/quality/backlog/09-protocol-v116.md`.
 | ~~—~~ | spelling | dictionary initialisation errors silently dropped | **resolved** — BUG-027 fixed (`_prepare_statement` now runs and reports) |
 
 Gap status after v1.16 (2026-09-12): G-05 and G-07 are confirmed unchanged by v1.16 (the protocol
-still requires `categoria` and still forbids a trailing period in `desc_simples`); G-10 shrinks —
-the `relacao ∈ {1,−1}` sub-gap disappears because the column itself was removed (PROTO-002);
-G-25 is downgraded to historical.
+still requires `categoria` and still forbids a trailing period in `desc_simples`); **G-05, G-06,
+G-07, G-09 and G-10 are now resolved in code** (PROTO-004 step 1, PROTO-005, PROTO-008,
+PROTO-009, and PROTO-010, all done 2026-09-13 — G-10's `meta`-format sub-gap, DESC-018, stays
+open, parked pending an owner decision); G-25 is downgraded to historical.
+
+**PROTO-009/DESC-015 maintainer note (2026-09-13, staged same day)**: implementing the
+`cenario` propagation check first revealed that `data_ground_truth_01` — the canonical
+"everything passes" e2e fixture — has always had a level-2 indicator (`codigo=2`, `cenario=1`)
+whose two direct children lack it (`cenario=0`); with the propagation half reported as an
+error, the fixture's `exit_code` flipped from `0` to `1` for the first time, an unacceptable
+regression risk for production bundles whose data predates this rule. **Staged: warning now,
+error by future owner decision** — before that change reached a commit, the propagation half
+(`rule.DESC-015.propagation_warning`, message text unchanged) was downgraded to `Severity.WARNING`
+(matching the PROTO-004 staging precedent for `categoria`'s absence check); the domain half
+(`cenario` outside `{0, 1}`, `rule.DESC-015.domain_error`) is unaffected and stays an error.
+`data_ground_truth_01`'s `exit_code` is back to `0`. This is called out explicitly in
+`tests/e2e/golden/CHANGELOG.md`'s PROTO-008/009/010 entry (and its same-day amendment), since
+other docs (`CLAUDE.md`) point at this fixture as a "run it and see it pass" example; promoting
+the propagation half back to an error is left to a future owner decision.
 
 Last synced with code: 344fef7

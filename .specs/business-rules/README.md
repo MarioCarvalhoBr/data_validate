@@ -31,7 +31,7 @@ backlog `09-protocol-v116.md` (`PROTO-*` items).
 |---|---|---|
 | `STRUCT-` | Folder/file existence, loading, generic column structure | File structure (`FS`) |
 | `CLEAN-` | Type/cleaning checks done inside `Sp*` models (`data_cleaning`) | File cleaning (`FC`) |
-| `DESC-` | `descricao` content rules | various |
+| `DESC-` | `descricao` content rules | various, incl. `CATEG_DESC` |
 | `COMP-` | `composicao` hierarchy rules | `IR`, `TH`, `UT`, `CHILD_LVL`, `LEAF_NO_DATA` |
 | `VAL-` | `valores` rules | `FS`, `IR`, `VAL_COMB`, `UNAV_INV` |
 | `TEMP-` | `referencia_temporal` rules | `MAND_PUNC_TEMP`, `YEARS_TEMP`, `UVR_TEMP` |
@@ -44,11 +44,15 @@ backlog `09-protocol-v116.md` (`PROTO-*` items).
 Target message keys follow `rule.<RULE-ID>.<error|warning>` (see `.specs/i18n/catalog.md`).
 
 Planned IDs reserved by the v1.16 alignment and the gap list (not yet implemented): STRUCT-013
-(UTF-8, G-01), STRUCT-014 (single-worksheet xlsx, PROTO-003), DESC-013 (categoria, PROTO-004),
-DESC-014 (codes ordered by level), DESC-015 (cenario domain/propagation), DESC-017 (ordem
-sequence), DESC-018 (meta format — parked), DESC-019 (nome_completo length), DESC-016 (retired
-unimplemented — `relacao` removed by protocol v1.15), SCEN-005 (symbol charset/length), TEMP-004,
-TEMP-005, LEG-016 (>11 slices), VAL-006 (id uniqueness), TERR-001, TERR-002.
+(UTF-8, G-01), STRUCT-014 (single-worksheet xlsx, PROTO-003), DESC-018 (meta format — parked, no
+owner decision), DESC-016 (retired unimplemented — `relacao` removed by protocol v1.15),
+SCEN-005 (symbol charset/length), TEMP-004, TEMP-005, LEG-016 (>11 slices), VAL-006 (id
+uniqueness), TERR-001, TERR-002.
+
+`DESC-013` (categoria domain, PROTO-004 step 1), `DESC-014` (codes ordered by level, PROTO-008),
+`DESC-015` (cenario domain/propagation, PROTO-009), `DESC-017` (ordem sequence, PROTO-010), and
+`DESC-019` (nome_completo length, PROTO-010) are all implemented — see the `CATEG_DESC`/`IL`/
+`TH`/`CHILD_LVL`/`INP` rows below.
 
 ## Severity
 
@@ -64,7 +68,7 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 
 ## Map `NamesEnum` → verification title key → rule IDs
 
-`data_validate/config/names_enum.py` (34 members). Titles are resolved through the i18n catalog
+`data_validate/config/names_enum.py` (35 members, since PROTO-004 added `CATEG_DESC`). Titles are resolved through the i18n catalog
 (`static/locales/<locale>/messages.json`), and every title is pre-registered in the report by
 `SpreadsheetProcessor._prepare_statement`, so unused members still appear as empty sections.
 
@@ -73,15 +77,15 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 | `FS` | `file_structure` | STRUCT-001…012, STRUCT-015, DESC-011, DESC-012, VAL-001, SCEN-001, SCEN-002, PROP-001, PROP-002 |
 | `FC` | `file_cleaning` | CLEAN-001…006, LEG-001…011 |
 | `IR` | `indicator_relations` | COMP-001, COMP-002, COMP-003, VAL-002, PROP-003 |
-| `TH` | `tree_hierarchy` | COMP-007, COMP-008 |
-| `IL` | `indicator_levels` | DESC-005 |
+| `TH` | `tree_hierarchy` | COMP-007, COMP-008, DESC-015 |
+| `IL` | `indicator_levels` | DESC-005, DESC-014 |
 | `CO_UN` | `code_uniqueness` | DESC-003 |
 | `HTML_DESC` | `html_codes_in_descriptions` | DESC-001 |
 | `SPELL` | `spelling` | SPELL-001…005 |
 | `UT` | `unique_titles` | COMP-004 |
 | `SC` | `sequential_codes` | DESC-002 |
 | `EF` | `empty_fields` | DESC-007 |
-| `INP` | `indicator_name_pattern` | DESC-004 |
+| `INP` | `indicator_name_pattern` | DESC-004, DESC-019 |
 | `TITLES_N` | `titles_over_n_chars` (value=40) | DESC-010 |
 | `SIMP_DESC_N` | `simple_descriptions_over_n_chars` (value=150) | DESC-009 |
 | `MAND_PUNC_DESC` | `mandatory_and_prohibited_punctuation_in_descriptions` | DESC-006 |
@@ -103,7 +107,8 @@ sheets, index + 3 for the double-header `proporcionalidades` (see
 | `IR_PROP` | `indicator_relations_in_proportionalities` | PROP-006 |
 | `IND_VAL_PROP` | `indicators_in_values_and_proportionalities` | PROP-005 |
 | `LEAF_NO_DATA` | `leaf_indicators_without_associated_data` | COMP-005, COMP-006 |
-| `CHILD_LVL` | `child_indicator_levels` | COMP-009 |
+| `CHILD_LVL` | `child_indicator_levels` | COMP-009, DESC-017 |
+| `CATEG_DESC` | `indicator_category` | DESC-013 |
 
 ## Skipped verifications
 
@@ -118,7 +123,8 @@ deleted entirely (ARC-008, ARC-017 Phase 3 Port 8): every rule now runs through
 
 Every rule ID in this map is now ported onto the `rules` engine (ARC-017 Phase 3, Ports 2–8) with
 a dedicated, table-driven unit test module: `tests/unit/rules/test_structure.py` (STRUCT-001…006,
-Phase 3b), `test_description.py` (DESC-001…010, Port 2), `test_composition.py` (COMP-001…009, Port
+Phase 3b), `test_description.py` (DESC-001…010 Port 2, plus DESC-013/014/015/017/019 from the v1.16
+alignment — PROTO-004/008/009/010), `test_composition.py` (COMP-001…009, Port
 3), `test_temporal_reference.py`/`test_scenario.py` (TEMP-001…003/SCEN-003…004, Port 4),
 `test_value.py` (VAL-002…005, Port 5), `test_legend.py` (LEG-012…015, Port 6),
 `test_proportionality.py` (PROP-003…010, Port 7), and `test_spell.py` (SPELL-001…005, Port 8, the

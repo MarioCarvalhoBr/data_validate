@@ -14,19 +14,20 @@ Files: `descricao.xlsx` or `descricao.csv` (`|`-separated). Single header. Requi
 | `nome_completo` | required | str | unique, ABNT capitalisation, ≥ len(`nome_simples`) | `RequiredColumn.COLUMN_COMPLETE_NAME` |
 | `desc_simples` | required | str | ≤ 150 chars, no spatial/temporal/scenario refs, must **not** end with `.` (protocol) | `RequiredColumn.COLUMN_SIMPLE_DESC` |
 | `desc_completa` | required | str | may contain HTML, must end with `.` | `RequiredColumn.COLUMN_COMPLETE_DESC` |
-| `fontes` | required | str | free text, not spell-checked | `RequiredColumn.COLUMN_SOURCES` |
 | `meta` | required (code) | str | ODS targets `6.2,13.1` or blank | `RequiredColumn.COLUMN_META` |
 | `cenario` | dynamic | int ≥ −1 (code) / 0 or 1 (protocol) | only when `cenarios` exists | `DynamicColumn.COLUMN_SCENARIO` |
 | `legenda` | dynamic | int ≥ 1 or empty | only when `legenda` exists | `DynamicColumn.COLUMN_LEGEND` |
 | `unidade` | optional | str | empty = adimensional; injected as `""` when absent | `OptionalColumn.COLUMN_UNIT` |
-| `relacao` | optional | int | 1 direct / −1 inverse; injected as `1` when absent | `OptionalColumn.COLUMN_RELATION` |
 | `ordem` | optional | int ≥ 1 | sibling display order | `OptionalColumn.COLUMN_ORDER` |
-| `categoria` | protocol v1.13 | — | `social`/`economico`/`ambiental`/`climatico` — **not known to the code** (gap G-05) | — |
+| `fontes` | **deprecated** (PROTO-001) | str | removed by protocol v1.16 ("não é usada"); accepted silently, never required, never injected | `DeprecatedColumn.COLUMN_SOURCES` |
+| `relacao` | **deprecated** (PROTO-002) | int | removed by protocol v1.15 ("parâmetro desnecessário"); accepted silently, never required, no longer injected | `DeprecatedColumn.COLUMN_RELATION` |
+| `categoria` | optional (staged, PROTO-004) | str | `social`/`economico`/`ambiental`/`climatico`; absent → warning (staged step 1); present + invalid → error | `OptionalColumn.COLUMN_CATEGORY` |
 
 `EXPECTED_COLUMNS` is computed at runtime: required + `cenario` (if `cenarios` file exists) +
-`legenda` (if `legenda` file exists) + whichever optional columns are present
-(`SpDescription.pre_processing`). Pre-processing drops/injects columns on `self.frame`, this
-instance's own working copy — not the shared `LoadedSheet.raw_data` (BUG-003, fixed).
+`legenda` (if `legenda` file exists) + whichever optional columns are present + whichever
+deprecated columns (`fontes`/`relacao`) are present (`SpDescription.pre_processing`).
+Pre-processing drops/injects columns on `self.frame`, this instance's own working copy — not the
+shared `LoadedSheet.raw_data` (BUG-003, fixed).
 
 ## Rules
 
@@ -94,16 +95,16 @@ It now compares via `DataFrameProcessing.numeric_not_equals_mask`/`numeric_equal
 (`pd.to_numeric(series, errors="coerce")`), tolerant of `"1.0"`, `" 1"`, `"01"`, etc. Regression
 test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 
-### DESC-006 · Punctuation: names never end with punctuation, descriptions end with a period
+### DESC-006 · Punctuation: names and `desc_simples` never end with punctuation, `desc_completa` ends with a period
 - Severity: warning
 - NamesEnum: MAND_PUNC_DESC (`verification_name_mandatory_and_prohibited_punctuation_in_descriptions`)
-- Protocol: §2.3 p.7 — **partially contradicts**: protocol says `desc_simples` must *not* end with a special character such as `.`, while `desc_completa` must end with `.`
-- Statement (as implemented): `nome_simples`, `nome_completo` must not end with one of `, . ; : ! ?`; `desc_simples` and `desc_completa` must end with `.`.
+- Protocol: §2.3 p.7 (v1.13 and v1.16 agree): "Toda descrição simples não pode terminar com um caractere especial como o ponto." — `desc_completa` must end with `.`.
+- Statement (as implemented, PROTO-005 done): `nome_simples`, `nome_completo`, `desc_simples` must not end with one of `, . ; : ! ?`; `desc_completa` must end with `.`.
 - Current message (pt-BR): `{filename}, linha {row}: O valor da coluna '{column}' não deve terminar com pontuação.` · `{filename}, linha {row}: O valor da coluna '{column}' deve terminar com ponto.`
 - Target message key: `rule.DESC-006.no_punctuation` / `rule.DESC-006.must_end_with_dot` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
-- Implemented by: `rules/description.py::check_punctuation` — no longer calls `helpers/common/validation/character_processing.py::CharacterProcessing.check_characters_punctuation_rules` (that helper still builds its own hardcoded pt-BR strings and is out of this port's scope; it remains in use by `scenario_validator.py`/`temporal_reference_validator.py`), reimplemented with the same `.str[-1].isin(...)`/`.str.endswith(".")` masks
+- Implemented by: `rules/description.py::check_punctuation` — no longer calls `helpers/common/validation/character_processing.py::CharacterProcessing.check_characters_punctuation_rules` (that helper still builds its own hardcoded pt-BR strings and is out of this port's scope; it remains in use by `scenario_validator.py`/`temporal_reference_validator.py`), reimplemented with the same `.str[-1].isin(...)`/`.str.endswith(".")` masks; `_NO_PUNCTUATION_COLUMNS = (nome_simples, nome_completo, desc_simples)`, `_MUST_END_WITH_DOT_COLUMNS = (desc_completa,)`
 - Covered by tests: `tests/unit/rules/test_description.py::TestCheckPunctuation`; the still-used helper is covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
-- Notes / known defects: gap G-07 — decide with the protocol owners whether `desc_simples` must or must not end with `.`; goldens currently encode the code's behaviour.
+- Notes / known defects: gap G-07 resolved (PROTO-005, done, 2026-09-13) — `desc_simples` moved from `_MUST_END_WITH_DOT_COLUMNS` to `_NO_PUNCTUATION_COLUMNS`; goldens re-baselined (`tests/e2e/golden/CHANGELOG.md`).
 
 ### DESC-007 · Names and descriptions must not be empty
 - Severity: error
@@ -173,6 +174,65 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - Covered by tests: none — TST-001
 - Notes / known defects: none (BUG-003 fixed, see DESC-011).
 
+### DESC-013 · `categoria` domain (PROTO-004, staged)
+- Severity: warning (column absent) / error (invalid value present)
+- NamesEnum: CATEG_DESC (`verification_name_indicator_category`)
+- Protocol: §2.3 p.8 (since v1.13): `categoria` ∈ `{social, economico, ambiental, climatico}`.
+- Statement: when `categoria` is absent, report a single sheet-level warning (staged rollout —
+  step 1; a future re-baseline promotes this to a missing-required-column error). When present,
+  every non-blank cell must equal one of the four domain values exactly (unaccented, lower-case
+  — an accented or mis-cased variant does not match); each mismatch is reported with the
+  offending value and row.
+- Current message (pt-BR): `{filename}: A coluna 'categoria' está ausente; o protocolo exige uma categoria (social, economico, ambiental ou climatico) para cada indicador.` · `{filename}, linha {row}: O valor '{value}' da coluna '{column}' deve ser um dos seguintes: {allowed_values}.`
+- Target message key: `rule.DESC-013.warning` / `rule.DESC-013.error`
+- Implemented by: `rules/description.py::check_category_domain` (vectorised `.isin(_CATEGORY_DOMAIN)` mask)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckCategoryDomain`
+- Notes / known defects: staged (PROTO-004 step 1) — blank cells are not themselves flagged (DESC-007 does not cover `categoria`, so a blank cell in a present column currently passes silently); goldens re-baselined 2026-09-13 (every current fixture lacks the column, so every fixture gained the absence warning — see `tests/e2e/golden/CHANGELOG.md`).
+
+### DESC-014 · Codes ordered by hierarchy level (PROTO-008)
+- Severity: error
+- NamesEnum: IL (`verification_name_indicator_levels`)
+- Protocol: §2.3 p.6: "Não inserir um codigo de menor nível entre codigos de níveis superiores."
+- Statement: after cleaning (`ctx.cleaned["descricao"]["codigo"]`/`["nivel"]`), sorted by ascending `codigo`, `nivel` must be non-decreasing — a row whose `nivel` is lower than the immediately preceding (in code order) row's `nivel` is an error. Reports nothing when either cleaned column is a different length than the raw frame (a cleaning failure DESC-002/CLEAN-001 already report).
+- Current message (pt-BR): `{filename}, linha {row}: O indicador {codigo} (nível {nivel}) não pode ter um nível menor que o indicador anterior {previous_codigo} (nível {previous_nivel}); os níveis devem ser não decrescentes em ordem crescente de código.`
+- Target message key: `rule.DESC-014.error` (missing column: `rule.description.missing_required_column`, `Severity.ERROR`)
+- Implemented by: `rules/description.py::check_codes_ordered_by_level` (vectorised `.sort_values()` + `.shift()`, no `iterrows()`)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckCodesOrderedByLevel`
+- Notes / known defects: resolves gap G-06. Goldens re-baselined 2026-09-13: `data_errors_09`/`data_errors_11` gain one new error each (pre-existing, previously undetected level-ordering defects); no other fixture is affected — see `tests/e2e/golden/CHANGELOG.md`.
+
+### DESC-015 · `cenario` domain {0, 1} plus downward propagation (PROTO-009)
+- Severity: error (domain half) / **warning** (propagation half — staged, see notes)
+- NamesEnum: TH (`verification_name_tree_hierarchy`)
+- Protocol: §2.3 p.8: `cenario` ∈ {0, 1}; "se um índice possui cenário, todos os índices construídos a partir deste também deverão" (hierarchy propagation).
+- Statement: (1) domain — every cleaned `cenario` cell (`CLEAN-002` itself stays permissive, accepting any integer ≥ −1) outside `{0, 1}` is an **error**; (2) propagation — for every DIRECT `composicao` edge, a parent whose `cenario == 1` must have every child also `== 1`; a child with `cenario == 1` whose parent lacks it is **not** flagged (directional, one-way, matching the backlog's own worked example "parent with scenario whose child lacks it → error" — not a full transitive ancestor/descendant closure). The propagation half is a **warning**, staged down from an error (orchestrator decision, 2026-09-13) — see notes below.
+- Current message (pt-BR): `{filename}, linha {row}: O valor '{value}' da coluna '{column}' deve ser 0 ou 1.` · `{filename}, linha {row}: O indicador pai {parent} (cenario {parent_cenario}) e o indicador filho {child} (cenario {child_cenario}) devem compartilhar o mesmo valor de 'cenario'.`
+- Target message key: `rule.DESC-015.domain_error` / `rule.DESC-015.propagation_warning`
+- Implemented by: `rules/description.py::check_scenario_domain_and_propagation`, reading `ctx.options["composition_facts"]` (`rules/composition.py::CompositionFacts`, computed once per run — BUG-019) for the cleaned `composicao` edges
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckScenarioDomainAndPropagation`
+- Notes / known defects: resolves gap G-09 (domain half; propagation scoped to direct edges, not the full transitive closure — a documented, deliberately narrower slice). Goldens re-baselined 2026-09-13: **every** current fixture's `descricao` has a level-2 indicator (`codigo=2`, `cenario=1`) whose two direct `composicao` children both have `cenario=0` — each fixture gains two new **warnings** in "Hierarquia como árvore". The propagation half was initially shipped as an error, which flipped `data_ground_truth_01`'s `exit_code` from `0` to `1` for the first time (`errors` `0` → `2`) — an unacceptable regression risk for production bundles whose data predates this rule, since `data_ground_truth_01` is documented elsewhere (`CLAUDE.md`'s `make run FIXTURE=data_ground_truth_01`) as the "everything passes" example. Staged like PROTO-004 (`categoria`'s absence-warning step): the propagation half is now a warning (message text unchanged), so `data_ground_truth_01`'s `exit_code` stays `0`; promoting it back to an error is a future owner decision. See `tests/e2e/golden/CHANGELOG.md`'s PROTO-008/009/010 entry (and its same-day amendment) and `.specs/business-rules/protocol-changelog.md`'s PROTO-009/DESC-015 maintainer note.
+
+### DESC-017 · `ordem` sibling sequence (PROTO-010)
+- Severity: error
+- NamesEnum: CHILD_LVL (`verification_name_child_indicator_levels`)
+- Protocol: §2.3 pp.7-8 / `#202`: sibling display order.
+- Statement: when `ordem` is present, for every `composicao` parent whose children's `ordem` values (looked up via cleaned `codigo`) are ALL parseable integers, that set must equal `{1, ..., n}` (`n` = number of children); a parent group with any missing/non-numeric `ordem` among its children is silently skipped (out of this rule's scope — that cell may still be reported by other checks). Reports nothing when `ordem` is absent (optional column) or `codigo`'s cleaning failed entirely.
+- Current message (pt-BR): `{filename}: Os indicadores filhos do pai {parent} devem ter a coluna 'ordem' com valores sequenciais de 1 a n; valores encontrados: {observed_orders}.`
+- Target message key: `rule.DESC-017.error`
+- Implemented by: `rules/description.py::check_order_sibling_sequence`, reading `ctx.options["composition_facts"]`
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckOrderSiblingSequence`
+- Notes / known defects: resolves part of gap G-10 (`ordem` sequence half). Goldens unchanged 2026-09-13 — every current fixture's `ordem` values already form a valid `1..n` sequence per parent.
+
+### DESC-019 · `nome_completo` must be at least as long as `nome_simples` (PROTO-010)
+- Severity: warning
+- NamesEnum: INP (`verification_name_indicator_name_pattern`)
+- Protocol: p.7.
+- Statement: `len(nome_completo) >= len(nome_simples)` per row; missing-column abort mirrors DESC-004's own two-column shape (both columns' missing-column issues reported before any length is compared).
+- Current message (pt-BR): `{filename}, linha {row}: O texto da coluna 'nome_completo' ({complete_length} caracteres) deve ter pelo menos o tamanho do texto da coluna 'nome_simples' ({simple_length} caracteres).`
+- Target message key: `rule.DESC-019.warning` (missing column: `rule.description.missing_required_column`, `Severity.WARNING`)
+- Implemented by: `rules/description.py::check_complete_name_length` (vectorised `.str.len()` comparison)
+- Covered by tests: `tests/unit/rules/test_description.py::TestCheckCompleteNameLength`
+- Notes / known defects: resolves part of gap G-10 (name-length half). Goldens re-baselined 2026-09-13: `data_errors_xss` gains one new warning — its known `<Script>` payload (appended to row 1's `nome_simples`) makes `nome_simples` longer than `nome_completo`, which no prior rule detected; no other fixture is affected.
+
 ### CLEAN-001 · `codigo` and `nivel` must be integers ≥ 1
 - Severity: error
 - NamesEnum: FC (`verification_name_file_cleaning`)
@@ -195,7 +255,7 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 - Target message key: `rule.CLEAN-002.error`
 - Implemented by: `models/sp_description.py::SpDescription.data_cleaning`
 - Covered by tests: none — TST-001
-- Notes / known defects: —
+- Notes / known defects: intentionally stays permissive at ≥ −1 (PROTO-009, done) — DESC-015 (rule layer) is the one that flags the protocol's stricter {0,1} domain as an error; keeping the model's own cleaning permissive avoids dropping a `cenario=-1` row from every other DESC-*/COMP-* rule's cleaned data before DESC-015 gets a chance to report it.
 
 ### CLEAN-003 · `legenda` must be an integer ≥ 1 or empty
 - Severity: error
@@ -210,29 +270,43 @@ test: `tests/unit/helpers/common/validation/test_description_processing.py`.
 
 ## Gaps (protocol ↔ code)
 
-- **G-05 `categoria`** (v1.13): not read, not validated; today it is reported as an unexpected column (STRUCT-012 warning).
-- **G-06 code order by level**: "não inserir um codigo de menor nível entre codigos de níveis superiores" is not checked.
-- **G-07 `desc_simples` trailing period**: code demands a final `.`, protocol forbids it.
-- **G-09 `cenario` domain**: protocol {0,1}; code ≥ −1. Hierarchy propagation ("se um índice possui cenário, todos os índices construídos a partir deste também deverão") is not checked.
-- **G-10 `relacao`** domain {1, −1}, **`ordem`** sibling sequence, **`meta`** format, **`nome_completo` ≥ `nome_simples` length**: not validated.
+- **G-05 `categoria`** (v1.13): resolved (PROTO-004 step 1, done) — DESC-013 validates the domain when present and warns (not errors) when absent; step 2 (a future re-baseline promoting the absence to an error) is still open.
+- **G-06 code order by level**: resolved (PROTO-008, done) — DESC-014 checks "não inserir um codigo de menor nível entre codigos de níveis superiores".
+- **G-07 `desc_simples` trailing period**: resolved (PROTO-005, done) — the code now forbids the trailing period, matching the protocol.
+- **G-09 `cenario` domain**: resolved (PROTO-009, done) — DESC-015 flags values outside {0,1} (`CLEAN-002` itself stays permissive at ≥ −1) and checks direct-edge downward propagation ("se um índice possui cenário, todos os índices construídos a partir deste também deverão"), scoped to direct `composicao` edges (not the full transitive closure — a documented, narrower slice).
+- **G-10 `relacao`** domain {1, −1} (retired unimplemented — the column itself was removed, PROTO-002), **`ordem`** sibling sequence (resolved, PROTO-010, done — DESC-017), **`meta`** format (still parked, no owner decision), **`nome_completo` ≥ `nome_simples` length** (resolved, PROTO-010, done — DESC-019).
 - **G-11 global uniqueness of names**: protocol says two indicators may not share `nome_simples`/`nome_completo`; code checks uniqueness per level-2 subtree only (COMP-004).
 
 ## Protocol v1.16 update (2026-09-12)
 
-- **`fontes` removed** (v1.16): the column no longer exists in the protocol; the code still
-  requires it, so a v1.16-compliant bundle fails DESC-011's missing-column check → PROTO-001
-  (accept silently as deprecated when present; stop requiring).
-- **`relacao` removed** (v1.15): the code still injects `relacao=1` onto `SpDescription.frame`
-  (BUG-003, fixed — the injection itself is unchanged, only its target moved off the shared
-  `raw_data`) and the composition tree validator lists it as required → PROTO-002.
-- **`categoria`** (since v1.13) is still required by the protocol with domain
-  `social|economico|ambiental|climatico`; today it only triggers an unexpected-column warning →
-  PROTO-004 / planned DESC-013 (staged: warning on absence first, error after the Phase 4
-  re-baseline).
-- **`desc_simples` trailing period**: v1.16 repeats v1.13's prohibition; DESC-006 still requires
-  the period for this column → PROTO-005 flips it (G-07).
-- Also reserved: DESC-014 (codes ordered by level), DESC-015 (`cenario` ∈ {0,1} + propagation),
-  DESC-017 (`ordem` sibling sequence), DESC-019 (`nome_completo` ≥ `nome_simples` length);
-  DESC-016 (`relacao` domain) is retired unimplemented — the column is gone.
+- **`fontes` removed** (v1.16, PROTO-001, done): the column no longer exists in the protocol.
+  `fontes` moved from `RequiredColumn` to `DeprecatedColumn`/`ColumnKind.DEPRECATED` in
+  `specs/sheet_specs.py`: a v1.16-compliant bundle without it reports no missing-column error;
+  a bundle still carrying it (pre-v1.16 delivery) reports no unexpected-column warning either —
+  `SpDescription.pre_processing` only adds it to `EXPECTED_COLUMNS` when present, never injects
+  a default. Goldens byte-identical (every current fixture already carries `fontes`).
+- **`relacao` removed** (v1.15, PROTO-002, done): `SpDescription.pre_processing` no longer
+  injects `relacao=1` onto `self.frame`; the column moved to `DeprecatedColumn` the same way as
+  `fontes` (accepted silently, never required). `rules/composition.py::_tree_required_column_issues`
+  (COMP-007/008/009) no longer lists `relacao` among `descricao`'s required columns. Goldens
+  byte-identical: `EXPECTED_COLUMNS` (and therefore DESC-008's CR/LF scan set) still includes
+  `relacao` whenever a fixture's raw file carries it, exactly as when it was injected.
+- **`categoria`** (since v1.13, PROTO-004 step 1, done): the protocol requires domain
+  `social|economico|ambiental|climatico`; DESC-013 now validates it when present (error on an
+  invalid value) and warns (not errors) when absent, staged to protect current sectors — step 2
+  (absence becomes an error) is a future re-baseline, not part of this slice. Goldens
+  re-baselined 2026-09-13 (every current fixture lacks `categoria`, so every fixture gained the
+  one new absence warning — see `tests/e2e/golden/CHANGELOG.md`).
+- **`desc_simples` trailing period** (PROTO-005, done): v1.16 repeats v1.13's prohibition;
+  DESC-006 no longer requires the period for this column — flipped, re-baselined 2026-09-13
+  (G-07 resolved).
+- **DESC-014/DESC-015/DESC-017/DESC-019** (PROTO-008/PROTO-009/PROTO-010, all done 2026-09-13):
+  codes ordered by level, `cenario` ∈ {0,1} + direct-edge downward propagation, `ordem` sibling
+  sequence, and `nome_completo` ≥ `nome_simples` length are all implemented — see their own
+  entries above and `tests/e2e/golden/CHANGELOG.md`'s PROTO-008/009/010 entry for the reviewed
+  re-baseline (note in particular: `data_ground_truth_01`'s `exit_code` flips `0` → `1`, flagged
+  there for explicit maintainer sign-off). DESC-016 (`relacao` domain) is retired unimplemented
+  — the column itself is gone (PROTO-002). DESC-018 (`meta` format) stays parked, no owner
+  decision yet.
 
 Last synced with code: cf5ddaa

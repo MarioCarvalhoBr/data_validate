@@ -67,7 +67,7 @@ Extensions `.csv` (separator `|`) or `.xlsx`; the same stem must not exist in bo
 
 - Python 3.12, Poetry, pandas 3, networkx, pyenchant, jinja2, babel, calamine, pdfkit.
 - 878 unit tests (all under `tests/unit/helpers/`), 54.99 % line coverage (measured with the current configuration; 55.97 % with legacy exclusions).
-- 34 verification categories (`config/names_enum.py`), messages hard-coded in pt-BR.
+- 35 verification categories (`config/names_enum.py`, since PROTO-004 added `CATEG_DESC`), messages hard-coded in pt-BR.
 - Known debt: `quality/backlog/` (90 items). Migration plan: `quality/backlog/08-migration-roadmap.md`.
 
 ## Where next

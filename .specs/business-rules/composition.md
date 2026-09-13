@@ -125,7 +125,10 @@ _build_rule_context` via `ctx.options["composition_facts"]`.
 - Target message key: `rule.COMP-008.error`
 - Implemented by: `rules/composition.py::check_parent_level_below_child_level`, reading `CompositionFacts.edges`/`description_levels` — vectorised via `.map()` (PERF-001)
 - Covered by tests: `tests/unit/rules/test_composition.py::TestCheckParentLevelBelowChildLevel`
-- Notes / known defects: requires `relacao` column present (listed in the legacy `global_required_columns`, reproduced in `_tree_required_column_issues`, although injected by the model as a default) — vestigial but preserved for exact fidelity.
+- Notes / known defects: no longer requires `relacao` (PROTO-002, done — the column was removed
+  from the protocol in v1.15 and is no longer injected by `SpDescription.pre_processing`;
+  `_tree_required_column_issues` now only requires `descricao`'s `codigo`/`nivel`, matching
+  COMP-007/COMP-009's own required set).
 
 ### COMP-009 · All children of a parent share the same level; codes must exist in `descricao`
 - Severity: error

@@ -49,7 +49,7 @@ behaviour, just moved out of `__init__`).
 | `GeneralContext` | `controllers/context/general_context.py` | Holds `data_args`, `language_manager` (built once from `data_args.data_file.locale`, BUG-004/BUG-023), `config`, `file_system_utils` (both injected with the same `language_manager`), `logger_manager`, `logger`; disables logger unless `--debug`; opens a file handler only in debug mode, under `<output_folder>/logs`; `finalize()` closes and detaches every file-logger handler | ARC-006 |
 | `DataModelContext` | `controllers/context/data_model_context.py` | Holds initialized models; `get_instance_of(cls)` linear `isinstance` scan | ARC-006 |
 | `ApplicationConfig` | `config/application_config.py` | Constants (`TITLE_OVER_N_CHARS=40`, `SIMPLE_DESCRIPTIONS_OVER_N_CHARS=150`, `REPORT_LIMIT_N_MESSAGES=20`, `VALUE_DATA_UNAVAILABLE="DI"`, `LABEL_DATA_UNAVAILABLE="Dado indisponível"`, `PRECISION_DECIMAL_PLACE_TRUNCATE=3`, `DATE_NOW`, `CURRENT_YEAR`), fallback HTML template, `get_verify_names()` | BUG-011, PERF-004 |
-| `NamesEnum` | `config/names_enum.py` | 34 verification keys → i18n keys `verification_name_*` | — |
+| `NamesEnum` | `config/names_enum.py` | 35 verification keys → i18n keys `verification_name_*` (since PROTO-004 added `CATEG_DESC`) | — |
 | `SpreadsheetInfo` / `SHEET` | `config/spreadsheet_info.py` | Sheet stems, `.csv/.xlsx`, `EXPECTED_FILES`, `OPTIONAL_FILES` | ARC-003 |
 | `MetadataInfo` / `METADATA` | `config/metadata_info.py` | Version string from installed metadata + hand-maintained `serial` | BUG-017, TOOL-005 |
 
