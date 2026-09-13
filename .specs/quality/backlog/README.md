@@ -63,10 +63,10 @@ table.
 | Priority | Count | Status | Highlights |
 |---|---|---|---|
 | P0 | 7 | 7 done | — |
-| P1 | 36 | 35 done, 1 wont-fix | includes 8 PROTO/TERR items |
-| P2 | 52 | 49 done, 3 wont-fix | includes 9 PROTO items |
-| P3 | 16 | 15 done, 1 wont-fix | includes PROTO-014/015/016 |
-| **Total** | **111** | **106 done, 5 wont-fix, 0 open** | backlog cleared 2026-09-13 |
+| P1 | 34 | 33 done, 1 wont-fix | includes PROTO/TERR items |
+| P2 | 52 | 50 done, 2 wont-fix | includes PROTO items |
+| P3 | 17 | 16 done, 1 wont-fix | includes PROTO-014/015/016 |
+| **Total** | **110** | **106 done, 4 wont-fix, 0 open** | backlog cleared 2026-09-13 |
 
 Recomputed again 2026-09-13 (Phase 5 round M): **ARC-014 → done** (`mypy --strict`
 project-wide, see `03-architecture.md`) was the last open item across files 01–07. Same-day
