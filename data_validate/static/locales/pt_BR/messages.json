@@ -610,5 +610,20 @@
   },
   "verification_name_value_id_uniqueness": {
     "message": "Unicidade do identificador em valores"
+  },
+  "loader_error_registry_invalid": {
+    "message": "{filename}: O arquivo de cadastro de territórios está malformado e não pôde ser lido. Detalhes: {details}."
+  },
+  "loader_warning_registry_duplicate_ids": {
+    "message": "{filename}: O cadastro de territórios contém identificadores duplicados; os valores duplicados foram ignorados."
+  },
+  "rule.TERR-001.error": {
+    "message": "{filename}, linha {row}: O identificador '{value}' da coluna 'id' não foi encontrado no cadastro de territórios (spd_data.json)."
+  },
+  "rule.TERR-002.error": {
+    "message": "{filename}, linha {row}: O identificador '{value}' da coluna 'id' não foi encontrado no cadastro de territórios (spd_data.json)."
+  },
+  "verification_name_territory_registry": {
+    "message": "Cadastro de territórios (spd_data.json)"
   }
 }

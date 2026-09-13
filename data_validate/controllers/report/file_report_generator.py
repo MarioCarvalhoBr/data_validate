@@ -180,8 +180,9 @@ class FileReportGenerator:
 
         Returns:
             list[str]: Localized names of skipped verifications, in a fixed order
-                (`--no-spellchecker`, then `--no-warning-titles-length`, then any report marked
-                `was_executed=False`).
+                (`--no-spellchecker`, then `--no-warning-titles-length`, then
+                `context.skipped_validations` — PROTO-013's absent/malformed territory registry
+                today — then any report marked `was_executed=False`).
         """
         # See the `__init__` narrowing note; `data_action` is always populated by `DataArgs.run()`.
         data_action = cast(DataAction, self.context.data_args.data_action)
@@ -191,6 +192,7 @@ class FileReportGenerator:
             skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.SPELL.value])
         if data_action.no_warning_titles_length:
             skipped_tests.append(self.context.config.get_verify_names()[NamesEnum.TITLES_N.value])
+        skipped_tests.extend(self.context.skipped_validations)
 
         for report in report_list.reports.values():
             if not report.was_executed:
@@ -267,10 +269,16 @@ class FileReportGenerator:
         Outputs a concise JSON structure to stdout and logs, containing the
         version, and counts of errors, warnings, and tests run. Useful for parsing
         by external tools.
+
+        PROTO-018: also carries `spatial_data_validated` (`self.context.spatial_data_validated`,
+        computed by `SpreadsheetProcessor._finalize_territory_registry_status`) — always present,
+        `True` only when the optional territory registry was provided, loaded, and TERR-001/
+        TERR-002 found zero errors.
         """
         summary = {
             "data_validate": {
                 "version": METADATA.__version__,
+                "spatial_data_validated": bool(self.context.spatial_data_validated),
                 "report": {
                     "errors": int(self.error_count),
                     "warnings": int(self.warning_count),

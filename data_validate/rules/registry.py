@@ -22,7 +22,7 @@ from types import MappingProxyType
 from data_validate.rules.context import RuleContext
 from data_validate.specs.issues import Issue, Severity
 
-RULE_ID_PATTERN = re.compile(r"^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN)-\d{3}$")
+RULE_ID_PATTERN = re.compile(r"^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN|TERR)-\d{3}$")
 """Stable rule-ID shape a `RuleSpec.rule_id` must match.
 
 Kept as its own compiled pattern (rather than importing `Issue`'s private
@@ -68,6 +68,13 @@ class RuleSpec:
         depends_on: Rule IDs that must not have been `SKIPPED` or `FAILED` before this rule runs
             (see `Engine`'s skip semantics) — an issue-producing dependency does *not* block.
         check: Pure function computing this rule's findings from a `RuleContext`.
+        requires_options: `ctx.options` keys that must all be truthy for this rule to run; a
+            falsy/absent key skips the rule with `SkipReason.DISABLED_BY_OPTION`
+            (`.specs/architecture/error-model.md`'s `engine.skipped.disabled_by_option`).
+            PROTO-013's first consumer: `TERR-001`/`TERR-002` declare
+            `requires_options=("territory_registry_present",)` so an absent/malformed
+            `spd_data.json` registry engine-skips both rules instead of running them against an
+            empty id set. Defaults to no option gate.
 
     Raises:
         ValueError: If `rule_id` does not match `RULE_ID_PATTERN`.
@@ -79,6 +86,7 @@ class RuleSpec:
     requires: Mapping[str, tuple[str, ...]]
     depends_on: tuple[str, ...]
     check: Callable[[RuleContext], list[Issue]]
+    requires_options: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
         """Validate `rule_id` and freeze `requires` into a read-only mapping."""
@@ -86,6 +94,7 @@ class RuleSpec:
             raise ValueError(f"RuleSpec.rule_id {self.rule_id!r} does not match {RULE_ID_PATTERN.pattern!r}")
         object.__setattr__(self, "requires", MappingProxyType(dict(self.requires)))
         object.__setattr__(self, "depends_on", tuple(self.depends_on))
+        object.__setattr__(self, "requires_options", tuple(self.requires_options))
 
 
 class RuleRegistry:
@@ -195,6 +204,7 @@ class RuleRegistry:
         requires: Mapping[str, tuple[str, ...]] | None = None,
         depends_on: tuple[str, ...] = (),
         severity_default: Severity = Severity.ERROR,
+        requires_options: tuple[str, ...] = (),
     ) -> Callable[[Callable[[RuleContext], list[Issue]]], Callable[[RuleContext], list[Issue]]]:
         """Decorator form of `register`: wraps and registers a `check` function in one step.
 
@@ -206,6 +216,8 @@ class RuleRegistry:
             depends_on: Rule IDs this rule depends on, see `RuleSpec.depends_on`. Defaults to no
                 dependencies.
             severity_default: See `RuleSpec.severity_default`. Defaults to `Severity.ERROR`.
+            requires_options: `ctx.options` keys that must all be truthy, see
+                `RuleSpec.requires_options`. Defaults to no option gate.
 
         Returns:
             Callable: A decorator that registers the wrapped function unchanged (so it stays
@@ -221,6 +233,7 @@ class RuleRegistry:
                     requires=requires if requires is not None else {},
                     depends_on=depends_on,
                     check=check,
+                    requires_options=requires_options,
                 )
             )
             return check

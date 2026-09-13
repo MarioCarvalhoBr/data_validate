@@ -44,6 +44,11 @@ class GeneralContext:
         logger_manager (LoggerManager): Manager responsible for configuring the logging system.
         logger (logging.Logger): The primary logger instance for the application.
         skipped_validations (list): A list to track validations that were skipped or not executed.
+        spatial_data_validated (bool): PROTO-018 — `True` only when the optional territory
+            registry (`spd_data.json`) was provided, loaded successfully, and TERR-001/TERR-002
+            found zero errors; `False` in every other case (absent, malformed, or errors found).
+            Set by `SpreadsheetProcessor` once the territory registry rules have run; read by
+            `FileReportGenerator`/`main.py` for the JSON summary's `spatial_data_validated` field.
     """
 
     def __init__(
@@ -101,6 +106,7 @@ class GeneralContext:
             self.logger.disabled = True
 
         self.skipped_validations: list[str] = []
+        self.spatial_data_validated: bool = False
 
     def finalize(self) -> None:
         """

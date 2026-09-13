@@ -21,7 +21,7 @@ from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.base import DataArgs
 
 
-def _build_json_summary(validation_reports: ValidationReport) -> dict[str, Any]:
+def _build_json_summary(validation_reports: ValidationReport, spatial_data_validated: bool) -> dict[str, Any]:
     """Build the machine-readable summary object written by `--json PATH`.
 
     Mirrors the shape `FileReportGenerator._print_json_summary` prints to
@@ -30,6 +30,9 @@ def _build_json_summary(validation_reports: ValidationReport) -> dict[str, Any]:
 
     Args:
         validation_reports: The completed run's aggregated report.
+        spatial_data_validated: PROTO-018's summary flag — `True` only when the optional
+            territory registry (`spd_data.json`) was provided, loaded, and TERR-001/TERR-002
+            found zero errors (`GeneralContext.spatial_data_validated`).
 
     Returns:
         dict[str, Any]: The summary object, ready to serialise as JSON.
@@ -37,6 +40,7 @@ def _build_json_summary(validation_reports: ValidationReport) -> dict[str, Any]:
     return {
         "data_validate": {
             "version": METADATA.__version__,
+            "spatial_data_validated": spatial_data_validated,
             "report": {
                 "errors": validation_reports.get_total_errors(),
                 "warnings": validation_reports.get_total_warnings(),
@@ -90,7 +94,7 @@ def main() -> int:
     total_warnings = processor.validation_reports.get_total_warnings()
 
     if data_args.json_path:
-        summary = _build_json_summary(processor.validation_reports)
+        summary = _build_json_summary(processor.validation_reports, general_context.spatial_data_validated)
         Path(data_args.json_path).write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
 
     return _compute_exit_code(data_args.fail_on, total_errors, total_warnings)

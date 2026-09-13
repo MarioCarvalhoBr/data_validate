@@ -55,6 +55,7 @@ class TestIssueValidation:
             "PROP-010",
             "SPELL-001",
             "CLEAN-006",
+            "TERR-001",
         ],
     )
     def test_accepts_every_registered_prefix(self, rule_id: str) -> None:

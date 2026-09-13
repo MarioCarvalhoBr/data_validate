@@ -52,3 +52,6 @@ class NamesEnum(Enum):
     """PROTO-006/SCEN-005: `cenarios.simbolo` must be exactly one alphanumeric ASCII character."""
     UNIQ_VAL = "verification_name_value_id_uniqueness"
     """PROTO-017/VAL-006: `valores.id` must contain no duplicated value."""
+    TERR = "verification_name_territory_registry"
+    """PROTO-013/TERR-001/TERR-002: the optional `spd_data.json` territory registry -- dedicated
+    category, triggered only when the file is present, skipped (not an error) when absent."""

@@ -73,6 +73,12 @@ class HeaderLayout(StrEnum):
 ALLOWED_EXTENSIONS: tuple[str, ...] = (".csv", ".xlsx")
 """File extensions accepted for any sheet in the bundle (ADR-0003 drops the legacy ``.qml``)."""
 
+EXTRA_INPUT_FILES: tuple[str, ...] = ("spd_data.json",)
+"""Optional, server-generated artefacts accepted in the input folder even though they are not a
+declared sheet in ``SHEET_SPECS`` (PROTO-013): ``spd_data.json``, the territory registry
+(``.specs/business-rules/territories.md``). ``rules/structure.py``'s STRUCT-004 whitelist checks
+this tuple by exact file name (not by ``<base>.<ext>`` splitting, since these are not sheets)."""
+
 
 @dataclass(frozen=True)
 class ColumnSpec:

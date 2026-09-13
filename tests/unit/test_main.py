@@ -24,6 +24,7 @@ def _mock_run(
     tests: int = 34,
     fail_on: str = "error",
     json_path: str | None = None,
+    spatial_data_validated: bool = False,
 ):
     """Patch `DataArgs`/`GeneralContext`/`SpreadsheetProcessor` for a scripted run.
 
@@ -34,6 +35,9 @@ def _mock_run(
         tests: Number of verification categories the mocked run should report.
         fail_on: Value assigned to `data_args.fail_on`.
         json_path: Value assigned to `data_args.json_path`.
+        spatial_data_validated: PROTO-018 — value assigned to the mocked
+            `GeneralContext.spatial_data_validated`, read by `_build_json_summary`. A real `bool`
+            (not the default `MagicMock` attribute), since it must serialise as JSON.
 
     Returns:
         tuple: The mocked `DataArgs` instance and the mocked `SpreadsheetProcessor` class.
@@ -43,7 +47,8 @@ def _mock_run(
     mock_data_args.fail_on = fail_on
     mock_data_args.json_path = json_path
 
-    mocker.patch("data_validate.main.GeneralContext")
+    mock_general_context_cls = mocker.patch("data_validate.main.GeneralContext")
+    mock_general_context_cls.return_value.spatial_data_validated = spatial_data_validated
 
     mock_validation_reports = mocker.MagicMock()
     mock_validation_reports.get_total_errors.return_value = errors
@@ -108,6 +113,26 @@ class TestMainJsonOutput:
         assert exit_code == 1
         written = json.loads(json_path.read_text(encoding="utf-8"))
         assert written["data_validate"]["report"] == {"errors": 1, "warnings": 2, "tests": 34}
+
+    def test_main_json_flag_carries_spatial_data_validated_true(self, mocker, tmp_path) -> None:
+        """PROTO-018: the `--json` file mirrors `GeneralContext.spatial_data_validated`."""
+        json_path = tmp_path / "summary.json"
+        _mock_run(mocker, json_path=str(json_path), spatial_data_validated=True)
+
+        main_module.main()
+
+        written = json.loads(json_path.read_text(encoding="utf-8"))
+        assert written["data_validate"]["spatial_data_validated"] is True
+
+    def test_main_json_flag_carries_spatial_data_validated_false(self, mocker, tmp_path) -> None:
+        """PROTO-018: `False` (the default -- absent/malformed registry, or TERR errors) too."""
+        json_path = tmp_path / "summary.json"
+        _mock_run(mocker, json_path=str(json_path), spatial_data_validated=False)
+
+        main_module.main()
+
+        written = json.loads(json_path.read_text(encoding="utf-8"))
+        assert written["data_validate"]["spatial_data_validated"] is False
 
     def test_main_without_json_flag_writes_no_file(self, mocker, tmp_path) -> None:
         json_path = tmp_path / "summary.json"

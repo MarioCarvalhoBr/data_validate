@@ -4,6 +4,51 @@ Every regeneration of `tests/e2e/golden/*.json` is recorded here: date, fixture(
 the commit/PR it shipped with. See `.claude/skills/golden-harness/SKILL.md` for the update
 process — regenerate only via `make harness-update`, with the diff reviewed.
 
+## 2026-09-13 (Phase 6 round N3: PROTO-013/PROTO-018 — territory registry, `spatial_data_validated`)
+
+- **Fixtures re-baselined (reviewed, additive only)**: all eight pre-existing fixtures
+  (`data_errors_01`, `data_errors_09`, `data_errors_11`, `data_errors_13`, `data_errors_14`,
+  `data_errors_15`, `data_errors_xss`, `data_ground_truth_01`) — none of them ships a
+  `spd_data.json`, so the diff is identical in shape across all eight:
+  - A new, always-empty report section/title, `"Cadastro de territórios (spd_data.json)"`
+    (`NamesEnum.TERR`), appears at the end of `section_order`/`sections` — the registry is
+    absent, so TERR-001/TERR-002 never run (`SkipReason.DISABLED_BY_OPTION`); the title is
+    pre-registered by `_prepare_statement` like every other category and additionally listed in
+    the report's "skipped verifications" (not part of the golden's normalised `sections`/
+    `section_order`, which only capture rendered error/warning spans).
+  - `json_summary.data_validate.report.tests`: `37` → `38` (one more `NamesEnum` category, same
+    precedent as PROTO-004/PROTO-006/PROTO-017's own `tests` bumps).
+  - `json_summary.data_validate.spatial_data_validated`: new field, `false` for every one of
+    these eight fixtures (no registry provided).
+  - No other section/message content changed in any of the eight — verified programmatically
+    (`set(actual["sections"]) - set(expected["sections"]) == {"Cadastro de territórios
+    (spd_data.json)"}`, `set(expected) - set(actual) == set()`, and every shared section's
+    `errors`/`warnings` list unchanged) before regenerating.
+- **Fixtures added (additive, new goldens)**:
+  - `data_ground_truth_02_registry` — a copy of `data_ground_truth_01`'s bundle plus a hand-built
+    `spd_data.json` covering exactly its 19 `valores.id`/4 `proporcionalidades.id` values (all of
+    which are already a subset of `valores`'s). Green: `exit_code: 0`,
+    `spatial_data_validated: true`, TERR section empty.
+  - `data_errors_16_registry` — the same bundle, but `spd_data.json` omits two ids present in
+    `valores` (`1100015`, also referenced by `proporcionalidades`; `1100338`, `valores`-only).
+    `exit_code: 1`, `spatial_data_validated: false`, TERR section carries three errors: two
+    TERR-001 (`valores.xlsx`, both missing ids) and one TERR-002 (`proporcionalidades.xlsx`, the
+    shared missing id) — confirming both rules fire independently against the same registry.
+- **Reason**: `.specs/quality/backlog/09-protocol-v116.md`'s PROTO-013 (territory registry
+  `spd_data.json`: loader + TERR-001/TERR-002 + STRUCT-004 whitelist, new dedicated `TERR`
+  category) and PROTO-018 (the `spatial_data_validated` JSON summary flag, sequenced immediately
+  after). `.specs/business-rules/territories.md`.
+- **Bug found and fixed during this same slice (not a golden concern, a code fix)**: a real
+  `proporcionalidades.xlsx`'s `id` column is `("Unnamed: 0_level_0", "id")` under pandas'
+  `header=[0, 1]` read (a blank top header cell), never `("id", "id")` — only
+  `tests/factories.py::make_proportionality_frame`'s own synthetic shape uses `"id"` at level 0.
+  TERR-002 initially used a naive `frame[("id", "id")]` lookup (silently producing zero findings
+  against `data_ground_truth_02_registry`'s deliberately-broken variant during manual smoke
+  testing, before any golden was written) and was fixed to locate the `id` column by level 1
+  (`rules/territories.py::_proportionality_id_column`), matching `rules/proportionality.py`'s own
+  `_proportionality_missing_id` precedent — verified with a dedicated regression unit test
+  reproducing the real column shape before this golden was generated.
+
 ## 2026-09-13 (Phase 6 round N2: PROTO-003/006/007/011/012/014/017)
 
 - **Fixtures re-baselined**: all eight (`data_errors_01`, `data_errors_09`, `data_errors_11`,

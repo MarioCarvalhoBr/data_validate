@@ -49,15 +49,18 @@ class SkipReason(StrEnum):
 
     These are the same key shapes `error-model.md` documents for `RuleOutcome.reason`
     (`engine.skipped.missing_sheet`, `engine.skipped.missing_column`,
-    `engine.skipped.dependency_failed`); `DEPENDENCY_SKIPPED` is this slice's addition, needed
-    because `depends_on` blocks on either a `SKIPPED` or a `FAILED` upstream rule and the two
-    deserve a distinguishable reason.
+    `engine.skipped.dependency_failed`, `engine.skipped.disabled_by_option`);
+    `DEPENDENCY_SKIPPED` is this slice's addition, needed because `depends_on` blocks on either a
+    `SKIPPED` or a `FAILED` upstream rule and the two deserve a distinguishable reason.
     """
 
     MISSING_SHEET = "engine.skipped.missing_sheet"
     MISSING_COLUMN = "engine.skipped.missing_column"
     DEPENDENCY_SKIPPED = "engine.skipped.dependency_skipped"
     DEPENDENCY_FAILED = "engine.skipped.dependency_failed"
+    DISABLED_BY_OPTION = "engine.skipped.disabled_by_option"
+    """PROTO-013's first consumer: a `RuleSpec.requires_options` key that is falsy/absent in
+    `ctx.options` (e.g. `territory_registry_present` when `spd_data.json` was not provided)."""
 
 
 @dataclass(frozen=True)
@@ -214,9 +217,9 @@ class Engine:
     ) -> str | None:
         """Return the `SkipReason` for `spec`, or `None` if every prerequisite is met.
 
-        Checks `spec.requires` before `spec.depends_on`, so a rule missing both its sheet and a
-        healthy dependency is reported for the sheet, matching the order they are declared in
-        `RuleSpec`.
+        Checks `spec.requires` before `spec.requires_options` before `spec.depends_on`, so a rule
+        missing both its sheet and a healthy dependency is reported for the sheet, matching the
+        order they are declared in `RuleSpec`.
         """
         for sheet_name, required_columns in spec.requires.items():
             if not ctx.has_sheet(sheet_name):
@@ -227,6 +230,10 @@ class Engine:
             for column_name in required_columns:
                 if column_name not in frame.columns:
                     return SkipReason.MISSING_COLUMN
+
+        for option_key in spec.requires_options:
+            if not ctx.options.get(option_key, False):
+                return SkipReason.DISABLED_BY_OPTION
 
         for dependency_id in spec.depends_on:
             dependency_outcome = previous_outcomes.get(dependency_id)

@@ -35,10 +35,17 @@ from data_validate.controllers.report.file_report_generator import FileReportGen
 from data_validate.controllers.report.report_model import ReportModel, ReportSection
 
 
-def _build_generator(mocker, error_count: int, warning_count: int, total_tests: int) -> FileReportGenerator:
+def _build_generator(
+    mocker,
+    error_count: int,
+    warning_count: int,
+    total_tests: int,
+    spatial_data_validated: bool = False,
+) -> FileReportGenerator:
     """Build a `FileReportGenerator` without running its I/O-heavy `__init__`."""
     generator = FileReportGenerator.__new__(FileReportGenerator)
     generator.context = mocker.MagicMock()
+    generator.context.spatial_data_validated = spatial_data_validated
     generator.error_count = error_count
     generator.warning_count = warning_count
     generator.total_tests = total_tests
@@ -74,6 +81,7 @@ class TestPrintJsonSummary:
         assert payload == {
             "data_validate": {
                 "version": '1.0.0"-café',
+                "spatial_data_validated": False,
                 "report": {"errors": 2, "warnings": 1, "tests": 10},
             }
         }
@@ -94,10 +102,16 @@ class TestPrintJsonSummary:
         summary = {
             "data_validate": {
                 "version": "1.2.3",
+                "spatial_data_validated": False,
                 "report": {"errors": 0, "warnings": 3, "tests": 34},
             }
         }
-        expected = f"<{str(summary).replace(chr(39), chr(34))}>"
+        # `str(dict).replace("'", '"')` (the original BUG-010 regression-test trick) renders a
+        # Python bool as `False`/`True`, not the lowercase `false`/`true` JSON requires, now that
+        # `spatial_data_validated` is a bool field (PROTO-018) -- `json.dumps` (the same
+        # serialisation `_print_json_summary` itself uses) is the correct way to build the
+        # expected fragment for a summary that is no longer string/int leaves only.
+        expected = f"<{json.dumps(summary, ensure_ascii=False)}>"
 
         assert fragment == expected
 

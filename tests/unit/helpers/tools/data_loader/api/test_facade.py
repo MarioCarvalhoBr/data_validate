@@ -14,6 +14,7 @@ key and its QML-specific tests are deleted along with `.qml` support (BUG-015).
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
 
+import json
 import zipfile
 
 import pandas as pd
@@ -21,7 +22,7 @@ import pytest
 from pathlib import Path
 
 from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet, DataLoaderFacade, LoadResult
-from data_validate.specs.sheet_specs import ColumnKind, ColumnSpec, HeaderLayout, SheetSpec
+from data_validate.specs.sheet_specs import ColumnKind, ColumnSpec, HeaderLayout, SHEET_SPECS, SheetSpec
 
 FACADE_MODULE = "data_validate.helpers.tools.data_loader.api.facade"
 
@@ -799,3 +800,138 @@ class TestDataLoaderFacadeStructuralChecks:
 
         assert result.errors == []
         assert result.models["file1"].is_read_successful is True
+
+
+def _empty_scanner_facade(mocker, tmp_path: Path, **kwargs: object) -> DataLoaderFacade:
+    """Build a facade over a real `tmp_path` whose sheet scan always finds nothing.
+
+    Isolates territory-registry tests (which only care about `spd_data.json`, a real file this
+    facade reads directly, never through `ReaderFactory`) from every declared-sheet concern.
+    """
+    facade = DataLoaderFacade(str(tmp_path), **kwargs)  # type: ignore[arg-type]
+    mock_scanner = mocker.MagicMock()
+    mock_scanner.scan.return_value = ({}, {}, list(SHEET_SPECS))
+    facade.scanner = mock_scanner
+    return facade
+
+
+class TestDataLoaderFacadeTerritoryRegistry:
+    """PROTO-013: the optional `spd_data.json` territory registry."""
+
+    def test_absent_registry_is_not_an_error(self, mocker, tmp_path: Path) -> None:
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=lambda key, **params: key)
+
+        result = facade.load()
+
+        assert result.territory_registry.loaded is False
+        assert result.territory_registry.ids == frozenset()
+        assert result.territory_registry.error is None
+        assert result.errors == []
+        assert result.warnings == []
+
+    def test_present_and_valid_registry_loads_its_ids(self, mocker, tmp_path: Path) -> None:
+        (tmp_path / "spd_data.json").write_text(
+            json.dumps({"values": [{"id": 1, "name": "A", "region": "N"}, {"id": 2, "name": "B", "region": "S"}]}),
+            encoding="utf-8",
+        )
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=lambda key, **params: key)
+
+        result = facade.load()
+
+        assert result.territory_registry.loaded is True
+        assert result.territory_registry.ids == frozenset({1, 2})
+        assert result.territory_registry.error is None
+        assert result.errors == []
+        assert result.warnings == []
+
+    def test_extra_keys_per_entry_are_tolerated(self, mocker, tmp_path: Path) -> None:
+        """Only `id` matters -- `name`/`region`/anything else is ignored, not rejected."""
+        (tmp_path / "spd_data.json").write_text(
+            json.dumps({"values": [{"id": 7, "name": "X", "region": "N", "extra": True}]}), encoding="utf-8"
+        )
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=lambda key, **params: key)
+
+        result = facade.load()
+
+        assert result.territory_registry.ids == frozenset({7})
+
+    def test_duplicate_ids_load_deduplicated_with_a_warning(self, mocker, tmp_path: Path) -> None:
+        (tmp_path / "spd_data.json").write_text(
+            json.dumps({"values": [{"id": 1}, {"id": 1}, {"id": 2}]}), encoding="utf-8"
+        )
+        recorded_calls = []
+
+        def _record_translate(key: str, **params: object) -> str:
+            recorded_calls.append((key, params))
+            return key
+
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=_record_translate)
+
+        result = facade.load()
+
+        assert result.territory_registry.loaded is True
+        assert result.territory_registry.ids == frozenset({1, 2})
+        assert result.errors == []
+        assert result.warnings == ["loader_warning_registry_duplicate_ids"]
+        assert recorded_calls[-1][0] == "loader_warning_registry_duplicate_ids"
+        assert recorded_calls[-1][1]["filename"] == "spd_data.json"
+
+    @pytest.mark.parametrize(
+        "payload",
+        [
+            "not json at all {",
+            "{}",
+            json.dumps({"values": "not-a-list"}),
+            json.dumps({"values": [{"name": "missing id"}]}),
+            json.dumps({"values": [{"id": "1"}]}),
+            json.dumps({"values": [{"id": 1.5}]}),
+            json.dumps({"values": [{"id": True}]}),
+            json.dumps({"values": ["not-an-object"]}),
+        ],
+        ids=[
+            "invalid_json",
+            "missing_values_key",
+            "values_not_a_list",
+            "entry_missing_id",
+            "id_is_a_string",
+            "id_is_a_float",
+            "id_is_a_bool",
+            "entry_not_an_object",
+        ],
+    )
+    def test_malformed_registry_is_a_loading_error_and_never_loads(self, mocker, tmp_path: Path, payload: str) -> None:
+        (tmp_path / "spd_data.json").write_text(payload, encoding="utf-8")
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=lambda key, **params: key.format(**params))
+
+        result = facade.load()
+
+        assert result.territory_registry.loaded is False
+        assert result.territory_registry.ids == frozenset()
+        assert result.territory_registry.error == "loader_error_registry_invalid"
+        assert result.errors == ["loader_error_registry_invalid"]
+
+    def test_non_utf8_registry_is_a_loading_error(self, mocker, tmp_path: Path) -> None:
+        (tmp_path / "spd_data.json").write_bytes('{"values": [{"id": 1, "nome": "São Paulo"}]}'.encode("latin-1"))
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=lambda key, **params: key)
+
+        result = facade.load()
+
+        assert result.territory_registry.loaded is False
+        assert result.errors == ["loader_error_registry_invalid"]
+
+    def test_oversized_registry_is_a_loading_error(self, mocker, tmp_path: Path) -> None:
+        (tmp_path / "spd_data.json").write_text(json.dumps({"values": [{"id": 1}]}), encoding="utf-8")
+        recorded_calls = []
+
+        def _record_translate(key: str, **params: object) -> str:
+            recorded_calls.append((key, params))
+            return key
+
+        facade = _empty_scanner_facade(mocker, tmp_path, translate=_record_translate, limits=(1, 1_000_000, 5_000))
+
+        result = facade.load()
+
+        assert result.territory_registry.loaded is False
+        assert result.errors == ["loader_error_file_too_large"]
+        assert recorded_calls[0][0] == "loader_error_file_too_large"
+        assert recorded_calls[0][1]["filename"] == "spd_data.json"

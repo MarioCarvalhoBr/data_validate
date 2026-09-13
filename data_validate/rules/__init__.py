@@ -26,6 +26,13 @@ adds `spell.py` (`SPELL_REGISTRY`, `SPELL-001`…`SPELL-005`), replacing the del
 caller instead of automatically from `__init__` (ARC-001). See
 `.specs/architecture/target-architecture.md` (`Rule`, `RuleContext`, `RuleOutcome` sketches) and
 `docs/adrs/0006-rule-registry-with-prerequisites.md`.
+
+Phase 6 (PROTO-013) adds `territories.py` (`TERRITORY_REGISTRY_RULES`, `TERR-001`…`TERR-002`), the
+first rule module with no legacy validator to port: the optional, server-generated territory
+registry `spd_data.json` (`.specs/business-rules/territories.md`). Its first-ever use of
+`RuleSpec.requires_options` (an option-gated engine skip, `SkipReason.DISABLED_BY_OPTION`)
+implements the `engine.skipped.disabled_by_option` key `.specs/architecture/error-model.md` had
+sketched but left unimplemented.
 """
 
 from __future__ import annotations
@@ -44,11 +51,14 @@ from data_validate.rules.scenario import SCENARIO_REGISTRY
 from data_validate.rules.spell import SPELL_REGISTRY, SpellBackend
 from data_validate.rules.structure import STRUCTURE_REGISTRY
 from data_validate.rules.temporal_reference import TEMPORAL_REGISTRY
+from data_validate.rules.territories import TERRITORY_REGISTRY_RULES
 from data_validate.rules.value import VALUE_REGISTRY
 
 #: Every rule registry the pipeline runs, in the same fixed order
 #: `SpreadsheetProcessor._build_pipeline` runs them (registry-to-registry order is still
 #: explicit, per ARC-017's "Done" note — only each registry's *internal* order is topological).
+#: `TERRITORY_REGISTRY_RULES` runs last (PROTO-013 — territories.md's own decision, independent of
+#: every other sheet).
 ALL_REGISTRIES: tuple[RuleRegistry, ...] = (
     STRUCTURE_REGISTRY,
     SPELL_REGISTRY,
@@ -59,6 +69,7 @@ ALL_REGISTRIES: tuple[RuleRegistry, ...] = (
     VALUE_REGISTRY,
     SCENARIO_REGISTRY,
     LEGEND_REGISTRY,
+    TERRITORY_REGISTRY_RULES,
 )
 
 
@@ -120,6 +131,7 @@ __all__ = [
     "SkipReason",
     "SpellBackend",
     "TEMPORAL_REGISTRY",
+    "TERRITORY_REGISTRY_RULES",
     "VALUE_REGISTRY",
     "compute_composition_facts",
     "extend_report_from_outcomes",

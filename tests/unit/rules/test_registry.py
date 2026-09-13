@@ -28,6 +28,7 @@ def _make_spec(
     severity_default: Severity = Severity.ERROR,
     requires: dict[str, tuple[str, ...]] | None = None,
     depends_on: tuple[str, ...] = (),
+    requires_options: tuple[str, ...] = (),
     check: Callable[[RuleContext], list[Issue]] = _no_issues,
 ) -> RuleSpec:
     """Build a `RuleSpec` with sensible defaults, overridable per test."""
@@ -38,6 +39,7 @@ def _make_spec(
         requires=requires if requires is not None else {},
         depends_on=depends_on,
         check=check,
+        requires_options=requires_options,
     )
 
 
@@ -57,6 +59,7 @@ class TestRuleSpecValidation:
             "PROP-007",
             "SPELL-001",
             "CLEAN-002",
+            "TERR-001",
         ],
     )
     def test_accepts_every_known_prefix(self, rule_id: str) -> None:
@@ -76,6 +79,14 @@ class TestRuleSpecValidation:
         assert spec.requires == {"descricao": ("codigo", "nivel")}
         with pytest.raises(TypeError):
             spec.requires["descricao"] = ()  # type: ignore[index]
+
+    def test_requires_options_defaults_to_empty_tuple(self) -> None:
+        spec = _make_spec()
+        assert spec.requires_options == ()
+
+    def test_requires_options_is_stored_as_a_tuple(self) -> None:
+        spec = _make_spec(requires_options=["territory_registry_present"])  # type: ignore[arg-type]
+        assert spec.requires_options == ("territory_registry_present",)
 
 
 class TestRuleRegistryRegistration:
@@ -126,6 +137,7 @@ class TestRuleRegistryDecorator:
         assert spec.severity_default is Severity.ERROR
         assert spec.requires == {}
         assert spec.depends_on == ()
+        assert spec.requires_options == ()
         assert spec.check is check
 
     def test_decorator_returns_the_original_function_unchanged(self) -> None:
@@ -147,6 +159,7 @@ class TestRuleRegistryDecorator:
             requires={"descricao": ("codigo",)},
             depends_on=("DESC-001",),
             severity_default=Severity.WARNING,
+            requires_options=("territory_registry_present",),
         )
         def check(ctx: RuleContext) -> list[Issue]:
             return []
@@ -155,6 +168,7 @@ class TestRuleRegistryDecorator:
         assert spec.requires == {"descricao": ("codigo",)}
         assert spec.depends_on == ("DESC-001",)
         assert spec.severity_default is Severity.WARNING
+        assert spec.requires_options == ("territory_registry_present",)
 
 
 class TestRuleRegistryTopologicalOrder:

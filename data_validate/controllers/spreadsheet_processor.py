@@ -33,6 +33,7 @@ from data_validate.rules import (
     STRUCTURE_REGISTRY,
     SpellBackend,
     TEMPORAL_REGISTRY,
+    TERRITORY_REGISTRY_RULES,
     VALUE_REGISTRY,
     compute_composition_facts,
     extend_report_from_outcomes,
@@ -95,6 +96,8 @@ class SpreadsheetProcessor:
         self.raw_data_map: dict[str, tools.LoadedSheet] | None = None
         self.data_loader_facade: tools.DataLoaderFacade | None = None
         self.model_configurations: dict[str, object] | None = None
+        # PROTO-013: the optional `spd_data.json` territory registry, populated by `_read_data()`.
+        self.territory_registry: tools.TerritoryRegistry = tools.TerritoryRegistry()
 
         self.data_models_context: controllers.DataModelContext | None = None
         self.initialized_models: list[models.SpModelABC] = []
@@ -153,7 +156,12 @@ class SpreadsheetProcessor:
         )
         load_result = self.data_loader_facade.load()
         self.raw_data_map, load_errors = load_result.models, load_result.errors
-        self.validation_reports.extend(self.validation_titles[config.NamesEnum.FS.value], errors=load_errors)
+        self.territory_registry = load_result.territory_registry
+        self.validation_reports.extend(
+            self.validation_titles[config.NamesEnum.FS.value],
+            errors=load_errors,
+            warnings=load_result.warnings,
+        )
 
         # Verify scenarios and legend existence
         if self.raw_data_map[models.SpScenario.CONSTANTS.SP_NAME].is_read_successful and (
@@ -311,6 +319,10 @@ class SpreadsheetProcessor:
             "current_language": self.language_manager.current_language,
             "spell_backend": self._spell_backend,
             "no_spellchecker": data_action.no_spellchecker,
+            # PROTO-013: gates TERR-001/TERR-002 (`RuleSpec.requires_options`) and supplies the
+            # registry ids they compare `valores`/`proporcionalidades` ids against.
+            "territory_registry_present": self.territory_registry.loaded,
+            "territory_registry_ids": self.territory_registry.ids,
         }
 
         preliminary_context = RuleContext(
@@ -362,6 +374,8 @@ class SpreadsheetProcessor:
         2. **Spelling**: Spell checking on text fields.
         3. **Mandatory**: Core business rules (Description, Composition, Temporal Reference).
         4. **Optional**: Secondary business rules (Proportionality, Values, Scenarios, Legends).
+        5. **Territory registry**: TERR-001/TERR-002 (PROTO-013), always last — independent of
+           every other sheet, and its own `spatial_data_validated` summary flag (PROTO-018).
         """
         self.context.logger.info("Building validation pipeline...")
 
@@ -404,6 +418,32 @@ class SpreadsheetProcessor:
         self._run_rule_registries([VALUE_REGISTRY], rule_context)
         self._run_rule_registries([SCENARIO_REGISTRY], rule_context)
         self._run_rule_registries([LEGEND_REGISTRY], rule_context)
+
+        # 5. Validate the optional territory registry (PROTO-013), always last — see the
+        # docstring's point 5.
+        self._run_rule_registries([TERRITORY_REGISTRY_RULES], rule_context)
+        self._finalize_territory_registry_status()
+
+    def _finalize_territory_registry_status(self) -> None:
+        """
+        Record the TERR verification's skip status and compute `spatial_data_validated` (PROTO-018).
+
+        Two maintainer decisions (`.specs/business-rules/territories.md`) land here, after
+        `TERRITORY_REGISTRY_RULES` has already run and populated its report bucket:
+
+        1. An absent or malformed registry means TERR-001/TERR-002 never ran (engine-skipped via
+           `RuleSpec.requires_options`, see `rules/territories.py`) — the TERR title is appended
+           to `self.context.skipped_validations`, the same mechanism
+           `FileReportGenerator._collect_skipped_tests` already reads for `--no-spellchecker`/
+           `--no-warning-titles-length`.
+        2. `self.context.spatial_data_validated` is `True` only when the registry loaded *and*
+           the TERR report bucket has zero errors.
+        """
+        if not self.territory_registry.loaded:
+            self.context.skipped_validations.append(self.validation_titles[config.NamesEnum.TERR.value])
+
+        territory_report = self.validation_reports[self.validation_titles[config.NamesEnum.TERR.value]]
+        self.context.spatial_data_validated = self.territory_registry.loaded and not territory_report.has_errors()
 
     def _report(self) -> None:
         """

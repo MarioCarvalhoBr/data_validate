@@ -610,5 +610,20 @@
   },
   "verification_name_value_id_uniqueness": {
     "message": "Value id uniqueness"
+  },
+  "loader_error_registry_invalid": {
+    "message": "{filename}: The territory registry file is malformed and could not be read. Details: {details}."
+  },
+  "loader_warning_registry_duplicate_ids": {
+    "message": "{filename}: The territory registry contains duplicate identifiers; the duplicate values were ignored."
+  },
+  "rule.TERR-001.error": {
+    "message": "{filename}, row {row}: identifier '{value}' in column 'id' was not found in the territory registry (spd_data.json)."
+  },
+  "rule.TERR-002.error": {
+    "message": "{filename}, row {row}: identifier '{value}' in column 'id' was not found in the territory registry (spd_data.json)."
+  },
+  "verification_name_territory_registry": {
+    "message": "Territory registry (spd_data.json)"
   }
 }

@@ -242,6 +242,22 @@ class TestCheckNoUnexpectedFiles:
 
         assert check_no_unexpected_files(ctx) == []
 
+    def test_the_territory_registry_file_is_whitelisted(self, tmp_path: Path) -> None:
+        """PROTO-013: `spd_data.json` is accepted even though it is not a declared sheet."""
+        (tmp_path / "spd_data.json").touch()
+        ctx = _make_context(tmp_path)
+
+        assert check_no_unexpected_files(ctx) == []
+
+    def test_a_similarly_named_file_is_still_rejected(self, tmp_path: Path) -> None:
+        """Only the exact `spd_data.json` name is whitelisted, not a lookalike."""
+        (tmp_path / "spd_data.xlsx").touch()
+        ctx = _make_context(tmp_path)
+
+        issues = check_no_unexpected_files(ctx)
+
+        assert issues[0].params == {"file_name": "spd_data.xlsx"}
+
 
 class TestCheckRequiredFilesPresent:
     """STRUCT-005: descricao/composicao/valores/referencia_temporal must each exist."""

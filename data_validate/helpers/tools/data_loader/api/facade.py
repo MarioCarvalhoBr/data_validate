@@ -25,6 +25,13 @@ User-facing violation messages go through an injected `translate` callable (fall
 `pt_BR` `MessageCatalog` when none is given) rather than a hardcoded string, per
 `.claude/rules/i18n.md`.
 
+PROTO-013: `DataLoaderFacade.load()` also loads the optional, server-generated territory registry
+`spd_data.json` (`.specs/business-rules/territories.md`) directly (stdlib `json`, not a
+`ReaderFactory`/header strategy, since it is not a declared sheet) and returns it as a
+`TerritoryRegistry` on `LoadResult.territory_registry` -- absent is not an error; a malformed or
+oversized registry is (SEC-003 applies to it too); a duplicate registry `id` is a warning, not an
+error (the registry still loads, deduplicated).
+
 SEC-004: `load()`'s per-file read loop catches only the specific, expected reader failures
 (`FileNotFoundError`, `UnicodeDecodeError`, `pd.errors.ParserError`, `ValueError`, `IOError`, and
 `python_calamine.CalamineError` -- the base of `python-calamine`'s own `ZipError`/`XmlError`/
@@ -40,9 +47,11 @@ string, reaching `main()`'s boundary, which reports it as a fatal error and exit
 
 from __future__ import annotations
 
+import json
+import os
 import warnings
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import chardet
@@ -50,7 +59,7 @@ import pandas as pd
 import python_calamine
 
 from data_validate.i18n.catalog import MessageCatalog, default_catalog_dir
-from data_validate.specs.sheet_specs import HeaderLayout, SHEET_SPECS
+from data_validate.specs.sheet_specs import EXTRA_INPUT_FILES, HeaderLayout, SHEET_SPECS
 
 from ..engine.factory import ReaderFactory
 from ..engine.scanner import FileScanner
@@ -69,6 +78,46 @@ _DEFAULT_MAX_SHEET_COLUMNS = 5_000
 _ENCODING_SAMPLE_BYTES = 4096
 _ENCODING_CONFIDENCE_THRESHOLD = 0.7
 _ACCEPTED_ENCODINGS = frozenset({"utf-8", "ascii"})
+
+# PROTO-013: the optional, server-generated territory registry (`.specs/business-rules/
+# territories.md`); the sole entry of `EXTRA_INPUT_FILES` today, named here as its own constant
+# for readability at each of this module's several call sites.
+_TERRITORY_REGISTRY_FILENAME = EXTRA_INPUT_FILES[0]
+
+
+def _parse_territory_registry_ids(payload: object) -> list[int]:
+    """PROTO-013: validate and extract every `id` from a parsed `spd_data.json` payload.
+
+    Expected shape: `{"values": [{"id": int, "name": str, "region": str}, ...]}` -- extra keys on
+    each entry (`name`/`region`/anything else) are tolerated and ignored; only `id` matters here.
+
+    Args:
+        payload: The object `json.load` produced from `spd_data.json`.
+
+    Returns:
+        list[int]: Every entry's `id`, in file order (may contain duplicates -- the caller
+            decides how to treat those).
+
+    Raises:
+        ValueError: If `payload` is not a `dict`, `payload["values"]` is not a `list`, or any
+            entry is not an object with an integer `id` (`bool` is rejected too -- `isinstance(True,
+            int)` is `True` in Python, but a boolean is not a territory id).
+    """
+    if not isinstance(payload, dict):
+        raise ValueError("root JSON value must be an object")
+    values = payload.get("values")
+    if not isinstance(values, list):
+        raise ValueError("'values' must be a list")
+
+    ids: list[int] = []
+    for entry in values:
+        if not isinstance(entry, dict):
+            raise ValueError(f"each entry of 'values' must be an object, got {entry!r}")
+        entry_id = entry.get("id")
+        if isinstance(entry_id, bool) or not isinstance(entry_id, int):
+            raise ValueError(f"each entry's 'id' must be an integer, got {entry_id!r}")
+        ids.append(entry_id)
+    return ids
 
 
 def _worksheet_names(path: Path) -> list[str]:
@@ -205,6 +254,30 @@ DataLoaderModel = LoadedSheet
 
 
 @dataclass(frozen=True)
+class TerritoryRegistry:
+    """PROTO-013: parsed state of the optional `spd_data.json` territory registry.
+
+    `spd_data.json` is not a declared sheet (`SHEET_SPECS`) -- it is an optional, server-generated
+    artefact (`.specs/business-rules/territories.md`) read directly by `DataLoaderFacade`, never
+    through `ReaderFactory`/a header strategy.
+
+    Attributes:
+        ids: Every registry `id`, deduplicated. Empty when the registry is absent or malformed
+            (`loaded` is `False` in both of those cases).
+        loaded: Whether `spd_data.json` was present and parsed into a valid `{"values": [...]}`
+            shape -- `True` even when `ids` also triggered the duplicate-id warning (a registry
+            defect, not a fatal one). `False` when the file is simply absent (not an error) or
+            malformed/oversized (an error; see `error`).
+        error: The user-facing (translated) loading-error message when `loaded` is `False` because
+            the file could not be parsed, or `None` (the file is absent, or it loaded fine).
+    """
+
+    ids: frozenset[int] = frozenset()
+    loaded: bool = False
+    error: str | None = None
+
+
+@dataclass(frozen=True)
 class LoadResult:
     """Outcome of `DataLoaderFacade.load()`.
 
@@ -213,10 +286,17 @@ class LoadResult:
             (present even when the file was absent or failed to read, mirroring `load_all`'s
             historical "missing sheets fill in as empty" behaviour).
         errors: User-facing (translated) messages for read failures and SEC-003 size violations.
+        warnings: User-facing (translated) non-fatal messages -- today, only the territory
+            registry's duplicate-id case (PROTO-013).
+        territory_registry: The parsed state of the optional `spd_data.json` registry (PROTO-013),
+            defaulting to "absent" (`TerritoryRegistry()`) so every existing call site that builds
+            a `LoadResult` without naming this field keeps working unchanged.
     """
 
     models: dict[str, LoadedSheet]
     errors: list[str]
+    warnings: list[str] = field(default_factory=list)
+    territory_registry: TerritoryRegistry = field(default_factory=TerritoryRegistry)
 
 
 class DataLoaderFacade:
@@ -367,7 +447,64 @@ class DataLoaderFacade:
                     is_read_successful=False,
                 )
 
-        return LoadResult(models=data, errors=errors)
+        territory_registry, registry_errors, registry_warnings = self._load_territory_registry()
+        errors.extend(registry_errors)
+
+        return LoadResult(models=data, errors=errors, warnings=registry_warnings, territory_registry=territory_registry)
+
+    def _load_territory_registry(self) -> tuple[TerritoryRegistry, list[str], list[str]]:
+        """PROTO-013: load the optional `spd_data.json` territory registry, if present.
+
+        Untrusted input (`.claude/rules/security.md`): size-limited with the same
+        `MAX_INPUT_FILE_BYTES`-derived limit (SEC-003) as every other input file, parsed with the
+        stdlib `json` module, and only the specific exceptions a malformed/oversized file can
+        raise are ever caught (`OSError` -- e.g. the file vanished or is unreadable;
+        `json.JSONDecodeError` -- not valid JSON; `UnicodeDecodeError` -- not valid UTF-8; and this
+        module's own `ValueError` from `_parse_territory_registry_ids` for well-formed JSON in the
+        wrong shape) -- never a bare `except`, and a malformed registry never crashes `load()`.
+
+        A duplicate `id` across registry entries is not treated as fatal: `.specs/business-rules/
+        territories.md` calls it "a registry defect (server-side)", so the registry still loads
+        (deduplicated) and a warning is returned instead of an error.
+
+        Returns:
+            tuple[TerritoryRegistry, list[str], list[str]]: the parsed registry state, error
+                messages (empty unless the file is oversized or malformed), and warning messages
+                (empty unless the registry contains duplicate ids).
+        """
+        path = self.input_dir / _TERRITORY_REGISTRY_FILENAME
+        # `os.path.isfile`/`os.path.getsize` (not `Path.is_file`/`Path.stat`) deliberately: this
+        # method reads a file no other code path in this class touches, and several existing
+        # tests patch `Path.stat` globally to fake the size of the *sheet* files scanned earlier
+        # in `load()` -- using the `os` module here keeps that unrelated mock from also making
+        # this method believe a non-existent `spd_data.json` exists.
+        if not os.path.isfile(path):
+            return TerritoryRegistry(), [], []
+
+        try:
+            file_size_bytes = os.path.getsize(path)  # noqa: PTH202 -- see the comment above
+            if file_size_bytes > self._max_file_bytes:
+                message = self._translate(
+                    "loader_error_file_too_large",
+                    filename=path.name,
+                    size_mb=f"{file_size_bytes / (1024 * 1024):.1f}",
+                    limit_mb=f"{self._max_file_bytes / (1024 * 1024):.0f}",
+                )
+                return TerritoryRegistry(error=message), [message], []
+
+            with open(path, encoding="utf-8") as handle:
+                payload = json.load(handle)
+            ids = _parse_territory_registry_ids(payload)
+        except (OSError, json.JSONDecodeError, UnicodeDecodeError, ValueError) as error:
+            message = self._translate("loader_error_registry_invalid", filename=path.name, details=str(error))
+            return TerritoryRegistry(error=message), [message], []
+
+        registry_warnings: list[str] = []
+        unique_ids = frozenset(ids)
+        if len(unique_ids) != len(ids):
+            registry_warnings.append(self._translate("loader_warning_registry_duplicate_ids", filename=path.name))
+
+        return TerritoryRegistry(ids=unique_ids, loaded=True, error=None), [], registry_warnings
 
     @property
     def load_all(self) -> tuple[dict[str, LoadedSheet], list[str]]:

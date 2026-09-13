@@ -35,7 +35,7 @@ from data_validate.config import NamesEnum
 from data_validate.rules.context import RuleContext
 from data_validate.rules.registry import RuleRegistry
 from data_validate.specs.issues import Issue, Severity
-from data_validate.specs.sheet_specs import ALLOWED_EXTENSIONS, SHEET_SPECS
+from data_validate.specs.sheet_specs import ALLOWED_EXTENSIONS, EXTRA_INPUT_FILES, SHEET_SPECS
 
 STRUCTURE_REGISTRY = RuleRegistry()
 """Every `STRUCT-*` rule ported from `FileStructureValidator`, in the legacy check order."""
@@ -131,6 +131,11 @@ def check_no_unexpected_folders(ctx: RuleContext) -> list[Issue]:
 def check_no_unexpected_files(ctx: RuleContext) -> list[Issue]:
     """STRUCT-004: every file must be `<base>.<ext>` with `<base>` a known sheet stem.
 
+    PROTO-013: an exact-name match against `EXTRA_INPUT_FILES` (`spd_data.json`, the optional
+    territory registry — `.specs/business-rules/territories.md`) is also accepted, even though
+    it is not a declared sheet in `SHEET_SPECS` and does not follow the `<base>.<ext>` shape this
+    check otherwise enforces.
+
     Same zipped-subfolder short-circuit as STRUCT-003 (see its docstring).
     """
     if _is_zipped_with_extra_folder(ctx):
@@ -141,6 +146,8 @@ def check_no_unexpected_files(ctx: RuleContext) -> list[Issue]:
     for entry_name in _dir_entries(ctx):
         entry_path = input_folder / entry_name
         if not entry_path.is_file():
+            continue
+        if entry_name in EXTRA_INPUT_FILES:
             continue
         file_base, file_ext = os.path.splitext(entry_name)
         if file_base in SHEET_SPECS and file_ext in ALLOWED_EXTENSIONS:

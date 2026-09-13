@@ -20,7 +20,7 @@ from enum import StrEnum
 from types import MappingProxyType
 from typing import Mapping
 
-_RULE_ID_PATTERN = re.compile(r"^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN)-\d{3}$")
+_RULE_ID_PATTERN = re.compile(r"^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN|TERR)-\d{3}$")
 
 
 class Severity(StrEnum):
@@ -41,7 +41,7 @@ class Issue:
 
     Attributes:
         rule_id: Stable rule identifier (`"DESC-004"`), also the link to `.specs/business-rules/`.
-            Must match `^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN)-\\d{3}$`.
+            Must match `^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN|TERR)-\\d{3}$`.
         severity: Whether this finding is an error or a warning.
         sheet: File name as delivered (`"descricao.xlsx"`), or `None` for a folder-level issue.
         row: Spreadsheet row (0-based data index, i.e. the position in the sheet's data rows,
@@ -72,7 +72,7 @@ class Issue:
         if not _RULE_ID_PATTERN.match(self.rule_id):
             raise ValueError(
                 f"Issue.rule_id {self.rule_id!r} does not match "
-                f"'^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN)-\\d{{3}}$'"
+                f"'^(STRUCT|DESC|COMP|VAL|TEMP|SCEN|LEG|PROP|SPELL|CLEAN|TERR)-\\d{{3}}$'"
             )
         object.__setattr__(self, "params", MappingProxyType(dict(self.params)))
 

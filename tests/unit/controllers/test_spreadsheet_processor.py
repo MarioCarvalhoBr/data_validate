@@ -23,11 +23,12 @@ from pathlib import Path
 
 import pandas as pd
 
+from data_validate.helpers import tools
 from data_validate.controllers.spreadsheet_processor import SpreadsheetProcessor
 from data_validate import config, models
 from data_validate.controllers.report.validation_report import ValidationReport
 from data_validate.helpers.tools.data_loader.api.facade import LoadedSheet, LoadResult
-from data_validate.rules import RuleContext, STRUCTURE_REGISTRY
+from data_validate.rules import RuleContext, STRUCTURE_REGISTRY, TERRITORY_REGISTRY_RULES
 
 
 def _fake_raw_data_map() -> dict[str, LoadedSheet]:
@@ -110,7 +111,34 @@ class TestReadDataUsesLoad:
         processor._read_data()
 
         processor.validation_reports.extend.assert_any_call(
-            processor.validation_titles[config.NamesEnum.FS.value], errors=["boom"]
+            processor.validation_titles[config.NamesEnum.FS.value], errors=["boom"], warnings=[]
+        )
+
+    def test_read_data_stores_the_territory_registry_from_the_load_result(self, mocker) -> None:
+        """PROTO-013: `_read_data` populates `self.territory_registry` from `LoadResult`."""
+        processor = _build_bare_processor(mocker)
+
+        registry = tools.TerritoryRegistry(ids=frozenset({1, 2}), loaded=True, error=None)
+        fake_facade = mocker.MagicMock()
+        fake_facade.load.return_value = LoadResult(models=_fake_raw_data_map(), errors=[], territory_registry=registry)
+        mocker.patch("data_validate.controllers.spreadsheet_processor.tools.DataLoaderFacade", return_value=fake_facade)
+
+        processor._read_data()
+
+        assert processor.territory_registry is registry
+
+    def test_read_data_extends_report_with_registry_warnings(self, mocker) -> None:
+        """PROTO-013: `LoadResult.warnings` (e.g. duplicate registry ids) reach the FS category."""
+        processor = _build_bare_processor(mocker)
+
+        fake_facade = mocker.MagicMock()
+        fake_facade.load.return_value = LoadResult(models=_fake_raw_data_map(), errors=[], warnings=["dup"])
+        mocker.patch("data_validate.controllers.spreadsheet_processor.tools.DataLoaderFacade", return_value=fake_facade)
+
+        processor._read_data()
+
+        processor.validation_reports.extend.assert_any_call(
+            processor.validation_titles[config.NamesEnum.FS.value], errors=[], warnings=["dup"]
         )
 
 
@@ -224,3 +252,75 @@ class TestConfigureCallsRunExplicitly:
         processor._configure()
 
         assert processor._models_by_name["descricao"] is processor.sp_descricao
+
+
+class TestFinalizeTerritoryRegistryStatus:
+    """PROTO-013/PROTO-018: `_finalize_territory_registry_status`'s skip/flag bookkeeping."""
+
+    def _build_processor(self, mocker, *, registry: tools.TerritoryRegistry) -> SpreadsheetProcessor:
+        processor = SpreadsheetProcessor.__new__(SpreadsheetProcessor)
+        processor.context = mocker.MagicMock()
+        processor.context.skipped_validations = []
+        processor.validation_titles = {name.value: name.value for name in config.NamesEnum}
+        processor.validation_reports = ValidationReport()
+        for title in processor.validation_titles.values():
+            processor.validation_reports.add_by_name(title)
+        processor.territory_registry = registry
+        return processor
+
+    def test_absent_registry_is_appended_to_skipped_validations(self, mocker) -> None:
+        processor = self._build_processor(mocker, registry=tools.TerritoryRegistry())
+
+        processor._finalize_territory_registry_status()
+
+        terr_title = processor.validation_titles[config.NamesEnum.TERR.value]
+        assert terr_title in processor.context.skipped_validations
+        assert processor.context.spatial_data_validated is False
+
+    def test_loaded_registry_with_zero_errors_is_not_skipped_and_flag_is_true(self, mocker) -> None:
+        processor = self._build_processor(
+            mocker, registry=tools.TerritoryRegistry(ids=frozenset({1}), loaded=True, error=None)
+        )
+
+        processor._finalize_territory_registry_status()
+
+        assert processor.context.skipped_validations == []
+        assert processor.context.spatial_data_validated is True
+
+    def test_loaded_registry_with_errors_is_not_skipped_but_flag_is_false(self, mocker) -> None:
+        processor = self._build_processor(
+            mocker, registry=tools.TerritoryRegistry(ids=frozenset({1}), loaded=True, error=None)
+        )
+        terr_title = processor.validation_titles[config.NamesEnum.TERR.value]
+        processor.validation_reports.extend(terr_title, errors=["rule.TERR-001.error"])
+
+        processor._finalize_territory_registry_status()
+
+        assert processor.context.skipped_validations == []
+        assert processor.context.spatial_data_validated is False
+
+    def test_run_rule_registries_renders_terr_findings_into_the_terr_report(self, mocker) -> None:
+        """`_run_rule_registries([TERRITORY_REGISTRY_RULES], ctx)` reaches the TERR bucket."""
+        processor = self._build_processor(
+            mocker, registry=tools.TerritoryRegistry(ids=frozenset({1}), loaded=True, error=None)
+        )
+        processor.language_manager = mocker.MagicMock()
+        processor.language_manager.text = mocker.MagicMock(side_effect=lambda key, **kwargs: key)
+
+        valores = pd.DataFrame({"id": ["1", "2"]})
+        ctx = RuleContext(
+            sheets={"valores": valores},
+            cleaned={},
+            options={
+                "filenames": {"valores": "valores.xlsx"},
+                "territory_registry_present": True,
+                "territory_registry_ids": frozenset({1}),
+            },
+            translate=lambda key, **params: key,
+            clock=lambda: datetime(2026, 1, 1, tzinfo=UTC),
+        )
+
+        processor._run_rule_registries([TERRITORY_REGISTRY_RULES], ctx)
+
+        terr_title = processor.validation_titles[config.NamesEnum.TERR.value]
+        assert "rule.TERR-001.error" in processor.validation_reports[terr_title].errors

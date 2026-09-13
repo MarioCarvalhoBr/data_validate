@@ -52,6 +52,7 @@ def _make_spec(
     *,
     requires: dict[str, tuple[str, ...]] | None = None,
     depends_on: tuple[str, ...] = (),
+    requires_options: tuple[str, ...] = (),
     check: object = None,
 ) -> RuleSpec:
     """Build a `RuleSpec` whose `check` defaults to a no-op returning no issues."""
@@ -66,6 +67,7 @@ def _make_spec(
         requires=requires if requires is not None else {},
         depends_on=depends_on,
         check=check if check is not None else _default_check,  # type: ignore[arg-type]
+        requires_options=requires_options,
     )
 
 
@@ -152,6 +154,56 @@ class TestEngineRequiresSkip:
         registry.register(_make_spec("LEG-012", requires={"legenda": ()}, check=check))
         Engine(registry).run(_make_context(sheets={}))
         assert calls == []
+
+
+class TestEngineRequiresOptionsSkip:
+    """`requires_options` unmet `ctx.options` keys produce a SKIPPED outcome (PROTO-013)."""
+
+    def test_missing_option_is_skipped_with_disabled_by_option_reason(self) -> None:
+        registry = RuleRegistry()
+        registry.register(_make_spec("TERR-001", requires_options=("territory_registry_present",)))
+        result = Engine(registry).run(_make_context(options={}))
+        outcome = result.outcomes[0]
+        assert outcome.status is RuleStatus.SKIPPED
+        assert outcome.skip_reason == SkipReason.DISABLED_BY_OPTION
+
+    def test_falsy_option_is_skipped_with_disabled_by_option_reason(self) -> None:
+        registry = RuleRegistry()
+        registry.register(_make_spec("TERR-001", requires_options=("territory_registry_present",)))
+        result = Engine(registry).run(_make_context(options={"territory_registry_present": False}))
+        assert result.outcomes[0].status is RuleStatus.SKIPPED
+        assert result.outcomes[0].skip_reason == SkipReason.DISABLED_BY_OPTION
+
+    def test_truthy_option_runs_normally(self) -> None:
+        registry = RuleRegistry()
+        registry.register(_make_spec("TERR-001", requires_options=("territory_registry_present",)))
+        result = Engine(registry).run(_make_context(options={"territory_registry_present": True}))
+        assert result.outcomes[0].status is RuleStatus.PASSED
+
+    def test_check_is_never_called_when_disabled_by_option(self) -> None:
+        calls: list[str] = []
+
+        def check(ctx: RuleContext) -> list[Issue]:
+            calls.append("called")
+            return []
+
+        registry = RuleRegistry()
+        registry.register(_make_spec("TERR-001", requires_options=("territory_registry_present",), check=check))
+        Engine(registry).run(_make_context(options={}))
+        assert calls == []
+
+    def test_requires_is_checked_before_requires_options(self) -> None:
+        """A rule missing both its sheet and a truthy option is reported for the sheet."""
+        registry = RuleRegistry()
+        registry.register(
+            _make_spec(
+                "TERR-001",
+                requires={"valores": ()},
+                requires_options=("territory_registry_present",),
+            )
+        )
+        result = Engine(registry).run(_make_context(sheets={}, options={}))
+        assert result.outcomes[0].skip_reason == SkipReason.MISSING_SHEET
 
 
 class TestEngineDependsOnSkip:

@@ -5,9 +5,10 @@
     "data_validate": {
       "report": {
         "errors": 18,
-        "tests": 37,
+        "tests": 38,
         "warnings": 13
       },
+      "spatial_data_validated": false,
       "version": "<version>"
     }
   },
@@ -47,10 +48,15 @@
     "Níveis dos indicadores filhos",
     "Categoria do indicador",
     "Conjunto de caracteres do símbolo de cenário",
-    "Unicidade do identificador em valores"
+    "Unicidade do identificador em valores",
+    "Cadastro de territórios (spd_data.json)"
   ],
   "sections": {
     "Anos em referência temporal": {
+      "errors": [],
+      "warnings": []
+    },
+    "Cadastro de territórios (spd_data.json)": {
       "errors": [],
       "warnings": []
     },
