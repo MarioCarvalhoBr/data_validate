@@ -170,6 +170,17 @@ zero global state. Each item below names the current smell, where it lives, and 
   duplicate-title warning uses two distinct keys (`warning.simple_name`/`warning.complete_name`)
   rather than one key with a Portuguese-noun param, so the en_US locale renders a genuine English
   sentence instead of an English template around a Portuguese word.
+- Note (Phase 3 Port 4 slice, ARC-017): both `SpTemporalReferenceValidator`
+  (`temporal_reference_validator.py`) and `SpScenarioValidator` (`scenario_validator.py`) are
+  deleted; their five ported rules (`rules/temporal_reference.py`'s TEMP-001…003,
+  `rules/scenario.py`'s SCEN-003…004) render every message through `ctx.translate(message_key,
+  **params)` — 9 new catalog keys added to both `static/locales/{pt_BR,en_US}/messages.json`
+  (`rule.temporal_reference.missing_required_column`/`rule.scenario.missing_required_column`
+  shared by every rule's "required column is missing" abort case, plus one-or-more
+  `rule.TEMP-0XX.<slug>`/`rule.SCEN-0XX.<slug>` keys per rule), all pt-BR values copied verbatim
+  from the legacy f-strings (verified byte-identical by the e2e golden harness run twice).
+  TEMP-002's current-year comparison now reads `ctx.clock().year` instead of
+  `ApplicationConfig.CURRENT_YEAR` directly, keeping the rule pure.
 - Related: BUG-016, DOC-003
 
 ### ARC-006 · Context god-objects and Demeter chains

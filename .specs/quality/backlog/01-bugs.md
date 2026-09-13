@@ -225,8 +225,16 @@ Every fix here must land with a regression test under `tests/` that fails before
   only this rule's dependency on that global was removed. Regression tests (including a
   same-process two-validators-independent case that would have failed against the old
   class-Series read, since a fresh `SpTemporalReference` model was never actually instantiated
-  in the mocked context and the class attribute stayed empty):
-  `tests/unit/validators/spreadsheets/temporal_reference/test_temporal_reference_validator.py`.
+  in the mocked context and the class attribute stayed empty). Original regression tests were in
+  `tests/unit/validators/spreadsheets/temporal_reference/test_temporal_reference_validator.py`
+  (deleted).
+- Note (ARC-017 Phase 3 Port 4): `temporal_reference_validator.py`/`SpTemporalReferenceValidator`
+  is deleted; the fix's semantics are preserved (not reopened) in
+  `rules/temporal_reference.py::check_reference_years_are_future` (reads `ctx.sheet(...)`'s raw
+  `simbolo` column, never a class-level `RequiredColumn` Series; a non-numeric symbol is silently
+  excluded from the violation mask instead of raising). The two migrated regression cases
+  (a `"2030a"` symbol skipped without raising, two independent contexts not leaking state) now
+  live in `tests/unit/rules/test_temporal_reference.py::TestCheckReferenceYearsAreFuture`.
 
 ### BUG-008 · `Bootstrap.run` argument checks are in the wrong order
 - Priority: P2 · Effort: S · Status: done

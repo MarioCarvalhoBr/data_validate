@@ -100,10 +100,10 @@ extending `ValidationReport` and catching **any** exception into an error messag
 | `SpellCheckerValidator` | `validate_spellchecker(SpDescription/SpTemporalReference/SpScenario) → SPELL` via `SpellChecker` (pyenchant) | BUG-022, BUG-023 |
 | ~~`SpDescriptionValidator`~~ | **deleted (ARC-017 Phase 3 Port 2)** — its nine checks are now `rules/description.py`'s ten `DESC-001`…`DESC-010` pure functions (`HTML_DESC, SC, CO_UN, INP, IL, MAND_PUNC_DESC, EF, LB_DESC, SIMP_DESC_N, TITLES_N`), run by `SpreadsheetProcessor._run_rule_registries([DESCRIPTION_REGISTRY], ctx)` | PERF-001 (resolved by the port: no `iterrows()` left in this validator) |
 | ~~`SpCompositionGraphValidator`~~ / ~~`SpCompositionTreeValidator`~~ | **deleted (ARC-017 Phase 3 Port 3)** — their nine checks are now `rules/composition.py`'s nine `COMP-001`…`COMP-009` pure functions (`IR, IR, IR, UT, LEAF_NO_DATA, LEAF_NO_DATA, TH, TH, CHILD_LVL`), run by `SpreadsheetProcessor._run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` | BUG-019 (resolved: `compute_composition_facts` computes the graph/tree/relation facts once, injected via `ctx.options["composition_facts"]`), BUG-024 (resolved: the `compostion_` filename typo is gone), PERF-001 (resolved: no `iterrows()` left in this validator) |
-| `SpTemporalReferenceValidator` | `MAND_PUNC_TEMP, YEARS_TEMP, UVR_TEMP` | BUG-007 |
+| ~~`SpTemporalReferenceValidator`~~ | **deleted (ARC-017 Phase 3 Port 4)** — its three checks are now `rules/temporal_reference.py`'s `TEMP-001`…`TEMP-003` pure functions (`MAND_PUNC_TEMP, YEARS_TEMP, UVR_TEMP`), run by `SpreadsheetProcessor._run_rule_registries([TEMPORAL_REGISTRY], ctx)` | BUG-007 (preserved, not reopened: the current year now comes from `ctx.clock().year`) |
 | `SpProportionalityValidator` | `IR, REP_IND_PROP, IND_VAL_PROP, IR_PROP, SUM_PROP` | BUG-006 |
 | `SpValueValidator` | `IR, VAL_COMB, UNAV_INV` | BUG-001, BUG-014 |
-| `SpScenarioValidator` | `MAND_PUNC_SCEN, UVR_SCEN` | — |
+| ~~`SpScenarioValidator`~~ | **deleted (ARC-017 Phase 3 Port 4)** — its two checks are now `rules/scenario.py`'s `SCEN-003`…`SCEN-004` pure functions (`MAND_PUNC_SCEN, UVR_SCEN`), run by `SpreadsheetProcessor._run_rule_registries([SCENARIO_REGISTRY], ctx)` | — |
 | `SpLegendValidator` | `LEG_REL, LEG_RANGE` | PERF-001 |
 
 Helpers used by validators live in `helpers/common/` (`validation/*Processing`,
@@ -125,7 +125,7 @@ static-method namespaces (ARC-007).
 | Logging | `LoggerManager` (console + file, colour formatter); a file handler is only created in debug mode, under `<output_folder>/logs`; `finalize()` closes every handler (BUG-021 fixed) | — |
 | Spell-check | `SpellChecker → DictionaryManager (enchant Broker, ENCHANT_CONFIG_DIR = static/dictionaries)`, `SpellCheckerController`, `TextProcessor`, `DataFrameProcessor` | ARC-015, BUG-022 |
 | Errors as data | `list[str]` of pre-formatted messages everywhere | ARC-004 |
-| Rules engine | `data_validate/rules/` (`RuleContext`, `RuleRegistry`, `Engine`) is live and wired for two validators so far: `SpreadsheetProcessor._run_rule_registries` runs `STRUCTURE_REGISTRY` and `DESCRIPTION_REGISTRY` (one shared `RuleContext`, built once by `_build_rule_context`) and renders each into `ValidationReport` via `rules.legacy_adapter.extend_report_from_outcomes` — see `module-map.md`'s `rules/` section for the full table | ARC-017 (in progress, two of ten validators ported) |
+| Rules engine | `data_validate/rules/` (`RuleContext`, `RuleRegistry`, `Engine`) is live and wired for six validators so far: `SpreadsheetProcessor._run_rule_registries` runs `STRUCTURE_REGISTRY`, `DESCRIPTION_REGISTRY`, `COMPOSITION_REGISTRY`, `TEMPORAL_REGISTRY`, and `SCENARIO_REGISTRY` (one shared `RuleContext`, built once by `_build_rule_context`) and renders each into `ValidationReport` via `rules.legacy_adapter.extend_report_from_outcomes` — see `module-map.md`'s `rules/` section for the full table | ARC-017 (in progress, six of ten validators ported) |
 
 ## Data ownership and mutation (BUG-002/BUG-003 fixed)
 

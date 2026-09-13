@@ -48,6 +48,17 @@ rule has a unit test *and* a golden fixture case. See `.specs/quality/testing-st
   this item; the rest of the list (legend, value, `spreadsheet_processor.py`'s remaining
   validator-construction lines, spellchecker, `file_report_generator.py`,
   `validation_report.py`, models) is still open.
+- Done (temporal, scenario): `SpTemporalReferenceValidator`/`temporal_reference_validator.py`
+  (0 dedicated rule tests) and `SpScenarioValidator`/`scenario_validator.py` (0 dedicated rule
+  tests) are both deleted; their five ported TEMP-001…003/SCEN-003…004 rules
+  (`rules/temporal_reference.py`, `rules/scenario.py`) are 98.41 %/98.48 % covered by
+  `tests/unit/rules/test_temporal_reference.py`/`test_scenario.py` (table-driven per rule: valid
+  case, every failure mode, missing-required-column abort, and the engine-level empty-sheet
+  skip for each registry), including the BUG-007 regression tests migrated from the deleted
+  `tests/unit/validators/spreadsheets/temporal_reference/test_temporal_reference_validator.py`.
+  Fifth/sixth validators closed under this item; the rest of the list (legend, value,
+  `spreadsheet_processor.py`'s remaining validator-construction lines, spellchecker,
+  `file_report_generator.py`, `validation_report.py`, models) is still open.
 - Related: TST-002
 
 ### TST-002 · No end-to-end / golden safety net for the migration

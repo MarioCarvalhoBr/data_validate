@@ -44,8 +44,8 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Statement: every non-empty `descricao` cell, stripped, ends with `.`.
 - Current message (pt-BR): `{file_name}, linha {idx + 2}: O valor da coluna 'descricao' deve terminar com ponto.` · missing column → warning `{file}: A verificação foi abortada para a coluna obrigatória 'descricao' que está ausente.`
 - Target message key: `rule.TEMP-001.warning`
-- Implemented by: `validators/spreadsheets/temporal_reference/temporal_reference_validator.py::SpTemporalReferenceValidator.validate_punctuation` → `CharacterProcessing.check_characters_punctuation_rules`
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
+- Implemented by: `rules/temporal_reference.py::check_description_ends_with_period` (ARC-017 Phase 3 Port 4; ported from `validators/spreadsheets/temporal_reference/temporal_reference_validator.py::SpTemporalReferenceValidator.validate_punctuation` → `CharacterProcessing.check_characters_punctuation_rules`, deleted)
+- Covered by tests: `tests/unit/rules/test_temporal_reference.py::TestCheckDescriptionEndsWithPeriod`
 - Notes / known defects: —
 
 ### TEMP-002 · Scenario years must be in the future
@@ -55,9 +55,9 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Statement: excluding the first row (present time), every distinct `simbolo` must be ≥ the current calendar year.
 - Current message (pt-BR): `{filename}: O ano {year} não pode estar associado a cenários por não ser um ano futuro.`
 - Target message key: `rule.TEMP-002.error`
-- Implemented by: `temporal_reference_validator.py::SpTemporalReferenceValidator.validate_reference_years`; year from `ApplicationConfig.CURRENT_YEAR`
-- Covered by tests: `tests/unit/validators/spreadsheets/temporal_reference/test_temporal_reference_validator.py`
-- Notes / known defects: fixed BUG-007 — the rule now reads `self._dataframe[column_name_symbol]` (the validator's own copy of the model's `frame`) instead of the model's class-level `RequiredColumn.COLUMN_SYMBOL` Series, and validates each symbol with `NumberFormattingProcessing.check_cell_integer`/`parse_numeric` before comparing years, silently skipping non-numeric symbols (already reported as data-cleaning errors by the model) instead of raising `ValueError` inside `int(year)`. BUG-002 (class-level `RequiredColumn` Series as global mutable state) is now fixed for the model itself too (`self.cleaned["simbolo"]`/`cleaned_column()`), though this rule still intentionally reads `self._dataframe` rather than the cleaned column (unchanged by this slice); import-time clock (BUG-011) is unrelated and still open. "Future" is still `>= current year` (a symbol equal to the current year passes).
+- Implemented by: `rules/temporal_reference.py::check_reference_years_are_future` (ARC-017 Phase 3 Port 4; ported from `temporal_reference_validator.py::SpTemporalReferenceValidator.validate_reference_years`, deleted); the current year comes from `ctx.clock().year` rather than `ApplicationConfig.CURRENT_YEAR` directly
+- Covered by tests: `tests/unit/rules/test_temporal_reference.py::TestCheckReferenceYearsAreFuture` (including the migrated BUG-007 regression cases: a non-numeric `"2030a"` symbol is skipped without raising, and two independent `RuleContext`s do not leak state)
+- Notes / known defects: BUG-007 preserved (not reopened) — the rule reads the sheet's own raw `simbolo` column (`ctx.sheet(...)`, never a class-level `RequiredColumn` Series) and validates each distinct value with a vectorised `pd.to_numeric(errors="coerce")` mask before comparing years, silently skipping non-numeric symbols (already reported as data-cleaning errors by the model) instead of raising `ValueError` inside `int(year)`. BUG-002 (class-level `RequiredColumn` Series as global mutable state) is fixed for the model itself (`self.cleaned["simbolo"]`/`cleaned_column()`); this rule reads the sheet's raw frame rather than the cleaned column (unchanged by this slice); import-time clock (BUG-011) is unrelated and still open. "Future" is still `>= current year` (a symbol equal to the current year passes).
 
 ### TEMP-003 · `nome` and `simbolo` must be unique
 - Severity: error
@@ -66,8 +66,8 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - Statement: no duplicated values in either column.
 - Current message (pt-BR): `{file_name}: A coluna '{column}' não deve conter valores repetidos.` · missing column → error with the abort text
 - Target message key: `rule.TEMP-003.error`
-- Implemented by: `temporal_reference_validator.py::SpTemporalReferenceValidator.validate_unique_values` → `DataFrameProcessing.check_dataframe_unique_values`
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_column_validation.py`
+- Implemented by: `rules/temporal_reference.py::check_name_and_symbol_are_unique` (ARC-017 Phase 3 Port 4; ported from `temporal_reference_validator.py::SpTemporalReferenceValidator.validate_unique_values` → `DataFrameProcessing.check_dataframe_unique_values`, deleted)
+- Covered by tests: `tests/unit/rules/test_temporal_reference.py::TestCheckNameAndSymbolAreUnique`
 - Notes / known defects: —
 
 ## Gaps (protocol ↔ code)
@@ -76,4 +76,4 @@ Files: `referencia_temporal.xlsx`/`.csv`. Single header. Required.
 - **G-16 single observed time**: "atualmente suporta apenas uma referência temporal para dados observados" — the code assumes row 1 is the present time but does not verify that only one symbol is ≤ current year.
 - CR/LF and line-break checks exist for `descricao` (DESC-008) but `LB_TEMP` is never emitted (gap G-08).
 
-Last synced with code: 09279f4
+Last synced with code: ARC-017 Phase 3 Port 4 (temporal reference content rules ported to `rules/temporal_reference.py`; legacy validator deleted)

@@ -47,9 +47,9 @@ every model as `scenarios` (`SpModelABC.VAR_CONSTS.SCENARIOS`); the loader sets
 - Protocol: §2.1 p.4 ("O nome não poderá terminar com algum caracter especial do tipo '.'", "Toda descrição deverá necessariamente terminar com um ponto")
 - Statement: `nome` must not end with one of `, . ; : ! ?`; `descricao` must end with `.`.
 - Current message (pt-BR): `{file_name}, linha {idx + 2}: O valor da coluna 'nome' não deve terminar com pontuação.` · `{file_name}, linha {idx + 2}: O valor da coluna 'descricao' deve terminar com ponto.` · missing column → warning with the abort text
-- Target message key: `rule.SCEN-003.warning`
-- Implemented by: `validators/spreadsheets/scenario/scenario_validator.py::SpScenarioValidator.validate_punctuation` → `CharacterProcessing.check_characters_punctuation_rules`
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_dataframe_character_processing.py`
+- Target message key: `rule.SCEN-003.no_punctuation` (name) / `rule.SCEN-003.must_end_with_dot` (description)
+- Implemented by: `rules/scenario.py::check_punctuation` (ARC-017 Phase 3 Port 4; ported from `validators/spreadsheets/scenario/scenario_validator.py::SpScenarioValidator.validate_punctuation` → `CharacterProcessing.check_characters_punctuation_rules`, deleted)
+- Covered by tests: `tests/unit/rules/test_scenario.py::TestCheckPunctuation`
 - Notes / known defects: —
 
 ### SCEN-004 · `nome` and `simbolo` must be unique
@@ -59,8 +59,8 @@ every model as `scenarios` (`SpModelABC.VAR_CONSTS.SCENARIOS`); the loader sets
 - Statement: no duplicated values in either column.
 - Current message (pt-BR): `{file_name}: A coluna '{column}' não deve conter valores repetidos.` · missing column → error with the abort text
 - Target message key: `rule.SCEN-004.error`
-- Implemented by: `scenario_validator.py::SpScenarioValidator.validate_unique_values` → `DataFrameProcessing.check_dataframe_unique_values`
-- Covered by tests: helper covered by `tests/unit/helpers/common/validation/test_column_validation.py`
+- Implemented by: `rules/scenario.py::check_name_and_symbol_are_unique` (ARC-017 Phase 3 Port 4; ported from `scenario_validator.py::SpScenarioValidator.validate_unique_values` → `DataFrameProcessing.check_dataframe_unique_values`, deleted)
+- Covered by tests: `tests/unit/rules/test_scenario.py::TestCheckNameAndSymbolAreUnique`
 - Notes / known defects: —
 
 ## Gaps (protocol ↔ code)
@@ -77,4 +77,4 @@ every model as `scenarios` (`SpModelABC.VAR_CONSTS.SCENARIOS`); the loader sets
 - New explicit note: sheet row order = display order in the platform; the first row is the default
   scenario (documentation only, nothing to validate).
 
-Last synced with code: 344fef7
+Last synced with code: ARC-017 Phase 3 Port 4 (scenario content rules ported to `rules/scenario.py`; legacy validator deleted)

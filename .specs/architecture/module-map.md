@@ -108,10 +108,10 @@ Locale is now an explicit `LanguageManager(locale=...)` constructor argument bui
 | ~~`spreadsheets/description/description_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 2) — `rules/description.py`** | PERF-001 (its two `iterrows()` sites are gone, see `05-performance.md`) |
 | ~~`spreadsheets/composition/compostion_graph_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 3) — `rules/composition.py`** | BUG-019 (done), BUG-024 (the `compostion_` filename typo is gone) |
 | ~~`spreadsheets/composition/composition_tree_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 3) — `rules/composition.py`** | PERF-001 (its `iterrows()` sites are gone/vectorised, see `05-performance.md`) |
-| `spreadsheets/temporal_reference/temporal_reference_validator.py` | none | `rules/temporal/TEMP-0xx.py` | BUG-007 |
+| ~~`spreadsheets/temporal_reference/temporal_reference_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 4) — `rules/temporal_reference.py`** | BUG-007 (preserved, not reopened) |
 | `spreadsheets/proportionality/proportionality_validator.py` | none | `rules/proportionality/PROP-0xx.py` | BUG-006 |
 | `spreadsheets/value/value_validator.py` | none | `rules/values/VAL-0xx.py` | BUG-001 |
-| `spreadsheets/scenario/scenario_validator.py` | none | `rules/scenarios/SCEN-0xx.py` | — |
+| ~~`spreadsheets/scenario/scenario_validator.py`~~ | ~~none~~ | **deleted (ARC-017 Phase 3 Port 4) — `rules/scenario.py`** | — |
 | `spreadsheets/legend/legend_validator.py` | none | `rules/legend/LEG-0xx.py` | BUG-014 |
 
 ## `static/`
@@ -135,15 +135,15 @@ from the legacy source instead.
 | `specs/issues.py` | Structured validation finding + result grouping/truncation | `Issue`, `Severity`, `ValidationResult` | `specs/test_issues.py` (100 % coverage) | ARC-004 (model implemented, not wired into any validator/model/`ValidationReport` yet — Phase 3) |
 | `i18n/catalog.py` | Locale-scoped message lookup and `Issue` rendering | `MessageCatalog`, `default_catalog_dir`, `CatalogNotFoundError`, `CatalogInvalidError` | `i18n/test_message_catalog.py` (100 % coverage) | ARC-004 (implemented; `helpers/tools/locale/language_manager.py::LanguageManager` remains the module every current call site actually uses) |
 
-## `rules/` (new package, Phase 3a engine core + Phase 3b/3 Port 2/3 ports — ARC-017, ARC-001, ARC-008)
+## `rules/` (new package, Phase 3a engine core + Phase 3b/3 Port 2/3/4 ports — ARC-017, ARC-001, ARC-008)
 
 Brand new at its target-architecture path (no legacy predecessor to map the registry/engine core
-from): ADR-0006's engine, plus (Phase 3b/Phase 3 Port 2/Phase 3 Port 3) the first three ported
-validators, `structure.py`, `description.py`, and `composition.py`, and the reusable
-legacy-report adapter, `legacy_adapter.py`. All three deviate from the target architecture's
-aspirational "one `Rule` per module under `rules/<sheet>/<RULE-ID>.py`" (ADR-0006) by declaring
-every rule for their sheet in one flat module — the sheet-level `rules/<sheet>/` subpackage split
-is deferred to whichever later port first needs it.
+from): ADR-0006's engine, plus (Phase 3b/Phase 3 Port 2/3/4) the first five ported validators,
+`structure.py`, `description.py`, `composition.py`, `temporal_reference.py`, and `scenario.py`,
+and the reusable legacy-report adapter, `legacy_adapter.py`. All five deviate from the target
+architecture's aspirational "one `Rule` per module under `rules/<sheet>/<RULE-ID>.py`" (ADR-0006)
+by declaring every rule for their sheet in one flat module — the sheet-level `rules/<sheet>/`
+subpackage split is deferred to whichever later port first needs it.
 
 | Module | Responsibility | Key symbols | Tests | Backlog |
 |---|---|---|---|---|
@@ -153,6 +153,8 @@ is deferred to whichever later port first needs it.
 | `structure.py` | STRUCT-001…006: input-folder structural checks, ported from `FileStructureValidator` | `STRUCTURE_REGISTRY`, `check_input_directory_not_empty`, `check_files_not_zipped_inside_a_folder`, `check_no_unexpected_folders`, `check_no_unexpected_files`, `check_required_files_present`, `check_no_csv_xlsx_conflict` | `rules/test_structure.py` (100 % coverage) | ARC-017, ARC-001, ARC-005, TST-001 |
 | `description.py` | DESC-001…010: `descricao` content checks, ported from `SpDescriptionValidator` | `DESCRIPTION_REGISTRY`, `check_html_in_simple_description`, `check_sequential_codes`, `check_unique_codes`, `check_name_capitalization`, `check_indicator_levels`, `check_punctuation`, `check_empty_strings`, `check_no_cr_lf_characters`, `check_simple_description_length`, `check_title_length` | `rules/test_description.py` (95.24 % coverage) | ARC-017, ARC-001, ARC-005, PERF-001, TST-001 |
 | `composition.py` | COMP-001…009: `composicao` hierarchy checks, ported from `SpCompositionGraphValidator`/`SpCompositionTreeValidator` | `COMPOSITION_REGISTRY`, `CompositionFacts`, `compute_composition_facts`, `check_relation_indicators_in_composition`, `check_composition_graph_acyclic`, `check_composition_no_disconnected_groups`, `check_unique_titles_per_subtree`, `check_leaf_indicators_have_values`, `check_leaf_indicators_have_proportionality`, `check_composition_tree_acyclic`, `check_parent_level_below_child_level`, `check_children_share_parent_level` | `rules/test_composition.py` (96.72 % coverage) | ARC-017, ARC-001, ARC-005, ARC-008, BUG-019, BUG-024, PERF-001, TST-001 |
+| `temporal_reference.py` | TEMP-001…003: `referencia_temporal` content checks, ported from `SpTemporalReferenceValidator` | `TEMPORAL_REGISTRY`, `check_description_ends_with_period`, `check_reference_years_are_future`, `check_name_and_symbol_are_unique` | `rules/test_temporal_reference.py` (98.41 % coverage) | ARC-017, ARC-001, ARC-005, BUG-007, TST-001 |
+| `scenario.py` | SCEN-003…004: `cenarios` content checks, ported from `SpScenarioValidator` | `SCENARIO_REGISTRY`, `check_punctuation`, `check_name_and_symbol_are_unique` | `rules/test_scenario.py` (98.48 % coverage) | ARC-017, ARC-001, ARC-005, TST-001 |
 | `legacy_adapter.py` | Renders `Engine.run(...)`'s outcomes into the legacy `ValidationReport`, reused by every later port | `extend_report_from_outcomes` | `rules/test_legacy_adapter.py` (100 % coverage) | ARC-017 |
 
 Last synced with code: cf5ddaa

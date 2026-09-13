@@ -145,10 +145,37 @@ harness (PERF-009); never optimise without a number.
   `concurrent.futures.ProcessPoolExecutor` (or threads with Arrow/NumPy releasing the GIL); measure.
 
 ### PERF-008 · Start-up overhead
-- Priority: P3 · Effort: S · Status: open
+- Priority: P3 · Effort: S · Status: done
 - Where: `config/metadata_info.py` (importlib metadata at import), `data_validate/__init__.py`
   (`__getattr__` indirection), heavy imports (`networkx`, `pdfkit`, `enchant`) at module import.
 - Proposed fix: lazy import renderers/spell backend; `python -X importtime` budget in CI.
+- Done (this slice — `pdfkit`/`enchant` only): measured with
+  `poetry run python -X importtime -c "import data_validate.main"` (`awk`/`sort` on the trace).
+  Before: `enchant` cumulative 5757 µs (`enchant._enchant` alone 3291 µs self / 3505 µs
+  cumulative — the native libenchant/hunspell backend load), `pdfkit` cumulative 709 µs; total
+  `data_validate.main` import ≈ 422.7 ms. `controllers/report/file_report_generator.py`'s
+  top-level `import pdfkit` moved into `_save_pdf_file` (the only call site), and
+  `helpers/tools/spellchecker/dictionary_manager.py`'s top-level `from enchant import Broker,
+  Dict` became a `TYPE_CHECKING`-only import for the `Dict`/`Broker` type hints plus a local
+  `from enchant import Broker` inside `validate_dictionary`/`initialize_dictionary` (the only two
+  methods that construct a `Broker`). After: three consecutive
+  `python -X importtime -c "import data_validate.main"` runs (373–499 ms total, pandas import
+  jitter dominates the run-to-run variance) show **zero** `pdfkit`/`enchant` entries in the trace
+  — confirmed by `grep -iE "pdfkit|enchant"` returning nothing on all three traces — so a run that
+  never reaches PDF generation or spell-check no longer pays either import. `enchant`/`pdfkit`'s
+  combined ~6.5 ms was already a small fraction (~1.5 %) of the ~423 ms baseline dominated by
+  `pandas` (≈225 ms) and `networkx`/`rules`/`controllers` (≈121–200 ms combined); this item's
+  `networkx` half and `config/metadata_info.py`'s importlib-metadata-at-import are deliberately
+  left open (out of this slice's scope — the former needs `rules`' registries to stop importing
+  it eagerly, the latter is a separate, larger change to `data_validate/__init__.py`'s
+  `__getattr__` indirection). End-to-end PDF generation was re-verified unaffected: `poetry run
+  canoa-data-validate --input_folder data/input/data_ground_truth_01 --output_folder ...` still
+  produces both the HTML and PDF report, and all 7 `tests/e2e/test_golden.py` goldens stay green.
+  Regression tests:
+  `tests/unit/controllers/report/test_file_report_generator.py::TestLazyPdfkitImport::test_module_import_does_not_import_pdfkit`,
+  `tests/unit/helpers/tools/spellchecker/test_dictionary_manager.py::TestLazyEnchantImport::test_module_import_does_not_import_enchant`
+  and `::test_construction_does_not_import_enchant` (each spawns a fresh subprocess importing/
+  constructing and asserts `'pdfkit'`/`'enchant'` are absent from `sys.modules`).
 
 ### PERF-009 · No benchmark or profiling harness
 - Priority: P2 · Effort: M · Status: open
