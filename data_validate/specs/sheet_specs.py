@@ -22,11 +22,12 @@ picking one value over another (each is recorded in the field-level docstring/co
 where it matters, and listed again for convenience):
 
 - ``composicao.codigo_pai``: the model (``SpComposition.data_cleaning``) cleans this column with
-  ``min_value=1``, but both composition graph/tree validators
-  (``validators/spreadsheets/composition/composition_tree_validator.py`` and
-  ``compostion_graph_validator.py``) independently clean the *same* column with ``min_value=0``
-  before building the tree. This registry records the model's value (``1``); the ``0``/``1``
-  mismatch is a pre-existing bug, tracked as a backlog note (see ``03-architecture.md``).
+  ``min_value=1``, but ``data_validate.rules.composition.compute_composition_facts`` (ARC-017
+  Phase 3 Port 3, replacing the two now-deleted legacy composition validators) re-cleans the
+  *same* column with ``min_value=0`` before building the graph/tree, admitting a virtual root.
+  This registry records the model's value (``1``); the ``0``/``1`` mismatch is a pre-existing
+  bug, preserved by the port for byte-identical output and tracked as a backlog note (see
+  ``03-architecture.md``).
 - ``referencia_temporal.nome`` and ``cenarios.nome``: both models used to declare this column
   ``dtype="int64"`` even though the column holds a human-readable name. **Resolved by BUG-013**:
   both models now declare ``dtype="str"``, and this registry mirrors that corrected value.
