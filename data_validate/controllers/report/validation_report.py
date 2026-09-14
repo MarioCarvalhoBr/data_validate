@@ -70,15 +70,6 @@ class ReportItem:
         """
         return bool(self.errors)
 
-    def has_warnings(self) -> bool:
-        """
-        Check if the report contains any warnings.
-
-        Returns:
-            bool: True if validation warnings exist, False otherwise.
-        """
-        return bool(self.warnings)
-
 
 # Backward-compatible alias kept for one release after the BUG-020 rename;
 # `ReportItem.__test__ = False` above already stops pytest from collecting it.
@@ -111,21 +102,6 @@ class ValidationReport:
             for report in reports:
                 self.add_report(report)
 
-    def set_not_executed(self, name_test: str) -> None:
-        """
-        Mark a specific test as not executed.
-
-        If the report does not exist, it creates a new one marked as not executed.
-
-        Args:
-            name_test (str): The name of the test to mark.
-        """
-        if name_test in self.reports:
-            self.reports[name_test].was_executed = False
-        else:
-            self.reports[name_test] = ReportItem(name_test)
-            self.reports[name_test].was_executed = False
-
     def add_report(self, report: ReportItem) -> None:
         """
         Add a full report object to the collection.
@@ -147,15 +123,6 @@ class ValidationReport:
             warnings (Optional[List[str]]): List of warnings. Defaults to None.
         """
         self.reports[name_test] = ReportItem(name_test, errors, warnings)
-
-    def list_all_names(self) -> List[str]:
-        """
-        List all names of the stored reports.
-
-        Returns:
-            List[str]: List of test names.
-        """
-        return list(self.reports.keys())
 
     def extend(self, name_test: str, errors: Optional[List[str]] = None, warnings: Optional[List[str]] = None) -> None:
         """

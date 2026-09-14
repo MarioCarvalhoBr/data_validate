@@ -17,7 +17,7 @@ inside `TestDataValidationIntegration`.
 
 import pytest
 import pandas as pd
-from typing import List, Optional
+from typing import List
 
 from data_validate.helpers.common.validation.dataframe_processing import DataFrameProcessing
 
@@ -538,171 +538,6 @@ class TestColumnExists:
         assert "any_column" in error_message
 
 
-class TestCheckTextLength:
-    """Test suite for check_text_length function."""
-
-    @pytest.fixture
-    def dataframe_with_various_text_lengths(self) -> pd.DataFrame:
-        """Create DataFrame with texts of various lengths."""
-        return pd.DataFrame(
-            {
-                "short_text": ["A", "AB", "ABC"],
-                "medium_text": [
-                    "Medium length text here",
-                    "Another medium text",
-                    "Third medium",
-                ],
-                "long_text": [
-                    "This is a very long text that exceeds normal limits for testing purposes",
-                    "Another extremely long text that goes beyond reasonable character limits",
-                    "Short",
-                ],
-                "mixed_length": [
-                    "Short",
-                    "Medium length text",
-                    "Very long text that exceeds limits",
-                ],
-            }
-        )
-
-    def test_check_text_length_all_within_limit(self, dataframe_with_various_text_lengths: pd.DataFrame) -> None:
-        """Test check_text_length with all texts within limit."""
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(
-            dataframe_with_various_text_lengths, "test.xlsx", "short_text", 10
-        )
-
-        # Assert
-        assert is_valid is True
-        assert errors == []
-
-    def test_check_text_length_some_exceed_limit(self, dataframe_with_various_text_lengths: pd.DataFrame) -> None:
-        """Test check_text_length with some texts exceeding limit."""
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(
-            dataframe_with_various_text_lengths, "test.xlsx", "long_text", 30
-        )
-
-        # Assert
-        assert is_valid is False
-        assert len(errors) == 2  # Two long texts exceed 30 characters
-
-        # Check error message format
-        for error in errors:
-            assert "excede o limite" in error
-            assert "encontrado:" in error
-
-    def test_check_text_length_nonexistent_column(self, dataframe_with_various_text_lengths: pd.DataFrame) -> None:
-        """Test check_text_length with non-existent column."""
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(
-            dataframe_with_various_text_lengths, "test.xlsx", "nonexistent", 50
-        )
-
-        # Assert
-        assert is_valid is False
-        assert len(errors) == 1
-        assert "verificação foi abortada" in errors[0]
-        assert "nonexistent" in errors[0]
-
-    @pytest.mark.parametrize(
-        "text_values,max_length,expected_error_count",
-        [
-            # Test case 1: All texts within limit
-            (["Short", "Text", "OK"], 10, 0),
-            # Test case 2: Some texts exceed limit
-            (["Short", "This is a very long text"], 10, 1),
-            # Test case 3: All texts exceed limit
-            (["Very long text here", "Another long text"], 5, 2),
-            # Test case 4: Empty and None values (should be ignored)
-            (["", None, "Short"], 4, 1),
-            # Test case 5: Exact limit
-            (["12345", "123"], 5, 0),
-            # Test case 6: One character over limit
-            (["123456", "123"], 5, 1),
-        ],
-    )
-    def test_check_text_length_parametrized_scenarios(
-        self,
-        text_values: List[Optional[str]],
-        max_length: int,
-        expected_error_count: int,
-    ) -> None:
-        """Test check_text_length with various text length scenarios."""
-        # Arrange
-        df = pd.DataFrame({"test_column": text_values})
-
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "test.xlsx", "test_column", max_length)
-
-        # Assert
-        assert len(errors) == expected_error_count
-        assert is_valid == (expected_error_count == 0)
-
-    def test_check_text_length_handles_none_values(self) -> None:
-        """Test check_text_length properly handles None values."""
-        # Arrange
-        df = pd.DataFrame({"test_col": [None, "Valid text", None, "Another valid text"]})
-
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "test.xlsx", "test_col", 20)
-
-        # Assert
-        assert is_valid is True
-        assert errors == []
-
-    def test_check_text_length_empty_dataframe(self) -> None:
-        """Test check_text_length with empty DataFrame."""
-        # Arrange
-        df = pd.DataFrame({"test_col": []})
-
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "empty.xlsx", "test_col", 10)
-
-        # Assert
-        assert is_valid is True
-        assert errors == []
-
-    def test_check_text_length_preserves_original_dataframe(
-        self, dataframe_with_various_text_lengths: pd.DataFrame
-    ) -> None:
-        """Test that check_text_length doesn't modify the original DataFrame."""
-        # Arrange
-        original_data = dataframe_with_various_text_lengths.copy()
-
-        # Act
-        DataFrameProcessing.check_dataframe_text_length(
-            dataframe_with_various_text_lengths, "test.xlsx", "short_text", 10
-        )
-
-        # Assert
-        pd.testing.assert_frame_equal(dataframe_with_various_text_lengths, original_data)
-
-    def test_check_text_length_accurate_character_counting(self) -> None:
-        """Test check_text_length accurately counts characters including special ones."""
-        # Arrange
-        df = pd.DataFrame(
-            {
-                "special_text": [
-                    "Texto com acentos: ção, não",  # 27 characters
-                    "Símbolos: @#$%&*(){}[]",  # 22 characters
-                    "Números: 12345",  # 15 characters
-                ]
-            }
-        )
-
-        # Act
-        is_valid, errors = DataFrameProcessing.check_dataframe_text_length(df, "test.xlsx", "special_text", 20)
-
-        # Assert
-        assert is_valid is False
-        assert len(errors) == 2  # First two exceed 20 characters
-
-        # Verify character counts in error messages
-        assert "27" in errors[0]
-        assert "22" in errors[1]
-
-
 class TestDataValidationIntegration:
     """Integration tests for data validation functions working together."""
 
@@ -746,12 +581,6 @@ class TestDataValidationIntegration:
         )
         all_warnings.extend(warnings_unique)
 
-        # 4. Check text length
-        is_valid_length, errors_length = DataFrameProcessing.check_dataframe_text_length(
-            complex_test_dataframe, file_name, "texto_longo", 20
-        )
-        all_errors.extend(errors_length)
-
         # Assert comprehensive results
         assert len(all_errors) > 0  # Should have multiple types of errors
         assert len(all_warnings) > 0  # Should have warnings
@@ -760,7 +589,6 @@ class TestDataValidationIntegration:
         error_text = " ".join(all_errors + all_warnings)
         assert "barra vertical" in error_text or "|" in error_text
         assert "valores repetidos" in error_text
-        assert "excede o limite" in error_text
 
     def test_validation_functions_return_consistent_format(self) -> None:
         """Test that all validation functions return consistent format."""
@@ -773,7 +601,6 @@ class TestDataValidationIntegration:
             (DataFrameProcessing.check_dataframe_unnamed_columns, (df, file_name)),
             (DataFrameProcessing.check_dataframe_unique_values, (df, file_name, [])),
             (DataFrameProcessing.column_exists, (df, file_name, "test")),
-            (DataFrameProcessing.check_dataframe_text_length, (df, file_name, "test", 50)),
         ]
 
         for func, args in functions_to_test:
@@ -781,104 +608,6 @@ class TestDataValidationIntegration:
             assert isinstance(result, tuple)
             assert len(result) == 2
             assert isinstance(result[0], bool)
-
-
-class TestCheckDataframeTitlesUniques:
-    """Test suite for check_dataframe_titles_uniques function."""
-
-    def test_check_dataframe_titles_uniques_no_duplicates(self):
-        """Test with no duplicate titles."""
-        df = pd.DataFrame(
-            {"title_one": ["Title 1", "Title 2", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]}
-        )
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert result == []
-
-    def test_check_dataframe_titles_uniques_with_duplicates_first_column(self):
-        """Test with duplicates in first column."""
-        df = pd.DataFrame(
-            {"title_one": ["Title 1", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]}
-        )
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert len(result) == 1
-        assert "titles one duplicados: ['Title 1']" in result[0]
-
-    def test_check_dataframe_titles_uniques_with_duplicates_second_column(self):
-        """Test with duplicates in second column."""
-        df = pd.DataFrame(
-            {"title_one": ["Title 1", "Title 2", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]}
-        )
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert len(result) == 1
-        assert "titles two duplicados: ['Subtitle 1']" in result[0]
-
-    def test_check_dataframe_titles_uniques_with_duplicates_both_columns(self):
-        """Test with duplicates in both columns."""
-        df = pd.DataFrame(
-            {"title_one": ["Title 1", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 1", "Subtitle 3"]}
-        )
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert len(result) == 2
-        assert any("titles one duplicados: ['Title 1']" in msg for msg in result)
-        assert any("titles two duplicados: ['Subtitle 1']" in msg for msg in result)
-
-    def test_check_dataframe_titles_uniques_empty_dataframe(self):
-        """Test with empty DataFrame."""
-        df = pd.DataFrame(columns=["title_one", "title_two"])
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert result == []
-
-    def test_check_dataframe_titles_uniques_missing_columns(self):
-        """Test with missing columns."""
-        df = pd.DataFrame({"title_one": ["Title 1", "Title 2", "Title 3"]})
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert len(result) == 0  # Should not find duplicates in missing column
-
-    def test_check_dataframe_titles_uniques_multiple_duplicates(self):
-        """Test with multiple duplicate values."""
-        df = pd.DataFrame(
-            {
-                "title_one": ["Title 1", "Title 1", "Title 2", "Title 2", "Title 3"],
-                "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3", "Subtitle 3", "Subtitle 4"],
-            }
-        )
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert len(result) == 2
-        assert any("titles one duplicados: ['Title 1', 'Title 2']" in msg for msg in result)
-        assert any("titles two duplicados: ['Subtitle 3']" in msg for msg in result)
-
-    def test_check_dataframe_titles_uniques_with_whitespace(self):
-        """Test with titles that have leading/trailing whitespace."""
-        df = pd.DataFrame(
-            {"title_one": [" Title 1 ", "Title 1", "Title 3"], "title_two": ["Subtitle 1", "Subtitle 2", "Subtitle 3"]}
-        )
-
-        result = DataFrameProcessing.check_dataframe_titles_uniques(
-            df, "title_one", "title_two", "titles_one", "titles_two"
-        )
-        assert len(result) == 1
-        assert "titles one duplicados: ['Title 1']" in result[0]
 
 
 class TestColumnExistsMultiIndex:

@@ -18,7 +18,7 @@ Components managed by GeneralContext:
 
 import os
 import sys
-from typing import Any, cast
+from typing import cast
 
 from data_validate.config import ApplicationConfig
 from data_validate.helpers.base import DataArgs, FileSystemUtils, LoggerManager
@@ -37,7 +37,6 @@ class GeneralContext:
 
     Attributes:
         data_args (DataArgs): Command-line arguments and runtime data configurations.
-        extra_config (Dict[str, Any]): Additional keyword arguments passed during initialization.
         language_manager (LanguageManager): Manager for handling internationalization and localized strings.
         config (ApplicationConfig): Central configuration object for application settings and constants.
         file_system_utils (FileSystemUtils): Utilities for file system operations.
@@ -54,14 +53,12 @@ class GeneralContext:
     def __init__(
         self,
         data_args: DataArgs,
-        **kwargs: Any,
     ) -> None:
         """
         Initialize the GeneralContext with a toolkit, configuration, file system utilities, and logger.
 
         Args:
             data_args (DataArgs): Data arguments containing input and output folder paths and execution flags.
-            **kwargs: Additional keyword arguments for extended context configuration.
 
         The initialization process involves:
         1.  Storing arguments and model_configurations.
@@ -78,7 +75,6 @@ class GeneralContext:
         """
         # Unpack the arguments
         self.data_args = data_args
-        self.extra_config = kwargs
 
         # `DataArgs.run()` (called from its own `__init__`) always populates `data_file`/
         # `data_action` before this constructor can observe them; the casts below are

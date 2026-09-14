@@ -58,7 +58,6 @@ class SpreadsheetProcessor:
         raw_data_map (Dict[str, Any]): Raw data loaded from files via DataLoaderFacade.
         data_loader_facade (DataLoaderFacade): Facade handles reading/parsing input files.
         model_configurations (Dict[str, Any]): Shared arguments passed to model constructors.
-        data_models_context (DataModelContext): Specialized context holding initialized data models.
         initialized_models (List[SpModelABC]): List of instantiated spreadsheet models.
         target_model_classes (List[Type[SpModelABC]]): List of model classes to process.
         validation_reports (ValidationReport): Aggregator for validation errors and warnings.
@@ -99,13 +98,10 @@ class SpreadsheetProcessor:
         # PROTO-013: the optional `spd_data.json` territory registry, populated by `_read_data()`.
         self.territory_registry: tools.TerritoryRegistry = tools.TerritoryRegistry()
 
-        self.data_models_context: controllers.DataModelContext | None = None
         self.initialized_models: list[models.SpModelABC] = []
-        # ARC-006: name-keyed lookup for the report step, replacing the repeated
-        # `DataModelContext.get_instance_of(...)` linear `isinstance` scans; built once in
-        # `_configure`, keyed by each model's `CONSTANTS.SP_NAME` (e.g. "descricao").
-        # `DataModelContext.get_instance_of` itself is unchanged/still exercised directly by
-        # its own tests.
+        # ARC-006: name-keyed lookup for the report step, replacing the former repeated
+        # linear `isinstance` scans; built once in `_configure`, keyed by each model's
+        # `CONSTANTS.SP_NAME` (e.g. "descricao").
         self._models_by_name: dict[str, models.SpModelABC] = {}
         self.target_model_classes = [
             models.SpDescription,
@@ -213,9 +209,6 @@ class SpreadsheetProcessor:
         for model_class in self.target_model_classes:
             sp_name_key = model_class.CONSTANTS.SP_NAME
 
-            # Dynamically create the attribute name, e.g., "sp_description"
-            attribute_name = f"sp_{sp_name_key.lower()}"
-
             # Model instance creation; ARC-001: construction no longer runs the pipeline as a
             # side effect, so `run()` is called explicitly right after construction. `model_class`
             # is statically `type[SpModelABC]` (the abstract base) even though every element of
@@ -228,7 +221,6 @@ class SpreadsheetProcessor:
                 **model_configurations,
             )
             model_instance.run()
-            setattr(self, attribute_name, model_instance)
             self.initialized_models.append(model_instance)
             self._models_by_name[sp_name_key] = model_instance
 
@@ -368,8 +360,7 @@ class SpreadsheetProcessor:
         """
         Construct and execute the main validation pipeline.
 
-        Initializes the `DataModelContext` with the configured models and runs
-        a sequence of validators:
+        Runs a sequence of validators over the already-configured models:
         1. **Structure**: File structure checks.
         2. **Spelling**: Spell checking on text fields.
         3. **Mandatory**: Core business rules (Description, Composition, Temporal Reference).
@@ -378,11 +369,6 @@ class SpreadsheetProcessor:
            every other sheet, and its own `spatial_data_validated` summary flag (PROTO-018).
         """
         self.context.logger.info("Building validation pipeline...")
-
-        # Create the DataContext with the initialized models
-        self.data_models_context = controllers.DataModelContext(
-            context=self.context, initialized_models=self.initialized_models
-        )
 
         # One shared, immutable RuleContext for every rule registry this pipeline runs.
         rule_context = self._build_rule_context()

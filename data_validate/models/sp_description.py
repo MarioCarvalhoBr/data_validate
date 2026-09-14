@@ -153,20 +153,6 @@ class SpDescription(SpModelABC):
             str(COLUMN_RELATION.name),
         ]
 
-    class PluralColumn:
-        """
-        Definitions of plural column variations.
-
-        Attributes:
-            COLUMN_PLURAL_SIMPLE_NAME (Series): Plural form for simple names.
-            COLUMN_PLURAL_COMPLETE_NAME (Series): Plural form for complete names.
-            ALL (List[str]): List of all plural column names.
-        """
-
-        COLUMN_PLURAL_SIMPLE_NAME = pd.Series(dtype="str", name="nomes_simples")
-        COLUMN_PLURAL_COMPLETE_NAME = pd.Series(dtype="str", name="nomes_completos")
-        ALL: List[str] = [str(COLUMN_PLURAL_SIMPLE_NAME.name), str(COLUMN_PLURAL_COMPLETE_NAME.name)]
-
     def __init__(
         self,
         context: GeneralContext,

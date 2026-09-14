@@ -53,8 +53,8 @@ class TestGraphProcessing:
 
         assert processor.graph is not None
         assert isinstance(processor.graph, nx.DiGraph)
-        assert processor.node_count > 0
-        assert processor.edge_count > 0
+        assert processor.graph.number_of_nodes() > 0
+        assert processor.graph.number_of_edges() > 0
 
     def test_init_with_empty_dataframe(self, empty_dataframe: pd.DataFrame) -> None:
         """Test initialization with empty DataFrame."""
@@ -74,7 +74,9 @@ class TestGraphProcessing:
 
         assert processor.graph is None
 
-    def test_create_graph_structure_basic(self, graph_processor: GraphProcessing, sample_dataframe: pd.DataFrame) -> None:
+    def test_create_graph_structure_basic(
+        self, graph_processor: GraphProcessing, sample_dataframe: pd.DataFrame
+    ) -> None:
         """Test basic graph creation from DataFrame."""
         graph = graph_processor.create_graph_structure(sample_dataframe, "parent", "child")
 
@@ -317,37 +319,6 @@ class TestGraphProcessing:
         with pytest.raises(ValueError, match="No graph available for BFS"):
             empty_graph_processor.breadth_first_search_from_node("1")
 
-    def test_node_count_property(self, graph_processor: GraphProcessing) -> None:
-        """Test node count property."""
-        assert graph_processor.node_count == 6
-
-    def test_node_count_property_no_graph(self, empty_graph_processor: GraphProcessing) -> None:
-        """Test node count property with no graph."""
-        assert empty_graph_processor.node_count == 0
-
-    def test_edge_count_property(self, graph_processor: GraphProcessing) -> None:
-        """Test edge count property."""
-        assert graph_processor.edge_count == 5
-
-    def test_edge_count_property_no_graph(self, empty_graph_processor: GraphProcessing) -> None:
-        """Test edge count property with no graph."""
-        assert empty_graph_processor.edge_count == 0
-
-    def test_is_empty_property_with_graph(self, graph_processor: GraphProcessing) -> None:
-        """Test is_empty property with graph."""
-        assert graph_processor.is_empty is False
-
-    def test_is_empty_property_no_graph(self, empty_graph_processor: GraphProcessing) -> None:
-        """Test is_empty property with no graph."""
-        assert empty_graph_processor.is_empty is True
-
-    def test_is_empty_property_empty_graph(self) -> None:
-        """Test is_empty property with empty graph."""
-        processor = GraphProcessing()
-        processor.graph = nx.DiGraph()  # Empty graph
-
-        assert processor.is_empty is True
-
 
 class TestGraphProcessingDataDrivenTests:
     """Data-driven tests for GraphProcessing class."""
@@ -379,8 +350,8 @@ class TestGraphProcessingDataDrivenTests:
         df = pd.DataFrame({"parent": parent_values, "child": child_values})
         processor = GraphProcessing(df, "parent", "child")
 
-        assert processor.node_count == expected_nodes
-        assert processor.edge_count == expected_edges
+        assert processor.graph.number_of_nodes() == expected_nodes
+        assert processor.graph.number_of_edges() == expected_edges
 
     @pytest.mark.parametrize(
         "edges,has_cycle",
@@ -429,7 +400,9 @@ class TestGraphProcessingDataDrivenTests:
             ([], 0),  # Empty graph
         ],
     )
-    def test_disconnected_components_data_driven(self, edges: List[Tuple[str, str]], disconnected_components_count: int) -> None:
+    def test_disconnected_components_data_driven(
+        self, edges: List[Tuple[str, str]], disconnected_components_count: int
+    ) -> None:
         """Test disconnected components detection with various configurations."""
         processor = GraphProcessing()
         graph = nx.DiGraph()
@@ -452,8 +425,8 @@ class TestGraphProcessingEdgeCases:
         df = pd.DataFrame({"parent": parent_values, "child": child_values})
         processor = GraphProcessing(df, "parent", "child")
 
-        assert processor.node_count == size + 1
-        assert processor.edge_count == size
+        assert processor.graph.number_of_nodes() == size + 1
+        assert processor.graph.number_of_edges() == size
 
     def test_self_loop_handling(self) -> None:
         """Test graph with self-loops."""
@@ -469,7 +442,7 @@ class TestGraphProcessingEdgeCases:
         df = pd.DataFrame({"parent": ["A", "B", "C"], "child": ["B", "C", "D"]})
         processor = GraphProcessing(df, "parent", "child")
 
-        assert processor.node_count == 4
+        assert processor.graph.number_of_nodes() == 4
         assert processor.graph.has_edge("A", "B")
         assert processor.graph.has_edge("B", "C")
         assert processor.graph.has_edge("C", "D")
@@ -479,7 +452,7 @@ class TestGraphProcessingEdgeCases:
         df = pd.DataFrame({"parent": [1, "B", 3.0], "child": ["A", 2, "C"]})
         processor = GraphProcessing(df, "parent", "child")
 
-        assert processor.node_count == 6  # All nodes are converted to strings
+        assert processor.graph.number_of_nodes() == 6  # All nodes are converted to strings
         assert processor.graph.has_edge("1", "A")
         assert processor.graph.has_edge("B", "2")
         assert processor.graph.has_edge("3.0", "C")
@@ -512,7 +485,7 @@ class TestGraphProcessingEdgeCases:
         df = pd.DataFrame({"parent": [long_name_1], "child": [long_name_2]})
         processor = GraphProcessing(df, "parent", "child")
 
-        assert processor.node_count == 2
+        assert processor.graph.number_of_nodes() == 2
         assert processor.graph.has_edge(long_name_1, long_name_2)
 
     def test_unicode_node_values(self) -> None:
@@ -520,7 +493,7 @@ class TestGraphProcessingEdgeCases:
         df = pd.DataFrame({"parent": ["αβγ", "测试", "🌟"], "child": ["δεζ", "试验", "⭐"]})
         processor = GraphProcessing(df, "parent", "child")
 
-        assert processor.node_count == 6
+        assert processor.graph.number_of_nodes() == 6
         assert processor.graph.has_edge("αβγ", "δεζ")
         assert processor.graph.has_edge("测试", "试验")
         assert processor.graph.has_edge("🌟", "⭐")

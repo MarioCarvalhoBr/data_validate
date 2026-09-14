@@ -156,12 +156,11 @@ def _detect_non_utf8_encoding(path: Path) -> str | None:
     containing only a couple of accented characters as `ISO-8859-1` with moderate-to-high
     confidence (a real false-positive risk this project must not surface as a false error). Only
     when the sample genuinely fails to decode as UTF-8 does `chardet` run, to name the encoding
-    the FAQ message reports (the same detection
-    `helpers.base.file_system_utils.FileSystemUtils.detect_encoding` performs, reproduced here
-    directly on `chardet` -- without that class's `LanguageManager` dependency -- so the loading
-    layer stays dependent only on `specs`/`util`, per `.claude/rules/architecture-boundaries.md`).
-    A low-confidence `chardet` guess (`_ENCODING_CONFIDENCE_THRESHOLD`) on that already-invalid
-    sample is still not reported, so an ambiguous case does not name a wrong encoding.
+    the FAQ message reports -- called directly on `chardet`, with no `LanguageManager` dependency,
+    so the loading layer stays dependent only on `specs`/`util`, per
+    `.claude/rules/architecture-boundaries.md`. A low-confidence `chardet` guess
+    (`_ENCODING_CONFIDENCE_THRESHOLD`) on that already-invalid sample is still not reported, so an
+    ambiguous case does not name a wrong encoding.
 
     An `OSError` opening the sample (e.g. the path vanished between the earlier `Path.stat()`
     size check and here) is swallowed and treated as "nothing to report" -- the file's actual

@@ -13,7 +13,6 @@ from datetime import datetime
 from types import MappingProxyType
 
 from data_validate.config.names_enum import NamesEnum
-from data_validate.config.spreadsheet_info import SpreadsheetInfo
 from data_validate.helpers.tools.locale.language_manager import LanguageManager
 
 
@@ -27,8 +26,6 @@ class ApplicationConfig:
 
     Attributes:
         language_manager (LanguageManager): Manager for handling localized text.
-        spreadsheet_info (SpreadsheetInfo): Information about the spreadsheets used in the application.
-        names_enum (NamesEnum): Enumeration of verification names used in the application.
     """
 
     # NUMBERS
@@ -74,13 +71,13 @@ class ApplicationConfig:
         Initializes the ApplicationConfig instance.
 
         Sets up the LanguageManager for handling localized strings throughout the application,
-        and computes `CURRENT_YEAR`/`DATE_NOW` from the given (or default) clock at construction
-        time, instead of once at import time (BUG-011).
+        and computes `DATE_NOW` from the given (or default) clock at construction time, instead
+        of once at import time (BUG-011).
 
         Args:
             clock (Callable[[], datetime] | None): Zero-argument callable returning the current
-                `datetime`, used to compute `CURRENT_YEAR` and `DATE_NOW`. Defaults to
-                `datetime.now` when not provided; injectable for testing/determinism.
+                `datetime`, used to compute `DATE_NOW`. Defaults to `datetime.now` when not
+                provided; injectable for testing/determinism.
             language_manager (LanguageManager | None): Shared `LanguageManager` instance
                 (ARC-002/BUG-004/BUG-023: a single locale source of truth). When not given,
                 builds its own with `locale=None` (backwards compatible default behaviour).
@@ -88,14 +85,10 @@ class ApplicationConfig:
         self._clock = clock or datetime.now
 
         # DATE AND TIME
-        self.CURRENT_YEAR = self._clock().year
-        """int: The current year."""
         self.DATE_NOW = self._clock().strftime("%d/%m/%Y %H:%M:%S")
         """str: The current date and time formatted as 'dd/mm/yyyy HH:MM:SS'."""
 
         self.language_manager: LanguageManager = language_manager or LanguageManager()
-        self.spreadsheet_info = SpreadsheetInfo()
-        self.names_enum = NamesEnum
         self._verify_names_cache: MappingProxyType[str, str] | None = None
 
     def get_verify_names(self) -> MappingProxyType[str, str]:

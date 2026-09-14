@@ -404,46 +404,6 @@ class TestDataArgs:
         assert isinstance(parser, argparse.ArgumentParser)
         assert parser.allow_abbrev is False
 
-    def test_get_dict_args_method(self, temp_input_dir: str, mocker) -> None:
-        """Test get_dict_args method returns correct dictionary."""
-        # Setup mocks
-        mock_parse_args = mocker.patch("argparse.ArgumentParser.parse_args")
-
-        mock_args = mocker.MagicMock()
-        mock_args.input_folder = temp_input_dir
-        mock_args.output_folder = "/test/output"
-        mock_args.locale = "en_US"
-        mock_args.no_spellchecker = True
-        mock_args.no_warning_titles_length = True
-        mock_args.no_time = True
-        mock_args.no_version = True
-        mock_args.debug = True
-        mock_args.sector = "Educação"
-        mock_args.protocol = "v2.0"
-        mock_args.user = "admin"
-        mock_args.file = "data.xlsx"
-        mock_parse_args.return_value = mock_args
-
-        data_args = DataArgs()
-        result_dict = data_args.get_dict_args()
-
-        expected_dict = {
-            "input_folder": temp_input_dir,
-            "output_folder": "/test/output",
-            "locale": "en_US",
-            "no_spellchecker": True,
-            "no_warning_titles_length": True,
-            "no_time": True,
-            "no_version": True,
-            "debug": True,
-            "sector": "Educação",
-            "protocol": "v2.0",
-            "user": "admin",
-            "file": "data.xlsx",
-        }
-
-        assert result_dict == expected_dict
-
     def test_str_method(self, temp_input_dir: str, mocker) -> None:
         """Test __str__ method returns correct string representation."""
         # Setup mocks
@@ -833,12 +793,6 @@ class TestDataArgsIntegration:
         assert data_args.data_report.user == "farmer"
         assert data_args.data_report.file == "crops.xlsx"
 
-        # Test dictionary output
-        result_dict = data_args.get_dict_args()
-        assert len(result_dict) == 12
-        assert result_dict["input_folder"] == temp_input_dir
-        assert result_dict["sector"] == "Agricultura"
-
         # Test string representation
         str_repr = str(data_args)
         assert "DataArgs(" in str_repr
@@ -872,12 +826,6 @@ class TestDataArgsIntegration:
         assert data_args.data_file.locale == "pt_BR"
         assert data_args.data_action.debug is False
         assert data_args.data_report.sector is None
-
-        # Test with minimal data
-        result_dict = data_args.get_dict_args()
-        assert result_dict["locale"] == "pt_BR"
-        assert result_dict["debug"] is False
-        assert result_dict["sector"] is None
 
     def test_multiple_dataargs_instances_independence(self, mocker) -> None:
         """Test that multiple DataArgs instances are independent."""

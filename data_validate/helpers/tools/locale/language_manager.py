@@ -61,39 +61,6 @@ class LanguageManager:
             logger.error("Unexpected error loading language '%s': %s", lang_code, e)
         return False
 
-    def set_language(self, lang_code: str) -> bool | None:
-        """
-        Sets the current language and loads the corresponding translations.
-
-        Args:
-            lang_code (str): Language code to set.
-
-        Returns:
-            bool: True if the language was successfully set, False otherwise.
-        """
-        if lang_code in self.supported_languages:
-            if self._load_translations(lang_code):
-                self.current_language = lang_code
-                return True
-            else:
-                logger.warning(
-                    self.text(
-                        "lang_load_error",
-                        lang=lang_code,
-                        default_lang=self.default_language,
-                    )
-                )
-                if self._load_translations(self.default_language):
-                    self.current_language = self.default_language
-                    return False
-                return None
-        else:
-            logger.warning(self.text("invalid_language", default_lang=self.default_language))
-            if self.current_language != self.default_language:
-                if self._load_translations(self.default_language):
-                    self.current_language = self.default_language
-            return False
-
     def text(self, key: str, **kwargs: object) -> str:
         """
         Retrieves the translated string for the given key in the current language.
@@ -120,23 +87,6 @@ class LanguageManager:
         except Exception as format_exc:
             logger.warning("Generic formatting error for key '%s': %s", key, format_exc)
             return text
-
-    def get_supported_languages(self) -> list[str]:
-        """Returns the list of supported language codes."""
-        return self.supported_languages
-
-    def get_current_language(self) -> str:
-        """Returns the currently selected language code."""
-        return self.current_language
-
-    def get_info(self) -> dict[str, str | list[str]]:
-        """
-        Returns the current language and supported languages.
-        """
-        return {
-            "current_language": self.current_language,
-            "supported_languages": self.supported_languages,
-        }
 
     def __str__(self) -> str:
         """

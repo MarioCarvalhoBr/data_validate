@@ -10,14 +10,18 @@ from data_validate.config.names_enum import NamesEnum
 
 
 class TestApplicationConfigClock:
-    """Regression tests for BUG-011: CURRENT_YEAR/DATE_NOW must be computed per instance."""
+    """Regression tests for BUG-011: DATE_NOW must be computed per instance.
 
-    def test_current_year_and_date_now_use_injected_clock(self) -> None:
+    `CURRENT_YEAR` (a dead attribute, ARC/dead-code cleanup: prod reads `ctx.clock` instead) was
+    removed along with its assertions here.
+    """
+
+    def test_date_now_uses_injected_clock(self) -> None:
         """Two instances built with different fake clocks report different values.
 
-        This pins the fix: before BUG-011, `CURRENT_YEAR`/`DATE_NOW` were class
-        attributes computed once at import time, so no per-instance clock could
-        influence them. Under the fix, each instance's clock is honoured.
+        This pins the fix: before BUG-011, `DATE_NOW` was a class attribute computed once at
+        import time, so no per-instance clock could influence it. Under the fix, each instance's
+        clock is honoured.
         """
         fixed_past = datetime(2001, 1, 2, 3, 4, 5)
         fixed_future = datetime(2099, 12, 31, 23, 59, 59)
@@ -25,22 +29,17 @@ class TestApplicationConfigClock:
         config_past = ApplicationConfig(clock=lambda: fixed_past)
         config_future = ApplicationConfig(clock=lambda: fixed_future)
 
-        assert config_past.CURRENT_YEAR == 2001
         assert config_past.DATE_NOW == "02/01/2001 03:04:05"
-
-        assert config_future.CURRENT_YEAR == 2099
         assert config_future.DATE_NOW == "31/12/2099 23:59:59"
 
         # The two instances must diverge - proof the value is not a shared
         # class-level constant computed once at import time.
-        assert config_past.CURRENT_YEAR != config_future.CURRENT_YEAR
         assert config_past.DATE_NOW != config_future.DATE_NOW
 
     def test_default_construction_matches_real_clock(self) -> None:
         """Default construction (no injected clock) still uses `datetime.now`."""
         config = ApplicationConfig()
 
-        assert config.CURRENT_YEAR == datetime.now().year
         assert isinstance(config.DATE_NOW, str)
         # Format is fixed: dd/mm/yyyy HH:MM:SS.
         datetime.strptime(config.DATE_NOW, "%d/%m/%Y %H:%M:%S")

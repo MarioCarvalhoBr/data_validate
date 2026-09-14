@@ -50,9 +50,9 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Implemented by: `rules/structure.py::check_input_directory_not_empty` (ARC-017 Phase 3b port; the
   deleted `validators/structure/file_structure_validator.py::FileStructureValidator.
   check_empty_directory` is the legacy predecessor)
-- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckInputDirectoryNotEmpty` (helper
-  it used to call, `FileSystemUtils.check_directory_is_empty`, is unused by the port and remains
-  covered by `tests/unit/helpers/base/test_file_system_utils.py`)
+- Covered by tests: `tests/unit/rules/test_structure.py::TestCheckInputDirectoryNotEmpty` (the
+  helper it used to call, `FileSystemUtils.check_directory_is_empty`, had zero production callers
+  once the port landed and was removed as dead code)
 - Notes / known defects: one of the few rules already using the i18n catalog.
 
 ### STRUCT-002 · Files must be in the root, not inside a single subfolder
@@ -147,7 +147,7 @@ Loading facts (`helpers/tools/data_loader/**`):
 - Implemented by: `helpers/tools/data_loader/api/facade.py::DataLoaderFacade.load()` (the
   deprecated `load_all` property wraps the same logic for one release, ARC-009)
 - Covered by tests: `tests/unit/helpers/tools/data_loader/api/test_facade.py`
-- Notes / known defects: raw exception text is leaked to the user; encoding is never proactively detected (`FileSystemUtils.detect_encoding` unused) — gap G-01. SEC-004: the "unexpected" cause is
+- Notes / known defects: raw exception text is leaked to the user — gap G-01 (partially addressed for CSV by `facade.py::_detect_non_utf8_encoding`, PROTO-007/STRUCT-013; the dead `FileSystemUtils.detect_encoding` this note used to point at was removed). SEC-004: the "unexpected" cause is
   now specifically `python_calamine.CalamineError` (the base of `python-calamine`'s
   `ZipError`/`XmlError`/`PasswordError`, raised by pandas' `engine="calamine"` for a
   malformed/corrupt `.xlsx`) rather than a catch-all `except Exception` — a reader failure that

@@ -7,9 +7,11 @@ This registry supersedes three sources that can and do disagree today:
    files, allowed extensions).
 2. ``data_validate.helpers.tools.data_loader.common.config.Config`` (required flag, header
    layout, CSV separator, plus a stray third extension ``.qml`` that (1) does not know about).
-3. Each ``models/sp_*.py``'s nested ``RequiredColumn`` / ``OptionalColumn`` / ``DynamicColumn`` /
-   ``PluralColumn`` classes (column names, dtypes, and the ``min_value``/``allow_empty``
-   constraints enforced ad hoc inside each model's ``data_cleaning``).
+3. Each ``models/sp_*.py``'s nested ``RequiredColumn`` / ``OptionalColumn`` / ``DynamicColumn``
+   classes (column names, dtypes, and the ``min_value``/``allow_empty`` constraints enforced ad
+   hoc inside each model's ``data_cleaning``). ``SpDescription`` also used to carry a
+   ``PluralColumn`` class for this; it was removed once this registry's ``plural_name_pairs``
+   became the sole reader.
 
 ``SHEET_SPECS`` is that single place. It does not yet *replace* the three legacy sources — no
 consumer has been migrated in this slice (Phase 1 of the migration roadmap only introduces the

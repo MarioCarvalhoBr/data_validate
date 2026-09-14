@@ -3,10 +3,9 @@
 
 BUG-002: `SpDescription`/`SpComposition`/`SpTemporalReference.data_cleaning` used to
 `setattr(self.RequiredColumn, ...)`, overwriting a *class-level* `pd.Series` shared by every
-instance and every run in the same process. `SpModelABC.cleaned`/`cleaned_column()` replace
-that with per-instance storage; these tests build two model instances from different frames
-in the same process and assert both that the class placeholder never changes and that each
-instance's own cleaned data reflects only its own input.
+instance and every run in the same process. `SpModelABC.cleaned` replaces that with
+per-instance storage; these tests build two model instances from different frames in the same
+process and assert the class placeholder never changes.
 
 BUG-003: `SpDescription.pre_processing` used to write dropped/injected columns straight into
 `data_loader_model.raw_data`, the same object every other model/validator reads.
@@ -96,38 +95,6 @@ class TestSpDescriptionInstanceIsolation:
         assert SpDescription.RequiredColumn.COLUMN_CODE.empty
         assert first_model is not None and second_model is not None
 
-    def test_each_instance_cleaned_column_reflects_only_its_own_data(self, mocker, tmp_path):
-        """Each instance's `cleaned_column("codigo")` must match only its own input."""
-        context = mocker.MagicMock()
-
-        first_model = SpDescription(
-            context=context,
-            data_model=_build_data_model(tmp_path, _description_raw_data([1, 2]), "first.csv"),
-        )
-        first_model.run()
-        second_model = SpDescription(
-            context=context,
-            data_model=_build_data_model(tmp_path, _description_raw_data([1, 2, 3]), "second.csv"),
-        )
-        second_model.run()
-
-        assert first_model.cleaned_column("codigo").tolist() == [1, 2]
-        assert second_model.cleaned_column("codigo").tolist() == [1, 2, 3]
-
-    def test_cleaned_column_defaults_to_empty_series_when_absent(self, mocker, tmp_path):
-        """An unpopulated column name must return an empty `pd.Series`, not raise."""
-        context = mocker.MagicMock()
-        model = SpDescription(
-            context=context,
-            data_model=_build_data_model(tmp_path, _description_raw_data([1]), "only.csv"),
-        )
-        model.run()
-
-        result = model.cleaned_column("does_not_exist")
-
-        assert isinstance(result, pd.Series)
-        assert result.empty
-
 
 class TestSpDescriptionRawDataImmutability:
     """BUG-003: `SpDescription` construction must never mutate `data_loader_model.raw_data`."""
@@ -191,25 +158,6 @@ class TestSpCompositionInstanceIsolation:
         assert SpComposition.RequiredColumn.COLUMN_PARENT_CODE is pristine_parent_column
         assert SpComposition.RequiredColumn.COLUMN_PARENT_CODE.empty
 
-    def test_each_instance_cleaned_column_reflects_only_its_own_data(self, mocker, tmp_path):
-        context = mocker.MagicMock()
-
-        first_model = SpComposition(
-            context=context,
-            data_model=_build_data_model(tmp_path, pd.DataFrame({"codigo_pai": [1], "codigo_filho": [2]}), "first.csv"),
-        )
-        first_model.run()
-        second_model = SpComposition(
-            context=context,
-            data_model=_build_data_model(
-                tmp_path, pd.DataFrame({"codigo_pai": [1, 1], "codigo_filho": [2, 3]}), "second.csv"
-            ),
-        )
-        second_model.run()
-
-        assert first_model.cleaned_column("codigo_filho").tolist() == [2]
-        assert second_model.cleaned_column("codigo_filho").tolist() == [2, 3]
-
 
 class TestSpTemporalReferenceInstanceIsolation:
     """BUG-002: two `SpTemporalReference` instances in one process must not share cleaned data."""
@@ -239,33 +187,6 @@ class TestSpTemporalReferenceInstanceIsolation:
 
         assert SpTemporalReference.RequiredColumn.COLUMN_SYMBOL is pristine_symbol_column
         assert SpTemporalReference.RequiredColumn.COLUMN_SYMBOL.empty
-
-    def test_each_instance_cleaned_column_reflects_only_its_own_data(self, mocker, tmp_path):
-        context = mocker.MagicMock()
-
-        first_model = SpTemporalReference(
-            context=context,
-            data_model=_build_data_model(
-                tmp_path,
-                pd.DataFrame({"nome": ["a"], "descricao": ["a."], "simbolo": [2020]}),
-                "first.csv",
-            ),
-            scenarios=["O"],
-        )
-        first_model.run()
-        second_model = SpTemporalReference(
-            context=context,
-            data_model=_build_data_model(
-                tmp_path,
-                pd.DataFrame({"nome": ["a", "b"], "descricao": ["a.", "b."], "simbolo": [2020, 2030]}),
-                "second.csv",
-            ),
-            scenarios=["O"],
-        )
-        second_model.run()
-
-        assert first_model.cleaned_column("simbolo").tolist() == [2020]
-        assert second_model.cleaned_column("simbolo").tolist() == [2020, 2030]
 
 
 class TestSpProportionalityFrameInvalidation:

@@ -18,7 +18,7 @@ test module exists today (covered by TST-001). Destination refers to `target-arc
 |---|---|---|---|---|---|
 | `spreadsheet_processor.py` | Orchestrates load → models → rule registries → report | `SpreadsheetProcessor` | `tests/unit/controllers/test_spreadsheet_processor.py` | `app/pipeline.py` | ARC-017 (ARC-001 done: construction only stores dependencies, `run()` called explicitly by `main.py`) |
 | `context/general_context.py` | DI container: args, i18n, config, fs, logger; builds one `LanguageManager` from `data_args.data_file.locale` and injects it into `config`/`file_system_utils`; opens a log file only in debug mode | `GeneralContext` | `tests/unit/controllers/context/test_general_context.py` | `app/context.py` | ARC-006 |
-| `context/data_model_context.py` | Model registry for validators | `DataModelContext.get_instance_of` | none | `rules/context.py` | ARC-006 |
+| ~~`context/data_model_context.py`~~ | **deleted (ARC-006, dead-code cleanup) — `SpreadsheetProcessor._models_by_name`** | `DataModelContext.get_instance_of`'s linear `isinstance` scan had zero production callers once `_models_by_name` (a plain dict keyed by `CONSTANTS.SP_NAME`) replaced it |
 | `report/validation_report.py` | Buckets of error/warning strings, truncation | `ReportItem`, `ValidationReport` | `tests/unit/controllers/report/test_validation_report.py` | `app/result.py`, `reporting/model.py` | none |
 | `report/file_report_generator.py` | HTML/PDF/JSON output | `FileReportGenerator` | `tests/unit/controllers/report/test_file_report_generator.py` | `reporting/{html,pdf,json,console}.py` | SEC-001, SEC-002 |
 

@@ -19,8 +19,9 @@
   (built with `json.dumps(summary, ensure_ascii=False)`, valid JSON even if a value contains a
   quote or non-ASCII character — BUG-010) where `T = len(report_list)` (number of buckets,
   currently 35 regardless of execution).
-- `was_executed` is never set to `False` (the `set_not_executed` placeholder is a no-op), so
-  "skipped tests" in the report only reflect `--no-spellchecker` and `--no-warning-titles-length`.
+- `was_executed` is never set to `False` (the dead `ValidationReport.set_not_executed` placeholder
+  was removed as unused code), so "skipped tests" in the report only reflect
+  `--no-spellchecker` and `--no-warning-titles-length`.
 
 ## Target
 

@@ -13,7 +13,7 @@ flowchart TD
   E --> E1[_prepare_statement: one empty report per NamesEnum]
   E1 --> E2[_read_data: DataLoaderFacade.load]
   E2 --> E3[_configure: instantiate 8 Sp* models, call model.run() explicitly on each]
-  E3 --> E4[_build_pipeline: DataModelContext + rules engine, every validator ported to a RuleRegistry ARC-008/ARC-017]
+  E3 --> E4[_build_pipeline: rules engine, every validator ported to a RuleRegistry ARC-008/ARC-017]
   E4 --> E5[_report: FileReportGenerator.build_report]
   E5 --> F[HTML + PDF in output folder<br/>JSON fragment on stdout]
   A --> G[GeneralContext.finalize<br/>closes/detaches every file-logger handler;<br/>prints the log path only when --debug]
@@ -30,7 +30,7 @@ locale is threaded as an explicit `--locale` value from `DataArgs` into `General
 | 0 | `_prepare_statement` | `ValidationReport.add_by_name` for every `NamesEnum` title (fixed order in the report) | all |
 | 1 | `_read_data` | `DataLoaderFacade(input_folder).load()` → `raw_data_map: dict[str, LoadedSheet]` + load errors; extracts `scenarios` from `cenarios.simbolo`; builds `model_configurations` (`scenario_exists_file`, `scenario_read_success`, `scenarios`, `legend_exists_file`, `legend_read_success`) | FS |
 | 2 | `_configure` | For each class in `target_model_classes` (`SpDescription, SpComposition, SpValue, SpTemporalReference, SpProportionality, SpScenario, SpLegend, SpDictionary`) instantiate the model (constructor only stores dependencies, ARC-001 Phase 3 Port 8), then call `model_instance.run()` explicitly (`initialize()` + `pre_processing()`/`expected_structure_columns()`/`data_cleaning()`), then copy `structural_errors/warnings` → FS and `data_cleaning_errors/warnings` → FC | FS, FC |
-| 3 | `_build_pipeline` | `DataModelContext(context, initialized_models)`; builds one shared `RuleContext` (`_build_rule_context`, which also computes `composition_facts` once via `compute_composition_facts` — BUG-019, and constructs the `SpellChecker` backend once, injected as `ctx.options["spell_backend"]`), then calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)` (ARC-017 Phase 3b), then `_run_rule_registries([SPELL_REGISTRY], ctx)` + `self._spell_backend.clean_files_generated()` (ARC-017 Phase 3 Port 8, replacing the deleted `SpellCheckerValidator` — the last validator ported, `data_validate/validators/` is now deleted entirely, ARC-008), then `_run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` (ARC-017 Phase 3 Port 2/3), then `_run_rule_registries([TEMPORAL_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([PROPORTIONALITY_REGISTRY], ctx)` (ARC-017 Phase 3 Port 7), then `_run_rule_registries([VALUE_REGISTRY], ctx)` (ARC-017 Phase 3 Port 5), then `_run_rule_registries([SCENARIO_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([LEGEND_REGISTRY], ctx)` (ARC-017 Phase 3 Port 6) — every `_run_rule_registries` call builds `Engine(registry).run(ctx)` and renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes`; no constructor-runs-pipeline involved anywhere in this step | per `NamesEnum` |
+| 3 | `_build_pipeline` | Builds one shared `RuleContext` (`_build_rule_context`, which also computes `composition_facts` once via `compute_composition_facts` — BUG-019, and constructs the `SpellChecker` backend once, injected as `ctx.options["spell_backend"]`), then calls `_run_rule_registries([STRUCTURE_REGISTRY], ctx)` (ARC-017 Phase 3b), then `_run_rule_registries([SPELL_REGISTRY], ctx)` + `self._spell_backend.clean_files_generated()` (ARC-017 Phase 3 Port 8, replacing the deleted `SpellCheckerValidator` — the last validator ported, `data_validate/validators/` is now deleted entirely, ARC-008), then `_run_rule_registries([DESCRIPTION_REGISTRY, COMPOSITION_REGISTRY], ctx)` (ARC-017 Phase 3 Port 2/3), then `_run_rule_registries([TEMPORAL_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([PROPORTIONALITY_REGISTRY], ctx)` (ARC-017 Phase 3 Port 7), then `_run_rule_registries([VALUE_REGISTRY], ctx)` (ARC-017 Phase 3 Port 5), then `_run_rule_registries([SCENARIO_REGISTRY], ctx)` (ARC-017 Phase 3 Port 4), then `_run_rule_registries([LEGEND_REGISTRY], ctx)` (ARC-017 Phase 3 Port 6) — every `_run_rule_registries` call builds `Engine(registry).run(ctx)` and renders outcomes via `rules.legacy_adapter.extend_report_from_outcomes`; no constructor-runs-pipeline involved anywhere in this step | per `NamesEnum` |
 | 4 | `_report` | debug dump to logger; `FileReportGenerator(context).build_report(validation_reports)` | — |
 
 `SpreadsheetProcessor.run()` itself is now called explicitly by `main.py::main` (ARC-001 Phase 3
@@ -47,8 +47,7 @@ behaviour, just moved out of `__init__`).
 | `main()` | `data_validate/main.py` | Wires `DataArgs → GeneralContext → SpreadsheetProcessor → finalize`; prints welcome banner at import | ARC-012, SEC-008 |
 | `DataArgs`, `DataFile`, `DataAction`, `DataReport` | `helpers/base/data_args.py` | argparse definition and validation; `allow_abbrev=True` makes `--i/--o/--l` work | ARC-001, ARC-011, BUG-009 |
 | `GeneralContext` | `controllers/context/general_context.py` | Holds `data_args`, `language_manager` (built once from `data_args.data_file.locale`, BUG-004/BUG-023), `config`, `file_system_utils` (both injected with the same `language_manager`), `logger_manager`, `logger`; disables logger unless `--debug`; opens a file handler only in debug mode, under `<output_folder>/logs`; `finalize()` closes and detaches every file-logger handler | ARC-006 |
-| `DataModelContext` | `controllers/context/data_model_context.py` | Holds initialized models; `get_instance_of(cls)` linear `isinstance` scan | ARC-006 |
-| `ApplicationConfig` | `config/application_config.py` | Constants (`TITLE_OVER_N_CHARS=40`, `SIMPLE_DESCRIPTIONS_OVER_N_CHARS=150`, `REPORT_LIMIT_N_MESSAGES=20`, `VALUE_DATA_UNAVAILABLE="DI"`, `LABEL_DATA_UNAVAILABLE="Dado indisponível"`, `PRECISION_DECIMAL_PLACE_TRUNCATE=3`, `DATE_NOW`, `CURRENT_YEAR`), fallback HTML template, `get_verify_names()` | BUG-011, PERF-004 |
+| `ApplicationConfig` | `config/application_config.py` | Constants (`TITLE_OVER_N_CHARS=40`, `SIMPLE_DESCRIPTIONS_OVER_N_CHARS=150`, `REPORT_LIMIT_N_MESSAGES=20`, `VALUE_DATA_UNAVAILABLE="DI"`, `LABEL_DATA_UNAVAILABLE="Dado indisponível"`, `PRECISION_DECIMAL_PLACE_TRUNCATE=3`, `DATE_NOW`), fallback HTML template, `get_verify_names()` | BUG-011, PERF-004 |
 | `NamesEnum` | `config/names_enum.py` | 37 verification keys → i18n keys `verification_name_*` (PROTO-004 added `CATEG_DESC`; Phase 6 round N2 added `SYMB_SCEN`/`UNIQ_VAL`) | — |
 | `SpreadsheetInfo` / `SHEET` | `config/spreadsheet_info.py` | Sheet stems, `.csv/.xlsx`, `EXPECTED_FILES`, `OPTIONAL_FILES` | ARC-003 |
 | `MetadataInfo` / `METADATA` | `config/metadata_info.py` | Version string from installed metadata + hand-maintained `serial` | BUG-017, TOOL-005 |
@@ -78,9 +77,8 @@ error, `|` check, unnamed-column check — this used to run from `SpModelABC.__i
 `pre_processing() → expected_structure_columns() → data_cleaning() [→ post_processing()]` when the
 file exists. Results go to `structural_errors/warnings` and `data_cleaning_errors/warnings`. Column
 *definitions* remain nested classes of `pd.Series` (`RequiredColumn`, `OptionalColumn`,
-`DynamicColumn`, `PluralColumn`) — pure name/dtype placeholders, never reassigned (BUG-002,
-fixed); cleaned *data* lives on the instance (`self.cleaned[column_name]`, read via
-`cleaned_column(name)`).
+`DynamicColumn`) — pure name/dtype placeholders, never reassigned (BUG-002, fixed); cleaned
+*data* lives on the instance, keyed by column name (`self.cleaned[column_name]`).
 
 | Model | Sheet | Specific behaviour | Smells |
 |---|---|---|---|

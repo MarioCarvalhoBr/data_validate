@@ -206,22 +206,3 @@ class GraphProcessing:
 
         bfs_tree = nx.bfs_tree(target_graph, start_node)
         return bfs_tree
-
-    @property
-    def node_count(self) -> int:
-        """Get the number of nodes in the graph."""
-        if self.graph is None:
-            return 0
-        return int(self.graph.number_of_nodes())
-
-    @property
-    def edge_count(self) -> int:
-        """Get the number of edges in the graph."""
-        if self.graph is None:
-            return 0
-        return int(self.graph.number_of_edges())
-
-    @property
-    def is_empty(self) -> bool:
-        """Check if the graph is empty."""
-        return self.graph is None or self.graph.number_of_nodes() == 0

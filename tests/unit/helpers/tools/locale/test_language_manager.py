@@ -2,10 +2,13 @@
 Unit tests for language_manager.py module.
 
 This module tests the LanguageManager class functionality including
-translation loading, language switching, text retrieval, and configuration management.
+translation loading and text retrieval.
 
 BUG-004: `LanguageManager` now takes its locale as an explicit constructor argument and
 never reads or writes `.config/store.locale` (no file I/O at all for locale resolution).
+`set_language`/`get_supported_languages`/`get_current_language`/`get_info` had zero production
+callers (the locale is fixed at construction; production reads `current_language` directly) and
+were removed as dead code; their tests were removed with them.
 """
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
@@ -139,68 +142,6 @@ class TestLanguageManagerTextRetrieval:
         assert "Message for 'hello' missing" in result
 
 
-class TestLanguageManagerLanguageManagement:
-    """Test suite for language management functionality."""
-
-    def test_set_language_success(self, mocker) -> None:
-        """Test successful language setting."""
-        mock_load = mocker.patch(
-            "data_validate.helpers.tools.locale.language_manager.LanguageManager._load_translations"
-        )
-        mock_load.return_value = True
-
-        manager = LanguageManager()
-        manager.supported_languages = ["pt_BR", "en_US"]
-
-        result = manager.set_language("en_US")
-
-        assert result is True
-        assert manager.current_language == "en_US"
-
-    def test_set_language_unsupported(self, mocker) -> None:
-        """Test setting unsupported language."""
-        mocker.patch("data_validate.helpers.tools.locale.language_manager.LanguageManager._load_translations")
-
-        manager = LanguageManager()
-        manager.supported_languages = ["pt_BR", "en_US"]
-        manager.current_language = "pt_BR"
-
-        result = manager.set_language("fr_FR")
-
-        assert result is False
-
-    def test_get_current_language(self, mocker) -> None:
-        """Test getting current language."""
-        mocker.patch("data_validate.helpers.tools.locale.language_manager.LanguageManager._load_translations")
-
-        manager = LanguageManager()
-        manager.current_language = "en_US"
-
-        assert manager.get_current_language() == "en_US"
-
-    def test_get_supported_languages(self, mocker) -> None:
-        """Test getting supported languages."""
-        mocker.patch("data_validate.helpers.tools.locale.language_manager.LanguageManager._load_translations")
-
-        manager = LanguageManager()
-        manager.supported_languages = ["pt_BR", "en_US"]
-
-        assert manager.get_supported_languages() == ["pt_BR", "en_US"]
-
-    def test_get_info(self, mocker) -> None:
-        """Test getting language information."""
-        mocker.patch("data_validate.helpers.tools.locale.language_manager.LanguageManager._load_translations")
-
-        manager = LanguageManager()
-        manager.current_language = "en_US"
-        manager.supported_languages = ["pt_BR", "en_US"]
-
-        info = manager.get_info()
-
-        assert info["current_language"] == "en_US"
-        assert info["supported_languages"] == ["pt_BR", "en_US"]
-
-
 class TestLanguageManagerEdgeCases:
     """Test suite for edge cases and boundary conditions."""
 
@@ -252,8 +193,8 @@ class TestLanguageManagerIntegration:
         manager1.current_language = "en_US"
         manager2.current_language = "pt_BR"
 
-        assert manager1.get_current_language() == "en_US"
-        assert manager2.get_current_language() == "pt_BR"
+        assert manager1.current_language == "en_US"
+        assert manager2.current_language == "pt_BR"
 
     def test_error_recovery(self, mocker) -> None:
         """Test error recovery scenarios."""
@@ -263,9 +204,6 @@ class TestLanguageManagerIntegration:
         manager.supported_languages = ["pt_BR", "en_US"]
         manager.translations = {"hello": {"message": "Olá"}}
         manager.current_language = "pt_BR"
-
-        # Test unsupported language
-        assert manager.set_language("fr_FR") is False
 
         # Test missing translation key
         result = manager.text("nonexistent")

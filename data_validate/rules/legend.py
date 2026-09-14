@@ -30,15 +30,15 @@ Two conditional-execution quirks preserved exactly (`ctx.options`, not the engin
   `SpreadsheetProcessor._build_rule_context` from the same `SpLegend.is_sanity_check_passed`
   property) reproduces the gate: `LEG-012`/`LEG-013`/`LEG-014` return `[]` immediately when it is
   `False`, functionally identical to never having been in the legacy validations list (an empty
-  issue list either way — see `base_validator.py::set_not_executed`, which is a no-op `pass`).
+  issue list either way — see the legacy not-executed placeholder, a no-op `pass`).
 - `validate_range_multiple_legend` always runs (even when the legend file is absent — the
   protocol's default `[0, 1]` range applies), using `df_legend.groupby(...)` only
   `if self.model_sp_legend.is_sanity_check_passed`, else an always-empty group lookup so every
   column falls back to the default range. `LEG-015` reproduces this the same way, via
   `_legend_sanity_ok(ctx)`.
 
-The outer `if self.model_sp_description.frame.empty: set_not_executed(...); return` gate that
-covers *both* legacy checks maps directly onto `requires={_DESCRIPTION_SHEET: ()}` on every
+The outer `if self.model_sp_description.frame.empty: <legacy not-executed placeholder>; return`
+gate that covers *both* legacy checks maps directly onto `requires={_DESCRIPTION_SHEET: ()}` on every
 `RuleSpec` below — an empty/absent `descricao` is exactly what the engine's own prerequisite check
 already treats as `SKIPPED`.
 

@@ -166,54 +166,6 @@ class DataFrameProcessing:
         return not bool(errors), errors
 
     @staticmethod
-    def check_dataframe_titles_uniques(
-        dataframe: pd.DataFrame, column_one: str, column_two: str, plural_column_one: str, plural_column_two: str
-    ) -> list[str]:
-        """
-        Check for duplicate values in specified columns and return warnings.
-
-        Iterates over the given columns (singular/plural variations) and identifies
-        duplicated entries.
-
-        Args:
-            dataframe: The pandas DataFrame to check
-            column_one: First column name to check for duplicates
-            column_two: Second column name to check for duplicates
-            plural_column_one: Plural name of first column for reporting
-            plural_column_two: Plural name of second column for reporting
-
-        Returns:
-            List of warning messages about duplicates
-        """
-        dataframe = dataframe.copy()
-        warnings: list[str] = []
-
-        if dataframe.empty:
-            return warnings
-
-        columns_to_check = [column_one, column_two]
-        columns_to_check = [col for col in columns_to_check if col in dataframe.columns]
-
-        for column in columns_to_check:
-            # Convert to string
-            dataframe[column] = dataframe[column].astype(str).str.strip()
-            duplicated = dataframe[column].duplicated().any()
-
-            if duplicated:
-                # Get unique duplicated values using a different approach
-                value_counts = dataframe[column].value_counts()
-                duplicated_values = value_counts[value_counts > 1].index.tolist()
-                # Rename columns to plural
-                if column == column_one:
-                    column = plural_column_one
-                elif column == column_two:
-                    column = plural_column_two
-
-                warnings.append(f"Existem {column.replace('_', ' ')} duplicados: {duplicated_values}.")
-
-        return warnings
-
-    @staticmethod
     def check_dataframe_unique_values(
         dataframe: pd.DataFrame, file_name: str, columns_uniques: list[str]
     ) -> tuple[bool, list[str]]:
@@ -306,42 +258,3 @@ class DataFrameProcessing:
             non-matching or missing cell also counted as "not equal".
         """
         return ~DataFrameProcessing.numeric_equals_mask(series, value)
-
-    @staticmethod
-    def check_dataframe_text_length(
-        dataframe: pd.DataFrame, file_name: str, column: str, max_length: int
-    ) -> tuple[bool, list[str]]:
-        """Validate text length in a specific column.
-
-        Args:
-            dataframe: The pandas DataFrame to validate
-            file_name: Name of the file being validated for error reporting
-            column: Column name to check text length
-            max_length: Maximum allowed text length
-
-        Returns:
-            Tuple of (is_valid, error_messages) where is_valid is True if no errors found
-        """
-
-        dataframe = dataframe.copy()
-        errors: list[str] = []
-
-        column_exists_result, error_message = DataFrameProcessing.column_exists(dataframe, file_name, column)
-        if not column_exists_result:
-            return False, [error_message]
-
-        # Vectorized text length check
-        text_series = dataframe[column].astype(str)
-        non_null_mask = dataframe[column].notna()
-
-        if non_null_mask.any():
-            text_lengths = text_series[non_null_mask].str.len()
-            exceeds_limit = text_lengths > max_length
-
-            for idx in text_lengths[exceeds_limit].index:
-                actual_length = text_lengths[idx]
-                errors.append(
-                    f'{file_name}, linha {idx + 2}: O texto da coluna "{column}" excede o limite de {max_length} caracteres (encontrado: {actual_length}).'
-                )
-
-        return not bool(errors), errors

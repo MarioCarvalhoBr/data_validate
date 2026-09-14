@@ -27,13 +27,15 @@ longer exists as a package (ARC-008). Every rule below is now `data_validate/rul
   it calls `ctx.translate(issue.message_key, **issue.params)` purely to derive a sort key (never
   to build displayed text), then returns the original `Issue`s in that order — a stable sort, so
   ties keep their row/signal order.
-- The backend (`helpers/tools/spellchecker/**`) keeps its original, string-returning surface
-  (`SpellChecker.check_spelling_text`, `SpellCheckerController.format_quality_warnings`,
-  `DataFrameProcessor.process_dataframe`) for backward compatibility/existing tests, and gains a
-  parallel structured surface the rule actually calls: `SpellChecker.check_spelling_text_structured`
-  (returns `tuple[SpellingFinding, ...]` + an optional error string, never a pre-formatted
-  sentence), `SpellCheckerController.build_quality_findings`, `DataFrameProcessor.
-  find_quality_findings`. `SpellChecker.check_spelling_text_structured`'s `except Exception` is a
+- The backend (`helpers/tools/spellchecker/**`) exposes the structured surface the rule actually
+  calls: `SpellChecker.check_spelling_text_structured` (returns `tuple[SpellingFinding, ...]` + an
+  optional error string, never a pre-formatted sentence), `SpellCheckerController.
+  build_quality_findings`, `DataFrameProcessor.find_quality_findings`. The original,
+  string-returning compatibility wrappers this structured surface was layered alongside
+  (`SpellCheckerController.format_quality_warnings`/`check_text_quality`, `DataFrameProcessor.
+  process_dataframe`/`validate_columns`) had zero production callers once every SPELL rule moved
+  onto the structured path, and were removed as dead code. `SpellChecker.
+  check_spelling_text_structured`'s `except Exception` is a
   **deliberate**, documented broad catch (SPELL-005's own business rule — "any exception … is
   caught and reported as one error", the same justified shape as `rules/engine.py::
   Engine._run_one`'s crash isolation), not an unreviewed bare except (`.claude/rules/security.md`).
@@ -92,7 +94,7 @@ length > 1 are treated as acronyms and skipped.
 - Target message key: `rule.spelling.missing_required_column`
 - Implemented by: `rules/spell.py::_spelling_issues_for_model` (shared by `check_spelling_description`/`_temporal_reference`/`_scenario`), `_missing_column_issue`
 - Covered by tests: `tests/unit/rules/test_spell.py::TestCheckSpellingDescription`/`TestCheckSpellingTemporalReference`/`TestCheckSpellingScenario`
-- Notes / known defects: `DataFrameProcessor.validate_columns`'s second message variant (`{file_name}: A verificação de ortografia foi abortada para as colunas: [..].`) is still discarded (`# warnings.extend(column_warnings)` in `spellchecker.py`) — `rules/spell.py` never calls `validate_columns`, it checks column presence directly against `ctx.sheet(...)`, matching every other port's precedent.
+- Notes / known defects: `rules/spell.py` checks column presence directly against `ctx.sheet(...)`, matching every other port's precedent. `DataFrameProcessor.validate_columns` (the legacy method that used to produce a second, discarded message variant here) had zero production callers and was removed as dead code.
 
 ### SPELL-003 · No two or more consecutive spaces
 - Severity: warning
@@ -101,7 +103,7 @@ length > 1 are treated as acronyms and skipped.
 - Statement: raw text (before sanitisation) must not match `[ \t\f\v]{2,}`.
 - Current message (pt-BR): `{sheet_name}, linha {row_index + 2}: Há dois ou mais espaços seguidos na coluna {column}.`
 - Target message key: `rule.SPELL-003.warning`
-- Implemented by: `helpers/tools/spellchecker/spellchecker_controller.py::SpellCheckerController.build_quality_findings` (structured; `format_quality_warnings` kept as a thin string-returning compatibility wrapper over it) → `TextProcessor.has_multiple_spaces`; rendered as an `Issue` by `rules/spell.py::_finding_to_issue`
+- Implemented by: `helpers/tools/spellchecker/spellchecker_controller.py::SpellCheckerController.build_quality_findings` → `TextProcessor.has_multiple_spaces`; rendered as an `Issue` by `rules/spell.py::_finding_to_issue`
 - Covered by tests: `tests/unit/helpers/tools/spellchecker/test_spellchecker_controller.py`, `test_text_processor.py`, `tests/unit/rules/test_spell.py`
 - Notes / known defects: overlaps DESC-004's `(EXTRA_SPACE)` report for name columns.
 
@@ -112,7 +114,7 @@ length > 1 are treated as acronyms and skipped.
 - Statement: after sanitisation, every token (except acronyms) must pass `dictionary.check`; unknown words are listed per cell. Results are sorted per sheet.
 - Current message (pt-BR): `{sheet_name}, linha {row_index + 2}: Palavras com possíveis erros ortográficos na coluna {column}: ['w1', 'w2'].`
 - Target message key: `rule.SPELL-004.warning`
-- Implemented by: `spellchecker_controller.py::SpellCheckerController.find_spelling_errors`, driven by `dataframe_processor.py::DataFrameProcessor.find_quality_findings` (structured; `process_dataframe` kept as a thin string-returning compatibility wrapper); `SpellChecker.check_spelling_text_structured` wraps the result as `SpellingFinding`s for `rules/spell.py::_finding_to_issue`
+- Implemented by: `spellchecker_controller.py::SpellCheckerController.find_spelling_errors`, driven by `dataframe_processor.py::DataFrameProcessor.find_quality_findings`; `SpellChecker.check_spelling_text_structured` wraps the result as `SpellingFinding`s for `rules/spell.py::_finding_to_issue`
 - Covered by tests: `tests/unit/helpers/tools/spellchecker/*.py` (with mocked enchant), `tests/unit/rules/test_spell.py` (with a `FakeSpellBackend` test double, no `enchant` dependency)
 - Notes / known defects: per-cell enchant calls without cache (PERF-006); the `#palavra#` escape from protocol v1.7 is not honoured (gap G-25); `fontes` is correctly excluded, but `unidade`, `meta`, `referencia_temporal.nome`, `legenda.label` are not checked although the protocol says "todas as informações textuais" (gap G-26). The legacy `sorted(warnings_spellchecker)` step (over already-rendered text) is reproduced by `rules/spell.py::_sort_by_rendered_text`, sorting `Issue`s by their own rendered text rather than building text in rule code.
 

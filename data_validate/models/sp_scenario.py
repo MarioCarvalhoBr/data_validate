@@ -6,7 +6,6 @@ This module defines the `SpScenario` class, which handles the loading,
 validation, and processing of scenario data (e.g., SSPs, climate scenarios).
 """
 
-from types import MappingProxyType
 from typing import Any, List
 
 import pandas as pd
@@ -68,10 +67,6 @@ class SpScenario(SpModelABC):
         COLUMN_SYMBOL = pd.Series(dtype="int64", name="simbolo")
 
         ALL: List[str] = [str(COLUMN_NAME.name), str(COLUMN_DESCRIPTION.name), str(COLUMN_SYMBOL.name)]
-
-    OPTIONAL_COLUMNS: MappingProxyType[str, str] = MappingProxyType({})
-
-    COLUMNS_PLURAL: MappingProxyType[str, str] = MappingProxyType({})
 
     def __init__(
         self,

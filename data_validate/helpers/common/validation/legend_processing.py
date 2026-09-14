@@ -57,24 +57,6 @@ class LegendProcessing:
         self.value_data_unavailable = value_data_unavailable
         self.filename = filename
 
-    @staticmethod
-    def get_min_max_values(df: pd.DataFrame, key_lower: str, key_upper: str) -> tuple[Any, Any]:
-        """
-        Calculate global min and max values from dataframe columns.
-
-        Args:
-            df: DataFrame containing the data
-            key_lower: Column name for lower bounds
-            key_upper: Column name for upper bounds
-
-        Returns:
-            Tuple of (min_value, max_value)
-        """
-        min_value = df[key_lower].min()
-        max_value = df[key_upper].max()
-
-        return min_value, max_value
-
     def validate_legend_labels(
         self,
         dataframe: pd.DataFrame,

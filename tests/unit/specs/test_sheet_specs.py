@@ -3,8 +3,10 @@
 
 Every test in this module asserts that `data_validate.specs.SHEET_SPECS` agrees with one of
 the legacy sources it supersedes (ADR-0003): `SpreadsheetInfo` and each `models/sp_*.py`'s
-`RequiredColumn`/`OptionalColumn`/`DynamicColumn`/`PluralColumn`. A failure here means the registry
-has drifted from a source it should mirror.
+`RequiredColumn`/`OptionalColumn`/`DynamicColumn`. A failure here means the registry has
+drifted from a source it should mirror. `descricao`'s plural-name pairs (formerly
+`SpDescription.PluralColumn`, removed as dead code) are pinned as literal expected values
+instead, since `SHEET_SPECS.plural_name_pairs` is now their sole source of truth.
 
 BUG-018/ARC-003 (Phase 2 loader migration): the third legacy source this module used to compare
 against, `data_loader.common.config.Config`, is deleted -- `SHEET_SPECS` is now the sole input the
@@ -148,11 +150,19 @@ class TestSheetSpecsMatchModelColumns:
         assert deprecated_names == list(SpDescription.DeprecatedColumn.ALL)
         assert deprecated_names == ["fontes", "relacao"]
 
-    def test_plural_name_pairs_match_description_model(self):
-        spec = SHEET_SPECS["descricao"]
-        plural_names = [pair[1] for pair in spec.plural_name_pairs]
+    def test_plural_name_pairs_are_the_expected_singular_plural_column_pairs(self):
+        """The `(singular, plural)` pairs for `descricao`'s two plural-form columns.
 
-        assert plural_names == list(SpDescription.PluralColumn.ALL)
+        Pinned as literal expected values (ARC-006): `SpDescription.PluralColumn` (the
+        legacy source of truth this test used to compare against) was removed as dead
+        code once `SHEET_SPECS.plural_name_pairs` became the sole reader.
+        """
+        spec = SHEET_SPECS["descricao"]
+
+        assert spec.plural_name_pairs == (
+            ("nome_simples", "nomes_simples"),
+            ("nome_completo", "nomes_completos"),
+        )
 
     @pytest.mark.parametrize(
         "sheet_name",

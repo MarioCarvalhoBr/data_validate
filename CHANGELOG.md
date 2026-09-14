@@ -123,6 +123,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   validator, and its fallback template constant (`ApplicationConfig
   .REPORT_TEMPLATE_DEFAULT_BASIC_NO_CSS`) — all superseded by `ReportModel` + autoescaped Jinja
   templates (SEC-001/ARC-016).
+- Dead code with zero production call sites, verified by a read-only survey: the
+  `DataModelContext` class and its dead `data_models_context`
+  attribute/`setattr(self, "sp_<name>", ...)` write on `SpreadsheetProcessor` (superseded by
+  `_models_by_name`, ARC-006); `SpModelABC.cleaned_column`/`.all_ok`; `SpScenario
+  .OPTIONAL_COLUMNS`/`.COLUMNS_PLURAL`; `SpDescription.PluralColumn` (superseded by
+  `SHEET_SPECS.plural_name_pairs`); `ValidationReport.set_not_executed`/`.has_warnings`/
+  `.list_all_names`; the legacy string-formatting spellcheck path
+  (`DataFrameProcessor.validate_columns`/`.process_dataframe`,
+  `SpellCheckerController.format_quality_warnings`/`.check_text_quality` — also fixing a
+  hardcoded pt-BR string, an i18n violation); `FileSystemUtils.detect_encoding`/`.remove_file`/
+  `.check_file_exists`/`.check_directory_exists`/`.check_directory_is_empty`; `LanguageManager
+  .set_language`/`.get_supported_languages`/`.get_current_language`/`.get_info`;
+  `GraphProcessing.node_count`/`.edge_count`/`.is_empty`; `LegendProcessing.get_min_max_values`;
+  `DataFrameProcessing.check_dataframe_titles_uniques`/`.check_dataframe_text_length`;
+  `DataArgs.get_dict_args`; `GeneralContext.extra_config` (and its now-unused `**kwargs`
+  constructor parameter); `ApplicationConfig.names_enum`/`.spreadsheet_info`/`.CURRENT_YEAR`;
+  the `data_validate.i18n` package-level re-exports (consumers import
+  `data_validate.i18n.catalog` directly); and the untracked, stale
+  `data_validate/validators/__pycache__` leftover directory.
 
 ## [0.7.65] - 2026-02-20
 

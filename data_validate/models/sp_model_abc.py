@@ -123,9 +123,6 @@ class SpModelABC(ABC):
         self.EXPECTED_COLUMNS: List[str] = []
         self.DF_COLUMNS: List[str] = []
 
-        # Additional variables
-        self.all_ok: bool = True
-
     def initialize(self) -> None:
         """
         Initialize the verification process by performing basic sanity checks.
@@ -159,27 +156,6 @@ class SpModelABC(ABC):
             self.data_loader_model.raw_data, self.filename, translate=translate
         )
         self.structural_errors.extend(errors_unnamed_columns)
-
-    def cleaned_column(self, name: str) -> pd.Series:
-        """
-        Return this instance's own cleaned data for one column.
-
-        Replaces reading a model's `RequiredColumn`/`DynamicColumn` class attribute as if
-        it held the current run's cleaned data (BUG-002): that attribute is a shared,
-        class-level placeholder, so a previous instance's `setattr` would leak into every
-        later instance/run in the same process. `data_cleaning` implementations populate
-        `self.cleaned[name]` with the cleaned `pd.Series` for that column; callers ask for
-        it through this accessor instead of the class attribute.
-
-        Args:
-            name (str): The column name (e.g. ``"codigo"``), not the class attribute name.
-
-        Returns:
-            pd.Series: The cleaned column data, or an empty `object`-dtype `pd.Series` when
-            `data_cleaning` has not populated that column (e.g. the column was missing or
-            the model never ran).
-        """
-        return self.cleaned.get(name, pd.Series(dtype="object"))
 
     @property
     def is_sanity_check_passed(self) -> bool:

@@ -3,9 +3,9 @@
 
 This package is the core described by ADR-0006: a declarative `RuleSpec` registered in a
 `RuleRegistry`, executed in topological order by `Engine`, with unmet prerequisites surfaced as a
-distinct, reasoned `SKIPPED` outcome instead of silently not running (closing the `set_not_executed`
-placeholder gap tracked as ARC-008) and a crashing rule isolated into a `FAILED` outcome instead of
-being mistaken for a clean run (SEC-004 at the engine level).
+distinct, reasoned `SKIPPED` outcome instead of silently not running (closing the legacy
+not-executed placeholder gap tracked as ARC-008) and a crashing rule isolated into a `FAILED`
+outcome instead of being mistaken for a clean run (SEC-004 at the engine level).
 
 Phase 3a built the registry/engine core with nothing wired into the legacy pipeline. Phase 3b
 (ARC-017) ports the first validator, `FileStructureValidator`, onto it: `structure.py` declares

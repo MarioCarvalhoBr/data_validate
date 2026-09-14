@@ -487,36 +487,6 @@ class DataArgs:
 
         return parser
 
-    def get_dict_args(self) -> dict[str, Any]:
-        """
-        Return the parsed arguments as a dictionary.
-
-        Aggregates attributes from all sub-models (file, action, report) into a single
-        dictionary for easier serialization or logging.
-
-        Returns:
-            dict: Dictionary of all parsed arguments.
-        """
-        # `run()` (called from `__init__`) always populates these before this method can be
-        # reached in normal usage; the casts are typing-only narrowing, not a new guard.
-        data_file = cast(DataFile, self.data_file)
-        data_action = cast(DataAction, self.data_action)
-        data_report = cast(DataReport, self.data_report)
-        return {
-            "input_folder": data_file.input_folder,
-            "output_folder": data_file.output_folder,
-            "locale": data_file.locale,
-            "no_spellchecker": data_action.no_spellchecker,
-            "no_warning_titles_length": data_action.no_warning_titles_length,
-            "no_time": data_action.no_time,
-            "no_version": data_action.no_version,
-            "debug": data_action.debug,
-            "sector": data_report.sector,
-            "protocol": data_report.protocol,
-            "user": data_report.user,
-            "file": data_report.file,
-        }
-
     def __str__(self) -> str:
         """
         Return a string representation of the parsed arguments.

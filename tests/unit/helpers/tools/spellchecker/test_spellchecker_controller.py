@@ -2,7 +2,11 @@
 Unit tests for spellchecker_controller.py module.
 
 This module tests the SpellCheckerController class functionality including
-spelling error detection, text quality checking, and dictionary integration.
+spelling error detection, text quality evaluation, and dictionary integration.
+
+`format_quality_warnings`/`check_text_quality` (the legacy string-formatting path superseded by
+`build_quality_findings`/`rules/spell.py`) were removed as dead code; their tests were rewritten
+against `build_quality_findings`, the surviving structured counterpart.
 """
 
 #  Copyright (c) 2026 National Institute for Space Research (INPE) (https://www.gov.br/inpe/pt-br). Documentation, source code, and more details about the AdaptaBrasil project are available at: https://github.com/AdaptaBrasil/.
@@ -12,6 +16,12 @@ import pytest
 from data_validate.helpers.tools.spellchecker.spellchecker_controller import SpellCheckerController
 from data_validate.helpers.tools.spellchecker.dictionary_manager import DictionaryManager
 from data_validate.helpers.tools.spellchecker.text_processor import TextProcessor
+
+
+def _findings_for(controller: SpellCheckerController, text: str, column: str, row_index: int):
+    """Evaluate `text` and build its structured findings, mirroring the deleted `check_text_quality`."""
+    has_multiple_spaces, spelling_errors = controller.evaluate_text_quality(text)
+    return controller.build_quality_findings(has_multiple_spaces, spelling_errors, column, row_index)
 
 
 class TestSpellCheckerController:
@@ -100,30 +110,26 @@ class TestSpellCheckerController:
         assert errors == []
         mock_dictionary.check.assert_not_called()
 
-    def test_check_text_quality_no_issues(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with no issues."""
+    def test_quality_findings_no_issues(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings when there are no quality issues."""
         spellchecker_controller.dictionary = mock_dictionary
         mock_dictionary.check.return_value = True
 
-        warnings = spellchecker_controller.check_text_quality("Hello World", "column1", 0, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello World", "column1", 0)
 
-        assert warnings == []
+        assert findings == []
 
-    def test_check_text_quality_multiple_spaces(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with multiple spaces."""
+    def test_quality_findings_multiple_spaces(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings with multiple spaces."""
         spellchecker_controller.dictionary = mock_dictionary
         mock_dictionary.check.return_value = True
 
-        warnings = spellchecker_controller.check_text_quality("Hello  World", "column1", 0, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello  World", "column1", 0)
 
-        assert len(warnings) == 1
-        assert "dois ou mais espaços seguidos" in warnings[0]
-        assert "Sheet1" in warnings[0]
-        assert "linha 2" in warnings[0]  # row_index + 2
-        assert "column1" in warnings[0]
+        assert findings == [(0, "column1", "multiple_spaces", None)]
 
-    def test_check_text_quality_spelling_errors(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with spelling errors."""
+    def test_quality_findings_spelling_errors(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings with spelling errors."""
         spellchecker_controller.dictionary = mock_dictionary
 
         # Mock dictionary to return False for "Wrld"
@@ -132,17 +138,12 @@ class TestSpellCheckerController:
 
         mock_dictionary.check.side_effect = mock_check
 
-        warnings = spellchecker_controller.check_text_quality("Hello Wrld", "column1", 1, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello Wrld", "column1", 1)
 
-        assert len(warnings) == 1
-        assert "erros ortográficos" in warnings[0]
-        assert "Wrld" in warnings[0]
-        assert "Sheet1" in warnings[0]
-        assert "linha 3" in warnings[0]  # row_index + 2
-        assert "column1" in warnings[0]
+        assert findings == [(1, "column1", "misspelled_words", ["Wrld"])]
 
-    def test_check_text_quality_both_issues(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with both multiple spaces and spelling errors."""
+    def test_quality_findings_both_issues(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings with both multiple spaces and spelling errors."""
         spellchecker_controller.dictionary = mock_dictionary
 
         # Mock dictionary to return False for "Wrld"
@@ -151,45 +152,40 @@ class TestSpellCheckerController:
 
         mock_dictionary.check.side_effect = mock_check
 
-        warnings = spellchecker_controller.check_text_quality("Hello  Wrld", "column1", 2, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello  Wrld", "column1", 2)
 
-        assert len(warnings) == 2
-        # Check that both warnings are present
-        space_warning = next((w for w in warnings if "espaços seguidos" in w), None)
-        spelling_warning = next((w for w in warnings if "erros ortográficos" in w), None)
+        assert findings == [
+            (2, "column1", "multiple_spaces", None),
+            (2, "column1", "misspelled_words", ["Wrld"]),
+        ]
 
-        assert space_warning is not None
-        assert spelling_warning is not None
-
-    def test_check_text_quality_with_acronyms(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with acronyms (should not flag as spelling errors)."""
+    def test_quality_findings_with_acronyms(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings with acronyms (should not flag as spelling errors)."""
         spellchecker_controller.dictionary = mock_dictionary
         mock_dictionary.check.return_value = False  # All words are "wrong"
 
-        warnings = spellchecker_controller.check_text_quality("NASA Hello", "column1", 0, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "NASA Hello", "column1", 0)
 
         # Should only flag "Hello" as spelling error, not "NASA" (acronym)
-        assert len(warnings) == 1
-        assert "Hello" in warnings[0]
-        assert "NASA" not in warnings[0]
+        assert findings == [(0, "column1", "misspelled_words", ["Hello"])]
 
-    def test_check_text_quality_empty_text(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with empty text."""
+    def test_quality_findings_empty_text(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings with empty text."""
         spellchecker_controller.dictionary = mock_dictionary
 
-        warnings = spellchecker_controller.check_text_quality("", "column1", 0, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "", "column1", 0)
 
-        assert warnings == []
+        assert findings == []
 
-    def test_check_text_quality_special_characters(self, spellchecker_controller, mock_dictionary) -> None:
-        """Test text quality check with special characters."""
+    def test_quality_findings_special_characters(self, spellchecker_controller, mock_dictionary) -> None:
+        """Test structured findings with special characters."""
         spellchecker_controller.dictionary = mock_dictionary
         mock_dictionary.check.return_value = True
 
-        warnings = spellchecker_controller.check_text_quality("Hello! World?", "column1", 0, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello! World?", "column1", 0)
 
         # Should process text normally, special characters handled by text processor
-        assert warnings == []
+        assert findings == []
 
 
 class TestSpellCheckerControllerEdgeCases:
@@ -248,31 +244,25 @@ class TestSpellCheckerControllerEdgeCases:
         assert "Hello" in errors
         assert "World" in errors
 
-    def test_check_text_quality_negative_row_index(self, spellchecker_controller, mocker) -> None:
-        """Test text quality check with negative row index."""
+    def test_quality_findings_negative_row_index(self, spellchecker_controller, mocker) -> None:
+        """Test structured findings with a negative row index (passed through as-is)."""
         mock_dictionary = mocker.MagicMock()
         mock_dictionary.check.return_value = True
         spellchecker_controller.dictionary = mock_dictionary
 
-        warnings = spellchecker_controller.check_text_quality("Hello  World", "column1", -1, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello  World", "column1", -1)
 
-        # Should handle negative row index gracefully
-        if warnings:  # If there are warnings
-            for warning in warnings:
-                assert "linha 1" in warning  # -1 + 2 = 1
+        assert findings == [(-1, "column1", "multiple_spaces", None)]
 
-    def test_check_text_quality_large_row_index(self, spellchecker_controller, mocker) -> None:
-        """Test text quality check with large row index."""
+    def test_quality_findings_large_row_index(self, spellchecker_controller, mocker) -> None:
+        """Test structured findings with a large row index (passed through as-is)."""
         mock_dictionary = mocker.MagicMock()
         mock_dictionary.check.return_value = True
         spellchecker_controller.dictionary = mock_dictionary
 
-        warnings = spellchecker_controller.check_text_quality("Hello  World", "column1", 1000000, "Sheet1")
+        findings = _findings_for(spellchecker_controller, "Hello  World", "column1", 1000000)
 
-        # Should handle large row index
-        if warnings:  # If there are warnings
-            for warning in warnings:
-                assert "linha 1000002" in warning  # 1000000 + 2
+        assert findings == [(1000000, "column1", "multiple_spaces", None)]
 
     def test_dictionary_not_initialized(self, spellchecker_controller) -> None:
         """Test behavior when dictionary is not initialized."""
@@ -316,7 +306,7 @@ class TestSpellCheckerControllerIntegration:
         mock_spaces = mocker.patch.object(TextProcessor, "has_multiple_spaces", return_value=False)
 
         spellchecker_controller.find_spelling_errors("Original Text")
-        spellchecker_controller.check_text_quality("Original Text", "col", 0, "sheet")
+        spellchecker_controller.evaluate_text_quality("Original Text")
 
         # Verify methods were called
         mock_sanitize.assert_called_with("Original Text")
@@ -324,7 +314,7 @@ class TestSpellCheckerControllerIntegration:
         assert mock_spaces.called
 
     def test_complete_workflow(self, spellchecker_controller, mocker) -> None:
-        """Test complete workflow from text input to warnings output."""
+        """Test complete workflow from text input to structured findings output."""
         mock_dictionary = mocker.MagicMock()
 
         # Mock dictionary to return False for "Wrld"
@@ -336,16 +326,13 @@ class TestSpellCheckerControllerIntegration:
 
         # Test complete workflow
         text = "Hello  Wrld"  # Multiple spaces + spelling error
-        warnings = spellchecker_controller.check_text_quality(text, "column1", 0, "Sheet1")
+        findings = _findings_for(spellchecker_controller, text, "column1", 0)
 
         # Should detect both issues
-        assert len(warnings) == 2
-        space_warning = next((w for w in warnings if "espaços seguidos" in w), None)
-        spelling_warning = next((w for w in warnings if "erros ortográficos" in w), None)
-
-        assert space_warning is not None
-        assert spelling_warning is not None
-        assert "Wrld" in spelling_warning
+        assert findings == [
+            (0, "column1", "multiple_spaces", None),
+            (0, "column1", "misspelled_words", ["Wrld"]),
+        ]
 
     def test_multiple_text_processing(self, spellchecker_controller, mocker) -> None:
         """Test processing multiple texts in sequence."""
@@ -354,14 +341,13 @@ class TestSpellCheckerControllerIntegration:
         spellchecker_controller.dictionary = mock_dictionary
 
         texts = ["Hello World", "Test Text", "Another Test"]
-        all_warnings = []
+        all_findings = []
 
         for i, text in enumerate(texts):
-            warnings = spellchecker_controller.check_text_quality(text, f"column{i}", i, "Sheet1")
-            all_warnings.extend(warnings)
+            all_findings.extend(_findings_for(spellchecker_controller, text, f"column{i}", i))
 
         # All texts should be processed without issues
-        assert all_warnings == []
+        assert all_findings == []
         # PERF-006: "Test" repeats between "Test Text" and "Another Test",
         # so the word-level cache means it is only checked once — 5 unique
         # words (Hello, World, Test, Text, Another), not 6 occurrences.
@@ -430,7 +416,7 @@ class TestSpellCheckerControllerCaching:
 
 
 class TestSpellCheckerControllerQualityEvaluation:
-    """Tests for the `evaluate_text_quality`/`format_quality_warnings` split (PERF-006)."""
+    """Tests for the `evaluate_text_quality`/`build_quality_findings` split (PERF-006, ARC-017 Phase 3 Port 8)."""
 
     @pytest.fixture
     def mock_dictionary_manager(self, mocker):
@@ -453,31 +439,17 @@ class TestSpellCheckerControllerQualityEvaluation:
         assert has_multiple_spaces is True
         assert spelling_errors == ["Wrld"]
 
-    def test_format_quality_warnings_builds_row_specific_messages(self, spellchecker_controller) -> None:
-        """`format_quality_warnings` renders precomputed signals for a specific row."""
-        warnings = spellchecker_controller.format_quality_warnings(True, ["Wrld"], "column1", 2, "Sheet1")
+    def test_build_quality_findings_builds_row_specific_findings(self, spellchecker_controller) -> None:
+        """`build_quality_findings` renders precomputed signals for a specific row."""
+        findings = spellchecker_controller.build_quality_findings(True, ["Wrld"], "column1", 2)
 
-        assert len(warnings) == 2
-        assert "linha 4" in warnings[0]  # row_index + 2
-        assert "Wrld" in warnings[1]
+        assert findings == [
+            (2, "column1", "multiple_spaces", None),
+            (2, "column1", "misspelled_words", ["Wrld"]),
+        ]
 
-    def test_format_quality_warnings_no_issues_returns_empty_list(self, spellchecker_controller) -> None:
-        """`format_quality_warnings` returns no messages when both signals are clean."""
-        warnings = spellchecker_controller.format_quality_warnings(False, [], "column1", 0, "Sheet1")
+    def test_build_quality_findings_no_issues_returns_empty_list(self, spellchecker_controller) -> None:
+        """`build_quality_findings` returns no findings when both signals are clean."""
+        findings = spellchecker_controller.build_quality_findings(False, [], "column1", 0)
 
-        assert warnings == []
-
-    def test_check_text_quality_matches_evaluate_and_format_composition(self, spellchecker_controller, mocker) -> None:
-        """`check_text_quality` is equivalent to evaluate_text_quality + format_quality_warnings."""
-        mock_dictionary = mocker.MagicMock()
-        mock_dictionary.check.side_effect = lambda word: word != "Wrld"
-        spellchecker_controller.dictionary = mock_dictionary
-
-        composed = spellchecker_controller.check_text_quality("Hello  Wrld", "column1", 1, "Sheet1")
-
-        has_multiple_spaces, spelling_errors = spellchecker_controller.evaluate_text_quality("Hello  Wrld")
-        expected = spellchecker_controller.format_quality_warnings(
-            has_multiple_spaces, spelling_errors, "column1", 1, "Sheet1"
-        )
-
-        assert composed == expected
+        assert findings == []

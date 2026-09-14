@@ -22,12 +22,12 @@ VAL-004/VAL-005 or `rules/legend.py`'s LEG-012/013/014 do for a *shared category
 `check_sum_properties_in_influencing_factors` is registered once, under `rule_id="PROP-007"`, and
 tags each individual finding with its own specific `PROP-0XX` id for spec traceability.
 
-The outer `if self._dataframe.empty: set_not_executed(...)` gate every legacy check shared (the
-proportionality sheet is empty or its header layout was structurally invalid,
+The outer `if self._dataframe.empty: <legacy not-executed placeholder>` gate every legacy check
+shared (the proportionality sheet is empty or its header layout was structurally invalid,
 `models/sp_proportionality.py::SpProportionality.post_processing`) maps onto
 `requires={_PROPORTIONALITY_SHEET: ()}` on every `RuleSpec` below, plus each rule's own additional
-sheet requirement (`descricao`/`valores`/`composicao`) — an engine `SKIPPED` outcome is exactly what
-the legacy `set_not_executed` no-op already meant (see `base_validator.py::set_not_executed`).
+sheet requirement (`descricao`/`valores`/`composicao`) — an engine `SKIPPED` outcome is exactly
+what that legacy no-op already meant.
 
 PROP-006 (`check_parent_child_relationships`) reproduces `validate_parent_child_relationships`'s
 final `errors = sorted(set(errors))` step without ever rendering the Portuguese sentences it used

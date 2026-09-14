@@ -82,33 +82,6 @@ class TestLegendProcessing:
 
         assert processor.filename == filename
 
-    def test_get_min_max_values_basic(self) -> None:
-        """Test get_min_max_values with valid data."""
-        df = pd.DataFrame({"min_col": [1.0, 2.0, 3.0], "max_col": [10.0, 20.0, 30.0]})
-
-        min_val, max_val = LegendProcessing.get_min_max_values(df, "min_col", "max_col")
-
-        assert min_val == 1.0
-        assert max_val == 30.0
-
-    def test_get_min_max_values_with_nan(self) -> None:
-        """Test get_min_max_values with NaN values."""
-        df = pd.DataFrame({"min_col": [1.0, float("nan"), 3.0], "max_col": [10.0, 20.0, float("nan")]})
-
-        min_val, max_val = LegendProcessing.get_min_max_values(df, "min_col", "max_col")
-
-        assert min_val == 1.0
-        assert max_val == 20.0
-
-    def test_get_min_max_values_empty_dataframe(self) -> None:
-        """Test get_min_max_values with empty DataFrame."""
-        df = pd.DataFrame({"min_col": [], "max_col": []})
-
-        min_val, max_val = LegendProcessing.get_min_max_values(df, "min_col", "max_col")
-
-        assert pd.isna(min_val)
-        assert pd.isna(max_val)
-
 
 class TestValidateLegendLabels:
     """Test suite for validate_legend_labels method."""

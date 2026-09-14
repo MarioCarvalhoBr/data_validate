@@ -20,7 +20,7 @@ BUG-007 (preserved, not reopened): `check_reference_years_are_future` reads the 
 skips any value that does not parse as a non-negative integer — it is already reported as a
 data-cleaning error by `SpTemporalReference.data_cleaning`. "Future" is still `>= current year`
 (a symbol equal to the current year passes), and the current year comes from `ctx.clock().year`
-rather than `ApplicationConfig.CURRENT_YEAR` directly, so the rule stays pure and testable
+rather than a shared `ApplicationConfig` instance attribute, so the rule stays pure and testable
 (`.claude/rules/coding-standards.md` "no global state").
 
 PERF-001: `check_reference_years_are_future` replaces the legacy per-unique-value
