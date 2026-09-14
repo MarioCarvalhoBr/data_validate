@@ -624,6 +624,6 @@
     "message": "{filename}, row {row}: identifier '{value}' in column 'id' was not found in the territory registry (spd_data.json)."
   },
   "verification_name_territory_registry": {
-    "message": "Territory registry (spd_data.json)"
+    "message": "Territory registry"
   }
 }

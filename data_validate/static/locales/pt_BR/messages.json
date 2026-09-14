@@ -624,6 +624,6 @@
     "message": "{filename}, linha {row}: O identificador '{value}' da coluna 'id' não foi encontrado no cadastro de territórios (spd_data.json)."
   },
   "verification_name_territory_registry": {
-    "message": "Cadastro de territórios (spd_data.json)"
+    "message": "Cadastro de territórios"
   }
 }

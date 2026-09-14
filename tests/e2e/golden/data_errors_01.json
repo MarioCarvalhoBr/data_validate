@@ -49,7 +49,7 @@
     "Categoria do indicador",
     "Conjunto de caracteres do símbolo de cenário",
     "Unicidade do identificador em valores",
-    "Cadastro de territórios (spd_data.json)"
+    "Cadastro de territórios"
   ],
   "sections": {
     "Anos em referência temporal": {
@@ -58,7 +58,7 @@
       ],
       "warnings": []
     },
-    "Cadastro de territórios (spd_data.json)": {
+    "Cadastro de territórios": {
       "errors": [],
       "warnings": []
     },

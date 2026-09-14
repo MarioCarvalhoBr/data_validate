@@ -4,6 +4,15 @@ Every regeneration of `tests/e2e/golden/*.json` is recorded here: date, fixture(
 the commit/PR it shipped with. See `.claude/skills/golden-harness/SKILL.md` for the update
 process — regenerate only via `make harness-update`, with the diff reviewed.
 
+## 2026-09-13 (territory-registry section title shortened)
+
+- **All 10 fixtures re-baselined (reviewed, title-only)**: the maintainer asked for the report
+  section title `"Cadastro de territórios (spd_data.json)"` to drop the filename suffix — the
+  catalog key `verification_name_territory_registry` now renders `"Cadastro de territórios"`
+  (`"Territory registry"` in en_US). Diff verified to be exactly that string in
+  `section_order`/`sections` across all 10 goldens (`git diff` shows 10× the old title removed,
+  10× the new title added, nothing else); no counts, messages, or summary fields changed.
+
 ## 2026-09-13 (Phase 6 round N3: PROTO-013/PROTO-018 — territory registry, `spatial_data_validated`)
 
 - **Fixtures re-baselined (reviewed, additive only)**: all eight pre-existing fixtures
