@@ -264,3 +264,10 @@ process — regenerate only via `make harness-update`, with the diff reviewed.
   before storing/comparing, so message *order* is not part of the golden's signal — only message
   *presence/text* is. The underlying `set`-ordering issue in the pipeline is unchanged (out of
   scope here; see backlog for a vectorised-columns fix).
+
+## 2026-09-13 — data_ground_truth_01 fixture updated by the maintainer for v1.16
+The maintainer edited `data/input/data_ground_truth_01/descricao.xlsx`: added the `categoria`
+column (value `climatico`) and removed the trailing period from all nine `desc_simples` values.
+The golden therefore loses the PROTO-004 absence warning and the nine PROTO-005 punctuation
+warnings (12 -> 2 warnings; the two remaining are the staged DESC-015 propagation warnings).
+Reviewed against the fixture content; no rule behaviour changed.

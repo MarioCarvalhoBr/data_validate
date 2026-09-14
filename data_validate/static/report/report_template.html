@@ -16,8 +16,17 @@
         /* START MY CUSTOM STYLES */
         /* ---------------------------------------------------------- */
 
+        /* PAGE (PDF): WeasyPrint honours CSS @page; replicate the legacy
+           pdfkit geometry (page-size Letter, all margins 0.0in) so the PDF
+           fills the sheet exactly like the wkhtmltopdf output did. */
+        @page {
+            size: Letter;
+            margin: 0;
+        }
+
         /* BODY */
         body {
+            margin: 0;
             background-color: #EEEDEA; /* Cor de fundo do corpo */
             color: #000000; /* Cor padrão do texto */
         }
